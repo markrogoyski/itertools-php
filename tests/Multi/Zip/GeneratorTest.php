@@ -7,7 +7,7 @@ namespace IterTools\Tests\Multi\Zip;
 use IterTools\Multi;
 use IterTools\Tests\Fixture;
 
-class IterZipGeneratorTest extends \PHPUnit\Framework\TestCase
+class GeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test         zip with two generators of the same size

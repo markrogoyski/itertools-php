@@ -7,7 +7,7 @@ namespace IterTools\Tests\Multi\Zip;
 use IterTools\Multi;
 use IterTools\Tests\Fixture;
 
-class IterZipTraversableTest extends \PHPUnit\Framework\TestCase
+class TraversableTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test         zip with two traversable objects of the same size

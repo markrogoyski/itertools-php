@@ -7,7 +7,7 @@ namespace IterTools\Tests\Multi\Zip;
 use IterTools\Multi;
 use IterTools\Tests\Fixture;
 
-class IterZipMixedTest extends \PHPUnit\Framework\TestCase
+class MixedTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test         zip with three different iterables of the same size

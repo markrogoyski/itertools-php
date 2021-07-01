@@ -6,7 +6,7 @@ namespace IterTools\Tests\Multi\Zip;
 
 use IterTools\Multi;
 
-class IterZipArrayTest extends \PHPUnit\Framework\TestCase
+class ArrayTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test         zip with two arrays of the same size

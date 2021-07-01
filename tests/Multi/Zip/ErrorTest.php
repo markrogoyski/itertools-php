@@ -6,7 +6,7 @@ namespace IterTools\Tests\Multi\Zip;
 
 use IterTools\Multi;
 
-class IterZipErrorTest extends \PHPUnit\Framework\TestCase
+class ErrorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test         Zipping a non-iterable is a type error
