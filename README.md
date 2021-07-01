@@ -8,18 +8,18 @@ Quick Refernce
 #### Multi Iteration
 | Iterator      | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
-| [`Multi::zip`](#Zip) | Iterate multiple collections simultaneously | `Multi::zip($collection1, $collection2)` |
+| [`zip`](#Zip) | Iterate multiple collections simultaneously | `Multi::zip($collection1, $collection2)` |
 
 #### Single Iteration
 | Iterator      | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
-| [`Single::string`](#String) | Iterate the characters of a string | `Single::string($string)` |
+| [`string`](#String) | Iterate the characters of a string | `Single::string($string)` |
 
 #### Infinite Iteration
 | Iterator      | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
-| [`Infinite::count`](#Count) | Count sequentially forever | `Infinite::count($start, $step)` |
-| [`Infinite::cycle`](#Cycle) | Cycle through a collection | `Infinite::cycle($collection)` |
+| [`count`](#Count) | Count sequentially forever | `Infinite::count($start, $step)` |
+| [`cycle`](#Cycle) | Cycle through a collection | `Infinite::cycle($collection)` |
 
 Setup
 -----
