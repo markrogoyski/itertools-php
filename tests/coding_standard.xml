@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ruleset name="IterToolsPHP">
+ <description>The coding standard for IterTools PHP.</description>
+
+ <config name="php_version" value="70400"/>
+
+ <rule ref="PSR12">
+  <!-- Welcome to the future where we have HD wide-screen monitors -->
+  <exclude name="Generic.Files.LineLength.TooLong"/>
+ </rule>
+
+</ruleset>

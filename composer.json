@@ -1,0 +1,34 @@
+{
+  "name": "markrogoyski/itertools-php",
+  "type": "library",
+  "description": "Iteration tools for PHP",
+  "keywords": ["iteration", "iterator", "generator"],
+  "homepage": "https://github.com/markrogoyski/itertools-php/",
+  "require": {
+    "php": ">=7.4.0"
+  },
+  "autoload": {
+    "psr-4": { "IterTools\\": "src/" }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.5",
+    "php-coveralls/php-coveralls": "^2.0",
+    "squizlabs/php_codesniffer": "3.*",
+    "phpstan/phpstan": "*",
+    "phpmd/phpmd": "^2.6",
+    "phploc/phploc": "*",
+    "php-parallel-lint/php-parallel-lint": "^1.2"
+  },
+  "autoload-dev": {
+    "psr-4": { "IterTools\\Tests\\": "tests/" }
+  },
+  "authors": [
+    {
+      "name": "Mark Rogoyski",
+      "role": "Lead developer",
+      "email": "mark@rogoyski.com",
+      "homepage": "https://github.com/markrogoyski"
+    }
+  ],
+  "license": "MIT"
+}
