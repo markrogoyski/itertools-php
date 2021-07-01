@@ -18,7 +18,8 @@ Quick Refernce
 #### Infinite Iteration
 | Iterator      | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
-| [`Infinite::count`](#String) | Count sequentially forever | `Infinite::count($start, $step)` |
+| [`Infinite::count`](#Count) | Count sequentially forever | `Infinite::count($start, $step)` |
+| [`Infinite::cycle`](#Cycle) | Cycle through a collection | `Infinite::cycle($collection)` |
 
 Setup
 -----
@@ -121,4 +122,35 @@ foreach (Infinite::count($start, $step) as $i) {
     print($i);
 }
 // 1, 2, 3, 4, 5 ...
+```
+
+### Cycle
+Cycle through the elements of a collection sequentially forever.
+
+```Infinite::cycle(iterable $iterable)```
+```php
+use IterTools\Infinite;
+
+$hands = ['rock', 'paper', 'scissors'];
+
+foreach (Infinite::cycle($hands) as $hand) {
+    RockPaperScissors::playHand($hand);
+}
+/// rock, paper, scissors, rock, paper, scissors, ...
+```
+
+## Composition
+IterTools can be combined to create new iterable compositions.
+#### Zip Strings
+```php
+use IterTools\Multi;
+use IterTools\Single;
+
+$letters = 'abc';
+$numbers = '123';
+
+foreach (Multi::zip(Single::string($letters), Single::string($numbers)) as [$letter, $number]) {
+            print("{$letter}{$number}");
+}
+// a1, b2, c3
 ```
