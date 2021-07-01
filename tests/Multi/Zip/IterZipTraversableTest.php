@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Multi;
+namespace IterTools\Tests\Multi\Zip;
 
 use IterTools\Multi;
+use IterTools\Tests\Fixture;
 
 class IterZipTraversableTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,28 +37,28 @@ class IterZipTraversableTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                new IteratorAggregateFixture([]),
-                new IteratorAggregateFixture([]),
+                new Fixture\IteratorAggregateFixture([]),
+                new Fixture\IteratorAggregateFixture([]),
                 [],
             ],
             [
-                new IteratorAggregateFixture([1]),
-                new IteratorAggregateFixture([2]),
+                new Fixture\IteratorAggregateFixture([1]),
+                new Fixture\IteratorAggregateFixture([2]),
                 [[1, 2]],
             ],
             [
-                new IteratorAggregateFixture([1, 2]),
-                new IteratorAggregateFixture([4, 5]),
+                new Fixture\IteratorAggregateFixture([1, 2]),
+                new Fixture\IteratorAggregateFixture([4, 5]),
                 [[1, 4], [2, 5]],
             ],
             [
-                new IteratorAggregateFixture([1, 2, 3]),
-                new IteratorAggregateFixture([4, 5, 6]),
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                new Fixture\IteratorAggregateFixture([4, 5, 6]),
                 [[1, 4], [2, 5], [3, 6]],
             ],
             [
-                new IteratorAggregateFixture([1, 2, 3, 4, 5, 6, 7, 8, 9]),
-                new IteratorAggregateFixture([4, 5, 6, 7, 8, 9, 1, 2, 3]),
+                new Fixture\IteratorAggregateFixture([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                new Fixture\IteratorAggregateFixture([4, 5, 6, 7, 8, 9, 1, 2, 3]),
                 [[1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9], [7, 1], [8, 2], [9, 3]],
             ],
         ];
@@ -90,43 +91,43 @@ class IterZipTraversableTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                new IteratorAggregateFixture([1]),
-                new IteratorAggregateFixture([]),
+                new Fixture\IteratorAggregateFixture([1]),
+                new Fixture\IteratorAggregateFixture([]),
                 [],
             ],
             [
-                new IteratorAggregateFixture([]),
-                new IteratorAggregateFixture([2]),
+                new Fixture\IteratorAggregateFixture([]),
+                new Fixture\IteratorAggregateFixture([2]),
                 [],
             ],
             [
-                new IteratorAggregateFixture([1, 2]),
-                new IteratorAggregateFixture([4]),
+                new Fixture\IteratorAggregateFixture([1, 2]),
+                new Fixture\IteratorAggregateFixture([4]),
                 [[1, 4]],
             ],
             [
-                new IteratorAggregateFixture([1]),
-                new IteratorAggregateFixture([4, 5]),
+                new Fixture\IteratorAggregateFixture([1]),
+                new Fixture\IteratorAggregateFixture([4, 5]),
                 [[1, 4]],
             ],
             [
-                new IteratorAggregateFixture([1, 2, 3]),
-                new IteratorAggregateFixture([4, 5]),
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                new Fixture\IteratorAggregateFixture([4, 5]),
                 [[1, 4], [2, 5]],
             ],
             [
-                new IteratorAggregateFixture([1, 2]),
-                new IteratorAggregateFixture([4, 5, 6]),
+                new Fixture\IteratorAggregateFixture([1, 2]),
+                new Fixture\IteratorAggregateFixture([4, 5, 6]),
                 [[1, 4], [2, 5]],
             ],
             [
-                new IteratorAggregateFixture([1, 2, 3]),
-                new IteratorAggregateFixture([4]),
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                new Fixture\IteratorAggregateFixture([4]),
                 [[1, 4]],
             ],
             [
-                new IteratorAggregateFixture([1]),
-                new IteratorAggregateFixture([4, 5, 6]),
+                new Fixture\IteratorAggregateFixture([1]),
+                new Fixture\IteratorAggregateFixture([4, 5, 6]),
                 [[1, 4]],
             ],
         ];

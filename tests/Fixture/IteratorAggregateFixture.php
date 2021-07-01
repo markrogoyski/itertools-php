@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Multi;
+namespace IterTools\Tests\Fixture;
 
 class IteratorAggregateFixture implements \IteratorAggregate
 {

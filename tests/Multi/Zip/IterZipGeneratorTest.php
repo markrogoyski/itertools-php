@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Multi;
+namespace IterTools\Tests\Multi\Zip;
 
 use IterTools\Multi;
+use IterTools\Tests\Fixture;
 
 class IterZipGeneratorTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,28 +37,28 @@ class IterZipGeneratorTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                GeneratorFixture::getGenerator([]),
-                GeneratorFixture::getGenerator([]),
+                Fixture\GeneratorFixture::getGenerator([]),
+                Fixture\GeneratorFixture::getGenerator([]),
                 [],
             ],
             [
-                GeneratorFixture::getGenerator([1]),
-                GeneratorFixture::getGenerator([2]),
+                Fixture\GeneratorFixture::getGenerator([1]),
+                Fixture\GeneratorFixture::getGenerator([2]),
                 [[1, 2]],
             ],
             [
-                GeneratorFixture::getGenerator([1, 2]),
-                GeneratorFixture::getGenerator([4, 5]),
+                Fixture\GeneratorFixture::getGenerator([1, 2]),
+                Fixture\GeneratorFixture::getGenerator([4, 5]),
                 [[1, 4], [2, 5]],
             ],
             [
-                GeneratorFixture::getGenerator([1, 2, 3]),
-                GeneratorFixture::getGenerator([4, 5, 6]),
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                Fixture\GeneratorFixture::getGenerator([4, 5, 6]),
                 [[1, 4], [2, 5], [3, 6]],
             ],
             [
-                GeneratorFixture::getGenerator([1, 2, 3, 4, 5, 6, 7, 8, 9]),
-                GeneratorFixture::getGenerator([4, 5, 6, 7, 8, 9, 1, 2, 3]),
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                Fixture\GeneratorFixture::getGenerator([4, 5, 6, 7, 8, 9, 1, 2, 3]),
                 [[1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9], [7, 1], [8, 2], [9, 3]],
             ],
         ];
