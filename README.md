@@ -8,7 +8,7 @@ Quick Refernce
 #### Multi Iteration
 | Iterator      | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
-| [`Multi::zip`](#Zip) | Iterate multiple iterable collections simultaneously | `Multi::zip($collection1, $collection2)` |
+| [`Multi::zip`](#Zip) | Iterate multiple collections simultaneously | `Multi::zip($collection1, $collection2)` |
 
 #### Single Iteration
 | Iterator      | Description | Code Snippet |
