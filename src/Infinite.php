@@ -20,4 +20,19 @@ class Infinite
             yield $i;
         }
     }
+
+    /**
+     * Cycle through the elements of a collection sequentially forever
+     *
+     * @param iterable<mixed> $iterable Finite array or traversable object
+     *
+     * @return \InfiniteIterator<mixed>
+     */
+    public static function cycle(iterable $iterable): \InfiniteIterator
+    {
+        if ($iterable instanceof \Generator) {
+            $iterable = iterator_to_array($iterable);
+        }
+        return new \InfiniteIterator(Util::makeIterator($iterable));
+    }
 }
