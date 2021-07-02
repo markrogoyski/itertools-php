@@ -2,13 +2,14 @@
 ### Iteration Tools Library for PHP
 
 
-Quick Refernce
+Quick Reference
 -----------
 
 #### Multi Iteration
 | Iterator      | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
 | [`zip`](#Zip) | Iterate multiple collections simultaneously | `Multi::zip($collection1, $collection2)` |
+| [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously | `Multi::zip($collection1, $collection2)` |
 
 #### Single Iteration
 | Iterator      | Description | Code Snippet |
@@ -91,6 +92,26 @@ foreach (Multi::zip($names, $country, $signatureMove) as [$name, $country, $sign
     $streetFighter = new StreetFighter($name, $country, $signatureMove);
 }
 ```
+Note: For uneven lengths, iteration stops when the shortest iterable is exhausted.
+
+### ZipLongest
+Iterate multiple iterable collections simultaneously.
+
+```Multi::zipLongest(iterable ...$iterables)```
+
+For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
+
+```php
+use IterTools\Multi;
+
+$letters = ['A', 'B', 'C'];
+$numbers   = [1, 2];
+
+foreach (Multi::zipLongest($letters, $numbers) as [$letter, $number]) {
+    // ['A', 1], ['B', 2], ['C', null]
+}
+```
+
 
 ## Single Iteration
 ### String
