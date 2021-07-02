@@ -21,7 +21,7 @@ Quick Refernce
 | ----------- | ----------- | ----------- |
 | [`count`](#Count) | Count sequentially forever | `Infinite::count($start, $step)` |
 | [`cycle`](#Cycle) | Cycle through a collection | `Infinite::cycle($collection)` |
-| [`repeat`](#Repeat-(Infinite)) | Repeat an item forever | `Infinite::repeat($item)` |
+| [`repeat`](#Repeat-\(Infinite\)) | Repeat an item forever | `Infinite::repeat($item)` |
 
 Setup
 -----
