@@ -99,7 +99,7 @@ Iterate multiple iterable collections simultaneously.
 
 ```Multi::zipLongest(iterable ...$iterables)```
 
-For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
+For uneven lengths, the exhausted iterables will produce `null` for the remaining iterations.
 
 ```php
 use IterTools\Multi;
