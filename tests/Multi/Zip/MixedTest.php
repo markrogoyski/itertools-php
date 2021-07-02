@@ -17,7 +17,7 @@ class MixedTest extends \PHPUnit\Framework\TestCase
      * @param        \Traversable $traversable
      * @param        array        $expected
      */
-    public function testZipThreeIterablesSameSize(array $array, \Iterator $iter, \Traversable $traversable, array $expected)
+    public function testZipThreeIterablesSameSize(array $array, \Iterator $iter, \Traversable $traversable, array $expected): void
     {
         // Given
         $result = [];
@@ -78,7 +78,7 @@ class MixedTest extends \PHPUnit\Framework\TestCase
      * @param        \Traversable $traversable
      * @param        array        $expected
      */
-    public function testZipThreeIterablesDifferentSize(array $array, \Iterator $iter, \Traversable $traversable, array $expected)
+    public function testZipThreeIterablesDifferentSize(array $array, \Iterator $iter, \Traversable $traversable, array $expected): void
     {
         // Given
         $result = [];

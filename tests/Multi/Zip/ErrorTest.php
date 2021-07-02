@@ -13,7 +13,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider dataProviderForNonIterables
      * @param        mixed $nonIterable
      */
-    public function testNonIterableTypeError($nonIterable)
+    public function testNonIterableTypeError($nonIterable): void
     {
         // Then
         $this->expectException(\TypeError::class);
@@ -39,7 +39,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
     /**
      * @test Nothing to iterate does nothing
      */
-    public function testNothingToIterate()
+    public function testNothingToIterate(): void
     {
         // Given
         $nothing = [];

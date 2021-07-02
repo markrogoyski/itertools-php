@@ -12,7 +12,7 @@ class MakeIteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @test makeIterator array to iterator
      */
-    public function testMakeArrayAnIterator()
+    public function testMakeArrayAnIterator(): void
     {
         // Given
         $array = [1, 2, 3, 4, 5];
@@ -28,7 +28,7 @@ class MakeIteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @test makeIterator iterator to iterator
      */
-    public function testMakeIteratorAnIterator()
+    public function testMakeIteratorAnIterator(): void
     {
         // Given
         $arrayIterator = new Fixture\ArrayIteratorFixture([1, 2, 3, 4, 5]);
@@ -44,7 +44,7 @@ class MakeIteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @test makeIterator traversable to iterator
      */
-    public function testMakeTraversableAnIterator()
+    public function testMakeTraversableAnIterator(): void
     {
         // Given
         $iteratorAggregate = new Fixture\IteratorAggregateFixture([1, 2, 3, 4, 5]);
@@ -60,7 +60,7 @@ class MakeIteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @test makeIterator generator to iterator
      */
-    public function testMakeGeneratorAnIterator()
+    public function testMakeGeneratorAnIterator(): void
     {
         // Given
         $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4, 5]);

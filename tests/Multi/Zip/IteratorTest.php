@@ -16,7 +16,7 @@ class IteratorTest extends \PHPUnit\Framework\TestCase
      * @param        \Iterator $iter2
      * @param        array     $expected
      */
-    public function testZipTwoIteratorSameSize(\Iterator $iter1, \Iterator $iter2, array $expected)
+    public function testZipTwoIteratorSameSize(\Iterator $iter1, \Iterator $iter2, array $expected): void
     {
         // Given
         $result = [];
@@ -71,7 +71,7 @@ class IteratorTest extends \PHPUnit\Framework\TestCase
      * @param        \Iterator $iter2
      * @param        array     $expected
      */
-    public function testZipTwoIteatorsDifferentSize(\Iterator $iter1, \Iterator $iter2, array $expected)
+    public function testZipTwoIteatorsDifferentSize(\Iterator $iter1, \Iterator $iter2, array $expected): void
     {
         // Given
         $result = [];

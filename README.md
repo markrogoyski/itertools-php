@@ -14,6 +14,7 @@ Quick Refernce
 | Iterator      | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
 | [`string`](#String) | Iterate the characters of a string | `Single::string($string)` |
+| [`repeat`](#Repeat) | Repeat an item | `Single::repeat($item, $repetitions)` |
 
 #### Infinite Iteration
 | Iterator      | Description | Code Snippet |
@@ -106,6 +107,22 @@ foreach (Single::string($string) as $character) {
     $listOfCharacters[] = $character;
 }
 // ['I', 't', 'e', 'r', 'T', 'o', 'o', 'l', 's']
+```
+
+### Repeat
+Repeat an item.
+
+```Single::repeat(mixed $item, int $repetitions)```
+```php
+use IterTools\Single;
+
+$item        = 'IterTools';
+$repetitions = 3;
+
+foreach (Infinite::repeat($item) as $repeated) {
+    print($repeated);
+}
+// 'IterTools', 'IterTools', 'IterTools'
 ```
 
 ## Infinite Iteration

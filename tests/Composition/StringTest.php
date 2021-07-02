@@ -12,7 +12,7 @@ class StringTest extends \PHPUnit\Framework\TestCase
     /**
      * @test zip strings
      */
-    public function testZipStrings()
+    public function testZipStrings(): void
     {
         // Given
         $letters = 'abc';

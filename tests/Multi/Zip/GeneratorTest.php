@@ -16,7 +16,7 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
      * @param        \Generator $generator2
      * @param        array      $expected
      */
-    public function testZipTwoGeneratorsSameSize(\Generator $generator1, \Generator $generator2, array $expected)
+    public function testZipTwoGeneratorsSameSize(\Generator $generator1, \Generator $generator2, array $expected): void
     {
         // Given
         $result = [];

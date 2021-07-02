@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Infinite;
+namespace IterTools\Tests\Single;
 
-use IterTools\Infinite;
+use IterTools\Single;
 
 class RepeatTest extends \PHPUnit\Framework\TestCase
 {
+    private const REPETITIONS = 5;
+
     /**
      * @test         repeat integer
      * @dataProvider dataProviderForInteger
@@ -19,16 +21,9 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         // Given
         $result = [];
 
-        // And
-        $count = 0;
-
         // When
-        foreach (Infinite::repeat($integer) as $item) {
+        foreach (Single::repeat($integer, self::REPETITIONS) as $item) {
             $result[] = $item;
-            $count++;
-            if ($count === 5) {
-                break;
-            }
         }
 
         // Then
@@ -56,16 +51,9 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         // Given
         $result = [];
 
-        // And
-        $count = 0;
-
         // When
-        foreach (Infinite::repeat($float) as $item) {
+        foreach (Single::repeat($float, self::REPETITIONS) as $item) {
             $result[] = $item;
-            $count++;
-            if ($count === 5) {
-                break;
-            }
         }
 
         // Then
@@ -91,17 +79,9 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $result = [];
-
-        // And
-        $count = 0;
-
         // When
-        foreach (Infinite::repeat(\NAN) as $item) {
+        foreach (Single::repeat(\NAN, self::REPETITIONS) as $item) {
             $result[] = $item;
-            $count++;
-            if ($count === 5) {
-                break;
-            }
         }
 
         // Then
@@ -119,16 +99,9 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         // Given
         $result = [];
 
-        // And
-        $count = 0;
-
         // When
-        foreach (Infinite::repeat(null) as $item) {
+        foreach (Single::repeat(null, self::REPETITIONS) as $item) {
             $result[] = $item;
-            $count++;
-            if ($count === 5) {
-                break;
-            }
         }
 
         // Then
@@ -149,16 +122,9 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         // Given
         $result = [];
 
-        // And
-        $count = 0;
-
         // When
-        foreach (Infinite::repeat($boolean) as $item) {
+        foreach (Single::repeat($boolean, self::REPETITIONS) as $item) {
             $result[] = $item;
-            $count++;
-            if ($count === 5) {
-                break;
-            }
         }
 
         // Then
@@ -184,16 +150,9 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         // Given
         $result = [];
 
-        // And
-        $count = 0;
-
         // When
-        foreach (Infinite::repeat($string) as $item) {
+        foreach (Single::repeat($string, self::REPETITIONS) as $item) {
             $result[] = $item;
-            $count++;
-            if ($count === 5) {
-                break;
-            }
         }
 
         // Then
@@ -224,12 +183,8 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         $count = 0;
 
         // When
-        foreach (Infinite::repeat($array) as $item) {
+        foreach (Single::repeat($array, self::REPETITIONS) as $item) {
             $result[] = $item;
-            $count++;
-            if ($count === 5) {
-                break;
-            }
         }
 
         // Then
@@ -246,16 +201,9 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         $result   = [];
         $expected = [[], [], [], [], []];
 
-        // And
-        $count = 0;
-
         // When
-        foreach (Infinite::repeat($array) as $item) {
+        foreach (Single::repeat($array, self::REPETITIONS) as $item) {
             $result[] = $item;
-            $count++;
-            if ($count === 5) {
-                break;
-            }
         }
 
         // Then
@@ -281,19 +229,66 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         $result   = [];
         $expected = [$object, $object, $object, $object, $object];
 
-        // And
-        $count = 0;
-
         // When
-        foreach (Infinite::repeat($object) as $item) {
+        foreach (Single::repeat($object, self::REPETITIONS) as $item) {
             $result[] = $item;
-            $count++;
-            if ($count === 5) {
-                break;
-            }
         }
 
         // Then
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @test         repetitions
+     * @dataProvider dataProviderForRepetitions
+     * @param        int   $item
+     * @param        int   $repetitions
+     * @param        array $expected
+     */
+    public function testRepetitions(int $item, int $repetitions, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Single::repeat($item, $repetitions) as $repetition) {
+            $result[] = $repetition;
+        }
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
+
+    public function dataProviderForRepetitions(): array
+    {
+        return [
+            [0, 0, []],
+            [1, 1, [1]],
+            [2, 2, [2, 2]],
+            [3, 3, [3, 3, 3]],
+            [4, 4, [4, 4, 4, 4]],
+            [10, 10, [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]],
+        ];
+    }
+
+    /**
+     * @test negative number of repeetitions is an error
+     */
+    public function testRepetitionsErrorNegativeNumber(): void
+    {
+        // Given
+        $item = 1;
+        $repetitions = -1;
+
+        // Then
+        $this->expectException(\LogicException::class);
+
+        // When
+        foreach (Single::repeat($item, $repetitions) as $_) {
+            break;
+        }
+
+        // Then
+        $this->fail('Expected an expcetion to be thrown.');
     }
 }

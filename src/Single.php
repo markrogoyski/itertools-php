@@ -20,4 +20,22 @@ class Single
             yield $character;
         }
     }
+
+    /**
+     * Repeat an item
+     *
+     * @param mixed $item
+     * @param int   $repetitions
+     *
+     * @return \Generator<mixed>
+     */
+    public static function repeat($item, int $repetitions): \Generator
+    {
+        if ($repetitions < 0) {
+            throw new \LogicException("Number of repetitions cannot be negative: {$repetitions}");
+        }
+        for ($i = $repetitions; $i > 0; $i--) {
+            yield $item;
+        }
+    }
 }

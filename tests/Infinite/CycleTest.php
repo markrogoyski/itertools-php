@@ -12,7 +12,7 @@ class CycleTest extends \PHPUnit\Framework\TestCase
     /**
      * @test cycle array
      */
-    public function testCycleArray()
+    public function testCycleArray(): void
     {
         // Given
         $array    = [1, 2, 3, 4, 5];
@@ -38,7 +38,7 @@ class CycleTest extends \PHPUnit\Framework\TestCase
     /**
      * @test cycle empty array
      */
-    public function testCycleEmptyArray()
+    public function testCycleEmptyArray(): void
     {
         // Given
         $array    = [];
@@ -57,7 +57,7 @@ class CycleTest extends \PHPUnit\Framework\TestCase
     /**
      * @test cycle generator
      */
-    public function testCycleGenerator()
+    public function testCycleGenerator(): void
     {
         $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4, 5]);
         $result    = [];
@@ -82,7 +82,7 @@ class CycleTest extends \PHPUnit\Framework\TestCase
     /**
      * @test cycle generator
      */
-    public function testCycleEmptyGenerator()
+    public function testCycleEmptyGenerator(): void
     {
         $generator = Fixture\GeneratorFixture::getGenerator([]);
         $result    = [];
@@ -100,7 +100,7 @@ class CycleTest extends \PHPUnit\Framework\TestCase
     /**
      * @test cycle iterator
      */
-    public function testCycleIterator()
+    public function testCycleIterator(): void
     {
         $iterator  = new Fixture\ArrayIteratorFixture([1, 2, 3, 4, 5]);
         $result    = [];
@@ -125,7 +125,7 @@ class CycleTest extends \PHPUnit\Framework\TestCase
     /**
      * @test cycle empty iterator
      */
-    public function testCycleEmptyIterator()
+    public function testCycleEmptyIterator(): void
     {
         $iterator  = new Fixture\ArrayIteratorFixture([]);
         $result    = [];
@@ -143,7 +143,7 @@ class CycleTest extends \PHPUnit\Framework\TestCase
     /**
      * @test cycle traversable
      */
-    public function testCycleTraversable()
+    public function testCycleTraversable(): void
     {
         $traversable = new Fixture\IteratorAggregateFixture([1, 2, 3, 4, 5]);
         $result      = [];
@@ -168,7 +168,7 @@ class CycleTest extends \PHPUnit\Framework\TestCase
     /**
      * @test cycle empty traversable
      */
-    public function testCycleEmptyTraversable()
+    public function testCycleEmptyTraversable(): void
     {
         $traversable = new Fixture\IteratorAggregateFixture([]);
         $result      = [];

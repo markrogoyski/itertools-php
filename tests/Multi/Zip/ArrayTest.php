@@ -15,7 +15,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
      * @param        array $array2
      * @param        array $expected
      */
-    public function testZipTwoArraysSameSize(array $array1, array $array2, array $expected)
+    public function testZipTwoArraysSameSize(array $array1, array $array2, array $expected): void
     {
         // Given
         $result = [];
@@ -70,7 +70,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
      * @param        array $array2
      * @param        array $expected
      */
-    public function testZipTwoArraysDifferentSize(array $array1, array $array2, array $expected)
+    public function testZipTwoArraysDifferentSize(array $array1, array $array2, array $expected): void
     {
         // Given
         $result = [];
@@ -140,7 +140,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
      * @param        array $array3
      * @param        array $expected
      */
-    public function testZipThreeArraysSameSize(array $array1, array $array2, array $array3, array $expected)
+    public function testZipThreeArraysSameSize(array $array1, array $array2, array $array3, array $expected): void
     {
         // Given
         $result = [];
@@ -162,7 +162,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
      * @param        array $array3
      * @param        array $expected
      */
-    public function testZipThreeArraysSameSizeUsingUnpacking(array $array1, array $array2, array $array3, array $expected)
+    public function testZipThreeArraysSameSizeUsingUnpacking(array $array1, array $array2, array $array3, array $expected): void
     {
         // Given
         $result = [];
@@ -223,7 +223,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
      * @param        array $array3
      * @param        array $expected
      */
-    public function testZipThreeArraysDifferentSize(array $array1, array $array2, array $array3, array $expected)
+    public function testZipThreeArraysDifferentSize(array $array1, array $array2, array $array3, array $expected): void
     {
         // Given
         $result = [];

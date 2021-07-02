@@ -13,7 +13,7 @@ class StringTest extends \PHPUnit\Framework\TestCase
      * @param        string $string
      * @param        array  $expected
      */
-    public function testStringAscii(string $string, array $expected)
+    public function testStringAscii(string $string, array $expected): void
     {
         // Given
         $result = [];
@@ -44,7 +44,7 @@ class StringTest extends \PHPUnit\Framework\TestCase
      * @param        string $string
      * @param        array  $expected
      */
-    public function testStringMultiByte(string $string, array $expected)
+    public function testStringMultiByte(string $string, array $expected): void
     {
         // Given
         $result = [];

@@ -16,7 +16,7 @@ class TraversableTest extends \PHPUnit\Framework\TestCase
      * @param        \Traversable $iter2
      * @param        array     $expected
      */
-    public function testZipTwoIteratorSameSize(\Traversable $iter1, \Traversable $iter2, array $expected)
+    public function testZipTwoIteratorSameSize(\Traversable $iter1, \Traversable $iter2, array $expected): void
     {
         // Given
         $result = [];
@@ -71,7 +71,7 @@ class TraversableTest extends \PHPUnit\Framework\TestCase
      * @param        \Traversable $iter2
      * @param        array     $expected
      */
-    public function testZipTwoTraversableDifferentSize(\Traversable $iter1, \Traversable $iter2, array $expected)
+    public function testZipTwoTraversableDifferentSize(\Traversable $iter1, \Traversable $iter2, array $expected): void
     {
         // Given
         $result = [];

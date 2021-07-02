@@ -11,7 +11,7 @@ class CountTest extends \PHPUnit\Framework\TestCase
     /**
      * @test count defaults
      */
-    public function testCountDefaults()
+    public function testCountDefaults(): void
     {
         // Given
         $result = [];
@@ -35,7 +35,7 @@ class CountTest extends \PHPUnit\Framework\TestCase
      * @param         int   $start
      * @param         array $expected
      */
-    public function testCountDefaultStep(int $start, array $expected)
+    public function testCountDefaultStep(int $start, array $expected): void
     {
         // Given
         $result = [];
@@ -73,7 +73,7 @@ class CountTest extends \PHPUnit\Framework\TestCase
      * @param         int   $step
      * @param         array $expected
      */
-    public function testCountCustomStep(int $start, int $step, array $expected)
+    public function testCountCustomStep(int $start, int $step, array $expected): void
     {
         // Given
         $result = [];
@@ -105,7 +105,7 @@ class CountTest extends \PHPUnit\Framework\TestCase
     /**
      * @test count for a long time
      */
-    public function testCountForLongTime()
+    public function testCountForLongTime(): void
     {
         // Given
         $result = [];
