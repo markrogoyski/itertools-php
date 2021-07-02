@@ -20,6 +20,7 @@ Quick Refernce
 | ----------- | ----------- | ----------- |
 | [`count`](#Count) | Count sequentially forever | `Infinite::count($start, $step)` |
 | [`cycle`](#Cycle) | Cycle through a collection | `Infinite::cycle($collection)` |
+| [`repeat`](#Repeat (Infinite)) | Repeat an item forever | `Infinite::repeat($item)` |
 
 Setup
 -----
@@ -136,7 +137,22 @@ $hands = ['rock', 'paper', 'scissors'];
 foreach (Infinite::cycle($hands) as $hand) {
     RockPaperScissors::playHand($hand);
 }
-/// rock, paper, scissors, rock, paper, scissors, ...
+// rock, paper, scissors, rock, paper, scissors, ...
+```
+
+### Repeat (Infinite)
+Repeat an item forever.
+
+```Infinite::repeat(mixed $item)```
+```php
+use IterTools\Infinite;
+
+$item = 'IterTools';
+
+foreach (Infinite::repeat($item) as $repeated) {
+    print($repeated);
+}
+// 'IterTools', 'IterTools', 'IterTools', ...
 ```
 
 ## Composition

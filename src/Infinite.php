@@ -31,8 +31,22 @@ class Infinite
     public static function cycle(iterable $iterable): \InfiniteIterator
     {
         if ($iterable instanceof \Generator) {
-            $iterable = iterator_to_array($iterable);
+            $iterable = \iterator_to_array($iterable);
         }
         return new \InfiniteIterator(Util::makeIterator($iterable));
+    }
+
+    /**
+     * Repeat an item forever
+     *
+     * @param mixed $item
+     *
+     * @return \Generator<mixed>
+     */
+    public static function repeat($item): \Generator
+    {
+        while (true) {
+            yield $item;
+        }
     }
 }
