@@ -9,7 +9,7 @@ Quick Reference
 | Iterator      | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
 | [`zip`](#Zip) | Iterate multiple collections simultaneously | `Multi::zip($collection1, $collection2)` |
-| [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously | `Multi::zip($collection1, $collection2)` |
+| [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously | `Multi::zipLongest($collection1, $collection2)` |
 
 #### Single Iteration
 | Iterator      | Description | Code Snippet |
