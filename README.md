@@ -30,6 +30,7 @@ Quick Reference
 #### Math Iteration
 | Iterator | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
+| [`runningDifference`](#Running-Difference) | Running difference accumulation | `Math::runningDifference($numbers, $initialValue` |
 | [`runningProduct`](#Running-Product) | Running product accumulation | `Math::runningProduct($numbers, $initialValue` |
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue` |
 
@@ -217,33 +218,32 @@ foreach (Infinite::repeat($item) as $repeated) {
 // 'IterTools', 'IterTools', 'IterTools', ...
 ```
 ## Math Iteration
+### Running Difference
+Accumulate the running difference over a list of numbers.
 
-### Running Total
-Accumulate the running total over a list of numbers.
-
-```Math::runningTotal(iterable $numbers, int|float $initialValue = null)```
+```Math::runningDifference(iterable $numbers, int|float $initialValue = null)```
 ```php
 use IterTools\Math;
 
-$prices = [1, 2, 3, 4, 5];
+$credits = [1, 2, 3, 4, 5];
 
-foreach (Math::runningTotal($numbers) as $runningTotal) {
-    print($runningTotal);
+foreach (Math::runningDifference($credits) as $runningDifference) {
+    print($runningDifference);
 }
-// 1, 3, 6, 10, 15
+// -1, -3, -6, -10, -15
 ```
 
-Provide an optional initial value to lead off the running total.
+Provide an optional initial value to lead off the running difference.
 ```php
 use IterTools\Math;
 
-$prices       = [1, 2, 3, 4, 5];
-$initialValue = 5;
+$dartsScores   = [50, 50, 25, 50];
+$startingScore = 501;
 
-foreach (Math::runningTotal($numbers, $initialValue) as $runningTotal) {
-    print($runningTotal);
+foreach (Math::runningDifference($numbers, $startingScore) as $runningScore) {
+    print($runningScore);
 }
-// 5, 6, 8, 11, 15, 20
+// 501, 451, 401, 376, 326
 ```
 
 ### Running Product
@@ -272,6 +272,34 @@ foreach (Math::runningProduct($numbers, $initialValue) as $runningProduct) {
     print($runningProduct);
 }
 // 5, 5, 10, 30, 120, 600
+```
+
+### Running Total
+Accumulate the running total over a list of numbers.
+
+```Math::runningTotal(iterable $numbers, int|float $initialValue = null)```
+```php
+use IterTools\Math;
+
+$prices = [1, 2, 3, 4, 5];
+
+foreach (Math::runningTotal($numbers) as $runningTotal) {
+    print($runningTotal);
+}
+// 1, 3, 6, 10, 15
+```
+
+Provide an optional initial value to lead off the running total.
+```php
+use IterTools\Math;
+
+$prices       = [1, 2, 3, 4, 5];
+$initialValue = 5;
+
+foreach (Math::runningTotal($numbers, $initialValue) as $runningTotal) {
+    print($runningTotal);
+}
+// 5, 6, 8, 11, 15, 20
 ```
 
 ## Composition

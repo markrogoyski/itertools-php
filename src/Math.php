@@ -47,4 +47,25 @@ class Math
             yield $product;
         }
     }
+
+    /**
+     * Accumulate the running difference over a list of numbers
+     *
+     * @param iterable<int|float> $numbers
+     * @param int|float           $initialValue (Optional) If provided, the running difference leads off with the initial value.
+     *
+     * @return \Generator<int|float>
+     */
+    public static function runningDifference(iterable $numbers, $initialValue = null): \Generator
+    {
+        if ($initialValue !== null) {
+            yield $initialValue;
+        }
+
+        $difference = $initialValue ?? 0;
+        foreach ($numbers as $number) {
+            $difference -= $number;
+            yield $difference;
+        }
+    }
 }
