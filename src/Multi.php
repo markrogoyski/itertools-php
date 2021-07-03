@@ -51,4 +51,22 @@ class Multi
 
         return $zippedIterator;
     }
+
+    /**
+     * Chain multiple iterables together into a single iteration.
+     *
+     * Makes a single continuous sequence out of multiple sequences.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    public static function chain(iterable ...$iterables): \Generator
+    {
+        foreach ($iterables as $iterable) {
+            foreach ($iterable as $item) {
+                yield ($item);
+            }
+        }
+    }
 }

@@ -1,24 +1,25 @@
 # IterTools PHP
-### Iteration Tools Library for PHP
 
+A PHP library of iteration tools to power up your loops.
 
 Quick Reference
 -----------
 
 #### Multi Iteration
-| Iterator      | Description | Code Snippet |
+| Iterator | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
+| [`chain`](#Chain) | Chain multiple iterables together | `Multi::chain($collection1, $collection2)` |
 | [`zip`](#Zip) | Iterate multiple collections simultaneously | `Multi::zip($collection1, $collection2)` |
 | [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously | `Multi::zipLongest($collection1, $collection2)` |
 
 #### Single Iteration
-| Iterator      | Description | Code Snippet |
+| Iterator | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
 | [`string`](#String) | Iterate the characters of a string | `Single::string($string)` |
 | [`repeat`](#Repeat) | Repeat an item | `Single::repeat($item, $repetitions)` |
 
 #### Infinite Iteration
-| Iterator      | Description | Code Snippet |
+| Iterator | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
 | [`count`](#Count) | Count sequentially forever | `Infinite::count($start, $step)` |
 | [`cycle`](#Cycle) | Cycle through a collection | `Infinite::cycle($collection)` |
@@ -64,6 +65,21 @@ $ php composer.phar require markrogoyski/itertools-php:0.*
 Usage
 -----
 ## Multi Iteration
+### Chain
+Chain multiple iterables together into a single continuous sequence.
+
+```Multi::chain(iterable ...$iterables)```
+```php
+use IterTools\Multi;
+
+$prequels  = ['Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith'];
+$originals = ['A New Hope', 'Empire Strikes Back', 'Return of the Jedi'];
+
+foreach (Multi::chain($prequels, $originals) as $movie) {
+    print($movie);
+}
+// 'Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith', 'A New Hope', 'Empire Strikes Back', 'Return of the Jedi'
+```
 
 ### Zip
 Iterate multiple iterable collections simultaneously.
@@ -84,11 +100,11 @@ foreach (Multi::zip($languages, $mascots) as [$language, $mascot]) {
 
 Zip works with multiple iterable inputs--not limited to just two.
 ```php
-$names         = ['Ryu', 'Ken', 'Chun Li', 'Guile'];
-$country       = ['Japan', 'USA', 'China', 'USA'];
-$signatureMove = ['hadouken', 'shoryuken', 'spinning bird kick', 'sonic boom'];
+$names          = ['Ryu', 'Ken', 'Chun Li', 'Guile'];
+$countries      = ['Japan', 'USA', 'China', 'USA'];
+$signatureMoves = ['hadouken', 'shoryuken', 'spinning bird kick', 'sonic boom'];
 
-foreach (Multi::zip($names, $country, $signatureMove) as [$name, $country, $signatureMove]) {
+foreach (Multi::zip($names, $countries, $signatureMoves) as [$name, $country, $signatureMove]) {
     $streetFighter = new StreetFighter($name, $country, $signatureMove);
 }
 ```
@@ -105,7 +121,7 @@ For uneven lengths, the exhausted iterables will produce `null` for the remainin
 use IterTools\Multi;
 
 $letters = ['A', 'B', 'C'];
-$numbers   = [1, 2];
+$numbers = [1, 2];
 
 foreach (Multi::zipLongest($letters, $numbers) as [$letter, $number]) {
     // ['A', 1], ['B', 2], ['C', null]
@@ -204,7 +220,21 @@ $letters = 'abc';
 $numbers = '123';
 
 foreach (Multi::zip(Single::string($letters), Single::string($numbers)) as [$letter, $number]) {
-            print("{$letter}{$number}");
+     print("{$letter}{$number}");
 }
 // a1, b2, c3
+```
+
+#### Chain Strings
+```php
+use IterTools\Multi;
+use IterTools\Single;
+
+$letters = 'abc';
+$numbers = '123';
+
+foreach (Multi::chain(Single::string($letters), Single::string($numbers)) as $character) {
+    print($character);
+}
+// a, b, c, 1, 2, 3
 ```
