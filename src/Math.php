@@ -26,4 +26,25 @@ class Math
             yield $total;
         }
     }
+
+    /**
+     * Accumulate the running product over a list of numbers
+     *
+     * @param iterable<int|float> $numbers
+     * @param int|float           $initialValue (Optional) If provided, the running product leads off with the initial value.
+     *
+     * @return \Generator<int|float>
+     */
+    public static function runningProduct(iterable $numbers, $initialValue = null): \Generator
+    {
+        if ($initialValue !== null) {
+            yield $initialValue;
+        }
+
+        $product = $initialValue ?? 1;
+        foreach ($numbers as $number) {
+            $product *= $number;
+            yield $product;
+        }
+    }
 }

@@ -2,6 +2,8 @@
 
 A PHP library of iteration tools to power up your loops.
 
+Inspired by Python—designed for PHP.
+
 Quick Reference
 -----------
 
@@ -28,6 +30,7 @@ Quick Reference
 #### Math Iteration
 | Iterator | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
+| [`runningProduct`](#Running-Product) | Running product accumulation | `Math::runningProduct($numbers, $initialValue` |
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue` |
 
 Setup
@@ -222,7 +225,7 @@ Accumulate the running total over a list of numbers.
 ```php
 use IterTools\Math;
 
-$numbers = [1, 2, 3, 4, 5];
+$prices = [1, 2, 3, 4, 5];
 
 foreach (Math::runningTotal($numbers) as $runningTotal) {
     print($runningTotal);
@@ -234,13 +237,41 @@ Provide an optional initial value to lead off the running total.
 ```php
 use IterTools\Math;
 
-$numbers      = [1, 2, 3, 4, 5];
+$prices       = [1, 2, 3, 4, 5];
 $initialValue = 5;
 
 foreach (Math::runningTotal($numbers, $initialValue) as $runningTotal) {
     print($runningTotal);
 }
 // 5, 6, 8, 11, 15, 20
+```
+
+### Running Product
+Accumulate the running product over a list of numbers.
+
+```Math::runningProduct(iterable $numbers, int|float $initialValue = null)```
+```php
+use IterTools\Math;
+
+$numbers = [1, 2, 3, 4, 5];
+
+foreach (Math::runningProduct($numbers) as $runningProduct) {
+    print($runningProduct);
+}
+// 1, 2, 6, 24, 120
+```
+
+Provide an optional initial value to lead off the running product.
+```php
+use IterTools\Math;
+
+$numbers      = [1, 2, 3, 4, 5];
+$initialValue = 5;
+
+foreach (Math::runningProduct($numbers, $initialValue) as $runningProduct) {
+    print($runningProduct);
+}
+// 5, 5, 10, 30, 120, 600
 ```
 
 ## Composition
