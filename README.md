@@ -25,6 +25,11 @@ Quick Reference
 | [`cycle`](#Cycle) | Cycle through a collection | `Infinite::cycle($collection)` |
 | [`repeat`](#Repeat-Infinite) | Repeat an item forever | `Infinite::repeat($item)` |
 
+#### Math Iteration
+| Iterator | Description | Code Snippet |
+| ----------- | ----------- | ----------- |
+| [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue` |
+
 Setup
 -----
 
@@ -207,6 +212,35 @@ foreach (Infinite::repeat($item) as $repeated) {
     print($repeated);
 }
 // 'IterTools', 'IterTools', 'IterTools', ...
+```
+## Math Iteration
+
+### Running Total
+Accumulate the running total over a list of numbers.
+
+```Math::runningTotal(iterable $numbers, int|float $initialValue = null)```
+```php
+use IterTools\Math;
+
+$numbers = [1, 2, 3, 4, 5];
+
+foreach (Math::runningTotal($numbers) as $runningTotal) {
+    print($runningTotal);
+}
+// 1, 3, 6, 10, 15
+```
+
+Provide an optional initial value to lead off the running total.
+```php
+use IterTools\Math;
+
+$numbers      = [1, 2, 3, 4, 5];
+$initialValue = 5;
+
+foreach (Math::runningTotal($numbers, $initialValue) as $runningTotal) {
+    print($runningTotal);
+}
+// 5, 6, 8, 11, 15, 20
 ```
 
 ## Composition
