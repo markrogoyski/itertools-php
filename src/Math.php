@@ -68,4 +68,46 @@ class Math
             yield $difference;
         }
     }
+
+    /**
+     * Accumulate the running max over a list of numbers
+     *
+     * @param iterable<int|float> $numbers
+     * @param int|float           $initialValue (Optional) If provided, the running max leads off with the initial value.
+     *
+     * @return \Generator<int|float>
+     */
+    public static function runningMax(iterable $numbers, $initialValue = null): \Generator
+    {
+        if ($initialValue !== null) {
+            yield $initialValue;
+        }
+
+        $max = $initialValue ?? -\INF;
+        foreach ($numbers as $number) {
+            $max = \max($max, $number);
+            yield $max;
+        }
+    }
+
+    /**
+     * Accumulate the running min over a list of numbers
+     *
+     * @param iterable<int|float> $numbers
+     * @param int|float           $initialValue (Optional) If provided, the running min leads off with the initial value.
+     *
+     * @return \Generator<int|float>
+     */
+    public static function runningMin(iterable $numbers, $initialValue = null): \Generator
+    {
+        if ($initialValue !== null) {
+            yield $initialValue;
+        }
+
+        $min = $initialValue ?? \INF;
+        foreach ($numbers as $number) {
+            $min = \min($min, $number);
+            yield $min;
+        }
+    }
 }
