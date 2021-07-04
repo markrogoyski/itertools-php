@@ -38,4 +38,23 @@ class Single
             yield $item;
         }
     }
+
+    /**
+     * Compress an iterable by filtering out data that is not selected.
+     *
+     * Selectors indicates which data. True value selects item. False value filters out data.
+     *
+     * @param iterable<mixed> $data
+     * @param iterable<bool> $selectors
+     *
+     * @return \Generator<mixed>
+     */
+    public static function compress(iterable $data, iterable $selectors): \Generator
+    {
+        foreach (Multi::zip($data, $selectors) as [$datum, $selector]) {
+            if ($selector) {
+                yield $datum;
+            }
+        }
+    }
 }
