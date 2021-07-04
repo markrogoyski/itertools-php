@@ -17,8 +17,9 @@ Quick Reference
 #### Single Iteration
 | Iterator | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
-| [`string`](#String) | Iterate the characters of a string | `Single::string($string)` |
+| [`compress`](#Compress) | Filter out elements not selected | `Single::compress($data, $selectors)` |
 | [`repeat`](#Repeat) | Repeat an item | `Single::repeat($item, $repetitions)` |
+| [`string`](#String) | Iterate the characters of a string | `Single::string($string)` |
 
 #### Infinite Iteration
 | Iterator | Description | Code Snippet |
@@ -30,9 +31,12 @@ Quick Reference
 #### Math Iteration
 | Iterator | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
-| [`runningDifference`](#Running-Difference) | Running difference accumulation | `Math::runningDifference($numbers, $initialValue` |
-| [`runningProduct`](#Running-Product) | Running product accumulation | `Math::runningProduct($numbers, $initialValue` |
-| [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue` |
+| [`runningAverage`](#Running-Averange) | Running average accumulation | `Math::runningAverage($numbers, $initialValue)` |
+| [`runningDifference`](#Running-Difference) | Running difference accumulation | `Math::runningDifference($numbers, $initialValue)` |
+| [`runningMax`](#Running-Max) | Running maximum accumulation | `Math::runningMax($numbers, $initialValue)` |
+| [`runningMin`](#Running-Min) | Running minimum accumulation | `Math::runningMin($numbers, $initialValue)` |
+| [`runningProduct`](#Running-Product) | Running product accumulation | `Math::runningProduct($numbers, $initialValue)` |
+| [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
 
 Setup
 -----
@@ -139,6 +143,43 @@ foreach (Multi::zipLongest($letters, $numbers) as [$letter, $number]) {
 
 
 ## Single Iteration
+### Compress
+Compress an iterable by filtering out data that is not selected.
+
+```Single::compress(string $data, $selectors)```
+```php
+use IterTools\Single;
+
+
+$movies  = [
+    'Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith',
+    'A New Hope', 'Empire Strikes Back', 'Return of the Jedi',
+    'The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker'
+];
+$goodMovies = [0, 0, 0, 1, 1, 1, 1, 0, 0];
+
+foreach (Single::compress($movies, $goodMovies) as $goodMovie) {
+    print($goodMovie);
+}
+// 'A New Hope', 'Empire Strikes Back', 'Return of the Jedi', 'The Force Awakens'
+```
+
+### Repeat
+Repeat an item.
+
+```Single::repeat(mixed $item, int $repetitions)```
+```php
+use IterTools\Single;
+
+$data
+$repetitions = 3;
+
+foreach (Infinite::repeat($item) as $repeated) {
+    print($repeated);
+}
+// 'IterTools', 'IterTools', 'IterTools'
+```
+
 ### String
 Iterate the individual characters of a string.
 
@@ -153,22 +194,6 @@ foreach (Single::string($string) as $character) {
     $listOfCharacters[] = $character;
 }
 // ['I', 't', 'e', 'r', 'T', 'o', 'o', 'l', 's']
-```
-
-### Repeat
-Repeat an item.
-
-```Single::repeat(mixed $item, int $repetitions)```
-```php
-use IterTools\Single;
-
-$item        = 'IterTools';
-$repetitions = 3;
-
-foreach (Infinite::repeat($item) as $repeated) {
-    print($repeated);
-}
-// 'IterTools', 'IterTools', 'IterTools'
 ```
 
 ## Infinite Iteration
@@ -218,6 +243,21 @@ foreach (Infinite::repeat($item) as $repeated) {
 // 'IterTools', 'IterTools', 'IterTools', ...
 ```
 ## Math Iteration
+### Running Average
+Accumulate the running average over a list of numbers.
+
+```Math::runningAverage(iterable $numbers, int|float $initialValue = null)```
+```php
+use IterTools\Math;
+
+$grades = [100, 80, 80, 90, 85];
+
+foreach (Math::runningAverage($grades) as $runningAverage) {
+    print($runningAverage);
+}
+// 100, 90, 86.667, 87.5, 87
+```
+
 ### Running Difference
 Accumulate the running difference over a list of numbers.
 
@@ -232,7 +272,6 @@ foreach (Math::runningDifference($credits) as $runningDifference) {
 }
 // -1, -3, -6, -10, -15
 ```
-
 Provide an optional initial value to lead off the running difference.
 ```php
 use IterTools\Math;
@@ -244,6 +283,36 @@ foreach (Math::runningDifference($numbers, $startingScore) as $runningScore) {
     print($runningScore);
 }
 // 501, 451, 401, 376, 326
+```
+
+### Running Max
+Accumulate the running maximum over a list of numbers.
+
+```Math::runningMax(iterable $numbers, int|float $initialValue = null)```
+```php
+use IterTools\Math;
+
+$numbers = [1, 2, 1, 3, 5];
+
+foreach (Math::runningMax($credits) as $runningMax) {
+    print($runningMax);
+}
+// 1, 2, 2, 3, 5
+```
+
+### Running Min
+Accumulate the running minimum over a list of numbers.
+
+```Math::runningMin(iterable $numbers, int|float $initialValue = null)```
+```php
+use IterTools\Math;
+
+$numbers = [3, 4, 2, 5, 1];
+
+foreach (Math::runningMin($credits) as $runningMin) {
+    print($runningMin);
+}
+// 3, 3, 2, 2, 1
 ```
 
 ### Running Product
