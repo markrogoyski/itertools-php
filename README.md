@@ -111,9 +111,9 @@ $languages = ['PHP', 'Python', 'Java', 'Go'];
 $mascots   = ['elephant', 'snake', 'bean', 'gopher'];
 
 foreach (Multi::zip($languages, $mascots) as [$language, $mascot]) {
-    print("The {$mascot} is the mascot of the {$language} language.");
+    print("The {$language} language mascot is an {$mascot}.");
 }
-// The elephant is the mascot of the PHP language.
+// The PHP language mascot is an elephant.
 // ...
 ```
 
