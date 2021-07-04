@@ -110,4 +110,21 @@ class Math
             yield $min;
         }
     }
+
+    /**
+     * Accumulate the running average (mean) over a list of numbers
+     *
+     * @param iterable<int|float> $numbers
+     * @param int|float           $initialValue (Optional) If provided, the running average leads off with the initial value.
+     *
+     * @return \Generator<int|float>
+     */
+    public static function runningAverage(iterable $numbers, $initialValue = null): \Generator
+    {
+        $n = 0;
+        foreach (Math::runningTotal($numbers, $initialValue) as $runningTotal) {
+            $n++;
+            yield $runningTotal / $n;
+        }
+    }
 }
