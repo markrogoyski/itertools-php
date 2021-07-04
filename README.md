@@ -77,6 +77,12 @@ $ php composer.phar require markrogoyski/itertools-php:0.*
 
 Usage
 -----
+All functions work on `iterable` collections:
+* `array` (type)
+* `Generator` (type)
+* `Iterator` (interface)
+* `Traversable` (interface)
+
 ## Multi Iteration
 ### Chain
 Chain multiple iterables together into a single continuous sequence.
