@@ -177,13 +177,13 @@ Repeat an item.
 ```php
 use IterTools\Single;
 
-$data
+$data        = 'Beetlejuice';
 $repetitions = 3;
 
 foreach (Infinite::repeat($item) as $repeated) {
     print($repeated);
 }
-// 'IterTools', 'IterTools', 'IterTools'
+// 'Beetlejuice', 'Beetlejuice', 'Beetlejuice'
 ```
 
 ### String
@@ -193,13 +193,13 @@ Iterate the individual characters of a string.
 ```php
 use IterTools\Single;
 
-$string = 'IterTools';
+$string = 'MickeyMouse';
 
 $listOfCharacters = [];
 foreach (Single::string($string) as $character) {
     $listOfCharacters[] = $character;
 }
-// ['I', 't', 'e', 'r', 'T', 'o', 'o', 'l', 's']
+// ['M', 'i', 'c', 'k', 'e', 'y', 'M', 'o', 'u', 's', 'e']
 ```
 
 ## Infinite Iteration
@@ -241,12 +241,12 @@ Repeat an item forever.
 ```php
 use IterTools\Infinite;
 
-$item = 'IterTools';
+$dialogue = 'Are we there yet?';
 
 foreach (Infinite::repeat($item) as $repeated) {
     print($repeated);
 }
-// 'IterTools', 'IterTools', 'IterTools', ...
+// 'Are we there yet?', 'Are we there yet?', 'Are we there yet?', ...
 ```
 ## Math Iteration
 ### Running Average
