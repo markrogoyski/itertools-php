@@ -10,9 +10,9 @@ Quick Reference
 #### Multi Iteration
 | Iterator | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
-| [`chain`](#Chain) | Chain multiple iterables together | `Multi::chain($collection1, $collection2)` |
-| [`zip`](#Zip) | Iterate multiple collections simultaneously | `Multi::zip($collection1, $collection2)` |
-| [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously | `Multi::zipLongest($collection1, $collection2)` |
+| [`chain`](#Chain) | Chain multiple iterables together | `Multi::chain($list1, $list2)` |
+| [`zip`](#Zip) | Iterate multiple collections simultaneously | `Multi::zip($list1, $list2)` |
+| [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously | `Multi::zipLongest($list1, $list2)` |
 
 #### Single Iteration
 | Iterator | Description | Code Snippet |
