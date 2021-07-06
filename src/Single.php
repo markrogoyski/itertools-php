@@ -57,4 +57,30 @@ class Single
             }
         }
     }
+
+    /**
+     * Drop elements from the iterable while the predicate function is true.
+     *
+     * Once the predicate function returns false once, all remaining elements are returned.
+     *
+     * @param iterable<mixed> $data
+     * @param callable $predicate
+     *
+     * @return \Generator<mixed>
+     */
+    public static function dropWhile(iterable $data, callable $predicate): \Generator
+    {
+        $drop = true;
+        foreach ($data as $datum) {
+            if ($drop === true) {
+                if (!$predicate($datum)) {
+                    $drop = false;
+                    yield $datum;
+                    continue;
+                }
+                continue;
+            }
+            yield $datum;
+        }
+    }
 }

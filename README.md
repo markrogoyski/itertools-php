@@ -18,6 +18,7 @@ Quick Reference
 | Iterator | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
 | [`compress`](#Compress) | Filter out elements not selected | `Single::compress($data, $selectors)` |
+| [`dropWhile`](#Drop-While) | Drop elements while predicate is true | `Single::dropWhile($data, $predicate)` |
 | [`repeat`](#Repeat) | Repeat an item | `Single::repeat($item, $repetitions)` |
 | [`string`](#String) | Iterate the characters of a string | `Single::string($string)` |
 
@@ -168,6 +169,24 @@ foreach (Single::compress($movies, $goodMovies) as $goodMovie) {
     print($goodMovie);
 }
 // 'A New Hope', 'Empire Strikes Back', 'Return of the Jedi', 'The Force Awakens'
+```
+
+### Drop While
+Drop elements from the iterable while the predicate function is true.
+
+Once the predicate function returns false once, all remaining elements are returned.
+
+```Single::dropWhile(iterable $data, callable $predicate)```
+```php
+Use IterTools\Single;
+
+$scores    = [50, 60, 70, 85, 65, 90];
+$predicate = fn ($x) => $x < 70;
+
+foreach (Single::dropWhile($scores, $predicate) as $score) {
+    print($score);
+}
+// 70, 85, 65, 90
 ```
 
 ### Repeat
