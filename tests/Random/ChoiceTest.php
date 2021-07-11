@@ -149,6 +149,29 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test choice exception when items is empty
+     */
+    public function testChoiceItemsEmptyException(): void
+    {
+        // Given
+        $items = [];
+
+        // And
+        $repetitions = 10;
+
+        // Then
+        $this->expectException(\RangeException::class);
+
+        // When
+        foreach (Random::choice($items, $repetitions) as $choice) {
+            continue;
+        }
+
+        // Fail
+        $this->fail('Expected \RangeException');
+    }
+
+    /**
      * @test choice exception when repetitions is negative
      */
     public function testChoiceRepetitionsException(): void

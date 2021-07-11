@@ -85,7 +85,7 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         $max = 0;
 
         // And
-        $repetitions = -1;
+        $repetitions = 10;
 
         // Then
         $this->expectException(\RangeException::class);
