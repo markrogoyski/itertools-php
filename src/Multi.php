@@ -65,7 +65,6 @@ class Multi
     {
         foreach ($iterables as $iterable) {
             yield from $iterable;
-
         }
     }
 }
