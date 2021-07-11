@@ -36,7 +36,7 @@ Quick Reference
 | [`coinFlip`](#CoinFlip) | Random coin flips (0 or 1) | `Random::coinFlip($repetitions)` |
 | [`number`](#Number) | Random numbers | `Random::number($min, $max, $repetitions)` |
 | [`percentage`](#Percentage) | Random percentage between 0 and 1 | `Random::percentage($repetitions)` |
-| [`rockPaperScissors`](#CoinFlip) | Random rock-paper-scissors hands | `Random::rockPaperScissors($repetitions)` |
+| [`rockPaperScissors`](#RockPaperScissors) | Random rock-paper-scissors hands | `Random::rockPaperScissors($repetitions)` |
 
 #### Math Iteration
 | Iterator | Description | Code Snippet |
