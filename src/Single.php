@@ -32,7 +32,7 @@ class Single
     public static function repeat($item, int $repetitions): \Generator
     {
         if ($repetitions < 0) {
-            throw new \LogicException("Number of repetitions cannot be negative: {$repetitions}");
+            throw new \RangeException("Number of repetitions cannot be negative: {$repetitions}");
         }
         for ($i = $repetitions; $i > 0; $i--) {
             yield $item;

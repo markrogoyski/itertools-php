@@ -272,7 +272,7 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test negative number of repeetitions is an error
+     * @test negative number of repetitions is an error
      */
     public function testRepetitionsErrorNegativeNumber(): void
     {
@@ -281,7 +281,7 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         $repetitions = -1;
 
         // Then
-        $this->expectException(\LogicException::class);
+        $this->expectException(\RangeException::class);
 
         // When
         foreach (Single::repeat($item, $repetitions) as $_) {
@@ -289,6 +289,6 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->fail('Expected an expcetion to be thrown.');
+        $this->fail('Expected an exception to be thrown.');
     }
 }
