@@ -4,6 +4,9 @@ A PHP library of iteration tools to power up your loops.
 
 Inspired by Python—designed for PHP.
 
+[![Coverage Status](https://coveralls.io/repos/github/markrogoyski/itertools-php/badge.svg?branch=develop)](https://coveralls.io/github/markrogoyski/itertools-php?branch=develop)
+[![License](https://poser.pugx.org/markrogoyski/math-php/license)](https://packagist.org/packages/markrogoyski/itertools-php)
+
 Quick Reference
 -----------
 
@@ -514,3 +517,17 @@ foreach (Multi::chain(Single::string($letters), Single::string($numbers)) as $ch
 }
 // a, b, c, 1, 2, 3
 ```
+
+Standards
+---------
+
+IterTools PHP conforms to the following standards:
+
+ * PSR-1  - Basic coding standard (http://www.php-fig.org/psr/psr-1/)
+ * PSR-4  - Autoloader (http://www.php-fig.org/psr/psr-4/)
+ * PSR-12 - Extended coding style guide (http://www.php-fig.org/psr/psr-12/)
+
+License
+-------
+
+IterTools PHP is licensed under the MIT License.
