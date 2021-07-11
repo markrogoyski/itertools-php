@@ -29,6 +29,15 @@ Quick Reference
 | [`cycle`](#Cycle) | Cycle through a collection | `Infinite::cycle($collection)` |
 | [`repeat`](#Repeat-Infinite) | Repeat an item forever | `Infinite::repeat($item)` |
 
+#### Random Iteration
+| Iterator | Description | Code Snippet |
+| ----------- | ----------- | ----------- |
+| [`choice`](#Choice) | Random selections from list | `Random::choice($list, $repetitions)` |
+| [`coinFlip`](#CoinFlip) | Random coin flips (0 or 1) | `Random::coinFlip($repetitions)` |
+| [`number`](#Number) | Random numbers | `Random::number($min, $max, $repetitions)` |
+| [`percentage`](#Percentage) | Random percentage between 0 and 1 | `Random::percentage($repetitions)` |
+| [`rockPaperScissors`](#CoinFlip) | Random rock-paper-scissors hands | `Random::rockPaperScissors($repetitions)` |
+
 #### Math Iteration
 | Iterator | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
@@ -267,6 +276,86 @@ foreach (Infinite::repeat($item) as $repeated) {
 }
 // 'Are we there yet?', 'Are we there yet?', 'Are we there yet?', ...
 ```
+
+## Random Iteration
+### Choice
+Generate random selections from an array of values.
+
+```Random::choice(array $items, int $repetitions)```
+```php
+use IterTools\Random;
+
+$cards       = ['Ace', 'King', 'Queen', 'Jack', 'Joker'];
+$repetitions = 10;
+
+foreach (Random::choice($cards) as $card) {
+    print($card);
+}
+// 'King', 'Jack', 'King', 'Ace', ... [random]
+```
+
+### CoinFlip
+Generate random coin flips (0 or 1).
+
+```Random::coinFlip(int $repetitions)```
+```php
+use IterTools\Random;
+
+$repetitions = 10;
+
+foreach (Random::coinFlip($repetitions) as $coinFlip) {
+    print($coinFlip);
+}
+// 1, 0, 1, 1, 0, ... [random]
+```
+
+### Number
+Generate random numbers (integers).
+
+```Random::number(int $min, int $max, int $repetitions)```
+```php
+use IterTools\Random;
+
+$min         = 1;
+$max         = 4;
+$repetitions = 10;
+
+foreach (Random::number($min, $max, $repetitions) as $number) {
+    print($number);
+}
+// 3, 2, 5, 5, 1, 2, ... [random]
+```
+
+### Percentage
+Generate a random percentage between 0 and 1.
+
+```Random::percentage(int $repetitions)```
+```php
+use IterTools\Random;
+
+$repetitions = 10;
+
+foreach (Random::percentage($min, $max, $repetitions) as $percentage) {
+    print($percentage);
+}
+// 0.30205562629132, 0.59648594775233, ... [random]
+```
+
+### RockPaperScissors
+Generate random rock-paper-scissors hands.
+
+```Random::rockPaperScissors(int $repetitions)```
+```php
+use IterTools\Random;
+
+$repetitions = 10;
+
+foreach (Random::rockPaperScissors($repetitions) as $rpsHand) {
+    print($rpsHand);
+}
+// 'paper', 'rock', 'rock', 'scissors', ... [random]
+```
+
 ## Math Iteration
 ### Running Average
 Accumulate the running average over a list of numbers.
