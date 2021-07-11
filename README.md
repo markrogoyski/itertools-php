@@ -492,13 +492,13 @@ IterTools can be combined to create new iterable compositions.
 use IterTools\Multi;
 use IterTools\Single;
 
-$letters = 'abc';
-$numbers = '123';
+$letters = 'ABCDEFGHI';
+$numbers = '123456789';
 
 foreach (Multi::zip(Single::string($letters), Single::string($numbers)) as [$letter, $number]) {
-     print("{$letter}{$number}");
+     $battleshipMove = new BattleshipMove($letter, $number)
 }
-// a1, b2, c3
+// A1, B2, C3
 ```
 
 #### Chain Strings
