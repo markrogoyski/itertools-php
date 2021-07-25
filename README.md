@@ -22,6 +22,8 @@ Quick Reference
 | ----------- | ----------- | ----------- |
 | [`compress`](#Compress) | Filter out elements not selected | `Single::compress($data, $selectors)` |
 | [`dropWhile`](#Drop-While) | Drop elements while predicate is true | `Single::dropWhile($data, $predicate)` |
+| [`filterFalse`](#Filter-False) | Filter out elements where predicate not false | `Single::filterFalse($data, $predicate)` |
+| [`filterTrue`](#Filter-True) | Filter out elements where predicate not true | `Single::filterTrue($data, $predicate)` |
 | [`repeat`](#Repeat) | Repeat an item | `Single::repeat($item, $repetitions)` |
 | [`string`](#String) | Iterate the characters of a string | `Single::string($string)` |
 
@@ -199,6 +201,42 @@ foreach (Single::dropWhile($scores, $predicate) as $score) {
     print($score);
 }
 // 70, 85, 65, 90
+```
+
+### Filter False
+Filter out elements from the iterable only returning elements where the predicate function is false.
+
+If no predicate is provided, the boolean value of the data is used.
+
+```Single::filterFalse(iterable $data, callable $predicate)```
+```php
+Use IterTools\Single;
+
+$starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
+
+foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $badMovie) {
+    print($badMovie);
+}
+// 1, 2, 3, 8, 9
+```
+
+### Filter True
+Filter out elements from the iterable only returning elements where the predicate function is true.
+
+If no predicate is provided, the boolean value of the data is used.
+
+```Single::filterFalse(iterable $data, callable $predicate)```
+```php
+Use IterTools\Single;
+
+$starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
+
+foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $goodMovie) {
+    print($goodMovie);
+}
+// 4, 5, 6, 7
 ```
 
 ### Repeat
