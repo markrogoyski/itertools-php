@@ -83,4 +83,50 @@ class Single
             yield $datum;
         }
     }
+
+    /**
+     * Filter out elements from the iterable only returning elements where the predicate function is false.
+     *
+     * If no predicate is provided, the boolean value of the data is used.
+     *
+     * @param iterable<mixed> $data
+     * @param callable|null $predicate
+     *
+     * @return \Generator<mixed>
+     */
+    public static function filterFalse(iterable $data, callable $predicate = null): \Generator
+    {
+        if ($predicate === null) {
+            $predicate = fn($datum) => boolval($datum);
+        }
+
+        foreach ($data as $datum) {
+            if (!$predicate($datum)) {
+                yield $datum;
+            }
+        }
+    }
+
+    /**
+     * Filter out elements from the iterable only returning elements where there predicate function is true.
+     *
+     * If no predicate is provided, the boolean value of the data is used.
+     *
+     * @param iterable<mixed> $data
+     * @param callable|null $predicate
+     *
+     * @return \Generator<mixed>
+     */
+    public static function filterTrue(iterable $data, callable $predicate = null): \Generator
+    {
+        if ($predicate === null) {
+            $predicate = fn($datum) => boolval($datum);
+        }
+
+        foreach ($data as $datum) {
+            if ($predicate($datum)) {
+                yield $datum;
+            }
+        }
+    }
 }
