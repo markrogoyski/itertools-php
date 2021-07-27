@@ -24,6 +24,7 @@ Quick Reference
 | [`dropWhile`](#Drop-While) | Drop elements while predicate is true | `Single::dropWhile($data, $predicate)` |
 | [`filterFalse`](#Filter-False) | Filter out elements where predicate not false | `Single::filterFalse($data, $predicate)` |
 | [`filterTrue`](#Filter-True) | Filter out elements where predicate not true | `Single::filterTrue($data, $predicate)` |
+| [`groupBy`](#Group-By) | Group data by a common element | `Single::groupBy($data, $groupKeyFunction)` |
 | [`repeat`](#Repeat) | Repeat an item | `Single::repeat($item, $repetitions)` |
 | [`string`](#String) | Iterate the characters of a string | `Single::string($string)` |
 
@@ -237,6 +238,49 @@ foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $goodMov
     print($goodMovie);
 }
 // 4, 5, 6, 7
+```
+
+### Group By
+Group data by a common data element.
+
+The groupKeyFunction determines the key to group elements by.
+
+```Single::groupBy(iterable $data, callable $groupKeyFunction)```
+```php
+Use IterTools\Single;
+
+$cartoonCharacters = [
+    ['Garfield', 'cat'],
+    ['Tom', 'cat'],
+    ['Felix', 'cat'],
+    ['Heathcliff', 'cat'],
+    ['Snoopy', 'dog'],
+    ['Scooby-Doo', 'dog'],
+    ['Odie', 'dog'],
+    ['Donald', 'duck'],
+    ['Daffy', 'duck'],
+];
+
+$charactersGroupedByAnimal = []
+foreach (Single::groupBy($cartoonCharacters, fn ($x) => $x[1]) as $animal => $characters) {
+    charactersGroupedByAnimal[$animal] = $characters;
+}
+/*
+'cat' => [
+    ['Garfield', 'cat'],
+    ['Tom', 'cat'],
+    ['Felix', 'cat'],
+    ['Heathcliff', 'cat'],
+],
+'dog' => [
+    ['Snoopy', 'dog'],
+    ['Scooby-Doo', 'dog'],
+    ['Odie', 'dog'],
+],
+'duck' => [
+    ['Donald', 'duck'],
+    ['Daffy', 'duck'],
+*/
 ```
 
 ### Repeat

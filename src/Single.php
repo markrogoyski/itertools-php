@@ -131,7 +131,7 @@ class Single
     }
 
     /**
-     * Group by a common data element.
+     * Group data by a common data element.
      *
      * The groupKeyFunction determines the key to group elements by.
      *

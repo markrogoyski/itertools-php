@@ -265,6 +265,37 @@ class GroupByTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
+            [
+                [
+                    ['Garfield', 'cat'],
+                    ['Tom', 'cat'],
+                    ['Felix', 'cat'],
+                    ['Heathcliff', 'cat'],
+                    ['Snoopy', 'dog'],
+                    ['Scooby-Doo', 'dog'],
+                    ['Odie', 'dog'],
+                    ['Donald', 'duck'],
+                    ['Daffy', 'duck'],
+                ],
+                fn ($x) => $x[1],
+                [
+                    'cat' => [
+                        ['Garfield', 'cat'],
+                        ['Tom', 'cat'],
+                        ['Felix', 'cat'],
+                        ['Heathcliff', 'cat'],
+                    ],
+                    'dog' => [
+                        ['Snoopy', 'dog'],
+                        ['Scooby-Doo', 'dog'],
+                        ['Odie', 'dog'],
+                    ],
+                    'duck' => [
+                        ['Donald', 'duck'],
+                        ['Daffy', 'duck'],
+                    ]
+                ]
+            ],
         ];
     }
 
