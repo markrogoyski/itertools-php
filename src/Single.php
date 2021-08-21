@@ -150,4 +150,25 @@ class Single
             yield $groupName => $groupData;
         }
     }
+
+    /**
+     * Return elements from the iterable as long as the predicate is true.
+     *
+     * If no predicate is provided, the boolean value of the data is used.
+     *
+     * @param iterable<mixed> $data
+     * @param callable        $predicate
+     *
+     * @return \Generator<mixed>
+     */
+    public static function takeWhile(iterable $data, callable $predicate): \Generator
+    {
+        foreach ($data as $datum) {
+            if ($predicate($datum)) {
+                yield $datum;
+            } else {
+                break;
+            }
+        }
+    }
 }
