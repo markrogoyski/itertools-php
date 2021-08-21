@@ -27,6 +27,7 @@ Quick Reference
 | [`groupBy`](#Group-By) | Group data by a common element | `Single::groupBy($data, $groupKeyFunction)` |
 | [`repeat`](#Repeat) | Repeat an item | `Single::repeat($item, $repetitions)` |
 | [`string`](#String) | Iterate the characters of a string | `Single::string($string)` |
+| [`takeWhile`](#Take-While) | Iterate elements while predicate is true | `Single::takeWhile($data, $predicate)` |
 
 #### Infinite Iteration
 | Iterator | Description | Code Snippet |
@@ -313,6 +314,24 @@ foreach (Single::string($string) as $character) {
     $listOfCharacters[] = $character;
 }
 // ['M', 'i', 'c', 'k', 'e', 'y', 'M', 'o', 'u', 's', 'e']
+```
+
+### Take While
+Return elements from the iterable as long as the predicate is true.
+
+Stops iteration as soon as the predicate returns false, even if other elements later on would eventually return true (different from filterTrue).
+
+```Single::takeWhile(iterable $data, callable $predicate)```
+```php
+Use IterTools\Single;
+
+$prices = [0, 0, 5, 10, 0, 0 9];
+$isFree = fn ($price) => $price == 0;
+
+foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
+    print($freePrice);
+}
+// 0, 0
 ```
 
 ## Infinite Iteration
