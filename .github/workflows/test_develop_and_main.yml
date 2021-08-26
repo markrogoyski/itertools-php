@@ -1,10 +1,10 @@
-name: Test and Static Analysis (Develop and Master)
+name: Test and Static Analysis (Develop and Main)
 
 on:
   push:
     branches:
       - develop
-      - master
+      - main
 
 jobs:
   test-and-static-analysis:
