@@ -9,7 +9,6 @@ use IterTools\Tests\Fixture;
 
 class CompressTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @test         compress array
      * @dataProvider dataProviderForArray
