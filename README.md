@@ -1,3 +1,7 @@
+![MathPHP Logo](https://github.com/markrogoyski/itertools-php/blob/develop/docs/image/IterToolsLogo.png?raw=true)
+
+# IterTools PHP
+
 # IterTools PHP
 
 A PHP library of iteration tools to power up your loops.
