@@ -1,8 +1,6 @@
 ![MathPHP Logo](https://github.com/markrogoyski/itertools-php/blob/develop/docs/image/IterToolsLogo.png?raw=true)
 
-### IterTools PHP
-
-A PHP library of iteration tools to power up your loops.
+### IterTools - PHP Iteration Tools to Power Up Your Loops
 
 Inspired by Python—designed for PHP.
 
