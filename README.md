@@ -4,7 +4,7 @@
 
 Inspired by Python—designed for PHP.
 
-[![Coverage Status](https://coveralls.io/repos/github/markrogoyski/itertools-php/badge.svg?branch=develop)](https://coveralls.io/github/markrogoyski/itertools-php?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/github/markrogoyski/itertools-php/badge.svg?branch=main)](https://coveralls.io/github/markrogoyski/itertools-php?branch=main)
 [![License](https://poser.pugx.org/markrogoyski/math-php/license)](https://packagist.org/packages/markrogoyski/itertools-php)
 
 Quick Reference
