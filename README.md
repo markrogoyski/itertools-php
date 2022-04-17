@@ -164,7 +164,6 @@ foreach (Multi::zipLongest($letters, $numbers) as [$letter, $number]) {
 }
 ```
 
-
 ## Single Iteration
 ### Compress
 Compress an iterable by filtering out data that is not selected.
@@ -172,7 +171,6 @@ Compress an iterable by filtering out data that is not selected.
 ```Single::compress(string $data, $selectors)```
 ```php
 use IterTools\Single;
-
 
 $movies  = [
     'Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith',
@@ -235,7 +233,7 @@ Use IterTools\Single;
 $starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 $goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
 
-foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $goodMovie) {
+foreach (Single::filterTrue($starWarsEpisodes, $goodMoviePredicate) as $goodMovie) {
     print($goodMovie);
 }
 // 4, 5, 6, 7
@@ -262,9 +260,9 @@ $cartoonCharacters = [
     ['Daffy', 'duck'],
 ];
 
-$charactersGroupedByAnimal = []
+$charactersGroupedByAnimal = [];
 foreach (Single::groupBy($cartoonCharacters, fn ($x) => $x[1]) as $animal => $characters) {
-    charactersGroupedByAnimal[$animal] = $characters;
+    $charactersGroupedByAnimal[$animal] = $characters;
 }
 /*
 'cat' => [
@@ -294,7 +292,7 @@ use IterTools\Single;
 $data        = 'Beetlejuice';
 $repetitions = 3;
 
-foreach (Infinite::repeat($item) as $repeated) {
+foreach (Single::repeat($data, $repetitions) as $repeated) {
     print($repeated);
 }
 // 'Beetlejuice', 'Beetlejuice', 'Beetlejuice'
@@ -325,7 +323,7 @@ Stops iteration as soon as the predicate returns false, even if other elements l
 ```php
 Use IterTools\Single;
 
-$prices = [0, 0, 5, 10, 0, 0 9];
+$prices = [0, 0, 5, 10, 0, 0, 9];
 $isFree = fn ($price) => $price == 0;
 
 foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
@@ -375,7 +373,7 @@ use IterTools\Infinite;
 
 $dialogue = 'Are we there yet?';
 
-foreach (Infinite::repeat($item) as $repeated) {
+foreach (Infinite::repeat($dialogue) as $repeated) {
     print($repeated);
 }
 // 'Are we there yet?', 'Are we there yet?', 'Are we there yet?', ...
@@ -392,7 +390,7 @@ use IterTools\Random;
 $cards       = ['Ace', 'King', 'Queen', 'Jack', 'Joker'];
 $repetitions = 10;
 
-foreach (Random::choice($cards) as $card) {
+foreach (Random::choice($cards, $repetitions) as $card) {
     print($card);
 }
 // 'King', 'Jack', 'King', 'Ace', ... [random]
@@ -439,7 +437,7 @@ use IterTools\Random;
 
 $repetitions = 10;
 
-foreach (Random::percentage($min, $max, $repetitions) as $percentage) {
+foreach (Random::percentage($repetitions) as $percentage) {
     print($percentage);
 }
 // 0.30205562629132, 0.59648594775233, ... [random]
@@ -497,7 +495,7 @@ use IterTools\Math;
 $dartsScores   = [50, 50, 25, 50];
 $startingScore = 501;
 
-foreach (Math::runningDifference($numbers, $startingScore) as $runningScore) {
+foreach (Math::runningDifference($dartsScores, $startingScore) as $runningScore) {
     print($runningScore);
 }
 // 501, 451, 401, 376, 326
@@ -512,7 +510,7 @@ use IterTools\Math;
 
 $numbers = [1, 2, 1, 3, 5];
 
-foreach (Math::runningMax($credits) as $runningMax) {
+foreach (Math::runningMax($numbers) as $runningMax) {
     print($runningMax);
 }
 // 1, 2, 2, 3, 5
@@ -527,7 +525,7 @@ use IterTools\Math;
 
 $numbers = [3, 4, 2, 5, 1];
 
-foreach (Math::runningMin($credits) as $runningMin) {
+foreach (Math::runningMin($numbers) as $runningMin) {
     print($runningMin);
 }
 // 3, 3, 2, 2, 1
@@ -570,7 +568,7 @@ use IterTools\Math;
 
 $prices = [1, 2, 3, 4, 5];
 
-foreach (Math::runningTotal($numbers) as $runningTotal) {
+foreach (Math::runningTotal($prices) as $runningTotal) {
     print($runningTotal);
 }
 // 1, 3, 6, 10, 15
@@ -583,7 +581,7 @@ use IterTools\Math;
 $prices       = [1, 2, 3, 4, 5];
 $initialValue = 5;
 
-foreach (Math::runningTotal($numbers, $initialValue) as $runningTotal) {
+foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
     print($runningTotal);
 }
 // 5, 6, 8, 11, 15, 20
