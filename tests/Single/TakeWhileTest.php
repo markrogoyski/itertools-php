@@ -7,7 +7,7 @@ namespace IterTools\Tests\Single;
 use IterTools\Single;
 use IterTools\Tests\Fixture;
 
-class TakeWhile extends \PHPUnit\Framework\TestCase
+class TakeWhileTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test         takeWhile array

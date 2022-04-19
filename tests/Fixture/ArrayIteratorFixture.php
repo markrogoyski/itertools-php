@@ -23,6 +23,7 @@ class ArrayIteratorFixture implements \Iterator
     /**
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->values[$this->i];

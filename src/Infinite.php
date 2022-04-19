@@ -45,6 +45,7 @@ class Infinite
      */
     public static function repeat($item): \Generator
     {
+        // @phpstan-ignore-next-line
         while (true) {
             yield $item;
         }
