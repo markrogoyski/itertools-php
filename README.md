@@ -18,16 +18,17 @@ Quick Reference
 | [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously | `Multi::zipLongest($list1, $list2)` |
 
 #### Single Iteration
-| Iterator | Description | Code Snippet |
-| ----------- | ----------- | ----------- |
-| [`compress`](#Compress) | Filter out elements not selected | `Single::compress($data, $selectors)` |
-| [`dropWhile`](#Drop-While) | Drop elements while predicate is true | `Single::dropWhile($data, $predicate)` |
-| [`filterFalse`](#Filter-False) | Filter out elements where predicate not false | `Single::filterFalse($data, $predicate)` |
-| [`filterTrue`](#Filter-True) | Filter out elements where predicate not true | `Single::filterTrue($data, $predicate)` |
-| [`groupBy`](#Group-By) | Group data by a common element | `Single::groupBy($data, $groupKeyFunction)` |
-| [`repeat`](#Repeat) | Repeat an item | `Single::repeat($item, $repetitions)` |
-| [`string`](#String) | Iterate the characters of a string | `Single::string($string)` |
-| [`takeWhile`](#Take-While) | Iterate elements while predicate is true | `Single::takeWhile($data, $predicate)` |
+| Iterator                       | Description                                   | Code Snippet                                |
+|--------------------------------|-----------------------------------------------|---------------------------------------------|
+| [`compress`](#Compress)        | Filter out elements not selected              | `Single::compress($data, $selectors)`       |
+| [`dropWhile`](#Drop-While)     | Drop elements while predicate is true         | `Single::dropWhile($data, $predicate)`      |
+| [`filterFalse`](#Filter-False) | Filter out elements where predicate not false | `Single::filterFalse($data, $predicate)`    |
+| [`filterTrue`](#Filter-True)   | Filter out elements where predicate not true  | `Single::filterTrue($data, $predicate)`     |
+| [`groupBy`](#Group-By)         | Group data by a common element                | `Single::groupBy($data, $groupKeyFunction)` |
+| [`repeat`](#Repeat)            | Repeat an item                                | `Single::repeat($item, $repetitions)`       |
+| [`string`](#String)            | Iterate the characters of a string            | `Single::string($string)`                   |
+| [`takeWhile`](#Take-While)     | Iterate elements while predicate is true      | `Single::takeWhile($data, $predicate)`      |
+| [`reduce`](#Reduce)            | Reduce elements into a single value           | `Single::reduce($data, $reducer, $carry)`   |
 
 #### Infinite Iteration
 | Iterator | Description | Code Snippet |
@@ -330,6 +331,22 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
     print($freePrice);
 }
 // 0, 0
+```
+
+### Reduce
+Reduce elements into a single value using reducer function.
+
+Works like array_reduce() function, but can take in all iterable types, not array only.
+
+```Single::reduce(iterable $data, callable $reducer, $carry)```
+```php
+Use IterTools\Single;
+
+$input = [1, 2, 3, 4, 5];
+$sum = fn ($carry, $item) => $carry + $item;
+
+$result = Single::reduce($input, $sum, 0);
+// 15
 ```
 
 ## Infinite Iteration
