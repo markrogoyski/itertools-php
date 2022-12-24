@@ -171,4 +171,23 @@ class Single
             }
         }
     }
+
+    /**
+     * Reduces given iterable like array_reduce() function
+     * But unlike array_reduce(), it works with all iterable types
+     *
+     * @param iterable<mixed> $data
+     * @param callable        $reducer
+     * @param mixed|null      $carry
+     *
+     * @return mixed
+     */
+    public static function reduce(iterable $data, callable $reducer, $carry = null)
+    {
+        foreach ($data as $datum) {
+            $carry = $reducer($carry, $datum);
+        }
+
+        return $carry;
+    }
 }
