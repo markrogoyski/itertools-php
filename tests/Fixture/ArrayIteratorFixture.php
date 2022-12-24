@@ -47,6 +47,11 @@ class ArrayIteratorFixture implements \Iterator
      */
     public function valid(): bool
     {
-        return isset($this->values[$this->i]);
+        // FIXME: [BEGIN] remove this comment
+        // We cannot use isset() in this place:
+        // because if ($a[0] === null) then (isset($a[0]) === false).
+        // So we need to use array_key_exists() instead of isset().
+        // FIXME: [END]
+        return array_key_exists($this->i, $this->values);
     }
 }

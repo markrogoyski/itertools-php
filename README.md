@@ -28,7 +28,6 @@ Quick Reference
 | [`repeat`](#Repeat)            | Repeat an item                                | `Single::repeat($item, $repetitions)`       |
 | [`string`](#String)            | Iterate the characters of a string            | `Single::string($string)`                   |
 | [`takeWhile`](#Take-While)     | Iterate elements while predicate is true      | `Single::takeWhile($data, $predicate)`      |
-| [`reduce`](#Reduce)            | Reduce elements into a single value           | `Single::reduce($data, $reducer, $carry)`   |
 
 #### Infinite Iteration
 | Iterator | Description | Code Snippet |
@@ -56,12 +55,23 @@ Quick Reference
 | [`runningProduct`](#Running-Product) | Running product accumulation | `Math::runningProduct($numbers, $initialValue)` |
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
 
+#### Reduce
+| Reducer                    | Description                                       | Code Snippet                               |
+|----------------------------|---------------------------------------------------|--------------------------------------------|
+| [`toValue`](#To-Value)     | Reduce collection using callable reducer          | `Reduce::toValue($data, $reducer, $carry)` |
+| [`toMin`](#To-Min)         | Reduce collection to it's greatest element        | `Reduce::toMin($data)`                     |
+| [`toMax`](#To-Max)         | Reduce collection to it's smallest element        | `Reduce::toMax($data)`                     |
+| [`toCount`](#To-Count)     | Reduce collection to it's length                  | `Reduce::toCount($data)`                   |
+| [`toSum`](#To-Sum)         | Reduce collection to the sum of it's elements     | `Reduce::toSum($data)`                     |
+| [`toProduct`](#To-Product) | Reduce collection to the product of it's elements | `Reduce::toProduct($data)`                 |
+| [`toAverage`](#To-Average) | Reduce collection to the average of it's elements | `Reduce::toAverage($data)`                 |
+
 Setup
 -----
 
  Add the library to your `composer.json` file in your project:
 
-```javascript
+```json
 {
   "require": {
       "markrogoyski/itertools-php": "1.*"
@@ -333,22 +343,6 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
 // 0, 0
 ```
 
-### Reduce
-Reduce elements into a single value using reducer function.
-
-Works like array_reduce() function, but can take in all iterable types, not array only.
-
-```Single::reduce(iterable $data, callable $reducer, $carry)```
-```php
-Use IterTools\Single;
-
-$input = [1, 2, 3, 4, 5];
-$sum = fn ($carry, $item) => $carry + $item;
-
-$result = Single::reduce($input, $sum, 0);
-// 15
-```
-
 ## Infinite Iteration
 ### Count
 Count sequentially forever.
@@ -602,6 +596,113 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
     print($runningTotal);
 }
 // 5, 6, 8, 11, 15, 20
+```
+
+## Reduce
+### To Value
+Reduce elements into a single value using reducer function.
+
+Works like array_reduce() function, but can take in all iterable types, not array only.
+
+```Reduce::toValue(iterable $data, callable $reducer, mixed $carry)```
+```php
+use IterTools\Reduce;
+
+$input = [1, 2, 3, 4, 5];
+$sum = fn ($carry, $item) => $carry + $item;
+
+$result = Reduce::toValue($input, $sum, 0);
+// 15
+```
+
+### To Min
+Reduces given iterable to it's min value.
+
+Items of given collection must be comparable.
+
+Returns null if given collection is empty.
+
+```Reduce::toMin(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$input = [5, 3, 1, 2, 4];
+
+$result = Reduce::toMin($input);
+// 1
+```
+
+### To Max
+Reduces given iterable to it's max value.
+
+Items of given collection must be comparable.
+
+Returns null if given collection is empty.
+
+```Reduce::toMax(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$input = [5, 3, 1, 2, 4];
+
+$result = Reduce::toMax($input);
+// 5
+```
+
+### To Count
+Reduces given iterable to it's length.
+
+```Reduce::toCount(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$input = [10, 20, 30];
+
+$result = Reduce::toCount($input);
+// 3
+```
+
+### To Sum
+Reduces given collection to the sum of it's items.
+
+```Reduce::toSum(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$input = [10, 20, 30];
+
+$result = Reduce::toSum($input);
+// 60
+```
+
+### To Product
+Reduces given collection to the product of it's items.
+
+Returns null if given collection is empty.
+
+```Reduce::toProduct(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$input = [3, 4, 2];
+
+$result = Reduce::toProduct($input);
+// 24
+```
+
+### To Average
+Reduces given collection to the average of it's items.
+
+Returns null if given collection is empty.
+
+```Reduce::toAverage(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$input = [2, 4, 6, 8];
+
+$result = Reduce::toAverage($input);
+// 5
 ```
 
 ## Composition
