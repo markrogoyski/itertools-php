@@ -56,15 +56,15 @@ Quick Reference
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
 
 #### Reduce
-| Reducer                    | Description                                       | Code Snippet                               |
-|----------------------------|---------------------------------------------------|--------------------------------------------|
-| [`toValue`](#To-Value)     | Reduce collection using callable reducer          | `Reduce::toValue($data, $reducer, $carry)` |
-| [`toMin`](#To-Min)         | Reduce collection to it's greatest element        | `Reduce::toMin($data)`                     |
-| [`toMax`](#To-Max)         | Reduce collection to it's smallest element        | `Reduce::toMax($data)`                     |
-| [`toCount`](#To-Count)     | Reduce collection to it's length                  | `Reduce::toCount($data)`                   |
-| [`toSum`](#To-Sum)         | Reduce collection to the sum of it's elements     | `Reduce::toSum($data)`                     |
-| [`toProduct`](#To-Product) | Reduce collection to the product of it's elements | `Reduce::toProduct($data)`                 |
-| [`toAverage`](#To-Average) | Reduce collection to the average of it's elements | `Reduce::toAverage($data)`                 |
+| Reducer                    | Description                                       | Code Snippet                                      |
+|----------------------------|---------------------------------------------------|---------------------------------------------------|
+| [`toValue`](#To-Value)     | Reduce collection using callable reducer          | `Reduce::toValue($data, $reducer, $initialValue)` |
+| [`toMin`](#To-Min)         | Reduce collection to it's greatest element        | `Reduce::toMin($data)`                            |
+| [`toMax`](#To-Max)         | Reduce collection to it's smallest element        | `Reduce::toMax($data)`                            |
+| [`toCount`](#To-Count)     | Reduce collection to it's length                  | `Reduce::toCount($data)`                          |
+| [`toSum`](#To-Sum)         | Reduce collection to the sum of it's elements     | `Reduce::toSum($data)`                            |
+| [`toProduct`](#To-Product) | Reduce collection to the product of it's elements | `Reduce::toProduct($data)`                        |
+| [`toAverage`](#To-Average) | Reduce collection to the average of it's elements | `Reduce::toAverage($data)`                        |
 
 Setup
 -----
@@ -604,7 +604,7 @@ Reduce elements into a single value using reducer function.
 
 Works like array_reduce() function, but can take in all iterable types, not array only.
 
-```Reduce::toValue(iterable $data, callable $reducer, mixed $carry)```
+```Reduce::toValue(iterable $data, callable $reducer, mixed $initialValue)```
 ```php
 use IterTools\Reduce;
 

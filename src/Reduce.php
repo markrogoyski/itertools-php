@@ -14,12 +14,14 @@ class Reduce
      * @template T
      * @param iterable<mixed> $data
      * @param callable        $reducer
-     * @param T               $carry
+     * @param T               $initialValue
      *
      * @return T
      */
-    public static function toValue(iterable $data, callable $reducer, $carry = null)
+    public static function toValue(iterable $data, callable $reducer, $initialValue = null)
     {
+        $carry = $initialValue;
+
         foreach ($data as $datum) {
             $carry = $reducer($carry, $datum);
         }
