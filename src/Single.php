@@ -131,6 +131,49 @@ class Single
     }
 
     /**
+     * Filter out elements from the iterable only returning unique elements.
+     *
+     * If $strict is true:
+     *  - scalars: compares strictly by type;
+     *  - objects: always treats different instances as not equal to each other;
+     *  - arrays: compares serialized.
+     *
+     * If $strict is false:
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @template T
+     * @param iterable<T> $data
+     * @param bool $strict
+     *
+     * @return \Generator<T>
+     */
+    public static function filterUnique(iterable $data, bool $strict = true): \Generator
+    {
+        $map = [];
+
+        foreach ($data as $datum) {
+            switch (true) {
+                case is_array($datum):
+                    $hash = 'array_'.md5(serialize($datum));
+                    break;
+                case is_object($datum):
+                    $hash = $strict ? 'object_'.spl_object_id($datum) : md5(serialize($datum));
+                    break;
+                default:
+                    $hash = $strict ? gettype($datum).'_'.$datum : (string)$datum;
+                    break;
+            }
+
+            if (!isset($map[$hash])) {
+                $map[$hash] = true;
+                yield $datum;
+            }
+        }
+    }
+
+    /**
      * Group data by a common data element.
      *
      * The groupKeyFunction determines the key to group elements by.
@@ -171,7 +214,6 @@ class Single
             }
         }
     }
-
 
     /**
      * Return pairs of elements from given collection.

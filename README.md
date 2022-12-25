@@ -18,17 +18,18 @@ Quick Reference
 | [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously | `Multi::zipLongest($list1, $list2)` |
 
 #### Single Iteration
-| Iterator                       | Description                                     | Code Snippet                                |
-|--------------------------------|-------------------------------------------------|---------------------------------------------|
-| [`compress`](#Compress)        | Filter out elements not selected                | `Single::compress($data, $selectors)`       |
-| [`dropWhile`](#Drop-While)     | Drop elements while predicate is true           | `Single::dropWhile($data, $predicate)`      |
-| [`filterFalse`](#Filter-False) | Filter out elements where predicate not false   | `Single::filterFalse($data, $predicate)`    |
-| [`filterTrue`](#Filter-True)   | Filter out elements where predicate not true    | `Single::filterTrue($data, $predicate)`     |
-| [`groupBy`](#Group-By)         | Group data by a common element                  | `Single::groupBy($data, $groupKeyFunction)` |
-| [`repeat`](#Repeat)            | Repeat an item                                  | `Single::repeat($item, $repetitions)`       |
-| [`string`](#String)            | Iterate the characters of a string              | `Single::string($string)`                   |
-| [`takeWhile`](#Take-While)     | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`      |
-| [`eachPair`](#Each-Pair)       | Iterate pairs of elements from given collection | `Single::eachPair($data)`                   |
+| Iterator                         | Description                                     | Code Snippet                                |
+|----------------------------------|-------------------------------------------------|---------------------------------------------|
+| [`compress`](#Compress)          | Filter out elements not selected                | `Single::compress($data, $selectors)`       |
+| [`dropWhile`](#Drop-While)       | Drop elements while predicate is true           | `Single::dropWhile($data, $predicate)`      |
+| [`filterFalse`](#Filter-False)   | Filter out elements where predicate not false   | `Single::filterFalse($data, $predicate)`    |
+| [`filterTrue`](#Filter-True)     | Filter out elements where predicate not true    | `Single::filterTrue($data, $predicate)`     |
+| [`filterUnique`](#Filter-Unique) | Filter out elements: iterate only unique items  | `Single::filterUnique($data, $strict)`      |
+| [`groupBy`](#Group-By)           | Group data by a common element                  | `Single::groupBy($data, $groupKeyFunction)` |
+| [`repeat`](#Repeat)              | Repeat an item                                  | `Single::repeat($item, $repetitions)`       |
+| [`string`](#String)              | Iterate the characters of a string              | `Single::string($string)`                   |
+| [`takeWhile`](#Take-While)       | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`      |
+| [`eachPair`](#Each-Pair)         | Iterate pairs of elements from given collection | `Single::eachPair($data)`                   |
 
 #### Infinite Iteration
 | Iterator | Description | Code Snippet |
@@ -251,6 +252,36 @@ foreach (Single::filterTrue($starWarsEpisodes, $goodMoviePredicate) as $goodMovi
     print($goodMovie);
 }
 // 4, 5, 6, 7
+```
+
+### Filter Unique
+Filter out elements from the iterable only returning unique elements.
+
+If $strict is true:
+- scalars: compares strictly by type;
+  - objects: always treats different instances as not equal to each other;
+  - arrays: compares serialized.
+
+ If $strict is false:
+  - scalars: compares non-strictly by value;
+  - objects: compares serialized;
+  - arrays: compares serialized.
+
+```Single::filterUnique(iterable $data, bool $strict)```
+```php
+Use IterTools\Single;
+
+$input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
+
+foreach (Single::filterUnique($input, true) as $datum) {
+    print($datum);
+}
+// 1, 2, 3, '1', '2', '3'
+
+foreach (Single::filterUnique($input, false) as $datum) {
+    print($datum);
+}
+// 1, 2, 3
 ```
 
 ### Group By
