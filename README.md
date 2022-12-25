@@ -18,16 +18,17 @@ Quick Reference
 | [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously | `Multi::zipLongest($list1, $list2)` |
 
 #### Single Iteration
-| Iterator                       | Description                                   | Code Snippet                                |
-|--------------------------------|-----------------------------------------------|---------------------------------------------|
-| [`compress`](#Compress)        | Filter out elements not selected              | `Single::compress($data, $selectors)`       |
-| [`dropWhile`](#Drop-While)     | Drop elements while predicate is true         | `Single::dropWhile($data, $predicate)`      |
-| [`filterFalse`](#Filter-False) | Filter out elements where predicate not false | `Single::filterFalse($data, $predicate)`    |
-| [`filterTrue`](#Filter-True)   | Filter out elements where predicate not true  | `Single::filterTrue($data, $predicate)`     |
-| [`groupBy`](#Group-By)         | Group data by a common element                | `Single::groupBy($data, $groupKeyFunction)` |
-| [`repeat`](#Repeat)            | Repeat an item                                | `Single::repeat($item, $repetitions)`       |
-| [`string`](#String)            | Iterate the characters of a string            | `Single::string($string)`                   |
-| [`takeWhile`](#Take-While)     | Iterate elements while predicate is true      | `Single::takeWhile($data, $predicate)`      |
+| Iterator                       | Description                                     | Code Snippet                                |
+|--------------------------------|-------------------------------------------------|---------------------------------------------|
+| [`compress`](#Compress)        | Filter out elements not selected                | `Single::compress($data, $selectors)`       |
+| [`dropWhile`](#Drop-While)     | Drop elements while predicate is true           | `Single::dropWhile($data, $predicate)`      |
+| [`filterFalse`](#Filter-False) | Filter out elements where predicate not false   | `Single::filterFalse($data, $predicate)`    |
+| [`filterTrue`](#Filter-True)   | Filter out elements where predicate not true    | `Single::filterTrue($data, $predicate)`     |
+| [`groupBy`](#Group-By)         | Group data by a common element                  | `Single::groupBy($data, $groupKeyFunction)` |
+| [`repeat`](#Repeat)            | Repeat an item                                  | `Single::repeat($item, $repetitions)`       |
+| [`string`](#String)            | Iterate the characters of a string              | `Single::string($string)`                   |
+| [`takeWhile`](#Take-While)     | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`      |
+| [`eachPair`](#Each-Pair)       | Iterate pairs of elements from given collection | `Single::eachPair($data)`                   |
 
 #### Infinite Iteration
 | Iterator | Description | Code Snippet |
@@ -341,6 +342,23 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
     print($freePrice);
 }
 // 0, 0
+```
+
+### Each pair
+Return pairs of elements from given collection.
+
+Returns empty generator if given collection contains less than 2 elements.
+
+```Single::eachPair(iterable $data)```
+```php
+Use IterTools\Single;
+
+$data = [1, 2, 3, 4, 5];
+
+foreach (Single::eachPair($data) as [$lhs, $rhs]) {
+    print("{$lhs}_{$lhs}");
+}
+// 1_2, 2_3, 3_4, 4_5
 ```
 
 ## Infinite Iteration
