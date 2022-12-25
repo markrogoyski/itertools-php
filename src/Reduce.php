@@ -131,4 +131,48 @@ class Reduce
 
         return $count ? ($sum / $count) : null;
     }
+
+    /**
+     * Returns true if given collection is sorted directly otherwise false.
+     *
+     * Items of given collection must be comparable.
+     *
+     * Returns true if given collection is empty or has one element.
+     *
+     * @param iterable<mixed> $data
+     *
+     * @return bool
+     */
+    public static function isSortedDirectly(iterable $data): bool
+    {
+        foreach (Single::eachPair($data) as [$lhs, $rhs]) {
+            if ($rhs < $lhs) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns true if given collection is sorted reversely otherwise false.
+     *
+     * Items of given collection must be comparable.
+     *
+     * Returns true if given collection is empty or has one element.
+     *
+     * @param iterable<mixed> $data
+     *
+     * @return bool
+     */
+    public static function isSortedReversely(iterable $data): bool
+    {
+        foreach (Single::eachPair($data) as [$lhs, $rhs]) {
+            if ($rhs > $lhs) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
