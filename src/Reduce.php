@@ -74,6 +74,10 @@ class Reduce
      */
     public static function toCount(iterable $data): int
     {
+        if (is_array($data) || $data instanceof \Countable) {
+            return count($data);
+        }
+
         return static::toValue($data, static function ($carry) {
             return $carry+1;
         }, 0);

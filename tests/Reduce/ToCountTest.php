@@ -6,6 +6,7 @@ namespace IterTools\Tests\Reduce;
 
 use IterTools\Reduce;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
+use IterTools\Tests\Fixture\CountableIteratorAggregateFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
@@ -133,6 +134,41 @@ class ToCountTest extends \PHPUnit\Framework\TestCase
     {
         $trav = static function (array $data) {
             return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            //  data                           expected
+            [   $trav([]),                     0      ],
+            [   $trav([0]),                    1      ],
+            [   $trav([null]),                 1      ],
+            [   $trav(['']),                   1      ],
+            [   $trav(['', null]),             2      ],
+            [   $trav([1, 2, 3]),              3      ],
+            [   $trav([[1], '2', 3]),          3      ],
+        ];
+    }
+
+    /**
+     * @test         toCount countables
+     * @dataProvider dataProviderForCountables
+     * @param        CountableIteratorAggregateFixture $data
+     * @param        int|float $expected
+     */
+    public function testCountables(CountableIteratorAggregateFixture $data, $expected)
+    {
+        // Given: $data
+
+        // When
+        $result = Reduce::toCount($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public function dataProviderForCountables(): array
+    {
+        $trav = static function (array $data) {
+            return new CountableIteratorAggregateFixture($data);
         };
 
         return [
