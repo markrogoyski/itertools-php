@@ -159,10 +159,10 @@ class Single
                     $hash = 'array_'.md5(serialize($datum));
                     break;
                 case is_object($datum):
-                    $hash = $strict ? 'object_'.spl_object_id($datum) : md5(serialize($datum));
+                    $hash = 'object_'.($strict ? spl_object_id($datum) : md5(serialize($datum)));
                     break;
                 default:
-                    $hash = $strict ? gettype($datum).'_'.$datum : (string)$datum;
+                    $hash = $strict ? gettype($datum).'_'.$datum : 'scalar_'.$datum;
                     break;
             }
 
