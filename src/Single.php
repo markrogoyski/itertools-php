@@ -161,8 +161,23 @@ class Single
                 case is_object($datum):
                     $hash = 'object_'.($strict ? spl_object_id($datum) : md5(serialize($datum)));
                     break;
+                case $strict:
+                    $hash = gettype($datum).'_'.$datum;
+                    break;
+                case gettype($datum) === 'boolean':
+                    $hash = 'boolean_'.(int)$datum;
+                    break;
+                case !$datum:
+                    $hash = 'boolean_0';
+                    break;
+                case (string)$datum === '1':
+                    $hash = 'boolean_1';
+                    break;
+                case is_numeric($datum):
+                    $hash = 'numeric_'.(float)$datum;
+                    break;
                 default:
-                    $hash = $strict ? gettype($datum).'_'.$datum : 'scalar_'.$datum;
+                    $hash = 'scalar_'.$datum;
                     break;
             }
 
@@ -170,6 +185,8 @@ class Single
                 $map[$hash] = true;
                 yield $datum;
             }
+
+            $a = 1;
         }
     }
 
