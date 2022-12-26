@@ -185,8 +185,6 @@ class Single
                 $map[$hash] = true;
                 yield $datum;
             }
-
-            $a = 1;
         }
     }
 
