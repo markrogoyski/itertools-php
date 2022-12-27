@@ -240,7 +240,7 @@ class Single
      *
      * @return \Generator<array{T, T}>
      */
-    public static function eachPair(iterable $data): \Generator
+    public static function pairwise(iterable $data): \Generator
     {
         $prevDatum = null;
         $prevDatumInitialized = false;

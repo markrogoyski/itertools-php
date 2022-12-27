@@ -9,7 +9,7 @@ use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
-class EachPairTest extends \PHPUnit\Framework\TestCase
+class PairwiseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderForArray
@@ -22,7 +22,7 @@ class EachPairTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::eachPair($data) as $datum) {
+        foreach (Single::pairwise($data) as $datum) {
             $result[] = $datum;
         }
 
@@ -54,7 +54,7 @@ class EachPairTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::eachPair($data) as $datum) {
+        foreach (Single::pairwise($data) as $datum) {
             $result[] = $datum;
         }
 
@@ -90,7 +90,7 @@ class EachPairTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::eachPair($data) as $datum) {
+        foreach (Single::pairwise($data) as $datum) {
             $result[] = $datum;
         }
 
@@ -126,7 +126,7 @@ class EachPairTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::eachPair($data) as $datum) {
+        foreach (Single::pairwise($data) as $datum) {
             $result[] = $datum;
         }
 

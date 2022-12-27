@@ -29,7 +29,7 @@ Quick Reference
 | [`repeat`](#Repeat)              | Repeat an item                                  | `Single::repeat($item, $repetitions)`       |
 | [`string`](#String)              | Iterate the characters of a string              | `Single::string($string)`                   |
 | [`takeWhile`](#Take-While)       | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`      |
-| [`eachPair`](#Each-Pair)         | Iterate pairs of elements from given collection | `Single::eachPair($data)`                   |
+| [`pairwise`](#Pairwise)          | Iterate pairs of elements from given collection | `Single::pairwise($data)`                   |
 
 #### Infinite Iteration
 | Iterator | Description | Code Snippet |
@@ -58,17 +58,17 @@ Quick Reference
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
 
 #### Reduce
-| Reducer                                     | Description                                                         | Code Snippet                                      |
-|---------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
-| [`toValue`](#To-Value)                      | Reduce collection using callable reducer                            | `Reduce::toValue($data, $reducer, $initialValue)` |
-| [`toMin`](#To-Min)                          | Reduce collection to it's greatest element                          | `Reduce::toMin($data)`                            |
-| [`toMax`](#To-Max)                          | Reduce collection to it's smallest element                          | `Reduce::toMax($data)`                            |
-| [`toCount`](#To-Count)                      | Reduce collection to it's length                                    | `Reduce::toCount($data)`                          |
-| [`toSum`](#To-Sum)                          | Reduce collection to the sum of it's elements                       | `Reduce::toSum($data)`                            |
-| [`toProduct`](#To-Product)                  | Reduce collection to the product of it's elements                   | `Reduce::toProduct($data)`                        |
-| [`toAverage`](#To-Average)                  | Reduce collection to the average of it's elements                   | `Reduce::toAverage($data)`                        |
-| [`isSortedDirectly`](#Is-Sorted-Directly)   | Reduce collection to true if it is sorted directly otherwise false  | `Reduce::isSortedDirectly($data)`                 |
-| [`isSortedReversely`](#Is-Sorted-Reversely) | Reduce collection to true if it is sorted reversely otherwise false | `Reduce::isSortedReversely($data)`                |
+| Reducer                        | Description                                                         | Code Snippet                                      |
+|--------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
+| [`toValue`](#To-Value)         | Reduce collection using callable reducer                            | `Reduce::toValue($data, $reducer, $initialValue)` |
+| [`toMin`](#To-Min)             | Reduce collection to it's greatest element                          | `Reduce::toMin($data)`                            |
+| [`toMax`](#To-Max)             | Reduce collection to it's smallest element                          | `Reduce::toMax($data)`                            |
+| [`toCount`](#To-Count)         | Reduce collection to it's length                                    | `Reduce::toCount($data)`                          |
+| [`toSum`](#To-Sum)             | Reduce collection to the sum of it's elements                       | `Reduce::toSum($data)`                            |
+| [`toProduct`](#To-Product)     | Reduce collection to the product of it's elements                   | `Reduce::toProduct($data)`                        |
+| [`toAverage`](#To-Average)     | Reduce collection to the average of it's elements                   | `Reduce::toAverage($data)`                        |
+| [`isSorted`](#Is-Sorted)       | Reduce collection to true if it is sorted directly otherwise false  | `Reduce::isSorted($data)`                         |
+| [`isReversed`](#Is-Reversed)   | Reduce collection to true if it is sorted reversely otherwise false | `Reduce::isReversed($data)`                       |
 
 Setup
 -----
@@ -378,18 +378,19 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
 // 0, 0
 ```
 
-### Each pair
+### Pairwise
 Return pairs of elements from given collection.
 
 Returns empty generator if given collection contains less than 2 elements.
 
-```Single::eachPair(iterable $data)```
+```Single::pairwise(iterable $data)```
+
 ```php
 Use IterTools\Single;
 
 $data = [1, 2, 3, 4, 5];
 
-foreach (Single::eachPair($data) as [$lhs, $rhs]) {
+foreach (Single::pairwise($data) as [$lhs, $rhs]) {
     print("{$lhs}_{$lhs}");
 }
 // 1_2, 2_3, 3_4, 4_5
@@ -757,47 +758,49 @@ $result = Reduce::toAverage($input);
 // 5
 ```
 
-### Is Sorted Directly
+### Is Sorted
 Returns true if given collection is sorted directly otherwise false.
 
 Items of given collection must be comparable.
 
 Returns true if given collection is empty or has one element.
 
-```Reduce::isSortedDirectly(iterable $data)```
+```Reduce::isSorted(iterable $data)```
+
 ```php
 use IterTools\Reduce;
 
 $input = [1, 2, 3, 4, 5];
 
-$result = Reduce::isSortedDirectly($input);
+$result = Reduce::isSorted($input);
 // true
 
 $input = [3, 2, 3, 4, 5];
 
-$result = Reduce::isSortedDirectly($input);
+$result = Reduce::isSorted($input);
 // false
 ```
 
-### Is Sorted Reversely
+### Is Reversed
 Returns true if given collection is sorted reversely otherwise false.
 
 Items of given collection must be comparable.
 
 Returns true if given collection is empty or has one element.
 
-```Reduce::isSortedReversely(iterable $data)```
+```Reduce::isReversed(iterable $data)```
+
 ```php
 use IterTools\Reduce;
 
 $input = [5, 4, 3, 2, 1];
 
-$result = Reduce::isSortedReversely($input);
+$result = Reduce::isReversed($input);
 // true
 
 $input = [1, 4, 3, 2, 1];
 
-$result = Reduce::isSortedReversely($input);
+$result = Reduce::isReversed($input);
 // false
 ```
 
