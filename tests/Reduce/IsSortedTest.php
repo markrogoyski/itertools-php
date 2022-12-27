@@ -12,12 +12,11 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class IsSortedTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @test         isSortedDirectly array
-     * @dataProvider dataProviderForArray
+     * @test         isSorted array true
+     * @dataProvider dataProviderForArrayTrue
      * @param        array $data
-     * @param        int|float $expected
      */
-    public function testArray(array $data, $expected)
+    public function testArrayTrue(array $data)
     {
         // Given: $data
 
@@ -25,46 +24,37 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::isSorted($data);
 
         // Then
-        $this->assertSame($expected, $result);
+        $this->assertTrue($result);
     }
 
-    public function dataProviderForArray(): array
+    public function dataProviderForArrayTrue(): array
     {
         return [
-            //  data                    expected
-            [   [],                     true      ],
-            [   [0],                    true      ],
-            [   [null],                 true      ],
-            [   [0, 1],                 true      ],
-            [   [null, null],           true      ],
-            [   [null, 1],              true      ],
-            [   [1, null],              false     ],
-            [   [-1, null],             false     ],
-            [   [0, 0],                 true      ],
-            [   [1, 1],                 true      ],
-            [   [1, 0],                 false     ],
-            [   [1, 2, 3],              true      ],
-            [   [3, 2, 1],              false     ],
-            [   [2, 2, 2],              true      ],
-            [   [2, 2, 3],              true      ],
-            [   [2, 3, 1],              false     ],
-            [   ['a', 'b', 'c'],        true      ],
-            [   ['b', 'a', 'c'],        false     ],
-            [   [['a'], ['b'], ['c']],  true      ],
-            [   [['b'], ['a'], ['c']],  false     ],
-            [   [['b'], ['a', 'a']],    true      ],
-            [   [['bb'], ['a', 'a']],   true      ],
-            [   [['a', 'a'], ['b']],    false     ],
+            //  data
+            [   [],                         ],
+            [   [0],                        ],
+            [   [null],                     ],
+            [   [0, 1],                     ],
+            [   [null, null],               ],
+            [   [null, 1],                  ],
+            [   [0, 0],                     ],
+            [   [1, 1],                     ],
+            [   [1, 2, 3],                  ],
+            [   [2, 2, 2],                  ],
+            [   [2, 2, 3],                  ],
+            [   ['a', 'b', 'c'],            ],
+            [   [['a'], ['b'], ['c']],      ],
+            [   [['b'], ['a', 'a']],        ],
+            [   [['bb'], ['a', 'a']],       ],
         ];
     }
 
     /**
-     * @test         isSortedDirectly generators
-     * @dataProvider dataProviderForGenerators
-     * @param        \Generator $data
-     * @param        mixed $expected
+     * @test         isSorted array false
+     * @dataProvider dataProviderForArrayFalse
+     * @param        array $data
      */
-    public function testGenerators(\Generator $data, $expected)
+    public function testArrayFalse(array $data)
     {
         // Given: $data
 
@@ -72,50 +62,72 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::isSorted($data);
 
         // Then
-        $this->assertSame($expected, $result);
+        $this->assertFalse($result);
     }
 
-    public function dataProviderForGenerators(): array
+    public function dataProviderForArrayFalse(): array
+    {
+        return [
+            //  data
+            [   [1, null],                  ],
+            [   [-1, null],                 ],
+            [   [1, 0],                     ],
+            [   [3, 2, 1],                  ],
+            [   [2, 3, 1],                  ],
+            [   ['b', 'a', 'c'],            ],
+            [   [['b'], ['a'], ['c']],      ],
+            [   [['a', 'a'], ['b']],        ],
+        ];
+    }
+
+    /**
+     * @test         isSorted generators true
+     * @dataProvider dataProviderForGeneratorsTrue
+     * @param        \Generator $data
+     */
+    public function testGeneratorsTrue(\Generator $data)
+    {
+        // Given: $data
+
+        // When
+        $result = Reduce::isSorted($data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    public function dataProviderForGeneratorsTrue(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
         };
 
         return [
-            //  data                          expected
-            [   $gen([]),                     true      ],
-            [   $gen([0]),                    true      ],
-            [   $gen([null]),                 true      ],
-            [   $gen([0, 1]),                 true      ],
-            [   $gen([null, null]),           true      ],
-            [   $gen([null, 1]),              true      ],
-            [   $gen([1, null]),              false     ],
-            [   $gen([-1, null]),             false     ],
-            [   $gen([0, 0]),                 true      ],
-            [   $gen([1, 1]),                 true      ],
-            [   $gen([1, 0]),                 false     ],
-            [   $gen([1, 2, 3]),              true      ],
-            [   $gen([3, 2, 1]),              false     ],
-            [   $gen([2, 2, 2]),              true      ],
-            [   $gen([2, 2, 3]),              true      ],
-            [   $gen([2, 3, 1]),              false     ],
-            [   $gen(['a', 'b', 'c']),        true      ],
-            [   $gen(['b', 'a', 'c']),        false     ],
-            [   $gen([['a'], ['b'], ['c']]),  true      ],
-            [   $gen([['b'], ['a'], ['c']]),  false     ],
-            [   $gen([['b'], ['a', 'a']]),    true      ],
-            [   $gen([['bb'], ['a', 'a']]),   true      ],
-            [   $gen([['a', 'a'], ['b']]),    false     ],
+            //  data
+            [   $gen([]),                         ],
+            [   $gen([0]),                        ],
+            [   $gen([null]),                     ],
+            [   $gen([0, 1]),                     ],
+            [   $gen([null, null]),               ],
+            [   $gen([null, 1]),                  ],
+            [   $gen([0, 0]),                     ],
+            [   $gen([1, 1]),                     ],
+            [   $gen([1, 2, 3]),                  ],
+            [   $gen([2, 2, 2]),                  ],
+            [   $gen([2, 2, 3]),                  ],
+            [   $gen(['a', 'b', 'c']),            ],
+            [   $gen([['a'], ['b'], ['c']]),      ],
+            [   $gen([['b'], ['a', 'a']]),        ],
+            [   $gen([['bb'], ['a', 'a']]),       ],
         ];
     }
 
     /**
-     * @test         isSortedDirectly iterators
-     * @dataProvider dataProviderForIterators
+     * @test         isSorted generators false
+     * @dataProvider dataProviderForGeneratorsFalse
      * @param        \Generator $data
-     * @param        mixed $expected
      */
-    public function testIterators(\Iterator $data, $expected)
+    public function testGeneratorsFalse(\Generator $data)
     {
         // Given: $data
 
@@ -123,50 +135,76 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::isSorted($data);
 
         // Then
-        $this->assertSame($expected, $result);
+        $this->assertFalse($result);
     }
 
-    public function dataProviderForIterators(): array
+    public function dataProviderForGeneratorsFalse(): array
+    {
+        $gen = static function (array $data) {
+            return GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            //  data
+            [   $gen([1, null]),                  ],
+            [   $gen([-1, null]),                 ],
+            [   $gen([1, 0]),                     ],
+            [   $gen([3, 2, 1]),                  ],
+            [   $gen([2, 3, 1]),                  ],
+            [   $gen(['b', 'a', 'c']),            ],
+            [   $gen([['b'], ['a'], ['c']]),      ],
+            [   $gen([['a', 'a'], ['b']]),        ],
+        ];
+    }
+
+    /**
+     * @test         isSorted iterators true
+     * @dataProvider dataProviderForIteratorsTrue
+     * @param        \Generator $data
+     */
+    public function testIteratorsTrue(\Iterator $data)
+    {
+        // Given: $data
+
+        // When
+        $result = Reduce::isSorted($data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    public function dataProviderForIteratorsTrue(): array
     {
         $iter = static function (array $data) {
             return new ArrayIteratorFixture($data);
         };
 
         return [
-            //  data                           expected
-            [   $iter([]),                     true      ],
-            [   $iter([0]),                    true      ],
-            [   $iter([null]),                 true      ],
-            [   $iter([0, 1]),                 true      ],
-            [   $iter([null, null]),           true      ],
-            [   $iter([null, 1]),              true      ],
-            [   $iter([1, null]),              false     ],
-            [   $iter([-1, null]),             false     ],
-            [   $iter([0, 0]),                 true      ],
-            [   $iter([1, 1]),                 true      ],
-            [   $iter([1, 0]),                 false     ],
-            [   $iter([1, 2, 3]),              true      ],
-            [   $iter([3, 2, 1]),              false     ],
-            [   $iter([2, 2, 2]),              true      ],
-            [   $iter([2, 2, 3]),              true      ],
-            [   $iter([2, 3, 1]),              false     ],
-            [   $iter(['a', 'b', 'c']),        true      ],
-            [   $iter(['b', 'a', 'c']),        false     ],
-            [   $iter([['a'], ['b'], ['c']]),  true      ],
-            [   $iter([['b'], ['a'], ['c']]),  false     ],
-            [   $iter([['b'], ['a', 'a']]),    true      ],
-            [   $iter([['bb'], ['a', 'a']]),   true      ],
-            [   $iter([['a', 'a'], ['b']]),    false     ],
+            //  data
+            [   $iter([]),                         ],
+            [   $iter([0]),                        ],
+            [   $iter([null]),                     ],
+            [   $iter([0, 1]),                     ],
+            [   $iter([null, null]),               ],
+            [   $iter([null, 1]),                  ],
+            [   $iter([0, 0]),                     ],
+            [   $iter([1, 1]),                     ],
+            [   $iter([1, 2, 3]),                  ],
+            [   $iter([2, 2, 2]),                  ],
+            [   $iter([2, 2, 3]),                  ],
+            [   $iter(['a', 'b', 'c']),            ],
+            [   $iter([['a'], ['b'], ['c']]),      ],
+            [   $iter([['b'], ['a', 'a']]),        ],
+            [   $iter([['bb'], ['a', 'a']]),       ],
         ];
     }
 
     /**
-     * @test         isSortedDirectly traversables
-     * @dataProvider dataProviderForTraversables
-     * @param        \Traversable $data
-     * @param        mixed $expected
+     * @test         isSorted iterators false
+     * @dataProvider dataProviderForIteratorsFalse
+     * @param        \Generator $data
      */
-    public function testTraversables(\Traversable $data, $expected)
+    public function testIteratorsFalse(\Iterator $data)
     {
         // Given: $data
 
@@ -174,40 +212,102 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::isSorted($data);
 
         // Then
-        $this->assertSame($expected, $result);
+        $this->assertFalse($result);
     }
 
-    public function dataProviderForTraversables(): array
+    public function dataProviderForIteratorsFalse(): array
+    {
+        $iter = static function (array $data) {
+            return new ArrayIteratorFixture($data);
+        };
+
+        return [
+            //  data
+            [   $iter([1, null]),                  ],
+            [   $iter([-1, null]),                 ],
+            [   $iter([1, 0]),                     ],
+            [   $iter([3, 2, 1]),                  ],
+            [   $iter([2, 3, 1]),                  ],
+            [   $iter(['b', 'a', 'c']),            ],
+            [   $iter([['b'], ['a'], ['c']]),      ],
+            [   $iter([['a', 'a'], ['b']]),        ],
+        ];
+    }
+
+    /**
+     * @test         isSorted traversables true
+     * @dataProvider dataProviderForTraversablesTrue
+     * @param        \Traversable $data
+     */
+    public function testTraversablesTrue(\Traversable $data)
+    {
+        // Given: $data
+
+        // When
+        $result = Reduce::isSorted($data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    public function dataProviderForTraversablesTrue(): array
     {
         $trav = static function (array $data) {
             return new IteratorAggregateFixture($data);
         };
 
         return [
-            //  data                           expected
-            [   $trav([]),                     true      ],
-            [   $trav([0]),                    true      ],
-            [   $trav([null]),                 true      ],
-            [   $trav([0, 1]),                 true      ],
-            [   $trav([null, null]),           true      ],
-            [   $trav([null, 1]),              true      ],
-            [   $trav([1, null]),              false     ],
-            [   $trav([-1, null]),             false     ],
-            [   $trav([0, 0]),                 true      ],
-            [   $trav([1, 1]),                 true      ],
-            [   $trav([1, 0]),                 false     ],
-            [   $trav([1, 2, 3]),              true      ],
-            [   $trav([3, 2, 1]),              false     ],
-            [   $trav([2, 2, 2]),              true      ],
-            [   $trav([2, 2, 3]),              true      ],
-            [   $trav([2, 3, 1]),              false     ],
-            [   $trav(['a', 'b', 'c']),        true      ],
-            [   $trav(['b', 'a', 'c']),        false     ],
-            [   $trav([['a'], ['b'], ['c']]),  true      ],
-            [   $trav([['b'], ['a'], ['c']]),  false     ],
-            [   $trav([['b'], ['a', 'a']]),    true      ],
-            [   $trav([['bb'], ['a', 'a']]),   true      ],
-            [   $trav([['a', 'a'], ['b']]),    false     ],
+            //  data
+            [   $trav([]),                         ],
+            [   $trav([0]),                        ],
+            [   $trav([null]),                     ],
+            [   $trav([0, 1]),                     ],
+            [   $trav([null, null]),               ],
+            [   $trav([null, 1]),                  ],
+            [   $trav([0, 0]),                     ],
+            [   $trav([1, 1]),                     ],
+            [   $trav([1, 2, 3]),                  ],
+            [   $trav([2, 2, 2]),                  ],
+            [   $trav([2, 2, 3]),                  ],
+            [   $trav(['a', 'b', 'c']),            ],
+            [   $trav([['a'], ['b'], ['c']]),      ],
+            [   $trav([['b'], ['a', 'a']]),        ],
+            [   $trav([['bb'], ['a', 'a']]),       ],
+        ];
+    }
+
+    /**
+     * @test         isSorted traversables false
+     * @dataProvider dataProviderForTraversablesFalse
+     * @param        \Traversable $data
+     */
+    public function testTraversablesFalse(\Traversable $data)
+    {
+        // Given: $data
+
+        // When
+        $result = Reduce::isSorted($data);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    public function dataProviderForTraversablesFalse(): array
+    {
+        $trav = static function (array $data) {
+            return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            //  data
+            [   $trav([1, null]),                  ],
+            [   $trav([-1, null]),                 ],
+            [   $trav([1, 0]),                     ],
+            [   $trav([3, 2, 1]),                  ],
+            [   $trav([2, 3, 1]),                  ],
+            [   $trav(['b', 'a', 'c']),            ],
+            [   $trav([['b'], ['a'], ['c']]),      ],
+            [   $trav([['a', 'a'], ['b']]),        ],
         ];
     }
 }
