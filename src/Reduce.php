@@ -74,7 +74,7 @@ class Reduce
      */
     public static function toCount(iterable $data): int
     {
-        if (is_array($data) || $data instanceof \Countable) {
+        if (is_countable($data)) {
             return count($data);
         }
 
@@ -143,9 +143,9 @@ class Reduce
      *
      * @return bool
      */
-    public static function isSortedDirectly(iterable $data): bool
+    public static function isSorted(iterable $data): bool
     {
-        foreach (Single::eachPair($data) as [$lhs, $rhs]) {
+        foreach (Single::pairwise($data) as [$lhs, $rhs]) {
             if ($rhs < $lhs) {
                 return false;
             }
@@ -165,9 +165,9 @@ class Reduce
      *
      * @return bool
      */
-    public static function isSortedReversely(iterable $data): bool
+    public static function isReversed(iterable $data): bool
     {
-        foreach (Single::eachPair($data) as [$lhs, $rhs]) {
+        foreach (Single::pairwise($data) as [$lhs, $rhs]) {
             if ($rhs > $lhs) {
                 return false;
             }
