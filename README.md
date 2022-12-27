@@ -21,21 +21,22 @@ Quick Reference
 | [`zipEqual`](#ZipEqual)     | Iterate multiple collections of equal length simultaneously, error if lengths not equal | `Multi::zipEqual($list1, $list2)`   |
 
 #### Single Iteration
-| Iterator                                 | Description                                   | Code Snippet                                                |
-|------------------------------------------|-----------------------------------------------|-------------------------------------------------------------|
-| [`chunkwise`](#Chunkwise)                | Iterate by chunks                             | `Single::chunkwise($data, $chunkSize)`                      |
-| [`chunkwiseOverlap`](#Chunkwise-Overlap) | Iterate by overlapped chunks                  | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
-| [`compress`](#Compress)                  | Filter out elements not selected              | `Single::compress($data, $selectors)`                       |
-| [`dropWhile`](#Drop-While)               | Drop elements while predicate is true         | `Single::dropWhile($data, $predicate)`                      |
-| [`filterFalse`](#Filter-False)           | Filter out elements where predicate not false | `Single::filterFalse($data, $predicate)`                    |
-| [`filterTrue`](#Filter-True)             | Filter out elements where predicate not true  | `Single::filterTrue($data, $predicate)`                     |
-| [`groupBy`](#Group-By)                   | Group data by a common element                | `Single::groupBy($data, $groupKeyFunction)`                 |
-| [`limit`](#Limit)                        | Iterate up to a limit                         | `Single::limit($data, $limit)`                              |
-| [`map`](#Map)                            | Map function onto each item                   | `Single::map($data, $function)`                             |
-| [`pairwise`](#Pairwise)                  | Iterate successive overlapping pairs          | `Single::pairwise($data)`                                   |
-| [`repeat`](#Repeat)                      | Repeat an item                                | `Single::repeat($item, $repetitions)`                       |
-| [`string`](#String)                      | Iterate the characters of a string            | `Single::string($string)`                                   |
-| [`takeWhile`](#Take-While)               | Iterate elements while predicate is true      | `Single::takeWhile($data, $predicate)`                      |
+| Iterator                                 | Description                                     | Code Snippet                                                |
+|------------------------------------------|-------------------------------------------------|-------------------------------------------------------------|
+| [`chunkwise`](#Chunkwise)                | Iterate by chunks                               | `Single::chunkwise($data, $chunkSize)`                      |
+| [`chunkwiseOverlap`](#Chunkwise-Overlap) | Iterate by overlapped chunks                    | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
+| [`compress`](#Compress)                  | Filter out elements not selected                | `Single::compress($data, $selectors)`                       |
+| [`dropWhile`](#Drop-While)               | Drop elements while predicate is true           | `Single::dropWhile($data, $predicate)`                      |
+| [`filterFalse`](#Filter-False)           | Filter out elements where predicate not false   | `Single::filterFalse($data, $predicate)`                    |
+| [`filterTrue`](#Filter-True)             | Filter out elements where predicate not true    | `Single::filterTrue($data, $predicate)`                     |
+| [`groupBy`](#Group-By)                   | Group data by a common element                  | `Single::groupBy($data, $groupKeyFunction)`                 |
+| [`limit`](#Limit)                        | Iterate up to a limit                           | `Single::limit($data, $limit)`                              |
+| [`map`](#Map)                            | Map function onto each item                     | `Single::map($data, $function)`                             |
+| [`pairwise`](#Pairwise)                  | Iterate successive overlapping pairs            | `Single::pairwise($data)`                                   |
+| [`repeat`](#Repeat)                      | Repeat an item                                  | `Single::repeat($item, $repetitions)`                       |
+| [`string`](#String)                      | Iterate the characters of a string              | `Single::string($string)`                                   |
+| [`takeWhile`](#Take-While)               | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`                      |
+| [`filterUnique`](#Filter-Unique)         | Filter out elements: iterate only unique items  | `Single::filterUnique($data, $strict)`                      |
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
@@ -551,6 +552,37 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
     print($freePrice);
 }
 // 0, 0
+```
+
+### Filter Unique
+Filter out elements from the iterable only returning unique elements.
+
+```Single::filterUnique(iterable $data, bool $strict)```
+
+If `$strict = true`:
+- **scalars**: compares strictly by type;
+- **objects**: always treats different instances as not equal to each other;
+- **arrays**: compares serialized.
+
+If `$strict = false`:
+- **scalars**: compares non-strictly by value;
+- **objects**: compares serialized;
+- **arrays**: compares serialized.
+
+```php
+Use IterTools\Single;
+
+$input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
+
+foreach (Single::filterUnique($input, true) as $datum) {
+    print($datum);
+}
+// 1, 2, 3, '1', '2', '3'
+
+foreach (Single::filterUnique($input, false) as $datum) {
+    print($datum);
+}
+// 1, 2, 3
 ```
 
 ## Infinite Iteration
