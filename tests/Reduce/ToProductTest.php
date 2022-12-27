@@ -26,10 +26,8 @@ class ToProductTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toProduct($data);
 
-        $this->roundIfFloat($expected, $result);
-
         // Then
-        $this->assertSame($expected, $result);
+        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
     }
 
     public function dataProviderForArray(): array
@@ -66,10 +64,8 @@ class ToProductTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toProduct($data);
 
-        $this->roundIfFloat($expected, $result);
-
         // Then
-        $this->assertSame($expected, $result);
+        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
     }
 
     public function dataProviderForGenerators(): array
@@ -110,10 +106,8 @@ class ToProductTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toProduct($data);
 
-        $this->roundIfFloat($expected, $result);
-
         // Then
-        $this->assertSame($expected, $result);
+        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
     }
 
     public function dataProviderForIterators(): array
@@ -154,10 +148,8 @@ class ToProductTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toProduct($data);
 
-        $this->roundIfFloat($expected, $result);
-
         // Then
-        $this->assertSame($expected, $result);
+        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
     }
 
     public function dataProviderForTraversables(): array
@@ -183,13 +175,5 @@ class ToProductTest extends \PHPUnit\Framework\TestCase
             [   $trav([1.1, 2.2, 3.3]),        7.986  ],
             [   $trav([1.1, 2, 3.3]),          7.26   ],
         ];
-    }
-
-    protected function roundIfFloat(&$expected, &$result): void
-    {
-        if (is_float($expected) && is_float($result)) {
-            $result = round($result, self::ROUND_PRECISION);
-            $expected = round($expected, self::ROUND_PRECISION);
-        }
     }
 }
