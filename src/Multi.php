@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Utility\StrictMultipleIterator;
+
 class Multi
 {
     /**
@@ -48,6 +50,28 @@ class Multi
             $zippedIterator->attachIterator(Util::makeIterator($iterable));
         }
         $zippedIterator->setFlags(\MultipleIterator::MIT_NEED_ANY);
+
+        return $zippedIterator;
+    }
+
+    /**
+     * Iterate multiple iterable collections simultaneously.
+     *
+     * Works like Multi::zipStrict() method
+     * but throws OutOfRangeException if at least one iterator ends before the others.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \MultipleIterator<mixed>
+     * @throws \OutOfRangeException
+     */
+    public static function zipStrict(iterable ...$iterables): \MultipleIterator
+    {
+        $zippedIterator = new StrictMultipleIterator(\MultipleIterator::MIT_NEED_ALL);
+        foreach ($iterables as $iterable) {
+            $zippedIterator->attachIterator(Util::makeIterator($iterable));
+        }
+        $zippedIterator->setFlags(\MultipleIterator::MIT_NEED_ALL);
 
         return $zippedIterator;
     }
