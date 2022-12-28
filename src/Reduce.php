@@ -131,4 +131,78 @@ class Reduce
 
         return $count ? ($sum / $count) : null;
     }
+
+    /**
+     * Returns true if given collection is exactly the same as another ones.
+     *
+     * @param iterable<mixed> $data
+     * @param iterable<mixed> $n
+     * @param iterable<mixed> ...$extra
+     *
+     * @return bool
+     */
+    public static function exactlyN(iterable $data, iterable $n, iterable ...$extra): bool
+    {
+        $iterables = [$data, $n, ...$extra];
+
+        try {
+            foreach (Multi::zipStrict(...$iterables) as $values) {
+                foreach (Single::pairwise($values) as [$lhs, $rhs]) {
+                    if ($lhs !== $rhs) {
+                        return false;
+                    }
+                }
+            }
+        } catch (\OutOfRangeException $e) {
+            return false;
+        }
+
+        return true;
+
+        // FIXME: remove this code
+        // =========================================== //
+        // OLD REALISATION WITHOUT Single::zipStrict() //
+        // =========================================== //
+
+        //$iterators = array_map(static function (iterable $iterable): \Iterator {
+        //    $iterator = Util::makeIterator($iterable);
+        //
+        //    if ($iterator instanceof \IteratorIterator) {
+        //        $iterator->rewind();
+        //    }
+        //
+        //    return $iterator;
+        //}, [$data, $n, ...$extra]);
+        //
+        //while (true) {
+        //    $statuses = array_map(static function (\Iterator $iterator) {
+        //        return $iterator->valid();
+        //    }, $iterators);
+        //
+        //    /** @var array{bool}|array{bool, bool} $uniqueStatuses */
+        //    $uniqueStatuses = iterator_to_array(Single::filterUnique($statuses));
+        //
+        //    if (count($uniqueStatuses) > 1) {
+        //        return false;
+        //    }
+        //
+        //    if (!$uniqueStatuses[0]) {
+        //        return true;
+        //    }
+        //
+        //    /**
+        //     * @var \Iterator $lhs
+        //     * @var \Iterator $rhs
+        //     */
+        //    foreach (Single::pairwise($iterators) as [$lhs, $rhs]) {
+        //        if ($lhs->current() !== $rhs->current()) {
+        //            return false;
+        //        }
+        //    }
+        //
+        //    foreach ($iterators as $iterator) {
+        //        $iterator->next();
+        //    }
+        //}
+    }
 }

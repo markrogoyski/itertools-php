@@ -72,6 +72,7 @@ Quick Reference
 | [`toMin`](#To-Min)             | Reduce to its smallest element                                      | `Reduce::toMin($numbers)`                         |
 | [`toProduct`](#To-Product)     | Reduce to the product of its elements                               | `Reduce::toProduct($numbers)`                     |
 | [`toSum`](#To-Sum)             | Reduce to the sum of its elements                                   | `Reduce::toSum($numbers)`                         |
+| [`exactlyN`](#Exactly-N)       | True if iterables are th same          | `Reduce::exactlyN($data, $n, ...$extra)`          |
 | [`toValue`](#To-Value)         | Reduce to value using callable reducer                              | `Reduce::toValue($data, $reducer, $initialValue)` |
 
 Setup
@@ -776,6 +777,32 @@ $parts = [10, 20, 30];
 
 $sum = Reduce::toSum($parts);
 // 60
+```
+
+### Exactly N
+Returns true if given collection is sorted reversely otherwise false.
+
+Items of given collection must be comparable.
+
+Returns true if given collection is empty or has one element.
+
+```Reduce::exactlyN(iterable $data, iterable $n, iterable ...$extra)```
+
+```php
+use IterTools\Reduce;
+
+$input = [1, 2, 3, 4, 5];
+$n1 = [1, 2, 3, 4, 5];
+$n2 = [1, 2, 3, 4, 5];
+
+$result = Reduce::exactlyN($input, $n1, $n2);
+// true
+
+$input = [1, 2, 3, 4, 5];
+$n = [1, 2, 3, 7];
+
+$result = Reduce::exactlyN($input, $n);
+// false
 ```
 
 ### To Value
