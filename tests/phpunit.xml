@@ -9,6 +9,7 @@
       <directory suffix="Test.php">Random</directory>
       <directory suffix="Test.php">Single</directory>
       <directory suffix="Test.php">Util</directory>
+      <directory suffix="Test.php">Reduce</directory>
     </testsuite>
   </testsuites>
   <coverage processUncoveredFiles="true">

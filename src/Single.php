@@ -171,4 +171,32 @@ class Single
             }
         }
     }
+
+    /**
+     * Return pairs of elements from given collection.
+     *
+     * Returns empty generator if given collection contains less than 2 elements.
+     *
+     * @template T
+     * @param iterable<T> $data
+     *
+     * @return \Generator<array{T, T}>
+     */
+    public static function pairwise(iterable $data): \Generator
+    {
+        $prevDatum = null;
+        $prevDatumInitialized = false;
+
+        foreach ($data as $datum) {
+            if (!$prevDatumInitialized) {
+                $prevDatum = $datum;
+                $prevDatumInitialized = true;
+                continue;
+            }
+
+            /** @var T $prevDatum */
+            yield [$prevDatum, $datum];
+            $prevDatum = $datum;
+        }
+    }
 }
