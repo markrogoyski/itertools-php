@@ -146,14 +146,14 @@ class Reduce
         $iterables = [$data, $n, ...$extra];
 
         try {
-            foreach (Multi::zipStrict(...$iterables) as $values) {
+            foreach (Multi::zipEqual(...$iterables) as $values) {
                 foreach (Single::pairwise($values) as [$lhs, $rhs]) {
                     if ($lhs !== $rhs) {
                         return false;
                     }
                 }
             }
-        } catch (\OutOfRangeException $e) {
+        } catch (\LengthException $e) {
             return false;
         }
 
