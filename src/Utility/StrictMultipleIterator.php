@@ -4,18 +4,18 @@ namespace IterTools\Utility;
 
 /**
  * Works like \MultipleIterator
- * but throws OutOfRangeException if at least one iterator ends before the others while iteration process.
+ * but throws \LengthException if at least one iterator ends before the others while iteration process.
  *
  * {@inheritDoc}
  */
 class StrictMultipleIterator extends \MultipleIterator
 {
     /**
-     * Throws OutOfRangeException if at least one iterator ends before the others.
+     * Throws \LengthException if at least one iterator ends before the others.
      *
      * {@inheritDoc}
      *
-     * @throws \OutOfRangeException
+     * @throws \LengthException
      */
     public function valid(): bool
     {
@@ -41,7 +41,7 @@ class StrictMultipleIterator extends \MultipleIterator
 
             if ($isValid !== $isReallyValid) {
                 // This is situation (2)
-                throw new \OutOfRangeException();
+                throw new \LengthException();
             }
 
             // Restoring flags.

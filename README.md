@@ -16,7 +16,7 @@ Quick Reference
 | [`chain`](#Chain)           | Chain multiple iterables together                                                 | `Multi::chain($list1, $list2)`      |
 | [`zip`](#Zip)               | Iterate multiple collections simultaneously until the shortest iterator completes | `Multi::zip($list1, $list2)`        |
 | [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously until the longest iterator completes  | `Multi::zipLongest($list1, $list2)` |
-| [`zipStrict`](#ZipStrict)   | Iterate multiple collections with strictly equal lengths simultaneously           | `Multi::zipStrict($list1, $list2)`  |
+| [`zipEqual`](#ZipEqual)     | Iterate multiple collections with strictly equal lengths simultaneously           | `Multi::zipEqual($list1, $list2)`   |
 
 #### Single Iteration
 | Iterator                         | Description                                     | Code Snippet                                |
@@ -182,9 +182,9 @@ foreach (Multi::zipLongest($letters, $numbers) as [$letter, $number]) {
 ### ZipStrict
 Iterate multiple iterable collections with equal lengths simultaneously.
 
-Throws `\OutOfRangeException` if at least one iterator ends before the others.
+Throws `\LengthException` if at least one iterator ends before the others.
 
-```Multi::zipStrict(iterable ...$iterables)```
+```Multi::zipEqual(iterable ...$iterables)```
 
 ```php
 use IterTools\Multi;
@@ -192,16 +192,16 @@ use IterTools\Multi;
 $letters = ['A', 'B', 'C'];
 $numbers = [1, 2, 3];
 
-foreach (Multi::zipStrict($letters, $numbers) as [$letter, $number]) {
+foreach (Multi::zipEqual($letters, $numbers) as [$letter, $number]) {
     // ['A', 1], ['B', 2], ['C', 3]
 }
 
 $letters = ['A', 'B', 'C'];
 $numbers = [1, 2];
 
-foreach (Multi::zipStrict($letters, $numbers) as [$letter, $number]) {
+foreach (Multi::zipEqual($letters, $numbers) as [$letter, $number]) {
     // ['A', 1], ['B', 2]
-    // throws \OutOfRangeException on 3-rd iteration
+    // throws \LengthException on 3-rd iteration
 }
 ```
 

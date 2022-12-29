@@ -57,15 +57,15 @@ class Multi
     /**
      * Iterate multiple iterable collections simultaneously.
      *
-     * Works like Multi::zipStrict() method
-     * but throws OutOfRangeException if at least one iterator ends before the others.
+     * Works like Multi::zip() method
+     * but throws \LengthException if at least one iterator ends before the others.
      *
      * @param iterable<mixed> ...$iterables
      *
      * @return \MultipleIterator<mixed>
-     * @throws \OutOfRangeException
+     * @throws \LengthException
      */
-    public static function zipStrict(iterable ...$iterables): \MultipleIterator
+    public static function zipEqual(iterable ...$iterables): \MultipleIterator
     {
         $zippedIterator = new StrictMultipleIterator(\MultipleIterator::MIT_NEED_ALL);
         foreach ($iterables as $iterable) {

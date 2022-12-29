@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Multi\ZipStrict;
+namespace IterTools\Tests\Multi\ZipEqual;
 
 use IterTools\Multi;
 use IterTools\Tests\Fixture;
@@ -22,7 +22,7 @@ class TraversableTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Multi::zipStrict($iter1, $iter2) as [$value1, $value2]) {
+        foreach (Multi::zipEqual($iter1, $iter2) as [$value1, $value2]) {
             $result[] = [$value1, $value2];
         }
 
@@ -85,12 +85,12 @@ class TraversableTest extends \PHPUnit\Framework\TestCase
 
         // When
         try {
-            foreach (Multi::zipStrict($iter1, $iter2) as [$value1, $value2]) {
+            foreach (Multi::zipEqual($iter1, $iter2) as [$value1, $value2]) {
                 $result[] = [$value1, $value2];
             }
 
             $this->fail();
-        } catch (\OutOfRangeException $e) {
+        } catch (\LengthException $e) {
             // Then
             $this->assertEquals($expected, $result);
         }

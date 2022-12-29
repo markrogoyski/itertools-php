@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Multi\ZipStrict;
+namespace IterTools\Tests\Multi\ZipEqual;
 
 use IterTools\Multi;
 use IterTools\Tests\Fixture;
@@ -25,7 +25,7 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Multi::zipStrict($generator1, $generator2) as [$value1, $value2]) {
+        foreach (Multi::zipEqual($generator1, $generator2) as [$value1, $value2]) {
             $result[] = [$value1, $value2];
         }
 
@@ -72,7 +72,7 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         zipStrict with two generators of the same size
+     * @test         zipEqual with two generators of the same size
      * @dataProvider dataProviderForZipStrictTwoArraysDifferentSize
      * @param        \Generator $generator1
      * @param        \Generator $generator2
@@ -88,12 +88,12 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
 
         // When
         try {
-            foreach (Multi::zipStrict($generator1, $generator2) as [$value1, $value2]) {
+            foreach (Multi::zipEqual($generator1, $generator2) as [$value1, $value2]) {
                 $result[] = [$value1, $value2];
             }
 
             $this->fail();
-        } catch (\OutOfRangeException $e) {
+        } catch (\LengthException $e) {
             // Then
             $this->assertEquals($expected, $result);
         }
@@ -153,7 +153,7 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         zipStrict with three arrays of different size
+     * @test         zipEqual with three arrays of different size
      * @dataProvider dataProviderForZipStrictThreeArraysDifferentSize
      * @param        \Generator $generator1
      * @param        \Generator $generator2
@@ -171,12 +171,12 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
 
         // When
         try {
-            foreach (Multi::zipStrict($generator1, $generator2, $generator3) as [$value1, $value2, $value3]) {
+            foreach (Multi::zipEqual($generator1, $generator2, $generator3) as [$value1, $value2, $value3]) {
                 $result[] = [$value1, $value2, $value3];
             }
 
             $this->fail();
-        } catch (\OutOfRangeException $e) {
+        } catch (\LengthException $e) {
             // Then
             $this->assertEquals($expected, $result);
         }

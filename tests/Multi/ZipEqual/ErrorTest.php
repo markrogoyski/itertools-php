@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Multi\ZipStrict;
+namespace IterTools\Tests\Multi\ZipEqual;
 
 use IterTools\Multi;
 
@@ -19,7 +19,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\TypeError::class);
 
         // When
-        Multi::zipStrict($nonIterable);
+        Multi::zipEqual($nonIterable);
     }
 
     /**
@@ -46,7 +46,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         $result  = [];
 
         // When
-        foreach (Multi::zipStrict($nothing) as $_) {
+        foreach (Multi::zipEqual($nothing) as $_) {
             $result[] = $_;
         }
 

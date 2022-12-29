@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Multi\ZipStrict;
+namespace IterTools\Tests\Multi\ZipEqual;
 
 use IterTools\Multi;
 
 class ArrayTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @test         zipStrict with two arrays of the same size
+     * @test         zipEqual with two arrays of the same size
      * @dataProvider dataProviderForZipStrictTwoArraysSameSize
      * @param        array $array1
      * @param        array $array2
@@ -21,7 +21,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Multi::zipStrict($array1, $array2) as [$value1, $value2]) {
+        foreach (Multi::zipEqual($array1, $array2) as [$value1, $value2]) {
             $result[] = [$value1, $value2];
         }
 
@@ -64,7 +64,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         zipStrict with two arrays of the different sizes
+     * @test         zipEqual with two arrays of the different sizes
      * @dataProvider dataProviderForZipStrictTwoArraysDifferentSize
      * @param        array $array1
      * @param        array $array2
@@ -77,12 +77,12 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
 
         // When
         try {
-            foreach (Multi::zipStrict($array1, $array2) as [$value1, $value2]) {
+            foreach (Multi::zipEqual($array1, $array2) as [$value1, $value2]) {
                 $result[] = [$value1, $value2];
             }
 
             $this->fail();
-        } catch (\OutOfRangeException $e) {
+        } catch (\LengthException $e) {
             // Then
             $this->assertEquals($expected, $result);
         }
@@ -138,7 +138,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         zipStrict with three arrays of the same size
+     * @test         zipEqual with three arrays of the same size
      * @dataProvider dataProviderForZipStrictThreeArraysSameSize
      * @param        array $array1
      * @param        array $array2
@@ -155,7 +155,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Multi::zipStrict($array1, $array2, $array3) as [$value1, $value2, $value3]) {
+        foreach (Multi::zipEqual($array1, $array2, $array3) as [$value1, $value2, $value3]) {
             $result[] = [$value1, $value2, $value3];
         }
 
@@ -164,7 +164,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         zipStrict with three arrays of the same size - unpacking
+     * @test         zipEqual with three arrays of the same size - unpacking
      * @dataProvider dataProviderForZipStrictThreeArraysSameSize
      * @param        array $array1
      * @param        array $array2
@@ -181,7 +181,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Multi::zipStrict(...[$array1, $array2, $array3]) as [$value1, $value2, $value3]) {
+        foreach (Multi::zipEqual(...[$array1, $array2, $array3]) as [$value1, $value2, $value3]) {
             $result[] = [$value1, $value2, $value3];
         }
 
@@ -229,7 +229,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         zipStrict with three arrays of different size
+     * @test         zipEqual with three arrays of different size
      * @dataProvider dataProviderForZipStrictThreeArraysDifferentSize
      * @param        array $array1
      * @param        array $array2
@@ -247,12 +247,12 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
 
         // When
         try {
-            foreach (Multi::zipStrict($array1, $array2, $array3) as [$value1, $value2, $value3]) {
+            foreach (Multi::zipEqual($array1, $array2, $array3) as [$value1, $value2, $value3]) {
                 $result[] = [$value1, $value2, $value3];
             }
 
             $this->fail();
-        } catch (\OutOfRangeException $e) {
+        } catch (\LengthException $e) {
             // Then
             $this->assertEquals($expected, $result);
         }
