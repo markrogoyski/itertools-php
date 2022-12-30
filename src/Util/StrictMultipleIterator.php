@@ -1,6 +1,6 @@
 <?php
 
-namespace IterTools\Utility;
+namespace IterTools\Util;
 
 /**
  * Works like \MultipleIterator
