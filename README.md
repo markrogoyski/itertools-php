@@ -11,12 +11,12 @@ Quick Reference
 -----------
 
 #### Multi Iteration
-| Iterator                    | Description                                                                       | Code Snippet                        |
-|-----------------------------|-----------------------------------------------------------------------------------|-------------------------------------|
-| [`chain`](#Chain)           | Chain multiple iterables together                                                 | `Multi::chain($list1, $list2)`      |
-| [`zip`](#Zip)               | Iterate multiple collections simultaneously until the shortest iterator completes | `Multi::zip($list1, $list2)`        |
-| [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously until the longest iterator completes  | `Multi::zipLongest($list1, $list2)` |
-| [`zipEqual`](#ZipEqual)     | Iterate multiple collections with strictly equal lengths simultaneously           | `Multi::zipEqual($list1, $list2)`   |
+| Iterator                    | Description                                                                             | Code Snippet                        |
+|-----------------------------|-----------------------------------------------------------------------------------------|-------------------------------------|
+| [`chain`](#Chain)           | Chain multiple iterables together                                                       | `Multi::chain($list1, $list2)`      |
+| [`zip`](#Zip)               | Iterate multiple collections simultaneously until the shortest iterator completes       | `Multi::zip($list1, $list2)`        |
+| [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously until the longest iterator completes        | `Multi::zipLongest($list1, $list2)` |
+| [`zipEqual`](#ZipEqual)     | Iterate multiple collections of equal length simultaneously, error if lengths not equal | `Multi::zipEqual($list1, $list2)`   |
 
 #### Single Iteration
 | Iterator                         | Description                                     | Code Snippet                                |
@@ -179,10 +179,10 @@ foreach (Multi::zipLongest($letters, $numbers) as [$letter, $number]) {
 }
 ```
 
-### ZipStrict
+### ZipEqual
 Iterate multiple iterable collections with equal lengths simultaneously.
 
-Throws `\LengthException` if at least one iterator ends before the others.
+Throws `\LengthException` if lengths are not equal, meaning that at least one iterator ends before the others.
 
 ```Multi::zipEqual(iterable ...$iterables)```
 
@@ -194,14 +194,6 @@ $numbers = [1, 2, 3];
 
 foreach (Multi::zipEqual($letters, $numbers) as [$letter, $number]) {
     // ['A', 1], ['B', 2], ['C', 3]
-}
-
-$letters = ['A', 'B', 'C'];
-$numbers = [1, 2];
-
-foreach (Multi::zipEqual($letters, $numbers) as [$letter, $number]) {
-    // ['A', 1], ['B', 2]
-    // throws \LengthException on 3-rd iteration
 }
 ```
 
