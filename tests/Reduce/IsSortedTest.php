@@ -18,8 +18,6 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
      */
     public function testArrayTrue(array $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isSorted($data);
 
@@ -30,22 +28,51 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
     public function dataProviderForArrayTrue(): array
     {
         return [
-            //  data
-            [   [],                         ],
-            [   [0],                        ],
-            [   [null],                     ],
-            [   [0, 1],                     ],
-            [   [null, null],               ],
-            [   [null, 1],                  ],
-            [   [0, 0],                     ],
-            [   [1, 1],                     ],
-            [   [1, 2, 3],                  ],
-            [   [2, 2, 2],                  ],
-            [   [2, 2, 3],                  ],
-            [   ['a', 'b', 'c'],            ],
-            [   [['a'], ['b'], ['c']],      ],
-            [   [['b'], ['a', 'a']],        ],
-            [   [['bb'], ['a', 'a']],       ],
+            [
+                [],
+            ],
+            [
+                [0],
+            ],
+            [
+                [null],
+            ],
+            [
+                [0, 1],
+            ],
+            [
+                [null, null],
+            ],
+            [
+                [null, 1],
+            ],
+            [
+                [0, 0],
+            ],
+            [
+                [1, 1],
+            ],
+            [
+                [1, 2, 3],
+            ],
+            [
+                [2, 2, 2],
+            ],
+            [
+                [2, 2, 3],
+            ],
+            [
+                ['a', 'b', 'c'],
+            ],
+            [
+                [['a'], ['b'], ['c']],
+            ],
+            [
+                [['b'], ['a', 'a']],
+            ],
+            [
+                [['bb'], ['a', 'a']],
+            ],
         ];
     }
 
@@ -56,8 +83,6 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
      */
     public function testArrayFalse(array $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isSorted($data);
 
@@ -68,15 +93,30 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
     public function dataProviderForArrayFalse(): array
     {
         return [
-            //  data
-            [   [1, null],                  ],
-            [   [-1, null],                 ],
-            [   [1, 0],                     ],
-            [   [3, 2, 1],                  ],
-            [   [2, 3, 1],                  ],
-            [   ['b', 'a', 'c'],            ],
-            [   [['b'], ['a'], ['c']],      ],
-            [   [['a', 'a'], ['b']],        ],
+            [
+                [1, null],
+            ],
+            [
+                [-1, null],
+            ],
+            [
+                [1, 0],
+            ],
+            [
+                [3, 2, 1],
+            ],
+            [
+                [2, 3, 1],
+            ],
+            [
+                ['b', 'a', 'c'],
+            ],
+            [
+                [['b'], ['a'], ['c']],
+            ],
+            [
+                [['a', 'a'], ['b']],
+            ],
         ];
     }
 
@@ -87,8 +127,6 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
      */
     public function testGeneratorsTrue(\Generator $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isSorted($data);
 
@@ -103,22 +141,51 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $gen([]),                         ],
-            [   $gen([0]),                        ],
-            [   $gen([null]),                     ],
-            [   $gen([0, 1]),                     ],
-            [   $gen([null, null]),               ],
-            [   $gen([null, 1]),                  ],
-            [   $gen([0, 0]),                     ],
-            [   $gen([1, 1]),                     ],
-            [   $gen([1, 2, 3]),                  ],
-            [   $gen([2, 2, 2]),                  ],
-            [   $gen([2, 2, 3]),                  ],
-            [   $gen(['a', 'b', 'c']),            ],
-            [   $gen([['a'], ['b'], ['c']]),      ],
-            [   $gen([['b'], ['a', 'a']]),        ],
-            [   $gen([['bb'], ['a', 'a']]),       ],
+            [
+                $gen([])
+            ],
+            [
+                $gen([0])
+            ],
+            [
+                $gen([null])
+            ],
+            [
+                $gen([0, 1])
+            ],
+            [
+                $gen([null, null])
+            ],
+            [
+                $gen([null, 1])
+            ],
+            [
+                $gen([0, 0])
+            ],
+            [
+                $gen([1, 1])
+            ],
+            [
+                $gen([1, 2, 3])
+            ],
+            [
+                $gen([2, 2, 2])
+            ],
+            [
+                $gen([2, 2, 3])
+            ],
+            [
+                $gen(['a', 'b', 'c'])
+            ],
+            [
+                $gen([['a'], ['b'], ['c']])
+            ],
+            [
+                $gen([['b'], ['a', 'a']])
+            ],
+            [
+                $gen([['bb'], ['a', 'a']])
+            ],
         ];
     }
 
@@ -129,8 +196,6 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
      */
     public function testGeneratorsFalse(\Generator $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isSorted($data);
 
@@ -145,15 +210,30 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $gen([1, null]),                  ],
-            [   $gen([-1, null]),                 ],
-            [   $gen([1, 0]),                     ],
-            [   $gen([3, 2, 1]),                  ],
-            [   $gen([2, 3, 1]),                  ],
-            [   $gen(['b', 'a', 'c']),            ],
-            [   $gen([['b'], ['a'], ['c']]),      ],
-            [   $gen([['a', 'a'], ['b']]),        ],
+            [
+                $gen([1, null])
+            ],
+            [
+                $gen([-1, null])
+            ],
+            [
+                $gen([1, 0])
+            ],
+            [
+                $gen([3, 2, 1])
+            ],
+            [
+                $gen([2, 3, 1])
+            ],
+            [
+                $gen(['b', 'a', 'c'])
+            ],
+            [
+                $gen([['b'], ['a'], ['c']])
+            ],
+            [
+                $gen([['a', 'a'], ['b']])
+            ],
         ];
     }
 
@@ -164,8 +244,6 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
      */
     public function testIteratorsTrue(\Iterator $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isSorted($data);
 
@@ -180,22 +258,51 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $iter([]),                         ],
-            [   $iter([0]),                        ],
-            [   $iter([null]),                     ],
-            [   $iter([0, 1]),                     ],
-            [   $iter([null, null]),               ],
-            [   $iter([null, 1]),                  ],
-            [   $iter([0, 0]),                     ],
-            [   $iter([1, 1]),                     ],
-            [   $iter([1, 2, 3]),                  ],
-            [   $iter([2, 2, 2]),                  ],
-            [   $iter([2, 2, 3]),                  ],
-            [   $iter(['a', 'b', 'c']),            ],
-            [   $iter([['a'], ['b'], ['c']]),      ],
-            [   $iter([['b'], ['a', 'a']]),        ],
-            [   $iter([['bb'], ['a', 'a']]),       ],
+            [
+                $iter([])
+            ],
+            [
+                $iter([0])
+            ],
+            [
+                $iter([null])
+            ],
+            [
+                $iter([0, 1])
+            ],
+            [
+                $iter([null, null])
+            ],
+            [
+                $iter([null, 1])
+            ],
+            [
+                $iter([0, 0])
+            ],
+            [
+                $iter([1, 1])
+            ],
+            [
+                $iter([1, 2, 3])
+            ],
+            [
+                $iter([2, 2, 2])
+            ],
+            [
+                $iter([2, 2, 3])
+            ],
+            [
+                $iter(['a', 'b', 'c'])
+            ],
+            [
+                $iter([['a'], ['b'], ['c']])
+            ],
+            [
+                $iter([['b'], ['a', 'a']])
+            ],
+            [
+                $iter([['bb'], ['a', 'a']])
+            ],
         ];
     }
 
@@ -206,8 +313,6 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
      */
     public function testIteratorsFalse(\Iterator $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isSorted($data);
 
@@ -222,15 +327,30 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $iter([1, null]),                  ],
-            [   $iter([-1, null]),                 ],
-            [   $iter([1, 0]),                     ],
-            [   $iter([3, 2, 1]),                  ],
-            [   $iter([2, 3, 1]),                  ],
-            [   $iter(['b', 'a', 'c']),            ],
-            [   $iter([['b'], ['a'], ['c']]),      ],
-            [   $iter([['a', 'a'], ['b']]),        ],
+            [
+                $iter([1, null])
+            ],
+            [
+                $iter([-1, null])
+            ],
+            [
+                $iter([1, 0])
+            ],
+            [
+                $iter([3, 2, 1])
+            ],
+            [
+                $iter([2, 3, 1])
+            ],
+            [
+                $iter(['b', 'a', 'c'])
+            ],
+            [
+                $iter([['b'], ['a'], ['c']])
+            ],
+            [
+                $iter([['a', 'a'], ['b']])
+            ],
         ];
     }
 
@@ -241,8 +361,6 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
      */
     public function testTraversablesTrue(\Traversable $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isSorted($data);
 
@@ -257,22 +375,51 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $trav([]),                         ],
-            [   $trav([0]),                        ],
-            [   $trav([null]),                     ],
-            [   $trav([0, 1]),                     ],
-            [   $trav([null, null]),               ],
-            [   $trav([null, 1]),                  ],
-            [   $trav([0, 0]),                     ],
-            [   $trav([1, 1]),                     ],
-            [   $trav([1, 2, 3]),                  ],
-            [   $trav([2, 2, 2]),                  ],
-            [   $trav([2, 2, 3]),                  ],
-            [   $trav(['a', 'b', 'c']),            ],
-            [   $trav([['a'], ['b'], ['c']]),      ],
-            [   $trav([['b'], ['a', 'a']]),        ],
-            [   $trav([['bb'], ['a', 'a']]),       ],
+            [
+                $trav([])
+            ],
+            [
+                $trav([0])
+            ],
+            [
+                $trav([null])
+            ],
+            [
+                $trav([0, 1])
+            ],
+            [
+                $trav([null, null])
+            ],
+            [
+                $trav([null, 1])
+            ],
+            [
+                $trav([0, 0])
+            ],
+            [
+                $trav([1, 1])
+            ],
+            [
+                $trav([1, 2, 3])
+            ],
+            [
+                $trav([2, 2, 2])
+            ],
+            [
+                $trav([2, 2, 3])
+            ],
+            [
+                $trav(['a', 'b', 'c'])
+            ],
+            [
+                $trav([['a'], ['b'], ['c']])
+            ],
+            [
+                $trav([['b'], ['a', 'a']])
+            ],
+            [
+                $trav([['bb'], ['a', 'a']])
+            ],
         ];
     }
 
@@ -283,8 +430,6 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
      */
     public function testTraversablesFalse(\Traversable $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isSorted($data);
 
@@ -299,15 +444,30 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $trav([1, null]),                  ],
-            [   $trav([-1, null]),                 ],
-            [   $trav([1, 0]),                     ],
-            [   $trav([3, 2, 1]),                  ],
-            [   $trav([2, 3, 1]),                  ],
-            [   $trav(['b', 'a', 'c']),            ],
-            [   $trav([['b'], ['a'], ['c']]),      ],
-            [   $trav([['a', 'a'], ['b']]),        ],
+            [
+                $trav([1, null])
+            ],
+            [
+                $trav([-1, null])
+            ],
+            [
+                $trav([1, 0])
+            ],
+            [
+                $trav([3, 2, 1])
+            ],
+            [
+                $trav([2, 3, 1])
+            ],
+            [
+                $trav(['b', 'a', 'c'])
+            ],
+            [
+                $trav([['b'], ['a'], ['c']])
+            ],
+            [
+                $trav([['a', 'a'], ['b']])
+            ],
         ];
     }
 }

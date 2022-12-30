@@ -20,8 +20,6 @@ class ToCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testArray(array $data, $expected)
     {
-        // Given: $data
-
         // When
         $result = Reduce::toCount($data);
 
@@ -32,14 +30,34 @@ class ToCountTest extends \PHPUnit\Framework\TestCase
     public function dataProviderForArray(): array
     {
         return [
-            //  data                    expected
-            [   [],                     0      ],
-            [   [0],                    1      ],
-            [   [null],                 1      ],
-            [   [''],                   1      ],
-            [   ['', null],             2      ],
-            [   [1, 2, 3],              3      ],
-            [   [[1], '2', 3],          3      ],
+            [
+                [],
+                0
+            ],
+            [
+                [0],
+                1
+            ],
+            [
+                [null],
+                1
+            ],
+            [
+                [''],
+                1
+            ],
+            [
+                ['', null],
+                2
+            ],
+            [
+                [1, 2, 3],
+                3
+            ],
+            [
+                [[1], '2', 3],
+                3
+            ],
         ];
     }
 
@@ -51,8 +69,6 @@ class ToCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testGenerators(\Generator $data, $expected)
     {
-        // Given: $data
-
         // When
         $result = Reduce::toCount($data);
 
@@ -67,14 +83,34 @@ class ToCountTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data                          expected
-            [   $gen([]),                     0      ],
-            [   $gen([0]),                    1      ],
-            [   $gen([null]),                 1      ],
-            [   $gen(['']),                   1      ],
-            [   $gen(['', null]),             2      ],
-            [   $gen([1, 2, 3]),              3      ],
-            [   $gen([[1], '2', 3]),          3      ],
+            [
+                $gen([]),
+                0
+            ],
+            [
+                $gen([0]),
+                1
+            ],
+            [
+                $gen([null]),
+                1
+            ],
+            [
+                $gen(['']),
+                1
+            ],
+            [
+                $gen(['', null]),
+                2
+            ],
+            [
+                $gen([1, 2, 3]),
+                3
+            ],
+            [
+                $gen([[1], '2', 3]),
+                3
+            ],
         ];
     }
 
@@ -86,8 +122,6 @@ class ToCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testIterators(\Iterator $data, $expected)
     {
-        // Given: $data
-
         // When
         $result = Reduce::toCount($data);
 
@@ -102,14 +136,34 @@ class ToCountTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data                           expected
-            [   $iter([]),                     0      ],
-            [   $iter([0]),                    1      ],
-            [   $iter([null]),                 1      ],
-            [   $iter(['']),                   1      ],
-            [   $iter(['', null]),             2      ],
-            [   $iter([1, 2, 3]),              3      ],
-            [   $iter([[1], '2', 3]),          3      ],
+            [
+                $iter([]),
+                0
+            ],
+            [
+                $iter([0]),
+                1
+            ],
+            [
+                $iter([null]),
+                1
+            ],
+            [
+                $iter(['']),
+                1
+            ],
+            [
+                $iter(['', null]),
+                2
+            ],
+            [
+                $iter([1, 2, 3]),
+                3
+            ],
+            [
+                $iter([[1], '2', 3]),
+                3
+            ],
         ];
     }
 
@@ -121,8 +175,6 @@ class ToCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testTraversables(\Traversable $data, $expected)
     {
-        // Given: $data
-
         // When
         $result = Reduce::toCount($data);
 
@@ -137,14 +189,34 @@ class ToCountTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data                           expected
-            [   $trav([]),                     0      ],
-            [   $trav([0]),                    1      ],
-            [   $trav([null]),                 1      ],
-            [   $trav(['']),                   1      ],
-            [   $trav(['', null]),             2      ],
-            [   $trav([1, 2, 3]),              3      ],
-            [   $trav([[1], '2', 3]),          3      ],
+            [
+                $trav([]),
+                0
+            ],
+            [
+                $trav([0]),
+                1
+            ],
+            [
+                $trav([null]),
+                1
+            ],
+            [
+                $trav(['']),
+                1
+            ],
+            [
+                $trav(['', null]),
+                2
+            ],
+            [
+                $trav([1, 2, 3]),
+                3
+            ],
+            [
+                $trav([[1], '2', 3]),
+                3
+            ],
         ];
     }
 
@@ -156,8 +228,6 @@ class ToCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testCountables(CountableIteratorAggregateFixture $data, $expected)
     {
-        // Given: $data
-
         // When
         $result = Reduce::toCount($data);
 
@@ -172,14 +242,34 @@ class ToCountTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data                           expected
-            [   $trav([]),                     0      ],
-            [   $trav([0]),                    1      ],
-            [   $trav([null]),                 1      ],
-            [   $trav(['']),                   1      ],
-            [   $trav(['', null]),             2      ],
-            [   $trav([1, 2, 3]),              3      ],
-            [   $trav([[1], '2', 3]),          3      ],
+            [
+                $trav([]),
+                0
+            ],
+            [
+                $trav([0]),
+                1
+            ],
+            [
+                $trav([null]),
+                1
+            ],
+            [
+                $trav(['']),
+                1
+            ],
+            [
+                $trav(['', null]),
+                2
+            ],
+            [
+                $trav([1, 2, 3]),
+                3
+            ],
+            [
+                $trav([[1], '2', 3]),
+                3
+            ],
         ];
     }
 }

@@ -18,8 +18,6 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
      */
     public function testArrayTrue(array $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isReversed($data);
 
@@ -30,19 +28,42 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
     public function dataProviderForArrayTrue(): array
     {
         return [
-            //  data
-            [   [],                         ],
-            [   [0],                        ],
-            [   [null],                     ],
-            [   [null, null],               ],
-            [   [1, null],                  ],
-            [   [-1, null],                 ],
-            [   [0, 0],                     ],
-            [   [1, 1],                     ],
-            [   [1, 0],                     ],
-            [   [3, 2, 1],                  ],
-            [   [2, 2, 2],                  ],
-            [   [['a', 'a'], ['b']],        ],
+            [
+                []
+            ],
+            [
+                [0]
+            ],
+            [
+                [null]
+            ],
+            [
+                [null, null]
+            ],
+            [
+                [1, null]
+            ],
+            [
+                [-1, null]
+            ],
+            [
+                [0, 0]
+            ],
+            [
+                [1, 1]
+            ],
+            [
+                [1, 0]
+            ],
+            [
+                [3, 2, 1]
+            ],
+            [
+                [2, 2, 2]
+            ],
+            [
+                [['a', 'a'], ['b']]
+            ],
         ];
     }
 
@@ -53,8 +74,6 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
      */
     public function testArrayFalse(array $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isReversed($data);
 
@@ -65,18 +84,39 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
     public function dataProviderForArrayFalse(): array
     {
         return [
-            //  data
-            [   [0, 1],                     ],
-            [   [null, 1],                  ],
-            [   [1, 2, 3],                  ],
-            [   [2, 2, 3],                  ],
-            [   [2, 3, 1],                  ],
-            [   ['a', 'b', 'c'],            ],
-            [   ['b', 'a', 'c'],            ],
-            [   [['a'], ['b'], ['c']],      ],
-            [   [['b'], ['a'], ['c']],      ],
-            [   [['b'], ['a', 'a']],        ],
-            [   [['bb'], ['a', 'a']],       ],
+            [
+                [0, 1]
+            ],
+            [
+                [null, 1]
+            ],
+            [
+                [1, 2, 3]
+            ],
+            [
+                [2, 2, 3]
+            ],
+            [
+                [2, 3, 1]
+            ],
+            [
+                ['a', 'b', 'c']
+            ],
+            [
+                ['b', 'a', 'c']
+            ],
+            [
+                [['a'], ['b'], ['c']]
+            ],
+            [
+                [['b'], ['a'], ['c']]
+            ],
+            [
+                [['b'], ['a', 'a']]
+            ],
+            [
+                [['bb'], ['a', 'a']]
+            ],
         ];
     }
 
@@ -87,8 +127,6 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
      */
     public function testGeneratorsTrue(\Generator $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isReversed($data);
 
@@ -103,19 +141,42 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $gen([]),                         ],
-            [   $gen([0]),                        ],
-            [   $gen([null]),                     ],
-            [   $gen([null, null]),               ],
-            [   $gen([1, null]),                  ],
-            [   $gen([-1, null]),                 ],
-            [   $gen([0, 0]),                     ],
-            [   $gen([1, 1]),                     ],
-            [   $gen([1, 0]),                     ],
-            [   $gen([3, 2, 1]),                  ],
-            [   $gen([2, 2, 2]),                  ],
-            [   $gen([['a', 'a'], ['b']]),        ],
+            [
+                $gen([])
+            ],
+            [
+                $gen([0])
+            ],
+            [
+                $gen([null])
+            ],
+            [
+                $gen([null, null])
+            ],
+            [
+                $gen([1, null])
+            ],
+            [
+                $gen([-1, null])
+            ],
+            [
+                $gen([0, 0])
+            ],
+            [
+                $gen([1, 1])
+            ],
+            [
+                $gen([1, 0])
+            ],
+            [
+                $gen([3, 2, 1])
+            ],
+            [
+                $gen([2, 2, 2])
+            ],
+            [
+                $gen([['a', 'a'], ['b']])
+            ],
         ];
     }
 
@@ -126,8 +187,6 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
      */
     public function testGeneratorsFalse(\Generator $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isReversed($data);
 
@@ -142,18 +201,39 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $gen([0, 1]),                     ],
-            [   $gen([null, 1]),                  ],
-            [   $gen([1, 2, 3]),                  ],
-            [   $gen([2, 2, 3]),                  ],
-            [   $gen([2, 3, 1]),                  ],
-            [   $gen(['a', 'b', 'c']),            ],
-            [   $gen(['b', 'a', 'c']),            ],
-            [   $gen([['a'], ['b'], ['c']]),      ],
-            [   $gen([['b'], ['a'], ['c']]),      ],
-            [   $gen([['b'], ['a', 'a']]),        ],
-            [   $gen([['bb'], ['a', 'a']]),       ],
+            [
+                $gen([0, 1])
+            ],
+            [
+                $gen([null, 1])
+            ],
+            [
+                $gen([1, 2, 3])
+            ],
+            [
+                $gen([2, 2, 3])
+            ],
+            [
+                $gen([2, 3, 1])
+            ],
+            [
+                $gen(['a', 'b', 'c'])
+            ],
+            [
+                $gen(['b', 'a', 'c'])
+            ],
+            [
+                $gen([['a'], ['b'], ['c']])
+            ],
+            [
+                $gen([['b'], ['a'], ['c']])
+            ],
+            [
+                $gen([['b'], ['a', 'a']])
+            ],
+            [
+                $gen([['bb'], ['a', 'a']])
+            ],
         ];
     }
 
@@ -164,8 +244,6 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
      */
     public function testIteratorsTrue(\Iterator $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isReversed($data);
 
@@ -180,19 +258,42 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $iter([]),                         ],
-            [   $iter([0]),                        ],
-            [   $iter([null]),                     ],
-            [   $iter([null, null]),               ],
-            [   $iter([1, null]),                  ],
-            [   $iter([-1, null]),                 ],
-            [   $iter([0, 0]),                     ],
-            [   $iter([1, 1]),                     ],
-            [   $iter([1, 0]),                     ],
-            [   $iter([3, 2, 1]),                  ],
-            [   $iter([2, 2, 2]),                  ],
-            [   $iter([['a', 'a'], ['b']]),        ],
+            [
+                $iter([])
+            ],
+            [
+                $iter([0])
+            ],
+            [
+                $iter([null])
+            ],
+            [
+                $iter([null, null])
+            ],
+            [
+                $iter([1, null])
+            ],
+            [
+                $iter([-1, null])
+            ],
+            [
+                $iter([0, 0])
+            ],
+            [
+                $iter([1, 1])
+            ],
+            [
+                $iter([1, 0])
+            ],
+            [
+                $iter([3, 2, 1])
+            ],
+            [
+                $iter([2, 2, 2])
+            ],
+            [
+                $iter([['a', 'a'], ['b']])
+            ],
         ];
     }
 
@@ -203,8 +304,6 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
      */
     public function testIteratorsFalse(\Iterator $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isReversed($data);
 
@@ -219,18 +318,39 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $iter([0, 1]),                     ],
-            [   $iter([null, 1]),                  ],
-            [   $iter([1, 2, 3]),                  ],
-            [   $iter([2, 2, 3]),                  ],
-            [   $iter([2, 3, 1]),                  ],
-            [   $iter(['a', 'b', 'c']),            ],
-            [   $iter(['b', 'a', 'c']),            ],
-            [   $iter([['a'], ['b'], ['c']]),      ],
-            [   $iter([['b'], ['a'], ['c']]),      ],
-            [   $iter([['b'], ['a', 'a']]),        ],
-            [   $iter([['bb'], ['a', 'a']]),       ],
+            [
+                $iter([0, 1])
+            ],
+            [
+                $iter([null, 1])
+            ],
+            [
+                $iter([1, 2, 3])
+            ],
+            [
+                $iter([2, 2, 3])
+            ],
+            [
+                $iter([2, 3, 1])
+            ],
+            [
+                $iter(['a', 'b', 'c'])
+            ],
+            [
+                $iter(['b', 'a', 'c'])
+            ],
+            [
+                $iter([['a'], ['b'], ['c']])
+            ],
+            [
+                $iter([['b'], ['a'], ['c']])
+            ],
+            [
+                $iter([['b'], ['a', 'a']])
+            ],
+            [
+                $iter([['bb'], ['a', 'a']])
+            ],
         ];
     }
 
@@ -241,8 +361,6 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
      */
     public function testTraversablesTrue(\Traversable $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isReversed($data);
 
@@ -257,19 +375,42 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $trav([]),                         ],
-            [   $trav([0]),                        ],
-            [   $trav([null]),                     ],
-            [   $trav([null, null]),               ],
-            [   $trav([1, null]),                  ],
-            [   $trav([-1, null]),                 ],
-            [   $trav([0, 0]),                     ],
-            [   $trav([1, 1]),                     ],
-            [   $trav([1, 0]),                     ],
-            [   $trav([3, 2, 1]),                  ],
-            [   $trav([2, 2, 2]),                  ],
-            [   $trav([['a', 'a'], ['b']]),        ],
+            [
+                $trav([])
+            ],
+            [
+                $trav([0])
+            ],
+            [
+                $trav([null])
+            ],
+            [
+                $trav([null, null])
+            ],
+            [
+                $trav([1, null])
+            ],
+            [
+                $trav([-1, null])
+            ],
+            [
+                $trav([0, 0])
+            ],
+            [
+                $trav([1, 1])
+            ],
+            [
+                $trav([1, 0])
+            ],
+            [
+                $trav([3, 2, 1])
+            ],
+            [
+                $trav([2, 2, 2])
+            ],
+            [
+                $trav([['a', 'a'], ['b']])
+            ],
         ];
     }
 
@@ -280,8 +421,6 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
      */
     public function testTraversablesFalse(\Traversable $data)
     {
-        // Given: $data
-
         // When
         $result = Reduce::isReversed($data);
 
@@ -296,18 +435,39 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            //  data
-            [   $trav([0, 1]),                     ],
-            [   $trav([null, 1]),                  ],
-            [   $trav([1, 2, 3]),                  ],
-            [   $trav([2, 2, 3]),                  ],
-            [   $trav([2, 3, 1]),                  ],
-            [   $trav(['a', 'b', 'c']),            ],
-            [   $trav(['b', 'a', 'c']),            ],
-            [   $trav([['a'], ['b'], ['c']]),      ],
-            [   $trav([['b'], ['a'], ['c']]),      ],
-            [   $trav([['b'], ['a', 'a']]),        ],
-            [   $trav([['bb'], ['a', 'a']]),       ],
+            [
+                $trav([0, 1])
+            ],
+            [
+                $trav([null, 1])
+            ],
+            [
+                $trav([1, 2, 3])
+            ],
+            [
+                $trav([2, 2, 3])
+            ],
+            [
+                $trav([2, 3, 1])
+            ],
+            [
+                $trav(['a', 'b', 'c'])
+            ],
+            [
+                $trav(['b', 'a', 'c'])
+            ],
+            [
+                $trav([['a'], ['b'], ['c']])
+            ],
+            [
+                $trav([['b'], ['a'], ['c']])
+            ],
+            [
+                $trav([['b'], ['a', 'a']])
+            ],
+            [
+                $trav([['bb'], ['a', 'a']])
+            ],
         ];
     }
 }

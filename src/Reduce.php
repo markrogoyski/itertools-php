@@ -30,7 +30,7 @@ class Reduce
     }
 
     /**
-     * Reduces given iterable to it's min value.
+     * Reduces given iterable to its min value.
      *
      * Items of given collection must be comparable.
      *
@@ -48,7 +48,7 @@ class Reduce
     }
 
     /**
-     * Reduces given iterable to it's max value.
+     * Reduces given iterable to its max value.
      *
      * Items of given collection must be comparable.
      *
@@ -66,7 +66,7 @@ class Reduce
     }
 
     /**
-     * Reduces given iterable to it's length.
+     * Reduces given iterable to its length.
      *
      * @param iterable<mixed> $data
      *
@@ -74,17 +74,17 @@ class Reduce
      */
     public static function toCount(iterable $data): int
     {
-        if (is_countable($data)) {
+        if (\is_countable($data)) {
             return count($data);
         }
 
         return static::toValue($data, static function ($carry) {
-            return $carry+1;
+            return $carry + 1;
         }, 0);
     }
 
     /**
-     * Reduces given collection to the sum of it's items.
+     * Reduces given collection to the sum of its items.
      *
      * @param iterable<numeric> $data
      *
@@ -98,7 +98,7 @@ class Reduce
     }
 
     /**
-     * Reduces given collection to the product of it's items.
+     * Reduces given collection to the product of its items.
      *
      * Returns null if given collection is empty.
      *
@@ -114,7 +114,7 @@ class Reduce
     }
 
     /**
-     * Reduces given collection to the average of it's items.
+     * Reduces given collection to the mean average of its items.
      *
      * Returns null if given collection is empty.
      *
@@ -133,11 +133,11 @@ class Reduce
     }
 
     /**
-     * Returns true if given collection is sorted directly otherwise false.
+     * Returns true if given collection is sorted in ascending order; otherwise false.
      *
      * Items of given collection must be comparable.
      *
-     * Returns true if given collection is empty or has one element.
+     * Returns true if given collection is empty or has only one element.
      *
      * @param iterable<mixed> $data
      *
@@ -155,11 +155,11 @@ class Reduce
     }
 
     /**
-     * Returns true if given collection is sorted reversely otherwise false.
+     * Returns true if given collection is sorted in reverse descending order; otherwise false.
      *
      * Items of given collection must be comparable.
      *
-     * Returns true if given collection is empty or has one element.
+     * Returns true if given collection is empty or has only one element.
      *
      * @param iterable<mixed> $data
      *
