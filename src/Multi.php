@@ -55,10 +55,10 @@ class Multi
     }
 
     /**
-     * Iterate multiple iterable collections simultaneously.
+     * Iterate multiple iterable collections of equal lengths simultaneously.
      *
-     * Works like Multi::zip() method
-     * but throws \LengthException if at least one iterator ends before the others.
+     * Works like Multi::zip() method but throws \LengthException if lengths not equal,
+     * i.e., at least one iterator ends before the others.
      *
      * @param iterable<mixed> ...$iterables
      *
