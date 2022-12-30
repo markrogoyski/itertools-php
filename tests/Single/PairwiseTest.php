@@ -77,6 +77,10 @@ class PairwiseTest extends \PHPUnit\Framework\TestCase
                 [1, 2.2, '3', [4], true, null, 'test data'],
                 [[1, 2.2], [2.2, '3'], ['3', [4]], [[4], true], [true, null], [null, 'test data']]
             ],
+            [
+                ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey', 'Phoebe'],
+                [['Ross', 'Rachel'], ['Rachel', 'Chandler'], ['Chandler', 'Monica'], ['Monica', 'Joey'], ['Joey', 'Phoebe']]
+            ],
         ];
     }
 
@@ -149,6 +153,10 @@ class PairwiseTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2.2, '3', [4], true, null, 'test data']),
                 [[1, 2.2], [2.2, '3'], ['3', [4]], [[4], true], [true, null], [null, 'test data']]
+            ],
+            [
+                $gen(['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey', 'Phoebe']),
+                [['Ross', 'Rachel'], ['Rachel', 'Chandler'], ['Chandler', 'Monica'], ['Monica', 'Joey'], ['Joey', 'Phoebe']]
             ],
         ];
     }
@@ -223,6 +231,10 @@ class PairwiseTest extends \PHPUnit\Framework\TestCase
                 $iter([1, 2.2, '3', [4], true, null, 'test data']),
                 [[1, 2.2], [2.2, '3'], ['3', [4]], [[4], true], [true, null], [null, 'test data']]
             ],
+            [
+                $iter(['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey', 'Phoebe']),
+                [['Ross', 'Rachel'], ['Rachel', 'Chandler'], ['Chandler', 'Monica'], ['Monica', 'Joey'], ['Joey', 'Phoebe']]
+            ],
         ];
     }
 
@@ -295,6 +307,10 @@ class PairwiseTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2.2, '3', [4], true, null, 'test data']),
                 [[1, 2.2], [2.2, '3'], ['3', [4]], [[4], true], [true, null], [null, 'test data']]
+            ],
+            [
+                $trav(['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey', 'Phoebe']),
+                [['Ross', 'Rachel'], ['Rachel', 'Chandler'], ['Chandler', 'Monica'], ['Monica', 'Joey'], ['Joey', 'Phoebe']]
             ],
         ];
     }
