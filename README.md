@@ -25,7 +25,7 @@ Quick Reference
 | [`filterFalse`](#Filter-False)   | Filter out elements where predicate not false   | `Single::filterFalse($data, $predicate)`    |
 | [`filterTrue`](#Filter-True)     | Filter out elements where predicate not true    | `Single::filterTrue($data, $predicate)`     |
 | [`groupBy`](#Group-By)           | Group data by a common element                  | `Single::groupBy($data, $groupKeyFunction)` |
-| [`pairwise`](#Pairwise)          | Iterate pairs of elements from given collection | `Single::pairwise($data)`                   |
+| [`pairwise`](#Pairwise)          | Iterate successive overlapping pairs            | `Single::pairwise($data)`                   |
 | [`repeat`](#Repeat)              | Repeat an item                                  | `Single::repeat($item, $repetitions)`       |
 | [`string`](#String)              | Iterate the characters of a string              | `Single::string($string)`                   |
 | [`takeWhile`](#Take-While)       | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`      |
@@ -59,10 +59,10 @@ Quick Reference
 #### Reduce (Summarizing Iterables)
 | Reducer                        | Description                                                         | Code Snippet                                      |
 |--------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
-| [`isSorted`](#Is-Sorted)       | Reduce to true if sorted                                            | `Reduce::isSorted($data)`                         |
-| [`isReversed`](#Is-Reversed)   | Reduce to true if reverse sorted                                    | `Reduce::isReversed($data)`                       |
-| [`toAverage`](#To-Average)     | Reduce to the mean average                                          | `Reduce::toAverage($numbers)`                     |
-| [`toCount`](#To-Count)         | Reduce to its length                                                | `Reduce::toCount($data)`                          |
+| [`isSorted`](#Is-Sorted)       | True if iterable sorted                                             | `Reduce::isSorted($data)`                         |
+| [`isReversed`](#Is-Reversed)   | True if iterable reverse sorted                                     | `Reduce::isReversed($data)`                       |
+| [`toAverage`](#To-Average)     | Mean average of elements                                            | `Reduce::toAverage($numbers)`                     |
+| [`toCount`](#To-Count)         | Reduce to length of iterable                                        | `Reduce::toCount($data)`                          |
 | [`toMax`](#To-Max)             | Reduce to its largest element                                       | `Reduce::toMax($numbers)`                         |
 | [`toMin`](#To-Min)             | Reduce to its smallest element                                      | `Reduce::toMin($numbers)`                         |
 | [`toProduct`](#To-Product)     | Reduce to the product of its elements                               | `Reduce::toProduct($numbers)`                     |
