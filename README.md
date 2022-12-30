@@ -25,10 +25,10 @@ Quick Reference
 | [`filterFalse`](#Filter-False)   | Filter out elements where predicate not false   | `Single::filterFalse($data, $predicate)`    |
 | [`filterTrue`](#Filter-True)     | Filter out elements where predicate not true    | `Single::filterTrue($data, $predicate)`     |
 | [`groupBy`](#Group-By)           | Group data by a common element                  | `Single::groupBy($data, $groupKeyFunction)` |
+| [`pairwise`](#Pairwise)          | Iterate pairs of elements from given collection | `Single::pairwise($data)`                   |
 | [`repeat`](#Repeat)              | Repeat an item                                  | `Single::repeat($item, $repetitions)`       |
 | [`string`](#String)              | Iterate the characters of a string              | `Single::string($string)`                   |
 | [`takeWhile`](#Take-While)       | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`      |
-| [`pairwise`](#Pairwise)          | Iterate pairs of elements from given collection | `Single::pairwise($data)`                   |
 
 #### Infinite Iteration
 | Iterator | Description | Code Snippet |
@@ -49,7 +49,7 @@ Quick Reference
 #### Math Iteration
 | Iterator | Description | Code Snippet |
 | ----------- | ----------- | ----------- |
-| [`runningAverage`](#Running-Averange) | Running average accumulation | `Math::runningAverage($numbers, $initialValue)` |
+| [`runningAverage`](#Running-Average) | Running average accumulation | `Math::runningAverage($numbers, $initialValue)` |
 | [`runningDifference`](#Running-Difference) | Running difference accumulation | `Math::runningDifference($numbers, $initialValue)` |
 | [`runningMax`](#Running-Max) | Running maximum accumulation | `Math::runningMax($numbers, $initialValue)` |
 | [`runningMin`](#Running-Min) | Running minimum accumulation | `Math::runningMin($numbers, $initialValue)` |
@@ -59,15 +59,15 @@ Quick Reference
 #### Reduce
 | Reducer                        | Description                                                         | Code Snippet                                      |
 |--------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
-| [`toValue`](#To-Value)         | Reduce collection using callable reducer                            | `Reduce::toValue($data, $reducer, $initialValue)` |
-| [`toMin`](#To-Min)             | Reduce collection to it's greatest element                          | `Reduce::toMin($data)`                            |
-| [`toMax`](#To-Max)             | Reduce collection to it's smallest element                          | `Reduce::toMax($data)`                            |
-| [`toCount`](#To-Count)         | Reduce collection to it's length                                    | `Reduce::toCount($data)`                          |
-| [`toSum`](#To-Sum)             | Reduce collection to the sum of it's elements                       | `Reduce::toSum($data)`                            |
-| [`toProduct`](#To-Product)     | Reduce collection to the product of it's elements                   | `Reduce::toProduct($data)`                        |
-| [`toAverage`](#To-Average)     | Reduce collection to the average of it's elements                   | `Reduce::toAverage($data)`                        |
-| [`isSorted`](#Is-Sorted)       | Reduce collection to true if it is sorted directly otherwise false  | `Reduce::isSorted($data)`                         |
-| [`isReversed`](#Is-Reversed)   | Reduce collection to true if it is sorted reversely otherwise false | `Reduce::isReversed($data)`                       |
+| [`isSorted`](#Is-Sorted)       | Reduce to true if sorted                                            | `Reduce::isSorted($data)`                         |
+| [`isReversed`](#Is-Reversed)   | Reduce to true if reverse sorted                                    | `Reduce::isReversed($data)`                       |
+| [`toAverage`](#To-Average)     | Reduce to the average of its elements                               | `Reduce::toAverage($data)`                        |
+| [`toCount`](#To-Count)         | Reduce to it's length                                               | `Reduce::toCount($data)`                          |
+| [`toMax`](#To-Max)             | Reduce to its smallest element                                      | `Reduce::toMax($data)`                            |
+| [`toMin`](#To-Min)             | Reduce to its greatest element                                      | `Reduce::toMin($data)`                            |
+| [`toProduct`](#To-Product)     | Reduce to the product of its elements                               | `Reduce::toProduct($data)`                        |
+| [`toSum`](#To-Sum)             | Reduce to the sum of its elements                                   | `Reduce::toSum($data)`                            |
+| [`toValue`](#To-Value)         | Reduce to value using callable reducer                              | `Reduce::toValue($data, $reducer, $initialValue)` |
 
 Setup
 -----
@@ -296,6 +296,24 @@ foreach (Single::groupBy($cartoonCharacters, fn ($x) => $x[1]) as $animal => $ch
 */
 ```
 
+### Pairwise
+Returns successive overlapping pairs.
+
+Returns empty generator if given collection contains fewer than 2 elements.
+
+```Single::pairwise(iterable $data)```
+
+```php
+Use IterTools\Single;
+
+$friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey', 'Phoebe'];
+
+foreach (Single::pairwise($friends) as [$leftFriend, $rightFriend]) {
+    print("{$leftFriend} and {$rightFriend}");
+}
+// Ross and Rachel, Rachel and Chandler, Chandler and Monica, ...
+```
+
 ### Repeat
 Repeat an item.
 
@@ -344,24 +362,6 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
     print($freePrice);
 }
 // 0, 0
-```
-
-### Pairwise
-Return pairs of elements from given collection.
-
-Returns empty generator if given collection contains less than 2 elements.
-
-```Single::pairwise(iterable $data)```
-
-```php
-Use IterTools\Single;
-
-$data = [1, 2, 3, 4, 5];
-
-foreach (Single::pairwise($data) as [$lhs, $rhs]) {
-    print("{$lhs}_{$lhs}");
-}
-// 1_2, 2_3, 3_4, 4_5
 ```
 
 ## Infinite Iteration
@@ -620,10 +620,145 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
 ```
 
 ## Reduce
-### To Value
-Reduce elements into a single value using reducer function.
 
-Works like array_reduce() function, but can take in all iterable types, not array only.
+### Is Reversed
+Returns true if elements are reverse sorted, otherwise false.
+
+Elements must be comparable.
+
+Returns true if empty or has only one element.
+
+```Reduce::isReversed(iterable $data)```
+
+```php
+use IterTools\Reduce;
+
+$numbers = [5, 4, 3, 2, 1];
+
+$result = Reduce::isReversed($numbers);
+// true
+
+$numbers = [1, 4, 3, 2, 1];
+
+$result = Reduce::isReversed($numbers);
+// false
+```
+
+### Is Sorted
+Returns true if elements are sorted, otherwise false.
+
+Elements must be comparable.
+
+Returns true if empty or has only one element.
+
+```Reduce::isSorted(iterable $data)```
+
+```php
+use IterTools\Reduce;
+
+$numbers = [1, 2, 3, 4, 5];
+
+$result = Reduce::isSorted($numbers);
+// true
+
+$numbers = [3, 2, 3, 4, 5];
+
+$result = Reduce::isSorted($numbers);
+// false
+```
+
+### To Average
+Reduces to the mean average.
+
+Returns null if collection is empty.
+
+```Reduce::toAverage(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$grades = [100, 90, 95, 85, 94];
+
+$finalGrade = Reduce::toAverage($numbers);
+// 92.8
+```
+
+### To Max
+Reduces to the max value.
+
+Elements must be comparable.
+
+Returns null if collection is empty.
+
+```Reduce::toMax(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$numbers = [5, 3, 1, 2, 4];
+
+$result = Reduce::toMax($numbers);
+// 5
+```
+
+### To Min
+Reduces to the min value.
+
+Elements must be comparable.
+
+Returns null if collection is empty.
+
+```Reduce::toMin(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$numbers = [5, 3, 1, 2, 4];
+
+$result = Reduce::toMin($numbers);
+// 1
+```
+
+### To Count
+Reduces iterable to its length.
+
+```Reduce::toCount(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$someIterable = ImportantThing::getCollectionAsIterable();
+
+$length = Reduce::toCount($someIterable);
+// 3
+```
+
+### To Product
+Reduces to the product of its elements.
+
+Returns null if collection is empty.
+
+```Reduce::toProduct(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$primeFactors = [5, 2, 2];
+
+$number = Reduce::toProduct($primeFactors);
+// 20
+```
+
+### To Sum
+Reduces to the sum of its elements.
+
+```Reduce::toSum(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$parts = [10, 20, 30];
+
+$sun = Reduce::toSum($parts);
+// 60
+```
+
+### To Value
+Reduce elements to a single value using reducer function.
 
 ```Reduce::toValue(iterable $data, callable $reducer, mixed $initialValue)```
 ```php
@@ -634,142 +769,6 @@ $sum = fn ($carry, $item) => $carry + $item;
 
 $result = Reduce::toValue($input, $sum, 0);
 // 15
-```
-
-### To Min
-Reduces given iterable to it's min value.
-
-Items of given collection must be comparable.
-
-Returns null if given collection is empty.
-
-```Reduce::toMin(iterable $data)```
-```php
-use IterTools\Reduce;
-
-$input = [5, 3, 1, 2, 4];
-
-$result = Reduce::toMin($input);
-// 1
-```
-
-### To Max
-Reduces given iterable to it's max value.
-
-Items of given collection must be comparable.
-
-Returns null if given collection is empty.
-
-```Reduce::toMax(iterable $data)```
-```php
-use IterTools\Reduce;
-
-$input = [5, 3, 1, 2, 4];
-
-$result = Reduce::toMax($input);
-// 5
-```
-
-### To Count
-Reduces given iterable to it's length.
-
-```Reduce::toCount(iterable $data)```
-```php
-use IterTools\Reduce;
-
-$input = [10, 20, 30];
-
-$result = Reduce::toCount($input);
-// 3
-```
-
-### To Sum
-Reduces given collection to the sum of it's items.
-
-```Reduce::toSum(iterable $data)```
-```php
-use IterTools\Reduce;
-
-$input = [10, 20, 30];
-
-$result = Reduce::toSum($input);
-// 60
-```
-
-### To Product
-Reduces given collection to the product of it's items.
-
-Returns null if given collection is empty.
-
-```Reduce::toProduct(iterable $data)```
-```php
-use IterTools\Reduce;
-
-$input = [3, 4, 2];
-
-$result = Reduce::toProduct($input);
-// 24
-```
-
-### To Average
-Reduces given collection to the average of it's items.
-
-Returns null if given collection is empty.
-
-```Reduce::toAverage(iterable $data)```
-```php
-use IterTools\Reduce;
-
-$input = [2, 4, 6, 8];
-
-$result = Reduce::toAverage($input);
-// 5
-```
-
-### Is Sorted
-Returns true if given collection is sorted directly otherwise false.
-
-Items of given collection must be comparable.
-
-Returns true if given collection is empty or has one element.
-
-```Reduce::isSorted(iterable $data)```
-
-```php
-use IterTools\Reduce;
-
-$input = [1, 2, 3, 4, 5];
-
-$result = Reduce::isSorted($input);
-// true
-
-$input = [3, 2, 3, 4, 5];
-
-$result = Reduce::isSorted($input);
-// false
-```
-
-### Is Reversed
-Returns true if given collection is sorted reversely otherwise false.
-
-Items of given collection must be comparable.
-
-Returns true if given collection is empty or has one element.
-
-```Reduce::isReversed(iterable $data)```
-
-```php
-use IterTools\Reduce;
-
-$input = [5, 4, 3, 2, 1];
-
-$result = Reduce::isReversed($input);
-// true
-
-$input = [1, 4, 3, 2, 1];
-
-$result = Reduce::isReversed($input);
-// false
 ```
 
 ## Composition
