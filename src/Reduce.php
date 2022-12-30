@@ -158,51 +158,5 @@ class Reduce
         }
 
         return true;
-
-        // FIXME: remove this code
-        // =========================================== //
-        // OLD REALISATION WITHOUT Single::zipStrict() //
-        // =========================================== //
-
-        //$iterators = array_map(static function (iterable $iterable): \Iterator {
-        //    $iterator = Util::makeIterator($iterable);
-        //
-        //    if ($iterator instanceof \IteratorIterator) {
-        //        $iterator->rewind();
-        //    }
-        //
-        //    return $iterator;
-        //}, [$data, $n, ...$extra]);
-        //
-        //while (true) {
-        //    $statuses = array_map(static function (\Iterator $iterator) {
-        //        return $iterator->valid();
-        //    }, $iterators);
-        //
-        //    /** @var array{bool}|array{bool, bool} $uniqueStatuses */
-        //    $uniqueStatuses = iterator_to_array(Single::filterUnique($statuses));
-        //
-        //    if (count($uniqueStatuses) > 1) {
-        //        return false;
-        //    }
-        //
-        //    if (!$uniqueStatuses[0]) {
-        //        return true;
-        //    }
-        //
-        //    /**
-        //     * @var \Iterator $lhs
-        //     * @var \Iterator $rhs
-        //     */
-        //    foreach (Single::pairwise($iterators) as [$lhs, $rhs]) {
-        //        if ($lhs->current() !== $rhs->current()) {
-        //            return false;
-        //        }
-        //    }
-        //
-        //    foreach ($iterators as $iterator) {
-        //        $iterator->next();
-        //    }
-        //}
     }
 }
