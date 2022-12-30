@@ -60,6 +60,11 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
                 [4, 5, 6, 7, 8, 9, 1, 2, 3],
                 [[1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9], [7, 1], [8, 2], [9, 3]],
             ],
+            [
+                ['a', 'b', 'c', 'd'],
+                ['one', 'two', 'three', 'four'],
+                [['a', 'one'], ['b', 'two'], ['c', 'three'], ['d', 'four']],
+            ],
         ];
     }
 
@@ -133,6 +138,11 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
                 [1],
                 [4, 5, 6],
                 [[1, 4]],
+            ],
+            [
+                ['a'],
+                [1, 2],
+                [['a', 1]],
             ],
         ];
     }
@@ -224,6 +234,12 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
                 [4, 5, 6, 7, 8, 9, 1, 2, 3],
                 [7, 8, 9, 1, 2, 3, 4, 5, 6],
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9], [4, 7, 1], [5, 8, 2], [6, 9, 3], [7, 1, 4], [8, 2, 5], [9, 3, 6]],
+            ],
+            [
+                ['a', 'b', 'c'],
+                [1, 2, 3],
+                [true, false, true],
+                [['a', 1, true], ['b', 2, false], ['c', 3, true]],
             ],
         ];
     }

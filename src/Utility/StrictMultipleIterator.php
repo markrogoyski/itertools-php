@@ -20,9 +20,9 @@ class StrictMultipleIterator extends \MultipleIterator
     public function valid(): bool
     {
         // If is valid by default:
-        if ($isValid = parent::valid()) {
+        if (parent::valid() === true) {
             // No extra checks required.
-            return $isValid;
+            return true;
         }
 
         // So we know that the iterator is invalid.
@@ -32,22 +32,21 @@ class StrictMultipleIterator extends \MultipleIterator
 
         // If flag MIT_NEED_ALL has been set:
         if (($flags = $this->getFlags()) & \MultipleIterator::MIT_NEED_ALL) {
-            // We are backuping current flags and replacing them with MIT_NEED_ANY
-            // to do an extra check
+            // We are backing up current flags and replacing them with MIT_NEED_ANY to do an extra check
             $this->setFlags(\MultipleIterator::MIT_NEED_ANY);
 
             // So do we have non-ended iterators?
-            $isReallyValid = parent::valid();
+            $isAnyIteratorStillValid = parent::valid();
 
-            if ($isValid !== $isReallyValid) {
+            if ($isAnyIteratorStillValid === true) {
                 // This is situation (2)
-                throw new \LengthException();
+                throw new \LengthException('Iterables of unequal sizes');
             }
 
             // Restoring flags.
             $this->setFlags($flags);
         }
 
-        return $isValid;
+        return false;
     }
 }

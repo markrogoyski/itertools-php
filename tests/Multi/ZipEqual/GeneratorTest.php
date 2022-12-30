@@ -68,6 +68,11 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
                 $gen([4, 5, 6, 7, 8, 9, 1, 2, 3]),
                 [[1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9], [7, 1], [8, 2], [9, 3]],
             ],
+            [
+                $gen(['a', 'b', 'c', 'd']),
+                $gen(['one', 'two', 'three', 'four']),
+                [['a', 'one'], ['b', 'two'], ['c', 'three'], ['d', 'four']],
+            ],
         ];
     }
 

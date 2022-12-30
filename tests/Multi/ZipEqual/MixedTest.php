@@ -71,6 +71,12 @@ class MixedTest extends \PHPUnit\Framework\TestCase
                 new Fixture\IteratorAggregateFixture([0, 9, 8, 7, 6, 5, 4, 3, 2]),
                 [[1, 4, 0], [2, 5, 9], [3, 6, 8], [4, 7, 7], [5, 8, 6], [6, 9, 5], [7, 1, 4], [8, 2, 3], [9, 3, 2]],
             ],
+            [
+                ['a', 'b', 'c', 'd'],
+                new Fixture\ArrayIteratorFixture(['one', 'two', 'three', 'four']),
+                new Fixture\IteratorAggregateFixture([true, true, false, false]),
+                [['a', 'one', true], ['b', 'two', true], ['c', 'three', false], ['d', 'four', false]],
+            ],
         ];
     }
 
