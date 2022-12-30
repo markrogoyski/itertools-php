@@ -56,17 +56,17 @@ Quick Reference
 | [`runningProduct`](#Running-Product) | Running product accumulation | `Math::runningProduct($numbers, $initialValue)` |
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
 
-#### Reduce
+#### Reduce (Summarizing Iterables)
 | Reducer                        | Description                                                         | Code Snippet                                      |
 |--------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
 | [`isSorted`](#Is-Sorted)       | Reduce to true if sorted                                            | `Reduce::isSorted($data)`                         |
 | [`isReversed`](#Is-Reversed)   | Reduce to true if reverse sorted                                    | `Reduce::isReversed($data)`                       |
-| [`toAverage`](#To-Average)     | Reduce to the average of its elements                               | `Reduce::toAverage($data)`                        |
-| [`toCount`](#To-Count)         | Reduce to it's length                                               | `Reduce::toCount($data)`                          |
-| [`toMax`](#To-Max)             | Reduce to its smallest element                                      | `Reduce::toMax($data)`                            |
-| [`toMin`](#To-Min)             | Reduce to its greatest element                                      | `Reduce::toMin($data)`                            |
-| [`toProduct`](#To-Product)     | Reduce to the product of its elements                               | `Reduce::toProduct($data)`                        |
-| [`toSum`](#To-Sum)             | Reduce to the sum of its elements                                   | `Reduce::toSum($data)`                            |
+| [`toAverage`](#To-Average)     | Reduce to the mean average                                          | `Reduce::toAverage($numbers)`                     |
+| [`toCount`](#To-Count)         | Reduce to its length                                                | `Reduce::toCount($data)`                          |
+| [`toMax`](#To-Max)             | Reduce to its largest element                                       | `Reduce::toMax($numbers)`                         |
+| [`toMin`](#To-Min)             | Reduce to its smallest element                                      | `Reduce::toMin($numbers)`                         |
+| [`toProduct`](#To-Product)     | Reduce to the product of its elements                               | `Reduce::toProduct($numbers)`                     |
+| [`toSum`](#To-Sum)             | Reduce to the sum of its elements                                   | `Reduce::toSum($numbers)`                         |
 | [`toValue`](#To-Value)         | Reduce to value using callable reducer                              | `Reduce::toValue($data, $reducer, $initialValue)` |
 
 Setup
@@ -624,9 +624,8 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
 ### Is Reversed
 Returns true if elements are reverse sorted, otherwise false.
 
-Elements must be comparable.
-
-Returns true if empty or has only one element.
+- Elements must be comparable.
+- Returns true if empty or has only one element.
 
 ```Reduce::isReversed(iterable $data)```
 
@@ -647,9 +646,8 @@ $result = Reduce::isReversed($numbers);
 ### Is Sorted
 Returns true if elements are sorted, otherwise false.
 
-Elements must be comparable.
-
-Returns true if empty or has only one element.
+- Elements must be comparable.
+- Returns true if empty or has only one element.
 
 ```Reduce::isSorted(iterable $data)```
 
@@ -685,9 +683,8 @@ $finalGrade = Reduce::toAverage($numbers);
 ### To Max
 Reduces to the max value.
 
-Elements must be comparable.
-
-Returns null if collection is empty.
+- Elements must be comparable.
+- Returns null if collection is empty.
 
 ```Reduce::toMax(iterable $data)```
 ```php
@@ -702,9 +699,8 @@ $result = Reduce::toMax($numbers);
 ### To Min
 Reduces to the min value.
 
-Elements must be comparable.
-
-Returns null if collection is empty.
+- Elements must be comparable.
+- Returns null if collection is empty.
 
 ```Reduce::toMin(iterable $data)```
 ```php
@@ -753,7 +749,7 @@ use IterTools\Reduce;
 
 $parts = [10, 20, 30];
 
-$sun = Reduce::toSum($parts);
+$sum = Reduce::toSum($parts);
 // 60
 ```
 
@@ -765,7 +761,7 @@ Reduce elements to a single value using reducer function.
 use IterTools\Reduce;
 
 $input = [1, 2, 3, 4, 5];
-$sum = fn ($carry, $item) => $carry + $item;
+$sum   = fn ($carry, $item) => $carry + $item;
 
 $result = Reduce::toValue($input, $sum, 0);
 // 15
