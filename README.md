@@ -64,16 +64,16 @@ Quick Reference
 | [`isReversed`](#Is-Reversed)   | True if iterable reverse sorted                                     | `Summary::isReversed($data)`                      |
 
 #### Reduce
-| Reducer                        | Description                                                         | Code Snippet                                      |
-|--------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
-| [`toAverage`](#To-Average)     | Mean average of elements                                            | `Reduce::toAverage($numbers)`                     |
-| [`toCount`](#To-Count)         | Reduce to length of iterable                                        | `Reduce::toCount($data)`                          |
-| [`toMax`](#To-Max)             | Reduce to its largest element                                       | `Reduce::toMax($numbers)`                         |
-| [`toMin`](#To-Min)             | Reduce to its smallest element                                      | `Reduce::toMin($numbers)`                         |
-| [`toProduct`](#To-Product)     | Reduce to the product of its elements                               | `Reduce::toProduct($numbers)`                     |
-| [`toSum`](#To-Sum)             | Reduce to the sum of its elements                                   | `Reduce::toSum($numbers)`                         |
-| [`exactlyN`](#Exactly-N)       | True if iterables are th same          | `Reduce::exactlyN($data, $n, ...$extra)`          |
-| [`toValue`](#To-Value)         | Reduce to value using callable reducer                              | `Reduce::toValue($data, $reducer, $initialValue)` |
+| Reducer                    | Description                            | Code Snippet                                      |
+|----------------------------|----------------------------------------|---------------------------------------------------|
+| [`toAverage`](#To-Average) | Mean average of elements               | `Reduce::toAverage($numbers)`                     |
+| [`toCount`](#To-Count)     | Reduce to length of iterable           | `Reduce::toCount($data)`                          |
+| [`toMax`](#To-Max)         | Reduce to its largest element          | `Reduce::toMax($numbers)`                         |
+| [`toMin`](#To-Min)         | Reduce to its smallest element         | `Reduce::toMin($numbers)`                         |
+| [`toProduct`](#To-Product) | Reduce to the product of its elements  | `Reduce::toProduct($numbers)`                     |
+| [`toSum`](#To-Sum)         | Reduce to the sum of its elements      | `Reduce::toSum($numbers)`                         |
+| [`same`](#Same)            | True if iterables are the same         | `Reduce::same(...$iterables)`                     |
+| [`toValue`](#To-Value)     | Reduce to value using callable reducer | `Reduce::toValue($data, $reducer, $initialValue)` |
 
 Setup
 -----
@@ -779,14 +779,12 @@ $sum = Reduce::toSum($parts);
 // 60
 ```
 
-### Exactly N
-Returns true if given collection is sorted reversely otherwise false.
+### Same
+Returns true if all given collections are the same.
 
-Items of given collection must be comparable.
+For single iterable or empty iterables list returns true.
 
-Returns true if given collection is empty or has one element.
-
-```Reduce::exactlyN(iterable $data, iterable $n, iterable ...$extra)```
+```Reduce::same(iterable ...$iterables)```
 
 ```php
 use IterTools\Reduce;
@@ -795,13 +793,13 @@ $input = [1, 2, 3, 4, 5];
 $n1 = [1, 2, 3, 4, 5];
 $n2 = [1, 2, 3, 4, 5];
 
-$result = Reduce::exactlyN($input, $n1, $n2);
+$result = Reduce::same($input, $n1, $n2);
 // true
 
 $input = [1, 2, 3, 4, 5];
 $n = [1, 2, 3, 7];
 
-$result = Reduce::exactlyN($input, $n);
+$result = Reduce::same($input, $n);
 // false
 ```
 

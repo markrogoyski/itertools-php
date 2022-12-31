@@ -133,18 +133,16 @@ class Reduce
     }
 
     /**
-     * Returns true if given collection is exactly the same as another ones.
+     * Returns true if all given collections are the same.
      *
-     * @param iterable<mixed> $data
-     * @param iterable<mixed> $n
-     * @param iterable<mixed> ...$extra
+     * For single iterable or empty iterables list returns true.
+     *
+     * @param iterable<mixed> ...$iterables
      *
      * @return bool
      */
-    public static function exactlyN(iterable $data, iterable $n, iterable ...$extra): bool
+    public static function same(iterable ...$iterables): bool
     {
-        $iterables = [$data, $n, ...$extra];
-
         try {
             foreach (Multi::zipEqual(...$iterables) as $values) {
                 foreach (Single::pairwise($values) as [$lhs, $rhs]) {
