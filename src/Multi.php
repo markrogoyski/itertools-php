@@ -64,7 +64,7 @@ class Multi
      * @param iterable<mixed> ...$iterables
      *
      * @return \MultipleIterator<mixed>
-     * @throws \LengthException if during iteration it is discovered that iterable lengths are not equal
+     * @throws \LengthException if during iteration one iterable ends before the others, indicating unequal lengths
      */
     public static function zipEqual(iterable ...$iterables): \MultipleIterator
     {
