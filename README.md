@@ -650,19 +650,19 @@ Returns true if elements are reverse sorted, otherwise false.
 - Elements must be comparable.
 - Returns true if empty or has only one element.
 
-```Reduce::isReversed(iterable $data)```
+```Summary::isReversed(iterable $data)```
 
 ```php
-use IterTools\Reduce;
+use IterTools\Summary;
 
 $numbers = [5, 4, 3, 2, 1];
 
-$result = Reduce::isReversed($numbers);
+$boolean = Summary::isReversed($numbers);
 // true
 
 $numbers = [1, 4, 3, 2, 1];
 
-$result = Reduce::isReversed($numbers);
+$boolean = Summary::isReversed($numbers);
 // false
 ```
 
@@ -672,19 +672,19 @@ Returns true if elements are sorted, otherwise false.
 - Elements must be comparable.
 - Returns true if empty or has only one element.
 
-```Reduce::isSorted(iterable $data)```
+```Summary::isSorted(iterable $data)```
 
 ```php
-use IterTools\Reduce;
+use IterTools\Summary;
 
 $numbers = [1, 2, 3, 4, 5];
 
-$result = Reduce::isSorted($numbers);
+$boolean = Summary::isSorted($numbers);
 // true
 
 $numbers = [3, 2, 3, 4, 5];
 
-$result = Reduce::isSorted($numbers);
+$boolean = Summary::isSorted($numbers);
 // false
 ```
 
