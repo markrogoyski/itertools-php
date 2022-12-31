@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Single;
+namespace IterTools\Tests\Util;
 
-use IterTools\Util;
+use IterTools\Util\IteratorFactory;
 use IterTools\Tests\Fixture;
 
 class MakeIteratorTest extends \PHPUnit\Framework\TestCase
@@ -18,7 +18,7 @@ class MakeIteratorTest extends \PHPUnit\Framework\TestCase
         $array = [1, 2, 3, 4, 5];
 
         // When
-        $iterator = Util::makeIterator($array);
+        $iterator = IteratorFactory::makeIterator($array);
 
         // Then
         $this->assertIsIterable($iterator);
@@ -34,7 +34,7 @@ class MakeIteratorTest extends \PHPUnit\Framework\TestCase
         $arrayIterator = new Fixture\ArrayIteratorFixture([1, 2, 3, 4, 5]);
 
         // When
-        $iterator = Util::makeIterator($arrayIterator);
+        $iterator = IteratorFactory::makeIterator($arrayIterator);
 
         // Then
         $this->assertIsIterable($iterator);
@@ -50,7 +50,7 @@ class MakeIteratorTest extends \PHPUnit\Framework\TestCase
         $iteratorAggregate = new Fixture\IteratorAggregateFixture([1, 2, 3, 4, 5]);
 
         // When
-        $iterator = Util::makeIterator($iteratorAggregate);
+        $iterator = IteratorFactory::makeIterator($iteratorAggregate);
 
         // Then
         $this->assertIsIterable($iterator);
@@ -66,7 +66,7 @@ class MakeIteratorTest extends \PHPUnit\Framework\TestCase
         $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4, 5]);
 
         // When
-        $iterator = Util::makeIterator($generator);
+        $iterator = IteratorFactory::makeIterator($generator);
 
         // Then
         $this->assertIsIterable($iterator);

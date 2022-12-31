@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\IteratorFactory;
 use IterTools\Util\StrictMultipleIterator;
 
 class Multi
@@ -24,7 +25,7 @@ class Multi
     {
         $zippedIterator = new \MultipleIterator();
         foreach ($iterables as $iterable) {
-            $zippedIterator->attachIterator(Util::makeIterator($iterable));
+            $zippedIterator->attachIterator(IteratorFactory::makeIterator($iterable));
         }
 
         return $zippedIterator;
@@ -47,7 +48,7 @@ class Multi
     {
         $zippedIterator = new \MultipleIterator();
         foreach ($iterables as $iterable) {
-            $zippedIterator->attachIterator(Util::makeIterator($iterable));
+            $zippedIterator->attachIterator(IteratorFactory::makeIterator($iterable));
         }
         $zippedIterator->setFlags(\MultipleIterator::MIT_NEED_ANY);
 
@@ -69,7 +70,7 @@ class Multi
     {
         $zippedIterator = new StrictMultipleIterator(\MultipleIterator::MIT_NEED_ALL);
         foreach ($iterables as $iterable) {
-            $zippedIterator->attachIterator(Util::makeIterator($iterable));
+            $zippedIterator->attachIterator(IteratorFactory::makeIterator($iterable));
         }
         $zippedIterator->setFlags(\MultipleIterator::MIT_NEED_ALL);
 

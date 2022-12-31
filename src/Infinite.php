@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\IteratorFactory;
+
 class Infinite
 {
     /**
@@ -33,7 +35,7 @@ class Infinite
         if ($iterable instanceof \Generator) {
             $iterable = \iterator_to_array($iterable);
         }
-        return new \InfiniteIterator(Util::makeIterator($iterable));
+        return new \InfiniteIterator(IteratorFactory::makeIterator($iterable));
     }
 
     /**

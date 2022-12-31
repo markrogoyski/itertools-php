@@ -35,10 +35,8 @@ class StrictMultipleIterator extends \MultipleIterator
             // We are backing up current flags and replacing them with MIT_NEED_ANY to do an extra check
             $this->setFlags(\MultipleIterator::MIT_NEED_ANY);
 
-            // So do we have non-ended iterators?
-            $isAnyIteratorStillValid = parent::valid();
-
-            if ($isAnyIteratorStillValid === true) {
+            /** So do we have non-ended iterators? @phpstan-ignore-next-line */
+            if (parent::valid() === true) {
                 // This is situation (2)
                 throw new \LengthException('Iterables of unequal sizes');
             }

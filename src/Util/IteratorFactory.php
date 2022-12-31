@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools;
+namespace IterTools\Util;
 
-class Util
+class IteratorFactory
 {
     /**
      * @param iterable<mixed> $iterable
