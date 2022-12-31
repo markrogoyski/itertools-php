@@ -157,4 +157,29 @@ class Reduce
 
         return true;
     }
+
+    /**
+     * Returns true if all given collections have the same lengths.
+     *
+     * For single iterable or empty iterables list returns true.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return bool
+     */
+    public static function sameCount(iterable ...$iterables): bool
+    {
+        $count = null;
+        foreach ($iterables as $iterable) {
+            $currentCount = self::toCount($iterable);
+
+            if ($count !== null && $count !== $currentCount) {
+                return false;
+            }
+
+            $count = $currentCount;
+        }
+
+        return true;
+    }
 }
