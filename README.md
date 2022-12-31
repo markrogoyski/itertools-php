@@ -57,11 +57,15 @@ Quick Reference
 | [`runningProduct`](#Running-Product) | Running product accumulation | `Math::runningProduct($numbers, $initialValue)` |
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
 
-#### Reduce (Summarizing Iterables)
+#### Summary
 | Reducer                        | Description                                                         | Code Snippet                                      |
 |--------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
-| [`isSorted`](#Is-Sorted)       | True if iterable sorted                                             | `Reduce::isSorted($data)`                         |
-| [`isReversed`](#Is-Reversed)   | True if iterable reverse sorted                                     | `Reduce::isReversed($data)`                       |
+| [`isSorted`](#Is-Sorted)       | True if iterable sorted                                             | `Summary::isSorted($data)`                        |
+| [`isReversed`](#Is-Reversed)   | True if iterable reverse sorted                                     | `Summary::isReversed($data)`                      |
+
+#### Reduce
+| Reducer                        | Description                                                         | Code Snippet                                      |
+|--------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
 | [`toAverage`](#To-Average)     | Mean average of elements                                            | `Reduce::toAverage($numbers)`                     |
 | [`toCount`](#To-Count)         | Reduce to length of iterable                                        | `Reduce::toCount($data)`                          |
 | [`toMax`](#To-Max)             | Reduce to its largest element                                       | `Reduce::toMax($numbers)`                         |
@@ -638,7 +642,7 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
 // 5, 6, 8, 11, 15, 20
 ```
 
-## Reduce
+## Summary
 
 ### Is Reversed
 Returns true if elements are reverse sorted, otherwise false.
@@ -683,6 +687,8 @@ $numbers = [3, 2, 3, 4, 5];
 $result = Reduce::isSorted($numbers);
 // false
 ```
+
+## Reduce
 
 ### To Average
 Reduces to the mean average.

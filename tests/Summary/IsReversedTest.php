@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Reduce;
+namespace IterTools\Tests\Summary;
 
-use IterTools\Reduce;
+use IterTools\Summary;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -19,7 +19,7 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
     public function testArrayTrue(array $data)
     {
         // When
-        $result = Reduce::isReversed($data);
+        $result = Summary::isReversed($data);
 
         // Then
         $this->assertTrue($result);
@@ -75,7 +75,7 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
     public function testArrayFalse(array $data)
     {
         // When
-        $result = Reduce::isReversed($data);
+        $result = Summary::isReversed($data);
 
         // Then
         $this->assertFalse($result);
@@ -128,7 +128,7 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
     public function testGeneratorsTrue(\Generator $data)
     {
         // When
-        $result = Reduce::isReversed($data);
+        $result = Summary::isReversed($data);
 
         // Then
         $this->assertTrue($result);
@@ -188,7 +188,7 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
     public function testGeneratorsFalse(\Generator $data)
     {
         // When
-        $result = Reduce::isReversed($data);
+        $result = Summary::isReversed($data);
 
         // Then
         $this->assertFalse($result);
@@ -245,7 +245,7 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
     public function testIteratorsTrue(\Iterator $data)
     {
         // When
-        $result = Reduce::isReversed($data);
+        $result = Summary::isReversed($data);
 
         // Then
         $this->assertTrue($result);
@@ -305,7 +305,7 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
     public function testIteratorsFalse(\Iterator $data)
     {
         // When
-        $result = Reduce::isReversed($data);
+        $result = Summary::isReversed($data);
 
         // Then
         $this->assertFalse($result);
@@ -362,7 +362,7 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
     public function testTraversablesTrue(\Traversable $data)
     {
         // When
-        $result = Reduce::isReversed($data);
+        $result = Summary::isReversed($data);
 
         // Then
         $this->assertTrue($result);
@@ -422,7 +422,7 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
     public function testTraversablesFalse(\Traversable $data)
     {
         // When
-        $result = Reduce::isReversed($data);
+        $result = Summary::isReversed($data);
 
         // Then
         $this->assertFalse($result);
