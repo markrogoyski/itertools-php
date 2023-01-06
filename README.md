@@ -58,10 +58,12 @@ Quick Reference
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
 
 #### Summary
-| Reducer                        | Description                                                         | Code Snippet                                      |
-|--------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
-| [`isSorted`](#Is-Sorted)       | True if iterable sorted                                             | `Summary::isSorted($data)`                        |
-| [`isReversed`](#Is-Reversed)   | True if iterable reverse sorted                                     | `Summary::isReversed($data)`                      |
+| Reducer                      | Description                               | Code Snippet                       |
+|------------------------------|-------------------------------------------|------------------------------------|
+| [`isSorted`](#Is-Sorted)     | True if iterable sorted                   | `Summary::isSorted($data)`         |
+| [`isReversed`](#Is-Reversed) | True if iterable reverse sorted           | `Summary::isReversed($data)`       |
+| [`same`](#Same)              | True if iterables are the same            | `Reduce::same(...$iterables)`      |
+| [`sameCount`](#Same-Count)   | True if iterables have the same lengths   | `Reduce::sameCount(...$iterables)` |
 
 #### Reduce
 | Reducer                    | Description                             | Code Snippet                                      |
@@ -72,8 +74,6 @@ Quick Reference
 | [`toMin`](#To-Min)         | Reduce to its smallest element          | `Reduce::toMin($numbers)`                         |
 | [`toProduct`](#To-Product) | Reduce to the product of its elements   | `Reduce::toProduct($numbers)`                     |
 | [`toSum`](#To-Sum)         | Reduce to the sum of its elements       | `Reduce::toSum($numbers)`                         |
-| [`same`](#Same)            | True if iterables are the same          | `Reduce::same(...$iterables)`                     |
-| [`sameCount`](#Same-Count) | True if iterables have the same lengths | `Reduce::sameCount(...$iterables)`                |
 | [`toValue`](#To-Value)     | Reduce to value using callable reducer  | `Reduce::toValue($data, $reducer, $initialValue)` |
 
 Setup
@@ -690,6 +690,54 @@ $boolean = Summary::isSorted($numbers);
 // false
 ```
 
+### Same
+Returns true if all given collections are the same.
+
+For single iterable or empty iterables list returns true.
+
+```Summary::same(iterable ...$iterables)```
+
+```php
+use IterTools\Summary;
+
+$input = [1, 2, 3, 4, 5];
+$n1 = [1, 2, 3, 4, 5];
+$n2 = [1, 2, 3, 4, 5];
+
+$result = Summary::same($input, $n1, $n2);
+// true
+
+$input = [1, 2, 3, 4, 5];
+$n = [1, 2, 3, 7];
+
+$result = Summary::same($input, $n);
+// false
+```
+
+### Same Count
+Returns true if all given collections have the same lengths.
+
+For single iterable or empty iterables list returns true.
+
+```Summary::sameCount(iterable ...$iterables)```
+
+```php
+use IterTools\Summary;
+
+$input = [1, 2, 3];
+$n1 = [2, 3, 4];
+$n2 = [3, 4, 5];
+
+$result = Summary::sameCount($input, $n1, $n2);
+// true
+
+$input = [1, 2, 3, 4, 5];
+$n = [1, 2, 3];
+
+$result = Summary::sameCount($input, $n);
+// false
+```
+
 ## Reduce
 
 ### To Average
@@ -778,54 +826,6 @@ $parts = [10, 20, 30];
 
 $sum = Reduce::toSum($parts);
 // 60
-```
-
-### Same
-Returns true if all given collections are the same.
-
-For single iterable or empty iterables list returns true.
-
-```Reduce::same(iterable ...$iterables)```
-
-```php
-use IterTools\Reduce;
-
-$input = [1, 2, 3, 4, 5];
-$n1 = [1, 2, 3, 4, 5];
-$n2 = [1, 2, 3, 4, 5];
-
-$result = Reduce::same($input, $n1, $n2);
-// true
-
-$input = [1, 2, 3, 4, 5];
-$n = [1, 2, 3, 7];
-
-$result = Reduce::same($input, $n);
-// false
-```
-
-### Same Count
-Returns true if all given collections have the same lengths.
-
-For single iterable or empty iterables list returns true.
-
-```Reduce::sameCount(iterable ...$iterables)```
-
-```php
-use IterTools\Reduce;
-
-$input = [1, 2, 3];
-$n1 = [2, 3, 4];
-$n2 = [3, 4, 5];
-
-$result = Reduce::sameCount($input, $n1, $n2);
-// true
-
-$input = [1, 2, 3, 4, 5];
-$n = [1, 2, 3];
-
-$result = Reduce::sameCount($input, $n);
-// false
 ```
 
 ### To Value

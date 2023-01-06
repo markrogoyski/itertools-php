@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Reduce;
+namespace IterTools\Tests\Summary;
 
-use IterTools\Reduce;
+use IterTools\Summary;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -19,7 +19,7 @@ class SameTest extends \PHPUnit\Framework\TestCase
         // Given: $data
 
         // When
-        $result = Reduce::same();
+        $result = Summary::same();
 
         // Then
         $this->assertTrue($result);
@@ -35,7 +35,7 @@ class SameTest extends \PHPUnit\Framework\TestCase
         // Given: $data
 
         // When
-        $result = Reduce::same(...$iterables);
+        $result = Summary::same(...$iterables);
 
         // Then
         $this->assertTrue($result);
@@ -127,7 +127,7 @@ class SameTest extends \PHPUnit\Framework\TestCase
         // Given: $data
 
         // When
-        $result = Reduce::same(...$iterables);
+        $result = Summary::same(...$iterables);
 
         // Then
         $this->assertFalse($result);
@@ -206,7 +206,7 @@ class SameTest extends \PHPUnit\Framework\TestCase
         // Given: $data
 
         // When
-        $result = Reduce::same($iterables);
+        $result = Summary::same($iterables);
 
         // Then
         $this->assertTrue($result);
@@ -295,7 +295,7 @@ class SameTest extends \PHPUnit\Framework\TestCase
         // Given: $data
 
         // When
-        $result = Reduce::same(...$iterables);
+        $result = Summary::same(...$iterables);
 
         // Then
         $this->assertFalse($result);
@@ -374,7 +374,7 @@ class SameTest extends \PHPUnit\Framework\TestCase
         // Given: $data
 
         // When
-        $result = Reduce::same(...$iterables);
+        $result = Summary::same(...$iterables);
 
         // Then
         $this->assertTrue($result);
@@ -463,7 +463,7 @@ class SameTest extends \PHPUnit\Framework\TestCase
         // Given: $data
 
         // When
-        $result = Reduce::same(...$iterables);
+        $result = Summary::same(...$iterables);
 
         // Then
         $this->assertFalse($result);
@@ -542,7 +542,7 @@ class SameTest extends \PHPUnit\Framework\TestCase
         // Given: $data
 
         // When
-        $result = Reduce::same(...$iterables);
+        $result = Summary::same(...$iterables);
 
         // Then
         $this->assertTrue($result);
@@ -631,7 +631,7 @@ class SameTest extends \PHPUnit\Framework\TestCase
         // Given: $data
 
         // When
-        $result = Reduce::same(...$iterables);
+        $result = Summary::same(...$iterables);
 
         // Then
         $this->assertFalse($result);

@@ -131,49 +131,4 @@ class Reduce
 
         return $count ? ($sum / $count) : null;
     }
-
-    /**
-     * Returns true if all given collections are the same.
-     *
-     * For single iterable or empty iterables list returns true.
-     *
-     * @param iterable<mixed> ...$iterables
-     *
-     * @return bool
-     */
-    public static function same(iterable ...$iterables): bool
-    {
-        try {
-            foreach (Multi::zipEqual(...$iterables) as $values) {
-                foreach (Single::pairwise($values) as [$lhs, $rhs]) {
-                    if ($lhs !== $rhs) {
-                        return false;
-                    }
-                }
-            }
-        } catch (\LengthException $e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Returns true if all given collections have the same lengths.
-     *
-     * For single iterable or empty iterables list returns true.
-     *
-     * @param iterable<mixed> ...$iterables
-     *
-     * @return bool
-     */
-    public static function sameCount(iterable ...$iterables): bool
-    {
-        if (count($iterables) <= 1) {
-            return true;
-        }
-
-        $counts = array_map('self::toCount', $iterables);
-        return count(array_unique($counts)) === 1;
-    }
 }
