@@ -646,28 +646,6 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
 
 ## Summary
 
-### Is Reversed
-Returns true if elements are reverse sorted, otherwise false.
-
-- Elements must be comparable.
-- Returns true if empty or has only one element.
-
-```Summary::isReversed(iterable $data)```
-
-```php
-use IterTools\Summary;
-
-$numbers = [5, 4, 3, 2, 1];
-
-$boolean = Summary::isReversed($numbers);
-// true
-
-$numbers = [1, 4, 3, 2, 1];
-
-$boolean = Summary::isReversed($numbers);
-// false
-```
-
 ### Is Sorted
 Returns true if elements are sorted, otherwise false.
 
@@ -687,6 +665,28 @@ $boolean = Summary::isSorted($numbers);
 $numbers = [3, 2, 3, 4, 5];
 
 $boolean = Summary::isSorted($numbers);
+// false
+```
+
+### Is Reversed
+Returns true if elements are reverse sorted, otherwise false.
+
+- Elements must be comparable.
+- Returns true if empty or has only one element.
+
+```Summary::isReversed(iterable $data)```
+
+```php
+use IterTools\Summary;
+
+$numbers = [5, 4, 3, 2, 1];
+
+$boolean = Summary::isReversed($numbers);
+// true
+
+$numbers = [1, 4, 3, 2, 1];
+
+$boolean = Summary::isReversed($numbers);
 // false
 ```
 
