@@ -169,17 +169,11 @@ class Reduce
      */
     public static function sameCount(iterable ...$iterables): bool
     {
-        $count = null;
-        foreach ($iterables as $iterable) {
-            $currentCount = self::toCount($iterable);
-
-            if ($count !== null && $count !== $currentCount) {
-                return false;
-            }
-
-            $count = $currentCount;
+        if (count($iterables) <= 1) {
+            return true;
         }
 
-        return true;
+        $counts = array_map('self::toCount', $iterables);
+        return count(array_unique($counts)) === 1;
     }
 }
