@@ -58,21 +58,23 @@ Quick Reference
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
 
 #### Summary
-| Reducer                        | Description                                                         | Code Snippet                                      |
-|--------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
-| [`isSorted`](#Is-Sorted)       | True if iterable sorted                                             | `Summary::isSorted($data)`                        |
-| [`isReversed`](#Is-Reversed)   | True if iterable reverse sorted                                     | `Summary::isReversed($data)`                      |
+| Reducer                      | Description                               | Code Snippet                       |
+|------------------------------|-------------------------------------------|------------------------------------|
+| [`isSorted`](#Is-Sorted)     | True if iterable sorted                   | `Summary::isSorted($data)`         |
+| [`isReversed`](#Is-Reversed) | True if iterable reverse sorted           | `Summary::isReversed($data)`       |
+| [`same`](#Same)              | True if iterables are the same            | `Reduce::same(...$iterables)`      |
+| [`sameCount`](#Same-Count)   | True if iterables have the same lengths   | `Reduce::sameCount(...$iterables)` |
 
 #### Reduce
-| Reducer                        | Description                                                         | Code Snippet                                      |
-|--------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
-| [`toAverage`](#To-Average)     | Mean average of elements                                            | `Reduce::toAverage($numbers)`                     |
-| [`toCount`](#To-Count)         | Reduce to length of iterable                                        | `Reduce::toCount($data)`                          |
-| [`toMax`](#To-Max)             | Reduce to its largest element                                       | `Reduce::toMax($numbers)`                         |
-| [`toMin`](#To-Min)             | Reduce to its smallest element                                      | `Reduce::toMin($numbers)`                         |
-| [`toProduct`](#To-Product)     | Reduce to the product of its elements                               | `Reduce::toProduct($numbers)`                     |
-| [`toSum`](#To-Sum)             | Reduce to the sum of its elements                                   | `Reduce::toSum($numbers)`                         |
-| [`toValue`](#To-Value)         | Reduce to value using callable reducer                              | `Reduce::toValue($data, $reducer, $initialValue)` |
+| Reducer                    | Description                             | Code Snippet                                      |
+|----------------------------|-----------------------------------------|---------------------------------------------------|
+| [`toAverage`](#To-Average) | Mean average of elements                | `Reduce::toAverage($numbers)`                     |
+| [`toCount`](#To-Count)     | Reduce to length of iterable            | `Reduce::toCount($data)`                          |
+| [`toMax`](#To-Max)         | Reduce to its largest element           | `Reduce::toMax($numbers)`                         |
+| [`toMin`](#To-Min)         | Reduce to its smallest element          | `Reduce::toMin($numbers)`                         |
+| [`toProduct`](#To-Product) | Reduce to the product of its elements   | `Reduce::toProduct($numbers)`                     |
+| [`toSum`](#To-Sum)         | Reduce to the sum of its elements       | `Reduce::toSum($numbers)`                         |
+| [`toValue`](#To-Value)     | Reduce to value using callable reducer  | `Reduce::toValue($data, $reducer, $initialValue)` |
 
 Setup
 -----
@@ -644,6 +646,28 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
 
 ## Summary
 
+### Is Sorted
+Returns true if elements are sorted, otherwise false.
+
+- Elements must be comparable.
+- Returns true if empty or has only one element.
+
+```Summary::isSorted(iterable $data)```
+
+```php
+use IterTools\Summary;
+
+$numbers = [1, 2, 3, 4, 5];
+
+$boolean = Summary::isSorted($numbers);
+// true
+
+$numbers = [3, 2, 3, 4, 5];
+
+$boolean = Summary::isSorted($numbers);
+// false
+```
+
 ### Is Reversed
 Returns true if elements are reverse sorted, otherwise false.
 
@@ -666,25 +690,51 @@ $boolean = Summary::isReversed($numbers);
 // false
 ```
 
-### Is Sorted
-Returns true if elements are sorted, otherwise false.
+### Same
+Returns true if all given collections are the same.
 
-- Elements must be comparable.
-- Returns true if empty or has only one element.
+For single iterable or empty iterables list returns true.
 
-```Summary::isSorted(iterable $data)```
+```Summary::same(iterable ...$iterables)```
 
 ```php
 use IterTools\Summary;
 
-$numbers = [1, 2, 3, 4, 5];
+$input = [1, 2, 3, 4, 5];
+$n1 = [1, 2, 3, 4, 5];
+$n2 = [1, 2, 3, 4, 5];
 
-$boolean = Summary::isSorted($numbers);
+$result = Summary::same($input, $n1, $n2);
 // true
 
-$numbers = [3, 2, 3, 4, 5];
+$input = [1, 2, 3, 4, 5];
+$n = [1, 2, 3, 7];
 
-$boolean = Summary::isSorted($numbers);
+$result = Summary::same($input, $n);
+// false
+```
+
+### Same Count
+Returns true if all given collections have the same lengths.
+
+For single iterable or empty iterables list returns true.
+
+```Summary::sameCount(iterable ...$iterables)```
+
+```php
+use IterTools\Summary;
+
+$input = [1, 2, 3];
+$n1 = [2, 3, 4];
+$n2 = [3, 4, 5];
+
+$result = Summary::sameCount($input, $n1, $n2);
+// true
+
+$input = [1, 2, 3, 4, 5];
+$n = [1, 2, 3];
+
+$result = Summary::sameCount($input, $n);
 // false
 ```
 
