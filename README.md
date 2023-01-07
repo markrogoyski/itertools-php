@@ -58,7 +58,7 @@ Quick Reference
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
 
 #### Summary
-| Reducer                      | Description                               | Code Snippet                       |
+| Summary                      | Description                               | Code Snippet                       |
 |------------------------------|-------------------------------------------|------------------------------------|
 | [`isSorted`](#Is-Sorted)     | True if iterable sorted                   | `Summary::isSorted($data)`         |
 | [`isReversed`](#Is-Reversed) | True if iterable reverse sorted           | `Summary::isReversed($data)`       |
@@ -700,17 +700,16 @@ For single iterable or empty iterables list returns true.
 ```php
 use IterTools\Summary;
 
-$input = [1, 2, 3, 4, 5];
-$n1 = [1, 2, 3, 4, 5];
-$n2 = [1, 2, 3, 4, 5];
+$cocaColaIngredients = ['carbonated water', 'sugar', 'caramel color', 'phosphoric acid'];
+$pepsiIngredients    = ['carbonated water', 'sugar', 'caramel color', 'phosphoric acid'];
 
-$result = Summary::same($input, $n1, $n2);
+$boolean = Summary::same($cocaColaIngredients, $pepsiIngredients);
 // true
 
-$input = [1, 2, 3, 4, 5];
-$n = [1, 2, 3, 7];
+$cocaColaIngredients = ['carbonated water', 'sugar', 'caramel color', 'phosphoric acid'];
+$spriteIngredients   = ['carbonated water', 'sugar', 'citric acid', 'lemon lime flavorings'];
 
-$result = Summary::same($input, $n);
+$boolean = Summary::same($cocaColaIngredients, $spriteIngredients);
 // false
 ```
 
@@ -724,17 +723,17 @@ For single iterable or empty iterables list returns true.
 ```php
 use IterTools\Summary;
 
-$input = [1, 2, 3];
-$n1 = [2, 3, 4];
-$n2 = [3, 4, 5];
+$prequels  = ['Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith'];
+$originals = ['A New Hope', 'Empire Strikes Back', 'Return of the Jedi'];
+$sequels   = ['The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker'];
 
-$result = Summary::sameCount($input, $n1, $n2);
+$boolean = Summary::sameCount($prequels, $originals, $sequels);
 // true
 
-$input = [1, 2, 3, 4, 5];
-$n = [1, 2, 3];
+$batmanMovies = ['Batman Begins', 'The Dark Knight', 'The Dark Knight Rises'];
+$matrixMovies = ['The Matrix', 'The Matrix Reloaded', 'The Matrix Revolutions', 'The Matrix Resurrections'];
 
-$result = Summary::sameCount($input, $n);
+$result = Summary::sameCount($batmanMovies, $matrixMovies);
 // false
 ```
 
