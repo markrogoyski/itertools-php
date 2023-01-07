@@ -43,7 +43,7 @@ class Reduce
     public static function toMin(iterable $data)
     {
         return static::toValue($data, static function ($carry, $datum) {
-            return min($carry ?? $datum, $datum);
+            return \min($carry ?? $datum, $datum);
         });
     }
 
@@ -61,7 +61,7 @@ class Reduce
     public static function toMax(iterable $data)
     {
         return static::toValue($data, static function ($carry, $datum) {
-            return max($carry ?? $datum, $datum);
+            return \max($carry ?? $datum, $datum);
         });
     }
 
@@ -75,7 +75,7 @@ class Reduce
     public static function toCount(iterable $data): int
     {
         if (\is_countable($data)) {
-            return count($data);
+            return \count($data);
         }
 
         return static::toValue($data, static function ($carry) {

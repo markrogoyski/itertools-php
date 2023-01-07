@@ -21,7 +21,7 @@ class Random
         }
 
         $start = 0;
-        $end   = count($items) - 1;
+        $end   = \count($items) - 1;
         foreach (self::number($start, $end, $repetitions) as $i) {
             yield $items[$i];
         }

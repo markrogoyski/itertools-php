@@ -90,11 +90,11 @@ class Summary
      */
     public static function sameCount(iterable ...$iterables): bool
     {
-        if (count($iterables) <= 1) {
+        if (\count($iterables) <= 1) {
             return true;
         }
 
-        $counts = array_map([Reduce::class, 'toCount'], $iterables);
-        return count(array_unique($counts)) === 1;
+        $counts = \array_map([Reduce::class, 'toCount'], $iterables);
+        return \count(\array_unique($counts)) === 1;
     }
 }
