@@ -16,8 +16,6 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testEmpty(): void
     {
-        // Given: $data
-
         // When
         $result = Summary::sameCount();
 
@@ -32,8 +30,6 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testArrayTrue(iterable ...$iterables)
     {
-        // Given: $data
-
         // When
         $result = Summary::sameCount(...$iterables);
 
@@ -124,8 +120,6 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testArrayFalse(iterable ...$iterables)
     {
-        // Given: $data
-
         // When
         $result = Summary::sameCount(...$iterables);
 
@@ -172,8 +166,6 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testGeneratorsTrue(iterable ...$iterables)
     {
-        // Given: $data
-
         // When
         $result = Summary::sameCount($iterables);
 
@@ -264,8 +256,6 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testGeneratorsFalse(iterable ...$iterables)
     {
-        // Given: $data
-
         // When
         $result = Summary::sameCount(...$iterables);
 
@@ -312,8 +302,6 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testIteratorsTrue(iterable ...$iterables)
     {
-        // Given: $data
-
         // When
         $result = Summary::sameCount(...$iterables);
 
@@ -404,8 +392,6 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testIteratorsFalse(iterable ...$iterables)
     {
-        // Given: $data
-
         // When
         $result = Summary::sameCount(...$iterables);
 
@@ -452,8 +438,6 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testTraversablesTrue(iterable ...$iterables)
     {
-        // Given: $data
-
         // When
         $result = Summary::sameCount(...$iterables);
 
@@ -544,8 +528,6 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
      */
     public function testTraversablesFalse(iterable ...$iterables)
     {
-        // Given: $data
-
         // When
         $result = Summary::sameCount(...$iterables);
 
