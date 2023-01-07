@@ -58,12 +58,12 @@ Quick Reference
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
 
 #### Summary
-| Summary                      | Description                               | Code Snippet                       |
-|------------------------------|-------------------------------------------|------------------------------------|
-| [`isSorted`](#Is-Sorted)     | True if iterable sorted                   | `Summary::isSorted($data)`         |
-| [`isReversed`](#Is-Reversed) | True if iterable reverse sorted           | `Summary::isReversed($data)`       |
-| [`same`](#Same)              | True if iterables are the same            | `Reduce::same(...$iterables)`      |
-| [`sameCount`](#Same-Count)   | True if iterables have the same lengths   | `Reduce::sameCount(...$iterables)` |
+| Summary                      | Description                               | Code Snippet                        |
+|------------------------------|-------------------------------------------|-------------------------------------|
+| [`isSorted`](#Is-Sorted)     | True if iterable sorted                   | `Summary::isSorted($data)`          |
+| [`isReversed`](#Is-Reversed) | True if iterable reverse sorted           | `Summary::isReversed($data)`        |
+| [`same`](#Same)              | True if iterables are the same            | `Summary::same(...$iterables)`      |
+| [`sameCount`](#Same-Count)   | True if iterables have the same lengths   | `Summary::sameCount(...$iterables)` |
 
 #### Reduce
 | Reducer                    | Description                             | Code Snippet                                      |
