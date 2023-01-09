@@ -112,13 +112,13 @@ class Tree
     protected static function accessValue($container, string $key)
     {
         switch (true) {
-            case is_array($container):
-                if (array_key_exists($key, $container)) {
+            case $container instanceof \ArrayAccess:
+                if ($container->offsetExists($key)) {
                     return $container[$key];
                 }
                 break;
-            case $container instanceof \ArrayAccess:
-                if ($container->offsetExists($key)) {
+            case is_array($container):
+                if (array_key_exists($key, $container)) {
                     return $container[$key];
                 }
                 break;

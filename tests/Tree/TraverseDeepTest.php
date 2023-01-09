@@ -1277,7 +1277,12 @@ class TraverseDeepTest extends \PHPUnit\Framework\TestCase
         switch (true) {
             case is_scalar($container):
                 return $container;
-            case is_array($container) || $container instanceof \ArrayAccess:
+            case $container instanceof \ArrayAccess:
+                if ($container->offsetExists($key)) {
+                    return $container[$key];
+                }
+                break;
+            case is_array($container):
                 if (array_key_exists($key, $container)) {
                     return $container[$key];
                 }
