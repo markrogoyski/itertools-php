@@ -10,45 +10,36 @@ namespace IterTools;
 class Tree
 {
     /**
+     * Iterates a tree like a flat collection using deep traversal.
      *
+     * If $childrenContainerKey is not null looks for children items using by this key only.
+     *
+     * Otherwise, considers any subarray to contain children.
      *
      * @param iterable<DictAccess> $data
      * @param ?string              $childrenContainerKey
-     * @param int                  $initialLevel
      *
      * @return \Generator
      */
-    public static function traverseDeep(
-        iterable $data,
-        ?string $childrenContainerKey = null,
-        int $initialLevel = 0
-    ): \Generator {
-        $level = $initialLevel;
-        foreach ($data as $datum) {
-            yield $level => $datum;
-            if ($childrenContainerKey !== null) {
-                $childrenContainer = static::accessValue($datum, $childrenContainerKey);
-            } else {
-                $childrenContainer = $datum;
-            }
-            if (is_iterable($childrenContainer)) {
-                yield from static::traverseDeep($childrenContainer, $childrenContainerKey, $level+1);
-            }
-        }
+    public static function traverseDeep(iterable $data, ?string $childrenContainerKey = null): \Generator
+    {
+        yield from static::traverseDeepRecursive($data, $childrenContainerKey);
     }
 
     /**
+     * Iterates a tree like a flat collection using wide traversal.
      *
+     * If $childrenContainerKey is not null looks for children items using by this key only.
+     *
+     * Otherwise, considers any subarray to contain children.
      *
      * @param iterable<DictAccess> $data
      * @param ?string              $childrenContainerKey
      *
      * @return \Generator
      */
-    public static function traverseWide(
-        iterable $data,
-        ?string $childrenContainerKey = null
-    ): \Generator {
+    public static function traverseWide(iterable $data, ?string $childrenContainerKey = null): \Generator
+    {
         $level = 0;
         do {
             $subLevelContainer = [];
@@ -74,8 +65,48 @@ class Tree
     }
 
     /**
+     * Recursive helper method for wide traversal.
+     *
+     * @param iterable<DictAccess> $data
+     * @param ?string              $childrenContainerKey
+     * @param int                  $initialLevel
+     *
+     * @return \Generator
+     */
+    protected static function traverseDeepRecursive(
+        iterable $data,
+        ?string $childrenContainerKey = null,
+        int $initialLevel = 0
+    ): \Generator {
+        $level = $initialLevel;
+        foreach ($data as $datum) {
+            if ($childrenContainerKey !== null) {
+                yield $level => $datum;
+                $childrenContainer = static::accessValue($datum, $childrenContainerKey);
+            } else {
+                if (!is_iterable($datum)) {
+                    yield $level => $datum;
+                }
+                $childrenContainer = $datum;
+            }
+            if (is_iterable($childrenContainer)) {
+                yield from static::traverseDeepRecursive($childrenContainer, $childrenContainerKey, $level+1);
+            }
+        }
+    }
+
+    /**
+     * Access value from container by property name.
+     *
+     * Works with:
+     * - arrays;
+     * - ArrayAccess objects;
+     * - stdClass objects
+     * - another objects (using public properties or getters).
+     *
      * @param DictAccess|mixed $container
      * @param string $key
+     *
      * @return mixed|null
      */
     protected static function accessValue($container, string $key)

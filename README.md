@@ -76,6 +76,12 @@ Quick Reference
 | [`toSum`](#To-Sum)         | Reduce to the sum of its elements       | `Reduce::toSum($numbers)`                         |
 | [`toValue`](#To-Value)     | Reduce to value using callable reducer  | `Reduce::toValue($data, $reducer, $initialValue)` |
 
+#### Tree
+| Reducer                          | Description                          | Code Snippet                                       |
+|----------------------------------|--------------------------------------|----------------------------------------------------|
+| [`traverseDeep`](#Traverse-Deep) | Iterates a tree using deep traversal | `Tree::traverseDeep($data, $childrenContainerKey)` |
+| [`traverseWide`](#Traverse-Wide) | Iterates a tree using wide traversal | `Tree::traverseWide($data, $childrenContainerKey)` |
+
 Setup
 -----
 
@@ -839,6 +845,80 @@ $sum   = fn ($carry, $item) => $carry + $item;
 
 $result = Reduce::toValue($input, $sum, 0);
 // 15
+```
+
+## Tree
+
+### Traverse Deep
+Iterates a tree like a flat collection using deep traversal.
+
+If $childrenContainerKey is not null looks for children items using by this key only.
+
+Otherwise, considers any subarray to contain children.
+
+```Tree::traverseDeep(iterable $data, ?string $childrenContainerKey = null)```
+
+```php
+use IterTools\Tree;
+
+$input = [
+    [
+        'id' => 1,
+        'children' => [
+            ['id' => 11],
+            ['id' => 12],
+            ['id' => 13],
+        ],
+    ],
+    [
+        'id' => 2,
+        'children' => [
+            ['id' => 22],
+            ['id' => 23],
+            ['id' => 34],
+        ],
+    ],
+];
+
+foreach (Tree::traverseDeep($input, 'children')) {
+    // IDs sequence: 1, 11, 12, 13, 2, 22, 23, 24
+}
+```
+
+### Traverse Wide
+Iterates a tree like a flat collection using wide traversal.
+
+If $childrenContainerKey is not null looks for children items using by this key only.
+
+Otherwise, considers any subarray to contain children.
+
+```Tree::traverseWide(iterable $data, ?string $childrenContainerKey = null)```
+
+```php
+use IterTools\Tree;
+
+$input = [
+    [
+        'id' => 1,
+        'children' => [
+            ['id' => 11],
+            ['id' => 12],
+            ['id' => 13],
+        ],
+    ],
+    [
+        'id' => 2,
+        'children' => [
+            ['id' => 22],
+            ['id' => 23],
+            ['id' => 34],
+        ],
+    ],
+];
+
+foreach (Tree::traverseWide($input, 'children')) {
+    // IDs sequence: 1, 2, 11, 12, 13, 22, 23, 24
+}
 ```
 
 ## Composition
