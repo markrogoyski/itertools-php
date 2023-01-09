@@ -67,6 +67,17 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
+                    new \ArrayObject(['id' => 1, 'children' => [11, 12, 13]]),
+                    new \ArrayObject(['id' => 2, 'children' => [21, 22, 23]]),
+                    new \ArrayObject(['id' => 3, 'children' => [31, 32, 33]]),
+                    new \ArrayObject(['id' => 4]),
+                ],
+                'children',
+                [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 2, 3, 4, 11, 12, 13, 21, 22, 23, 31, 32, 33],
+            ],
+            [
+                [
                     [
                         'id' => 1,
                         'children' => [
@@ -76,7 +87,7 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
                         ]
                     ],
                     2,
-                    [
+                    (object)[
                         'id' => 3,
                         'children' => [
                             [
@@ -97,15 +108,12 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
                             (object)['id' => 32],
                             new class (33) {
                                 public int $id;
+                                public array $children;
 
                                 public function __construct(int $id)
                                 {
                                     $this->id = $id;
-                                }
-
-                                public function getChildren(): array
-                                {
-                                    return [
+                                    $this->children = [
                                         ['id' => 331],
                                         332,
                                         (object)['id' => 333]
@@ -371,6 +379,17 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([
+                    new \ArrayObject(['id' => 1, 'children' => $gen([11, 12, 13])]),
+                    new \ArrayObject(['id' => 2, 'children' => $gen([21, 22, 23])]),
+                    new \ArrayObject(['id' => 3, 'children' => $gen([31, 32, 33])]),
+                    new \ArrayObject(['id' => 4]),
+                ]),
+                'children',
+                [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 2, 3, 4, 11, 12, 13, 21, 22, 23, 31, 32, 33],
+            ],
+            [
+                $gen([
                     [
                         'id' => 1,
                         'children' => $gen([
@@ -401,15 +420,12 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
                             (object)['id' => 32],
                             new class (33) {
                                 public int $id;
+                                public array $children;
 
                                 public function __construct(int $id)
                                 {
                                     $this->id = $id;
-                                }
-
-                                public function getChildren(): array
-                                {
-                                    return [
+                                    $this->children = [
                                         ['id' => 331],
                                         332,
                                         (object)['id' => 333]
@@ -468,7 +484,7 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
                         ]),
                     ],
                     2,
-                    [
+                    (object)[
                         'id' => 3,
                         'items' => $gen([
                             [
@@ -679,6 +695,17 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([
+                    new \ArrayObject(['id' => 1, 'children' => $iter([11, 12, 13])]),
+                    new \ArrayObject(['id' => 2, 'children' => $iter([21, 22, 23])]),
+                    new \ArrayObject(['id' => 3, 'children' => $iter([31, 32, 33])]),
+                    new \ArrayObject(['id' => 4]),
+                ]),
+                'children',
+                [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 2, 3, 4, 11, 12, 13, 21, 22, 23, 31, 32, 33],
+            ],
+            [
+                $iter([
                     [
                         'id' => 1,
                         'children' => $iter([
@@ -688,7 +715,7 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
                         ]),
                     ],
                     2,
-                    [
+                    (object)[
                         'id' => 3,
                         'children' => $iter([
                             [
@@ -709,15 +736,12 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
                             (object)['id' => 32],
                             new class (33) {
                                 public int $id;
+                                public array $children;
 
                                 public function __construct(int $id)
                                 {
                                     $this->id = $id;
-                                }
-
-                                public function getChildren(): array
-                                {
-                                    return [
+                                    $this->children = [
                                         ['id' => 331],
                                         332,
                                         (object)['id' => 333]
@@ -987,6 +1011,17 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([
+                    new \ArrayObject(['id' => 1, 'children' => $trav([11, 12, 13])]),
+                    new \ArrayObject(['id' => 2, 'children' => $trav([21, 22, 23])]),
+                    new \ArrayObject(['id' => 3, 'children' => $trav([31, 32, 33])]),
+                    new \ArrayObject(['id' => 4]),
+                ]),
+                'children',
+                [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                [1, 2, 3, 4, 11, 12, 13, 21, 22, 23, 31, 32, 33],
+            ],
+            [
+                $trav([
                     [
                         'id' => 1,
                         'children' => $trav([
@@ -996,7 +1031,7 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
                         ]),
                     ],
                     2,
-                    [
+                    (object)[
                         'id' => 3,
                         'children' => $trav([
                             [
@@ -1017,15 +1052,12 @@ class TraverseWideTest extends \PHPUnit\Framework\TestCase
                             (object)['id' => 32],
                             new class (33) {
                                 public int $id;
+                                public array $children;
 
                                 public function __construct(int $id)
                                 {
                                     $this->id = $id;
-                                }
-
-                                public function getChildren(): array
-                                {
-                                    return [
+                                    $this->children = [
                                         ['id' => 331],
                                         332,
                                         (object)['id' => 333]
