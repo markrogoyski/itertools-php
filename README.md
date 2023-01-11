@@ -58,12 +58,13 @@ Quick Reference
 | [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
 
 #### Summary
-| Summary                      | Description                               | Code Snippet                        |
-|------------------------------|-------------------------------------------|-------------------------------------|
-| [`isSorted`](#Is-Sorted)     | True if iterable sorted                   | `Summary::isSorted($data)`          |
-| [`isReversed`](#Is-Reversed) | True if iterable reverse sorted           | `Summary::isReversed($data)`        |
-| [`same`](#Same)              | True if iterables are the same            | `Summary::same(...$iterables)`      |
-| [`sameCount`](#Same-Count)   | True if iterables have the same lengths   | `Summary::sameCount(...$iterables)` |
+| Summary                      | Description                                             | Code Snippet                               |
+|------------------------------|---------------------------------------------------------|--------------------------------------------|
+| [`exactlyN`](#Exactly-N)     | True if exactly n items are true according to predicate | `Summary::exactlyN($data, $n, $predicate)` |
+| [`isSorted`](#Is-Sorted)     | True if iterable sorted                                 | `Summary::isSorted($data)`                 |
+| [`isReversed`](#Is-Reversed) | True if iterable reverse sorted                         | `Summary::isReversed($data)`               |
+| [`same`](#Same)              | True if iterables are the same                          | `Summary::same(...$iterables)`             |
+| [`sameCount`](#Same-Count)   | True if iterables have the same lengths                 | `Summary::sameCount(...$iterables)`        |
 
 #### Reduce
 | Reducer                    | Description                             | Code Snippet                                      |
@@ -645,6 +646,31 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
 ```
 
 ## Summary
+
+### Exactly N
+Returns true if exactly n items are true according to a predicate function.
+
+- Predicate is optional.
+- Default predicate is boolean value of each item.
+
+```Summary::exactlyN(iterable $data, int $n, callable $predicate)```
+
+```php
+use IterTools\Summary;
+
+$twoTruthsAndALie = [true, true, false];
+$n                = 2;
+
+$boolean = Summary::exactlyN($twoTruthsAndALie, $n);
+// true
+
+$ages      = [18, 21, 24, 54];
+$n         = 4;
+$predicate = fn ($age) => $age >= 21;
+
+$boolean = Summary::isSorted($ages, $n, $predicate);
+// false
+```
 
 ### Is Sorted
 Returns true if elements are sorted, otherwise false.

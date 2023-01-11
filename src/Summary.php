@@ -97,4 +97,38 @@ class Summary
         $counts = \array_map([Reduce::class, 'toCount'], $iterables);
         return \count(\array_unique($counts)) === 1;
     }
+
+    /**
+     * Returns true if exactly n items in the iterable are true where the predicate function is true.
+     *
+     * Default predicate if not provided is the boolean value of each data item.
+     *
+     * @param iterable<mixed> $data
+     * @param int             $n
+     * @param callable|null   $predicate
+     *
+     * @return bool
+     */
+    public static function exactlyN(iterable $data, int $n, callable $predicate = null): bool
+    {
+        if ($n < 0) {
+            return false;
+        }
+
+        if ($predicate === null) {
+            $predicate = fn($datum) => boolval($datum);
+        }
+
+        $count = 0;
+        foreach ($data as $datum) {
+            if ($predicate($datum)) {
+                $count++;
+                if ($count > $n) {
+                    return false;
+                }
+            }
+        }
+
+        return $count === $n;
+    }
 }
