@@ -32,30 +32,30 @@ Quick Reference
 | [`takeWhile`](#Take-While)       | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`      |
 
 #### Infinite Iteration
-| Iterator | Description | Code Snippet |
-| ----------- | ----------- | ----------- |
-| [`count`](#Count) | Count sequentially forever | `Infinite::count($start, $step)` |
-| [`cycle`](#Cycle) | Cycle through a collection | `Infinite::cycle($collection)` |
-| [`repeat`](#Repeat-Infinite) | Repeat an item forever | `Infinite::repeat($item)` |
+| Iterator                     | Description                | Code Snippet                     |
+| ---------------------------- | -------------------------- | -------------------------------- |
+| [`count`](#Count)            | Count sequentially forever | `Infinite::count($start, $step)` |
+| [`cycle`](#Cycle)            | Cycle through a collection | `Infinite::cycle($collection)`   |
+| [`repeat`](#Repeat-Infinite) | Repeat an item forever     | `Infinite::repeat($item)`        |
 
 #### Random Iteration
-| Iterator | Description | Code Snippet |
-| ----------- | ----------- | ----------- |
-| [`choice`](#Choice) | Random selections from list | `Random::choice($list, $repetitions)` |
-| [`coinFlip`](#CoinFlip) | Random coin flips (0 or 1) | `Random::coinFlip($repetitions)` |
-| [`number`](#Number) | Random numbers | `Random::number($min, $max, $repetitions)` |
-| [`percentage`](#Percentage) | Random percentage between 0 and 1 | `Random::percentage($repetitions)` |
-| [`rockPaperScissors`](#RockPaperScissors) | Random rock-paper-scissors hands | `Random::rockPaperScissors($repetitions)` |
+| Iterator                                  | Description                       | Code Snippet                               |
+| ----------------------------------------- | --------------------------------- | ------------------------------------------ |
+| [`choice`](#Choice)                       | Random selections from list       | `Random::choice($list, $repetitions)`      |
+| [`coinFlip`](#CoinFlip)                   | Random coin flips (0 or 1)        | `Random::coinFlip($repetitions)`           |
+| [`number`](#Number)                       | Random numbers                    | `Random::number($min, $max, $repetitions)` |
+| [`percentage`](#Percentage)               | Random percentage between 0 and 1 | `Random::percentage($repetitions)`         |
+| [`rockPaperScissors`](#RockPaperScissors) | Random rock-paper-scissors hands  | `Random::rockPaperScissors($repetitions)`  |
 
 #### Math Iteration
-| Iterator | Description | Code Snippet |
-| ----------- | ----------- | ----------- |
-| [`runningAverage`](#Running-Average) | Running average accumulation | `Math::runningAverage($numbers, $initialValue)` |
+| Iterator                                   | Description                     | Code Snippet                                       |
+| ------------------------------------------ | ------------------------------- | -------------------------------------------------- |
+| [`runningAverage`](#Running-Average)       | Running average accumulation    | `Math::runningAverage($numbers, $initialValue)`    |
 | [`runningDifference`](#Running-Difference) | Running difference accumulation | `Math::runningDifference($numbers, $initialValue)` |
-| [`runningMax`](#Running-Max) | Running maximum accumulation | `Math::runningMax($numbers, $initialValue)` |
-| [`runningMin`](#Running-Min) | Running minimum accumulation | `Math::runningMin($numbers, $initialValue)` |
-| [`runningProduct`](#Running-Product) | Running product accumulation | `Math::runningProduct($numbers, $initialValue)` |
-| [`runningTotal`](#Running-Total) | Running total accumulation | `Math::runningTotal($numbers, $initialValue)` |
+| [`runningMax`](#Running-Max)               | Running maximum accumulation    | `Math::runningMax($numbers, $initialValue)`        |
+| [`runningMin`](#Running-Min)               | Running minimum accumulation    | `Math::runningMin($numbers, $initialValue)`        |
+| [`runningProduct`](#Running-Product)       | Running product accumulation    | `Math::runningProduct($numbers, $initialValue)`    |
+| [`runningTotal`](#Running-Total)           | Running total accumulation      | `Math::runningTotal($numbers, $initialValue)`      |
 
 #### Summary
 | Summary                      | Description                                             | Code Snippet                               |
