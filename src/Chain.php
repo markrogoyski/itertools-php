@@ -38,6 +38,8 @@ class Chain implements \IteratorAggregate
      * @param iterable<bool> $selectors
      *
      * @return $this
+     *
+     * @see Single::compress()
      */
     public function compress(iterable $selectors): self
     {
@@ -53,6 +55,8 @@ class Chain implements \IteratorAggregate
      * @param callable $predicate
      *
      * @return $this
+     *
+     * @see Single::dropWhile()
      */
     public function dropWhile(callable $predicate): self
     {
@@ -68,6 +72,8 @@ class Chain implements \IteratorAggregate
      * @param callable $predicate
      *
      * @return $this
+     *
+     * @see Single::takeWhile()
      */
     public function takeWhile(callable $predicate): self
     {
@@ -83,6 +89,8 @@ class Chain implements \IteratorAggregate
      * @param callable $predicate
      *
      * @return $this
+     *
+     * @see Single::filterTrue()
      */
     public function filterTrue(callable $predicate): self
     {
@@ -98,6 +106,8 @@ class Chain implements \IteratorAggregate
      * @param callable $predicate
      *
      * @return $this
+     *
+     * @see Single::filterFalse()
      */
     public function filterFalse(callable $predicate): self
     {
@@ -113,6 +123,8 @@ class Chain implements \IteratorAggregate
      * @param callable $groupKeyFunction
      *
      * @return $this
+     *
+     * @see Single::groupBy()
      */
     public function groupBy(callable $groupKeyFunction): self
     {
@@ -126,6 +138,8 @@ class Chain implements \IteratorAggregate
      * Returns empty generator if given collection contains less than 2 elements.
      *
      * @return $this
+     *
+     * @see Single::pairwise()
      */
     public function pairwise(): self
     {
@@ -141,6 +155,8 @@ class Chain implements \IteratorAggregate
      * @param iterable<mixed> ...$iterables
      *
      * @return $this
+     *
+     * @see Multi::chain()
      */
     public function chainWith(iterable ...$iterables): self
     {
@@ -159,6 +175,8 @@ class Chain implements \IteratorAggregate
      * @param iterable<mixed> ...$iterables
      *
      * @return $this
+     *
+     * @see Multi::zip()
      */
     public function zipWith(iterable ...$iterables): self
     {
@@ -178,6 +196,8 @@ class Chain implements \IteratorAggregate
      * @param iterable<mixed> ...$iterables
      *
      * @return $this
+     *
+     * @see Multi::zipLongest()
      */
     public function zipLongestWith(iterable ...$iterables): self
     {
@@ -194,6 +214,8 @@ class Chain implements \IteratorAggregate
      * @param iterable<mixed> ...$iterables
      *
      * @return $this
+     *
+     * @see Multi::zipEqual()
      */
     public function zipEqualWith(iterable ...$iterables): self
     {
@@ -205,6 +227,8 @@ class Chain implements \IteratorAggregate
      * Cycle through the elements of iterable source sequentially forever
      *
      * @return $this
+     *
+     * @see Infinite::cycle()
      */
     public function infiniteCycle(): self
     {
@@ -218,6 +242,8 @@ class Chain implements \IteratorAggregate
      * @param int|float|null $initialValue
      *
      * @return $this
+     *
+     * @see Math::runningAverage()
      */
     public function runningAverage($initialValue = null): self
     {
@@ -233,6 +259,8 @@ class Chain implements \IteratorAggregate
      * @param int|float|null $initialValue
      *
      * @return $this
+     *
+     * @see Math::runningDifference()
      */
     public function runningDifference($initialValue = null): self
     {
@@ -248,6 +276,8 @@ class Chain implements \IteratorAggregate
      * @param int|float|null $initialValue
      *
      * @return $this
+     *
+     * @see Math::runningMax()
      */
     public function runningMax($initialValue = null): self
     {
@@ -263,6 +293,8 @@ class Chain implements \IteratorAggregate
      * @param int|float|null $initialValue
      *
      * @return $this
+     *
+     * @see Math::runningMin()
      */
     public function runningMin($initialValue = null): self
     {
@@ -278,6 +310,8 @@ class Chain implements \IteratorAggregate
      * @param int|float|null $initialValue
      *
      * @return $this
+     *
+     * @see Math::runningProduct()
      */
     public function runningProduct($initialValue = null): self
     {
@@ -293,6 +327,8 @@ class Chain implements \IteratorAggregate
      * @param int|float|null $initialValue
      *
      * @return $this
+     *
+     * @see Math::runningTotal()
      */
     public function runningTotal($initialValue = null): self
     {
@@ -310,6 +346,8 @@ class Chain implements \IteratorAggregate
      * Returns true if iterable source is empty or has only one element.
      *
      * @return bool
+     *
+     * @see Summary::isSorted()
      */
     public function isSorted(): bool
     {
@@ -324,6 +362,8 @@ class Chain implements \IteratorAggregate
      * Returns true if iterable source is empty or has only one element.
      *
      * @return bool
+     *
+     * @see Summary::isReversed()
      */
     public function isReversed(): bool
     {
@@ -338,6 +378,8 @@ class Chain implements \IteratorAggregate
      * @param iterable<mixed> ...$iterables
      *
      * @return bool
+     *
+     * @see Summary::same()
      */
     public function sameWith(iterable ...$iterables): bool
     {
@@ -352,6 +394,8 @@ class Chain implements \IteratorAggregate
      * @param iterable<mixed> ...$iterables
      *
      * @return bool
+     *
+     * @see Summary::sameCount()
      */
     public function sameCountWith(iterable ...$iterables): bool
     {
@@ -364,6 +408,8 @@ class Chain implements \IteratorAggregate
      * Returns null if iterable source is empty.
      *
      * @return int|float|null
+     *
+     * @see Reduce::toAverage()
      */
     public function toAverage()
     {
@@ -376,6 +422,8 @@ class Chain implements \IteratorAggregate
      * Reduces iterable source to its length.
      *
      * @return int
+     *
+     * @see Reduce::toCount()
      */
     public function toCount(): int
     {
@@ -390,6 +438,8 @@ class Chain implements \IteratorAggregate
      * Returns null if iterable source is empty.
      *
      * @return mixed
+     *
+     * @see Reduce::toMax()
      */
     public function toMax()
     {
@@ -404,6 +454,8 @@ class Chain implements \IteratorAggregate
      * Returns null if iterable source is empty.
      *
      * @return mixed
+     *
+     * @see Reduce::toMin()
      */
     public function toMin()
     {
@@ -416,6 +468,8 @@ class Chain implements \IteratorAggregate
      * Returns null if iterable source is empty.
      *
      * @return int|float|null
+     *
+     * @see Reduce::toProduct()
      */
     public function toProduct()
     {
@@ -428,6 +482,8 @@ class Chain implements \IteratorAggregate
      * Reduces iterable source to the sum of its items.
      *
      * @return int|float
+     *
+     * @see Reduce::toSum()
      */
     public function toSum()
     {
@@ -445,6 +501,8 @@ class Chain implements \IteratorAggregate
      * @param mixed $initialValue
      *
      * @return mixed
+     *
+     * @see Reduce::toValue()
      */
     public function toValue(callable $reducer, $initialValue = null)
     {
