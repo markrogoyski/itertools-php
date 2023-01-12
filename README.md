@@ -76,6 +76,40 @@ Quick Reference
 | [`toSum`](#To-Sum)         | Reduce to the sum of its elements       | `Reduce::toSum($numbers)`                         |
 | [`toValue`](#To-Value)     | Reduce to value using callable reducer  | `Reduce::toValue($data, $reducer, $initialValue)` |
 
+#### Chain
+| Reducer                                      | Description                                                                               | Code Snippet                                |
+|----------------------------------------------|-------------------------------------------------------------------------------------------|---------------------------------------------|
+| [`create`](#Create)                          | Creates iterable instance with fluent interface                                           | `Chain::create($iterable)`                  |
+| [`compress`](#Compress-1)                    | Compress an iterable source by filtering out data that is not selected                    | `$chain->compress($selectors)`              |
+| [`dropWhile`](#Drop-While-1)                 | Drop elements from the iterable source while the predicate function is true               | `$chain->dropWhile($predicate)`             |
+| [`takeWhile`](#Take-While-1)                 | Return elements from the iterable source as long as the predicate is true                 | `$chain->takeWhile($predicate)`             |
+| [`filterTrue`](#Filter-True-1)               | Filter out elements from the iterable source where there predicate function is true       | `$chain->filterTrue($predicate)`            |
+| [`filterFalse`](#Filter-False-1)             | Filter out elements from the iterable source where the predicate function is false        | `$chain->filterFalse($predicate)`           |
+| [`groupBy`](#Group-By-1)                     | Group iterable source by a common data element                                            | `$chain->groupBy($groupKeyFunction)`        |
+| [`pairwise`](#Pairwise-1)                    | Return pairs of elements from iterable source                                             | `$chain->pairwise()`                        |
+| [`chainWith`](#Chain-With)                   | Chain iterable source withs given iterables together into a single iteration              | `$chain->chainWith(...$iterables)`          |
+| [`zipWith`](#Zip-With)                       | Iterate iterable source with another iterable collections simultaneously                  | `$chain->zipWith(...$iterables)`            |
+| [`zipLongestWith`](#Zip-Longest-With)        | Iterate iterable source with another iterable collections simultaneously                  | `$chain->zipLongestWith(...$iterables)`     |
+| [`zipEqualWith`](#Zip-Equal-With)            | Iterate iterable source with another iterable collections of equal lengths simultaneously | `$chain->zipEqualWith(...$iterables)`       |
+| [`infiniteCycle`](#Infinite-Cycle)           | Cycle through the elements of iterable source sequentially forever                        | `$chain->infiniteCycle()`                   |
+| [`runningAverage`](#Running-Average-1)       | Accumulate the running average (mean) over iterable source                                | `$chain->runningAverage($initialValue)`     |
+| [`runningDifference`](#Running-Difference-1) | Accumulate the running difference over iterable source                                    | `$chain->runningDifference($initialValue)`  |
+| [`runningMax`](#Running-Max-1)               | Accumulate the running max over iterable source                                           | `$chain->runningMax($initialValue)`         |
+| [`runningMin`](#Running-Min-1)               | Accumulate the running min over iterable source                                           | `$chain->runningMin($initialValue)`         |
+| [`runningProduct`](#Running-Product-1)       | Accumulate the running product over iterable source                                       | `$chain->runningProduct($initialValue)`     |
+| [`runningTotal`](#Running-Total-1)           | Accumulate the running total over iterable source                                         | `$chain->runningTotal($initialValue)`       |
+| [`isSorted`](#Is-Sorted-1)                   | Returns true if iterable source is sorted in ascending order                              | `$chain->isSorted()`                        |
+| [`isReversed`](#Is-Reversed-1)               | Returns true if iterable source is sorted in reverse descending order                     | `$chain->isReversed()`                      |
+| [`sameWith`](#Same-With)                     | Returns true if iterable source and all given collections are the same                    | `$chain->sameWith(...$iterables)`           |
+| [`sameCountWith`](#Same-Count-With)          | Returns true if iterable source and all given collections have the same lengths           | `$chain->sameCountWith(...$iterables)`      |
+| [`toAverage`](#To-Average-1)                 | Reduces iterable source to the mean average of its items                                  | `$chain->toAverage()`                       |
+| [`toCount`](#To-Count-1)                     | Reduces iterable source to its length                                                     | `$chain->toCount()`                         |
+| [`toMax`](#To-Max-1)                         | Reduces iterable source to its max value                                                  | `$chain->toMax()`                           |
+| [`toMin`](#To-Min-1)                         | Reduces iterable source to its min value                                                  | `$chain->toMin()`                           |
+| [`toProduct`](#To-Product-1)                 | Reduces iterable source to the product of its items                                       | `$chain->toProduct()`                       |
+| [`toSum`](#To-Sum-1)                         | Reduces iterable source to the sum of its items                                           | `$chain->toSum()`                           |
+| [`toValue`](#To-Value-1)                     | Reduces iterable source like array_reduce() function                                      | `$chain->toValue($reducer, $initialValue )` |
+
 Setup
 -----
 
