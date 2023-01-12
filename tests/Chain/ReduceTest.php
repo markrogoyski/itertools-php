@@ -568,6 +568,89 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 },
                 -5,
             ],
+            [
+                [1, 2, 3],
+                static function (array $iterable) {
+                    return Chain::create($iterable)
+                        ->zipWith(
+                            [10, 20, 30],
+                            [100, 200, 300]
+                        )
+                        ->toValue(function ($carry, $item) {
+                            return $carry + array_sum($item);
+                        }, 0);
+                },
+                666,
+            ],
+            [
+                [1, 2, 3],
+                static function (array $iterable) {
+                    return Chain::create($iterable)
+                        ->zipEqualWith(
+                            [10, 20, 30],
+                            [100, 200, 300]
+                        )
+                        ->toValue(function ($carry, $item) {
+                            return $carry + array_sum($item);
+                        }, 0);
+                },
+                666,
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                static function (array $iterable) {
+                    return Chain::create($iterable)
+                        ->zipWith(
+                            [10, 20, 30],
+                            [100, 200, 300]
+                        )
+                        ->toValue(function ($carry, $item) {
+                            return $carry + array_sum($item);
+                        }, 0);
+                },
+                666,
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                static function (array $iterable) {
+                    return Chain::create($iterable)
+                        ->zipLongestWith(
+                            [10, 20, 30],
+                            [100, 200, 300]
+                        )
+                        ->toValue(function ($carry, $item) {
+                            return $carry + array_sum($item);
+                        }, 0);
+                },
+                675,
+            ],
+            [
+                [1, 2, 3],
+                static function (array $iterable) {
+                    return Chain::create($iterable)
+                        ->chainWith(
+                            [4, 5, 6],
+                            [7, 8, 9]
+                        )
+                        ->toSum();
+                },
+                45,
+            ],
+            [
+                [1, 2, 3],
+                static function (array $iterable) {
+                    return Chain::create($iterable)
+                        ->chainWith(
+                            [4, 5, 6],
+                            [7, 8, 9]
+                        )
+                        ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
+                        ->toValue(static function ($carry, $item) {
+                            return $carry + array_sum($item);
+                        });
+                },
+                90,
+            ],
         ];
     }
 }
