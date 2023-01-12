@@ -7,16 +7,20 @@ namespace IterTools;
 use IterTools\Util\IteratorFactory;
 
 /**
+ * Provides fluent interface for working with iterables.
+ *
  * @implements \IteratorAggregate<mixed>
  */
 class Chain implements \IteratorAggregate
 {
     /**
-     * @var iterable<mixed>
+     * @var iterable<mixed> iterable source
      */
     protected iterable $iterable;
 
     /**
+     * Creates iterable instance with fluent interface.
+     *
      * @param iterable<mixed> $iterable
      *
      * @return Chain<mixed>
@@ -27,6 +31,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Compress an iterable source by filtering out data that is not selected.
+     *
+     * Selectors indicate which data. True value selects item. False value filters out data.
+     *
      * @param iterable<bool> $selectors
      *
      * @return $this
@@ -38,6 +46,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Drop elements from the iterable source while the predicate function is true.
+     *
+     * Once the predicate function returns false once, all remaining elements are returned.
+     *
      * @param callable $predicate
      *
      * @return $this
@@ -49,6 +61,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Return elements from the iterable source as long as the predicate is true.
+     *
+     * If no predicate is provided, the boolean value of the data is used.
+     *
      * @param callable $predicate
      *
      * @return $this
@@ -60,6 +76,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Filter out elements from the iterable source only returning elements where there predicate function is true.
+     *
+     * If no predicate is provided, the boolean value of the data is used.
+     *
      * @param callable $predicate
      *
      * @return $this
@@ -71,6 +91,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Filter out elements from the iterable source only returning elements where the predicate function is false.
+     *
+     * If no predicate is provided, the boolean value of the data is used.
+     *
      * @param callable $predicate
      *
      * @return $this
@@ -82,6 +106,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Group iterable source by a common data element.
+     *
+     * The groupKeyFunction determines the key to group elements by.
+     *
      * @param callable $groupKeyFunction
      *
      * @return $this
@@ -93,6 +121,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Return pairs of elements from iterable source.
+     *
+     * Returns empty generator if given collection contains less than 2 elements.
+     *
      * @return $this
      */
     public function pairwise(): self
@@ -102,6 +134,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Chain iterable source withs given iterables together into a single iteration.
+     *
+     * Makes a single continuous sequence out of multiple sequences.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return $this
@@ -113,6 +149,13 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Iterate iterable source with another iterable collections simultaneously.
+     *
+     * Make an iterator that aggregates items from multiple iterators.
+     * Similar to Python's zip function.
+     *
+     * For uneven lengths, iterations stops when the shortest iterable is exhausted.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return $this
@@ -124,6 +167,14 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Iterate iterable source with another iterable collections simultaneously.
+     *
+     * Make an iterator that aggregates items from multiple iterators.
+     * Similar to Python's zip_longest function
+     *
+     * Iteration continues until the longest iterable is exhausted.
+     * For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return $this
@@ -135,6 +186,11 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Iterate iterable source with another iterable collections of equal lengths simultaneously.
+     *
+     * Works like Multi::zip() method but throws \LengthException if lengths not equal,
+     * i.e., at least one iterator ends before the others.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return $this
@@ -146,6 +202,8 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Cycle through the elements of iterable source sequentially forever
+     *
      * @return $this
      */
     public function infiniteCycle(): self
@@ -155,6 +213,8 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Accumulate the running average (mean) over iterable source
+     *
      * @param int|float|null $initialValue
      *
      * @return $this
@@ -168,6 +228,8 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Accumulate the running difference over iterable source
+     *
      * @param int|float|null $initialValue
      *
      * @return $this
@@ -181,6 +243,8 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Accumulate the running max over iterable source
+     *
      * @param int|float|null $initialValue
      *
      * @return $this
@@ -194,6 +258,8 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Accumulate the running min over iterable source
+     *
      * @param int|float|null $initialValue
      *
      * @return $this
@@ -207,6 +273,8 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Accumulate the running product over iterable source
+     *
      * @param int|float|null $initialValue
      *
      * @return $this
@@ -220,6 +288,8 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Accumulate the running total over iterable source
+     *
      * @param int|float|null $initialValue
      *
      * @return $this
@@ -233,6 +303,12 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Returns true if iterable source is sorted in ascending order; otherwise false.
+     *
+     * Items of iterable source must be comparable.
+     *
+     * Returns true if iterable source is empty or has only one element.
+     *
      * @return bool
      */
     public function isSorted(): bool
@@ -241,6 +317,12 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Returns true if iterable source is sorted in reverse descending order; otherwise false.
+     *
+     * Items of iterable source must be comparable.
+     *
+     * Returns true if iterable source is empty or has only one element.
+     *
      * @return bool
      */
     public function isReversed(): bool
@@ -249,6 +331,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Returns true if iterable source and all given collections are the same.
+     *
+     * For single iterable or empty iterables list returns true.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return bool
@@ -259,6 +345,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Returns true if iterable source and all given collections have the same lengths.
+     *
+     * For single iterable or empty iterables list returns true.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return bool
@@ -269,6 +359,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Reduces iterable source to the mean average of its items.
+     *
+     * Returns null if iterable source is empty.
+     *
      * @return int|float|null
      */
     public function toAverage()
@@ -279,6 +373,8 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Reduces iterable source to its length.
+     *
      * @return int
      */
     public function toCount(): int
@@ -287,6 +383,12 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Reduces iterable source to its max value.
+     *
+     * Items of iterable source must be comparable.
+     *
+     * Returns null if iterable source is empty.
+     *
      * @return mixed
      */
     public function toMax()
@@ -295,6 +397,12 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Reduces iterable source to its min value.
+     *
+     * Items of iterable source must be comparable.
+     *
+     * Returns null if iterable source is empty.
+     *
      * @return mixed
      */
     public function toMin()
@@ -303,6 +411,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Reduces iterable source to the product of its items.
+     *
+     * Returns null if iterable source is empty.
+     *
      * @return int|float|null
      */
     public function toProduct()
@@ -313,7 +425,9 @@ class Chain implements \IteratorAggregate
     }
 
     /**
-     * @return numeric
+     * Reduces iterable source to the sum of its items.
+     *
+     * @return int|float
      */
     public function toSum()
     {
@@ -323,6 +437,10 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Reduces iterable source like array_reduce() function.
+     *
+     * But unlike array_reduce(), it works with all iterable types.
+     *
      * @param callable $reducer
      * @param mixed $initialValue
      *
@@ -334,6 +452,8 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * Chain constructor.
+     *
      * @param iterable<mixed> $iterable
      */
     protected function __construct(iterable $iterable)
@@ -342,6 +462,8 @@ class Chain implements \IteratorAggregate
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @return \Iterator<mixed>
      */
     public function getIterator(): \Iterator
