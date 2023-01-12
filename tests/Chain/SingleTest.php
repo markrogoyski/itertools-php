@@ -247,7 +247,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value % 2 === 0;
                         })
-                        ->groupBy(static function($item) {
+                        ->groupBy(static function ($item) {
                             return $item > 0 ? 'pos' : 'neg';
                         });
                 },
@@ -260,7 +260,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value % 2 === 0;
                         })
-                        ->groupBy(static function($item) {
+                        ->groupBy(static function ($item) {
                             return $item > 0 ? 'pos' : 'neg';
                         });
                 },
