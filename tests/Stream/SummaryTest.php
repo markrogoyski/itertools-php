@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Chain;
+namespace IterTools\Tests\Stream;
 
-use IterTools\Chain;
+use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -33,31 +33,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->isSorted();
+                    return Stream::of($iterable)->isSorted();
                 },
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->isReversed();
+                    return Stream::of($iterable)->isReversed();
                 },
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameWith([]);
+                    return Stream::of($iterable)->sameWith([]);
                 },
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameCountWith([]);
+                    return Stream::of($iterable)->sameCountWith([]);
                 },
             ],
             [
                 [1, 3, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->isSorted();
                 },
@@ -65,7 +65,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 3, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameWith([1, 2, 3]);
                 },
@@ -73,7 +73,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 3, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameCountWith([11, 22, 33]);
                 },
@@ -81,7 +81,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item > 0;
                         })
@@ -92,7 +92,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })
@@ -103,7 +103,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin()
@@ -113,7 +113,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin()
@@ -145,19 +145,19 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameWith([1]);
+                    return Stream::of($iterable)->sameWith([1]);
                 },
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameCountWith([1]);
+                    return Stream::of($iterable)->sameCountWith([1]);
                 },
             ],
             [
                 [1, 3, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->isReversed();
                 },
@@ -165,7 +165,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 3, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameWith([11, 22, 33]);
                 },
@@ -173,7 +173,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 3, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameCountWith([11, 22, 33, 44, 55]);
                 },
@@ -181,7 +181,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item > 0;
                         })
@@ -192,7 +192,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })
@@ -229,31 +229,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->isSorted();
+                    return Stream::of($iterable)->isSorted();
                 },
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->isReversed();
+                    return Stream::of($iterable)->isReversed();
                 },
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameWith([]);
+                    return Stream::of($iterable)->sameWith([]);
                 },
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameCountWith([]);
+                    return Stream::of($iterable)->sameCountWith([]);
                 },
             ],
             [
                 $gen([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->isSorted();
                 },
@@ -261,7 +261,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameWith([1, 2, 3]);
                 },
@@ -269,7 +269,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameCountWith([11, 22, 33]);
                 },
@@ -277,7 +277,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item > 0;
                         })
@@ -288,7 +288,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })
@@ -299,7 +299,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin()
@@ -309,7 +309,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin()
@@ -345,19 +345,19 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameWith([1]);
+                    return Stream::of($iterable)->sameWith([1]);
                 },
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameCountWith([1]);
+                    return Stream::of($iterable)->sameCountWith([1]);
                 },
             ],
             [
                 $gen([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->isReversed();
                 },
@@ -365,7 +365,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameWith([11, 22, 33]);
                 },
@@ -373,7 +373,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameCountWith([11, 22, 33, 44, 55]);
                 },
@@ -381,7 +381,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item > 0;
                         })
@@ -392,7 +392,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })
@@ -429,31 +429,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->isSorted();
+                    return Stream::of($iterable)->isSorted();
                 },
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->isReversed();
+                    return Stream::of($iterable)->isReversed();
                 },
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameWith([]);
+                    return Stream::of($iterable)->sameWith([]);
                 },
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameCountWith([]);
+                    return Stream::of($iterable)->sameCountWith([]);
                 },
             ],
             [
                 $iter([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->isSorted();
                 },
@@ -461,7 +461,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameWith([1, 2, 3]);
                 },
@@ -469,7 +469,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameCountWith([11, 22, 33]);
                 },
@@ -477,7 +477,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item > 0;
                         })
@@ -488,7 +488,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })
@@ -499,7 +499,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin()
@@ -509,7 +509,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin()
@@ -545,19 +545,19 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameWith([1]);
+                    return Stream::of($iterable)->sameWith([1]);
                 },
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameCountWith([1]);
+                    return Stream::of($iterable)->sameCountWith([1]);
                 },
             ],
             [
                 $iter([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->isReversed();
                 },
@@ -565,7 +565,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameWith([11, 22, 33]);
                 },
@@ -573,7 +573,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameCountWith([11, 22, 33, 44, 55]);
                 },
@@ -581,7 +581,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item > 0;
                         })
@@ -592,7 +592,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })
@@ -629,31 +629,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->isSorted();
+                    return Stream::of($iterable)->isSorted();
                 },
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->isReversed();
+                    return Stream::of($iterable)->isReversed();
                 },
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameWith([]);
+                    return Stream::of($iterable)->sameWith([]);
                 },
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameCountWith([]);
+                    return Stream::of($iterable)->sameCountWith([]);
                 },
             ],
             [
                 $trav([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->isSorted();
                 },
@@ -661,7 +661,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameWith([1, 2, 3]);
                 },
@@ -669,7 +669,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameCountWith([11, 22, 33]);
                 },
@@ -677,7 +677,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item > 0;
                         })
@@ -688,7 +688,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })
@@ -699,7 +699,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin()
@@ -709,7 +709,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin()
@@ -745,19 +745,19 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameWith([1]);
+                    return Stream::of($iterable)->sameWith([1]);
                 },
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->sameCountWith([1]);
+                    return Stream::of($iterable)->sameCountWith([1]);
                 },
             ],
             [
                 $trav([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->isReversed();
                 },
@@ -765,7 +765,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameWith([11, 22, 33]);
                 },
@@ -773,7 +773,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->sameCountWith([11, 22, 33, 44, 55]);
                 },
@@ -781,7 +781,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item > 0;
                         })
@@ -792,7 +792,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })

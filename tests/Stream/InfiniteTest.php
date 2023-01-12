@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Chain;
+namespace IterTools\Tests\Stream;
 
-use IterTools\Chain;
+use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -47,14 +47,14 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->infiniteCycle();
+                    return Stream::of($iterable)->infiniteCycle();
                 },
                 [],
             ],
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })
@@ -65,14 +65,14 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->infiniteCycle();
+                    return Stream::of($iterable)->infiniteCycle();
                 },
                 [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
             ],
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item % 2 !== 0;
                         })
@@ -83,7 +83,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item % 2 !== 0;
                         })
@@ -95,7 +95,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->infiniteCycle()
                         ->runningTotal();
                 },
@@ -144,14 +144,14 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->infiniteCycle();
+                    return Stream::of($iterable)->infiniteCycle();
                 },
                 [],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })
@@ -162,14 +162,14 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->infiniteCycle();
+                    return Stream::of($iterable)->infiniteCycle();
                 },
                 [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item % 2 !== 0;
                         })
@@ -180,7 +180,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item % 2 !== 0;
                         })
@@ -192,7 +192,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->infiniteCycle()
                         ->runningTotal();
                 },
@@ -241,14 +241,14 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->infiniteCycle();
+                    return Stream::of($iterable)->infiniteCycle();
                 },
                 [],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })
@@ -259,14 +259,14 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->infiniteCycle();
+                    return Stream::of($iterable)->infiniteCycle();
                 },
                 [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item % 2 !== 0;
                         })
@@ -277,7 +277,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item % 2 !== 0;
                         })
@@ -289,7 +289,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->infiniteCycle()
                         ->runningTotal();
                 },
@@ -338,14 +338,14 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->infiniteCycle();
+                    return Stream::of($iterable)->infiniteCycle();
                 },
                 [],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item < 0;
                         })
@@ -356,14 +356,14 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->infiniteCycle();
+                    return Stream::of($iterable)->infiniteCycle();
                 },
                 [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item % 2 !== 0;
                         })
@@ -374,7 +374,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($item) {
                             return $item % 2 !== 0;
                         })
@@ -386,7 +386,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->infiniteCycle()
                         ->runningTotal();
                 },

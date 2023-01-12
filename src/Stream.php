@@ -11,7 +11,7 @@ use IterTools\Util\IteratorFactory;
  *
  * @implements \IteratorAggregate<mixed>
  */
-class Chain implements \IteratorAggregate
+class Stream implements \IteratorAggregate
 {
     /**
      * @var iterable<mixed> iterable source
@@ -23,9 +23,9 @@ class Chain implements \IteratorAggregate
      *
      * @param iterable<mixed> $iterable
      *
-     * @return Chain<mixed>
+     * @return Stream<mixed>
      */
-    public static function create(iterable $iterable): self
+    public static function of(iterable $iterable): self
     {
         return new self($iterable);
     }

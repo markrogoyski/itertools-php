@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Chain;
+namespace IterTools\Tests\Stream;
 
-use IterTools\Chain;
+use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -34,21 +34,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toCount();
+                    return Stream::of($iterable)->toCount();
                 },
                 0,
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toCount();
+                    return Stream::of($iterable)->toCount();
                 },
                 6,
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -59,7 +59,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -70,7 +70,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -82,7 +82,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -94,7 +94,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -105,7 +105,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -116,7 +116,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -128,7 +128,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -140,21 +140,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toAverage();
+                    return Stream::of($iterable)->toAverage();
                 },
                 null,
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toAverage();
+                    return Stream::of($iterable)->toAverage();
                 },
                 0,
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -165,7 +165,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -176,7 +176,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -187,7 +187,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -198,21 +198,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMax();
+                    return Stream::of($iterable)->toMax();
                 },
                 null,
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMax();
+                    return Stream::of($iterable)->toMax();
                 },
                 3,
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -223,7 +223,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -234,7 +234,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -245,7 +245,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -256,21 +256,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMin();
+                    return Stream::of($iterable)->toMin();
                 },
                 null,
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMin();
+                    return Stream::of($iterable)->toMin();
                 },
                 -3,
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -281,7 +281,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -292,7 +292,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -303,7 +303,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -314,21 +314,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toProduct();
+                    return Stream::of($iterable)->toProduct();
                 },
                 null,
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toProduct();
+                    return Stream::of($iterable)->toProduct();
                 },
                 -36,
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -339,7 +339,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -350,7 +350,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -361,7 +361,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -372,21 +372,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toSum();
+                    return Stream::of($iterable)->toSum();
                 },
                 0,
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toSum();
+                    return Stream::of($iterable)->toSum();
                 },
                 0,
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -397,7 +397,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -408,7 +408,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -419,7 +419,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -430,7 +430,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         });
@@ -440,7 +440,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         }, 1);
@@ -450,7 +450,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         });
@@ -460,7 +460,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         }, 1);
@@ -470,7 +470,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -483,7 +483,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -496,7 +496,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -509,7 +509,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -522,7 +522,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -535,7 +535,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -548,7 +548,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -561,7 +561,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -574,7 +574,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -588,7 +588,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipEqualWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -602,7 +602,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -616,7 +616,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipLongestWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -630,7 +630,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->chainWith(
                             [4, 5, 6],
                             [7, 8, 9]
@@ -642,7 +642,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->chainWith(
                             [4, 5, 6],
                             [7, 8, 9]
@@ -684,21 +684,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toCount();
+                    return Stream::of($iterable)->toCount();
                 },
                 0,
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toCount();
+                    return Stream::of($iterable)->toCount();
                 },
                 6,
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -709,7 +709,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -720,7 +720,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -732,7 +732,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -744,7 +744,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -755,7 +755,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -766,7 +766,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -778,7 +778,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -790,21 +790,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toAverage();
+                    return Stream::of($iterable)->toAverage();
                 },
                 null,
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toAverage();
+                    return Stream::of($iterable)->toAverage();
                 },
                 0,
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -815,7 +815,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -826,7 +826,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -837,7 +837,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -848,21 +848,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMax();
+                    return Stream::of($iterable)->toMax();
                 },
                 null,
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMax();
+                    return Stream::of($iterable)->toMax();
                 },
                 3,
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -873,7 +873,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -884,7 +884,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -895,7 +895,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -906,21 +906,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMin();
+                    return Stream::of($iterable)->toMin();
                 },
                 null,
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMin();
+                    return Stream::of($iterable)->toMin();
                 },
                 -3,
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -931,7 +931,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -942,7 +942,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -953,7 +953,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -964,21 +964,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toProduct();
+                    return Stream::of($iterable)->toProduct();
                 },
                 null,
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toProduct();
+                    return Stream::of($iterable)->toProduct();
                 },
                 -36,
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -989,7 +989,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1000,7 +1000,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1011,7 +1011,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1022,21 +1022,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toSum();
+                    return Stream::of($iterable)->toSum();
                 },
                 0,
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toSum();
+                    return Stream::of($iterable)->toSum();
                 },
                 0,
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1047,7 +1047,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1058,7 +1058,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1069,7 +1069,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1080,7 +1080,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         });
@@ -1090,7 +1090,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         }, 1);
@@ -1100,7 +1100,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         });
@@ -1110,7 +1110,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         }, 1);
@@ -1120,7 +1120,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1133,7 +1133,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1146,7 +1146,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1159,7 +1159,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1172,7 +1172,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1185,7 +1185,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1198,7 +1198,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1211,7 +1211,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1224,7 +1224,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -1238,7 +1238,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipEqualWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -1252,7 +1252,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -1266,7 +1266,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipLongestWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -1280,7 +1280,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->chainWith(
                             [4, 5, 6],
                             [7, 8, 9]
@@ -1292,7 +1292,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->chainWith(
                             [4, 5, 6],
                             [7, 8, 9]
@@ -1334,21 +1334,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toCount();
+                    return Stream::of($iterable)->toCount();
                 },
                 0,
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toCount();
+                    return Stream::of($iterable)->toCount();
                 },
                 6,
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1359,7 +1359,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1370,7 +1370,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1382,7 +1382,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1394,7 +1394,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1405,7 +1405,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1416,7 +1416,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1428,7 +1428,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1440,21 +1440,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toAverage();
+                    return Stream::of($iterable)->toAverage();
                 },
                 null,
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toAverage();
+                    return Stream::of($iterable)->toAverage();
                 },
                 0,
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1465,7 +1465,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1476,7 +1476,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1487,7 +1487,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1498,21 +1498,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMax();
+                    return Stream::of($iterable)->toMax();
                 },
                 null,
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMax();
+                    return Stream::of($iterable)->toMax();
                 },
                 3,
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1523,7 +1523,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1534,7 +1534,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1545,7 +1545,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1556,21 +1556,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMin();
+                    return Stream::of($iterable)->toMin();
                 },
                 null,
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMin();
+                    return Stream::of($iterable)->toMin();
                 },
                 -3,
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1581,7 +1581,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1592,7 +1592,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1603,7 +1603,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1614,21 +1614,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toProduct();
+                    return Stream::of($iterable)->toProduct();
                 },
                 null,
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toProduct();
+                    return Stream::of($iterable)->toProduct();
                 },
                 -36,
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1639,7 +1639,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1650,7 +1650,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1661,7 +1661,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1672,21 +1672,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toSum();
+                    return Stream::of($iterable)->toSum();
                 },
                 0,
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toSum();
+                    return Stream::of($iterable)->toSum();
                 },
                 0,
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1697,7 +1697,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1708,7 +1708,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1719,7 +1719,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1730,7 +1730,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         });
@@ -1740,7 +1740,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         }, 1);
@@ -1750,7 +1750,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         });
@@ -1760,7 +1760,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         }, 1);
@@ -1770,7 +1770,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1783,7 +1783,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1796,7 +1796,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1809,7 +1809,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1822,7 +1822,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1835,7 +1835,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1848,7 +1848,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1861,7 +1861,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1874,7 +1874,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -1888,7 +1888,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipEqualWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -1902,7 +1902,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -1916,7 +1916,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipLongestWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -1930,7 +1930,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->chainWith(
                             [4, 5, 6],
                             [7, 8, 9]
@@ -1942,7 +1942,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->chainWith(
                             [4, 5, 6],
                             [7, 8, 9]
@@ -1984,21 +1984,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toCount();
+                    return Stream::of($iterable)->toCount();
                 },
                 0,
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toCount();
+                    return Stream::of($iterable)->toCount();
                 },
                 6,
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2009,7 +2009,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2020,7 +2020,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2032,7 +2032,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2044,7 +2044,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2055,7 +2055,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2066,7 +2066,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2078,7 +2078,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2090,21 +2090,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toAverage();
+                    return Stream::of($iterable)->toAverage();
                 },
                 null,
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toAverage();
+                    return Stream::of($iterable)->toAverage();
                 },
                 0,
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2115,7 +2115,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2126,7 +2126,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2137,7 +2137,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2148,21 +2148,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMax();
+                    return Stream::of($iterable)->toMax();
                 },
                 null,
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMax();
+                    return Stream::of($iterable)->toMax();
                 },
                 3,
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2173,7 +2173,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2184,7 +2184,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2195,7 +2195,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2206,21 +2206,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMin();
+                    return Stream::of($iterable)->toMin();
                 },
                 null,
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toMin();
+                    return Stream::of($iterable)->toMin();
                 },
                 -3,
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2231,7 +2231,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2242,7 +2242,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2253,7 +2253,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2264,21 +2264,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toProduct();
+                    return Stream::of($iterable)->toProduct();
                 },
                 null,
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toProduct();
+                    return Stream::of($iterable)->toProduct();
                 },
                 -36,
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2289,7 +2289,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2300,7 +2300,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2311,7 +2311,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2322,21 +2322,21 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toSum();
+                    return Stream::of($iterable)->toSum();
                 },
                 0,
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->toSum();
+                    return Stream::of($iterable)->toSum();
                 },
                 0,
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2347,7 +2347,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2358,7 +2358,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2369,7 +2369,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2380,7 +2380,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         });
@@ -2390,7 +2390,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         }, 1);
@@ -2400,7 +2400,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         });
@@ -2410,7 +2410,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->toValue(function ($carry, $item) {
                             return $carry + $item;
                         }, 1);
@@ -2420,7 +2420,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2433,7 +2433,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2446,7 +2446,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2459,7 +2459,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -2472,7 +2472,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2485,7 +2485,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2498,7 +2498,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2511,7 +2511,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -2524,7 +2524,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -2538,7 +2538,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipEqualWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -2552,7 +2552,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -2566,7 +2566,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->zipLongestWith(
                             [10, 20, 30],
                             [100, 200, 300]
@@ -2580,7 +2580,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->chainWith(
                             [4, 5, 6],
                             [7, 8, 9]
@@ -2592,7 +2592,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->chainWith(
                             [4, 5, 6],
                             [7, 8, 9]

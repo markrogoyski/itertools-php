@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Chain;
+namespace IterTools\Tests\Stream;
 
-use IterTools\Chain;
+use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -39,35 +39,35 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage();
+                    return Stream::of($iterable)->runningAverage();
                 },
                 [],
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage(1);
+                    return Stream::of($iterable)->runningAverage(1);
                 },
                 [1],
             ],
             [
                 [1, 3, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage();
+                    return Stream::of($iterable)->runningAverage();
                 },
                 [1, 2, 3],
             ],
             [
                 [3, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage(1);
+                    return Stream::of($iterable)->runningAverage(1);
                 },
                 [1, 2, 3],
             ],
             [
                 [1, 3, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->runningTotal();
                 },
@@ -76,7 +76,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMax();
                 },
                 [1, 1, 2, 2, 3, 3],
@@ -84,7 +84,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMax()
                         ->runningTotal();
                 },
@@ -93,21 +93,21 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningMin();
+                    return Stream::of($iterable)->runningMin();
                 },
                 [1, -1, -1, -2, -2, -3],
             ],
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningDifference();
+                    return Stream::of($iterable)->runningDifference();
                 },
                 [-1, -3, -6, -10, -15],
             ],
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal();
                 },
@@ -116,7 +116,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal()
                         ->runningMin();
@@ -126,7 +126,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal()
                         ->runningMax();
@@ -136,7 +136,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMin()
                         ->runningTotal();
                 },
@@ -145,14 +145,14 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningProduct();
+                    return Stream::of($iterable)->runningProduct();
                 },
                 [1, 2, 6, 24, 120],
             ],
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal();
                 },
@@ -161,7 +161,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMax();
@@ -171,7 +171,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin();
@@ -213,35 +213,35 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage();
+                    return Stream::of($iterable)->runningAverage();
                 },
                 [],
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage(1);
+                    return Stream::of($iterable)->runningAverage(1);
                 },
                 [1],
             ],
             [
                 $gen([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage();
+                    return Stream::of($iterable)->runningAverage();
                 },
                 [1, 2, 3],
             ],
             [
                 $gen([3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage(1);
+                    return Stream::of($iterable)->runningAverage(1);
                 },
                 [1, 2, 3],
             ],
             [
                 $gen([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->runningTotal();
                 },
@@ -250,7 +250,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMax();
                 },
                 [1, 1, 2, 2, 3, 3],
@@ -258,7 +258,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMax()
                         ->runningTotal();
                 },
@@ -267,21 +267,21 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningMin();
+                    return Stream::of($iterable)->runningMin();
                 },
                 [1, -1, -1, -2, -2, -3],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningDifference();
+                    return Stream::of($iterable)->runningDifference();
                 },
                 [-1, -3, -6, -10, -15],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal();
                 },
@@ -290,7 +290,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal()
                         ->runningMin();
@@ -300,7 +300,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal()
                         ->runningMax();
@@ -310,7 +310,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMin()
                         ->runningTotal();
                 },
@@ -319,14 +319,14 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningProduct();
+                    return Stream::of($iterable)->runningProduct();
                 },
                 [1, 2, 6, 24, 120],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal();
                 },
@@ -335,7 +335,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMax();
@@ -345,7 +345,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin();
@@ -387,35 +387,35 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage();
+                    return Stream::of($iterable)->runningAverage();
                 },
                 [],
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage(1);
+                    return Stream::of($iterable)->runningAverage(1);
                 },
                 [1],
             ],
             [
                 $iter([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage();
+                    return Stream::of($iterable)->runningAverage();
                 },
                 [1, 2, 3],
             ],
             [
                 $iter([3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage(1);
+                    return Stream::of($iterable)->runningAverage(1);
                 },
                 [1, 2, 3],
             ],
             [
                 $iter([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->runningTotal();
                 },
@@ -424,7 +424,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMax();
                 },
                 [1, 1, 2, 2, 3, 3],
@@ -432,7 +432,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMax()
                         ->runningTotal();
                 },
@@ -441,21 +441,21 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningMin();
+                    return Stream::of($iterable)->runningMin();
                 },
                 [1, -1, -1, -2, -2, -3],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningDifference();
+                    return Stream::of($iterable)->runningDifference();
                 },
                 [-1, -3, -6, -10, -15],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal();
                 },
@@ -464,7 +464,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal()
                         ->runningMin();
@@ -474,7 +474,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal()
                         ->runningMax();
@@ -484,7 +484,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMin()
                         ->runningTotal();
                 },
@@ -493,14 +493,14 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningProduct();
+                    return Stream::of($iterable)->runningProduct();
                 },
                 [1, 2, 6, 24, 120],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal();
                 },
@@ -509,7 +509,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMax();
@@ -519,7 +519,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin();
@@ -561,35 +561,35 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage();
+                    return Stream::of($iterable)->runningAverage();
                 },
                 [],
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage(1);
+                    return Stream::of($iterable)->runningAverage(1);
                 },
                 [1],
             ],
             [
                 $trav([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage();
+                    return Stream::of($iterable)->runningAverage();
                 },
                 [1, 2, 3],
             ],
             [
                 $trav([3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningAverage(1);
+                    return Stream::of($iterable)->runningAverage(1);
                 },
                 [1, 2, 3],
             ],
             [
                 $trav([1, 3, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningAverage()
                         ->runningTotal();
                 },
@@ -598,7 +598,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMax();
                 },
                 [1, 1, 2, 2, 3, 3],
@@ -606,7 +606,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMax()
                         ->runningTotal();
                 },
@@ -615,21 +615,21 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningMin();
+                    return Stream::of($iterable)->runningMin();
                 },
                 [1, -1, -1, -2, -2, -3],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningDifference();
+                    return Stream::of($iterable)->runningDifference();
                 },
                 [-1, -3, -6, -10, -15],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal();
                 },
@@ -638,7 +638,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal()
                         ->runningMin();
@@ -648,7 +648,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningDifference()
                         ->runningTotal()
                         ->runningMax();
@@ -658,7 +658,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningMin()
                         ->runningTotal();
                 },
@@ -667,14 +667,14 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)->runningProduct();
+                    return Stream::of($iterable)->runningProduct();
                 },
                 [1, 2, 6, 24, 120],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal();
                 },
@@ -683,7 +683,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMax();
@@ -693,7 +693,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3, 4, 5]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->runningProduct()
                         ->runningTotal()
                         ->runningMin();

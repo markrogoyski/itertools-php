@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Chain;
+namespace IterTools\Tests\Stream;
 
-use IterTools\Chain;
+use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -39,21 +39,21 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable);
+                    return Stream::of($iterable);
                 },
                 [],
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable);
+                    return Stream::of($iterable);
                 },
                 [1, -1, 2, -2, 3, -3],
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         });
@@ -63,7 +63,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         });
@@ -73,7 +73,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         });
@@ -83,7 +83,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         });
@@ -93,7 +93,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -104,7 +104,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -115,7 +115,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -126,7 +126,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -137,7 +137,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -148,7 +148,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -159,7 +159,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -170,7 +170,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -181,7 +181,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -192,7 +192,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         });
@@ -202,7 +202,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -213,7 +213,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -224,7 +224,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -235,7 +235,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -246,7 +246,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value % 2 === 0;
                         })
@@ -259,7 +259,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value % 2 === 0;
                         })
@@ -304,21 +304,21 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable);
+                    return Stream::of($iterable);
                 },
                 [],
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable);
+                    return Stream::of($iterable);
                 },
                 [1, -1, 2, -2, 3, -3],
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         });
@@ -328,7 +328,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         });
@@ -338,7 +338,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         });
@@ -348,7 +348,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         });
@@ -358,7 +358,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -369,7 +369,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -380,7 +380,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -391,7 +391,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -402,7 +402,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -413,7 +413,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -424,7 +424,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -435,7 +435,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -446,7 +446,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -457,7 +457,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         });
@@ -467,7 +467,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -478,7 +478,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -489,7 +489,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -500,7 +500,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -511,7 +511,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value % 2 === 0;
                         })
@@ -524,7 +524,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value % 2 === 0;
                         })
@@ -569,21 +569,21 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable);
+                    return Stream::of($iterable);
                 },
                 [],
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable);
+                    return Stream::of($iterable);
                 },
                 [1, -1, 2, -2, 3, -3],
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         });
@@ -593,7 +593,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         });
@@ -603,7 +603,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         });
@@ -613,7 +613,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         });
@@ -623,7 +623,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -634,7 +634,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -645,7 +645,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -656,7 +656,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -667,7 +667,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -678,7 +678,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -689,7 +689,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -700,7 +700,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -711,7 +711,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -722,7 +722,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         });
@@ -732,7 +732,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -743,7 +743,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -754,7 +754,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -765,7 +765,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -776,7 +776,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value % 2 === 0;
                         })
@@ -789,7 +789,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value % 2 === 0;
                         })
@@ -834,21 +834,21 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable);
+                    return Stream::of($iterable);
                 },
                 [],
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable);
+                    return Stream::of($iterable);
                 },
                 [1, -1, 2, -2, 3, -3],
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         });
@@ -858,7 +858,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         });
@@ -868,7 +868,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         });
@@ -878,7 +878,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         });
@@ -888,7 +888,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -899,7 +899,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -910,7 +910,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -921,7 +921,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
@@ -932,7 +932,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -943,7 +943,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -954,7 +954,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -965,7 +965,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -976,7 +976,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -987,7 +987,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         });
@@ -997,7 +997,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1008,7 +1008,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
@@ -1019,7 +1019,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1030,7 +1030,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
@@ -1041,7 +1041,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value % 2 === 0;
                         })
@@ -1054,7 +1054,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Chain::create($iterable)
+                    return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value % 2 === 0;
                         })
