@@ -21,13 +21,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
     public function testArray(array $input, callable $chainMaker, array $expected): void
     {
         // Given
-        $result = [];
-
-        // When
-        $chain = $chainMaker($input);
-        foreach ($chain as $key => $value) {
-            $result[$key] = $value;
-        }
+        $result = $chainMaker($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -39,14 +33,16 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Stream::of($iterable);
+                    return Stream::of($iterable)
+                        ->toAssociativeArray();
                 },
                 [],
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 static function (iterable $iterable) {
-                    return Stream::of($iterable);
+                    return Stream::of($iterable)
+                        ->toAssociativeArray();
                 },
                 [1, -1, 2, -2, 3, -3],
             ],
@@ -56,7 +52,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -66,7 +63,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [1, 2, 3],
             ],
@@ -76,7 +74,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -86,7 +85,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [1, -1, 2, -2],
             ],
@@ -97,7 +97,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1, 0, 1]);
+                        ->compress([0, 1, 0, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -108,7 +109,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1, 0, 1]);
+                        ->compress([0, 1, 0, 1])
+                        ->toAssociativeArray();
                 },
                 [-1, -2],
             ],
@@ -119,7 +121,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1]);
+                        ->compress([0, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -130,7 +133,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1]);
+                        ->compress([0, 1])
+                        ->toAssociativeArray();
                 },
                 [-3],
             ],
@@ -141,7 +145,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -152,7 +157,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [2, 3],
             ],
@@ -163,7 +169,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -174,7 +181,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [2, 3],
             ],
@@ -185,7 +193,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -195,7 +204,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [-1, -2, -3],
             ],
@@ -206,7 +216,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -217,7 +228,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [[1, 2], [2, 3]],
             ],
@@ -228,7 +240,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -239,7 +252,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [[-1, -2], [-2, -3]],
             ],
@@ -252,7 +266,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         })
                         ->groupBy(static function ($item) {
                             return $item > 0 ? 'pos' : 'neg';
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -265,7 +280,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         })
                         ->groupBy(static function ($item) {
                             return $item > 0 ? 'pos' : 'neg';
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 ['pos' => [1, 3], 'neg' => [-1, -3]],
             ],
@@ -282,13 +298,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
     public function testGenerator(\Generator $input, callable $chainMaker, array $expected): void
     {
         // Given
-        $result = [];
-
-        // When
-        $chain = $chainMaker($input);
-        foreach ($chain as $key => $value) {
-            $result[$key] = $value;
-        }
+        $result = $chainMaker($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -304,14 +314,16 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) {
-                    return Stream::of($iterable);
+                    return Stream::of($iterable)
+                        ->toAssociativeArray();
                 },
                 [],
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Stream::of($iterable);
+                    return Stream::of($iterable)
+                        ->toAssociativeArray();
                 },
                 [1, -1, 2, -2, 3, -3],
             ],
@@ -321,7 +333,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -331,7 +344,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [1, 2, 3],
             ],
@@ -341,7 +355,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -351,7 +366,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [1, -1, 2, -2],
             ],
@@ -362,7 +378,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1, 0, 1]);
+                        ->compress([0, 1, 0, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -373,7 +390,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1, 0, 1]);
+                        ->compress([0, 1, 0, 1])
+                        ->toAssociativeArray();
                 },
                 [-1, -2],
             ],
@@ -384,7 +402,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1]);
+                        ->compress([0, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -395,7 +414,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1]);
+                        ->compress([0, 1])
+                        ->toAssociativeArray();
                 },
                 [-3],
             ],
@@ -406,7 +426,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -417,7 +438,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [2, 3],
             ],
@@ -428,7 +450,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -439,7 +462,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [2, 3],
             ],
@@ -450,7 +474,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -460,7 +485,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [-1, -2, -3],
             ],
@@ -471,7 +497,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -482,7 +509,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [[1, 2], [2, 3]],
             ],
@@ -493,7 +521,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -504,7 +533,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [[-1, -2], [-2, -3]],
             ],
@@ -517,7 +547,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         })
                         ->groupBy(static function ($item) {
                             return $item > 0 ? 'pos' : 'neg';
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -530,7 +561,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         })
                         ->groupBy(static function ($item) {
                             return $item > 0 ? 'pos' : 'neg';
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 ['pos' => [1, 3], 'neg' => [-1, -3]],
             ],
@@ -547,13 +579,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
     public function testIterator(\Iterator $input, callable $chainMaker, array $expected): void
     {
         // Given
-        $result = [];
-
-        // When
-        $chain = $chainMaker($input);
-        foreach ($chain as $key => $value) {
-            $result[$key] = $value;
-        }
+        $result = $chainMaker($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -569,14 +595,16 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) {
-                    return Stream::of($iterable);
+                    return Stream::of($iterable)
+                        ->toAssociativeArray();
                 },
                 [],
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Stream::of($iterable);
+                    return Stream::of($iterable)
+                        ->toAssociativeArray();
                 },
                 [1, -1, 2, -2, 3, -3],
             ],
@@ -586,7 +614,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -596,7 +625,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [1, 2, 3],
             ],
@@ -606,7 +636,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -616,7 +647,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [1, -1, 2, -2],
             ],
@@ -627,7 +659,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1, 0, 1]);
+                        ->compress([0, 1, 0, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -638,7 +671,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1, 0, 1]);
+                        ->compress([0, 1, 0, 1])
+                        ->toAssociativeArray();
                 },
                 [-1, -2],
             ],
@@ -649,7 +683,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1]);
+                        ->compress([0, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -660,7 +695,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1]);
+                        ->compress([0, 1])
+                        ->toAssociativeArray();
                 },
                 [-3],
             ],
@@ -671,7 +707,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -682,7 +719,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [2, 3],
             ],
@@ -693,7 +731,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -704,7 +743,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [2, 3],
             ],
@@ -715,7 +755,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -725,7 +766,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [-1, -2, -3],
             ],
@@ -736,7 +778,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -747,7 +790,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [[1, 2], [2, 3]],
             ],
@@ -758,7 +802,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -769,7 +814,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [[-1, -2], [-2, -3]],
             ],
@@ -782,7 +828,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         })
                         ->groupBy(static function ($item) {
                             return $item > 0 ? 'pos' : 'neg';
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -795,7 +842,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         })
                         ->groupBy(static function ($item) {
                             return $item > 0 ? 'pos' : 'neg';
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 ['pos' => [1, 3], 'neg' => [-1, -3]],
             ],
@@ -812,13 +860,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
     public function testTraversable(\Traversable $input, callable $chainMaker, array $expected): void
     {
         // Given
-        $result = [];
-
         // When
-        $chain = $chainMaker($input);
-        foreach ($chain as $key => $value) {
-            $result[$key] = $value;
-        }
+        $result = $chainMaker($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -834,14 +877,16 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) {
-                    return Stream::of($iterable);
+                    return Stream::of($iterable)
+                        ->toAssociativeArray();
                 },
                 [],
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 static function (iterable $iterable) {
-                    return Stream::of($iterable);
+                    return Stream::of($iterable)
+                        ->toAssociativeArray();
                 },
                 [1, -1, 2, -2, 3, -3],
             ],
@@ -851,7 +896,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -861,7 +907,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterTrue(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [1, 2, 3],
             ],
@@ -871,7 +918,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -881,7 +929,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [1, -1, 2, -2],
             ],
@@ -892,7 +941,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1, 0, 1]);
+                        ->compress([0, 1, 0, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -903,7 +953,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->takeWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1, 0, 1]);
+                        ->compress([0, 1, 0, 1])
+                        ->toAssociativeArray();
                 },
                 [-1, -2],
             ],
@@ -914,7 +965,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1]);
+                        ->compress([0, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -925,7 +977,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->dropWhile(static function ($value) {
                             return abs($value) < 3;
                         })
-                        ->compress([0, 1]);
+                        ->compress([0, 1])
+                        ->toAssociativeArray();
                 },
                 [-3],
             ],
@@ -936,7 +989,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -947,7 +1001,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [2, 3],
             ],
@@ -958,7 +1013,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -969,7 +1025,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->compress([0, 1, 1]);
+                        ->compress([0, 1, 1])
+                        ->toAssociativeArray();
                 },
                 [2, 3],
             ],
@@ -980,7 +1037,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -990,7 +1048,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     return Stream::of($iterable)
                         ->filterFalse(static function ($value) {
                             return $value > 0;
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [-1, -2, -3],
             ],
@@ -1001,7 +1060,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -1012,7 +1072,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterTrue(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [[1, 2], [2, 3]],
             ],
@@ -1023,7 +1084,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -1034,7 +1096,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         ->filterFalse(static function ($value) {
                             return $value > 0;
                         })
-                        ->pairwise();
+                        ->pairwise()
+                        ->toAssociativeArray();
                 },
                 [[-1, -2], [-2, -3]],
             ],
@@ -1047,7 +1110,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         })
                         ->groupBy(static function ($item) {
                             return $item > 0 ? 'pos' : 'neg';
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 [],
             ],
@@ -1060,7 +1124,8 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                         })
                         ->groupBy(static function ($item) {
                             return $item > 0 ? 'pos' : 'neg';
-                        });
+                        })
+                        ->toAssociativeArray();
                 },
                 ['pos' => [1, 3], 'neg' => [-1, -3]],
             ],

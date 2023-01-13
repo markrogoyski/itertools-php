@@ -31,6 +31,34 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Converts iterable source to array.
+     *
+     * @return array<mixed>
+     */
+    public function toArray(): array
+    {
+        $result = [];
+        foreach ($this->iterable as $item) {
+            $result[] = $item;
+        }
+        return $result;
+    }
+
+    /**
+     * Converts iterable source to associative array.
+     *
+     * @return array<mixed>
+     */
+    public function toAssociativeArray(): array
+    {
+        $result = [];
+        foreach ($this->iterable as $key => $item) {
+            $result[$key] = $item;
+        }
+        return $result;
+    }
+
+    /**
      * Compress an iterable source by filtering out data that is not selected.
      *
      * Selectors indicate which data. True value selects item. False value filters out data.

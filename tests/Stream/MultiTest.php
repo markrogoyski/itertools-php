@@ -21,13 +21,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
     public function testArray(array $input, callable $chainMaker, array $expected): void
     {
         // Given
-        $result = [];
-
         // When
-        $chain = $chainMaker($input);
-        foreach ($chain as $value) {
-            $result[] = $value;
-        }
+        $result = $chainMaker($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -39,21 +34,27 @@ class MultiTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 static function (iterable $iterable) {
-                    return Stream::of($iterable)->zipWith([], []);
+                    return Stream::of($iterable)
+                        ->zipWith([], [])
+                        ->toArray();
                 },
                 [],
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Stream::of($iterable)->zipEqualWith([], []);
+                    return Stream::of($iterable)
+                        ->zipEqualWith([], [])
+                        ->toArray();
                 },
                 [],
             ],
             [
                 [],
                 static function (iterable $iterable) {
-                    return Stream::of($iterable)->zipLongestWith([], []);
+                    return Stream::of($iterable)
+                        ->zipLongestWith([], [])
+                        ->toArray();
                 },
                 [],
             ],
@@ -64,7 +65,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipWith(
                             [11, 22, 33],
                             [111, 222, 333, 444]
-                        );
+                        )
+                        ->toArray();
                 },
                 [],
             ],
@@ -75,7 +77,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipLongestWith(
                             [11, 22, 33],
                             [111, 222, 333, 444]
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [null, 11, 111],
@@ -91,7 +94,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipWith(
                             [11, 22, 33],
                             [111, 222, 333, 444]
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
@@ -106,7 +110,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipEqualWith(
                             [11, 22, 33],
                             [111, 222, 333]
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
@@ -121,7 +126,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipLongestWith(
                             [11, 22, 33],
                             [111, 222, 333, 444]
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
@@ -144,13 +150,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
     public function testGenerator(\Generator $input, callable $chainMaker, array $expected): void
     {
         // Given
-        $result = [];
-
         // When
-        $chain = $chainMaker($input);
-        foreach ($chain as $value) {
-            $result[] = $value;
-        }
+        $result = $chainMaker($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -166,21 +167,27 @@ class MultiTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 static function (iterable $iterable) use ($gen) {
-                    return Stream::of($iterable)->zipWith($gen([]), $gen([]));
+                    return Stream::of($iterable)
+                        ->zipWith($gen([]), $gen([]))
+                        ->toArray();
                 },
                 [],
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) use ($gen) {
-                    return Stream::of($iterable)->zipEqualWith($gen([]), $gen([]));
+                    return Stream::of($iterable)
+                        ->zipEqualWith($gen([]), $gen([]))
+                        ->toArray();
                 },
                 [],
             ],
             [
                 $gen([]),
                 static function (iterable $iterable) use ($gen) {
-                    return Stream::of($iterable)->zipLongestWith($gen([]), $gen([]));
+                    return Stream::of($iterable)
+                        ->zipLongestWith($gen([]), $gen([]))
+                        ->toArray();
                 },
                 [],
             ],
@@ -191,7 +198,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipWith(
                             $gen([11, 22, 33]),
                             $gen([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [],
             ],
@@ -202,7 +210,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipLongestWith(
                             $gen([11, 22, 33]),
                             $gen([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [null, 11, 111],
@@ -218,7 +227,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipWith(
                             $gen([11, 22, 33]),
                             $gen([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
@@ -233,7 +243,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipEqualWith(
                             $gen([11, 22, 33]),
                             $gen([111, 222, 333])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
@@ -248,7 +259,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipLongestWith(
                             $gen([11, 22, 33]),
                             $gen([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
@@ -271,13 +283,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
     public function testIterator(\Iterator $input, callable $chainMaker, array $expected): void
     {
         // Given
-        $result = [];
-
         // When
-        $chain = $chainMaker($input);
-        foreach ($chain as $value) {
-            $result[] = $value;
-        }
+        $result = $chainMaker($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -293,21 +300,27 @@ class MultiTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 static function (iterable $iterable) use ($iter) {
-                    return Stream::of($iterable)->zipWith($iter([]), $iter([]));
+                    return Stream::of($iterable)
+                        ->zipWith($iter([]), $iter([]))
+                        ->toArray();
                 },
                 [],
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) use ($iter) {
-                    return Stream::of($iterable)->zipEqualWith($iter([]), $iter([]));
+                    return Stream::of($iterable)
+                        ->zipEqualWith($iter([]), $iter([]))
+                        ->toArray();
                 },
                 [],
             ],
             [
                 $iter([]),
                 static function (iterable $iterable) use ($iter) {
-                    return Stream::of($iterable)->zipLongestWith($iter([]), $iter([]));
+                    return Stream::of($iterable)
+                        ->zipLongestWith($iter([]), $iter([]))
+                        ->toArray();
                 },
                 [],
             ],
@@ -318,7 +331,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipWith(
                             $iter([11, 22, 33]),
                             $iter([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [],
             ],
@@ -329,7 +343,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipLongestWith(
                             $iter([11, 22, 33]),
                             $iter([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [null, 11, 111],
@@ -345,7 +360,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipWith(
                             $iter([11, 22, 33]),
                             $iter([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
@@ -360,7 +376,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipEqualWith(
                             $iter([11, 22, 33]),
                             $iter([111, 222, 333])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
@@ -375,7 +392,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipLongestWith(
                             $iter([11, 22, 33]),
                             $iter([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
@@ -398,13 +416,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
     public function testTraversable(\Traversable $input, callable $chainMaker, array $expected): void
     {
         // Given
-        $result = [];
-
         // When
-        $chain = $chainMaker($input);
-        foreach ($chain as $value) {
-            $result[] = $value;
-        }
+        $result = $chainMaker($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -420,21 +433,27 @@ class MultiTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 static function (iterable $iterable) use ($trav) {
-                    return Stream::of($iterable)->zipWith($trav([]), $trav([]));
+                    return Stream::of($iterable)
+                        ->zipWith($trav([]), $trav([]))
+                        ->toArray();
                 },
                 [],
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) use ($trav) {
-                    return Stream::of($iterable)->zipEqualWith($trav([]), $trav([]));
+                    return Stream::of($iterable)
+                        ->zipEqualWith($trav([]), $trav([]))
+                        ->toArray();
                 },
                 [],
             ],
             [
                 $trav([]),
                 static function (iterable $iterable) use ($trav) {
-                    return Stream::of($iterable)->zipLongestWith($trav([]), $trav([]));
+                    return Stream::of($iterable)
+                        ->zipLongestWith($trav([]), $trav([]))
+                        ->toArray();
                 },
                 [],
             ],
@@ -445,7 +464,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipWith(
                             $trav([11, 22, 33]),
                             $trav([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [],
             ],
@@ -456,7 +476,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipLongestWith(
                             $trav([11, 22, 33]),
                             $trav([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [null, 11, 111],
@@ -472,7 +493,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipWith(
                             $trav([11, 22, 33]),
                             $trav([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
@@ -487,7 +509,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipEqualWith(
                             $trav([11, 22, 33]),
                             $trav([111, 222, 333])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
@@ -502,7 +525,8 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                         ->zipLongestWith(
                             $trav([11, 22, 33]),
                             $trav([111, 222, 333, 444])
-                        );
+                        )
+                        ->toArray();
                 },
                 [
                     [1, 11, 111],
