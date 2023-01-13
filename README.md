@@ -891,9 +891,7 @@ $result = Stream::of($iterable)
         [7, 8, 9]
     )
     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
-    ->toValue(static function ($carry, $item) {
-        return $carry + array_sum($item);
-    });
+    ->toValue(fn ($carry, $item) => $carry + array_sum($item));
 // 90
 ```
 
@@ -930,9 +928,7 @@ use IterTools\Stream;
 $input = [1, 2, 3, 4, 5]
 
 $result = Stream::of($input)
-    ->dropWhile(static function ($value) {
-        return $value < 3;
-    });
+    ->dropWhile(fn ($value) => $value < 3);
     
 foreach ($result as $item) {
     // 3, 4, 5
@@ -952,9 +948,7 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->takeWhile(static function ($value) {
-        return abs($value) < 3;
-    });
+    ->takeWhile(fn ($value) => abs($value) < 3);
 
 foreach ($result as $item) {
     // 1, -1, 2, -2
@@ -974,9 +968,7 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->filterTrue(static function ($value) {
-        return $value > 0;
-    });
+    ->filterTrue(fn ($value) => $value > 0);
 
 foreach ($result as $item) {
     // 1, 2, 3
@@ -996,9 +988,7 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->filterFalse(static function ($value) {
-        return $value > 0;
-    });
+    ->filterFalse(fn ($value) => $value > 0);
 
 foreach ($result as $item) {
     // -1, -2, -3
@@ -1018,9 +1008,7 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->groupBy(static function ($item) {
-        return $item > 0 ? 'positive' : 'negative';
-    });
+    ->groupBy(fn ($item) => $item > 0 ? 'positive' : 'negative');
 
 foreach ($result as $group => $item) {
     // 'positive' => [1, 2, 3], 'negative' => [-1, -2, -3]
