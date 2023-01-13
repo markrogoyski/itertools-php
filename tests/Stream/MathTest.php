@@ -33,11 +33,9 @@ class MathTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
+                fn (iterable $iterable) => Stream::of($iterable)
                         ->runningAverage()
-                        ->toArray();
-                },
+                        ->toArray(),
                 [],
             ],
             [
