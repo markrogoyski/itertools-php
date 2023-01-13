@@ -30,7 +30,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         foreach ($chain as $value) {
             $result[] = $value;
 
-            if (count($expected) > 0 && $i === count($expected)-1) {
+            if (count($expected) > 0 && $i === count($expected) - 1) {
                 break;
             }
 
@@ -46,59 +46,41 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)->infiniteCycle(),
                 [],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item < 0;
-                        })
-                        ->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item < 0)
+                    ->infiniteCycle(),
                 [],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)->infiniteCycle(),
                 [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item % 2 !== 0;
-                        })
-                        ->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item % 2 !== 0)
+                    ->infiniteCycle(),
                 [1, 3, 5, 1, 3, 5, 1, 3, 5],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item % 2 !== 0;
-                        })
-                        ->infiniteCycle()
-                        ->runningMax();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item % 2 !== 0)
+                    ->infiniteCycle()
+                    ->runningMax(),
                 [1, 3, 5, 5, 5, 5, 5, 5, 5],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->infiniteCycle()
-                        ->runningTotal();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->infiniteCycle()
+                    ->runningTotal(),
                 [1, 3, 6, 10, 15, 16, 18, 21, 25, 30, 31, 33, 36, 40, 45],
             ],
         ];
@@ -123,7 +105,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         foreach ($chain as $value) {
             $result[] = $value;
 
-            if (count($expected) > 0 && $i === count($expected)-1) {
+            if (count($expected) > 0 && $i === count($expected) - 1) {
                 break;
             }
 
@@ -136,66 +118,46 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderForGenerator(): array
     {
-        $gen = static function (array $data) {
-            return GeneratorFixture::getGenerator($data);
-        };
+        $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
         return [
             [
                 $gen([]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)->infiniteCycle(),
                 [],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item < 0;
-                        })
-                        ->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item < 0)
+                    ->infiniteCycle(),
                 [],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)->infiniteCycle(),
                 [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item % 2 !== 0;
-                        })
-                        ->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item % 2 !== 0)
+                    ->infiniteCycle(),
                 [1, 3, 5, 1, 3, 5, 1, 3, 5],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item % 2 !== 0;
-                        })
-                        ->infiniteCycle()
-                        ->runningMax();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item % 2 !== 0)
+                    ->infiniteCycle()
+                    ->runningMax(),
                 [1, 3, 5, 5, 5, 5, 5, 5, 5],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->infiniteCycle()
-                        ->runningTotal();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->infiniteCycle()
+                    ->runningTotal(),
                 [1, 3, 6, 10, 15, 16, 18, 21, 25, 30, 31, 33, 36, 40, 45],
             ],
         ];
@@ -220,7 +182,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         foreach ($chain as $value) {
             $result[] = $value;
 
-            if (count($expected) > 0 && $i === count($expected)-1) {
+            if (count($expected) > 0 && $i === count($expected) - 1) {
                 break;
             }
 
@@ -233,66 +195,46 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderForIterator(): array
     {
-        $iter = static function (array $data) {
-            return new ArrayIteratorFixture($data);
-        };
+        $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
         return [
             [
                 $iter([]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)->infiniteCycle(),
                 [],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item < 0;
-                        })
-                        ->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item < 0)
+                    ->infiniteCycle(),
                 [],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)->infiniteCycle(),
                 [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item % 2 !== 0;
-                        })
-                        ->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item % 2 !== 0)
+                    ->infiniteCycle(),
                 [1, 3, 5, 1, 3, 5, 1, 3, 5],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item % 2 !== 0;
-                        })
-                        ->infiniteCycle()
-                        ->runningMax();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item % 2 !== 0)
+                    ->infiniteCycle()
+                    ->runningMax(),
                 [1, 3, 5, 5, 5, 5, 5, 5, 5],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->infiniteCycle()
-                        ->runningTotal();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->infiniteCycle()
+                    ->runningTotal(),
                 [1, 3, 6, 10, 15, 16, 18, 21, 25, 30, 31, 33, 36, 40, 45],
             ],
         ];
@@ -317,7 +259,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         foreach ($chain as $value) {
             $result[] = $value;
 
-            if (count($expected) > 0 && $i === count($expected)-1) {
+            if (count($expected) > 0 && $i === count($expected) - 1) {
                 break;
             }
 
@@ -330,66 +272,46 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderForTraversable(): array
     {
-        $trav = static function (array $data) {
-            return new IteratorAggregateFixture($data);
-        };
+        $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
         return [
             [
                 $trav([]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)->infiniteCycle(),
                 [],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item < 0;
-                        })
-                        ->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item < 0)
+                    ->infiniteCycle(),
                 [],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)->infiniteCycle(),
                 [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item % 2 !== 0;
-                        })
-                        ->infiniteCycle();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item % 2 !== 0)
+                    ->infiniteCycle(),
                 [1, 3, 5, 1, 3, 5, 1, 3, 5],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->filterTrue(static function ($item) {
-                            return $item % 2 !== 0;
-                        })
-                        ->infiniteCycle()
-                        ->runningMax();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($item) => $item % 2 !== 0)
+                    ->infiniteCycle()
+                    ->runningMax(),
                 [1, 3, 5, 5, 5, 5, 5, 5, 5],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->infiniteCycle()
-                        ->runningTotal();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->infiniteCycle()
+                    ->runningTotal(),
                 [1, 3, 6, 10, 15, 16, 18, 21, 25, 30, 31, 33, 36, 40, 45],
             ],
         ];

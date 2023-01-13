@@ -34,165 +34,133 @@ class MathTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
-                        ->runningAverage()
-                        ->toArray(),
+                    ->runningAverage()
+                    ->toArray(),
                 [],
             ],
             [
                 [],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage(1)
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage(1)
+                    ->toArray(),
                 [1],
             ],
             [
                 [1, 3, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage()
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 [3, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage(1)
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage(1)
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 [1, 3, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 3, 6],
             ],
             [
                 [1, -1, 2, -2, 3, -3],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMax()
+                    ->toArray(),
                 [1, 1, 2, 2, 3, 3],
             ],
             [
                 [1, -1, 2, -2, 3, -3],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMax()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMax()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 2, 4, 6, 9, 12],
             ],
             [
                 [1, -1, 2, -2, 3, -3],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMin()
+                    ->toArray(),
                 [1, -1, -1, -2, -2, -3],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->toArray(),
                 [-1, -3, -6, -10, -15],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->toArray(),
                 [-1, -4, -10, -20, -35],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->runningMin()
+                    ->toArray(),
                 [-1, -4, -10, -20, -35],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->runningMax()
+                    ->toArray(),
                 [-1, -1, -1, -1, -1],
             ],
             [
                 [1, -1, 2, -2, 3, -3],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMin()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMin()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 0, -1, -3, -5, -8],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->toArray(),
                 [1, 2, 6, 24, 120],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 3, 9, 33, 153],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->runningMax()
+                    ->toArray(),
                 [1, 3, 9, 33, 153],
             ],
             [
                 [1, 2, 3, 4, 5],
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->runningMin()
+                    ->toArray(),
                 [1, 1, 1, 1, 1],
             ],
         ];
@@ -217,175 +185,139 @@ class MathTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderForGenerator(): array
     {
-        $gen = static function (array $data) {
-            return GeneratorFixture::getGenerator($data);
-        };
+        $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
         return [
             [
                 $gen([]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage()
+                    ->toArray(),
                 [],
             ],
             [
                 $gen([]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage(1)
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage(1)
+                    ->toArray(),
                 [1],
             ],
             [
                 $gen([1, 3, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage()
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 $gen([3, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage(1)
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage(1)
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 $gen([1, 3, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 3, 6],
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMax()
+                    ->toArray(),
                 [1, 1, 2, 2, 3, 3],
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMax()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMax()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 2, 4, 6, 9, 12],
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMin()
+                    ->toArray(),
                 [1, -1, -1, -2, -2, -3],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->toArray(),
                 [-1, -3, -6, -10, -15],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->toArray(),
                 [-1, -4, -10, -20, -35],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->runningMin()
+                    ->toArray(),
                 [-1, -4, -10, -20, -35],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->runningMax()
+                    ->toArray(),
                 [-1, -1, -1, -1, -1],
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMin()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMin()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 0, -1, -3, -5, -8],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->toArray(),
                 [1, 2, 6, 24, 120],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 3, 9, 33, 153],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->runningMax()
+                    ->toArray(),
                 [1, 3, 9, 33, 153],
             ],
             [
                 $gen([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->runningMin()
+                    ->toArray(),
                 [1, 1, 1, 1, 1],
             ],
         ];
@@ -410,175 +342,139 @@ class MathTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderForIterator(): array
     {
-        $iter = static function (array $data) {
-            return new ArrayIteratorFixture($data);
-        };
+        $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
         return [
             [
                 $iter([]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage()
+                    ->toArray(),
                 [],
             ],
             [
                 $iter([]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage(1)
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage(1)
+                    ->toArray(),
                 [1],
             ],
             [
                 $iter([1, 3, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage()
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 $iter([3, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage(1)
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage(1)
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 $iter([1, 3, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 3, 6],
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMax()
+                    ->toArray(),
                 [1, 1, 2, 2, 3, 3],
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMax()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMax()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 2, 4, 6, 9, 12],
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMin()
+                    ->toArray(),
                 [1, -1, -1, -2, -2, -3],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->toArray(),
                 [-1, -3, -6, -10, -15],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->toArray(),
                 [-1, -4, -10, -20, -35],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->runningMin()
+                    ->toArray(),
                 [-1, -4, -10, -20, -35],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->runningMax()
+                    ->toArray(),
                 [-1, -1, -1, -1, -1],
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMin()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMin()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 0, -1, -3, -5, -8],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->toArray(),
                 [1, 2, 6, 24, 120],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 3, 9, 33, 153],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->runningMax()
+                    ->toArray(),
                 [1, 3, 9, 33, 153],
             ],
             [
                 $iter([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->runningMin()
+                    ->toArray(),
                 [1, 1, 1, 1, 1],
             ],
         ];
@@ -603,174 +499,138 @@ class MathTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderForTraversable(): array
     {
-        $trav = static function (array $data) {
-            return new IteratorAggregateFixture($data);
-        };
+        $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
         return [
             [
                 $trav([]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage()
+                    ->toArray(),
                 [],
             ],
             [
                 $trav([]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage(1)
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage(1)
+                    ->toArray(),
                 [1],
             ],
             [
                 $trav([1, 3, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage()
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 $trav([3, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage(1)
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage(1)
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 $trav([1, 3, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningAverage()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningAverage()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 3, 6],
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMax()
+                    ->toArray(),
                 [1, 1, 2, 2, 3, 3],
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMax()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMax()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 2, 4, 6, 9, 12],
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMin()
+                    ->toArray(),
                 [1, -1, -1, -2, -2, -3],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->toArray(),
                 [-1, -3, -6, -10, -15],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->toArray(),
                 [-1, -4, -10, -20, -35],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->runningMin()
+                    ->toArray(),
                 [-1, -4, -10, -20, -35],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningDifference()
-                        ->runningTotal()
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->runningMax()
+                    ->toArray(),
                 [-1, -1, -1, -1, -1],
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningMin()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningMin()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 0, -1, -3, -5, -8],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)->runningProduct()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)->runningProduct()
+                    ->toArray(),
                 [1, 2, 6, 24, 120],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->toArray(),
                 [1, 3, 9, 33, 153],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->runningMax()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->runningMax()
+                    ->toArray(),
                 [1, 3, 9, 33, 153],
             ],
             [
                 $trav([1, 2, 3, 4, 5]),
-                static function (iterable $iterable) {
-                    return Stream::of($iterable)
-                        ->runningProduct()
-                        ->runningTotal()
-                        ->runningMin()
-                        ->toArray();
-                },
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningTotal()
+                    ->runningMin()
+                    ->toArray(),
                 [1, 1, 1, 1, 1],
             ],
         ];
