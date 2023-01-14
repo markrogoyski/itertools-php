@@ -120,6 +120,21 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                     [5, null, null],
                 ],
             ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                ->chainWith([4, 5, 6])
+                ->toArray(),
+                [1, 2, 3, 4, 5, 6]
+            ],
+            [
+                [1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([3, 4, 5])
+                    ->chainWith([6, 7, 8, 9])
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            ],
         ];
     }
 
@@ -233,6 +248,21 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                     [4, null, 444],
                     [5, null, null],
                 ],
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith($gen([4, 5, 6]))
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6]
+            ],
+            [
+                $gen([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith($gen([3, 4, 5]))
+                    ->chainWith($gen([6, 7, 8, 9]))
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9]
             ],
         ];
     }
@@ -348,6 +378,21 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                     [5, null, null],
                 ],
             ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith($iter([4, 5, 6]))
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6]
+            ],
+            [
+                $iter([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith($iter([3, 4, 5]))
+                    ->chainWith($iter([6, 7, 8, 9]))
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            ],
         ];
     }
 
@@ -461,6 +506,21 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                     [4, null, 444],
                     [5, null, null],
                 ],
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith($trav([4, 5, 6]))
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6]
+            ],
+            [
+                $trav([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith($trav([3, 4, 5]))
+                    ->chainWith($trav([6, 7, 8, 9]))
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9]
             ],
         ];
     }
