@@ -111,31 +111,31 @@ Quick Reference
 
 ##### Stream Terminal Operations
 ###### Summary Terminal Operations
-| Terminal Operation                           | Description                                                                               | Code Snippet                                 |
-|----------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------|
+| Terminal Operation                           | Description                                                                      | Code Snippet                                 |
+|----------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------|
 | [`isSorted`](#Is-Sorted-1)                   | Returns true if stream is sorted in ascending order                              | `$stream->isSorted()`                        |
 | [`isReversed`](#Is-Reversed-1)               | Returns true if stream is sorted in reverse descending order                     | `$stream->isReversed()`                      |
 | [`sameWith`](#Same-With)                     | Returns true if stream and all given collections are the same                    | `$stream->sameWith(...$iterables)`           |
 | [`sameCountWith`](#Same-Count-With)          | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`      |
 
 ###### Reduction Terminal Operations
-| Terminal Operation                           | Description                                                                               | Code Snippet                                 |
-|----------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------|
+| Terminal Operation                           | Description                                                                      | Code Snippet                                 |
+|----------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------|
 | [`toAverage`](#To-Average-1)                 | Reduces stream to the mean average of its items                                  | `$stream->toAverage()`                       |
 | [`toCount`](#To-Count-1)                     | Reduces stream to its length                                                     | `$stream->toCount()`                         |
 | [`toMax`](#To-Max-1)                         | Reduces stream to its max value                                                  | `$stream->toMax()`                           |
 | [`toMin`](#To-Min-1)                         | Reduces stream to its min value                                                  | `$stream->toMin()`                           |
 | [`toProduct`](#To-Product-1)                 | Reduces stream to the product of its items                                       | `$stream->toProduct()`                       |
 | [`toSum`](#To-Sum-1)                         | Reduces stream to the sum of its items                                           | `$stream->toSum()`                           |
-| [`toValue`](#To-Value-1)                     | Reduces stream like array_reduce() function                                      | `$stream->toValue($reducer, $initialValue )` |
+| [`toValue`](#To-Value-1)                     | Reduces stream like array_reduce() function                                      | `$stream->toValue($reducer, $initialValue)`  |
 
 ###### Side Effect Terminal Operations
 | Terminal Operation         | Description                     | Code Snippet           |
 |----------------------------|---------------------------------|------------------------|
-| [`print`](#Print)          | Print each item in the stream   | `$stream->print()`     |
-| [`printLn`](#Print-Ln)     | Print each item on a new line   | `$stream->printLn()`   |
-| [`printR`](#Print-R)       | Print_R each item               | `$stream->printR()`    |
-| [`var_dump`](#Var-Dump)    | Var_Dump each item              | `$stream->varDump()`   |
+| [`print`](#Print)          | `print` each item in the stream | `$stream->print()`     |
+| [`printLn`](#Print-Ln)     | `print` each item on a new line | `$stream->printLn()`   |
+| [`printR`](#Print-R)       | `print_r` each item             | `$stream->printR()`    |
+| [`var_dump`](#Var-Dump)    | `var_dump` each item            | `$stream->varDump()`   |
 
 Setup
 -----
