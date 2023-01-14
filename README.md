@@ -10,6 +10,8 @@ Inspired by Python—designed for PHP.
 Quick Reference
 -----------
 
+### Loop Iteration Tools
+
 #### Multi Iteration
 | Iterator                    | Description                                                                             | Code Snippet                        |
 |-----------------------------|-----------------------------------------------------------------------------------------|-------------------------------------|
@@ -78,14 +80,14 @@ Quick Reference
 | [`toSum`](#To-Sum)         | Reduce to the sum of its elements       | `Reduce::toSum($numbers)`                         |
 | [`toValue`](#To-Value)     | Reduce to value using callable reducer  | `Reduce::toValue($data, $reducer, $initialValue)` |
 
-#### Stream
-##### Stream Sources
+### Stream Iteration Tools
+#### Stream Sources
 | Source                  | Description                                     | Code Snippet                                 |
 |-------------------------|-------------------------------------------------|----------------------------------------------|
 | [`of`](#Of)             | Start a fluent stream with an iterable          | `Stream::of($iterable)`                      |
 | [`ofEmpty`](#Of-Empty)  | Start an empty fluent stream                    | `Stream::ofEmpty()`                          |
 
-##### Stream Operations
+#### Stream Operations
 | Operation                                    | Description                                                                               | Code Snippet                                 |
 |----------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------|
 | [`chain`](#Chain-1)                          | Chain additional iterators to stream                                                      | `$stream->chain($selectors)`                 |
@@ -109,8 +111,8 @@ Quick Reference
 | [`runningProduct`](#Running-Product-1)       | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`     |
 | [`runningTotal`](#Running-Total-1)           | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`       |
 
-##### Stream Terminal Operations
-###### Summary Terminal Operations
+#### Stream Terminal Operations
+##### Summary Terminal Operations
 | Terminal Operation                           | Description                                                                      | Code Snippet                                 |
 |----------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------|
 | [`isSorted`](#Is-Sorted-1)                   | Returns true if stream is sorted in ascending order                              | `$stream->isSorted()`                        |
@@ -118,7 +120,7 @@ Quick Reference
 | [`sameWith`](#Same-With)                     | Returns true if stream and all given collections are the same                    | `$stream->sameWith(...$iterables)`           |
 | [`sameCountWith`](#Same-Count-With)          | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`      |
 
-###### Reduction Terminal Operations
+##### Reduction Terminal Operations
 | Terminal Operation                           | Description                                                                      | Code Snippet                                 |
 |----------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------|
 | [`toAverage`](#To-Average-1)                 | Reduces stream to the mean average of its items                                  | `$stream->toAverage()`                       |
@@ -129,7 +131,7 @@ Quick Reference
 | [`toSum`](#To-Sum-1)                         | Reduces stream to the sum of its items                                           | `$stream->toSum()`                           |
 | [`toValue`](#To-Value-1)                     | Reduces stream like array_reduce() function                                      | `$stream->toValue($reducer, $initialValue)`  |
 
-###### Side Effect Terminal Operations
+##### Side Effect Terminal Operations
 | Terminal Operation         | Description                     | Code Snippet           |
 |----------------------------|---------------------------------|------------------------|
 | [`print`](#Print)          | `print` each item in the stream | `$stream->print()`     |
