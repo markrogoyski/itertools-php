@@ -97,6 +97,7 @@ Quick Reference
 | [`filterFalse`](#Filter-False-1)             | Filter out elements from the iterable source where the predicate function is false        | `$stream->filterFalse($predicate)`           |
 | [`groupBy`](#Group-By-1)                     | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`        |
 | [`pairwise`](#Pairwise-1)                    | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                        |
+| [`chunkwise`](#Chunkwise-1)                  | Iterate collection by chunks                                                              | `$stream->chunkwise($chunkSize)`             |
 | [`limit`](#Limit-1)                          | Limit the stream's iteration                                                              | `$stream->limit($limit)`                     |
 | [`chainWith`](#Chain-With)                   | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`          |
 | [`zipWith`](#Zip-With)                       | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`            |
@@ -291,7 +292,7 @@ Once the predicate function returns false once, all remaining elements are retur
 
 ```Single::dropWhile(iterable $data, callable $predicate)```
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $scores    = [50, 60, 70, 85, 65, 90];
 $predicate = fn ($x) => $x < 70;
@@ -309,7 +310,7 @@ If no predicate is provided, the boolean value of the data is used.
 
 ```Single::filterFalse(iterable $data, callable $predicate)```
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 $goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
@@ -327,7 +328,7 @@ If no predicate is provided, the boolean value of the data is used.
 
 ```Single::filterFalse(iterable $data, callable $predicate)```
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 $goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
@@ -345,7 +346,7 @@ The groupKeyFunction determines the key to group elements by.
 
 ```Single::groupBy(iterable $data, callable $groupKeyFunction)```
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $cartoonCharacters = [
     ['Garfield', 'cat'],
@@ -389,7 +390,7 @@ Stops even if more data available if limit reached.
 ```Single::limit(iterable $data, int $limit)```
 
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $matrixMovies = ['The Matrix', 'The Matrix Reloaded', 'The Matrix Revolutions', 'The Matrix Resurrections'];
 $limit        = 1;
@@ -408,7 +409,7 @@ Returns empty generator if given collection contains fewer than 2 elements.
 ```Single::pairwise(iterable $data)```
 
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey', 'Phoebe'];
 
@@ -426,11 +427,11 @@ Return chunks of elements from given collection.
 Chunk size must be at least 1.
 
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey'];
 
-foreach (Single::chunkwise($friends, 2) as [$leftFriend, $rightFriend]) {
+foreach (Single::chunkwise($friends, 2) as $chunk) {
     // ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
 }
 ```
@@ -474,7 +475,7 @@ Stops iteration as soon as the predicate returns false, even if other elements l
 
 ```Single::takeWhile(iterable $data, callable $predicate)```
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $prices = [0, 0, 5, 10, 0, 0, 9];
 $isFree = fn ($price) => $price == 0;
@@ -1122,7 +1123,26 @@ $result = Stream::of($input)
 foreach ($result as $item) {
     // [1, 2], [2, 3], [3, 4], [4, 5]
 }
+```
 
+### Chunkwise
+Return chunks of elements from iterable source.
+
+```$stream->chunkwise(int $chunkSize): self```
+
+Chunk size must be at least 1.
+
+```php
+use IterTools\Stream;
+
+$friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey'];
+
+$result = Stream::of($friends)
+    ->chunkwise(2);
+
+foreach ($result as $chunk) {
+    // ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
+}
 ```
 
 ### Limit

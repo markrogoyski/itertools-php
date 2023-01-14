@@ -184,6 +184,38 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                [-3, -2, -1, 0, 1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                [-3, -2, -1, 0, 1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
                     ->toArray(),
@@ -423,6 +455,38 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->pairwise()
                     ->toArray(),
                 [[-1, -2], [-2, -3]],
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                $gen([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                $gen([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
             ],
             [
                 $gen([]),
@@ -670,6 +734,38 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                $iter([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                $iter([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
                     ->toArray(),
@@ -909,6 +1005,38 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->pairwise()
                     ->toArray(),
                 [[-1, -2], [-2, -3]],
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                $trav([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                $trav([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
             ],
             [
                 $trav([]),

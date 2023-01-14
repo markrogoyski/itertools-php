@@ -179,6 +179,21 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Return chunks of elements from iterable source.
+     *
+     * Chunk size must be at least 1.
+     *
+     * @return $this
+     *
+     * @see Single::chunkwise()
+     */
+    public function chunkwise(int $chunkSize): self
+    {
+        $this->iterable = Single::chunkwise($this->iterable, $chunkSize);
+        return $this;
+    }
+
+    /**
      * Limit iteration to a max size limit
      *
      * @param int $limit
