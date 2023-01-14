@@ -566,4 +566,86 @@ class ChunkwiseTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider dataProviderForError
+     * @param iterable $data
+     * @param int $chunkSize
+     */
+    public function testError(iterable $data, int $chunkSize): void
+    {
+        // Given
+        try {
+            // When
+            foreach (Single::chunkwise($data, $chunkSize) as $_) {
+                break;
+            }
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            // Then
+            $this->assertEquals("Chunk size must be ≥ 1. Got {$chunkSize}", $e->getMessage());
+        }
+    }
+
+    public function dataProviderForError(): array
+    {
+        return [
+            [
+                [],
+                0,
+            ],
+            [
+                [],
+                -1,
+            ],
+            [
+                [1],
+                0,
+            ],
+            [
+                [1],
+                -1,
+            ],
+            [
+                [1, 2],
+                0,
+            ],
+            [
+                [1, 2, 3],
+                0,
+            ],
+            [
+                [1, 2, 3],
+                -1,
+            ],
+            [
+                [1, 2, 3],
+                -2,
+            ],
+            [
+                [1.1, 2.2, 3.3, 4.4, 5.5],
+                0,
+            ],
+            [
+                ['1', '2', '3', '4', '5'],
+                -1,
+            ],
+            [
+                [[1], [2], [3], [4], [5]],
+                -2,
+            ],
+            [
+                [true, true, false, false],
+                0,
+            ],
+            [
+                [1, 2.2, '3', [4], true, null, 'test data'],
+                -1,
+            ],
+            [
+                ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey', 'Phoebe'],
+                -2,
+            ],
+        ];
+    }
 }
