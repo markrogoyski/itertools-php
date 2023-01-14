@@ -78,9 +78,16 @@ Quick Reference
 | [`toValue`](#To-Value)     | Reduce to value using callable reducer  | `Reduce::toValue($data, $reducer, $initialValue)` |
 
 #### Stream
-| Reducer                                      | Description                                                                               | Code Snippet                                 |
+##### Stream Sources
+| Source                  | Description                                     | Code Snippet                                 |
+|-------------------------|-------------------------------------------------|----------------------------------------------|
+| [`of`](#Of)             | Start a fluent stream with an iterable          | `Stream::of($iterable)`                      |
+| [`ofEmpty`](#Of-Empty)  | Start an empty fluent stream                    | `$stream->ofEmpty($selectors)`               |
+
+##### Stream Operations
+| Operation                                    | Description                                                                               | Code Snippet                                 |
 |----------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------|
-| [`of`](#Of)                                  | Creates iterable instance with fluent interface                                           | `Stream::of($iterable)`                      |
+| [`chain`](#Chain-1)                          | Chain additional iterators to stream                                                      | `$stream->chain($selectors)`                 |
 | [`compress`](#Compress-1)                    | Compress an iterable source by filtering out data that is not selected                    | `$stream->compress($selectors)`              |
 | [`dropWhile`](#Drop-While-1)                 | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`             |
 | [`takeWhile`](#Take-While-1)                 | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`             |
@@ -99,6 +106,10 @@ Quick Reference
 | [`runningMin`](#Running-Min-1)               | Accumulate the running min over iterable source                                           | `$stream->runningMin($initialValue)`         |
 | [`runningProduct`](#Running-Product-1)       | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`     |
 | [`runningTotal`](#Running-Total-1)           | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`       |
+
+##### Stream Terminal Operations
+| Terminal Operation                           | Description                                                                               | Code Snippet                                 |
+|----------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------|
 | [`isSorted`](#Is-Sorted-1)                   | Returns true if iterable source is sorted in ascending order                              | `$stream->isSorted()`                        |
 | [`isReversed`](#Is-Reversed-1)               | Returns true if iterable source is sorted in reverse descending order                     | `$stream->isReversed()`                      |
 | [`sameWith`](#Same-With)                     | Returns true if iterable source and all given collections are the same                    | `$stream->sameWith(...$iterables)`           |
