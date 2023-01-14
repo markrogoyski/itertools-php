@@ -197,6 +197,58 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [[1, 3], [-1, -3]], // ['pos' => [1, 3], 'neg' => [-1, -3]],
             ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(0)
+                    ->toArray(),
+                [],
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(5)
+                    ->toArray(),
+                [],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6, 7],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(5)
+                    ->toArray(),
+                [1, 2, 3, 4, 5],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6, 7],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($x) => $x < 5)
+                    ->limit(2)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($x) => $x < 5)
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 4],
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(0)
+                    ->chainWith([1, 2, 3])
+                    ->toArray(),
+                [1, 2, 3],
+            ],
         ];
     }
 
@@ -387,6 +439,58 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
                     ->toArray(),
                 [[1, 3], [-1, -3]], // ['pos' => [1, 3], 'neg' => [-1, -3]],
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(0)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(5)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $gen([1, 2, 3, 4, 5, 6, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(5)
+                    ->toArray(),
+                [1, 2, 3, 4, 5],
+            ],
+            [
+                $gen([1, 2, 3, 4, 5, 6, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
+            ],
+            [
+                $gen([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($x) => $x < 5)
+                    ->limit(2)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                $gen([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($x) => $x < 5)
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 4],
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(0)
+                    ->chainWith($gen([1, 2, 3]))
+                    ->toArray(),
+                [1, 2, 3],
             ],
         ];
     }
@@ -579,6 +683,58 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [[1, 3], [-1, -3]], // ['pos' => [1, 3], 'neg' => [-1, -3]],
             ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(0)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(5)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $iter([1, 2, 3, 4, 5, 6, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(5)
+                    ->toArray(),
+                [1, 2, 3, 4, 5],
+            ],
+            [
+                $iter([1, 2, 3, 4, 5, 6, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
+            ],
+            [
+                $iter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($x) => $x < 5)
+                    ->limit(2)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                $iter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($x) => $x < 5)
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 4],
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(0)
+                    ->chainWith($iter([1, 2, 3]))
+                    ->toArray(),
+                [1, 2, 3],
+            ],
         ];
     }
 
@@ -769,6 +925,58 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
                     ->toArray(),
                 [[1, 3], [-1, -3]], // ['pos' => [1, 3], 'neg' => [-1, -3]],
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(0)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(5)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 6, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(5)
+                    ->toArray(),
+                [1, 2, 3, 4, 5],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 6, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($x) => $x < 5)
+                    ->limit(2)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($x) => $x < 5)
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 4],
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->limit(0)
+                    ->chainWith($trav([1, 2, 3]))
+                    ->toArray(),
+                [1, 2, 3],
             ],
         ];
     }

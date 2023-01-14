@@ -179,6 +179,21 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Limit iteration to a max size limit
+     *
+     * @param int $limit
+     *
+     * @return $this
+     *
+     * @see Single::limit
+     */
+    public function limit(int $limit): self
+    {
+        $this->iterable = Single::limit($this->iterable, $limit);
+        return $this;
+    }
+
+    /**
      * Chain iterable source withs given iterables together into a single iteration.
      *
      * Makes a single continuous sequence out of multiple sequences.

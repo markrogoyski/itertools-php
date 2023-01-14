@@ -96,6 +96,7 @@ Quick Reference
 | [`filterFalse`](#Filter-False-1)             | Filter out elements from the iterable source where the predicate function is false        | `$stream->filterFalse($predicate)`           |
 | [`groupBy`](#Group-By-1)                     | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`        |
 | [`pairwise`](#Pairwise-1)                    | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                        |
+| [`limit`](#Limit-1)                          | Limit the stream's iteration                                                              | `$stream->limit($limit)`                     |
 | [`chainWith`](#Chain-With)                   | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`          |
 | [`zipWith`](#Zip-With)                       | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`            |
 | [`zipLongestWith`](#Zip-Longest-With)        | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipLongestWith(...$iterables)`     |
@@ -111,17 +112,17 @@ Quick Reference
 ##### Stream Terminal Operations
 | Terminal Operation                           | Description                                                                               | Code Snippet                                 |
 |----------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------|
-| [`isSorted`](#Is-Sorted-1)                   | Returns true if iterable source is sorted in ascending order                              | `$stream->isSorted()`                        |
-| [`isReversed`](#Is-Reversed-1)               | Returns true if iterable source is sorted in reverse descending order                     | `$stream->isReversed()`                      |
-| [`sameWith`](#Same-With)                     | Returns true if iterable source and all given collections are the same                    | `$stream->sameWith(...$iterables)`           |
-| [`sameCountWith`](#Same-Count-With)          | Returns true if iterable source and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`      |
-| [`toAverage`](#To-Average-1)                 | Reduces iterable source to the mean average of its items                                  | `$stream->toAverage()`                       |
-| [`toCount`](#To-Count-1)                     | Reduces iterable source to its length                                                     | `$stream->toCount()`                         |
-| [`toMax`](#To-Max-1)                         | Reduces iterable source to its max value                                                  | `$stream->toMax()`                           |
-| [`toMin`](#To-Min-1)                         | Reduces iterable source to its min value                                                  | `$stream->toMin()`                           |
-| [`toProduct`](#To-Product-1)                 | Reduces iterable source to the product of its items                                       | `$stream->toProduct()`                       |
-| [`toSum`](#To-Sum-1)                         | Reduces iterable source to the sum of its items                                           | `$stream->toSum()`                           |
-| [`toValue`](#To-Value-1)                     | Reduces iterable source like array_reduce() function                                      | `$stream->toValue($reducer, $initialValue )` |
+| [`isSorted`](#Is-Sorted-1)                   | Returns true if stream is sorted in ascending order                              | `$stream->isSorted()`                        |
+| [`isReversed`](#Is-Reversed-1)               | Returns true if stream is sorted in reverse descending order                     | `$stream->isReversed()`                      |
+| [`sameWith`](#Same-With)                     | Returns true if stream and all given collections are the same                    | `$stream->sameWith(...$iterables)`           |
+| [`sameCountWith`](#Same-Count-With)          | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`      |
+| [`toAverage`](#To-Average-1)                 | Reduces stream to the mean average of its items                                  | `$stream->toAverage()`                       |
+| [`toCount`](#To-Count-1)                     | Reduces stream to its length                                                     | `$stream->toCount()`                         |
+| [`toMax`](#To-Max-1)                         | Reduces stream to its max value                                                  | `$stream->toMax()`                           |
+| [`toMin`](#To-Min-1)                         | Reduces stream to its min value                                                  | `$stream->toMin()`                           |
+| [`toProduct`](#To-Product-1)                 | Reduces stream to the product of its items                                       | `$stream->toProduct()`                       |
+| [`toSum`](#To-Sum-1)                         | Reduces stream to the sum of its items                                           | `$stream->toSum()`                           |
+| [`toValue`](#To-Value-1)                     | Reduces stream like array_reduce() function                                      | `$stream->toValue($reducer, $initialValue )` |
 
 Setup
 -----
