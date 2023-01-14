@@ -88,29 +88,30 @@ Quick Reference
 | [`ofEmpty`](#Of-Empty)  | Start an empty fluent stream                    | `Stream::ofEmpty()`                          |
 
 ##### Stream Operations
-| Operation                                    | Description                                                                               | Code Snippet                                 |
-|----------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------|
-| [`chain`](#Chain-1)                          | Chain additional iterators to stream                                                      | `$stream->chain($selectors)`                 |
-| [`compress`](#Compress-1)                    | Compress an iterable source by filtering out data that is not selected                    | `$stream->compress($selectors)`              |
-| [`dropWhile`](#Drop-While-1)                 | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`             |
-| [`takeWhile`](#Take-While-1)                 | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`             |
-| [`filterTrue`](#Filter-True-1)               | Filter out elements from the iterable source where there predicate function is true       | `$stream->filterTrue($predicate)`            |
-| [`filterFalse`](#Filter-False-1)             | Filter out elements from the iterable source where the predicate function is false        | `$stream->filterFalse($predicate)`           |
-| [`groupBy`](#Group-By-1)                     | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`        |
-| [`pairwise`](#Pairwise-1)                    | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                        |
-| [`chunkwise`](#Chunkwise-1)                  | Iterate collection by chunks                                                              | `$stream->chunkwise($chunkSize)`             |
-| [`limit`](#Limit-1)                          | Limit the stream's iteration                                                              | `$stream->limit($limit)`                     |
-| [`chainWith`](#Chain-With)                   | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`          |
-| [`zipWith`](#Zip-With)                       | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`            |
-| [`zipLongestWith`](#Zip-Longest-With)        | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipLongestWith(...$iterables)`     |
-| [`zipEqualWith`](#Zip-Equal-With)            | Iterate iterable source with another iterable collections of equal lengths simultaneously | `$stream->zipEqualWith(...$iterables)`       |
-| [`infiniteCycle`](#Infinite-Cycle)           | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                   |
-| [`runningAverage`](#Running-Average-1)       | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`     |
-| [`runningDifference`](#Running-Difference-1) | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`  |
-| [`runningMax`](#Running-Max-1)               | Accumulate the running max over iterable source                                           | `$stream->runningMax($initialValue)`         |
-| [`runningMin`](#Running-Min-1)               | Accumulate the running min over iterable source                                           | `$stream->runningMin($initialValue)`         |
-| [`runningProduct`](#Running-Product-1)       | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`     |
-| [`runningTotal`](#Running-Total-1)           | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`       |
+| Operation                                    | Description                                                                               | Code Snippet                                          |
+|----------------------------------------------|-------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| [`chain`](#Chain-1)                          | Chain additional iterators to stream                                                      | `$stream->chain($selectors)`                          |
+| [`compress`](#Compress-1)                    | Compress an iterable source by filtering out data that is not selected                    | `$stream->compress($selectors)`                       |
+| [`dropWhile`](#Drop-While-1)                 | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`                      |
+| [`takeWhile`](#Take-While-1)                 | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                      |
+| [`filterTrue`](#Filter-True-1)               | Filter out elements from the iterable source where there predicate function is true       | `$stream->filterTrue($predicate)`                     |
+| [`filterFalse`](#Filter-False-1)             | Filter out elements from the iterable source where the predicate function is false        | `$stream->filterFalse($predicate)`                    |
+| [`groupBy`](#Group-By-1)                     | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`                 |
+| [`pairwise`](#Pairwise-1)                    | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                                 |
+| [`chunkwise`](#Chunkwise-1)                  | Iterate collection by chunks                                                              | `$stream->chunkwise($chunkSize)`                      |
+| [`chunkwiseOverlap`](#Chunkwise-Overlap-1)   | Iterate collection by overlapped chunks                                                   | `$stream->chunkwiseOverlap($chunkSize, $overlapSize)` |
+| [`limit`](#Limit-1)                          | Limit the stream's iteration                                                              | `$stream->limit($limit)`                              |
+| [`chainWith`](#Chain-With)                   | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                   |
+| [`zipWith`](#Zip-With)                       | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`                     |
+| [`zipLongestWith`](#Zip-Longest-With)        | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipLongestWith(...$iterables)`              |
+| [`zipEqualWith`](#Zip-Equal-With)            | Iterate iterable source with another iterable collections of equal lengths simultaneously | `$stream->zipEqualWith(...$iterables)`                |
+| [`infiniteCycle`](#Infinite-Cycle)           | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                            |
+| [`runningAverage`](#Running-Average-1)       | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`              |
+| [`runningDifference`](#Running-Difference-1) | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`           |
+| [`runningMax`](#Running-Max-1)               | Accumulate the running max over iterable source                                           | `$stream->runningMax($initialValue)`                  |
+| [`runningMin`](#Running-Min-1)               | Accumulate the running min over iterable source                                           | `$stream->runningMin($initialValue)`                  |
+| [`runningProduct`](#Running-Product-1)       | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`              |
+| [`runningTotal`](#Running-Total-1)           | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`                |
 
 ##### Stream Terminal Operations
 ###### Summary Terminal Operations
@@ -1162,6 +1163,28 @@ $result = Stream::of($friends)
 
 foreach ($result as $chunk) {
     // ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
+}
+```
+
+### Chunkwise Overlap
+Return overlapped chunks of elements from iterable source.
+
+```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): self```
+
+Chunk size must be at least 1.
+
+Overlap size must be less than chunk size.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+$result = Stream::of($friends)
+    ->chunkwiseOverlap(3, 1);
+
+foreach ($result as $chunk) {
+    // [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9]
 }
 ```
 
