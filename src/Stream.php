@@ -604,6 +604,7 @@ class Stream implements \IteratorAggregate
     public function print(): void
     {
         foreach ($this->iterable as $item) {
+            /** @var string $item */
             print($item);
         }
     }
