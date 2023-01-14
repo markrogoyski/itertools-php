@@ -77,6 +77,40 @@ Quick Reference
 | [`toSum`](#To-Sum)         | Reduce to the sum of its elements       | `Reduce::toSum($numbers)`                         |
 | [`toValue`](#To-Value)     | Reduce to value using callable reducer  | `Reduce::toValue($data, $reducer, $initialValue)` |
 
+#### Stream
+| Reducer                                      | Description                                                                               | Code Snippet                                 |
+|----------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------|
+| [`of`](#Of)                                  | Creates iterable instance with fluent interface                                           | `Stream::of($iterable)`                      |
+| [`compress`](#Compress-1)                    | Compress an iterable source by filtering out data that is not selected                    | `$stream->compress($selectors)`              |
+| [`dropWhile`](#Drop-While-1)                 | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`             |
+| [`takeWhile`](#Take-While-1)                 | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`             |
+| [`filterTrue`](#Filter-True-1)               | Filter out elements from the iterable source where there predicate function is true       | `$stream->filterTrue($predicate)`            |
+| [`filterFalse`](#Filter-False-1)             | Filter out elements from the iterable source where the predicate function is false        | `$stream->filterFalse($predicate)`           |
+| [`groupBy`](#Group-By-1)                     | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`        |
+| [`pairwise`](#Pairwise-1)                    | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                        |
+| [`chainWith`](#Chain-With)                   | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`          |
+| [`zipWith`](#Zip-With)                       | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`            |
+| [`zipLongestWith`](#Zip-Longest-With)        | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipLongestWith(...$iterables)`     |
+| [`zipEqualWith`](#Zip-Equal-With)            | Iterate iterable source with another iterable collections of equal lengths simultaneously | `$stream->zipEqualWith(...$iterables)`       |
+| [`infiniteCycle`](#Infinite-Cycle)           | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                   |
+| [`runningAverage`](#Running-Average-1)       | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`     |
+| [`runningDifference`](#Running-Difference-1) | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`  |
+| [`runningMax`](#Running-Max-1)               | Accumulate the running max over iterable source                                           | `$stream->runningMax($initialValue)`         |
+| [`runningMin`](#Running-Min-1)               | Accumulate the running min over iterable source                                           | `$stream->runningMin($initialValue)`         |
+| [`runningProduct`](#Running-Product-1)       | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`     |
+| [`runningTotal`](#Running-Total-1)           | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`       |
+| [`isSorted`](#Is-Sorted-1)                   | Returns true if iterable source is sorted in ascending order                              | `$stream->isSorted()`                        |
+| [`isReversed`](#Is-Reversed-1)               | Returns true if iterable source is sorted in reverse descending order                     | `$stream->isReversed()`                      |
+| [`sameWith`](#Same-With)                     | Returns true if iterable source and all given collections are the same                    | `$stream->sameWith(...$iterables)`           |
+| [`sameCountWith`](#Same-Count-With)          | Returns true if iterable source and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`      |
+| [`toAverage`](#To-Average-1)                 | Reduces iterable source to the mean average of its items                                  | `$stream->toAverage()`                       |
+| [`toCount`](#To-Count-1)                     | Reduces iterable source to its length                                                     | `$stream->toCount()`                         |
+| [`toMax`](#To-Max-1)                         | Reduces iterable source to its max value                                                  | `$stream->toMax()`                           |
+| [`toMin`](#To-Min-1)                         | Reduces iterable source to its min value                                                  | `$stream->toMin()`                           |
+| [`toProduct`](#To-Product-1)                 | Reduces iterable source to the product of its items                                       | `$stream->toProduct()`                       |
+| [`toSum`](#To-Sum-1)                         | Reduces iterable source to the sum of its items                                           | `$stream->toSum()`                           |
+| [`toValue`](#To-Value-1)                     | Reduces iterable source like array_reduce() function                                      | `$stream->toValue($reducer, $initialValue )` |
+
 Setup
 -----
 
@@ -111,8 +145,6 @@ $ php composer.phar require markrogoyski/itertools-php:1.*
 
 #### Minimum Requirements
  * PHP 7.4
-
-
 
 Usage
 -----
@@ -864,6 +896,601 @@ $input = [1, 2, 3, 4, 5];
 $sum   = fn ($carry, $item) => $carry + $item;
 
 $result = Reduce::toValue($input, $sum, 0);
+// 15
+```
+
+## Stream
+
+### Of
+Creates iterable instance with fluent interface.
+
+```Stream::of(iterable $iterable): self```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$result = Stream::of($iterable)
+    ->chainWith(
+        [4, 5, 6],
+        [7, 8, 9]
+    )
+    ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    ->toValue(fn ($carry, $item) => $carry + array_sum($item));
+// 90
+```
+
+### Compress
+Compress an iterable source by filtering out data that is not selected.
+
+```$stream->compress(iterable $selectors): self```
+
+Selectors indicate which data. True value selects item. False value filters out data.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$result = Stream::of($input)
+    ->compress([0, 1, 1]);
+    
+foreach ($result as $item) {
+    // 2, 3
+}
+```
+
+### Drop While
+Drop elements from the iterable source while the predicate function is true.
+
+```$stream->dropWhile(callable $predicate): self```
+
+Once the predicate function returns false once, all remaining elements are returned.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5]
+
+$result = Stream::of($input)
+    ->dropWhile(fn ($value) => $value < 3);
+    
+foreach ($result as $item) {
+    // 3, 4, 5
+}
+```
+
+### Take While
+Return elements from the iterable source as long as the predicate is true.
+
+```$stream->takeWhile(callable $predicate): self```
+
+If no predicate is provided, the boolean value of the data is used.
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($input)
+    ->takeWhile(fn ($value) => abs($value) < 3);
+
+foreach ($result as $item) {
+    // 1, -1, 2, -2
+}
+```
+
+### Filter True
+Filter out elements from the iterable source only returning elements where there predicate function is true.
+
+```$stream->filterTrue(callable $predicate): self```
+
+If no predicate is provided, the boolean value of the data is used.
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($input)
+    ->filterTrue(fn ($value) => $value > 0);
+
+foreach ($result as $item) {
+    // 1, 2, 3
+}
+```
+
+### Filter False
+Filter out elements from the iterable source only returning elements where the predicate function is false.
+
+```$stream->filterFalse(callable $predicate): self```
+
+If no predicate is provided, the boolean value of the data is used.
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($input)
+    ->filterFalse(fn ($value) => $value > 0);
+
+foreach ($result as $item) {
+    // -1, -2, -3
+}
+```
+
+### Group By
+Group iterable source by a common data element.
+
+```$stream->groupBy(callable $groupKeyFunction): self```
+
+The groupKeyFunction determines the key to group elements by.
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($input)
+    ->groupBy(fn ($item) => $item > 0 ? 'positive' : 'negative');
+
+foreach ($result as $group => $item) {
+    // 'positive' => [1, 2, 3], 'negative' => [-1, -2, -3]
+}
+```
+
+### Pairwise
+Return pairs of elements from iterable source.
+
+```$stream->pairwise(): self```
+
+Returns empty generator if given collection contains less than 2 elements.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($input)
+    ->pairwise();
+
+foreach ($result as $item) {
+    // [1, 2], [2, 3], [3, 4], [4, 5]
+}
+
+```
+
+### Chain With
+Chain iterable source withs given iterables together into a single iteration.
+
+```$stream->chainWith(iterable ...$iterables): self```
+
+Makes a single continuous sequence out of multiple sequences.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$result = Stream::of($input)
+    ->chainWith([4, 5, 6])
+    ->chainWith([7, 8, 9]);
+
+foreach ($result as $item) {
+    // 1, 2, 3, 4, 5, 6, 7, 8, 9
+}
+```
+
+### Zip With
+Iterate iterable source with another iterable collections simultaneously.
+
+```$stream->zipWith(iterable ...$iterables): self```
+
+Make an iterator that aggregates items from multiple iterators.
+
+Similar to Python's zip function.
+
+For uneven lengths, iterations stops when the shortest iterable is exhausted.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$result = Stream::of($input)
+    ->zipWith([4, 5, 6])
+    ->zipWith([7, 8, 9]);
+
+foreach ($result as $item) {
+    // [1, 4, 7], [2, 5, 8], [3, 6, 9]
+}
+```
+
+### Zip Longest With
+Iterate iterable source with another iterable collections simultaneously.
+
+```$stream->zipLongestWith(iterable ...$iterables): self```
+
+Make an iterator that aggregates items from multiple iterators.
+
+Similar to Python's zip_longest function.
+
+Iteration continues until the longest iterable is exhausted.
+
+For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($input)
+    ->zipLongestWith([4, 5, 6])
+    ->zipLongestWith([7, 8, 9, 10]);
+
+foreach ($result as $item) {
+    // [1, 4, 7], [2, 5, 8], [3, 6, 9], [4, null, 10], [null, null, 5]
+}
+```
+
+### Zip Equal With
+Iterate iterable source with another iterable collections of equal lengths simultaneously.
+
+```$stream->zipEqualWith(iterable ...$iterables): self```
+
+Works like Multi::zip() method but throws \LengthException if lengths not equal,
+i.e., at least one iterator ends before the others.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$result = Stream::of($input)
+    ->zipEqualWith([4, 5, 6])
+    ->zipEqualWith([7, 8, 9]);
+
+foreach ($result as $item) {
+    // [1, 4, 7], [2, 5, 8], [3, 6, 9]
+}
+```
+
+### Infinite Cycle
+Cycle through the elements of iterable source sequentially forever.
+
+```$stream->infiniteCycle(): self```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$result = Stream::of($input)
+    ->infiniteCycle();
+
+foreach ($result as $item) {
+    // 1, 2, 3, 1, 2, 3, ...
+}
+```
+
+### Running Average
+Accumulate the running average (mean) over iterable source.
+
+```$stream->runningAverage(int|float|null $initialValue = null): self```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 3, 5];
+
+$result = Stream::of($input)
+    ->runningAverage();
+
+foreach ($result as $item) {
+    // 1, 2, 3
+}
+```
+
+### Running Difference
+Accumulate the running difference over iterable source.
+
+```$stream->runningDifference(int|float|null $initialValue = null): self```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($input)
+    ->runningDifference();
+
+foreach ($result as $item) {
+    // -1, -3, -6, -10, -15
+}
+```
+
+### Running Max
+Accumulate the running max over iterable source.
+
+```$stream->runningMax(int|float|null $initialValue = null): self```
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($input)
+    ->runningMax();
+
+foreach ($result as $item) {
+    // 1, 1, 2, 2, 3, 3
+}
+```
+
+### Running Min
+Accumulate the running min over iterable source.
+
+```$stream->runningMin(int|float|null $initialValue = null): self```
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($input)
+    ->runningMin();
+
+foreach ($result as $item) {
+    // 1, -1, -1, -2, -2, -3
+}
+```
+
+### Running Product
+Accumulate the running product over iterable source.
+
+```$stream->runningProduct(int|float|null $initialValue = null): self```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($input)
+    ->runningProduct();
+
+foreach ($result as $item) {
+    // 1, 2, 6, 24, 120
+}
+```
+
+### Running Total
+Accumulate the running total over iterable source.
+
+```$stream->runningTotal(int|float|null $initialValue = null): self```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($input)
+    ->runningTotal();
+
+foreach ($result as $item) {
+    // 1, 3, 6, 10, 15
+}
+```
+
+### Is Sorted
+Returns true if iterable source is sorted in ascending order; otherwise false.
+
+```$stream->isSorted(): bool```
+
+Items of iterable source must be comparable.
+
+Returns true if iterable source is empty or has only one element.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($input)
+    ->isSorted();
+// true
+
+$input = [1, 2, 3, 2, 1];
+
+$result = Stream::of($input)
+    ->isSorted();
+// false
+```
+
+### Is Reversed
+Returns true if iterable source is sorted in reverse descending order; otherwise false.
+
+```$stream->isReversed(): bool```
+
+Items of iterable source must be comparable.
+
+Returns true if iterable source is empty or has only one element.
+
+```php
+use IterTools\Stream;
+
+$input = [5, 4, 3, 2, 1];
+
+$result = Stream::of($input)
+    ->isReversed();
+// true
+
+$input = [1, 2, 3, 2, 1];
+
+$result = Stream::of($input)
+    ->isReversed();
+// false
+```
+
+### Same With
+Returns true if iterable source and all given collections are the same.
+
+```$stream->sameWith(iterable ...$iterables): bool```
+
+For single iterable or empty iterables list returns true.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($input)
+    ->sameWith([1, 2, 3, 4, 5]);
+// true
+
+$result = Stream::of($input)
+    ->sameWith([5, 4, 3, 2, 1]);
+// false
+```
+
+### Same Count With
+Returns true if iterable source and all given collections have the same lengths.
+
+```$stream->sameCountWith(iterable ...$iterables): bool```
+
+For single iterable or empty iterables list returns true.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($input)
+    ->sameCountWith([5, 4, 3, 2, 1]);
+// true
+
+$result = Stream::of($input)
+    ->sameCountWith([1, 2, 3]);
+// false
+```
+
+### To Average
+Reduces iterable source to the mean average of its items.
+
+```$stream->toAverage(): mixed```
+
+Returns null if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$input = [2, 4, 6, 8];
+
+$result = Stream::of($iterable)
+    ->toAverage();
+// 5
+```
+
+### To Count
+Reduces iterable source to its length.
+
+```$stream->toCount(): mixed```
+
+```php
+use IterTools\Stream;
+
+$input = [10, 20, 30, 40, 50];
+
+$result = Stream::of($iterable)
+    ->toCount();
+// 5
+```
+
+### To Max
+Reduces iterable source to its max value.
+
+```$stream->toMax(): mixed```
+
+Items of iterable source must be comparable.
+
+Returns null if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($iterable)
+    ->toMax();
+// 3
+```
+
+### To Min
+Reduces iterable source to its min value.
+
+```$stream->toMin(): mixed```
+
+Items of iterable source must be comparable.
+
+Returns null if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($iterable)
+    ->toMin();
+// -3
+```
+
+### To Product
+Reduces iterable source to the product of its items.
+
+```$stream->toProduct(): mixed```
+
+Returns null if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($iterable)
+    ->toProduct();
+// 120
+```
+
+### To Sum
+Reduces iterable source to the sum of its items.
+
+```$stream->toSum(): mixed```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($iterable)
+    ->toSum();
+// 15
+```
+
+### To Value
+Reduces iterable source like array_reduce() function.
+
+But unlike array_reduce(), it works with all iterable types.
+
+```$stream->toValue(callable $reducer, mixed $initialValue): mixed```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($iterable)
+    ->toValue(fn ($carry, $item) => $carry + $item);
 // 15
 ```
 
