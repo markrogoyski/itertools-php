@@ -39,6 +39,20 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($array);
     }
 
+    public function testStreamOfEmptyAllowsContinuation(): void
+    {
+        // Given
+        $stream   = Stream::ofEmpty();
+        $expected = [5, 5, 10];
+
+        // When
+        $array = $stream->chainWith([5, 5, 10])
+            ->toArray();
+
+        // Then
+        $this->assertEquals($expected, $array);
+    }
+
     /**
      * @test stream of data count
      * @dataProvider dataProviderForSourceCounts
