@@ -557,6 +557,56 @@ class Stream implements \IteratorAggregate
         return Reduce::toValue($this->iterable, $reducer, $initialValue);
     }
 
+    // TERMINAL OPERATIONS WITH SIDE EFFECTS - PRINT
+
+    /**
+     * Print each item in the stream
+     *
+     * @return void
+     */
+    public function print(): void
+    {
+        foreach ($this->iterable as $item) {
+            print($item);
+        }
+    }
+
+    /**
+     * Print each item in the stream on a new line
+     *
+     * @return void
+     */
+    public function printLn(): void
+    {
+        foreach ($this->iterable as $item) {
+            print($item . \PHP_EOL);
+        }
+    }
+
+    /**
+     * Print_R each item in the stream
+     *
+     * @return void
+     */
+    public function printR(): void
+    {
+        foreach ($this->iterable as $item) {
+            \print_r($item);
+        }
+    }
+
+    /**
+     * Var_Dump each item in the stream
+     *
+     * @return void
+     */
+    public function varDump(): void
+    {
+        foreach ($this->iterable as $item) {
+            \var_dump($item);
+        }
+    }
+
     /**
      * {@inheritDoc}
      *

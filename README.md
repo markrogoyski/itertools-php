@@ -110,12 +110,17 @@ Quick Reference
 | [`runningTotal`](#Running-Total-1)           | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`       |
 
 ##### Stream Terminal Operations
+###### Summary Terminal Operations
 | Terminal Operation                           | Description                                                                               | Code Snippet                                 |
 |----------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------|
 | [`isSorted`](#Is-Sorted-1)                   | Returns true if stream is sorted in ascending order                              | `$stream->isSorted()`                        |
 | [`isReversed`](#Is-Reversed-1)               | Returns true if stream is sorted in reverse descending order                     | `$stream->isReversed()`                      |
 | [`sameWith`](#Same-With)                     | Returns true if stream and all given collections are the same                    | `$stream->sameWith(...$iterables)`           |
 | [`sameCountWith`](#Same-Count-With)          | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`      |
+
+###### Reduction Terminal Operations
+| Terminal Operation                           | Description                                                                               | Code Snippet                                 |
+|----------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------|
 | [`toAverage`](#To-Average-1)                 | Reduces stream to the mean average of its items                                  | `$stream->toAverage()`                       |
 | [`toCount`](#To-Count-1)                     | Reduces stream to its length                                                     | `$stream->toCount()`                         |
 | [`toMax`](#To-Max-1)                         | Reduces stream to its max value                                                  | `$stream->toMax()`                           |
@@ -123,6 +128,14 @@ Quick Reference
 | [`toProduct`](#To-Product-1)                 | Reduces stream to the product of its items                                       | `$stream->toProduct()`                       |
 | [`toSum`](#To-Sum-1)                         | Reduces stream to the sum of its items                                           | `$stream->toSum()`                           |
 | [`toValue`](#To-Value-1)                     | Reduces stream like array_reduce() function                                      | `$stream->toValue($reducer, $initialValue )` |
+
+###### Side Effect Terminal Operations
+| Terminal Operation         | Description                     | Code Snippet           |
+|----------------------------|---------------------------------|------------------------|
+| [`print`](#Print)          | Print each item in the stream   | `$stream->print()`     |
+| [`printLn`](#Print-Ln)     | Print each item on a new line   | `$stream->printLn()`   |
+| [`printR`](#Print-R)       | Print_R each item               | `$stream->printR()`    |
+| [`var_dump`](#Var-Dump)    | Var_Dump each item              | `$stream->varDump()`   |
 
 Setup
 -----
