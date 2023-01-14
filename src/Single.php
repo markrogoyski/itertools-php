@@ -234,6 +234,47 @@ class Single
     }
 
     /**
+     * Return chunks of elements from given collection.
+     *
+     * Chunk size must be at least 1.
+     *
+     * @template T
+     * @param iterable<T> $data
+     * @param int $chunkSize
+     * @param int $overlapSize
+     *
+     * @return \Generator<array<T>>
+     */
+    public static function chunkwiseOverlap(iterable $data, int $chunkSize, int $overlapSize): \Generator
+    {
+        if ($chunkSize < 1) {
+            throw new \InvalidArgumentException("Chunk size must be ≥ 1. Got {$chunkSize}");
+        }
+
+        if ($overlapSize >= $chunkSize) {
+            throw new \InvalidArgumentException("Overlap size must be less than chunk size");
+        }
+
+        $chunk = [];
+        $isLastIterationYielded = false;
+
+        foreach ($data as $datum) {
+            $isLastIterationYielded = false;
+            $chunk[] = $datum;
+
+            if (count($chunk) === $chunkSize) {
+                yield $chunk;
+                $chunk = array_slice($chunk, $chunkSize-$overlapSize);
+                $isLastIterationYielded = true;
+            }
+        }
+
+        if (!$isLastIterationYielded && count($chunk) > 0) {
+            yield $chunk;
+        }
+    }
+
+    /**
      * Limit iteration to a max size limit
      *
      * @param iterable<mixed> $data
