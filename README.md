@@ -141,12 +141,12 @@ Quick Reference
 | [`toValue`](#To-Value-1)                     | Reduces stream like array_reduce() function                                      | `$stream->toValue($reducer, $initialValue)`  |
 
 ##### Side Effect Terminal Operations
-| Terminal Operation         | Description                     | Code Snippet           |
-|----------------------------|---------------------------------|------------------------|
-| [`print`](#Print)          | `print` each item in the stream | `$stream->print()`     |
-| [`printLn`](#Print-Ln)     | `print` each item on a new line | `$stream->printLn()`   |
-| [`printR`](#Print-R)       | `print_r` each item             | `$stream->printR()`    |
-| [`var_dump`](#Var-Dump)    | `var_dump` each item            | `$stream->varDump()`   |
+| Terminal Operation         | Description                     | Code Snippet            |
+|----------------------------|---------------------------------|-------------------------|
+| [`print`](#Print)          | `print` each item in the stream | `$stream->print($glue)` |
+| [`printLn`](#Print-Ln)     | `print` each item on a new line | `$stream->printLn()`    |
+| [`printR`](#Print-R)       | `print_r` each item             | `$stream->printR()`     |
+| [`var_dump`](#Var-Dump)    | `var_dump` each item            | `$stream->varDump()`    |
 
 Setup
 -----

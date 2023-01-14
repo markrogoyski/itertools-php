@@ -677,11 +677,21 @@ class Stream implements \IteratorAggregate
     /**
      * Print each item in the stream
      *
+     * @param string|null $glue
+     *
      * @return void
      */
-    public function print(): void
+    public function print(?string $glue = null): void
     {
+        $isFirstIteration = true;
+
         foreach ($this->iterable as $item) {
+            if ($isFirstIteration) {
+                $isFirstIteration = false;
+            } elseif ($glue !== null) {
+                print($glue);
+            }
+
             // @phpstan-ignore-next-line
             print($item);
         }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace IterTools\Tests\Stream;
 
 use IterTools\Stream;
-use IterTools\Tests\Fixture;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -19,7 +18,7 @@ class PrintTest extends \PHPUnit\Framework\TestCase
      * @dataProvider dataProviderForPrintIterator
      * @dataProvider dataProviderForPrintTraversable
      */
-    public function testPrint(iterable $data, string $expectedOutput): void
+    public function testPrint(iterable $data, ?string $glue, string $expectedOutput): void
     {
         // Given
         $stream = Stream::of($data);
@@ -28,7 +27,7 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         $this->expectOutputString($expectedOutput);
 
         // When
-        $stream->print();
+        $stream->print($glue);
     }
 
     public function dataProviderForPrintArray(): array
@@ -36,23 +35,53 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [],
+                null,
+                '',
+            ],
+            [
+                [],
+                ', ',
                 '',
             ],
             [
                 [1],
+                null,
+                '1',
+            ],
+            [
+                [1],
+                ', ',
                 '1',
             ],
             [
                 [1, 2, 3],
+                null,
                 '123',
             ],
             [
+                [1, 2, 3],
+                ', ',
+                '1, 2, 3',
+            ],
+            [
                 ['first', 'second', 'third'],
+                null,
                 'firstsecondthird',
             ],
             [
+                ['first', 'second', 'third'],
+                ', ',
+                'first, second, third',
+            ],
+            [
                 ['日本語', 'English', 'Español'],
+                null,
                 '日本語EnglishEspañol',
+            ],
+            [
+                ['日本語', 'English', 'Español'],
+                ', ',
+                '日本語, English, Español',
             ],
         ];
     }
@@ -64,23 +93,53 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $gen([]),
+                null,
+                '',
+            ],
+            [
+                $gen([]),
+                ', ',
                 '',
             ],
             [
                 $gen([1]),
+                null,
+                '1',
+            ],
+            [
+                $gen([1]),
+                ', ',
                 '1',
             ],
             [
                 $gen([1, 2, 3]),
+                null,
                 '123',
             ],
             [
+                $gen([1, 2, 3]),
+                ', ',
+                '1, 2, 3',
+            ],
+            [
                 $gen(['first', 'second', 'third']),
+                null,
                 'firstsecondthird',
             ],
             [
+                $gen(['first', 'second', 'third']),
+                ', ',
+                'first, second, third',
+            ],
+            [
                 $gen(['日本語', 'English', 'Español']),
+                null,
                 '日本語EnglishEspañol',
+            ],
+            [
+                $gen(['日本語', 'English', 'Español']),
+                ', ',
+                '日本語, English, Español',
             ],
         ];
     }
@@ -92,23 +151,53 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $iter([]),
+                null,
+                '',
+            ],
+            [
+                $iter([]),
+                ', ',
                 '',
             ],
             [
                 $iter([1]),
+                null,
+                '1',
+            ],
+            [
+                $iter([1]),
+                ', ',
                 '1',
             ],
             [
                 $iter([1, 2, 3]),
+                null,
                 '123',
             ],
             [
+                $iter([1, 2, 3]),
+                ', ',
+                '1, 2, 3',
+            ],
+            [
                 $iter(['first', 'second', 'third']),
+                null,
                 'firstsecondthird',
             ],
             [
+                $iter(['first', 'second', 'third']),
+                ', ',
+                'first, second, third',
+            ],
+            [
                 $iter(['日本語', 'English', 'Español']),
+                null,
                 '日本語EnglishEspañol',
+            ],
+            [
+                $iter(['日本語', 'English', 'Español']),
+                ', ',
+                '日本語, English, Español',
             ],
         ];
     }
@@ -120,23 +209,53 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $trav([]),
+                null,
+                '',
+            ],
+            [
+                $trav([]),
+                ', ',
                 '',
             ],
             [
                 $trav([1]),
+                null,
+                '1',
+            ],
+            [
+                $trav([1]),
+                ', ',
                 '1',
             ],
             [
                 $trav([1, 2, 3]),
+                null,
                 '123',
             ],
             [
+                $trav([1, 2, 3]),
+                ', ',
+                '1, 2, 3',
+            ],
+            [
                 $trav(['first', 'second', 'third']),
+                null,
                 'firstsecondthird',
             ],
             [
+                $trav(['first', 'second', 'third']),
+                ', ',
+                'first, second, third',
+            ],
+            [
                 $trav(['日本語', 'English', 'Español']),
+                null,
                 '日本語EnglishEspañol',
+            ],
+            [
+                $trav(['日本語', 'English', 'Español']),
+                ', ',
+                '日本語, English, Español',
             ],
         ];
     }
