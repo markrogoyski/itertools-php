@@ -30,6 +30,11 @@ class Stream implements \IteratorAggregate
         return new self($iterable);
     }
 
+    public static function ofEmpty(): self
+    {
+        return new self([]);
+    }
+
     /**
      * Converts iterable source to array.
      *
