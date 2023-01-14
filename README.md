@@ -26,6 +26,7 @@ Quick Reference
 | [`filterFalse`](#Filter-False)   | Filter out elements where predicate not false   | `Single::filterFalse($data, $predicate)`    |
 | [`filterTrue`](#Filter-True)     | Filter out elements where predicate not true    | `Single::filterTrue($data, $predicate)`     |
 | [`groupBy`](#Group-By)           | Group data by a common element                  | `Single::groupBy($data, $groupKeyFunction)` |
+| [`limit`](#Limit)                | Iterate up to a limit                           | `Single::limit($data, $limit)`              |
 | [`pairwise`](#Pairwise)          | Iterate successive overlapping pairs            | `Single::pairwise($data)`                   |
 | [`repeat`](#Repeat)              | Repeat an item                                  | `Single::repeat($item, $repetitions)`       |
 | [`string`](#String)              | Iterate the characters of a string              | `Single::string($string)`                   |
@@ -363,6 +364,25 @@ foreach (Single::groupBy($cartoonCharacters, fn ($x) => $x[1]) as $animal => $ch
     ['Donald', 'duck'],
     ['Daffy', 'duck'],
 */
+```
+
+### Limit
+Iterate up to a limit.
+
+Stops even if more data available if limit reached.
+
+```Single::limit(iterable $data, int $limit)```
+
+```php
+Use IterTools\Single;
+
+$matrixMovies = ['The Matrix', 'The Matrix Reloaded', 'The Matrix Revolutions', 'The Matrix Resurrections'];
+$limit        = 1;
+
+foreach (Single::limit($matrixMovies, $limit) as $goodMovie) {
+    print($goodMovie);
+}
+// 'The Matrix' (and nothing else)
 ```
 
 ### Pairwise

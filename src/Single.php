@@ -199,4 +199,29 @@ class Single
             $prevDatum = $datum;
         }
     }
+
+    /**
+     * Limit iteration to a max size limit
+     *
+     * @param iterable $data
+     * @param int      $limit ≥ 0, max count of iteration
+     *
+     * @return \Generator<mixed>
+     */
+    public static function limit(iterable $data, int $limit): \Generator
+    {
+        if ($limit < 0) {
+            throw new \InvalidArgumentException("Limit must be ≥ 0. Got $limit");
+        }
+
+        $i = 0;
+        foreach ($data as $datum) {
+            if ($i >= $limit) {
+                return;
+            }
+            yield $datum;
+            $i++;
+        }
+
+    }
 }
