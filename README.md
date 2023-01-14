@@ -1094,6 +1094,25 @@ foreach ($result as $item) {
 
 ```
 
+### Limit
+Stream up to a limit.
+
+Stops even if more data available if limit reached.
+
+```$stream->limit(int $limit)```
+
+```php
+Use IterTools\Single;
+
+$matrixMovies = ['The Matrix', 'The Matrix Reloaded', 'The Matrix Revolutions', 'The Matrix Resurrections'];
+$limit        = 1;
+
+$goodMovies = Stream::of($matrixMovies)
+    ->limit($limit)
+    ->toArray();
+// 'The Matrix' (and nothing else)
+```
+
 ### Chain With
 Chain iterable source withs given iterables together into a single iteration.
 
