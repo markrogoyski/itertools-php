@@ -82,7 +82,7 @@ Quick Reference
 | Source                  | Description                                     | Code Snippet                                 |
 |-------------------------|-------------------------------------------------|----------------------------------------------|
 | [`of`](#Of)             | Start a fluent stream with an iterable          | `Stream::of($iterable)`                      |
-| [`ofEmpty`](#Of-Empty)  | Start an empty fluent stream                    | `$stream->ofEmpty($selectors)`               |
+| [`ofEmpty`](#Of-Empty)  | Start an empty fluent stream                    | `Stream::ofEmpty($selectors)`                |
 
 ##### Stream Operations
 | Operation                                    | Description                                                                               | Code Snippet                                 |
