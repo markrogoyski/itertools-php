@@ -272,4 +272,22 @@ class LimitTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test invalid limit
+     */
+    public function testInvalidLimit(): void
+    {
+        // Given
+        $data         = [1, 2, 3];
+        $invalidLimit = -1;
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        foreach (Single::limit($data, $invalidLimit) as $_) {
+            break;
+        }
+    }
 }

@@ -203,8 +203,8 @@ class Single
     /**
      * Limit iteration to a max size limit
      *
-     * @param iterable $data
-     * @param int      $limit ≥ 0, max count of iteration
+     * @param iterable<mixed> $data
+     * @param int             $limit ≥ 0, max count of iteration
      *
      * @return \Generator<mixed>
      */
@@ -222,6 +222,5 @@ class Single
             yield $datum;
             $i++;
         }
-
     }
 }

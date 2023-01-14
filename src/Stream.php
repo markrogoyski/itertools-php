@@ -19,6 +19,16 @@ class Stream implements \IteratorAggregate
     protected iterable $iterable;
 
     /**
+     * @param iterable<mixed> $iterable
+     */
+    private function __construct(iterable $iterable)
+    {
+        $this->iterable = $iterable;
+    }
+
+    // STREAM SOURCES
+
+    /**
      * Creates iterable instance with fluent interface.
      *
      * @param iterable<mixed> $iterable
@@ -48,6 +58,8 @@ class Stream implements \IteratorAggregate
         }
         return $result;
     }
+
+    // STREAM OPERATIONS
 
     /**
      * Compress an iterable source by filtering out data that is not selected.
@@ -357,6 +369,8 @@ class Stream implements \IteratorAggregate
         return $this;
     }
 
+    // STREAM TERMINAL OPERATIONS
+
     /**
      * Returns true if iterable source is sorted in ascending order; otherwise false.
      *
@@ -526,16 +540,6 @@ class Stream implements \IteratorAggregate
     public function toValue(callable $reducer, $initialValue = null)
     {
         return Reduce::toValue($this->iterable, $reducer, $initialValue);
-    }
-
-    /**
-     * Chain constructor.
-     *
-     * @param iterable<mixed> $iterable
-     */
-    protected function __construct(iterable $iterable)
-    {
-        $this->iterable = $iterable;
     }
 
     /**

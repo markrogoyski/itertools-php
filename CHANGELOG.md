@@ -1,5 +1,13 @@
 # IterTools PHP Change Log
 
+## v1.2.0 - TBD
+* Single
+  * `limit`
+* Summary
+  * `exactlyN`
+* Streams
+
+
 ## v1.1.0 - 2023-01-10
 
 ### New Features
