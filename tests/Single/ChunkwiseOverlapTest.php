@@ -329,6 +329,12 @@ class ChunkwiseOverlapTest extends \PHPUnit\Framework\TestCase
                 1,
                 [['Ross', 'Rachel'], ['Rachel', 'Chandler'], ['Chandler', 'Monica'], ['Monica', 'Joey'], ['Joey', 'Phoebe']],
             ],
+            [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                3,
+                1,
+                [[1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9], [9, 10]],
+            ],
         ];
     }
 

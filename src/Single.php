@@ -213,9 +213,11 @@ class Single
     }
 
     /**
-     * Return chunks of elements from given collection.
+     * Return overlapped chunks of elements from given collection.
      *
      * Chunk size must be at least 1.
+     *
+     * Overlap size must be less than chunk size.
      *
      * @template T
      * @param iterable<T> $data
