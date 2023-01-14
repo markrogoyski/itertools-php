@@ -12,17 +12,16 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class ReduceTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param array $input
-     * @param callable $reducer
-     * @param mixed $expected
+     * @param array    $input
+     * @param callable $reducingStreamFactoryFunc
+     * @param mixed    $expected
      * @return void
      * @dataProvider dataProviderForArray
      */
-    public function testArray(array $input, callable $reducer, $expected): void
+    public function testArray(array $input, callable $reducingStreamFactoryFunc, $expected): void
     {
-        // Given
         // When
-        $result = $reducer($input);
+        $result = $reducingStreamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -447,16 +446,15 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Generator $input
-     * @param callable $reducer
-     * @param mixed $expected
+     * @param callable   $reducingStreamFactoryFunc
+     * @param mixed      $expected
      * @return void
      * @dataProvider dataProviderForGenerator
      */
-    public function testGenerator(\Generator $input, callable $reducer, $expected): void
+    public function testGenerator(\Generator $input, callable $reducingStreamFactoryFunc, $expected): void
     {
-        // Given
         // When
-        $result = $reducer($input);
+        $result = $reducingStreamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -883,16 +881,15 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Iterator $input
-     * @param callable $reducer
-     * @param mixed $expected
+     * @param callable  $reducingStreamFactoryFunc
+     * @param mixed     $expected
      * @return void
      * @dataProvider dataProviderForIterator
      */
-    public function testIterator(\Iterator $input, callable $reducer, $expected): void
+    public function testIterator(\Iterator $input, callable $reducingStreamFactoryFunc, $expected): void
     {
-        // Given
         // When
-        $result = $reducer($input);
+        $result = $reducingStreamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -1319,16 +1316,15 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Traversable $input
-     * @param callable $reducer
-     * @param mixed $expected
+     * @param callable     $reducingStreamFactoryFunc
+     * @param mixed        $expected
      * @return void
      * @dataProvider dataProviderForTraversable
      */
-    public function testTraversable(\Traversable $input, callable $reducer, $expected): void
+    public function testTraversable(\Traversable $input, callable $reducingStreamFactoryFunc, $expected): void
     {
-        // Given
         // When
-        $result = $reducer($input);
+        $result = $reducingStreamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);

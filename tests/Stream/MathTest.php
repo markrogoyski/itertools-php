@@ -12,17 +12,16 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class MathTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param array $input
-     * @param callable $chainMaker
-     * @param array $expected
+     * @param array    $input
+     * @param callable $streamFactoryFunc
+     * @param array    $expected
      * @return void
      * @dataProvider dataProviderForArray
      */
-    public function testArray(array $input, callable $chainMaker, array $expected): void
+    public function testArray(array $input, callable $streamFactoryFunc, array $expected): void
     {
         // Given
-        // When
-        $result = $chainMaker($input);
+        $result = $streamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -168,16 +167,15 @@ class MathTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Generator $input
-     * @param callable $chainMaker
-     * @param array $expected
+     * @param callable   $streamFactoryFunc
+     * @param array      $expected
      * @return void
      * @dataProvider dataProviderForGenerator
      */
-    public function testGenerator(\Generator $input, callable $chainMaker, array $expected): void
+    public function testGenerator(\Generator $input, callable $streamFactoryFunc, array $expected): void
     {
-        // Given
         // When
-        $result = $chainMaker($input);
+        $result = $streamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -325,16 +323,16 @@ class MathTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Iterator $input
-     * @param callable $chainMaker
-     * @param array $expected
+     * @param callable  $streamFactoryFunc
+     * @param array     $expected
      * @return void
      * @dataProvider dataProviderForIterator
      */
-    public function testIterator(\Iterator $input, callable $chainMaker, array $expected): void
+    public function testIterator(\Iterator $input, callable $streamFactoryFunc, array $expected): void
     {
         // Given
         // When
-        $result = $chainMaker($input);
+        $result = $streamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -482,16 +480,15 @@ class MathTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Traversable $input
-     * @param callable $chainMaker
-     * @param array $expected
+     * @param callable     $streamFactoryFunc
+     * @param array        $expected
      * @return void
      * @dataProvider dataProviderForTraversable
      */
-    public function testTraversable(\Traversable $input, callable $chainMaker, array $expected): void
+    public function testTraversable(\Traversable $input, callable $streamFactoryFunc, array $expected): void
     {
-        // Given
         // When
-        $result = $chainMaker($input);
+        $result = $streamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);

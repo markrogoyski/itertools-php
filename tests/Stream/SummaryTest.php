@@ -12,16 +12,15 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class SummaryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param array $input
-     * @param callable $reducer
+     * @param array    $input
+     * @param callable $summaryStreamFactoryFunc
      * @return void
      * @dataProvider dataProviderForArrayTrue
      */
-    public function testArrayTrue(array $input, callable $reducer): void
+    public function testArrayTrue(array $input, callable $summaryStreamFactoryFunc): void
     {
-        // Given
         // When
-        $result = $reducer($input);
+        $result = $summaryStreamFactoryFunc($input);
 
         // Then
         $this->assertTrue($result);
@@ -98,16 +97,16 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $input
-     * @param callable $reducer
+     * @param array    $input
+     * @param callable $summaryStreamFactoryFunc
      * @return void
      * @dataProvider dataProviderForArrayFalse
      */
-    public function testArrayFalse(array $input, callable $reducer): void
+    public function testArrayFalse(array $input, callable $summaryStreamFactoryFunc): void
     {
         // Given
         // When
-        $result = $reducer($input);
+        $result = $summaryStreamFactoryFunc($input);
 
         // Then
         $this->assertFalse($result);
@@ -161,15 +160,14 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Generator $input
-     * @param callable $reducer
+     * @param callable   $summaryStreamFactoryFunc
      * @return void
      * @dataProvider dataProviderForGeneratorTrue
      */
-    public function testGeneratorTrue(\Generator $input, callable $reducer): void
+    public function testGeneratorTrue(\Generator $input, callable $summaryStreamFactoryFunc): void
     {
-        // Given
         // When
-        $result = $reducer($input);
+        $result = $summaryStreamFactoryFunc($input);
 
         // Then
         $this->assertTrue($result);
@@ -249,15 +247,14 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Generator $input
-     * @param callable $reducer
+     * @param callable   $summaryStreamFactoryFunc
      * @return void
      * @dataProvider dataProviderForGeneratorFalse
      */
-    public function testGeneratorFalse(\Generator $input, callable $reducer): void
+    public function testGeneratorFalse(\Generator $input, callable $summaryStreamFactoryFunc): void
     {
-        // Given
         // When
-        $result = $reducer($input);
+        $result = $summaryStreamFactoryFunc($input);
 
         // Then
         $this->assertFalse($result);
@@ -313,15 +310,14 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Iterator $input
-     * @param callable $reducer
+     * @param callable  $summaryStreamFactoryFunc
      * @return void
      * @dataProvider dataProviderForIteratorTrue
      */
-    public function testIteratorTrue(\Iterator $input, callable $reducer): void
+    public function testIteratorTrue(\Iterator $input, callable $summaryStreamFactoryFunc): void
     {
-        // Given
         // When
-        $result = $reducer($input);
+        $result = $summaryStreamFactoryFunc($input);
 
         // Then
         $this->assertTrue($result);
@@ -401,15 +397,14 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Iterator $input
-     * @param callable $reducer
+     * @param callable  $summaryStreamFactoryFunc
      * @return void
      * @dataProvider dataProviderForIteratorFalse
      */
-    public function testIteratorFalse(\Iterator $input, callable $reducer): void
+    public function testIteratorFalse(\Iterator $input, callable $summaryStreamFactoryFunc): void
     {
-        // Given
         // When
-        $result = $reducer($input);
+        $result = $summaryStreamFactoryFunc($input);
 
         // Then
         $this->assertFalse($result);
@@ -465,15 +460,14 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Traversable $input
-     * @param callable $reducer
+     * @param callable     $summaryStreamFactoryFunc
      * @return void
      * @dataProvider dataProviderForTraversableTrue
      */
-    public function testTraversableTrue(\Traversable $input, callable $reducer): void
+    public function testTraversableTrue(\Traversable $input, callable $summaryStreamFactoryFunc): void
     {
-        // Given
         // When
-        $result = $reducer($input);
+        $result = $summaryStreamFactoryFunc($input);
 
         // Then
         $this->assertTrue($result);
@@ -553,15 +547,14 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Traversable $input
-     * @param callable $reducer
+     * @param callable     $summaryStreamFactoryFunc
      * @return void
      * @dataProvider dataProviderForTraversableFalse
      */
-    public function testTraversableFalse(\Traversable $input, callable $reducer): void
+    public function testTraversableFalse(\Traversable $input, callable $summaryStreamFactoryFunc): void
     {
-        // Given
         // When
-        $result = $reducer($input);
+        $result = $summaryStreamFactoryFunc($input);
 
         // Then
         $this->assertFalse($result);

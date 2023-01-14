@@ -12,16 +12,16 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class SingleTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param array $input
-     * @param callable $chainMaker
-     * @param array $expected
+     * @param array    $input
+     * @param callable $streamFactoryFunc
+     * @param array    $expected
      * @return void
      * @dataProvider dataProviderForArray
      */
-    public function testArray(array $input, callable $chainMaker, array $expected): void
+    public function testArray(array $input, callable $streamFactoryFunc, array $expected): void
     {
         // Given
-        $result = $chainMaker($input);
+        $result = $streamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -33,41 +33,41 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [1, -1, 2, -2, 3, -3],
             ],
             [
                 [],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
-                [],
-            ],
-            [
-                [1, -1, 2, -2, 3, -3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
+                    ->toArray(),
+                [],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [1, -1, 2, -2],
             ],
             [
@@ -75,7 +75,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1, 0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -83,7 +83,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1, 0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-1, -2],
             ],
             [
@@ -91,7 +91,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->dropWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -99,7 +99,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->dropWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-3],
             ],
             [
@@ -107,7 +107,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -115,7 +115,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [2, 3],
             ],
             [
@@ -123,7 +123,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -131,7 +131,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [2, 3],
             ],
             [
@@ -139,14 +139,14 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-1, -2, -3],
             ],
             [
@@ -154,7 +154,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -162,7 +162,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [[1, 2], [2, 3]],
             ],
             [
@@ -170,7 +170,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -178,7 +178,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [[-1, -2], [-2, -3]],
             ],
             [
@@ -186,7 +186,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -194,23 +194,23 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
-                    ->toAssociativeArray(),
-                ['pos' => [1, 3], 'neg' => [-1, -3]],
+                    ->toArray(),
+                [[1, 3], [-1, -3]], // ['pos' => [1, 3], 'neg' => [-1, -3]],
             ],
         ];
     }
 
     /**
      * @param \Generator $input
-     * @param callable $chainMaker
-     * @param array $expected
+     * @param callable   $streamFactoryFunc
+     * @param array      $expected
      * @return void
      * @dataProvider dataProviderForGenerator
      */
-    public function testGenerator(\Generator $input, callable $chainMaker, array $expected): void
+    public function testGenerator(\Generator $input, callable $streamFactoryFunc, array $expected): void
     {
         // Given
-        $result = $chainMaker($input);
+        $result = $streamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -224,41 +224,41 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [1, -1, 2, -2, 3, -3],
             ],
             [
                 $gen([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 $gen([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [1, -1, 2, -2],
             ],
             [
@@ -266,7 +266,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1, 0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -274,7 +274,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1, 0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-1, -2],
             ],
             [
@@ -282,7 +282,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->dropWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -290,7 +290,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->dropWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-3],
             ],
             [
@@ -298,7 +298,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -306,7 +306,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [2, 3],
             ],
             [
@@ -314,7 +314,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -322,7 +322,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [2, 3],
             ],
             [
@@ -330,14 +330,14 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-1, -2, -3],
             ],
             [
@@ -345,7 +345,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -353,7 +353,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [[1, 2], [2, 3]],
             ],
             [
@@ -361,7 +361,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -369,7 +369,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [[-1, -2], [-2, -3]],
             ],
             [
@@ -377,7 +377,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -385,23 +385,23 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
-                    ->toAssociativeArray(),
-                ['pos' => [1, 3], 'neg' => [-1, -3]],
+                    ->toArray(),
+                [[1, 3], [-1, -3]], // ['pos' => [1, 3], 'neg' => [-1, -3]],
             ],
         ];
     }
 
     /**
      * @param \Iterator $input
-     * @param callable $chainMaker
-     * @param array $expected
+     * @param callable  $streamFactoryFunc
+     * @param array     $expected
      * @return void
      * @dataProvider dataProviderForIterator
      */
-    public function testIterator(\Iterator $input, callable $chainMaker, array $expected): void
+    public function testIterator(\Iterator $input, callable $streamFactoryFunc, array $expected): void
     {
         // Given
-        $result = $chainMaker($input);
+        $result = $streamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -415,41 +415,41 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [1, -1, 2, -2, 3, -3],
             ],
             [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [1, -1, 2, -2],
             ],
             [
@@ -457,7 +457,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1, 0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -465,7 +465,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1, 0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-1, -2],
             ],
             [
@@ -473,7 +473,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->dropWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -481,7 +481,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->dropWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-3],
             ],
             [
@@ -489,7 +489,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -497,7 +497,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [2, 3],
             ],
             [
@@ -505,7 +505,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -513,7 +513,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [2, 3],
             ],
             [
@@ -521,14 +521,14 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-1, -2, -3],
             ],
             [
@@ -536,7 +536,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -544,7 +544,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [[1, 2], [2, 3]],
             ],
             [
@@ -552,7 +552,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -560,7 +560,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [[-1, -2], [-2, -3]],
             ],
             [
@@ -568,7 +568,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -576,24 +576,23 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
-                    ->toAssociativeArray(),
-                ['pos' => [1, 3], 'neg' => [-1, -3]],
+                    ->toArray(),
+                [[1, 3], [-1, -3]], // ['pos' => [1, 3], 'neg' => [-1, -3]],
             ],
         ];
     }
 
     /**
      * @param \Traversable $input
-     * @param callable $chainMaker
-     * @param array $expected
+     * @param callable     $streamFactoryFunc
+     * @param array        $expected
      * @return void
      * @dataProvider dataProviderForTraversable
      */
-    public function testTraversable(\Traversable $input, callable $chainMaker, array $expected): void
+    public function testTraversable(\Traversable $input, callable $streamFactoryFunc, array $expected): void
     {
-        // Given
         // When
-        $result = $chainMaker($input);
+        $result = $streamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);
@@ -607,41 +606,41 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [1, -1, 2, -2, 3, -3],
             ],
             [
                 $trav([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [1, 2, 3],
             ],
             [
                 $trav([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [1, -1, 2, -2],
             ],
             [
@@ -649,7 +648,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1, 0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -657,7 +656,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->takeWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1, 0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-1, -2],
             ],
             [
@@ -665,7 +664,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->dropWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -673,7 +672,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->dropWhile(fn ($value) => abs($value) < 3)
                     ->compress([0, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-3],
             ],
             [
@@ -681,7 +680,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -689,7 +688,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [2, 3],
             ],
             [
@@ -697,7 +696,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -705,7 +704,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [2, 3],
             ],
             [
@@ -713,14 +712,14 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [-1, -2, -3],
             ],
             [
@@ -728,7 +727,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -736,7 +735,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [[1, 2], [2, 3]],
             ],
             [
@@ -744,7 +743,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -752,7 +751,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->pairwise()
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [[-1, -2], [-2, -3]],
             ],
             [
@@ -760,7 +759,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
-                    ->toAssociativeArray(),
+                    ->toArray(),
                 [],
             ],
             [
@@ -768,9 +767,49 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
-                    ->toAssociativeArray(),
-                ['pos' => [1, 3], 'neg' => [-1, -3]],
+                    ->toArray(),
+                [[1, 3], [-1, -3]], // ['pos' => [1, 3], 'neg' => [-1, -3]],
             ],
         ];
+    }
+
+    public function testGroupByOnItsOwn(): void
+    {
+        // Given
+        $data = [1, -1, 2, -2, 3, -3];
+
+        // And
+        $expected = ['pos' => [1, 2, 3], 'neg' => [-1, -2, -3]];
+        $result   = [];
+
+        // When
+        foreach (Stream::of($data)->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg') as $groupKey => $groupData) {
+            $result[$groupKey] = $groupData;
+        }
+
+        // Then
+        $this->assertEqualsCanonicalizing($expected, $result);
+    }
+
+    public function testGroupByAsLastFunction(): void
+    {
+        // Given
+        $data = [1, -1, 2, -2, 3, -3];
+
+        // And
+        $expected = ['pos' => [1, 3], 'neg' => [-1, -3]];
+        $result   = [];
+
+        // When
+        foreach (
+            Stream::of($data)
+                ->filterFalse(fn($value) => $value % 2 === 0)
+                ->groupBy(fn($item) => $item > 0 ? 'pos' : 'neg') as $groupKey => $groupData
+        ) {
+            $result[$groupKey] = $groupData;
+        }
+
+        // Then
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 }
