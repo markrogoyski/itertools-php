@@ -201,6 +201,39 @@ class Single
     }
 
     /**
+     * Return chunks of elements from given collection.
+     *
+     * Chunk size must be at least 1.
+     *
+     * @template T
+     * @param iterable<T> $data
+     * @param int $chunkSize
+     *
+     * @return \Generator<array<T>>
+     */
+    public static function chunkwise(iterable $data, int $chunkSize): \Generator
+    {
+        if ($chunkSize < 1) {
+            throw new \InvalidArgumentException("Chunk size must be ≥ 1. Got {$chunkSize}");
+        }
+
+        $chunk = [];
+
+        foreach ($data as $datum) {
+            $chunk[] = $datum;
+
+            if (count($chunk) === $chunkSize) {
+                yield $chunk;
+                $chunk = [];
+            }
+        }
+
+        if (count($chunk) > 0) {
+            yield $chunk;
+        }
+    }
+
+    /**
      * Limit iteration to a max size limit
      *
      * @param iterable<mixed> $data

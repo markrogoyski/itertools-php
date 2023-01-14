@@ -28,6 +28,7 @@ Quick Reference
 | [`groupBy`](#Group-By)           | Group data by a common element                  | `Single::groupBy($data, $groupKeyFunction)` |
 | [`limit`](#Limit)                | Iterate up to a limit                           | `Single::limit($data, $limit)`              |
 | [`pairwise`](#Pairwise)          | Iterate successive overlapping pairs            | `Single::pairwise($data)`                   |
+| [`chunkwise`](#Chunkwise)        | Iterate collection by chunks                    | `Single::chunkwise($data, $chunkSize)`      |
 | [`repeat`](#Repeat)              | Repeat an item                                  | `Single::repeat($item, $repetitions)`       |
 | [`string`](#String)              | Iterate the characters of a string              | `Single::string($string)`                   |
 | [`takeWhile`](#Take-While)       | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`      |
@@ -415,6 +416,23 @@ foreach (Single::pairwise($friends) as [$leftFriend, $rightFriend]) {
     print("{$leftFriend} and {$rightFriend}");
 }
 // Ross and Rachel, Rachel and Chandler, Chandler and Monica, ...
+```
+
+### Chunkwise
+Return chunks of elements from given collection.
+
+```Single::chunkwise(iterable $data, int $chunkSize)```
+
+Chunk size must be at least 1.
+
+```php
+Use IterTools\Single;
+
+$friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey'];
+
+foreach (Single::chunkwise($friends, 2) as [$leftFriend, $rightFriend]) {
+    // ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
+}
 ```
 
 ### Repeat
