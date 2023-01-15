@@ -696,9 +696,9 @@ class Stream implements \IteratorAggregate
     /**
      * Print each item in the stream
      *
-     * @param string          $separator (optional) inserted between each item. Ex: ', ' for 1, 2, 3, ...
-     * @param string          $prefix (optional) prepended to string
-     * @param string          $suffix (optional) appended to string
+     * @param string $separator (optional) inserted between each item. Ex: ', ' for 1, 2, 3, ...
+     * @param string $prefix (optional) prepended to string
+     * @param string $suffix (optional) appended to string
      *
      * @return void
      */
