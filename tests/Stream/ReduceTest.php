@@ -441,6 +441,82 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toValue(fn ($carry, $item) => $carry + array_sum($item)),
                 90,
             ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)->toString(),
+                '',
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)->toString(', ', 'pre:', '_suf'),
+                'pre:_suf',
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)->toString(),
+                '1-12-23-3',
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)->toString(', '),
+                '1, -1, 2, -2, 3, -3',
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)->toString(', ', 'pre:', '_suf'),
+                'pre:1, -1, 2, -2, 3, -3_suf',
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toString(),
+                '',
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toString(),
+                '123',
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->pairwise()
+                    ->toString(),
+                '',
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toString('', 'BEGIN--', '--END'),
+                'BEGIN----END',
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toString(),
+                '-1-2-3',
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toString(' ... '),
+                '-1 ... -2 ... -3',
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->pairwise()
+                    ->toString(),
+                '',
+            ],
         ];
     }
 

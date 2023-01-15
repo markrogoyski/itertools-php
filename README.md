@@ -72,15 +72,16 @@ Quick Reference
 | [`sameCount`](#Same-Count)   | True if iterables have the same lengths                 | `Summary::sameCount(...$iterables)`        |
 
 #### Reduce
-| Reducer                    | Description                             | Code Snippet                                      |
-|----------------------------|-----------------------------------------|---------------------------------------------------|
-| [`toAverage`](#To-Average) | Mean average of elements                | `Reduce::toAverage($numbers)`                     |
-| [`toCount`](#To-Count)     | Reduce to length of iterable            | `Reduce::toCount($data)`                          |
-| [`toMax`](#To-Max)         | Reduce to its largest element           | `Reduce::toMax($numbers)`                         |
-| [`toMin`](#To-Min)         | Reduce to its smallest element          | `Reduce::toMin($numbers)`                         |
-| [`toProduct`](#To-Product) | Reduce to the product of its elements   | `Reduce::toProduct($numbers)`                     |
-| [`toSum`](#To-Sum)         | Reduce to the sum of its elements       | `Reduce::toSum($numbers)`                         |
-| [`toValue`](#To-Value)     | Reduce to value using callable reducer  | `Reduce::toValue($data, $reducer, $initialValue)` |
+| Reducer                    | Description                             | Code Snippet                                             |
+|----------------------------|-----------------------------------------|----------------------------------------------------------|
+| [`toAverage`](#To-Average) | Mean average of elements                | `Reduce::toAverage($numbers)`                            |
+| [`toCount`](#To-Count)     | Reduce to length of iterable            | `Reduce::toCount($data)`                                 |
+| [`toMax`](#To-Max)         | Reduce to its largest element           | `Reduce::toMax($numbers)`                                |
+| [`toMin`](#To-Min)         | Reduce to its smallest element          | `Reduce::toMin($numbers)`                                |
+| [`toProduct`](#To-Product) | Reduce to the product of its elements   | `Reduce::toProduct($numbers)`                            |
+| [`toString`](#To-String)   | Reduce to joined string                 | `Reduce::toString($data, [$glue], [$prefix], [$suffix])` |
+| [`toSum`](#To-Sum)         | Reduce to the sum of its elements       | `Reduce::toSum($numbers)`                                |
+| [`toValue`](#To-Value)     | Reduce to value using callable reducer  | `Reduce::toValue($data, $reducer, $initialValue)`        |
 
 ### Stream Iteration Tools
 #### Stream Sources
@@ -130,15 +131,16 @@ Quick Reference
 | [`sameCountWith`](#Same-Count-With)          | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`      |
 
 ##### Reduction Terminal Operations
-| Terminal Operation                           | Description                                                                      | Code Snippet                                 |
-|----------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------|
-| [`toAverage`](#To-Average-1)                 | Reduces stream to the mean average of its items                                  | `$stream->toAverage()`                       |
-| [`toCount`](#To-Count-1)                     | Reduces stream to its length                                                     | `$stream->toCount()`                         |
-| [`toMax`](#To-Max-1)                         | Reduces stream to its max value                                                  | `$stream->toMax()`                           |
-| [`toMin`](#To-Min-1)                         | Reduces stream to its min value                                                  | `$stream->toMin()`                           |
-| [`toProduct`](#To-Product-1)                 | Reduces stream to the product of its items                                       | `$stream->toProduct()`                       |
-| [`toSum`](#To-Sum-1)                         | Reduces stream to the sum of its items                                           | `$stream->toSum()`                           |
-| [`toValue`](#To-Value-1)                     | Reduces stream like array_reduce() function                                      | `$stream->toValue($reducer, $initialValue)`  |
+| Terminal Operation                           | Description                                                                      | Code Snippet                                               |
+|----------------------------------------------|----------------------------------------------------------------------------------|------------------------------------------------------------|
+| [`toAverage`](#To-Average-1)                 | Reduces stream to the mean average of its items                                  | `$stream->toAverage()`                                     |
+| [`toCount`](#To-Count-1)                     | Reduces stream to its length                                                     | `$stream->toCount()`                                       |
+| [`toMax`](#To-Max-1)                         | Reduces stream to its max value                                                  | `$stream->toMax()`                                         |
+| [`toMin`](#To-Min-1)                         | Reduces stream to its min value                                                  | `$stream->toMin()`                                         |
+| [`toProduct`](#To-Product-1)                 | Reduces stream to the product of its items                                       | `$stream->toProduct()`                                     |
+| [`toString`](#To-String-1)                   | Reduces stream to joined string                                                  | `$stream->toString([$glue], [$prefix], [$suffix])`         |
+| [`toSum`](#To-Sum-1)                         | Reduces stream to the sum of its items                                           | `$stream->toSum()`                                         |
+| [`toValue`](#To-Value-1)                     | Reduces stream like array_reduce() function                                      | `$stream->toValue($reducer, $initialValue)`                |
 
 ##### Side Effect Terminal Operations
 | Terminal Operation         | Description                     | Code Snippet           |
@@ -972,6 +974,29 @@ $number = Reduce::toProduct($primeFactors);
 // 20
 ```
 
+### To String
+Reduces to a string joining all elements.
+
+* Optional separator to insert between items.
+* Optional prefix to prepend to the string.
+* Optional suffix to append to the string.
+
+```Reduce::toSum(iterable $data, string $separator = '', string $prefix = '', string $suffix = ''): string```
+```php
+use IterTools\Reduce;
+
+$words = ['IterTools', 'PHP', 'v1.0'];
+
+$string = Reduce::toString($words);
+// IterToolsPHPv1.0
+$string = Reduce::toString($words, '-');
+// IterTools-PHP-v1.0
+$string = Reduce::toString($words, '-', 'Library: ');
+// Library: IterTools-PHP-v1.0
+$string = Reduce::toString($words, '-', 'Library: ', '!');
+// Library: IterTools-PHP-v1.0!
+```
+
 ### To Sum
 Reduces to the sum of its elements.
 
@@ -1713,6 +1738,29 @@ $input = [1, 2, 3, 4, 5];
 $result = Stream::of($iterable)
     ->toProduct();
 // 120
+```
+
+### To String
+Reduces to a string joining all elements.
+
+* Optional separator to insert between items.
+* Optional prefix to prepend to the string.
+* Optional suffix to append to the string.
+
+```$stream->toSum(string $separator = '', string $prefix = '', string $suffix = ''): string```
+```php
+use IterTools\Stream;
+
+$words = ['IterTools', 'PHP', 'v1.0'];
+
+$string = Stream::of($words)->toString($words);
+// IterToolsPHPv1.0
+$string = Stream::of($words)->toString($words, '-');
+// IterTools-PHP-v1.0
+$string = Stream::of($words)->toString($words, '-', 'Library: ');
+// Library: IterTools-PHP-v1.0
+$string = Stream::of($words)->toString($words, '-', 'Library: ', '!');
+// Library: IterTools-PHP-v1.0!
 ```
 
 ### To Sum

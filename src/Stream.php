@@ -642,6 +642,25 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Reduces iterable to a string with optional glue, prefix, and suffix.
+     *
+     * Returns empty string (with optional prefix and suffix) if stream is empty.
+     *
+     * @param string   $separator (optional) inserted between each item. Ex: ', ' for 1, 2, 3, ...
+     * @param string   $prefix (optional) prepended to string
+     * @param string   $suffix (optional) appended to string
+     *
+     * @return string
+     *
+     * @see Reduce::toString
+     */
+    public function toString(string $separator = '', string $prefix = '', string $suffix = ''): string
+    {
+        $iterable = $this->iterable;
+        return Reduce::toString($iterable, $separator, $prefix, $suffix);
+    }
+
+    /**
      * Reduces iterable source to the sum of its items.
      *
      * @return int|float

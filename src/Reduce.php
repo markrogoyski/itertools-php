@@ -131,4 +131,27 @@ class Reduce
 
         return $count ? ($sum / $count) : null;
     }
+
+    /**
+     * Reduces to a string with optional glue, prefix, and suffix.
+     *
+     * Returns empty string (with optional prefix and suffix) if collection is empty.
+     *
+     * @param iterable<mixed> $data
+     * @param string          $separator (optional) inserted between each item. Ex: ', ' for 1, 2, 3, ...
+     * @param string          $prefix (optional) prepended to string
+     * @param string          $suffix (optional) appended to string
+     *
+     * @return string
+     */
+    public static function toString(iterable $data, string $separator = '', string $prefix = '', string $suffix = ''): string
+    {
+        $items = [];
+        foreach ($data as $datum) {
+            $items[] = $datum;
+        }
+
+        $joined = \implode($separator, $items);
+        return $prefix . $joined . $suffix;
+    }
 }
