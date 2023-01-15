@@ -574,16 +574,13 @@ class ChunkwiseTest extends \PHPUnit\Framework\TestCase
      */
     public function testError(iterable $data, int $chunkSize): void
     {
-        // Given
-        try {
-            // When
-            foreach (Single::chunkwise($data, $chunkSize) as $_) {
-                break;
-            }
-            $this->fail();
-        } catch (\InvalidArgumentException $e) {
-            // Then
-            $this->assertEquals("Chunk size must be ≥ 1. Got {$chunkSize}", $e->getMessage());
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Chunk size must be ≥ 1. Got {$chunkSize}");
+
+        // When
+        foreach (Single::chunkwise($data, $chunkSize) as $_) {
+            break;
         }
     }
 

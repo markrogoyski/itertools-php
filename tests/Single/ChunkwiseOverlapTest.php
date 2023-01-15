@@ -1321,16 +1321,13 @@ class ChunkwiseOverlapTest extends \PHPUnit\Framework\TestCase
      */
     public function testChunkSizeError(iterable $data, int $chunkSize, int $overlapSize): void
     {
-        // Given
-        try {
-            // When
-            foreach (Single::chunkwiseOverlap($data, $chunkSize, $overlapSize) as $_) {
-                break;
-            }
-            $this->fail();
-        } catch (\InvalidArgumentException $e) {
-            // Then
-            $this->assertEquals("Chunk size must be ≥ 1. Got {$chunkSize}", $e->getMessage());
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Chunk size must be ≥ 1. Got {$chunkSize}");
+
+        // When
+        foreach (Single::chunkwiseOverlap($data, $chunkSize, $overlapSize) as $_) {
+            break;
         }
     }
 
@@ -1418,16 +1415,13 @@ class ChunkwiseOverlapTest extends \PHPUnit\Framework\TestCase
      */
     public function testOverlapSizeError(iterable $data, int $chunkSize, int $overlapSize): void
     {
-        // Given
-        try {
-            // When
-            foreach (Single::chunkwiseOverlap($data, $chunkSize, $overlapSize) as $_) {
-                break;
-            }
-            $this->fail();
-        } catch (\InvalidArgumentException $e) {
-            // Then
-            $this->assertEquals("Overlap size must be less than chunk size", $e->getMessage());
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Overlap size must be less than chunk size");
+
+        // When
+        foreach (Single::chunkwiseOverlap($data, $chunkSize, $overlapSize) as $_) {
+            break;
         }
     }
 
