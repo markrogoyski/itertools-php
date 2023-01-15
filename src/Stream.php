@@ -123,20 +123,6 @@ class Stream implements \IteratorAggregate
         return new self(Random::rockPaperScissors($repetitions));
     }
 
-    /**
-     * Converts iterable source to array.
-     *
-     * @return array<mixed>
-     */
-    public function toArray(): array
-    {
-        $result = [];
-        foreach ($this->iterable as $item) {
-            $result[] = $item;
-        }
-        return $result;
-    }
-
     // STREAM OPERATIONS
 
     /**
@@ -500,6 +486,20 @@ class Stream implements \IteratorAggregate
     }
 
     // STREAM TERMINAL OPERATIONS
+
+    /**
+     * Converts iterable source to array.
+     *
+     * @return array<mixed>
+     */
+    public function toArray(): array
+    {
+        $result = [];
+        foreach ($this->iterable as $item) {
+            $result[] = $item;
+        }
+        return $result;
+    }
 
     /**
      * Returns true if iterable source is sorted in ascending order; otherwise false.
