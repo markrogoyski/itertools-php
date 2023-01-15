@@ -1747,7 +1747,7 @@ Reduces to a string joining all elements.
 * Optional prefix to prepend to the string.
 * Optional suffix to append to the string.
 
-```$stream->toSum(string $separator = '', string $prefix = '', string $suffix = ''): string```
+```$stream->toString(string $separator = '', string $prefix = '', string $suffix = ''): string```
 ```php
 use IterTools\Stream;
 
