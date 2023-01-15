@@ -142,6 +142,133 @@ class PrintTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test print
+     * @dataProvider dataProviderForPrintGluePrefixSuffix
+     */
+    public function testPrintGluePrefixSuffix(iterable $data, string $separator, string $prefix, string $suffix, string $expectedOutput): void
+    {
+        // Given
+        $stream = Stream::of($data);
+
+        // Then
+        $this->expectOutputString($expectedOutput);
+
+        // When
+        $stream->print($separator, $prefix, $suffix);
+    }
+
+    public function dataProviderForPrintGluePrefixSuffix(): array
+    {
+        return [
+            [
+                [],
+                '',
+                '',
+                '',
+                '',
+            ],
+            [
+                [],
+                ',',
+                '',
+                '',
+                '',
+            ],
+            [
+                [],
+                '',
+                '',
+                'pre:',
+                'pre:',
+            ],
+            [
+                [],
+                '',
+                '',
+                ':suffix',
+                ':suffix',
+            ],
+            [
+                [1],
+                '',
+                '',
+                '',
+                '1',
+            ],
+            [
+                [1],
+                ',',
+                '',
+                '',
+                '1',
+            ],
+            [
+                [1],
+                '',
+                'pre:',
+                '',
+                'pre:1',
+            ],
+            [
+                [1],
+                '',
+                '',
+                ':suffix',
+                '1:suffix',
+            ],
+            [
+                [1, 2, 3],
+                '',
+                '',
+                '',
+                '123',
+            ],
+            [
+                [1, 2, 3],
+                ',',
+                '',
+                '',
+                '1,2,3',
+            ],
+            [
+                [1, 2, 3],
+                ', ',
+                '',
+                '',
+                '1, 2, 3',
+            ],
+            [
+                [1, 2, 3],
+                '',
+                'pre:',
+                '',
+                'pre:123',
+            ],
+            [
+                [1, 2, 3],
+                '',
+                '',
+                ':suffix',
+                '123:suffix',
+            ],
+            [
+                [1, 2, 3],
+                ',',
+                'pre:',
+                ':suffix',
+                'pre:1,2,3:suffix',
+            ],
+            [
+                [1, 2, 3],
+                ', ',
+                'pre: ',
+                ' :suffix',
+                'pre: 1, 2, 3 :suffix',
+            ],
+        ];
+    }
+
+    /**
      * @test printLn
      * @dataProvider dataProviderForPrintLnArray
      * @dataProvider dataProviderForPrintLnGenerator
