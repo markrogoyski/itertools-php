@@ -84,10 +84,15 @@ Quick Reference
 
 ### Stream Iteration Tools
 #### Stream Sources
-| Source                  | Description                                     | Code Snippet                                 |
-|-------------------------|-------------------------------------------------|----------------------------------------------|
-| [`of`](#Of)             | Start a fluent stream with an iterable          | `Stream::of($iterable)`                      |
-| [`ofEmpty`](#Of-Empty)  | Start an empty fluent stream                    | `Stream::ofEmpty()`                          |
+| Source                                           | Description                                                     | Code Snippet                                        |
+|--------------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------------|
+| [`of`](#Of)                                      | Start a fluent stream with an iterable                          | `Stream::of($iterable)`                             |
+| [`ofEmpty`](#Of-Empty)                           | Start a fluent stream with empty iterable source                | `Stream::ofEmpty()`                                 |
+| [`ofRandomChoice`](#Of-Random-Choice)            | Start a fluent stream random selections from an array of values | `Stream::ofRandomChoice($items, $repetitions)`      |
+| [`ofRandomNumbers`](#Of-Random-Numbers)          | Start a fluent stream random numbers (integers)                 | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
+| [`ofRandomPercentage`](#Of-Random-Percentage)    | Start a fluent stream random percentages between 0 and 1        | `Stream::ofRandomPercentage($repetitions)`          |
+| [`ofCoinFlips`](#Of-Coin-Flips)                  | Start a fluent stream random coin flips                         | `Stream::ofCoinFlips($repetitions)`                 |
+| [`ofRockPaperScissors`](#Of-Rock-Paper-Scissors) | Start a fluent stream rock-paper-scissors hands                 | `Stream::ofRockPaperScissors($repetitions)`         |
 
 #### Stream Operations
 | Operation                                    | Description                                                                               | Code Snippet                                          |
@@ -1014,6 +1019,99 @@ $result = Stream::of($iterable)
     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
     ->toValue(fn ($carry, $item) => $carry + array_sum($item));
 // 90
+```
+
+### Of Empty
+Creates iterable instance with fluent interface from empty iterable source.
+
+```Stream::ofEmpty(): self```
+
+```php
+use IterTools\Stream;
+
+$result = Stream::ofEmpty()
+    ->chainWith([1, 2, 3]);
+
+foreach ($result as $item) {
+    // 1, 2, 3
+}
+```
+
+### Of Random Choice
+Creates iterable instance with fluent interface of random selections from an array of values.
+
+```Stream::ofRandomChoice(array $items, int $repetitions): self```
+
+```php
+use IterTools\Stream;
+
+$languages = ['PHP', 'Go', 'Python'];
+
+$result = Stream::ofRandomChoice($languages, 5);
+
+foreach ($result as $language) {
+    // 'Go', 'PHP', 'Python', 'PHP', 'PHP' [random]
+}
+```
+
+### Of Random Numbers
+Creates iterable instance with fluent interface of random numbers (integers).
+
+```Stream::ofRandomNumbers(int $min, int $max, int $repetitions): self```
+
+```php
+use IterTools\Stream;
+
+$result = Stream::ofRandomNumbers(1, 3, 7);
+
+foreach ($result as $item) {
+    // 1, 2, 2, 1, 3, 2, 1 [random]
+}
+```
+
+### Of Random Percentage
+Creates iterable instance with fluent interface of random percentages between 0 and 1.
+
+```Stream::ofRandomPercentage(int $repetitions): self```
+
+```php
+use IterTools\Stream;
+
+$result = Stream::ofRandomPercentage(3);
+
+foreach ($result as $item) {
+    // 0.8012566976245, 0.81237281724151, 0.61676896329459 [random]
+}
+```
+
+### Of Coin Flips
+Creates iterable instance with fluent interface of random coin flips.
+
+```Stream::ofCoinFlips(int $repetitions): self```
+
+```php
+use IterTools\Stream;
+
+$result = Stream::ofCoinFlips(10);
+
+foreach ($result as $item) {
+    // 1, 0, 0, 1, 1, 1, 0, 1, 0, 0 [random]
+}
+```
+
+### Of Rock Paper Scissors
+Creates iterable instance with fluent interface of rock-paper-scissors hands.
+
+```Stream::ofRockPaperScissors(int $repetitions): self```
+
+```php
+use IterTools\Stream;
+
+$result = Stream::ofRockPaperScissors(5);
+
+foreach ($result as $item) {
+    // 'paper', 'rock', 'rock', 'scissors', 'paper' [random]
+}
 ```
 
 ### Compress
