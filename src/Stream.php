@@ -40,9 +40,87 @@ class Stream implements \IteratorAggregate
         return new self($iterable);
     }
 
+    /**
+     * Creates iterable instance with fluent interface from empty iterable source.
+     *
+     * @return Stream<mixed>
+     */
     public static function ofEmpty(): self
     {
         return new self([]);
+    }
+
+    /**
+     * Creates iterable instance with fluent interface of random selections from an array of values.
+     *
+     * @param array<mixed> $items
+     * @param int     $repetitions
+     *
+     * @return Stream<mixed>
+     *
+     * @see Random::choice()
+     */
+    public static function ofRandomChoice(array $items, int $repetitions): self
+    {
+        return new self(Random::choice($items, $repetitions));
+    }
+
+    /**
+     * Creates iterable instance with fluent interface of random numbers (integers).
+     *
+     * @param int $min
+     * @param int $max
+     * @param int $repetitions
+     *
+     * @return Stream<mixed>
+     *
+     * @see Random::number()
+     */
+    public static function ofRandomNumbers(int $min, int $max, int $repetitions): self
+    {
+        return new self(Random::number($min, $max, $repetitions));
+    }
+
+    /**
+     * Creates iterable instance with fluent interface of random percentages between 0 and 1.
+     *
+     * @param int $repetitions
+     *
+     * @return Stream<mixed>
+     *
+     * @see Random::percentage()
+     */
+    public static function ofRandomPercentage(int $repetitions): self
+    {
+        return new self(Random::percentage($repetitions));
+    }
+
+    /**
+     * Creates iterable instance with fluent interface of random coin flips.
+     *
+     * @param int $repetitions
+     *
+     * @return Stream<mixed>
+     *
+     * @see Random::coinFlip()
+     */
+    public static function ofCoinFlips(int $repetitions): self
+    {
+        return new self(Random::coinFlip($repetitions));
+    }
+
+    /**
+     * Creates iterable instance with fluent interface of rock-paper-scissors hands.
+     *
+     * @param int $repetitions
+     *
+     * @return Stream<mixed>
+     *
+     * @see Random::rockPaperScissors()
+     */
+    public static function ofRockPaperScissors(int $repetitions): self
+    {
+        return new self(Random::rockPaperScissors($repetitions));
     }
 
     /**
