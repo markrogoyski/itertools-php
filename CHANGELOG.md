@@ -2,6 +2,8 @@
 
 ## v1.2.0 - TBD
 * Single
+  * `chunkwise`
+  * `chunkwiseOverlap`
   * `limit`
 * Summary
   * `exactlyN`
