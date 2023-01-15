@@ -675,6 +675,38 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Reduces iterable source to array of its upper and lower bounds.
+     *
+     * Returns [null, null] if iterable source is empty.
+     *
+     * @return array{numeric, numeric}|array{null, null}
+     *
+     * @see Reduce::toBounds()
+     */
+    public function toBounds(): array
+    {
+        /** @var iterable<numeric> $iterable */
+        $iterable = $this->iterable;
+        return Reduce::toBounds($iterable);
+    }
+
+    /**
+     * Reduces iterable source to its amplitude.
+     *
+     * Returns 0 if iterable source is empty.
+     *
+     * @return int|float
+     *
+     * @see Reduce::toAmplitude()
+     */
+    public function toAmplitude()
+    {
+        /** @var iterable<numeric> $iterable */
+        $iterable = $this->iterable;
+        return Reduce::toAmplitude($iterable);
+    }
+
+    /**
      * Reduces iterable source like array_reduce() function.
      *
      * But unlike array_reduce(), it works with all iterable types.
