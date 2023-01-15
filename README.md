@@ -23,6 +23,8 @@ Quick Reference
 #### Single Iteration
 | Iterator                                 | Description                                   | Code Snippet                                                |
 |------------------------------------------|-----------------------------------------------|-------------------------------------------------------------|
+| [`chunkwise`](#Chunkwise)                | Iterate by chunks                             | `Single::chunkwise($data, $chunkSize)`                      |
+| [`chunkwiseOverlap`](#Chunkwise-Overlap) | Iterate by overlapped chunks                  | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
 | [`compress`](#Compress)                  | Filter out elements not selected              | `Single::compress($data, $selectors)`                       |
 | [`dropWhile`](#Drop-While)               | Drop elements while predicate is true         | `Single::dropWhile($data, $predicate)`                      |
 | [`filterFalse`](#Filter-False)           | Filter out elements where predicate not false | `Single::filterFalse($data, $predicate)`                    |
@@ -30,8 +32,6 @@ Quick Reference
 | [`groupBy`](#Group-By)                   | Group data by a common element                | `Single::groupBy($data, $groupKeyFunction)`                 |
 | [`limit`](#Limit)                        | Iterate up to a limit                         | `Single::limit($data, $limit)`                              |
 | [`pairwise`](#Pairwise)                  | Iterate successive overlapping pairs          | `Single::pairwise($data)`                                   |
-| [`chunkwise`](#Chunkwise)                | Iterate collection by chunks                  | `Single::chunkwise($data, $chunkSize)`                      |
-| [`chunkwiseOverlap`](#Chunkwise-Overlap) | Iterate collection by overlapped chunks       | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
 | [`repeat`](#Repeat)                      | Repeat an item                                | `Single::repeat($item, $repetitions)`                       |
 | [`string`](#String)                      | Iterate the characters of a string            | `Single::string($string)`                                   |
 | [`takeWhile`](#Take-While)               | Iterate elements while predicate is true      | `Single::takeWhile($data, $predicate)`                      |
@@ -276,7 +276,7 @@ Compress an iterable by filtering out data that is not selected.
 ```php
 use IterTools\Single;
 
-$movies  = [
+$movies = [
     'Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith',
     'A New Hope', 'Empire Strikes Back', 'Return of the Jedi',
     'The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker'
@@ -424,7 +424,7 @@ foreach (Single::pairwise($friends) as [$leftFriend, $rightFriend]) {
 ```
 
 ### Chunkwise
-Return chunks of elements from given collection.
+Return elements in chunks of a certain size.
 
 ```Single::chunkwise(iterable $data, int $chunkSize)```
 
@@ -433,21 +433,29 @@ Chunk size must be at least 1.
 ```php
 use IterTools\Single;
 
-$friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey'];
+$movies = [
+    'Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith',
+    'A New Hope', 'Empire Strikes Back', 'Return of the Jedi',
+    'The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker'
+];
 
-foreach (Single::chunkwise($friends, 2) as $chunk) {
-    // ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
+foreach (Single::chunkwise($movies, 3) as $trilogy) {
+    $trilogies[] = $trilogy;
 }
+// [
+//     ['Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith'],
+//     ['A New Hope', 'Empire Strikes Back', 'Return of the Jedi'],
+//     ['The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker]'
+// ]
 ```
 
 ### Chunkwise Overlap
-Return overlapped chunks of elements from given collection.
+Return overlapped chunks of elements.
 
 ```Single::chunkwiseOverlap(iterable $data, int $chunkSize, int $overlapSize)```
 
-Chunk size must be at least 1.
-
-Overlap size must be less than chunk size.
+* Chunk size must be at least 1.
+* Overlap size must be less than chunk size.
 
 ```php
 use IterTools\Single;
