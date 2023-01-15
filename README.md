@@ -269,6 +269,50 @@ foreach (Multi::zipEqual($letters, $numbers) as [$letter, $number]) {
 ```
 
 ## Single Iteration
+### Chunkwise
+Return elements in chunks of a certain size.
+
+```Single::chunkwise(iterable $data, int $chunkSize)```
+
+Chunk size must be at least 1.
+
+```php
+use IterTools\Single;
+
+$movies = [
+    'Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith',
+    'A New Hope', 'Empire Strikes Back', 'Return of the Jedi',
+    'The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker'
+];
+
+foreach (Single::chunkwise($movies, 3) as $trilogy) {
+    $trilogies[] = $trilogy;
+}
+// [
+//     ['Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith'],
+//     ['A New Hope', 'Empire Strikes Back', 'Return of the Jedi'],
+//     ['The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker]'
+// ]
+```
+
+### Chunkwise Overlap
+Return overlapped chunks of elements.
+
+```Single::chunkwiseOverlap(iterable $data, int $chunkSize, int $overlapSize)```
+
+* Chunk size must be at least 1.
+* Overlap size must be less than chunk size.
+
+```php
+use IterTools\Single;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+foreach (Single::chunkwiseOverlap($numbers, 3, 1) as $chunk) {
+    // [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9], [9, 10]
+}
+```
+
 ### Compress
 Compress an iterable by filtering out data that is not selected.
 
@@ -421,50 +465,6 @@ foreach (Single::pairwise($friends) as [$leftFriend, $rightFriend]) {
     print("{$leftFriend} and {$rightFriend}");
 }
 // Ross and Rachel, Rachel and Chandler, Chandler and Monica, ...
-```
-
-### Chunkwise
-Return elements in chunks of a certain size.
-
-```Single::chunkwise(iterable $data, int $chunkSize)```
-
-Chunk size must be at least 1.
-
-```php
-use IterTools\Single;
-
-$movies = [
-    'Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith',
-    'A New Hope', 'Empire Strikes Back', 'Return of the Jedi',
-    'The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker'
-];
-
-foreach (Single::chunkwise($movies, 3) as $trilogy) {
-    $trilogies[] = $trilogy;
-}
-// [
-//     ['Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith'],
-//     ['A New Hope', 'Empire Strikes Back', 'Return of the Jedi'],
-//     ['The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker]'
-// ]
-```
-
-### Chunkwise Overlap
-Return overlapped chunks of elements.
-
-```Single::chunkwiseOverlap(iterable $data, int $chunkSize, int $overlapSize)```
-
-* Chunk size must be at least 1.
-* Overlap size must be less than chunk size.
-
-```php
-use IterTools\Single;
-
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
-foreach (Single::chunkwiseOverlap($numbers, 3, 1) as $chunk) {
-    // [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9], [9, 10]
-}
 ```
 
 ### Repeat
