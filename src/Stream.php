@@ -567,6 +567,7 @@ class Stream implements \IteratorAggregate
     public function print(): void
     {
         foreach ($this->iterable as $item) {
+            // @phpstan-ignore-next-line
             print($item);
         }
     }

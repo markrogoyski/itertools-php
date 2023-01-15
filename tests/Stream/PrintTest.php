@@ -12,7 +12,6 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
 class PrintTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @test print
      * @dataProvider dataProviderForPrintArray
