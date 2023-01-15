@@ -517,6 +517,20 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toString(),
                 '',
             ],
+            [
+                [1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toVectorLength(),
+                sqrt(0),
+            ],
+            [
+                [1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([3, 4])
+                    ->toVectorLength(),
+                sqrt(30),
+            ],
         ];
     }
 
@@ -951,6 +965,20 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
                     ->toValue(fn ($carry, $item) => $carry + array_sum($item)),
                 90,
+            ],
+            [
+                $gen([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toVectorLength(),
+                sqrt(0),
+            ],
+            [
+                $gen([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([3, 4])
+                    ->toVectorLength(),
+                sqrt(30),
             ],
         ];
     }
@@ -1387,6 +1415,20 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toValue(fn ($carry, $item) => $carry + array_sum($item)),
                 90,
             ],
+            [
+                $iter([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toVectorLength(),
+                sqrt(0),
+            ],
+            [
+                $iter([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([3, 4])
+                    ->toVectorLength(),
+                sqrt(30),
+            ],
         ];
     }
 
@@ -1821,6 +1863,20 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
                     ->toValue(fn ($carry, $item) => $carry + array_sum($item)),
                 90,
+            ],
+            [
+                $trav([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toVectorLength(),
+                sqrt(0),
+            ],
+            [
+                $trav([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([3, 4])
+                    ->toVectorLength(),
+                sqrt(30),
             ],
         ];
     }

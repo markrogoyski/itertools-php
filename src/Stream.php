@@ -675,6 +675,22 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Reduces iterable to the vector length using items as coordinates.
+     *
+     * Returns 0 if given collection is empty.
+     *
+     * @return float
+     *
+     * @see Reduce::toVectorLength()
+     */
+    public function toVectorLength(): float
+    {
+        /** @var iterable<numeric> $iterable */
+        $iterable = $this->iterable;
+        return Reduce::toVectorLength($iterable);
+    }
+
+    /**
      * Reduces iterable source like array_reduce() function.
      *
      * But unlike array_reduce(), it works with all iterable types.

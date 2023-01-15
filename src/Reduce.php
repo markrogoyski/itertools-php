@@ -154,4 +154,22 @@ class Reduce
         $joined = \implode($separator, $items);
         return $prefix . $joined . $suffix;
     }
+
+    /**
+     * Reduces given collection to the vector length using items as coordinates.
+     *
+     * Returns 0 if given collection is empty.
+     *
+     * @param iterable<numeric> $vector
+     *
+     * @return float
+     */
+    public static function toVectorLength(iterable $vector): float
+    {
+        $result = 0;
+        foreach ($vector as $coordinate) {
+            $result += $coordinate**2;
+        }
+        return sqrt($result);
+    }
 }
