@@ -361,6 +361,14 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3],
             ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->infiniteCycle()
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
+            ],
         ];
     }
 
@@ -715,6 +723,14 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->chainWith($gen([1, 2, 3]))
                     ->toArray(),
                 [1, 2, 3],
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->infiniteCycle()
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
             ],
         ];
     }
@@ -1071,6 +1087,14 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3],
             ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->infiniteCycle()
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
+            ],
         ];
     }
 
@@ -1425,6 +1449,14 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->chainWith($trav([1, 2, 3]))
                     ->toArray(),
                 [1, 2, 3],
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->infiniteCycle()
+                    ->limit(10)
+                    ->toArray(),
+                [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
             ],
         ];
     }
