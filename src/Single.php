@@ -184,19 +184,74 @@ class Single
      */
     public static function pairwise(iterable $data): \Generator
     {
-        $prevDatum = null;
-        $prevDatumInitialized = false;
+        $chunked = static::chunkwiseOverlap($data, 2, 1);
 
-        foreach ($data as $datum) {
-            if (!$prevDatumInitialized) {
-                $prevDatum = $datum;
-                $prevDatumInitialized = true;
-                continue;
+        foreach ($chunked as $chunk) {
+            if (count($chunk) !== 2) {
+                break;
             }
 
-            /** @var T $prevDatum */
-            yield [$prevDatum, $datum];
-            $prevDatum = $datum;
+            /** @var array{T, T} $chunk */
+            yield $chunk;
+        }
+    }
+
+    /**
+     * Return chunks of elements from given collection.
+     *
+     * Chunk size must be at least 1.
+     *
+     * @template T
+     * @param iterable<T> $data
+     * @param int $chunkSize
+     *
+     * @return \Generator<array<T>>
+     */
+    public static function chunkwise(iterable $data, int $chunkSize): \Generator
+    {
+        return static::chunkwiseOverlap($data, $chunkSize, 0);
+    }
+
+    /**
+     * Return overlapped chunks of elements from given collection.
+     *
+     * Chunk size must be at least 1.
+     *
+     * Overlap size must be less than chunk size.
+     *
+     * @template T
+     * @param iterable<T> $data
+     * @param int $chunkSize
+     * @param int $overlapSize
+     *
+     * @return \Generator<array<T>>
+     */
+    public static function chunkwiseOverlap(iterable $data, int $chunkSize, int $overlapSize): \Generator
+    {
+        if ($chunkSize < 1) {
+            throw new \InvalidArgumentException("Chunk size must be ≥ 1. Got {$chunkSize}");
+        }
+
+        if ($overlapSize >= $chunkSize) {
+            throw new \InvalidArgumentException("Overlap size must be less than chunk size");
+        }
+
+        $chunk = [];
+        $isLastIterationYielded = false;
+
+        foreach ($data as $datum) {
+            $isLastIterationYielded = false;
+            $chunk[] = $datum;
+
+            if (count($chunk) === $chunkSize) {
+                yield $chunk;
+                $chunk = array_slice($chunk, $chunkSize-$overlapSize);
+                $isLastIterationYielded = true;
+            }
+        }
+
+        if (!$isLastIterationYielded && count($chunk) > 0) {
+            yield $chunk;
         }
     }
 

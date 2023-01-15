@@ -179,6 +179,43 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Return chunks of elements from iterable source.
+     *
+     * Chunk size must be at least 1.
+     *
+     * @param int $chunkSize
+     *
+     * @return $this
+     *
+     * @see Single::chunkwise()
+     */
+    public function chunkwise(int $chunkSize): self
+    {
+        $this->iterable = Single::chunkwise($this->iterable, $chunkSize);
+        return $this;
+    }
+
+    /**
+     * Return overlapped chunks of elements from iterable source.
+     *
+     * Chunk size must be at least 1.
+     *
+     * Overlap size must be less than chunk size.
+     *
+     * @param int $chunkSize
+     * @param int $overlapSize
+     *
+     * @return $this
+     *
+     * @see Single::chunkwiseOverlap()
+     */
+    public function chunkwiseOverlap(int $chunkSize, int $overlapSize): self
+    {
+        $this->iterable = Single::chunkwiseOverlap($this->iterable, $chunkSize, $overlapSize);
+        return $this;
+    }
+
+    /**
      * Limit iteration to a max size limit
      *
      * @param int $limit

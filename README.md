@@ -21,18 +21,20 @@ Quick Reference
 | [`zipEqual`](#ZipEqual)     | Iterate multiple collections of equal length simultaneously, error if lengths not equal | `Multi::zipEqual($list1, $list2)`   |
 
 #### Single Iteration
-| Iterator                         | Description                                     | Code Snippet                                |
-|----------------------------------|-------------------------------------------------|---------------------------------------------|
-| [`compress`](#Compress)          | Filter out elements not selected                | `Single::compress($data, $selectors)`       |
-| [`dropWhile`](#Drop-While)       | Drop elements while predicate is true           | `Single::dropWhile($data, $predicate)`      |
-| [`filterFalse`](#Filter-False)   | Filter out elements where predicate not false   | `Single::filterFalse($data, $predicate)`    |
-| [`filterTrue`](#Filter-True)     | Filter out elements where predicate not true    | `Single::filterTrue($data, $predicate)`     |
-| [`groupBy`](#Group-By)           | Group data by a common element                  | `Single::groupBy($data, $groupKeyFunction)` |
-| [`limit`](#Limit)                | Iterate up to a limit                           | `Single::limit($data, $limit)`              |
-| [`pairwise`](#Pairwise)          | Iterate successive overlapping pairs            | `Single::pairwise($data)`                   |
-| [`repeat`](#Repeat)              | Repeat an item                                  | `Single::repeat($item, $repetitions)`       |
-| [`string`](#String)              | Iterate the characters of a string              | `Single::string($string)`                   |
-| [`takeWhile`](#Take-While)       | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`      |
+| Iterator                                 | Description                                   | Code Snippet                                                |
+|------------------------------------------|-----------------------------------------------|-------------------------------------------------------------|
+| [`compress`](#Compress)                  | Filter out elements not selected              | `Single::compress($data, $selectors)`                       |
+| [`dropWhile`](#Drop-While)               | Drop elements while predicate is true         | `Single::dropWhile($data, $predicate)`                      |
+| [`filterFalse`](#Filter-False)           | Filter out elements where predicate not false | `Single::filterFalse($data, $predicate)`                    |
+| [`filterTrue`](#Filter-True)             | Filter out elements where predicate not true  | `Single::filterTrue($data, $predicate)`                     |
+| [`groupBy`](#Group-By)                   | Group data by a common element                | `Single::groupBy($data, $groupKeyFunction)`                 |
+| [`limit`](#Limit)                        | Iterate up to a limit                         | `Single::limit($data, $limit)`                              |
+| [`pairwise`](#Pairwise)                  | Iterate successive overlapping pairs          | `Single::pairwise($data)`                                   |
+| [`chunkwise`](#Chunkwise)                | Iterate collection by chunks                  | `Single::chunkwise($data, $chunkSize)`                      |
+| [`chunkwiseOverlap`](#Chunkwise-Overlap) | Iterate collection by overlapped chunks       | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
+| [`repeat`](#Repeat)                      | Repeat an item                                | `Single::repeat($item, $repetitions)`                       |
+| [`string`](#String)                      | Iterate the characters of a string            | `Single::string($string)`                                   |
+| [`takeWhile`](#Take-While)               | Iterate elements while predicate is true      | `Single::takeWhile($data, $predicate)`                      |
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
@@ -88,28 +90,30 @@ Quick Reference
 | [`ofEmpty`](#Of-Empty)  | Start an empty fluent stream                    | `Stream::ofEmpty()`                          |
 
 #### Stream Operations
-| Operation                                    | Description                                                                               | Code Snippet                                 |
-|----------------------------------------------|-------------------------------------------------------------------------------------------|----------------------------------------------|
-| [`chain`](#Chain-1)                          | Chain additional iterators to stream                                                      | `$stream->chain($selectors)`                 |
-| [`compress`](#Compress-1)                    | Compress an iterable source by filtering out data that is not selected                    | `$stream->compress($selectors)`              |
-| [`dropWhile`](#Drop-While-1)                 | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`             |
-| [`takeWhile`](#Take-While-1)                 | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`             |
-| [`filterTrue`](#Filter-True-1)               | Filter out elements from the iterable source where there predicate function is true       | `$stream->filterTrue($predicate)`            |
-| [`filterFalse`](#Filter-False-1)             | Filter out elements from the iterable source where the predicate function is false        | `$stream->filterFalse($predicate)`           |
-| [`groupBy`](#Group-By-1)                     | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`        |
-| [`pairwise`](#Pairwise-1)                    | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                        |
-| [`limit`](#Limit-1)                          | Limit the stream's iteration                                                              | `$stream->limit($limit)`                     |
-| [`chainWith`](#Chain-With)                   | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`          |
-| [`zipWith`](#Zip-With)                       | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`            |
-| [`zipLongestWith`](#Zip-Longest-With)        | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipLongestWith(...$iterables)`     |
-| [`zipEqualWith`](#Zip-Equal-With)            | Iterate iterable source with another iterable collections of equal lengths simultaneously | `$stream->zipEqualWith(...$iterables)`       |
-| [`infiniteCycle`](#Infinite-Cycle)           | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                   |
-| [`runningAverage`](#Running-Average-1)       | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`     |
-| [`runningDifference`](#Running-Difference-1) | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`  |
-| [`runningMax`](#Running-Max-1)               | Accumulate the running max over iterable source                                           | `$stream->runningMax($initialValue)`         |
-| [`runningMin`](#Running-Min-1)               | Accumulate the running min over iterable source                                           | `$stream->runningMin($initialValue)`         |
-| [`runningProduct`](#Running-Product-1)       | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`     |
-| [`runningTotal`](#Running-Total-1)           | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`       |
+| Operation                                    | Description                                                                               | Code Snippet                                          |
+|----------------------------------------------|-------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| [`chain`](#Chain-1)                          | Chain additional iterators to stream                                                      | `$stream->chain($selectors)`                          |
+| [`compress`](#Compress-1)                    | Compress an iterable source by filtering out data that is not selected                    | `$stream->compress($selectors)`                       |
+| [`chunkwise`](#Chunkwise-1)                  | Iterate by chunks                                                                         | `$stream->chunkwise($chunkSize)`                      |
+| [`chunkwiseOverlap`](#Chunkwise-Overlap-1)   | Iterate by overlapped chunks                                                              | `$stream->chunkwiseOverlap($chunkSize, $overlapSize)` |
+| [`dropWhile`](#Drop-While-1)                 | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`                      |
+| [`takeWhile`](#Take-While-1)                 | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                      |
+| [`filterTrue`](#Filter-True-1)               | Filter out elements from the iterable source where there predicate function is true       | `$stream->filterTrue($predicate)`                     |
+| [`filterFalse`](#Filter-False-1)             | Filter out elements from the iterable source where the predicate function is false        | `$stream->filterFalse($predicate)`                    |
+| [`groupBy`](#Group-By-1)                     | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`                 |
+| [`pairwise`](#Pairwise-1)                    | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                                 |
+| [`limit`](#Limit-1)                          | Limit the stream's iteration                                                              | `$stream->limit($limit)`                              |
+| [`chainWith`](#Chain-With)                   | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                   |
+| [`zipWith`](#Zip-With)                       | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`                     |
+| [`zipLongestWith`](#Zip-Longest-With)        | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipLongestWith(...$iterables)`              |
+| [`zipEqualWith`](#Zip-Equal-With)            | Iterate iterable source with another iterable collections of equal lengths simultaneously | `$stream->zipEqualWith(...$iterables)`                |
+| [`infiniteCycle`](#Infinite-Cycle)           | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                            |
+| [`runningAverage`](#Running-Average-1)       | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`              |
+| [`runningDifference`](#Running-Difference-1) | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`           |
+| [`runningMax`](#Running-Max-1)               | Accumulate the running max over iterable source                                           | `$stream->runningMax($initialValue)`                  |
+| [`runningMin`](#Running-Min-1)               | Accumulate the running min over iterable source                                           | `$stream->runningMin($initialValue)`                  |
+| [`runningProduct`](#Running-Product-1)       | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`              |
+| [`runningTotal`](#Running-Total-1)           | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`                |
 
 #### Stream Terminal Operations
 ##### Summary Terminal Operations
@@ -292,7 +296,7 @@ Once the predicate function returns false once, all remaining elements are retur
 
 ```Single::dropWhile(iterable $data, callable $predicate)```
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $scores    = [50, 60, 70, 85, 65, 90];
 $predicate = fn ($x) => $x < 70;
@@ -310,7 +314,7 @@ If no predicate is provided, the boolean value of the data is used.
 
 ```Single::filterFalse(iterable $data, callable $predicate)```
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 $goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
@@ -328,7 +332,7 @@ If no predicate is provided, the boolean value of the data is used.
 
 ```Single::filterFalse(iterable $data, callable $predicate)```
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 $goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
@@ -346,7 +350,7 @@ The groupKeyFunction determines the key to group elements by.
 
 ```Single::groupBy(iterable $data, callable $groupKeyFunction)```
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $cartoonCharacters = [
     ['Garfield', 'cat'],
@@ -390,7 +394,7 @@ Stops even if more data available if limit reached.
 ```Single::limit(iterable $data, int $limit)```
 
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $matrixMovies = ['The Matrix', 'The Matrix Reloaded', 'The Matrix Revolutions', 'The Matrix Resurrections'];
 $limit        = 1;
@@ -409,7 +413,7 @@ Returns empty generator if given collection contains fewer than 2 elements.
 ```Single::pairwise(iterable $data)```
 
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey', 'Phoebe'];
 
@@ -417,6 +421,42 @@ foreach (Single::pairwise($friends) as [$leftFriend, $rightFriend]) {
     print("{$leftFriend} and {$rightFriend}");
 }
 // Ross and Rachel, Rachel and Chandler, Chandler and Monica, ...
+```
+
+### Chunkwise
+Return chunks of elements from given collection.
+
+```Single::chunkwise(iterable $data, int $chunkSize)```
+
+Chunk size must be at least 1.
+
+```php
+use IterTools\Single;
+
+$friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey'];
+
+foreach (Single::chunkwise($friends, 2) as $chunk) {
+    // ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
+}
+```
+
+### Chunkwise Overlap
+Return overlapped chunks of elements from given collection.
+
+```Single::chunkwiseOverlap(iterable $data, int $chunkSize, int $overlapSize)```
+
+Chunk size must be at least 1.
+
+Overlap size must be less than chunk size.
+
+```php
+use IterTools\Single;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+foreach (Single::chunkwiseOverlap($numbers, 3, 1) as $chunk) {
+    // [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9], [9, 10]
+}
 ```
 
 ### Repeat
@@ -458,7 +498,7 @@ Stops iteration as soon as the predicate returns false, even if other elements l
 
 ```Single::takeWhile(iterable $data, callable $predicate)```
 ```php
-Use IterTools\Single;
+use IterTools\Single;
 
 $prices = [0, 0, 5, 10, 0, 0, 9];
 $isFree = fn ($price) => $price == 0;
@@ -1106,7 +1146,48 @@ $result = Stream::of($input)
 foreach ($result as $item) {
     // [1, 2], [2, 3], [3, 4], [4, 5]
 }
+```
 
+### Chunkwise
+Return chunks of elements from iterable source.
+
+```$stream->chunkwise(int $chunkSize): self```
+
+Chunk size must be at least 1.
+
+```php
+use IterTools\Stream;
+
+$friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey'];
+
+$result = Stream::of($friends)
+    ->chunkwise(2);
+
+foreach ($result as $chunk) {
+    // ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
+}
+```
+
+### Chunkwise Overlap
+Return overlapped chunks of elements from iterable source.
+
+```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): self```
+
+Chunk size must be at least 1.
+
+Overlap size must be less than chunk size.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+$result = Stream::of($friends)
+    ->chunkwiseOverlap(3, 1);
+
+foreach ($result as $chunk) {
+    // [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9]
+}
 ```
 
 ### Limit

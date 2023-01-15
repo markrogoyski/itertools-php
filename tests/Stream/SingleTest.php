@@ -184,6 +184,118 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                [-3, -2, -1, 0, 1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                [-3, -2, -1, 0, 1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [],
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[-1, -2], [-2, -3]],
+            ],
+            [
+                [-3, -2, -1, 0, 1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                [-3, -2, -1, 0, 1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[1, 2], [2, 3], [3, 4], [4, 5]],
+            ],
+            [
+                [-3, -2, -1, 0, 1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
+            ],
+            [
+                [-3, -2, -1, 0, 1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]],
+            ],
+            [
+                [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(3, 1)
+                    ->toArray(),
+                [[0, 1, 2], [2, 3, 4], [4, 5, 6], [6, 7, 8], [8, 9]],
+            ],
+            [
+                [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(3, 2)
+                    ->toArray(),
+                [[0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5], [4, 5, 6], [5, 6, 7], [6, 7, 8], [7, 8, 9]],
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
                     ->toArray(),
@@ -423,6 +535,118 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->pairwise()
                     ->toArray(),
                 [[-1, -2], [-2, -3]],
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                $gen([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                $gen([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[-1, -2], [-2, -3]],
+            ],
+            [
+                $gen([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                $gen([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[1, 2], [2, 3], [3, 4], [4, 5]],
+            ],
+            [
+                $gen([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
+            ],
+            [
+                $gen([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]],
+            ],
+            [
+                $gen([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(3, 1)
+                    ->toArray(),
+                [[0, 1, 2], [2, 3, 4], [4, 5, 6], [6, 7, 8], [8, 9]],
+            ],
+            [
+                $gen([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(3, 2)
+                    ->toArray(),
+                [[0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5], [4, 5, 6], [5, 6, 7], [6, 7, 8], [7, 8, 9]],
             ],
             [
                 $gen([]),
@@ -670,6 +894,118 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                $iter([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                $iter([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[-1, -2], [-2, -3]],
+            ],
+            [
+                $iter([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                $iter([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[1, 2], [2, 3], [3, 4], [4, 5]],
+            ],
+            [
+                $iter([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
+            ],
+            [
+                $iter([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]],
+            ],
+            [
+                $iter([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(3, 1)
+                    ->toArray(),
+                [[0, 1, 2], [2, 3, 4], [4, 5, 6], [6, 7, 8], [8, 9]],
+            ],
+            [
+                $iter([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(3, 2)
+                    ->toArray(),
+                [[0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5], [4, 5, 6], [5, 6, 7], [6, 7, 8], [7, 8, 9]],
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value % 2 === 0)
                     ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg')
                     ->toArray(),
@@ -909,6 +1245,118 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->pairwise()
                     ->toArray(),
                 [[-1, -2], [-2, -3]],
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                $trav([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                $trav([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwise(2)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [],
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[-1, -2], [-3]],
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[-1, -2], [-2, -3]],
+            ],
+            [
+                $trav([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[1, 2], [3, 4], [5]],
+            ],
+            [
+                $trav([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[1, 2], [2, 3], [3, 4], [4, 5]],
+            ],
+            [
+                $trav([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(2, 0)
+                    ->toArray(),
+                [[0, 1], [2, 3], [4, 5]],
+            ],
+            [
+                $trav([-3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(2, 1)
+                    ->toArray(),
+                [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]],
+            ],
+            [
+                $trav([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(3, 1)
+                    ->toArray(),
+                [[0, 1, 2], [2, 3, 4], [4, 5, 6], [6, 7, 8], [8, 9]],
+            ],
+            [
+                $trav([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value >= 0)
+                    ->chunkwiseOverlap(3, 2)
+                    ->toArray(),
+                [[0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5], [4, 5, 6], [5, 6, 7], [6, 7, 8], [7, 8, 9]],
             ],
             [
                 $trav([]),
