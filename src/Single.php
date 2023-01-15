@@ -97,7 +97,7 @@ class Single
     public static function filterFalse(iterable $data, callable $predicate = null): \Generator
     {
         if ($predicate === null) {
-            $predicate = fn($datum) => boolval($datum);
+            $predicate = fn($datum) => \boolval($datum);
         }
 
         foreach ($data as $datum) {
@@ -120,7 +120,7 @@ class Single
     public static function filterTrue(iterable $data, callable $predicate = null): \Generator
     {
         if ($predicate === null) {
-            $predicate = fn($datum) => boolval($datum);
+            $predicate = fn($datum) => \boolval($datum);
         }
 
         foreach ($data as $datum) {
@@ -243,14 +243,14 @@ class Single
             $isLastIterationYielded = false;
             $chunk[] = $datum;
 
-            if (count($chunk) === $chunkSize) {
+            if (\count($chunk) === $chunkSize) {
                 yield $chunk;
-                $chunk = array_slice($chunk, $chunkSize-$overlapSize);
+                $chunk = \array_slice($chunk, $chunkSize-$overlapSize);
                 $isLastIterationYielded = true;
             }
         }
 
-        if (!$isLastIterationYielded && count($chunk) > 0) {
+        if (!$isLastIterationYielded && \count($chunk) > 0) {
             yield $chunk;
         }
     }

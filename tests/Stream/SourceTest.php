@@ -211,7 +211,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
 
         // And
         foreach ($actual as $choice) {
-            $this->assertTrue(in_array($choice, $items));
+            $this->assertTrue(\in_array($choice, $items));
         }
     }
 
