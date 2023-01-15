@@ -1747,6 +1747,83 @@ $result = Stream::of($iterable)
 // 15
 ```
 
+### Print
+Print each item in the stream.
+
+```$stream->print(string|null $glue): void```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+Stream::of($iterable)->print('; ');
+// '1; 2; 3; 4; 5'
+```
+
+### Print Ln
+Print each item in the stream on a new line.
+
+```$stream->printLn(): void```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+Stream::of($iterable)->printLn();
+/*
+1
+2
+3
+*/
+```
+
+### Print R
+Calls `print_r()` function for each item in the stream.
+
+```$stream->printR(): void```
+
+```php
+use IterTools\Stream;
+
+$input = [['id' => 1], ['id' => 2], ['id' => 3]];
+
+Stream::of($iterable)->printR();
+/*
+Array
+(
+    [id] => 1
+)
+Array
+(
+    [id] => 2
+)
+Array
+(
+    [id] => 3
+)
+*/
+```
+
+### Var Dump
+Calls `var_dump()` function for each item in the stream.
+
+```$stream->varDump(): void```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+Stream::of($iterable)->varDump();
+/*
+int(1)
+int(2)
+int(3)
+*/
+```
+
 ## Composition
 IterTools can be combined to create new iterable compositions.
 #### Zip Strings
