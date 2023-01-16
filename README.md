@@ -1973,7 +1973,7 @@ use IterTools\Stream;
 
 $items = [$string, $array, $object];
 
-Stream::of($words)->printR();
+Stream::of($words)->varDump();
 // var_dump output
 ```
 
