@@ -7,6 +7,8 @@
   * `limit`
   * `map`
 * Reduce
+  * `toMinMax`
+  * `toRange`
   * `toString`
 * Summary
   * `exactlyN`
