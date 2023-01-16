@@ -72,18 +72,18 @@ Quick Reference
 | [`sameCount`](#Same-Count)   | True if iterables have the same lengths                 | `Summary::sameCount(...$iterables)`        |
 
 #### Reduce
-| Reducer                        | Description                                   | Code Snippet                                                  |
-|--------------------------------|-----------------------------------------------|---------------------------------------------------------------|
-| [`toAverage`](#To-Average)     | Mean average of elements                      | `Reduce::toAverage($numbers)`                                 |
-| [`toCount`](#To-Count)         | Reduce to length of iterable                  | `Reduce::toCount($data)`                                      |
-| [`toMax`](#To-Max)             | Reduce to its largest element                 | `Reduce::toMax($numbers)`                                     |
-| [`toMin`](#To-Min)             | Reduce to its smallest element                | `Reduce::toMin($numbers)`                                     |
-| [`toProduct`](#To-Product)     | Reduce to the product of its elements         | `Reduce::toProduct($numbers)`                                 |
-| [`toString`](#To-String)       | Reduce to joined string                       | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
-| [`toSum`](#To-Sum)             | Reduce to the sum of its elements             | `Reduce::toSum($numbers)`                                     |
-| [`toBounds`](#To-Bounds)       | Reduce to array of upper and lower bounds     | `Reduce::toBounds($numbers)`                                  |
-| [`toAmplitude`](#To-Amplitude) | Reduces to amplitude of numbers in collection | `Reduce::toAmplitude($numbers)`                               |
-| [`toValue`](#To-Value)         | Reduce to value using callable reducer        | `Reduce::toValue($data, $reducer, $initialValue)`             |
+| Reducer                      | Description                                   | Code Snippet                                                  |
+|------------------------------|-----------------------------------------------|---------------------------------------------------------------|
+| [`toAverage`](#To-Average)   | Mean average of elements                      | `Reduce::toAverage($numbers)`                                 |
+| [`toCount`](#To-Count)       | Reduce to length of iterable                  | `Reduce::toCount($data)`                                      |
+| [`toMax`](#To-Max)           | Reduce to its largest element                 | `Reduce::toMax($numbers)`                                     |
+| [`toMin`](#To-Min)           | Reduce to its smallest element                | `Reduce::toMin($numbers)`                                     |
+| [`toProduct`](#To-Product)   | Reduce to the product of its elements         | `Reduce::toProduct($numbers)`                                 |
+| [`toString`](#To-String)     | Reduce to joined string                       | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
+| [`toSum`](#To-Sum)           | Reduce to the sum of its elements             | `Reduce::toSum($numbers)`                                     |
+| [`toMinMax`](#To-Bounds)     | Reduce to array of upper and lower bounds     | `Reduce::toMinMax($numbers)`                                  |
+| [`toRange`](#To-Amplitude)   | Reduces to amplitude of numbers in collection | `Reduce::toRange($numbers)`                                   |
+| [`toValue`](#To-Value)       | Reduce to value using callable reducer        | `Reduce::toValue($data, $reducer, $initialValue)`             |
 
 ### Stream Iteration Tools
 #### Stream Sources
@@ -133,18 +133,18 @@ Quick Reference
 | [`sameCountWith`](#Same-Count-With)          | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`      |
 
 ##### Reduction Terminal Operations
-| Terminal Operation               | Description                                           | Code Snippet                                            |
-|----------------------------------|-------------------------------------------------------|---------------------------------------------------------|
-| [`toAverage`](#To-Average-1)     | Reduces stream to the mean average of its items       | `$stream->toAverage()`                                  |
-| [`toCount`](#To-Count-1)         | Reduces stream to its length                          | `$stream->toCount()`                                    |
-| [`toMax`](#To-Max-1)             | Reduces stream to its max value                       | `$stream->toMax()`                                      |
-| [`toMin`](#To-Min-1)             | Reduces stream to its min value                       | `$stream->toMin()`                                      |
-| [`toProduct`](#To-Product-1)     | Reduces stream to the product of its items            | `$stream->toProduct()`                                  |
-| [`toString`](#To-String-1)       | Reduces stream to joined string                       | `$stream->toString([$separator], [$prefix], [$suffix])` |
-| [`toSum`](#To-Sum-1)             | Reduces stream to the sum of its items                | `$stream->toSum()`                                      |
-| [`toBounds`](#To-Bounds-1)       | Reduces stream to array of upper and lower bounds     | `$stream->toBounds()`                                   |
-| [`toAmplitude`](#To-Amplitude-1) | Reduces stream to amplitude of numbers in collection  | `$stream->toAmplitude()`                                |
-| [`toValue`](#To-Value-1)         | Reduces stream like array_reduce() function           | `$stream->toValue($reducer, $initialValue)`             |
+| Terminal Operation             | Description                                           | Code Snippet                                            |
+|--------------------------------|-------------------------------------------------------|---------------------------------------------------------|
+| [`toAverage`](#To-Average-1)   | Reduces stream to the mean average of its items       | `$stream->toAverage()`                                  |
+| [`toCount`](#To-Count-1)       | Reduces stream to its length                          | `$stream->toCount()`                                    |
+| [`toMax`](#To-Max-1)           | Reduces stream to its max value                       | `$stream->toMax()`                                      |
+| [`toMin`](#To-Min-1)           | Reduces stream to its min value                       | `$stream->toMin()`                                      |
+| [`toProduct`](#To-Product-1)   | Reduces stream to the product of its items            | `$stream->toProduct()`                                  |
+| [`toString`](#To-String-1)     | Reduces stream to joined string                       | `$stream->toString([$separator], [$prefix], [$suffix])` |
+| [`toSum`](#To-Sum-1)           | Reduces stream to the sum of its items                | `$stream->toSum()`                                      |
+| [`toMinMax`](#To-Bounds-1)     | Reduces stream to array of upper and lower bounds     | `$stream->toMinMax()`                                   |
+| [`toRange`](#To-Amplitude-1)   | Reduces stream to amplitude of numbers in collection  | `$stream->toRange()`                                    |
+| [`toValue`](#To-Value-1)       | Reduces stream like array_reduce() function           | `$stream->toValue($reducer, $initialValue)`             |
 
 ##### Side Effect Terminal Operations
 | Terminal Operation         | Description                     | Code Snippet                                          |
@@ -1017,7 +1017,7 @@ $sum = Reduce::toSum($parts);
 ### To Bounds
 Reduces given collection to array of its upper and lower bounds.
 
-```Reduce::toBounds(iterable $numbers): array```
+```Reduce::toMinMax(iterable $numbers): array```
 
 Returns `[null, null]` if given collection is empty.
 
@@ -1026,14 +1026,14 @@ use IterTools\Reduce;
 
 $numbers = [1, 2, 3, -1, -2, -3];
 
-[$min, $max] = Reduce::toBounds($numbers);
+[$min, $max] = Reduce::toMinMax($numbers);
 // [-3, 3]
 ```
 
 ### To Amplitude
 Reduces given collection to its amplitude.
 
-```Reduce::toAmplitude(iterable $numbers): int|float```
+```Reduce::toRange(iterable $numbers): int|float```
 
 Returns 0 if iterable source is empty.
 
@@ -1042,7 +1042,7 @@ use IterTools\Reduce;
 
 $numbers = [1, 2, 3, -1, -2, -3];
 
-[$min, $max] = Reduce::toAmplitude($numbers);
+[$min, $max] = Reduce::toRange($numbers);
 // 6
 ```
 
@@ -1817,7 +1817,7 @@ $result = Stream::of($iterable)
 ### To Bounds
 Reduces iterable source to array of its upper and lower bounds.
 
-```$stream->toBounds(): array```
+```$stream->toMinMax(): array```
 
 Returns `[null, null]` if given collection is empty.
 
@@ -1827,14 +1827,14 @@ use IterTools\Stream;
 $numbers = [1, 2, 3, -1, -2, -3];
 
 [$min, $max] = Stream::of($numbers)
-    ->toBounds();
+    ->toMinMax();
 // [-3, 3]
 ```
 
 ### To Amplitude
 Reduces iterable source to its amplitude.
 
-```$stream->toAmplitude(): int|float```
+```$stream->toRange(): int|float```
 
 Returns 0 if iterable source is empty.
 
@@ -1844,7 +1844,7 @@ use IterTools\Stream;
 $numbers = [1, 2, 3, -1, -2, -3];
 
 [$min, $max] = Stream::of($numbers)
-    ->toAmplitude();
+    ->toRange();
 // 6
 ```
 

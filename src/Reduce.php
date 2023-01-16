@@ -164,7 +164,7 @@ class Reduce
      *
      * @return array{numeric, numeric}|array{null, null}
      */
-    public static function toBounds(iterable $numbers): array
+    public static function toMinMax(iterable $numbers): array
     {
         return static::toValue($numbers, static function ($carry, $datum) {
             return [\min($carry[0] ?? $datum, $datum), \max($carry[1] ?? $datum, $datum)];
@@ -172,7 +172,7 @@ class Reduce
     }
 
     /**
-     * Reduces given collection to its amplitude.
+     * Reduces given collection to its range.
      *
      * Returns 0 if given collection is empty.
      *
@@ -180,9 +180,9 @@ class Reduce
      *
      * @return int|float
      */
-    public static function toAmplitude(iterable $numbers)
+    public static function toRange(iterable $numbers)
     {
-        [$min, $max] = static::toBounds($numbers);
+        [$min, $max] = static::toMinMax($numbers);
 
         return ($max ?? 0) - ($min ?? 0);
     }

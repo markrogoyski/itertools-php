@@ -9,12 +9,12 @@ use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
-class ToAmplitudeTest extends \PHPUnit\Framework\TestCase
+class ToRangeTest extends \PHPUnit\Framework\TestCase
 {
     protected const ROUND_PRECISION = 0.0001;
 
     /**
-     * @test         toAmplitude array
+     * @test         toRange array
      * @dataProvider dataProviderForArray
      * @param        array $data
      * @param        int|float $expected
@@ -22,7 +22,7 @@ class ToAmplitudeTest extends \PHPUnit\Framework\TestCase
     public function testArray(array $data, $expected)
     {
         // When
-        $result = Reduce::toAmplitude($data);
+        $result = Reduce::toRange($data);
 
         // Then
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
@@ -83,7 +83,7 @@ class ToAmplitudeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         toAmplitude generators
+     * @test         toRange generators
      * @dataProvider dataProviderForGenerators
      * @param        \Generator $data
      * @param        int|float $expected
@@ -91,7 +91,7 @@ class ToAmplitudeTest extends \PHPUnit\Framework\TestCase
     public function testGenerators(\Generator $data, $expected)
     {
         // When
-        $result = Reduce::toAmplitude($data);
+        $result = Reduce::toRange($data);
 
         // Then
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
@@ -156,7 +156,7 @@ class ToAmplitudeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         toAmplitude iterators
+     * @test         toRange iterators
      * @dataProvider dataProviderForIterators
      * @param        \Generator $data
      * @param        int|float $expected
@@ -164,7 +164,7 @@ class ToAmplitudeTest extends \PHPUnit\Framework\TestCase
     public function testIterators(\Iterator $data, $expected)
     {
         // When
-        $result = Reduce::toAmplitude($data);
+        $result = Reduce::toRange($data);
 
         // Then
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
@@ -229,7 +229,7 @@ class ToAmplitudeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         toAmplitude traversables
+     * @test         toRange traversables
      * @dataProvider dataProviderForTraversables
      * @param        \Traversable $data
      * @param        int|float $expected
@@ -237,7 +237,7 @@ class ToAmplitudeTest extends \PHPUnit\Framework\TestCase
     public function testTraversables(\Traversable $data, $expected)
     {
         // When
-        $result = Reduce::toAmplitude($data);
+        $result = Reduce::toRange($data);
 
         // Then
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);

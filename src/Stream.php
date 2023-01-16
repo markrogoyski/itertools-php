@@ -681,13 +681,13 @@ class Stream implements \IteratorAggregate
      *
      * @return array{numeric, numeric}|array{null, null}
      *
-     * @see Reduce::toBounds()
+     * @see Reduce::toMinMax()
      */
-    public function toBounds(): array
+    public function toMinMax(): array
     {
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;
-        return Reduce::toBounds($iterable);
+        return Reduce::toMinMax($iterable);
     }
 
     /**
@@ -697,13 +697,13 @@ class Stream implements \IteratorAggregate
      *
      * @return int|float
      *
-     * @see Reduce::toAmplitude()
+     * @see Reduce::toRange()
      */
-    public function toAmplitude()
+    public function toRange()
     {
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;
-        return Reduce::toAmplitude($iterable);
+        return Reduce::toRange($iterable);
     }
 
     /**

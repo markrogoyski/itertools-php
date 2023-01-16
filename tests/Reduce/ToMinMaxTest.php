@@ -9,12 +9,12 @@ use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
-class ToBoundsTest extends \PHPUnit\Framework\TestCase
+class ToMinMaxTest extends \PHPUnit\Framework\TestCase
 {
     protected const ROUND_PRECISION = 0.0001;
 
     /**
-     * @test         toBounds array
+     * @test         toMinMax array
      * @dataProvider dataProviderForArray
      * @param        array $data
      * @param        array $expected
@@ -22,7 +22,7 @@ class ToBoundsTest extends \PHPUnit\Framework\TestCase
     public function testArray(array $data, array $expected)
     {
         // When
-        $result = Reduce::toBounds($data);
+        $result = Reduce::toMinMax($data);
 
         // Then
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
@@ -83,7 +83,7 @@ class ToBoundsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         toBounds generators
+     * @test         toMinMax generators
      * @dataProvider dataProviderForGenerators
      * @param        \Generator $data
      * @param        array $expected
@@ -91,7 +91,7 @@ class ToBoundsTest extends \PHPUnit\Framework\TestCase
     public function testGenerators(\Generator $data, array $expected)
     {
         // When
-        $result = Reduce::toBounds($data);
+        $result = Reduce::toMinMax($data);
 
         // Then
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
@@ -156,7 +156,7 @@ class ToBoundsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         toBounds iterators
+     * @test         toMinMax iterators
      * @dataProvider dataProviderForIterators
      * @param        \Generator $data
      * @param        array $expected
@@ -164,7 +164,7 @@ class ToBoundsTest extends \PHPUnit\Framework\TestCase
     public function testIterators(\Iterator $data, array $expected)
     {
         // When
-        $result = Reduce::toBounds($data);
+        $result = Reduce::toMinMax($data);
 
         // Then
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
@@ -229,7 +229,7 @@ class ToBoundsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         toBounds traversables
+     * @test         toMinMax traversables
      * @dataProvider dataProviderForTraversables
      * @param        \Traversable $data
      * @param        array $expected
@@ -237,7 +237,7 @@ class ToBoundsTest extends \PHPUnit\Framework\TestCase
     public function testTraversables(\Traversable $data, array $expected)
     {
         // When
-        $result = Reduce::toBounds($data);
+        $result = Reduce::toMinMax($data);
 
         // Then
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
