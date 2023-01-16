@@ -282,8 +282,8 @@ class Single
     /**
      * Map a function onto every element of the iteration
      *
-     * @param iterable $data
-     * @param callable $func
+     * @param iterable<mixed> $data
+     * @param callable        $func
      *
      * @return \Generator
      */
