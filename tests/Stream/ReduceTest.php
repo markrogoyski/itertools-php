@@ -517,6 +517,48 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toString(),
                 '',
             ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toMinMax(),
+                [null, null],
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toMinMax(),
+                [7, 7],
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toMinMax(),
+                [-3, 10],
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toRange(),
+                0,
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toRange(),
+                0,
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toRange(),
+                13,
+            ],
         ];
     }
 
@@ -951,6 +993,48 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
                     ->toValue(fn ($carry, $item) => $carry + array_sum($item)),
                 90,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toMinMax(),
+                [null, null],
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toMinMax(),
+                [7, 7],
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toMinMax(),
+                [-3, 10],
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toRange(),
+                0,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toRange(),
+                0,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toRange(),
+                13,
             ],
         ];
     }
@@ -1387,6 +1471,48 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toValue(fn ($carry, $item) => $carry + array_sum($item)),
                 90,
             ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toMinMax(),
+                [null, null],
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toMinMax(),
+                [7, 7],
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toMinMax(),
+                [-3, 10],
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toRange(),
+                0,
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toRange(),
+                0,
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toRange(),
+                13,
+            ],
         ];
     }
 
@@ -1821,6 +1947,48 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
                     ->toValue(fn ($carry, $item) => $carry + array_sum($item)),
                 90,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toMinMax(),
+                [null, null],
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toMinMax(),
+                [7, 7],
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toMinMax(),
+                [-3, 10],
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn () => false)
+                    ->toRange(),
+                0,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toRange(),
+                0,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toRange(),
+                13,
             ],
         ];
     }

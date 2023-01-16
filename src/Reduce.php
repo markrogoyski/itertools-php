@@ -154,4 +154,36 @@ class Reduce
         $joined = \implode($separator, $items);
         return $prefix . $joined . $suffix;
     }
+
+    /**
+     * Reduces given collection to array of its upper and lower bounds.
+     *
+     * Returns [null, null] if given collection is empty.
+     *
+     * @param iterable<numeric> $numbers
+     *
+     * @return array{numeric, numeric}|array{null, null}
+     */
+    public static function toMinMax(iterable $numbers): array
+    {
+        return static::toValue($numbers, static function ($carry, $datum) {
+            return [\min($carry[0] ?? $datum, $datum), \max($carry[1] ?? $datum, $datum)];
+        }, [null, null]);
+    }
+
+    /**
+     * Reduces given collection to its range.
+     *
+     * Returns 0 if given collection is empty.
+     *
+     * @param iterable<numeric> $numbers
+     *
+     * @return int|float
+     */
+    public static function toRange(iterable $numbers)
+    {
+        [$min, $max] = static::toMinMax($numbers);
+
+        return ($max ?? 0) - ($min ?? 0);
+    }
 }
