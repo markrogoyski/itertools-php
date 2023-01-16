@@ -79,11 +79,11 @@ Quick Reference
 | [`toCount`](#To-Count)       | Reduce to length of iterable                  | `Reduce::toCount($data)`                                      |
 | [`toMax`](#To-Max)           | Reduce to its largest element                 | `Reduce::toMax($numbers)`                                     |
 | [`toMin`](#To-Min)           | Reduce to its smallest element                | `Reduce::toMin($numbers)`                                     |
+| [`toMinMax`](#To-Min-Max)    | Reduce to array of upper and lower bounds     | `Reduce::toMinMax($numbers)`                                  |
 | [`toProduct`](#To-Product)   | Reduce to the product of its elements         | `Reduce::toProduct($numbers)`                                 |
+| [`toRange`](#To-Range)       | Reduce to difference of max and min values    | `Reduce::toRange($numbers)`                                   |
 | [`toString`](#To-String)     | Reduce to joined string                       | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
 | [`toSum`](#To-Sum)           | Reduce to the sum of its elements             | `Reduce::toSum($numbers)`                                     |
-| [`toMinMax`](#To-Bounds)     | Reduce to array of upper and lower bounds     | `Reduce::toMinMax($numbers)`                                  |
-| [`toRange`](#To-Amplitude)   | Reduces to amplitude of numbers in collection | `Reduce::toRange($numbers)`                                   |
 | [`toValue`](#To-Value)       | Reduce to value using callable reducer        | `Reduce::toValue($data, $reducer, $initialValue)`             |
 
 ### Stream Iteration Tools
@@ -144,8 +144,8 @@ Quick Reference
 | [`toProduct`](#To-Product-1)   | Reduces stream to the product of its items            | `$stream->toProduct()`                                  |
 | [`toString`](#To-String-1)     | Reduces stream to joined string                       | `$stream->toString([$separator], [$prefix], [$suffix])` |
 | [`toSum`](#To-Sum-1)           | Reduces stream to the sum of its items                | `$stream->toSum()`                                      |
-| [`toMinMax`](#To-Bounds-1)     | Reduces stream to array of upper and lower bounds     | `$stream->toMinMax()`                                   |
-| [`toRange`](#To-Amplitude-1)   | Reduces stream to amplitude of numbers in collection  | `$stream->toRange()`                                    |
+| [`toMinMax`](#To-Min-Max-1)    | Reduces stream to array of upper and lower bounds     | `$stream->toMinMax()`                                   |
+| [`toRange`](#To-Range-1)       | Reduces stream to difference of max and min values    | `$stream->toRange()`                                    |
 | [`toValue`](#To-Value-1)       | Reduces stream like array_reduce() function           | `$stream->toValue($reducer, $initialValue)`             |
 
 ##### Side Effect Terminal Operations
@@ -1033,8 +1033,8 @@ $sum = Reduce::toSum($parts);
 // 60
 ```
 
-### To Bounds
-Reduces given collection to array of its upper and lower bounds.
+### To Min Max
+Reduces to array of its upper and lower bounds (max and min).
 
 ```Reduce::toMinMax(iterable $numbers): array```
 
@@ -1049,8 +1049,8 @@ $numbers = [1, 2, 3, -1, -2, -3];
 // [-3, 3]
 ```
 
-### To Amplitude
-Reduces given collection to its amplitude.
+### To Range
+Reduces given collection to its range (difference between max and min).
 
 ```Reduce::toRange(iterable $numbers): int|float```
 
@@ -1059,10 +1059,10 @@ Returns 0 if iterable source is empty.
 ```php
 use IterTools\Reduce;
 
-$numbers = [1, 2, 3, -1, -2, -3];
+$grades = [100, 90, 80, 85, 95];
 
-[$min, $max] = Reduce::toRange($numbers);
-// 6
+$range = Reduce::toRange($numbers);
+// 20
 ```
 
 ### To Value
@@ -1851,8 +1851,8 @@ $result = Stream::of($iterable)
 // 15
 ```
 
-### To Bounds
-Reduces iterable source to array of its upper and lower bounds.
+### To Min Max
+Reduces iterable source to array of its upper and lower bounds (max and min).
 
 ```$stream->toMinMax(): array```
 
@@ -1868,8 +1868,8 @@ $numbers = [1, 2, 3, -1, -2, -3];
 // [-3, 3]
 ```
 
-### To Amplitude
-Reduces iterable source to its amplitude.
+### To Range
+Reduces iterable source to its range (difference between max and min).
 
 ```$stream->toRange(): int|float```
 
@@ -1878,11 +1878,11 @@ Returns 0 if iterable source is empty.
 ```php
 use IterTools\Stream;
 
-$numbers = [1, 2, 3, -1, -2, -3];
+$grades = [100, 90, 80, 85, 95];
 
-[$min, $max] = Stream::of($numbers)
+$range = Stream::of($numbers)
     ->toRange();
-// 6
+// 20
 ```
 
 ### To Value
