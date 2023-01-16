@@ -5,6 +5,9 @@
   * `chunkwise`
   * `chunkwiseOverlap`
   * `limit`
+  * `map`
+* Reduce
+  * `toString`
 * Summary
   * `exactlyN`
 * Streams
