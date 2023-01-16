@@ -278,4 +278,19 @@ class Single
             $i++;
         }
     }
+
+    /**
+     * Map a function onto every element of the iteration
+     *
+     * @param iterable $data
+     * @param callable $func
+     *
+     * @return \Generator
+     */
+    public static function map(iterable $data, callable $func): \Generator
+    {
+        foreach ($data as $datum) {
+            yield $func($datum);
+        }
+    }
 }

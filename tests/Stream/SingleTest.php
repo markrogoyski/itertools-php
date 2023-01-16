@@ -369,6 +369,42 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
             ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->toArray(),
+                [],
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map('sqrt')
+                    ->toArray(),
+                [],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->toArray(),
+                [2, -2, 4, -4, 6, -6],
+            ],
+            [
+                [1, 4, 9, 16, 25],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map('sqrt')
+                    ->toArray(),
+                [1.0, 2.0, 3.0, 4.0, 5.0],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->map(fn ($x) => $x + 1)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
         ];
     }
 

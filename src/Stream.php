@@ -295,6 +295,21 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Map a function onto every element of the stream
+     *
+     * @param callable $func
+     *
+     * @return $this
+     *
+     * @see Single::map
+     */
+    public function map(callable $func): self
+    {
+        $this->iterable = Single::map($this->iterable, $func);
+        return $this;
+    }
+
+    /**
      * Chain iterable source withs given iterables together into a single iteration.
      *
      * Makes a single continuous sequence out of multiple sequences.

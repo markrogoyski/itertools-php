@@ -31,6 +31,7 @@ Quick Reference
 | [`filterTrue`](#Filter-True)             | Filter out elements where predicate not true  | `Single::filterTrue($data, $predicate)`                     |
 | [`groupBy`](#Group-By)                   | Group data by a common element                | `Single::groupBy($data, $groupKeyFunction)`                 |
 | [`limit`](#Limit)                        | Iterate up to a limit                         | `Single::limit($data, $limit)`                              |
+| [`map`](#Map)                            | Map function onto each item                   | `Single::map($data, $function)`                             |
 | [`pairwise`](#Pairwise)                  | Iterate successive overlapping pairs          | `Single::pairwise($data)`                                   |
 | [`repeat`](#Repeat)                      | Repeat an item                                | `Single::repeat($item, $repetitions)`                       |
 | [`string`](#String)                      | Iterate the characters of a string            | `Single::string($string)`                                   |
@@ -107,6 +108,7 @@ Quick Reference
 | [`filterTrue`](#Filter-True-1)               | Filter out elements from the iterable source where there predicate function is true       | `$stream->filterTrue($predicate)`                     |
 | [`filterFalse`](#Filter-False-1)             | Filter out elements from the iterable source where the predicate function is false        | `$stream->filterFalse($predicate)`                    |
 | [`groupBy`](#Group-By-1)                     | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`                 |
+| [`map`](#Map-1)                              | Map function onto elements                                                                | `$stream->map($function)`                             |
 | [`pairwise`](#Pairwise-1)                    | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                                 |
 | [`limit`](#Limit-1)                          | Limit the stream's iteration                                                              | `$stream->limit($limit)`                              |
 | [`chainWith`](#Chain-With)                   | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                   |
@@ -454,6 +456,23 @@ foreach (Single::limit($matrixMovies, $limit) as $goodMovie) {
     print($goodMovie);
 }
 // 'The Matrix' (and nothing else)
+```
+
+### Map
+Map a function onto each element.
+
+```Single::map(iterable $data, callable $function)```
+
+```php
+use IterTools\Single;
+
+$grades               = [100, 99, 95, 98, 100];
+$strictParentsOpinion = fn ($g) => $g === 100 ? 'A' : 'F';
+
+foreach (Single::map($grades, $strictParentsOpinion) as $actualGrade) {
+    print($actualGrade);
+}
+// A, F, F, F, A
 ```
 
 ### Pairwise
@@ -1256,6 +1275,24 @@ $result = Stream::of($input)
 
 foreach ($result as $group => $item) {
     // 'positive' => [1, 2, 3], 'negative' => [-1, -2, -3]
+}
+```
+
+### Map
+Map a function onto each element of the stream.
+
+```$stream->map(callable $function): self```
+
+```php
+use IterTools\Stream;
+
+$grades = [100, 95, 98, 89, 100];
+
+$result = Stream::of($grades)
+    ->map(fn ($grade) => $grade === 100 ? 'A' : 'F');
+
+foreach ($result as $actualGrade) {
+    // A, F, F, F, A
 }
 ```
 
