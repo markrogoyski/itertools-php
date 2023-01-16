@@ -91,39 +91,38 @@ Quick Reference
 | Source                                           | Description                                                     | Code Snippet                                        |
 |--------------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------------|
 | [`of`](#Of)                                      | Start a fluent stream with an iterable                          | `Stream::of($iterable)`                             |
+| [`ofCoinFlips`](#Of-Coin-Flips)                  | Start a fluent stream random coin flips                         | `Stream::ofCoinFlips($repetitions)`                 |
 | [`ofEmpty`](#Of-Empty)                           | Start a fluent stream with empty iterable source                | `Stream::ofEmpty()`                                 |
 | [`ofRandomChoice`](#Of-Random-Choice)            | Start a fluent stream random selections from an array of values | `Stream::ofRandomChoice($items, $repetitions)`      |
 | [`ofRandomNumbers`](#Of-Random-Numbers)          | Start a fluent stream random numbers (integers)                 | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
 | [`ofRandomPercentage`](#Of-Random-Percentage)    | Start a fluent stream random percentages between 0 and 1        | `Stream::ofRandomPercentage($repetitions)`          |
-| [`ofCoinFlips`](#Of-Coin-Flips)                  | Start a fluent stream random coin flips                         | `Stream::ofCoinFlips($repetitions)`                 |
 | [`ofRockPaperScissors`](#Of-Rock-Paper-Scissors) | Start a fluent stream rock-paper-scissors hands                 | `Stream::ofRockPaperScissors($repetitions)`         |
 
 #### Stream Operations
 | Operation                                    | Description                                                                               | Code Snippet                                          |
 |----------------------------------------------|-------------------------------------------------------------------------------------------|-------------------------------------------------------|
-| [`chain`](#Chain-1)                          | Chain additional iterators to stream                                                      | `$stream->chain($selectors)`                          |
+| [`chainWith`](#Chain-With)                   | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                   |
 | [`compress`](#Compress-1)                    | Compress an iterable source by filtering out data that is not selected                    | `$stream->compress($selectors)`                       |
 | [`chunkwise`](#Chunkwise-1)                  | Iterate by chunks                                                                         | `$stream->chunkwise($chunkSize)`                      |
 | [`chunkwiseOverlap`](#Chunkwise-Overlap-1)   | Iterate by overlapped chunks                                                              | `$stream->chunkwiseOverlap($chunkSize, $overlapSize)` |
 | [`dropWhile`](#Drop-While-1)                 | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`                      |
-| [`takeWhile`](#Take-While-1)                 | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                      |
 | [`filterTrue`](#Filter-True-1)               | Filter out elements from the iterable source where there predicate function is true       | `$stream->filterTrue($predicate)`                     |
 | [`filterFalse`](#Filter-False-1)             | Filter out elements from the iterable source where the predicate function is false        | `$stream->filterFalse($predicate)`                    |
 | [`groupBy`](#Group-By-1)                     | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`                 |
+| [`infiniteCycle`](#Infinite-Cycle)           | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                            |
+| [`limit`](#Limit-1)                          | Limit the stream's iteration                                                              | `$stream->limit($limit)`                              |
 | [`map`](#Map-1)                              | Map function onto elements                                                                | `$stream->map($function)`                             |
 | [`pairwise`](#Pairwise-1)                    | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                                 |
-| [`limit`](#Limit-1)                          | Limit the stream's iteration                                                              | `$stream->limit($limit)`                              |
-| [`chainWith`](#Chain-With)                   | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                   |
-| [`zipWith`](#Zip-With)                       | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`                     |
-| [`zipLongestWith`](#Zip-Longest-With)        | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipLongestWith(...$iterables)`              |
-| [`zipEqualWith`](#Zip-Equal-With)            | Iterate iterable source with another iterable collections of equal lengths simultaneously | `$stream->zipEqualWith(...$iterables)`                |
-| [`infiniteCycle`](#Infinite-Cycle)           | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                            |
 | [`runningAverage`](#Running-Average-1)       | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`              |
 | [`runningDifference`](#Running-Difference-1) | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`           |
 | [`runningMax`](#Running-Max-1)               | Accumulate the running max over iterable source                                           | `$stream->runningMax($initialValue)`                  |
 | [`runningMin`](#Running-Min-1)               | Accumulate the running min over iterable source                                           | `$stream->runningMin($initialValue)`                  |
 | [`runningProduct`](#Running-Product-1)       | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`              |
 | [`runningTotal`](#Running-Total-1)           | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`                |
+| [`takeWhile`](#Take-While-1)                 | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                      |
+| [`zipWith`](#Zip-With)                       | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`                     |
+| [`zipLongestWith`](#Zip-Longest-With)        | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipLongestWith(...$iterables)`              |
+| [`zipEqualWith`](#Zip-Equal-With)            | Iterate iterable source with another iterable collections of equal lengths simultaneously | `$stream->zipEqualWith(...$iterables)`                |
 
 #### Stream Terminal Operations
 ##### Summary Terminal Operations
@@ -152,7 +151,7 @@ Quick Reference
 | Terminal Operation         | Description                     | Code Snippet                                          |
 |----------------------------|---------------------------------|-------------------------------------------------------|
 | [`print`](#Print)          | `print` each item in the stream | `$stream->print([$separator], [$prefix], [$suffix])`  |
-| [`printLn`](#Print-Ln)     | `print` each item on a new line | `$stream->printLn()`                                  |
+| [`printLn`](#Print-Line)   | `print` each item on a new line | `$stream->printLn()`                                  |
 | [`printR`](#Print-R)       | `print_r` each item             | `$stream->printR()`                                   |
 | [`var_dump`](#Var-Dump)    | `var_dump` each item            | `$stream->varDump()`                                  |
 
@@ -937,6 +936,19 @@ $finalGrade = Reduce::toAverage($numbers);
 // 92.8
 ```
 
+### To Count
+Reduces iterable to its length.
+
+```Reduce::toCount(iterable $data)```
+```php
+use IterTools\Reduce;
+
+$someIterable = ImportantThing::getCollectionAsIterable();
+
+$length = Reduce::toCount($someIterable);
+// 3
+```
+
 ### To Max
 Reduces to the max value.
 
@@ -969,17 +981,20 @@ $result = Reduce::toMin($numbers);
 // 1
 ```
 
-### To Count
-Reduces iterable to its length.
+### To Min Max
+Reduces to array of its upper and lower bounds (max and min).
 
-```Reduce::toCount(iterable $data)```
+```Reduce::toMinMax(iterable $numbers): array```
+
+Returns `[null, null]` if given collection is empty.
+
 ```php
 use IterTools\Reduce;
 
-$someIterable = ImportantThing::getCollectionAsIterable();
+$numbers = [1, 2, 3, -1, -2, -3];
 
-$length = Reduce::toCount($someIterable);
-// 3
+[$min, $max] = Reduce::toMinMax($numbers);
+// [-3, 3]
 ```
 
 ### To Product
@@ -994,6 +1009,22 @@ use IterTools\Reduce;
 $primeFactors = [5, 2, 2];
 
 $number = Reduce::toProduct($primeFactors);
+// 20
+```
+
+### To Range
+Reduces given collection to its range (difference between max and min).
+
+```Reduce::toRange(iterable $numbers): int|float```
+
+Returns 0 if iterable source is empty.
+
+```php
+use IterTools\Reduce;
+
+$grades = [100, 90, 80, 85, 95];
+
+$range = Reduce::toRange($numbers);
 // 20
 ```
 
@@ -1033,38 +1064,6 @@ $sum = Reduce::toSum($parts);
 // 60
 ```
 
-### To Min Max
-Reduces to array of its upper and lower bounds (max and min).
-
-```Reduce::toMinMax(iterable $numbers): array```
-
-Returns `[null, null]` if given collection is empty.
-
-```php
-use IterTools\Reduce;
-
-$numbers = [1, 2, 3, -1, -2, -3];
-
-[$min, $max] = Reduce::toMinMax($numbers);
-// [-3, 3]
-```
-
-### To Range
-Reduces given collection to its range (difference between max and min).
-
-```Reduce::toRange(iterable $numbers): int|float```
-
-Returns 0 if iterable source is empty.
-
-```php
-use IterTools\Reduce;
-
-$grades = [100, 90, 80, 85, 95];
-
-$range = Reduce::toRange($numbers);
-// 20
-```
-
 ### To Value
 Reduce elements to a single value using reducer function.
 
@@ -1081,7 +1080,9 @@ $result = Reduce::toValue($input, $sum, 0);
 
 ## Stream
 
-### Of
+### Stream Sources
+
+#### Of
 Creates iterable instance with fluent interface.
 
 ```Stream::of(iterable $iterable): self```
@@ -1101,7 +1102,22 @@ $result = Stream::of($iterable)
 // 90
 ```
 
-### Of Empty
+#### Of Coin Flips
+Creates iterable instance with fluent interface of random coin flips.
+
+```Stream::ofCoinFlips(int $repetitions): self```
+
+```php
+use IterTools\Stream;
+
+$result = Stream::ofCoinFlips(10);
+
+foreach ($result as $item) {
+    // 1, 0, 0, 1, 1, 1, 0, 1, 0, 0 [random]
+}
+```
+
+#### Of Empty
 Creates iterable instance with fluent interface from empty iterable source.
 
 ```Stream::ofEmpty(): self```
@@ -1117,7 +1133,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Of Random Choice
+#### Of Random Choice
 Creates iterable instance with fluent interface of random selections from an array of values.
 
 ```Stream::ofRandomChoice(array $items, int $repetitions): self```
@@ -1134,7 +1150,7 @@ foreach ($result as $language) {
 }
 ```
 
-### Of Random Numbers
+#### Of Random Numbers
 Creates iterable instance with fluent interface of random numbers (integers).
 
 ```Stream::ofRandomNumbers(int $min, int $max, int $repetitions): self```
@@ -1149,7 +1165,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Of Random Percentage
+#### Of Random Percentage
 Creates iterable instance with fluent interface of random percentages between 0 and 1.
 
 ```Stream::ofRandomPercentage(int $repetitions): self```
@@ -1164,22 +1180,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Of Coin Flips
-Creates iterable instance with fluent interface of random coin flips.
-
-```Stream::ofCoinFlips(int $repetitions): self```
-
-```php
-use IterTools\Stream;
-
-$result = Stream::ofCoinFlips(10);
-
-foreach ($result as $item) {
-    // 1, 0, 0, 1, 1, 1, 0, 1, 0, 0 [random]
-}
-```
-
-### Of Rock Paper Scissors
+#### Of Rock Paper Scissors
 Creates iterable instance with fluent interface of rock-paper-scissors hands.
 
 ```Stream::ofRockPaperScissors(int $repetitions): self```
@@ -1194,7 +1195,9 @@ foreach ($result as $item) {
 }
 ```
 
-### Compress
+### Stream Operations
+
+#### Compress
 Compress an iterable source by filtering out data that is not selected.
 
 ```$stream->compress(iterable $selectors): self```
@@ -1214,7 +1217,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Drop While
+#### Drop While
 Drop elements from the iterable source while the predicate function is true.
 
 ```$stream->dropWhile(callable $predicate): self```
@@ -1234,7 +1237,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Take While
+#### Take While
 Return elements from the iterable source as long as the predicate is true.
 
 ```$stream->takeWhile(callable $predicate): self```
@@ -1254,7 +1257,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Filter True
+#### Filter True
 Filter out elements from the iterable source only returning elements where there predicate function is true.
 
 ```$stream->filterTrue(callable $predicate): self```
@@ -1274,7 +1277,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Filter False
+#### Filter False
 Filter out elements from the iterable source only returning elements where the predicate function is false.
 
 ```$stream->filterFalse(callable $predicate): self```
@@ -1294,7 +1297,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Group By
+#### Group By
 Group iterable source by a common data element.
 
 ```$stream->groupBy(callable $groupKeyFunction): self```
@@ -1314,7 +1317,7 @@ foreach ($result as $group => $item) {
 }
 ```
 
-### Map
+#### Map
 Map a function onto each element of the stream.
 
 ```$stream->map(callable $function): self```
@@ -1332,7 +1335,7 @@ foreach ($result as $actualGrade) {
 }
 ```
 
-### Pairwise
+#### Pairwise
 Return pairs of elements from iterable source.
 
 ```$stream->pairwise(): self```
@@ -1352,7 +1355,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Chunkwise
+#### Chunkwise
 Return chunks of elements from iterable source.
 
 ```$stream->chunkwise(int $chunkSize): self```
@@ -1372,7 +1375,7 @@ foreach ($result as $chunk) {
 }
 ```
 
-### Chunkwise Overlap
+#### Chunkwise Overlap
 Return overlapped chunks of elements from iterable source.
 
 ```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): self```
@@ -1394,7 +1397,7 @@ foreach ($result as $chunk) {
 }
 ```
 
-### Limit
+#### Limit
 Stream up to a limit.
 
 Stops even if more data available if limit reached.
@@ -1413,7 +1416,7 @@ $goodMovies = Stream::of($matrixMovies)
 // 'The Matrix' (and nothing else)
 ```
 
-### Chain With
+#### Chain With
 Chain iterable source withs given iterables together into a single iteration.
 
 ```$stream->chainWith(iterable ...$iterables): self```
@@ -1434,7 +1437,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Zip With
+#### Zip With
 Iterate iterable source with another iterable collections simultaneously.
 
 ```$stream->zipWith(iterable ...$iterables): self```
@@ -1459,7 +1462,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Zip Longest With
+#### Zip Longest With
 Iterate iterable source with another iterable collections simultaneously.
 
 ```$stream->zipLongestWith(iterable ...$iterables): self```
@@ -1486,7 +1489,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Zip Equal With
+#### Zip Equal With
 Iterate iterable source with another iterable collections of equal lengths simultaneously.
 
 ```$stream->zipEqualWith(iterable ...$iterables): self```
@@ -1508,7 +1511,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Infinite Cycle
+#### Infinite Cycle
 Cycle through the elements of iterable source sequentially forever.
 
 ```$stream->infiniteCycle(): self```
@@ -1526,7 +1529,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Running Average
+#### Running Average
 Accumulate the running average (mean) over iterable source.
 
 ```$stream->runningAverage(int|float|null $initialValue = null): self```
@@ -1544,7 +1547,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Running Difference
+#### Running Difference
 Accumulate the running difference over iterable source.
 
 ```$stream->runningDifference(int|float|null $initialValue = null): self```
@@ -1562,7 +1565,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Running Max
+#### Running Max
 Accumulate the running max over iterable source.
 
 ```$stream->runningMax(int|float|null $initialValue = null): self```
@@ -1580,7 +1583,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Running Min
+#### Running Min
 Accumulate the running min over iterable source.
 
 ```$stream->runningMin(int|float|null $initialValue = null): self```
@@ -1598,7 +1601,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Running Product
+#### Running Product
 Accumulate the running product over iterable source.
 
 ```$stream->runningProduct(int|float|null $initialValue = null): self```
@@ -1616,7 +1619,7 @@ foreach ($result as $item) {
 }
 ```
 
-### Running Total
+#### Running Total
 Accumulate the running total over iterable source.
 
 ```$stream->runningTotal(int|float|null $initialValue = null): self```
@@ -1634,7 +1637,11 @@ foreach ($result as $item) {
 }
 ```
 
-### Is Sorted
+### Stream Terminal Operations
+
+#### Stream Summary Operations - Terminal
+
+##### Is Sorted
 Returns true if iterable source is sorted in ascending order; otherwise false.
 
 ```$stream->isSorted(): bool```
@@ -1659,7 +1666,7 @@ $result = Stream::of($input)
 // false
 ```
 
-### Is Reversed
+##### Is Reversed
 Returns true if iterable source is sorted in reverse descending order; otherwise false.
 
 ```$stream->isReversed(): bool```
@@ -1684,7 +1691,7 @@ $result = Stream::of($input)
 // false
 ```
 
-### Same With
+##### Same With
 Returns true if iterable source and all given collections are the same.
 
 ```$stream->sameWith(iterable ...$iterables): bool```
@@ -1705,7 +1712,7 @@ $result = Stream::of($input)
 // false
 ```
 
-### Same Count With
+##### Same Count With
 Returns true if iterable source and all given collections have the same lengths.
 
 ```$stream->sameCountWith(iterable ...$iterables): bool```
@@ -1726,7 +1733,9 @@ $result = Stream::of($input)
 // false
 ```
 
-### To Average
+#### Stream Reduction Operations - Terminal
+
+##### To Average
 Reduces iterable source to the mean average of its items.
 
 ```$stream->toAverage(): mixed```
@@ -1743,7 +1752,7 @@ $result = Stream::of($iterable)
 // 5
 ```
 
-### To Count
+##### To Count
 Reduces iterable source to its length.
 
 ```$stream->toCount(): mixed```
@@ -1758,7 +1767,7 @@ $result = Stream::of($iterable)
 // 5
 ```
 
-### To Max
+##### To Max
 Reduces iterable source to its max value.
 
 ```$stream->toMax(): mixed```
@@ -1777,7 +1786,7 @@ $result = Stream::of($iterable)
 // 3
 ```
 
-### To Min
+##### To Min
 Reduces iterable source to its min value.
 
 ```$stream->toMin(): mixed```
@@ -1796,7 +1805,24 @@ $result = Stream::of($iterable)
 // -3
 ```
 
-### To Product
+##### To Min Max
+Reduces iterable source to array of its upper and lower bounds (max and min).
+
+```$stream->toMinMax(): array```
+
+Returns `[null, null]` if given collection is empty.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 2, 3, -1, -2, -3];
+
+[$min, $max] = Stream::of($numbers)
+    ->toMinMax();
+// [-3, 3]
+```
+
+##### To Product
 Reduces iterable source to the product of its items.
 
 ```$stream->toProduct(): mixed```
@@ -1813,7 +1839,24 @@ $result = Stream::of($iterable)
 // 120
 ```
 
-### To String
+##### To Range
+Reduces iterable source to its range (difference between max and min).
+
+```$stream->toRange(): int|float```
+
+Returns 0 if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$grades = [100, 90, 80, 85, 95];
+
+$range = Stream::of($numbers)
+    ->toRange();
+// 20
+```
+
+##### To String
 Reduces to a string joining all elements.
 
 * Optional separator to insert between items.
@@ -1836,7 +1879,7 @@ $string = Stream::of($words)->toString($words, '-', 'Library: ', '!');
 // Library: IterTools-PHP-v1.0!
 ```
 
-### To Sum
+##### To Sum
 Reduces iterable source to the sum of its items.
 
 ```$stream->toSum(): mixed```
@@ -1851,41 +1894,7 @@ $result = Stream::of($iterable)
 // 15
 ```
 
-### To Min Max
-Reduces iterable source to array of its upper and lower bounds (max and min).
-
-```$stream->toMinMax(): array```
-
-Returns `[null, null]` if given collection is empty.
-
-```php
-use IterTools\Stream;
-
-$numbers = [1, 2, 3, -1, -2, -3];
-
-[$min, $max] = Stream::of($numbers)
-    ->toMinMax();
-// [-3, 3]
-```
-
-### To Range
-Reduces iterable source to its range (difference between max and min).
-
-```$stream->toRange(): int|float```
-
-Returns 0 if iterable source is empty.
-
-```php
-use IterTools\Stream;
-
-$grades = [100, 90, 80, 85, 95];
-
-$range = Stream::of($numbers)
-    ->toRange();
-// 20
-```
-
-### To Value
+##### To Value
 Reduces iterable source like array_reduce() function.
 
 But unlike array_reduce(), it works with all iterable types.
@@ -1900,6 +1909,72 @@ $input = [1, 2, 3, 4, 5];
 $result = Stream::of($iterable)
     ->toValue(fn ($carry, $item) => $carry + $item);
 // 15
+```
+
+#### Side Effect Terminal Operations
+
+##### Print
+Prints each item in the stream.
+
+* Items must be printable.
+
+```$stream->print(string $separator = '', string $prefix = '', string $suffix = ''): void```
+
+```php
+use IterTools\Stream;
+
+$words = ['IterTools', 'PHP', 'v1.0'];
+
+Stream::of($words)->print();                       // IterToolsPHPv1.0
+Stream::of($words)->print('-');                    // IterTools-PHP-v1.0
+Stream::of($words)->print('-', 'Library: ');       // Library: IterTools-PHP-v1.0
+Stream::of($words)->print('-', 'Library: ', '!');  // Library: IterTools-PHP-v1.0!
+```
+
+##### Print Line
+Prints each item in the stream on its own line.
+
+* Items must be printable.
+
+```$stream->println(): void```
+
+```php
+use IterTools\Stream;
+
+$words = ['IterTools', 'PHP', 'v1.0'];
+
+Stream::of($words)->printLn();
+// IterTools
+// PHP
+// v1.0
+```
+
+##### Print R
+`print_r` each item in the stream.
+
+```$stream->printR(): void```
+
+```php
+use IterTools\Stream;
+
+$items = [$string, $array, $object];
+
+Stream::of($words)->printR();
+// print_r output
+```
+
+##### Var Dump
+`var_dump` each item in the stream.
+
+```$stream->varDump(): void```
+
+```php
+use IterTools\Stream;
+
+$items = [$string, $array, $object];
+
+Stream::of($words)->printR();
+// var_dump output
 ```
 
 ## Composition
