@@ -1,6 +1,8 @@
 # IterTools PHP Change Log
 
 ## v1.2.0 - TBD
+
+### New Features
 * Single
   * `chunkwise`
   * `chunkwiseOverlap`
