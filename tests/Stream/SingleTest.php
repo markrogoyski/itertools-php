@@ -405,6 +405,27 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [2, 3, 4],
             ],
+            [
+                [1, 2, 3, '1', '2', '3'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct(false)
+                    ->toArray(),
+                [1, 2, 3],
+            ],
+            [
+                [1, 2, 3, '1', '2', '3'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct()
+                    ->toArray(),
+                [1, 2, 3, '1', '2', '3'],
+            ],
+            [
+                [1, 2, 3, '1', '2', '3', 1, '1'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct()
+                    ->toArray(),
+                [1, 2, 3, '1', '2', '3'],
+            ],
         ];
     }
 
@@ -767,6 +788,27 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->limit(10)
                     ->toArray(),
                 [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
+            ],
+            [
+                $gen([1, 2, 3, '1', '2', '3']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct(false)
+                    ->toArray(),
+                [1, 2, 3],
+            ],
+            [
+                $gen([1, 2, 3, '1', '2', '3']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct()
+                    ->toArray(),
+                [1, 2, 3, '1', '2', '3'],
+            ],
+            [
+                $gen([1, 2, 3, '1', '2', '3', 1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct()
+                    ->toArray(),
+                [1, 2, 3, '1', '2', '3'],
             ],
         ];
     }
@@ -1131,6 +1173,27 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
             ],
+            [
+                $iter([1, 2, 3, '1', '2', '3']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct(false)
+                    ->toArray(),
+                [1, 2, 3],
+            ],
+            [
+                $iter([1, 2, 3, '1', '2', '3']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct()
+                    ->toArray(),
+                [1, 2, 3, '1', '2', '3'],
+            ],
+            [
+                $iter([1, 2, 3, '1', '2', '3', 1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct()
+                    ->toArray(),
+                [1, 2, 3, '1', '2', '3'],
+            ],
         ];
     }
 
@@ -1493,6 +1556,27 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->limit(10)
                     ->toArray(),
                 [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
+            ],
+            [
+                $trav([1, 2, 3, '1', '2', '3']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct(false)
+                    ->toArray(),
+                [1, 2, 3],
+            ],
+            [
+                $trav([1, 2, 3, '1', '2', '3']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct()
+                    ->toArray(),
+                [1, 2, 3, '1', '2', '3'],
+            ],
+            [
+                $trav([1, 2, 3, '1', '2', '3', 1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinct()
+                    ->toArray(),
+                [1, 2, 3, '1', '2', '3'],
             ],
         ];
     }

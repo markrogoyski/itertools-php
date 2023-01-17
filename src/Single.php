@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\UniqueExtractor;
+
 class Single
 {
     /**
@@ -149,37 +151,12 @@ class Single
      *
      * @return \Generator<T>
      */
-    public static function filterUnique(iterable $data, bool $strict = true): \Generator
+    public static function distinct(iterable $data, bool $strict = true): \Generator
     {
         $map = [];
 
         foreach ($data as $datum) {
-            switch (true) {
-                case is_array($datum):
-                    $hash = 'array_'.md5(serialize($datum));
-                    break;
-                case is_object($datum):
-                    $hash = 'object_'.($strict ? spl_object_id($datum) : md5(serialize($datum)));
-                    break;
-                case $strict:
-                    $hash = gettype($datum).'_'.$datum;
-                    break;
-                case gettype($datum) === 'boolean':
-                    $hash = 'boolean_'.(int)$datum;
-                    break;
-                case !$datum:
-                    $hash = 'boolean_0';
-                    break;
-                case (string)$datum === '1':
-                    $hash = 'boolean_1';
-                    break;
-                case is_numeric($datum):
-                    $hash = 'numeric_'.(float)$datum;
-                    break;
-                default:
-                    $hash = 'scalar_'.$datum;
-                    break;
-            }
+            $hash = UniqueExtractor::getString($datum, $strict);
 
             if (!isset($map[$hash])) {
                 $map[$hash] = true;
