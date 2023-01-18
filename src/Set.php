@@ -130,13 +130,15 @@ class Set
 
         foreach ($multipleIterator as $index => $values) {
             foreach ($values as $owner => $value) {
-                if (!($value instanceof NoValueMonad)) {
-                    $usageMap->addUsage($value, (string)$owner);
+                if ($value instanceof NoValueMonad) {
+                    continue;
+                }
 
-                    if ($usageMap->getOwnersCount($value) === $minIntersectionCount) {
-                        yield $index => $value;
-                        $usageMap->deleteUsage($value);
-                    }
+                $usageMap->addUsage($value, (string)$owner);
+
+                if ($usageMap->getOwnersCount($value) === $minIntersectionCount) {
+                    yield $index => $value;
+                    $usageMap->deleteUsage($value);
                 }
             }
         }
