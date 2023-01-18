@@ -13,8 +13,12 @@
   * `toRange`
   * `toString`
 * Summary
+  * `allMatch`
+  * `anyMatch`
   * `exactlyN`
+  * `noneMatch`
 * Streams
+  * TBD
 
 
 ## v1.1.0 - 2023-01-10
