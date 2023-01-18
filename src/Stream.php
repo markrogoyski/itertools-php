@@ -406,7 +406,7 @@ class Stream implements \IteratorAggregate
      */
     public function distinct(bool $strict = true): self
     {
-        $this->iterable = Single::distinct($this->iterable, $strict);
+        $this->iterable = Set::distinct($this->iterable, $strict);
         return $this;
     }
 

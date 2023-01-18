@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Single;
+namespace IterTools\Tests\Set;
 
-use IterTools\Single;
+use IterTools\Set;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -23,7 +23,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::distinct($data, $strict) as $datum) {
+        foreach (Set::distinct($data, $strict) as $datum) {
             $result[] = $datum;
         }
 
@@ -319,7 +319,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::distinct($data, $strict) as $datum) {
+        foreach (Set::distinct($data, $strict) as $datum) {
             $result[] = $datum;
         }
 
@@ -619,7 +619,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::distinct($data, $strict) as $datum) {
+        foreach (Set::distinct($data, $strict) as $datum) {
             $result[] = $datum;
         }
 
@@ -919,7 +919,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::distinct($data, $strict) as $datum) {
+        foreach (Set::distinct($data, $strict) as $datum) {
             $result[] = $datum;
         }
 

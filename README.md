@@ -36,7 +36,11 @@ Quick Reference
 | [`repeat`](#Repeat)                      | Repeat an item                                  | `Single::repeat($item, $repetitions)`                       |
 | [`string`](#String)                      | Iterate the characters of a string              | `Single::string($string)`                                   |
 | [`takeWhile`](#Take-While)               | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`                      |
-| [`distinct`](#Distinct)                  | Filter out elements: iterate only unique items  | `Single::distinct($data, $strict)`                          |
+
+#### Set
+| Iterator                | Description                                     | Code Snippet                    |
+|-------------------------|-------------------------------------------------|---------------------------------|
+| [`distinct`](#Distinct) | Filter out elements: iterate only unique items  | `Set::distinct($data, $strict)` |
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
@@ -555,10 +559,11 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
 // 0, 0
 ```
 
+## Set
 ### Distinct
 Filter out elements from the iterable only returning unique elements.
 
-```Single::distinct(iterable $data, bool $strict = true)```
+```Set::distinct(iterable $data, bool $strict = true)```
 
 If `$strict = true`:
 * **scalars**: compares strictly by type;
@@ -575,12 +580,12 @@ use IterTools\Single;
 
 $input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
 
-foreach (Single::distinct($input, true) as $datum) {
+foreach (Set::distinct($input, true) as $datum) {
     print($datum);
 }
 // 1, 2, 3, '1', '2', '3'
 
-foreach (Single::distinct($input, false) as $datum) {
+foreach (Set::distinct($input, false) as $datum) {
     print($datum);
 }
 // 1, 2, 3
