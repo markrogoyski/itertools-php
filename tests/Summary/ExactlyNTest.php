@@ -10,6 +10,8 @@ use IterTools\Tests\Fixture;
 
 class ExactlyNTest extends \PHPUnit\Framework\TestCase
 {
+    use \IterTools\Tests\Fixture\DataProvider;
+
     /**
      * @dataProvider dataProviderForEmptyIterable
      * @param        iterable $data
@@ -24,16 +26,6 @@ class ExactlyNTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertTrue($result);
-    }
-
-    public function dataProviderForEmptyIterable(): array
-    {
-        return [
-            [[]],
-            [Fixture\GeneratorFixture::getGenerator([])],
-            [new Fixture\ArrayIteratorFixture([])],
-            [new Fixture\IteratorAggregateFixture([])],
-        ];
     }
 
     /**
