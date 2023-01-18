@@ -439,4 +439,60 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         $output = $this->getActualOutputForAssertion();
         $this->assertNotEmpty($output);
     }
+
+    /**
+     * @test callForEach - print_r callable
+     * @dataProvider dataProviderForPrintArray
+     * @dataProvider dataProviderForPrintGenerator
+     * @dataProvider dataProviderForPrintIterator
+     * @dataProvider dataProviderForPrintTraversable
+     */
+    public function testCallForEachPrintRCallable(iterable $data, string $expectedOutput): void
+    {
+        // Given
+        $stream = Stream::of($data);
+        $func = 'print_r';
+
+        // Then
+        $this->expectOutputString($expectedOutput);
+
+        // When
+        $stream->callForEach($func);
+    }
+
+    /**
+     * @test callForEach - print closure
+     * @dataProvider dataProviderForPrintArray
+     * @dataProvider dataProviderForPrintGenerator
+     * @dataProvider dataProviderForPrintIterator
+     * @dataProvider dataProviderForPrintTraversable
+     */
+    public function testCallForEachPrintClosure(iterable $data, string $expectedOutput): void
+    {
+        // Given
+        $stream = Stream::of($data);
+        $func = fn ($x) => print($x);
+
+        // Then
+        $this->expectOutputString($expectedOutput);
+
+        // When
+        $stream->callForEach($func);
+    }
+
+    /**
+     * @test callForEach - zip print closure
+     */
+    public function testCallForEachZipPrintClosure(): void
+    {
+        // Given
+        $stream = Stream::of(['a', 'b', 'c'])->zipWith([1, 2, 3]);
+        $func = fn ($x) => print("Left:{$x[0]} Right:{$x[1]}\n");
+
+        // Then
+        $this->expectOutputString("Left:a Right:1\nLeft:b Right:2\nLeft:c Right:3\n");
+
+        // When
+        $stream->callForEach($func);
+    }
 }

@@ -148,12 +148,13 @@ Quick Reference
 | [`toValue`](#To-Value-1)       | Reduces stream like array_reduce() function           | `$stream->toValue($reducer, $initialValue)`             |
 
 ##### Side Effect Terminal Operations
-| Terminal Operation         | Description                     | Code Snippet                                          |
-|----------------------------|---------------------------------|-------------------------------------------------------|
-| [`print`](#Print)          | `print` each item in the stream | `$stream->print([$separator], [$prefix], [$suffix])`  |
-| [`printLn`](#Print-Line)   | `print` each item on a new line | `$stream->printLn()`                                  |
-| [`printR`](#Print-R)       | `print_r` each item             | `$stream->printR()`                                   |
-| [`var_dump`](#Var-Dump)    | `var_dump` each item            | `$stream->varDump()`                                  |
+| Terminal Operation              | Description                              | Code Snippet                                          |
+|---------------------------------|------------------------------------------|-------------------------------------------------------|
+| [`callForEach`](#Call-For-Each) | Perform action via function on each item | `$stream->callForEach($function)`                     |
+| [`print`](#Print)               | `print` each item in the stream          | `$stream->print([$separator], [$prefix], [$suffix])`  |
+| [`printLn`](#Print-Line)        | `print` each item on a new line          | `$stream->printLn()`                                  |
+| [`printR`](#Print-R)            | `print_r` each item                      | `$stream->printR()`                                   |
+| [`var_dump`](#Var-Dump)         | `var_dump` each item                     | `$stream->varDump()`                                  |
 
 Setup
 -----
@@ -1912,6 +1913,26 @@ $result = Stream::of($iterable)
 ```
 
 #### Side Effect Terminal Operations
+
+##### Call For Each
+Perform an action via a callable on each item in the stream.
+
+```$stream->callForEach(callable $function): void```
+```php
+use IterTools\Stream;
+
+$languages = ['PHP', 'Python', 'Java', 'Go'];
+$mascots   = ['elephant', 'snake', 'bean', 'gopher'];
+
+$zipPrinter = fn ($zipped) => print("{$zipped[0]}'s mascot: {$zipped[1]}");
+
+Stream::of($languages)
+    ->zipWith($mascots)
+    ->callForEach($zipPrinter);
+// PHP's mascot: elephant
+// Python's mascot: snake
+// ...
+```
 
 ##### Print
 Prints each item in the stream.

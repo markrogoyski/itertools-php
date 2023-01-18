@@ -791,6 +791,13 @@ class Stream implements \IteratorAggregate
         }
     }
 
+    public function callForEach(callable $func): void
+    {
+        foreach ($this->iterable as $item) {
+            $func($item);
+        }
+    }
+
     /**
      * {@inheritDoc}
      *
