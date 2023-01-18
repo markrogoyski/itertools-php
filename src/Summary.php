@@ -10,6 +10,70 @@ namespace IterTools;
 class Summary
 {
     /**
+     * Returns true if all elements match the predicate function.
+     *
+     * Empty iterables return true.
+     *
+     * @param iterable<mixed> $data
+     * @param callable        $predicate
+     *
+     * @return bool
+     */
+    public static function allMatch(iterable $data, callable $predicate): bool
+    {
+        $count = 0;
+
+        foreach ($data as $datum) {
+            if ($predicate($datum) === false) {
+                return false;
+            }
+            $count++;
+        }
+
+        return $count > 0;
+    }
+
+    /**
+     * Returns true if any element matches the predicate function.
+     *
+     * Empty iterables return false.
+     *
+     * @param iterable<mixed> $data
+     * @param callable        $predicate
+     *
+     * @return bool
+     */
+    public static function anyMatch(iterable $data, callable $predicate): bool
+    {
+        foreach ($data as $datum) {
+            if ($predicate($datum) === true) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if no element matches the predicate function.
+     *
+     * Empty iterables return true.
+     *
+     * @param iterable<mixed> $data
+     * @param callable        $predicate
+     *
+     * @return bool
+     */
+    public static function noneMatch(iterable $data, callable $predicate): bool
+    {
+        foreach ($data as $datum) {
+            if ($predicate($datum) === true) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns true if given collection is sorted in ascending order; otherwise false.
      *
      * Items of given collection must be comparable.

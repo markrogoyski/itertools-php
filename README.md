@@ -66,9 +66,12 @@ Quick Reference
 #### Summary
 | Summary                      | Description                                             | Code Snippet                               |
 |------------------------------|---------------------------------------------------------|--------------------------------------------|
+| [`allMatch`](#All-Match)     | True if all items are true according to predicate       | `Summary::allMatch($data, $predicate)`     |
+| [`anyMatch`](#Any-Match)     | True if any item is true according to predicate         | `Summary::anyMatch($data, $predicate)`     |
 | [`exactlyN`](#Exactly-N)     | True if exactly n items are true according to predicate | `Summary::exactlyN($data, $n, $predicate)` |
 | [`isSorted`](#Is-Sorted)     | True if iterable sorted                                 | `Summary::isSorted($data)`                 |
 | [`isReversed`](#Is-Reversed) | True if iterable reverse sorted                         | `Summary::isReversed($data)`               |
+| [`noneMatch`](#None-Match)   | True if none of items true according to predicate       | `Summary::noneMatch($data, $predicate)`    |
 | [`same`](#Same)              | True if iterables are the same                          | `Summary::same(...$iterables)`             |
 | [`sameCount`](#Same-Count)   | True if iterables have the same lengths                 | `Summary::sameCount(...$iterables)`        |
 
@@ -128,8 +131,11 @@ Quick Reference
 ##### Summary Terminal Operations
 | Terminal Operation                           | Description                                                                      | Code Snippet                                 |
 |----------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------|
+| [`allMatch`](#All-Match-1)                   | Returns true if all items in stream match predicate                              | `$stream->allMatch($predicate)`              |
+| [`anyMatch`](#Any-Match-1)                   | Returns true if any item in stream matches predicate                             | `$stream->anyMatch($predicate)`              |
 | [`isSorted`](#Is-Sorted-1)                   | Returns true if stream is sorted in ascending order                              | `$stream->isSorted()`                        |
 | [`isReversed`](#Is-Reversed-1)               | Returns true if stream is sorted in reverse descending order                     | `$stream->isReversed()`                      |
+| [`noneMatch`](#None-Match-1)                 | Returns true if none of the items in stream match predicate                      | `$stream->noneMatch($predicate)`             |
 | [`sameWith`](#Same-With)                     | Returns true if stream and all given collections are the same                    | `$stream->sameWith(...$iterables)`           |
 | [`sameCountWith`](#Same-Count-With)          | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`      |
 

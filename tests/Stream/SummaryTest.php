@@ -93,6 +93,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->runningMin()
                     ->isReversed(),
             ],
+            [
+                [1, 3, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allMatch(fn ($x) => $x > 0),
+            ],
+            [
+                [1, 3, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->anyMatch(fn ($x) => $x === 3),
+            ],
+            [
+                [1, 3, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->noneMatch(fn ($x) => $x === 9),
+            ],
         ];
     }
 
@@ -154,6 +169,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn ($item) => $item < 0)
                     ->runningMin()
                     ->isSorted(),
+            ],
+            [
+                [1, 3, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allMatch(fn ($x) => $x > 3),
+            ],
+            [
+                [1, 3, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->anyMatch(fn ($x) => $x === 9),
+            ],
+            [
+                [1, 3, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->noneMatch(fn ($x) => $x === 5),
             ],
         ];
     }
@@ -242,6 +272,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->runningMin()
                     ->isReversed(),
             ],
+            [
+                $gen([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allMatch(fn ($x) => $x > 0),
+            ],
+            [
+                $gen([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->anyMatch(fn ($x) => $x === 3),
+            ],
+            [
+                $gen([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->noneMatch(fn ($x) => $x === 9),
+            ],
         ];
     }
 
@@ -304,6 +349,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn ($item) => $item < 0)
                     ->runningMin()
                     ->isSorted(),
+            ],
+            [
+                $gen([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allMatch(fn ($x) => $x > 3),
+            ],
+            [
+                $gen([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->anyMatch(fn ($x) => $x === 9),
+            ],
+            [
+                $gen([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->noneMatch(fn ($x) => $x === 5),
             ],
         ];
     }
@@ -392,6 +452,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->runningMin()
                     ->isReversed(),
             ],
+            [
+                $iter([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allMatch(fn ($x) => $x > 0),
+            ],
+            [
+                $iter([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->anyMatch(fn ($x) => $x === 3),
+            ],
+            [
+                $iter([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->noneMatch(fn ($x) => $x === 9),
+            ],
         ];
     }
 
@@ -454,6 +529,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn ($item) => $item < 0)
                     ->runningMin()
                     ->isSorted(),
+            ],
+            [
+                $iter([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allMatch(fn ($x) => $x > 3),
+            ],
+            [
+                $iter([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->anyMatch(fn ($x) => $x === 9),
+            ],
+            [
+                $iter([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->noneMatch(fn ($x) => $x === 5),
             ],
         ];
     }
@@ -542,6 +632,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->runningMin()
                     ->isReversed(),
             ],
+            [
+                $trav([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allMatch(fn ($x) => $x > 0),
+            ],
+            [
+                $trav([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->anyMatch(fn ($x) => $x === 3),
+            ],
+            [
+                $trav([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->noneMatch(fn ($x) => $x === 9),
+            ],
         ];
     }
 
@@ -604,6 +709,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn ($item) => $item < 0)
                     ->runningMin()
                     ->isSorted(),
+            ],
+            [
+                $trav([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allMatch(fn ($x) => $x > 3),
+            ],
+            [
+                $trav([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->anyMatch(fn ($x) => $x === 9),
+            ],
+            [
+                $trav([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->noneMatch(fn ($x) => $x === 5),
             ],
         ];
     }

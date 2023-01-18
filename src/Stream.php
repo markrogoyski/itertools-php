@@ -517,6 +517,54 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns true if all elements match the predicate function.
+     *
+     * Empty iterables return true.
+     *
+     * @param callable $predicate
+     *
+     * @return bool
+     *
+     * @see Summary::allMatch
+     */
+    public function allMatch(callable $predicate): bool
+    {
+        return Summary::allMatch($this->iterable, $predicate);
+    }
+
+    /**
+     * Returns true if any element matches the predicate function.
+     *
+     * Empty iterables return false.
+     *
+     * @param callable $predicate
+     *
+     * @return bool
+     *
+     * @see Summary::anyMatch
+     */
+    public function anyMatch(callable $predicate): bool
+    {
+        return Summary::anyMatch($this->iterable, $predicate);
+    }
+
+    /**
+     * Returns true if no element matches the predicate function.
+     *
+     * Empty iterables return true.
+     *
+     * @param callable $predicate
+     *
+     * @return bool
+     *
+     * @see Summary::noneMatch
+     */
+    public function noneMatch(callable $predicate): bool
+    {
+        return Summary::noneMatch($this->iterable, $predicate);
+    }
+
+    /**
      * Returns true if iterable source is sorted in ascending order; otherwise false.
      *
      * Items of iterable source must be comparable.
