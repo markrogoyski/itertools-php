@@ -36,30 +36,29 @@ class UniqueExtractor
     public static function getString($var, bool $strict): string
     {
         switch (true) {
-            case is_array($var):
-                return 'array_'.serialize($var);
-            case is_resource($var):
-                preg_match('/#([0-9]+)$/', (string)$var, $matches);
-                return 'resource_'.$matches[1];
+            case \is_array($var):
+                return 'array_' . \serialize($var);
+            case \is_resource($var):
+                \preg_match('/#([0-9]+)$/', (string) $var, $matches);
+                return 'resource_' . $matches[1];
             case $var instanceof \Generator:
-                return 'generator_'.spl_object_id($var);
+                return 'generator_' . \spl_object_id($var);
             case $var instanceof \Closure:
-                return 'closure_'.spl_object_id($var);
-            case is_object($var):
-                return 'object_'.($strict ? spl_object_id($var) : serialize($var));
-            case gettype($var) === 'boolean':
-                /** @var bool $var */
-                return 'boolean_'.(int)$var;
+                return 'closure_' . \spl_object_id($var);
+            case \is_object($var):
+                return 'object_' . ($strict ? \spl_object_id($var) : \serialize($var));
+            case \gettype($var) === 'boolean':
+                return 'boolean_' . \intval($var);
             case $strict:
-                return gettype($var).'_'.$var;
+                return \gettype($var) . '_' . $var;
             case !$var:
                 return 'boolean_0';
-            case strval($var) === '1':
+            case \strval($var) === '1':
                 return 'boolean_1';
-            case is_numeric($var):
-                return 'numeric_'.(float)$var;
+            case \is_numeric($var):
+                return 'numeric_' . \floatval($var);
             default:
-                return 'scalar_'.$var;
+                return 'scalar_' . $var;
         }
     }
 }
