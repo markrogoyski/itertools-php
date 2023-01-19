@@ -386,6 +386,31 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Filter out elements from the iterable source only returning unique elements.
+     *
+     * If $strict is true:
+     *  - scalars: compares strictly by type;
+     *  - objects: always treats different instances as not equal to each other;
+     *  - arrays: compares serialized.
+     *
+     * If $strict is false:
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param bool $strict
+     *
+     * @return $this
+     *
+     * @see Single::distinct()
+     */
+    public function distinct(bool $strict = true): self
+    {
+        $this->iterable = Set::distinct($this->iterable, $strict);
+        return $this;
+    }
+
+    /**
      * Cycle through the elements of iterable source sequentially forever
      *
      * @return $this

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\UniqueExtractor;
+
 class Single
 {
     /**
