@@ -7,8 +7,8 @@ namespace IterTools\Util;
 /**
  * Tool for extracting unique IDs and hashes of any PHP variables and data structures.
  *
- * @author Smoren <ofigate@gmail.com>
- *
+ * Based on PHP Type Tool's UniqueExtractor.
+ * Contributed to IterTools by @author Smoren <ofigate@gmail.com>
  * @see https://github.com/Smoren/type-tools-php
  */
 class UniqueExtractor
@@ -39,8 +39,7 @@ class UniqueExtractor
             case \is_array($var):
                 return 'array_' . \serialize($var);
             case \is_resource($var):
-                \preg_match('/#([0-9]+)$/', (string) $var, $matches);
-                return 'resource_' . $matches[1];
+                return 'resource_' . \get_resource_type($var) . '_' . \get_resource_id($var);
             case $var instanceof \Generator:
                 return 'generator_' . \spl_object_id($var);
             case $var instanceof \Closure:
