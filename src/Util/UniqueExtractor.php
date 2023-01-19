@@ -39,7 +39,7 @@ class UniqueExtractor
             case \is_array($var):
                 return 'array_' . \serialize($var);
             case \is_resource($var):
-                return 'resource_' . \get_resource_type($var) . '_' . \get_resource_id($var);
+                return 'resource_' . \get_resource_type($var) . '_' . (string) $var;
             case $var instanceof \Generator:
                 return 'generator_' . \spl_object_id($var);
             case $var instanceof \Closure:
