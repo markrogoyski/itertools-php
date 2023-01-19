@@ -48,6 +48,7 @@ class UniqueExtractor
             case is_object($var):
                 return 'object_'.($strict ? spl_object_id($var) : serialize($var));
             case gettype($var) === 'boolean':
+                /** @var bool $var */
                 return 'boolean_'.(int)$var;
             case $strict:
                 return gettype($var).'_'.$var;
