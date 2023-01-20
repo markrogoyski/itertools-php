@@ -51,7 +51,7 @@ class Set
      *  - objects: compares serialized;
      *  - arrays: compares serialized.
      *
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      *
      * @return \Generator<mixed>
      */
@@ -68,7 +68,7 @@ class Set
      *  - arrays: compares serialized.
      *
      * @param positive-int $minIntersectionCount
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      *
      * @return \Generator<mixed>
      */
@@ -84,7 +84,7 @@ class Set
      *  - objects: always treats different instances as not equal to each other;
      *  - arrays: compares serialized.
      *
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      *
      * @return \Generator<mixed>
      */
@@ -101,7 +101,7 @@ class Set
      *  - arrays: compares serialized.
      *
      * @param positive-int $minIntersectionCount
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      *
      * @return \Generator<mixed>
      */
@@ -115,7 +115,7 @@ class Set
      *
      * @param bool $strict
      * @param int $minIntersectionCount
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      *
      * @return \Generator<mixed>
      */

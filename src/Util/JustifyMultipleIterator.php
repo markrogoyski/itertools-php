@@ -19,7 +19,7 @@ class JustifyMultipleIterator implements \Iterator
     protected int $index = 0;
 
     /**
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      */
     public function __construct(iterable ...$iterables)
     {

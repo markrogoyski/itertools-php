@@ -525,6 +525,84 @@ class Stream implements \IteratorAggregate
         return $this;
     }
 
+    /**
+     * Iterates the intersection of iterable source and given iterables in non-strict type mode.
+     *
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param array<iterable<mixed>> ...$iterables
+     *
+     * @return $this
+     *
+     * @see Set::intersection()
+     */
+    public function intersectionWith(iterable ...$iterables): self
+    {
+        $this->iterable = Set::intersection($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Iterates partial intersection of iterable source and given iterables in non-strict type mode.
+     *
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param positive-int $minIntersectionCount
+     * @param array<iterable<mixed>> ...$iterables
+     *
+     * @return $this
+     *
+     * @see Set::partialIntersection()
+     */
+    public function partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables): self
+    {
+        $this->iterable = Set::partialIntersection($minIntersectionCount, $this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Iterates the intersection of iterable source and given iterables in strict type mode.
+     *
+     *  - scalars: compares strictly by type;
+     *  - objects: always treats different instances as not equal to each other;
+     *  - arrays: compares serialized.
+     *
+     * @param array<iterable<mixed>> ...$iterables
+     *
+     * @return $this
+     *
+     * @see Set::intersectionStrict()
+     */
+    public function intersectionStrictWith(iterable ...$iterables): self
+    {
+        $this->iterable = Set::intersectionStrict($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Iterates partial intersection of iterable source and given iterables in strict type mode.
+     *
+     *  - scalars: compares strictly by type;
+     *  - objects: always treats different instances as not equal to each other;
+     *  - arrays: compares serialized.
+     *
+     * @param positive-int $minIntersectionCount
+     * @param array<iterable<mixed>> ...$iterables
+     *
+     * @return $this
+     *
+     * @see Set::partialIntersectionStrict()
+     */
+    public function partialIntersectionStrictWith(int $minIntersectionCount, iterable ...$iterables): self
+    {
+        $this->iterable = Set::partialIntersectionStrict($minIntersectionCount, $this->iterable, ...$iterables);
+        return $this;
+    }
+
     // STREAM TERMINAL OPERATIONS
 
     /**
