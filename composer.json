@@ -28,6 +28,12 @@
       "role": "Lead developer",
       "email": "mark@rogoyski.com",
       "homepage": "https://github.com/markrogoyski"
+    },
+    {
+      "name": "Smoren",
+      "role": "Developer",
+      "email": "ofigate@gmail.com",
+      "homepage": "https://github.com/Smoren"
     }
   ],
   "license": "MIT"
