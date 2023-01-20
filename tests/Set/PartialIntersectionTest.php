@@ -484,7 +484,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
     public function dataProviderForIterators(): array
     {
         $iter = static function (array $data) {
-            return new \ArrayIterator($data);
+            return new ArrayIteratorFixture($data);
         };
 
         return [
