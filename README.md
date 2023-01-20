@@ -38,9 +38,13 @@ Quick Reference
 | [`takeWhile`](#Take-While)               | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`                      |
 
 #### Set
-| Iterator                | Description                                     | Code Snippet                    |
-|-------------------------|-------------------------------------------------|---------------------------------|
-| [`distinct`](#Distinct) | Filter out elements: iterate only unique items  | `Set::distinct($data, $strict)` |
+| Iterator                                                    | Description                                               | Code Snippet                                                           |
+|-------------------------------------------------------------|-----------------------------------------------------------|------------------------------------------------------------------------|
+| [`distinct`](#Distinct)                                     | Filter out elements: iterate only unique items            | `Set::distinct($data, $strict)`                                        |
+| [`intersection`](#Intersection)                             | Intersection of iterables in non-strict type mode         | `Set::intersection(...$iterables)`                                     |
+| [`partialIntersection`](#Partial-Intersection)              | Partial intersection of iterables in non-strict type mode | `Set::partialIntersection($minIntersectionCount, ...$iterables)`       |
+| [`intersectionStrict`](#Intersection-Strict)                | Intersection of iterables in strict type mode             | `Set::intersectionStrict(...$iterables)`                               |
+| [`partialIntersectionStrict`](#Partial-Intersection-Strict) | Partial intersection of iterables in strict type mode     | `Set::partialIntersectionStrict($minIntersectionCount, ...$iterables)` |
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
@@ -576,7 +580,7 @@ If `$strict = false`:
 * **arrays**: compares serialized.
 
 ```php
-use IterTools\Single;
+use IterTools\Set;
 
 $input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
 
@@ -589,6 +593,94 @@ foreach (Set::distinct($input, false) as $datum) {
     print($datum);
 }
 // 1, 2, 3
+```
+
+### Intersection
+Iterates intersection of iterables in non-strict type mode.
+
+```Set::intersection(iterable ...$iterables)```
+
+* **scalars**: compares non-strictly by value;
+* **objects**: compares serialized;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
+$scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
+$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
+
+foreach (Set::intersection($languages, $scriptLanguages, $supportsInterfaces) as $lang) {
+    print($lang);
+}
+// 'php', 'typescript'
+```
+
+### Partial Intersection
+Iterates partial intersection of iterables in non-strict type mode.
+
+```Set::partialIntersection(int $minIntersectionCount, iterable ...$iterables)```
+
+* **scalars**: compares non-strictly by value;
+* **objects**: compares serialized;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
+$scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
+$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
+
+foreach (Set::partialIntersection(2, $languages, $scriptLanguages, $supportsInterfaces) as $lang) {
+    print($lang);
+}
+// 'php', 'python', 'java', 'c#', 'javascript', 'typescript'
+```
+
+### Intersection Strict
+Iterates intersection of iterables in strict type mode.
+
+```Set::intersectionStrict(iterable ...$iterables)```
+
+* **scalars**: compares strictly by type;
+* **objects**: always treats different instances as not equal to each other;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
+
+foreach (Set::intersectionStrict($numbers, $numerics, $oddNumbers) as $item) {
+    print($item);
+}
+// 3, 5, 7
+```
+
+### Partial Intersection Strict
+Iterates partial intersection of iterables in strict type mode.
+
+```Set::partialIntersectionStrict(int $minIntersectionCount, iterable ...$iterables)```
+
+* **scalars**: compares strictly by type;
+* **objects**: always treats different instances as not equal to each other;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
+
+foreach (Set::partialIntersectionStrict(2, $numbers, $numerics, $oddNumbers) as $item) {
+    print($item);
+}
+// 1, 3, 4, 5, 6, 7, 9
 ```
 
 ## Infinite Iteration

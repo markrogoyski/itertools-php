@@ -141,6 +141,15 @@ class PartialIntersectionStrictTest extends \PHPUnit\Framework\TestCase
                 2,
                 [true],
             ],
+            [
+                [
+                    [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    ['1', '2', 3, 4, 5, 6, 7, '8', '9'],
+                    [1, 3, 5, 7, 9, 11],
+                ],
+                2,
+                [1, 3, 4, 5, 6, 7, 9],
+            ],
         ];
     }
 
@@ -277,6 +286,15 @@ class PartialIntersectionStrictTest extends \PHPUnit\Framework\TestCase
                 ],
                 2,
                 [true],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $gen(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $gen([1, 3, 5, 7, 9, 11]),
+                ],
+                2,
+                [1, 3, 4, 5, 6, 7, 9],
             ],
         ];
     }
@@ -415,6 +433,15 @@ class PartialIntersectionStrictTest extends \PHPUnit\Framework\TestCase
                 2,
                 [true],
             ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $iter(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $iter([1, 3, 5, 7, 9, 11]),
+                ],
+                2,
+                [1, 3, 4, 5, 6, 7, 9],
+            ],
         ];
     }
 
@@ -551,6 +578,15 @@ class PartialIntersectionStrictTest extends \PHPUnit\Framework\TestCase
                 ],
                 2,
                 [true],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $trav(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $trav([1, 3, 5, 7, 9, 11]),
+                ],
+                2,
+                [1, 3, 4, 5, 6, 7, 9],
             ],
         ];
     }

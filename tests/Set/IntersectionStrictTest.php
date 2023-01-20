@@ -133,6 +133,14 @@ class IntersectionStrictTest extends \PHPUnit\Framework\TestCase
                 ],
                 [true],
             ],
+            [
+                [
+                    [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    ['1', '2', 3, 4, 5, 6, 7, '8', '9'],
+                    [1, 3, 5, 7, 9, 11],
+                ],
+                [3, 5, 7],
+            ],
         ];
     }
 
@@ -261,6 +269,14 @@ class IntersectionStrictTest extends \PHPUnit\Framework\TestCase
                     $gen([true, '2', 3.3, '4', true]),
                 ],
                 [true],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $gen(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $gen([1, 3, 5, 7, 9, 11]),
+                ],
+                [3, 5, 7],
             ],
         ];
     }
@@ -391,6 +407,14 @@ class IntersectionStrictTest extends \PHPUnit\Framework\TestCase
                 ],
                 [true],
             ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $iter(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $iter([1, 3, 5, 7, 9, 11]),
+                ],
+                [3, 5, 7],
+            ],
         ];
     }
 
@@ -519,6 +543,14 @@ class IntersectionStrictTest extends \PHPUnit\Framework\TestCase
                     $trav([true, '2', 3.3, '4', true]),
                 ],
                 [true],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $trav(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $trav([1, 3, 5, 7, 9, 11]),
+                ],
+                [3, 5, 7],
             ],
         ];
     }

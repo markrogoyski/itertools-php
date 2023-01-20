@@ -178,6 +178,14 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
                 ],
                 [true, 2, 3.3, true],
             ],
+            [
+                [
+                    ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'],
+                    ['php', 'python', 'javascript', 'typescript'],
+                    ['php', 'java', 'c#', 'typescript'],
+                ],
+                ['php', 'typescript'],
+            ],
         ];
     }
 
@@ -351,6 +359,14 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
                     $gen([true, '2', 3.3, '4', true]),
                 ],
                 [true, 2, 3.3, true],
+            ],
+            [
+                [
+                    $gen(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $gen(['php', 'python', 'javascript', 'typescript']),
+                    $gen(['php', 'java', 'c#', 'typescript']),
+                ],
+                ['php', 'typescript'],
             ],
         ];
     }
@@ -526,6 +542,14 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
                 ],
                 [true, 2, 3.3, true],
             ],
+            [
+                [
+                    $iter(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $iter(['php', 'python', 'javascript', 'typescript']),
+                    $iter(['php', 'java', 'c#', 'typescript']),
+                ],
+                ['php', 'typescript'],
+            ],
         ];
     }
 
@@ -699,6 +723,14 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
                     $trav([true, '2', 3.3, '4', true]),
                 ],
                 [true, 2, 3.3, true],
+            ],
+            [
+                [
+                    $trav(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $trav(['php', 'python', 'javascript', 'typescript']),
+                    $trav(['php', 'java', 'c#', 'typescript']),
+                ],
+                ['php', 'typescript'],
             ],
         ];
     }

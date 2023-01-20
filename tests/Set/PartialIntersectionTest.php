@@ -231,6 +231,15 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
                 3,
                 [],
             ],
+            [
+                [
+                    ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'],
+                    ['php', 'python', 'javascript', 'typescript'],
+                    ['php', 'java', 'c#', 'typescript'],
+                ],
+                2,
+                ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
+            ],
         ];
     }
 
@@ -457,6 +466,15 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
                 ],
                 3,
                 [],
+            ],
+            [
+                [
+                    $gen(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $gen(['php', 'python', 'javascript', 'typescript']),
+                    $gen(['php', 'java', 'c#', 'typescript']),
+                ],
+                2,
+                ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
             ],
         ];
     }
@@ -685,6 +703,15 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
                 3,
                 [],
             ],
+            [
+                [
+                    $iter(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $iter(['php', 'python', 'javascript', 'typescript']),
+                    $iter(['php', 'java', 'c#', 'typescript']),
+                ],
+                2,
+                ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
+            ],
         ];
     }
 
@@ -911,6 +938,15 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
                 ],
                 3,
                 [],
+            ],
+            [
+                [
+                    $trav(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $trav(['php', 'python', 'javascript', 'typescript']),
+                    $trav(['php', 'java', 'c#', 'typescript']),
+                ],
+                2,
+                ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
             ],
         ];
     }
