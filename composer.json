@@ -2,7 +2,7 @@
   "name": "markrogoyski/itertools-php",
   "type": "library",
   "description": "Iteration tools for PHP",
-  "keywords": ["iteration", "iterator", "generator", "loop", "looping", "traversable", "zip", "infinite", "random", "accumulate"],
+  "keywords": ["iteration", "iterator", "generator", "loop", "looping", "traversable", "stream", "functional", "zip", "infinite", "random", "accumulate", "itertools"],
   "homepage": "https://github.com/markrogoyski/itertools-php/",
   "require": {
     "php": ">=7.4.0"
