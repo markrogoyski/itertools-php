@@ -51,17 +51,205 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3, '1', '2', '3'],
             ],
+            [
+                [
+                    [1, 2, 3, 4, 5],
+                    [2, 3, 4, 5, 6, 7],
+                    [3, 4, 5, 6, 7, 8, 9],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5],
+                    [2, 3, 4, 5, 6, 7],
+                    ['3', 4, 5, 6, 7, 8, 9],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5],
+                    [2, 3, 4, 5, 6, 7],
+                    [3, 4, 5, 6, 7, 8, 9],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5],
+                    [2, 3, 4, 5, 6, 7],
+                    ['3', 4, 5, 6, 7, 8, 9],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [4, 5],
+            ],
+            [
+                [
+                    [1, 2],
+                    [2, 3, 4],
+                    [2, 3, 4, 5, 6],
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                [
+                    [1, 2],
+                    [2, 3, 4],
+                    [2, 3, 4, 5, 6],
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    [1, 2],
+                    [2, 3, 4],
+                    [2, 3, 4, 5, 6],
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    [1, 2],
+                    ['2', 3, 4],
+                    [2, 3, 4, 5, 6],
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, '2', 3, 4, 5, 6],
+            ],
+            [
+                [
+                    [1, 2],
+                    ['2', 3, 4],
+                    [2, 3, 4, 5, 6],
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    [1, 2],
+                    ['2', 3, 4],
+                    [2, 3, 4, 5, 6],
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    [1, 2],
+                    [2, 3, 4],
+                    [2, 3, 4, 5, 6],
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                [
+                    [1, 2],
+                    [2, 3, 4],
+                    [2, 3, 4, 5, 6],
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    [1, 2],
+                    [2, 3, 4],
+                    [2, 3, 4, 5, 6],
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    [1, 2],
+                    [2, '3', 4],
+                    [2, 3, 4, 5, 6],
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, '3', 3, 4, 5, 6],
+            ],
+            [
+                [
+                    [1, 2],
+                    [2, '3', 4],
+                    [2, 3, 4, 5, 6],
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 4],
+            ],
+            [
+                [
+                    [1, 2, 3],
+                    [2, '3', 4],
+                    [2, 3, 4, 5, 6],
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
         ];
     }
 
     /**
-     * @param \Generator $input
+     * @param iterable $input
      * @param callable   $streamFactoryFunc
      * @param array      $expected
      * @return void
      * @dataProvider dataProviderForGenerator
      */
-    public function testGenerator(\Generator $input, callable $streamFactoryFunc, array $expected): void
+    public function testGenerator(iterable $input, callable $streamFactoryFunc, array $expected): void
     {
         // Given
         $result = $streamFactoryFunc($input);
@@ -96,17 +284,205 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3, '1', '2', '3'],
             ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5]),
+                    $gen([2, 3, 4, 5, 6, 7]),
+                    $gen([3, 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5]),
+                    $gen([2, 3, 4, 5, 6, 7]),
+                    $gen(['3', 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5]),
+                    $gen([2, 3, 4, 5, 6, 7]),
+                    $gen([3, 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5]),
+                    $gen([2, 3, 4, 5, 6, 7]),
+                    $gen(['3', 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [4, 5],
+            ],
+            [
+                [
+                    $gen([1, 2]),
+                    $gen([2, 3, 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $gen([1, 2]),
+                    $gen([2, 3, 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    $gen([1, 2]),
+                    $gen([2, 3, 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    $gen([1, 2]),
+                    $gen(['2', 3, 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, '2', 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $gen([1, 2]),
+                    $gen(['2', 3, 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    $gen([1, 2]),
+                    $gen(['2', 3, 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    $gen([1, 2]),
+                    $gen([2, 3, 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $gen([1, 2]),
+                    $gen([2, 3, 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    $gen([1, 2]),
+                    $gen([2, 3, 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    $gen([1, 2]),
+                    $gen([2, '3', 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, '3', 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $gen([1, 2]),
+                    $gen([2, '3', 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 4],
+            ],
+            [
+                [
+                    $gen([1, 2, 3]),
+                    $gen([2, '3', 4]),
+                    $gen([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
         ];
     }
 
     /**
-     * @param \Iterator $input
+     * @param iterable $input
      * @param callable  $streamFactoryFunc
      * @param array     $expected
      * @return void
      * @dataProvider dataProviderForIterator
      */
-    public function testIterator(\Iterator $input, callable $streamFactoryFunc, array $expected): void
+    public function testIterator(iterable $input, callable $streamFactoryFunc, array $expected): void
     {
         // Given
         $result = $streamFactoryFunc($input);
@@ -141,17 +517,205 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3, '1', '2', '3'],
             ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5]),
+                    $iter([2, 3, 4, 5, 6, 7]),
+                    $iter([3, 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5]),
+                    $iter([2, 3, 4, 5, 6, 7]),
+                    $iter(['3', 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5]),
+                    $iter([2, 3, 4, 5, 6, 7]),
+                    $iter([3, 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5]),
+                    $iter([2, 3, 4, 5, 6, 7]),
+                    $iter(['3', 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [4, 5],
+            ],
+            [
+                [
+                    $iter([1, 2]),
+                    $iter([2, 3, 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $iter([1, 2]),
+                    $iter([2, 3, 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    $iter([1, 2]),
+                    $iter([2, 3, 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    $iter([1, 2]),
+                    $iter(['2', 3, 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, '2', 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $iter([1, 2]),
+                    $iter(['2', 3, 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    $iter([1, 2]),
+                    $iter(['2', 3, 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    $iter([1, 2]),
+                    $iter([2, 3, 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $iter([1, 2]),
+                    $iter([2, 3, 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    $iter([1, 2]),
+                    $iter([2, 3, 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    $iter([1, 2]),
+                    $iter([2, '3', 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, '3', 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $iter([1, 2]),
+                    $iter([2, '3', 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 4],
+            ],
+            [
+                [
+                    $iter([1, 2, 3]),
+                    $iter([2, '3', 4]),
+                    $iter([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
         ];
     }
 
     /**
-     * @param \Traversable $input
+     * @param iterable $input
      * @param callable     $streamFactoryFunc
      * @param array        $expected
      * @return void
      * @dataProvider dataProviderForTraversable
      */
-    public function testTraversable(\Traversable $input, callable $streamFactoryFunc, array $expected): void
+    public function testTraversable(iterable $input, callable $streamFactoryFunc, array $expected): void
     {
         // When
         $result = $streamFactoryFunc($input);
@@ -185,6 +749,194 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->distinct()
                     ->toArray(),
                 [1, 2, 3, '1', '2', '3'],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5]),
+                    $trav([2, 3, 4, 5, 6, 7]),
+                    $trav([3, 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5]),
+                    $trav([2, 3, 4, 5, 6, 7]),
+                    $trav(['3', 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5]),
+                    $trav([2, 3, 4, 5, 6, 7]),
+                    $trav([3, 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [3, 4, 5],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5]),
+                    $trav([2, 3, 4, 5, 6, 7]),
+                    $trav(['3', 4, 5, 6, 7, 8, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [4, 5],
+            ],
+            [
+                [
+                    $trav([1, 2]),
+                    $trav([2, 3, 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $trav([1, 2]),
+                    $trav([2, 3, 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    $trav([1, 2]),
+                    $trav([2, 3, 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    $trav([1, 2]),
+                    $trav(['2', 3, 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, '2', 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $trav([1, 2]),
+                    $trav(['2', 3, 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    $trav([1, 2]),
+                    $trav(['2', 3, 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    $trav([1, 2]),
+                    $trav([2, 3, 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $trav([1, 2]),
+                    $trav([2, 3, 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 3, 4],
+            ],
+            [
+                [
+                    $trav([1, 2]),
+                    $trav([2, 3, 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
+            ],
+            [
+                [
+                    $trav([1, 2]),
+                    $trav([2, '3', 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    1,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 2, '3', 3, 4, 5, 6],
+            ],
+            [
+                [
+                    $trav([1, 2]),
+                    $trav([2, '3', 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2, 4],
+            ],
+            [
+                [
+                    $trav([1, 2, 3]),
+                    $trav([2, '3', 4]),
+                    $trav([2, 3, 4, 5, 6]),
+                    3,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [2],
             ],
         ];
     }
