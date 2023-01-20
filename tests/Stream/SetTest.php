@@ -239,6 +239,52 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [2],
             ],
+            [
+                [
+                    ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'],
+                    ['php', 'python', 'javascript', 'typescript'],
+                    ['php', 'java', 'c#', 'typescript'],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                ['php', 'typescript'],
+            ],
+            [
+                [
+                    ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'],
+                    ['php', 'python', 'javascript', 'typescript'],
+                    ['php', 'java', 'c#', 'typescript'],
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    ['1', '2', 3, 4, 5, 6, 7, '8', '9'],
+                    [1, 3, 5, 7, 9, 11],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [3, 5, 7],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    ['1', '2', 3, 4, 5, 6, 7, '8', '9'],
+                    [1, 3, 5, 7, 9, 11],
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 3, 4, 5, 6, 7, 9],
+            ],
         ];
     }
 
@@ -471,6 +517,52 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
+            ],
+            [
+                [
+                    $gen(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $gen(['php', 'python', 'javascript', 'typescript']),
+                    $gen(['php', 'java', 'c#', 'typescript']),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                ['php', 'typescript'],
+            ],
+            [
+                [
+                    $gen(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $gen(['php', 'python', 'javascript', 'typescript']),
+                    $gen(['php', 'java', 'c#', 'typescript']),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $gen(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $gen([1, 3, 5, 7, 9, 11]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [3, 5, 7],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $gen(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $gen([1, 3, 5, 7, 9, 11]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 3, 4, 5, 6, 7, 9],
             ],
         ];
     }
@@ -705,6 +797,52 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [2],
             ],
+            [
+                [
+                    $iter(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $iter(['php', 'python', 'javascript', 'typescript']),
+                    $iter(['php', 'java', 'c#', 'typescript']),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                ['php', 'typescript'],
+            ],
+            [
+                [
+                    $iter(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $iter(['php', 'python', 'javascript', 'typescript']),
+                    $iter(['php', 'java', 'c#', 'typescript']),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $iter(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $iter([1, 3, 5, 7, 9, 11]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [3, 5, 7],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $iter(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $iter([1, 3, 5, 7, 9, 11]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 3, 4, 5, 6, 7, 9],
+            ],
         ];
     }
 
@@ -937,6 +1075,52 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
+            ],
+            [
+                [
+                    $trav(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $trav(['php', 'python', 'javascript', 'typescript']),
+                    $trav(['php', 'java', 'c#', 'typescript']),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionWith(...$iterables)
+                    ->toArray(),
+                ['php', 'typescript'],
+            ],
+            [
+                [
+                    $trav(['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript']),
+                    $trav(['php', 'python', 'javascript', 'typescript']),
+                    $trav(['php', 'java', 'c#', 'typescript']),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $trav(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $trav([1, 3, 5, 7, 9, 11]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->intersectionStrictWith(...$iterables)
+                    ->toArray(),
+                [3, 5, 7],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                    $trav(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
+                    $trav([1, 3, 5, 7, 9, 11]),
+                    2,
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->toArray(),
+                [1, 3, 4, 5, 6, 7, 9],
             ],
         ];
     }
