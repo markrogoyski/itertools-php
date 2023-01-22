@@ -38,13 +38,13 @@ Quick Reference
 | [`takeWhile`](#Take-While)               | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`                      |
 
 #### Set
-| Iterator                                                    | Description                                               | Code Snippet                                                           |
-|-------------------------------------------------------------|-----------------------------------------------------------|------------------------------------------------------------------------|
-| [`distinct`](#Distinct)                                     | Filter out elements: iterate only unique items            | `Set::distinct($data, $strict)`                                        |
-| [`intersection`](#Intersection)                             | Intersection of iterables in non-strict type mode         | `Set::intersection(...$iterables)`                                     |
-| [`partialIntersection`](#Partial-Intersection)              | Partial intersection of iterables in non-strict type mode | `Set::partialIntersection($minIntersectionCount, ...$iterables)`       |
-| [`intersectionStrict`](#Intersection-Strict)                | Intersection of iterables in strict type mode             | `Set::intersectionStrict(...$iterables)`                               |
-| [`partialIntersectionStrict`](#Partial-Intersection-Strict) | Partial intersection of iterables in strict type mode     | `Set::partialIntersectionStrict($minIntersectionCount, ...$iterables)` |
+| Iterator                                                           | Description                                               | Code Snippet                                                              |
+|--------------------------------------------------------------------|-----------------------------------------------------------|---------------------------------------------------------------------------|
+| [`distinct`](#Distinct)                                            | Filter out elements: iterate only unique items            | `Set::distinct($data, $strict)`                                           |
+| [`intersection`](#Intersection)                                    | Intersection of iterables in strict type mode             | `Set::intersection(...$iterables)`                                        |
+| [`intersectionNonStrict`](#Intersection-Non-Strict)                | Intersection of iterables in non-strict type mode         | `Set::intersectionNonStrict(...$iterables)`                               |
+| [`partialIntersection`](#Partial-Intersection)                     | Partial intersection of iterables in strict type mode     | `Set::partialIntersection($minIntersectionCount, ...$iterables)`          |
+| [`partialIntersectionNonStrict`](#Partial-Intersection-Non-Strict) | Partial intersection of iterables in non-strict type mode | `Set::partialIntersectionNonStrict($minIntersectionCount, ...$iterables)` |
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
@@ -111,35 +111,35 @@ Quick Reference
 | [`ofRockPaperScissors`](#Of-Rock-Paper-Scissors) | Start a fluent stream rock-paper-scissors hands                 | `Stream::ofRockPaperScissors($repetitions)`         |
 
 #### Stream Operations
-| Operation                                                            | Description                                                                                  | Code Snippet                                                                   |
-|----------------------------------------------------------------------|----------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| [`chainWith`](#Chain-With)                                           | Chain iterable source withs given iterables together into a single iteration                 | `$stream->chainWith(...$iterables)`                                            |
-| [`compress`](#Compress-1)                                            | Compress an iterable source by filtering out data that is not selected                       | `$stream->compress($selectors)`                                                |
-| [`chunkwise`](#Chunkwise-1)                                          | Iterate by chunks                                                                            | `$stream->chunkwise($chunkSize)`                                               |
-| [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                           | Iterate by overlapped chunks                                                                 | `$stream->chunkwiseOverlap($chunkSize, $overlapSize)`                          |
-| [`dropWhile`](#Drop-While-1)                                         | Drop elements from the iterable source while the predicate function is true                  | `$stream->dropWhile($predicate)`                                               |
-| [`filterTrue`](#Filter-True-1)                                       | Filter out elements from the iterable source where there predicate function is true          | `$stream->filterTrue($predicate)`                                              |
-| [`filterFalse`](#Filter-False-1)                                     | Filter out elements from the iterable source where the predicate function is false           | `$stream->filterFalse($predicate)`                                             |
-| [`groupBy`](#Group-By-1)                                             | Group iterable source by a common data element                                               | `$stream->groupBy($groupKeyFunction)`                                          |
-| [`infiniteCycle`](#Infinite-Cycle)                                   | Cycle through the elements of iterable source sequentially forever                           | `$stream->infiniteCycle()`                                                     |
-| [`limit`](#Limit-1)                                                  | Limit the stream's iteration                                                                 | `$stream->limit($limit)`                                                       |
-| [`map`](#Map-1)                                                      | Map function onto elements                                                                   | `$stream->map($function)`                                                      |
-| [`pairwise`](#Pairwise-1)                                            | Return pairs of elements from iterable source                                                | `$stream->pairwise()`                                                          |
-| [`runningAverage`](#Running-Average-1)                               | Accumulate the running average (mean) over iterable source                                   | `$stream->runningAverage($initialValue)`                                       |
-| [`runningDifference`](#Running-Difference-1)                         | Accumulate the running difference over iterable source                                       | `$stream->runningDifference($initialValue)`                                    |
-| [`runningMax`](#Running-Max-1)                                       | Accumulate the running max over iterable source                                              | `$stream->runningMax($initialValue)`                                           |
-| [`runningMin`](#Running-Min-1)                                       | Accumulate the running min over iterable source                                              | `$stream->runningMin($initialValue)`                                           |
-| [`runningProduct`](#Running-Product-1)                               | Accumulate the running product over iterable source                                          | `$stream->runningProduct($initialValue)`                                       |
-| [`runningTotal`](#Running-Total-1)                                   | Accumulate the running total over iterable source                                            | `$stream->runningTotal($initialValue)`                                         |
-| [`takeWhile`](#Take-While-1)                                         | Return elements from the iterable source as long as the predicate is true                    | `$stream->takeWhile($predicate)`                                               |
-| [`zipWith`](#Zip-With)                                               | Iterate iterable source with another iterable collections simultaneously                     | `$stream->zipWith(...$iterables)`                                              |
-| [`zipLongestWith`](#Zip-Longest-With)                                | Iterate iterable source with another iterable collections simultaneously                     | `$stream->zipLongestWith(...$iterables)`                                       |
-| [`zipEqualWith`](#Zip-Equal-With)                                    | Iterate iterable source with another iterable collections of equal lengths simultaneously    | `$stream->zipEqualWith(...$iterables)`                                         |
-| [`distinct`](#Distinct-1)                                            | Filter out elements: iterate only unique items                                               | `$stream->distinct($strict)`                                                   |
-| [`intersectionWith`](#Intersection-With)                             | Iterates the intersection of iterable source and given iterables in non-strict type mode     | `$stream->intersection(...$iterables)`                                         |
-| [`partialIntersectionWith`](#Partial-Intersection-With)              | Iterates partial intersection of iterable source and given iterables in non-strict type mode | `$stream->partialIntersectionWith($minIntersectionCount, ...$iterables)`       |
-| [`intersectionStrictWith`](#Intersection-Strict-With)                | Iterates the intersection of iterable source and given iterables in strict type mode         | `$stream->intersectionStrictWith(...$iterables)`                               |
-| [`partialIntersectionStrictWith`](#Partial-Intersection-Strict-With) | Iterates partial intersection of iterable source and given iterables in strict type mode     | `$stream->partialIntersectionStrictWith($minIntersectionCount, ...$iterables)` |
+| Operation                                                                   | Description                                                                                  | Code Snippet                                                                      |
+|-----------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`chainWith`](#Chain-With)                                                  | Chain iterable source withs given iterables together into a single iteration                 | `$stream->chainWith(...$iterables)`                                               |
+| [`compress`](#Compress-1)                                                   | Compress an iterable source by filtering out data that is not selected                       | `$stream->compress($selectors)`                                                   |
+| [`chunkwise`](#Chunkwise-1)                                                 | Iterate by chunks                                                                            | `$stream->chunkwise($chunkSize)`                                                  |
+| [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                                  | Iterate by overlapped chunks                                                                 | `$stream->chunkwiseOverlap($chunkSize, $overlapSize)`                             |
+| [`dropWhile`](#Drop-While-1)                                                | Drop elements from the iterable source while the predicate function is true                  | `$stream->dropWhile($predicate)`                                                  |
+| [`filterTrue`](#Filter-True-1)                                              | Filter out elements from the iterable source where there predicate function is true          | `$stream->filterTrue($predicate)`                                                 |
+| [`filterFalse`](#Filter-False-1)                                            | Filter out elements from the iterable source where the predicate function is false           | `$stream->filterFalse($predicate)`                                                |
+| [`groupBy`](#Group-By-1)                                                    | Group iterable source by a common data element                                               | `$stream->groupBy($groupKeyFunction)`                                             |
+| [`infiniteCycle`](#Infinite-Cycle)                                          | Cycle through the elements of iterable source sequentially forever                           | `$stream->infiniteCycle()`                                                        |
+| [`limit`](#Limit-1)                                                         | Limit the stream's iteration                                                                 | `$stream->limit($limit)`                                                          |
+| [`map`](#Map-1)                                                             | Map function onto elements                                                                   | `$stream->map($function)`                                                         |
+| [`pairwise`](#Pairwise-1)                                                   | Return pairs of elements from iterable source                                                | `$stream->pairwise()`                                                             |
+| [`runningAverage`](#Running-Average-1)                                      | Accumulate the running average (mean) over iterable source                                   | `$stream->runningAverage($initialValue)`                                          |
+| [`runningDifference`](#Running-Difference-1)                                | Accumulate the running difference over iterable source                                       | `$stream->runningDifference($initialValue)`                                       |
+| [`runningMax`](#Running-Max-1)                                              | Accumulate the running max over iterable source                                              | `$stream->runningMax($initialValue)`                                              |
+| [`runningMin`](#Running-Min-1)                                              | Accumulate the running min over iterable source                                              | `$stream->runningMin($initialValue)`                                              |
+| [`runningProduct`](#Running-Product-1)                                      | Accumulate the running product over iterable source                                          | `$stream->runningProduct($initialValue)`                                          |
+| [`runningTotal`](#Running-Total-1)                                          | Accumulate the running total over iterable source                                            | `$stream->runningTotal($initialValue)`                                            |
+| [`takeWhile`](#Take-While-1)                                                | Return elements from the iterable source as long as the predicate is true                    | `$stream->takeWhile($predicate)`                                                  |
+| [`zipWith`](#Zip-With)                                                      | Iterate iterable source with another iterable collections simultaneously                     | `$stream->zipWith(...$iterables)`                                                 |
+| [`zipLongestWith`](#Zip-Longest-With)                                       | Iterate iterable source with another iterable collections simultaneously                     | `$stream->zipLongestWith(...$iterables)`                                          |
+| [`zipEqualWith`](#Zip-Equal-With)                                           | Iterate iterable source with another iterable collections of equal lengths simultaneously    | `$stream->zipEqualWith(...$iterables)`                                            |
+| [`distinct`](#Distinct-1)                                                   | Filter out elements: iterate only unique items                                               | `$stream->distinct($strict)`                                                      |
+| [`intersectionWith`](#Intersection-With)                                    | Iterates the intersection of iterable source and given iterables in strict type mode         | `$stream->intersectionWith(...$iterables)`                                        |
+| [`intersectionNonStrictWith`](#Intersection-Non-Strict-With)                | Iterates the intersection of iterable source and given iterables in non-strict type mode     | `$stream->intersectionNonStrictWith(...$iterables)`                               |
+| [`partialIntersectionWith`](#Partial-Intersection-With)                     | Iterates partial intersection of iterable source and given iterables in strict type mode     | `$stream->partialIntersectionWith($minIntersectionCount, ...$iterables)`          |
+| [`partialIntersectionNonStrictWith`](#Partial-Intersection-Non-Strict-With) | Iterates partial intersection of iterable source and given iterables in non-strict type mode | `$stream->partialIntersectionNonStrictWith($minIntersectionCount, ...$iterables)` |
 
 #### Stream Terminal Operations
 ##### Summary Terminal Operations
@@ -600,9 +600,31 @@ foreach (Set::distinct($input, false) as $datum) {
 ```
 
 ### Intersection
-Iterates intersection of iterables in non-strict type mode.
+Iterates intersection of iterables in strict type mode.
 
 ```Set::intersection(iterable ...$iterables)```
+
+* **scalars**: compares strictly by type;
+* **objects**: always treats different instances as not equal to each other;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
+
+foreach (Set::intersection($numbers, $numerics, $oddNumbers) as $item) {
+    print($item);
+}
+// 3, 5, 7
+```
+
+### Intersection Non-Strict
+Iterates intersection of iterables in non-strict type mode.
+
+```Set::intersectionNonStrict(iterable ...$iterables)```
 
 * **scalars**: compares non-strictly by value;
 * **objects**: compares serialized;
@@ -615,16 +637,38 @@ $languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
 $scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
 $supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
-foreach (Set::intersection($languages, $scriptLanguages, $supportsInterfaces) as $lang) {
+foreach (Set::intersectionNonStrict($languages, $scriptLanguages, $supportsInterfaces) as $lang) {
     print($lang);
 }
 // 'php', 'typescript'
 ```
 
 ### Partial Intersection
-Iterates partial intersection of iterables in non-strict type mode.
+Iterates partial intersection of iterables in strict type mode.
 
 ```Set::partialIntersection(int $minIntersectionCount, iterable ...$iterables)```
+
+* **scalars**: compares strictly by type;
+* **objects**: always treats different instances as not equal to each other;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
+
+foreach (Set::partialIntersection(2, $numbers, $numerics, $oddNumbers) as $item) {
+    print($item);
+}
+// 1, 3, 4, 5, 6, 7, 9
+```
+
+### Partial Intersection Non-Strict
+Iterates partial intersection of iterables in non-strict type mode.
+
+```Set::partialIntersectionNonStrict(int $minIntersectionCount, iterable ...$iterables)```
 
 * **scalars**: compares non-strictly by value;
 * **objects**: compares serialized;
@@ -637,54 +681,10 @@ $languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
 $scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
 $supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
-foreach (Set::partialIntersection(2, $languages, $scriptLanguages, $supportsInterfaces) as $lang) {
+foreach (Set::partialIntersectionNonStrict(2, $languages, $scriptLanguages, $supportsInterfaces) as $lang) {
     print($lang);
 }
 // 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
-```
-
-### Intersection Strict
-Iterates intersection of iterables in strict type mode.
-
-```Set::intersectionStrict(iterable ...$iterables)```
-
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
-
-```php
-use IterTools\Set;
-
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
-$oddNumbers = [1, 3, 5, 7, 9, 11];
-
-foreach (Set::intersectionStrict($numbers, $numerics, $oddNumbers) as $item) {
-    print($item);
-}
-// 3, 5, 7
-```
-
-### Partial Intersection Strict
-Iterates partial intersection of iterables in strict type mode.
-
-```Set::partialIntersectionStrict(int $minIntersectionCount, iterable ...$iterables)```
-
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
-
-```php
-use IterTools\Set;
-
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
-$oddNumbers = [1, 3, 5, 7, 9, 11];
-
-foreach (Set::partialIntersectionStrict(2, $numbers, $numerics, $oddNumbers) as $item) {
-    print($item);
-}
-// 1, 3, 4, 5, 6, 7, 9
 ```
 
 ## Infinite Iteration
@@ -1812,9 +1812,33 @@ foreach ($result as $item) {
 ```
 
 ### Intersection With
-Iterates the intersection of iterable source and given iterables in non-strict type mode.
+Iterates the intersection of iterable source and given iterables in strict type mode.
 
 ```$stream->intersectionWith(iterable ...$iterables)```
+
+* **scalars**: compares strictly by type;
+* **objects**: always treats different instances as not equal to each other;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
+
+$stream = Stream::of($numbers);
+
+foreach ($stream->intersectionWith($numerics, $oddNumbers) as $item) {
+    print($item);
+}
+// 3, 5, 7
+```
+
+### Intersection Non-Strict With
+Iterates the intersection of iterable source and given iterables in non-strict type mode.
+
+```$stream->intersectionNonStrictWith(iterable ...$iterables)```
 
 * **scalars**: compares non-strictly by value;
 * **objects**: compares serialized;
@@ -1829,16 +1853,40 @@ $supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
 $stream = Stream::of($languages);
 
-foreach ($stream->intersectionWith($scriptLanguages, $supportsInterfaces) as $lang) {
+foreach ($stream->intersectionNonStrictWith($scriptLanguages, $supportsInterfaces) as $lang) {
     print($lang);
 }
 // 'php', 'typescript'
 ```
 
 ### Partial Intersection With
-Iterates partial intersection of iterable source and given iterables in non-strict type mode.
+Iterates partial intersection of iterable source and given iterables in strict type mode.
 
 ```$stream->partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables)```
+
+* **scalars**: compares strictly by type;
+* **objects**: always treats different instances as not equal to each other;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
+
+$stream = Stream::of($numbers);
+
+foreach ($stream->partialIntersectionWith($numerics, $oddNumbers) as $item) {
+    print($item);
+}
+// 1, 3, 4, 5, 6, 7, 9
+```
+
+### Partial Intersection Non-Strict With
+Iterates partial intersection of iterable source and given iterables in non-strict type mode.
+
+```$stream->partialIntersectionNonStrictWith(int $minIntersectionCount, iterable ...$iterables)```
 
 * **scalars**: compares non-strictly by value;
 * **objects**: compares serialized;
@@ -1853,58 +1901,10 @@ $supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
 $stream = Stream::of($languages);
 
-foreach ($stream->partialIntersectionWith(2, $scriptLanguages, $supportsInterfaces) as $lang) {
+foreach ($stream->partialIntersectionNonStrictWith(2, $scriptLanguages, $supportsInterfaces) as $lang) {
     print($lang);
 }
 // 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
-```
-
-### Intersection Strict With
-Iterates the intersection of iterable source and given iterables in strict type mode.
-
-```$stream->intersectionStrictWith(iterable ...$iterables)```
-
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
-
-```php
-use IterTools\Stream;
-
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
-$oddNumbers = [1, 3, 5, 7, 9, 11];
-
-$stream = Stream::of($numbers);
-
-foreach ($stream->intersectionStrictWith($numerics, $oddNumbers) as $item) {
-    print($item);
-}
-// 3, 5, 7
-```
-
-### Partial Intersection Strict With
-Iterates partial intersection of iterable source and given iterables in strict type mode.
-
-```$stream->partialIntersectionStrictWith(int $minIntersectionCount, iterable ...$iterables)```
-
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
-
-```php
-use IterTools\Stream;
-
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
-$oddNumbers = [1, 3, 5, 7, 9, 11];
-
-$stream = Stream::of($numbers);
-
-foreach ($stream->partialIntersectionStrictWith($numerics, $oddNumbers) as $item) {
-    print($item);
-}
-// 1, 3, 4, 5, 6, 7, 9
 ```
 
 ### Stream Terminal Operations

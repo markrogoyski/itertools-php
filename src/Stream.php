@@ -526,10 +526,10 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Iterates the intersection of iterable source and given iterables in non-strict type mode.
+     * Iterates the intersection of iterable source and given iterables in strict type mode.
      *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
+     *  - scalars: compares strictly by type;
+     *  - objects: always treats different instances as not equal to each other;
      *  - arrays: compares serialized.
      *
      * @param array<iterable<mixed>> ...$iterables
@@ -545,10 +545,29 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Iterates partial intersection of iterable source and given iterables in non-strict type mode.
+     * Iterates the intersection of iterable source and given iterables in non-strict type mode.
      *
      *  - scalars: compares non-strictly by value;
      *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param array<iterable<mixed>> ...$iterables
+     *
+     * @return $this
+     *
+     * @see Set::intersectionNonStrict()
+     */
+    public function intersectionNonStrictWith(iterable ...$iterables): self
+    {
+        $this->iterable = Set::intersectionNonStrict($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Iterates partial intersection of iterable source and given iterables in strict type mode.
+     *
+     *  - scalars: compares strictly by type;
+     *  - objects: always treats different instances as not equal to each other;
      *  - arrays: compares serialized.
      *
      * @param positive-int $minIntersectionCount
@@ -565,29 +584,10 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Iterates the intersection of iterable source and given iterables in strict type mode.
+     * Iterates partial intersection of iterable source and given iterables in non-strict type mode.
      *
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
-     *  - arrays: compares serialized.
-     *
-     * @param array<iterable<mixed>> ...$iterables
-     *
-     * @return $this
-     *
-     * @see Set::intersectionStrict()
-     */
-    public function intersectionStrictWith(iterable ...$iterables): self
-    {
-        $this->iterable = Set::intersectionStrict($this->iterable, ...$iterables);
-        return $this;
-    }
-
-    /**
-     * Iterates partial intersection of iterable source and given iterables in strict type mode.
-     *
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
      *  - arrays: compares serialized.
      *
      * @param positive-int $minIntersectionCount
@@ -595,11 +595,11 @@ class Stream implements \IteratorAggregate
      *
      * @return $this
      *
-     * @see Set::partialIntersectionStrict()
+     * @see Set::partialIntersectionNonStrict()
      */
-    public function partialIntersectionStrictWith(int $minIntersectionCount, iterable ...$iterables): self
+    public function partialIntersectionNonStrictWith(int $minIntersectionCount, iterable ...$iterables): self
     {
-        $this->iterable = Set::partialIntersectionStrict($minIntersectionCount, $this->iterable, ...$iterables);
+        $this->iterable = Set::partialIntersectionNonStrict($minIntersectionCount, $this->iterable, ...$iterables);
         return $this;
     }
 

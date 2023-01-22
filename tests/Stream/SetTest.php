@@ -58,7 +58,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [3, 4, 5, 6, 7, 8, 9],
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -69,7 +69,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ['3', 4, 5, 6, 7, 8, 9],
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -80,7 +80,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [3, 4, 5, 6, 7, 8, 9],
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -91,7 +91,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ['3', 4, 5, 6, 7, 8, 9],
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [4, 5],
             ],
@@ -103,7 +103,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
             ],
@@ -115,7 +115,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -127,7 +127,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -139,7 +139,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, '2', 3, 4, 5, 6],
             ],
@@ -151,7 +151,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -163,7 +163,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -175,7 +175,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
             ],
@@ -187,7 +187,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -199,7 +199,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -211,7 +211,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, '3', 3, 4, 5, 6],
             ],
@@ -223,7 +223,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 4],
             ],
@@ -235,7 +235,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -246,7 +246,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ['php', 'java', 'c#', 'typescript'],
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 ['php', 'typescript'],
             ],
@@ -258,7 +258,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
             ],
@@ -269,7 +269,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [1, 3, 5, 7, 9, 11],
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 5, 7],
             ],
@@ -281,7 +281,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 3, 4, 5, 6, 7, 9],
             ],
@@ -337,7 +337,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([3, 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -348,7 +348,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen(['3', 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -359,7 +359,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([3, 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -370,7 +370,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen(['3', 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [4, 5],
             ],
@@ -382,7 +382,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
             ],
@@ -394,7 +394,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -406,7 +406,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -418,7 +418,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, '2', 3, 4, 5, 6],
             ],
@@ -430,7 +430,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -442,7 +442,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -454,7 +454,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
             ],
@@ -466,7 +466,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -478,7 +478,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -490,7 +490,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, '3', 3, 4, 5, 6],
             ],
@@ -502,7 +502,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 4],
             ],
@@ -514,7 +514,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -525,7 +525,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen(['php', 'java', 'c#', 'typescript']),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 ['php', 'typescript'],
             ],
@@ -537,7 +537,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
             ],
@@ -548,7 +548,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([1, 3, 5, 7, 9, 11]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 5, 7],
             ],
@@ -560,7 +560,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 3, 4, 5, 6, 7, 9],
             ],
@@ -616,7 +616,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([3, 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -627,7 +627,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter(['3', 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -638,7 +638,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([3, 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -649,7 +649,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter(['3', 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [4, 5],
             ],
@@ -661,7 +661,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
             ],
@@ -673,7 +673,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -685,7 +685,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -697,7 +697,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, '2', 3, 4, 5, 6],
             ],
@@ -709,7 +709,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -721,7 +721,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -733,7 +733,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
             ],
@@ -745,7 +745,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -757,7 +757,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -769,7 +769,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, '3', 3, 4, 5, 6],
             ],
@@ -781,7 +781,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 4],
             ],
@@ -793,7 +793,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -804,7 +804,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter(['php', 'java', 'c#', 'typescript']),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 ['php', 'typescript'],
             ],
@@ -816,7 +816,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
             ],
@@ -827,7 +827,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([1, 3, 5, 7, 9, 11]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 5, 7],
             ],
@@ -839,7 +839,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 3, 4, 5, 6, 7, 9],
             ],
@@ -895,7 +895,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([3, 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -906,7 +906,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav(['3', 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -917,7 +917,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([3, 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
             ],
@@ -928,7 +928,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav(['3', 4, 5, 6, 7, 8, 9]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [4, 5],
             ],
@@ -940,7 +940,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
             ],
@@ -952,7 +952,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -964,7 +964,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -976,7 +976,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, '2', 3, 4, 5, 6],
             ],
@@ -988,7 +988,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -1000,7 +1000,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -1012,7 +1012,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
             ],
@@ -1024,7 +1024,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
             ],
@@ -1036,7 +1036,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -1048,7 +1048,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     1,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 2, '3', 3, 4, 5, 6],
             ],
@@ -1060,7 +1060,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2, 4],
             ],
@@ -1072,7 +1072,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     3,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [2],
             ],
@@ -1083,7 +1083,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav(['php', 'java', 'c#', 'typescript']),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionWith(...$iterables)
+                    ->intersectionNonStrictWith(...$iterables)
                     ->toArray(),
                 ['php', 'typescript'],
             ],
@@ -1095,7 +1095,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionNonStrictWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
             ],
@@ -1106,7 +1106,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([1, 3, 5, 7, 9, 11]),
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->intersectionStrictWith(...$iterables)
+                    ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 5, 7],
             ],
@@ -1118,7 +1118,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     2,
                 ],
                 fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->partialIntersectionStrictWith(array_pop($iterables), ...$iterables)
+                    ->partialIntersectionWith(array_pop($iterables), ...$iterables)
                     ->toArray(),
                 [1, 3, 4, 5, 6, 7, 9],
             ],

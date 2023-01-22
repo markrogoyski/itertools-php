@@ -45,39 +45,6 @@ class Set
     }
 
     /**
-     * Iterates the intersection of iterables in non-strict type mode.
-     *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
-     *  - arrays: compares serialized.
-     *
-     * @param iterable<mixed> ...$iterables
-     *
-     * @return \Generator<mixed>
-     */
-    public static function intersection(iterable ...$iterables): \Generator
-    {
-        yield from static::intersectionInternal(false, count($iterables), ...$iterables);
-    }
-
-    /**
-     * Iterates partial intersection of iterables in non-strict type mode.
-     *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
-     *  - arrays: compares serialized.
-     *
-     * @param positive-int $minIntersectionCount
-     * @param iterable<mixed> ...$iterables
-     *
-     * @return \Generator<mixed>
-     */
-    public static function partialIntersection(int $minIntersectionCount, iterable ...$iterables): \Generator
-    {
-        yield from static::intersectionInternal(false, $minIntersectionCount, ...$iterables);
-    }
-
-    /**
      * Iterates the intersection of iterables in strict type mode.
      *
      *  - scalars: compares strictly by type;
@@ -88,9 +55,25 @@ class Set
      *
      * @return \Generator<mixed>
      */
-    public static function intersectionStrict(iterable ...$iterables): \Generator
+    public static function intersection(iterable ...$iterables): \Generator
     {
         yield from static::intersectionInternal(true, count($iterables), ...$iterables);
+    }
+
+    /**
+     * Iterates the intersection of iterables in non-strict type mode.
+     *
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    public static function intersectionNonStrict(iterable ...$iterables): \Generator
+    {
+        yield from static::intersectionInternal(false, count($iterables), ...$iterables);
     }
 
     /**
@@ -105,9 +88,26 @@ class Set
      *
      * @return \Generator<mixed>
      */
-    public static function partialIntersectionStrict(int $minIntersectionCount, iterable ...$iterables): \Generator
+    public static function partialIntersection(int $minIntersectionCount, iterable ...$iterables): \Generator
     {
         yield from static::intersectionInternal(true, $minIntersectionCount, ...$iterables);
+    }
+
+    /**
+     * Iterates partial intersection of iterables in non-strict type mode.
+     *
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param positive-int $minIntersectionCount
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    public static function partialIntersectionNonStrict(int $minIntersectionCount, iterable ...$iterables): \Generator
+    {
+        yield from static::intersectionInternal(false, $minIntersectionCount, ...$iterables);
     }
 
     /**
