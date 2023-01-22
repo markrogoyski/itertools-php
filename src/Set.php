@@ -111,22 +111,6 @@ class Set
     }
 
     /**
-     * Iterates the symmetric difference of iterables in non-strict type mode.
-     *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
-     *  - arrays: compares serialized.
-     *
-     * @param iterable<mixed> ...$iterables
-     *
-     * @return \Generator<mixed>
-     */
-    public static function symmetricDifference(iterable ...$iterables): \Generator
-    {
-        yield from self::symmetricDifferenceInternal(false, ...$iterables);
-    }
-
-    /**
      * Iterates the symmetric difference of iterables in strict type mode.
      *
      *  - scalars: compares strictly by type;
@@ -137,9 +121,25 @@ class Set
      *
      * @return \Generator<mixed>
      */
-    public static function symmetricDifferenceStrict(iterable ...$iterables): \Generator
+    public static function symmetricDifference(iterable ...$iterables): \Generator
     {
         yield from self::symmetricDifferenceInternal(true, ...$iterables);
+    }
+
+    /**
+     * Iterates the symmetric difference of iterables in non-strict type mode.
+     *
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    public static function symmetricDifferenceNonStrict(iterable ...$iterables): \Generator
+    {
+        yield from self::symmetricDifferenceInternal(false, ...$iterables);
     }
 
     /**
