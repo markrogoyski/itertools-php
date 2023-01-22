@@ -111,6 +111,22 @@ class Set
     }
 
     /**
+     * Iterates the symmetric difference of iterables in non-strict type mode.
+     *
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    public static function symmetricDifference(iterable ...$iterables): \Generator
+    {
+        yield from self::symmetricDifferenceInternal(false, ...$iterables);
+    }
+
+    /**
      * Iterates the intersection of iterables.
      *
      * @param bool $strict
@@ -140,6 +156,46 @@ class Set
                     yield $index => $value;
                     $usageMap->deleteUsage($value);
                 }
+            }
+        }
+    }
+
+    /**
+     * Iterates the symmetric difference of iterables.
+     *
+     * @param bool $strict
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    protected static function symmetricDifferenceInternal(
+        bool $strict,
+        iterable ...$iterables
+    ): \Generator {
+        $usageMap = new UsageMap($strict);
+        $valuesMap = [];
+
+        $multipleIterator = new JustifyMultipleIterator(...$iterables);
+
+        foreach ($multipleIterator as $values) {
+            foreach ($values as $owner => $value) {
+                if ($value instanceof NoValueMonad) {
+                    continue;
+                }
+
+                $usageMap->addUsage($value, (string)$owner);
+
+                $valuesMap[UniqueExtractor::getString($value, $strict)] = $value;
+
+                if ($usageMap->getOwnersCount($value) === count($iterables)) {
+                    $usageMap->deleteUsage($value);
+                }
+            }
+        }
+
+        foreach ($valuesMap as $value) {
+            foreach (Single::repeat($value, $usageMap->getUsagesCount($value)) as $item) {
+                yield $item;
             }
         }
     }
