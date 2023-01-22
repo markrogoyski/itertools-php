@@ -127,6 +127,22 @@ class Set
     }
 
     /**
+     * Iterates the symmetric difference of iterables in strict type mode.
+     *
+     *  - scalars: compares strictly by type;
+     *  - objects: always treats different instances as not equal to each other;
+     *  - arrays: compares serialized.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    public static function symmetricDifferenceStrict(iterable ...$iterables): \Generator
+    {
+        yield from self::symmetricDifferenceInternal(true, ...$iterables);
+    }
+
+    /**
      * Iterates the intersection of iterables.
      *
      * @param bool $strict
