@@ -9,7 +9,7 @@ use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
-class SymmetricDifferenceNonStrictTest extends \PHPUnit\Framework\TestCase
+class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderForArray
@@ -22,7 +22,7 @@ class SymmetricDifferenceNonStrictTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Set::symmetricDifferenceNonStrict(...$iterables) as $datum) {
+        foreach (Set::symmetricDifferenceCoercive(...$iterables) as $datum) {
             $result[] = $datum;
         }
 
@@ -200,7 +200,7 @@ class SymmetricDifferenceNonStrictTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Set::symmetricDifferenceNonStrict(...$iterables) as $datum) {
+        foreach (Set::symmetricDifferenceCoercive(...$iterables) as $datum) {
             $result[] = $datum;
         }
 
@@ -382,7 +382,7 @@ class SymmetricDifferenceNonStrictTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Set::symmetricDifferenceNonStrict(...$iterables) as $datum) {
+        foreach (Set::symmetricDifferenceCoercive(...$iterables) as $datum) {
             $result[] = $datum;
         }
 
@@ -564,7 +564,7 @@ class SymmetricDifferenceNonStrictTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Set::symmetricDifferenceNonStrict(...$iterables) as $datum) {
+        foreach (Set::symmetricDifferenceCoercive(...$iterables) as $datum) {
             $result[] = $datum;
         }
 
@@ -746,7 +746,7 @@ class SymmetricDifferenceNonStrictTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Set::symmetricDifferenceNonStrict(...$iterables) as $datum) {
+        foreach (Set::symmetricDifferenceCoercive(...$iterables) as $datum) {
             $result[] = $datum;
         }
 

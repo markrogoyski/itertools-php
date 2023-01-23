@@ -137,7 +137,7 @@ class Set
      *
      * @return \Generator<mixed>
      */
-    public static function symmetricDifferenceNonStrict(iterable ...$iterables): \Generator
+    public static function symmetricDifferenceCoercive(iterable ...$iterables): \Generator
     {
         yield from self::symmetricDifferenceInternal(false, ...$iterables);
     }
