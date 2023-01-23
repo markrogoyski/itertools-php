@@ -700,6 +700,8 @@ Iterates the symmetric difference of iterables in strict type mode.
 * **objects**: always treats different instances as not equal to each other;
 * **arrays**: compares serialized.
 
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+
 ```php
 use IterTools\Set;
 
@@ -721,6 +723,8 @@ Iterates the symmetric difference of iterables in non-strict type mode.
 * **scalars**: compares non-strictly by value;
 * **objects**: compares serialized;
 * **arrays**: compares serialized.
+
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
 
 ```php
 use IterTools\Set;
@@ -1964,6 +1968,8 @@ Iterates the symmetric difference of iterable source and given iterables in stri
 * **objects**: always treats different instances as not equal to each other;
 * **arrays**: compares serialized.
 
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+
 ```php
 use IterTools\Stream;
 
@@ -1987,6 +1993,8 @@ Iterates the symmetric difference of iterable source and given iterables in non-
 * **scalars**: compares non-strictly by value;
 * **objects**: compares serialized;
 * **arrays**: compares serialized.
+
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
 
 ```php
 use IterTools\Stream;

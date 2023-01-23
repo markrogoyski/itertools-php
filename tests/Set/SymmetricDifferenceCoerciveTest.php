@@ -27,7 +27,7 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForArray(): array
@@ -205,7 +205,7 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForGenerators(): array
@@ -387,7 +387,7 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForIterators(): array
@@ -569,7 +569,7 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForTraversables(): array
@@ -751,7 +751,7 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForMixed(): array

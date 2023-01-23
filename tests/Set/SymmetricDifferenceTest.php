@@ -27,7 +27,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForArray(): array
@@ -162,7 +162,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForGenerators(): array
@@ -301,7 +301,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForIterators(): array
@@ -440,7 +440,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForTraversables(): array
@@ -579,7 +579,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForMixed(): array
