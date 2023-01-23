@@ -54,15 +54,17 @@ class File
      *
      * Data items must be stringifiable.
      *
+     * Returns count of written bytes.
+     *
      * @param resource $fileResource
-     * @param iterable $data
+     * @param iterable<mixed> $data
      * @param string $suffix
      * @param string $prefix
      * @param int|null $length
      *
-     * @return \Generator
+     * @return int
      *
-     * @see fgets()
+     * @see fwrite()
      */
     public static function write(
         $fileResource,
@@ -70,10 +72,10 @@ class File
         string $suffix = '',
         string $prefix = '',
         ?int $length = null
-    ): int
-    {
+    ): int {
         $bytesWrote = 0;
 
+        /** @var string $datum */
         foreach ($data as $datum) {
             $toWrite = "{$prefix}{$datum}{$suffix}";
             fputs($fileResource, $toWrite, $length);
