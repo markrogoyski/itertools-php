@@ -738,4 +738,51 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider dataProviderForDemo
+     * @param array $a
+     * @param array $b
+     * @param array $c
+     * @param array $d
+     * @param int $m
+     * @param array $expected
+     * @return void
+     */
+    public function testDemo(
+        array $a,
+        array $b,
+        array $c,
+        array $d,
+        int $m,
+        array $expected
+    ): void {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Set::partialIntersection($m, $a, $b, $c, $d) as $value) {
+            $result[] = $value;
+        }
+        sort($result);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public function dataProviderForDemo(): array
+    {
+        $a = [1, 2, 3, 4, 5];
+        $b = [1, 2, 10, 11];
+        $c = [1, 2, 3, 12];
+        $d = [1, 4, 13, 14];
+
+        return [
+            [$a, $b, $c, $d, 1, [1, 2, 3, 4, 5, 10, 11, 12, 13, 14]],
+            [$a, $b, $c, $d, 2, [1, 2, 3, 4]],
+            [$a, $b, $c, $d, 3, [1, 2]],
+            [$a, $b, $c, $d, 4, [1]],
+            [$a, $b, $c, $d, 5, []],
+        ];
+    }
 }
