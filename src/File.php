@@ -12,15 +12,15 @@ class File
      * @param resource $fileResource
      * @param int<0, max>|null $length
      *
-     * @return \Generator
+     * @return \Generator<string>
      *
      * @see fgets()
      */
     public static function readByLine($fileResource, ?int $length = null): \Generator
     {
         // @phpstan-ignore-next-line (expects int<0, max>, int<0, max>|null given.)
-        while (($row = fgets($fileResource, $length)) !== false) {
-            yield $row;
+        while (($line = @\fgets($fileResource, $length)) !== false) {
+            yield $line;
         }
     }
 
@@ -33,7 +33,9 @@ class File
      * @param string $enclosure
      * @param string $escape
      *
-     * @return \Generator
+     * @return \Generator<array<int, string|null>>
+     *
+     * @throws \RuntimeException if read error occurred
      *
      * @see fgetcsv()
      */
@@ -45,7 +47,11 @@ class File
         string $escape = "\\"
     ): \Generator {
         // @phpstan-ignore-next-line (expects int<0, max>, int<0, max>|null given.)
-        while (($row = fgetcsv($fileResource, $length, $separator, $enclosure, $escape)) !== false) {
+        while (($row = @\fgetcsv($fileResource, $length, $separator, $enclosure, $escape)) !== false) {
+            if ($row === null) {
+                throw new \RuntimeException('cannot read from file resource');
+            }
+
             yield $row;
         }
     }
@@ -65,7 +71,9 @@ class File
      *
      * @return int
      *
-     * @see fwrite()
+     * @throws \RuntimeException if write error occurred
+     *
+     * @see fputs()
      */
     public static function write(
         $fileResource,
@@ -78,10 +86,14 @@ class File
 
         /** @var string $datum */
         foreach ($data as $datum) {
-            $toWrite = "{$prefix}{$datum}{$suffix}";
             // @phpstan-ignore-next-line (expects int<0, max>, int<0, max>|null given.)
-            fputs($fileResource, $toWrite, $length);
-            $bytesWrote += mb_strlen($toWrite, '8bit');
+            $writeResult = @\fputs($fileResource, "{$prefix}{$datum}{$suffix}", $length);
+
+            if ($writeResult === false) {
+                throw new \RuntimeException('cannot write to file resource');
+            }
+
+            $bytesWrote += $writeResult;
         }
 
         return $bytesWrote;
