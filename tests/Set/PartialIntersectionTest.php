@@ -28,7 +28,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForArray(): array
@@ -170,7 +170,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForGenerators(): array
@@ -316,7 +316,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForIterators(): array
@@ -462,7 +462,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForTraversables(): array
@@ -608,7 +608,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForMixed(): array
@@ -767,7 +767,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         sort($result);
 
         // Then
-        $this->assertSame($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     public function dataProviderForDemo(): array
