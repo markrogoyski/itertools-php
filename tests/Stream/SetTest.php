@@ -176,6 +176,28 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 9, 10],
             ],
+            [
+                [
+                    [1, 2, 3, 4, 7],
+                    ['1', 2, 3, 5, 8],
+                    [1, 2, 3, 6, 9],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                ['1', 4, 5, 6, 7, 8, 9],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 7],
+                    ['1', 2, 3, 5, 8],
+                    [1, 2, 3, 6, 9],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9],
+            ],
         ];
     }
 
@@ -540,6 +562,28 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->symmetricDifferenceCoerciveWith(...$iterables)
                     ->toArray(),
                 [1, 2, 9, 10],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 7]),
+                    $gen(['1', 2, 3, 5, 8]),
+                    $gen([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                ['1', 4, 5, 6, 7, 8, 9],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 7]),
+                    $gen(['1', 2, 3, 5, 8]),
+                    $gen([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9],
             ],
         ];
     }
@@ -908,6 +952,28 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 9, 10],
             ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 7]),
+                    $iter(['1', 2, 3, 5, 8]),
+                    $iter([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                ['1', 4, 5, 6, 7, 8, 9],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 7]),
+                    $iter(['1', 2, 3, 5, 8]),
+                    $iter([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9],
+            ],
         ];
     }
 
@@ -1274,6 +1340,28 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->symmetricDifferenceCoerciveWith(...$iterables)
                     ->toArray(),
                 [1, 2, 9, 10],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 7]),
+                    $trav(['1', 2, 3, 5, 8]),
+                    $trav([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                ['1', 4, 5, 6, 7, 8, 9],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 7]),
+                    $trav(['1', 2, 3, 5, 8]),
+                    $trav([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9],
             ],
         ];
     }

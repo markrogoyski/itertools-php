@@ -38,13 +38,15 @@ Quick Reference
 | [`takeWhile`](#Take-While)               | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`                      |
 
 #### Set
-| Iterator                                                        | Description                                               | Code Snippet                                                              |
-|-----------------------------------------------------------------|-----------------------------------------------------------|---------------------------------------------------------------------------|
-| [`distinct`](#Distinct)                                         | Filter out elements: iterate only unique items            | `Set::distinct($data, $strict)`                                           |
-| [`intersection`](#Intersection)                                 | Intersection of iterables in strict type mode             | `Set::intersection(...$iterables)`                                        |
+| Iterator                                                        | Description                                               | Code Snippet                                                             |
+|-----------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------------------|
+| [`distinct`](#Distinct)                                         | Filter out elements: iterate only unique items            | `Set::distinct($data, $strict)`                                          |
+| [`intersection`](#Intersection)                                 | Intersection of iterables in strict type mode             | `Set::intersection(...$iterables)`                                       |
 | [`intersectionCoercive`](#Intersection-Coercive)                | Intersection of iterables in non-strict type mode         | `Set::intersectionCoercive(...$iterables)`                               |
-| [`partialIntersection`](#Partial-Intersection)                  | Partial intersection of iterables in strict type mode     | `Set::partialIntersection($minIntersectionCount, ...$iterables)`          |
+| [`partialIntersection`](#Partial-Intersection)                  | Partial intersection of iterables in strict type mode     | `Set::partialIntersection($minIntersectionCount, ...$iterables)`         |
 | [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Partial intersection of iterables in non-strict type mode | `Set::partialIntersectionCoercive($minIntersectionCount, ...$iterables)` |
+| [`symmetricDifference`](#Symmetric-Difference)                  | Symmetric difference of iterables in strict type mode     | `Set::symmetricDifference(...$iterables)`                                |
+| [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Symmetric difference of iterables in non-strict type mode | `Set::symmetricDifferenceCoercive(...$iterables)`                        |
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
@@ -685,6 +687,50 @@ foreach (Set::partialIntersectionCoercive(2, $languages, $scriptLanguages, $supp
     print($lang);
 }
 // 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
+```
+
+### Symmetric difference
+Iterates the symmetric difference of iterables in strict type mode.
+
+```Set::symmetricDifference(iterable ...$iterables)```
+
+* **scalars**: compares strictly by type;
+* **objects**: always treats different instances as not equal to each other;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+$c = [1, 2, 3, 6, 9];
+
+foreach (Set::symmetricDifference($a, $b, $c) as $item) {
+    print($item);
+}
+// '1', 4, 5, 6, 7, 8, 9
+```
+
+### Symmetric difference Coercive
+Iterates the symmetric difference of iterables in non-strict type mode.
+
+```Set::symmetricDifferenceCoercive(iterable ...$iterables)```
+
+* **scalars**: compares non-strictly by value;
+* **objects**: compares serialized;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+$c = [1, 2, 3, 6, 9];
+
+foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
+    print($item);
+}
+// 4, 5, 6, 7, 8, 9
 ```
 
 ## Infinite Iteration
