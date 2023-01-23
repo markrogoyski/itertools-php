@@ -57,7 +57,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6, 7],
                     [3, 4, 5, 6, 7, 8, 9],
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionCoerciveWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -68,7 +68,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6, 7],
                     ['3', 4, 5, 6, 7, 8, 9],
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionCoerciveWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -79,7 +79,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6, 7],
                     [3, 4, 5, 6, 7, 8, 9],
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -90,7 +90,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6, 7],
                     ['3', 4, 5, 6, 7, 8, 9],
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [4, 5],
@@ -101,7 +101,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ['1', '2', 3, 4, 5, 6, 7, '8', '9'],
                     [1, 3, 5, 7, 9, 11],
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 5, 7],
@@ -113,8 +113,8 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [[1, 1], [2, 1], [3, 1], [1, 2], [1, 3]],
                     [[1, 3], [1, 1], [1, 4], [2, 1]],
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->zipWith(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
+                    ->zipWith(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [[1, 1], [2, 1]],
@@ -126,8 +126,8 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [[1, 'a'], [2, 'b'], [3, 'c'], ['a', 2], ['a', 3]],
                     [['c', 3], [1, 'a'], ['d', 4], [2, 'b']],
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->zipWith(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
+                    ->zipWith(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [[1, 'a'], [2, 'b']],
@@ -166,7 +166,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
@@ -178,7 +178,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -190,7 +190,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -202,7 +202,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, '2', 3, 4, 5, 6],
@@ -214,7 +214,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -226,7 +226,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -238,7 +238,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
@@ -250,7 +250,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -262,7 +262,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -274,7 +274,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, '3', 3, 4, 5, 6],
@@ -286,7 +286,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 4],
@@ -298,7 +298,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [2, 3, 4, 5, 6],
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -310,7 +310,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ['php', 'java', 'c#', 'typescript'],
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
@@ -322,7 +322,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     [1, 3, 5, 7, 9, 11],
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 3, 4, 5, 6, 7, 9],
@@ -378,7 +378,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6, 7]),
                     $gen([3, 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionCoerciveWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -389,7 +389,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6, 7]),
                     $gen(['3', 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionCoerciveWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -400,7 +400,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6, 7]),
                     $gen([3, 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -411,7 +411,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6, 7]),
                     $gen(['3', 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [4, 5],
@@ -422,7 +422,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
                     $gen([1, 3, 5, 7, 9, 11]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 5, 7],
@@ -434,8 +434,8 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([[1, 1], [2, 1], [3, 1], [1, 2], [1, 3]]),
                     $gen([[1, 3], [1, 1], [1, 4], [2, 1]]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->zipWith(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
+                    ->zipWith(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [[1, 1], [2, 1]],
@@ -447,8 +447,8 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([[1, 'a'], [2, 'b'], [3, 'c'], ['a', 2], ['a', 3]]),
                     $gen([['c', 3], [1, 'a'], ['d', 4], [2, 'b']]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->zipWith(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
+                    ->zipWith(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [[1, 'a'], [2, 'b']],
@@ -489,7 +489,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
@@ -501,7 +501,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -513,7 +513,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -525,7 +525,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, '2', 3, 4, 5, 6],
@@ -537,7 +537,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -549,7 +549,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -561,7 +561,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
@@ -573,7 +573,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -585,7 +585,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -597,7 +597,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, '3', 3, 4, 5, 6],
@@ -609,7 +609,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 4],
@@ -621,7 +621,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -633,7 +633,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen(['php', 'java', 'c#', 'typescript']),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
@@ -645,7 +645,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $gen([1, 3, 5, 7, 9, 11]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 3, 4, 5, 6, 7, 9],
@@ -701,7 +701,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6, 7]),
                     $iter([3, 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionCoerciveWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -712,7 +712,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6, 7]),
                     $iter(['3', 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionCoerciveWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -723,7 +723,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6, 7]),
                     $iter([3, 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -734,7 +734,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6, 7]),
                     $iter(['3', 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [4, 5],
@@ -745,7 +745,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
                     $iter([1, 3, 5, 7, 9, 11]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 5, 7],
@@ -757,8 +757,8 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([[1, 1], [2, 1], [3, 1], [1, 2], [1, 3]]),
                     $iter([[1, 3], [1, 1], [1, 4], [2, 1]]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->zipWith(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
+                    ->zipWith(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [[1, 1], [2, 1]],
@@ -770,8 +770,8 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([[1, 'a'], [2, 'b'], [3, 'c'], ['a', 2], ['a', 3]]),
                     $iter([['c', 3], [1, 'a'], ['d', 4], [2, 'b']]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->zipWith(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
+                    ->zipWith(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [[1, 'a'], [2, 'b']],
@@ -812,7 +812,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
@@ -824,7 +824,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -836,7 +836,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -848,7 +848,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, '2', 3, 4, 5, 6],
@@ -860,7 +860,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -872,7 +872,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -884,7 +884,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
@@ -896,7 +896,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -908,7 +908,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -920,7 +920,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, '3', 3, 4, 5, 6],
@@ -932,7 +932,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 4],
@@ -944,7 +944,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -956,7 +956,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter(['php', 'java', 'c#', 'typescript']),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
@@ -968,7 +968,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $iter([1, 3, 5, 7, 9, 11]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 3, 4, 5, 6, 7, 9],
@@ -1024,7 +1024,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6, 7]),
                     $trav([3, 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionCoerciveWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -1035,7 +1035,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6, 7]),
                     $trav(['3', 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionCoerciveWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -1046,7 +1046,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6, 7]),
                     $trav([3, 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 4, 5],
@@ -1057,7 +1057,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6, 7]),
                     $trav(['3', 4, 5, 6, 7, 8, 9]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [4, 5],
@@ -1068,7 +1068,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav(['1', '2', 3, 4, 5, 6, 7, '8', '9']),
                     $trav([1, 3, 5, 7, 9, 11]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [3, 5, 7],
@@ -1080,8 +1080,8 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([[1, 1], [2, 1], [3, 1], [1, 2], [1, 3]]),
                     $trav([[1, 3], [1, 1], [1, 4], [2, 1]]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->zipWith(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
+                    ->zipWith(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [[1, 1], [2, 1]],
@@ -1093,8 +1093,8 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([[1, 'a'], [2, 'b'], [3, 'c'], ['a', 2], ['a', 3]]),
                     $trav([['c', 3], [1, 'a'], ['d', 4], [2, 'b']]),
                 ],
-                fn (array $iterables) => Stream::of(array_shift($iterables))
-                    ->zipWith(array_shift($iterables))
+                fn (array $iterables) => Stream::of(\array_shift($iterables))
+                    ->zipWith(\array_shift($iterables))
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [[1, 'a'], [2, 'b']],
@@ -1135,7 +1135,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
@@ -1147,7 +1147,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -1159,7 +1159,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -1171,7 +1171,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, '2', 3, 4, 5, 6],
@@ -1183,7 +1183,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -1195,7 +1195,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -1207,7 +1207,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6],
@@ -1219,7 +1219,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 3, 4],
@@ -1231,7 +1231,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -1243,7 +1243,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 1,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 2, '3', 3, 4, 5, 6],
@@ -1255,7 +1255,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2, 4],
@@ -1267,7 +1267,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([2, 3, 4, 5, 6]),
                 ],
                 3,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [2],
@@ -1279,7 +1279,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav(['php', 'java', 'c#', 'typescript']),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 ['php', 'python', 'java', 'typescript', 'c#', 'javascript'],
@@ -1291,7 +1291,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     $trav([1, 3, 5, 7, 9, 11]),
                 ],
                 2,
-                fn (int $minIntersectionCount, array $iterables) => Stream::of(array_shift($iterables))
+                fn (int $minIntersectionCount, array $iterables) => Stream::of(\array_shift($iterables))
                     ->partialIntersectionWith($minIntersectionCount, ...$iterables)
                     ->toArray(),
                 [1, 3, 4, 5, 6, 7, 9],

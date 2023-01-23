@@ -57,7 +57,7 @@ class Set
      */
     public static function intersection(iterable ...$iterables): \Generator
     {
-        yield from static::intersectionInternal(true, count($iterables), ...$iterables);
+        yield from static::intersectionInternal(true, \count($iterables), ...$iterables);
     }
 
     /**
@@ -73,7 +73,7 @@ class Set
      */
     public static function intersectionCoercive(iterable ...$iterables): \Generator
     {
-        yield from static::intersectionInternal(false, count($iterables), ...$iterables);
+        yield from static::intersectionInternal(false, \count($iterables), ...$iterables);
     }
 
     /**
