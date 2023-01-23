@@ -71,7 +71,7 @@ class Set
      *
      * @return \Generator<mixed>
      */
-    public static function intersectionNonStrict(iterable ...$iterables): \Generator
+    public static function intersectionCoercive(iterable ...$iterables): \Generator
     {
         yield from static::intersectionInternal(false, count($iterables), ...$iterables);
     }
@@ -105,7 +105,7 @@ class Set
      *
      * @return \Generator<mixed>
      */
-    public static function partialIntersectionNonStrict(int $minIntersectionCount, iterable ...$iterables): \Generator
+    public static function partialIntersectionCoercive(int $minIntersectionCount, iterable ...$iterables): \Generator
     {
         yield from static::intersectionInternal(false, $minIntersectionCount, ...$iterables);
     }

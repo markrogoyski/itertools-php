@@ -555,11 +555,11 @@ class Stream implements \IteratorAggregate
      *
      * @return $this
      *
-     * @see Set::intersectionNonStrict()
+     * @see Set::intersectionCoercive()
      */
-    public function intersectionNonStrictWith(iterable ...$iterables): self
+    public function intersectionCoerciveWith(iterable ...$iterables): self
     {
-        $this->iterable = Set::intersectionNonStrict($this->iterable, ...$iterables);
+        $this->iterable = Set::intersectionCoercive($this->iterable, ...$iterables);
         return $this;
     }
 
@@ -595,11 +595,11 @@ class Stream implements \IteratorAggregate
      *
      * @return $this
      *
-     * @see Set::partialIntersectionNonStrict()
+     * @see Set::partialIntersectionCoercive()
      */
-    public function partialIntersectionNonStrictWith(int $minIntersectionCount, iterable ...$iterables): self
+    public function partialIntersectionCoerciveWith(int $minIntersectionCount, iterable ...$iterables): self
     {
-        $this->iterable = Set::partialIntersectionNonStrict($minIntersectionCount, $this->iterable, ...$iterables);
+        $this->iterable = Set::partialIntersectionCoercive($minIntersectionCount, $this->iterable, ...$iterables);
         return $this;
     }
 

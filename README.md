@@ -42,9 +42,9 @@ Quick Reference
 |--------------------------------------------------------------------|-----------------------------------------------------------|---------------------------------------------------------------------------|
 | [`distinct`](#Distinct)                                            | Filter out elements: iterate only unique items            | `Set::distinct($data, $strict)`                                           |
 | [`intersection`](#Intersection)                                    | Intersection of iterables in strict type mode             | `Set::intersection(...$iterables)`                                        |
-| [`intersectionNonStrict`](#Intersection-Non-Strict)                | Intersection of iterables in non-strict type mode         | `Set::intersectionNonStrict(...$iterables)`                               |
+| [`intersectionCoercive`](#Intersection-Coercive)                | Intersection of iterables in non-strict type mode         | `Set::intersectionCoercive(...$iterables)`                               |
 | [`partialIntersection`](#Partial-Intersection)                     | Partial intersection of iterables in strict type mode     | `Set::partialIntersection($minIntersectionCount, ...$iterables)`          |
-| [`partialIntersectionNonStrict`](#Partial-Intersection-Non-Strict) | Partial intersection of iterables in non-strict type mode | `Set::partialIntersectionNonStrict($minIntersectionCount, ...$iterables)` |
+| [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Partial intersection of iterables in non-strict type mode | `Set::partialIntersectionCoercive($minIntersectionCount, ...$iterables)` |
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
@@ -137,9 +137,9 @@ Quick Reference
 | [`zipEqualWith`](#Zip-Equal-With)                                           | Iterate iterable source with another iterable collections of equal lengths simultaneously    | `$stream->zipEqualWith(...$iterables)`                                            |
 | [`distinct`](#Distinct-1)                                                   | Filter out elements: iterate only unique items                                               | `$stream->distinct($strict)`                                                      |
 | [`intersectionWith`](#Intersection-With)                                    | Iterates the intersection of iterable source and given iterables in strict type mode         | `$stream->intersectionWith(...$iterables)`                                        |
-| [`intersectionNonStrictWith`](#Intersection-Non-Strict-With)                | Iterates the intersection of iterable source and given iterables in non-strict type mode     | `$stream->intersectionNonStrictWith(...$iterables)`                               |
+| [`intersectionCoerciveWith`](#Intersection-Coercive-With)                | Iterates the intersection of iterable source and given iterables in non-strict type mode     | `$stream->intersectionCoerciveWith(...$iterables)`                               |
 | [`partialIntersectionWith`](#Partial-Intersection-With)                     | Iterates partial intersection of iterable source and given iterables in strict type mode     | `$stream->partialIntersectionWith($minIntersectionCount, ...$iterables)`          |
-| [`partialIntersectionNonStrictWith`](#Partial-Intersection-Non-Strict-With) | Iterates partial intersection of iterable source and given iterables in non-strict type mode | `$stream->partialIntersectionNonStrictWith($minIntersectionCount, ...$iterables)` |
+| [`partialIntersectionCoerciveWith`](#Partial-Intersection-Coercive-With) | Iterates partial intersection of iterable source and given iterables in non-strict type mode | `$stream->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)` |
 
 #### Stream Terminal Operations
 ##### Summary Terminal Operations
@@ -621,10 +621,10 @@ foreach (Set::intersection($numbers, $numerics, $oddNumbers) as $item) {
 // 3, 5, 7
 ```
 
-### Intersection Non-Strict
+### Intersection Coercive
 Iterates intersection of iterables in non-strict type mode.
 
-```Set::intersectionNonStrict(iterable ...$iterables)```
+```Set::intersectionCoercive(iterable ...$iterables)```
 
 * **scalars**: compares non-strictly by value;
 * **objects**: compares serialized;
@@ -637,7 +637,7 @@ $languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
 $scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
 $supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
-foreach (Set::intersectionNonStrict($languages, $scriptLanguages, $supportsInterfaces) as $lang) {
+foreach (Set::intersectionCoercive($languages, $scriptLanguages, $supportsInterfaces) as $lang) {
     print($lang);
 }
 // 'php', 'typescript'
@@ -665,10 +665,10 @@ foreach (Set::partialIntersection(2, $numbers, $numerics, $oddNumbers) as $item)
 // 1, 3, 4, 5, 6, 7, 9
 ```
 
-### Partial Intersection Non-Strict
+### Partial Intersection Coercive
 Iterates partial intersection of iterables in non-strict type mode.
 
-```Set::partialIntersectionNonStrict(int $minIntersectionCount, iterable ...$iterables)```
+```Set::partialIntersectionCoercive(int $minIntersectionCount, iterable ...$iterables)```
 
 * **scalars**: compares non-strictly by value;
 * **objects**: compares serialized;
@@ -681,7 +681,7 @@ $languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
 $scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
 $supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
-foreach (Set::partialIntersectionNonStrict(2, $languages, $scriptLanguages, $supportsInterfaces) as $lang) {
+foreach (Set::partialIntersectionCoercive(2, $languages, $scriptLanguages, $supportsInterfaces) as $lang) {
     print($lang);
 }
 // 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
@@ -1835,10 +1835,10 @@ foreach ($stream->intersectionWith($numerics, $oddNumbers) as $item) {
 // 3, 5, 7
 ```
 
-### Intersection Non-Strict With
+### Intersection Coercive With
 Iterates the intersection of iterable source and given iterables in non-strict type mode.
 
-```$stream->intersectionNonStrictWith(iterable ...$iterables)```
+```$stream->intersectionCoerciveWith(iterable ...$iterables)```
 
 * **scalars**: compares non-strictly by value;
 * **objects**: compares serialized;
@@ -1853,7 +1853,7 @@ $supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
 $stream = Stream::of($languages);
 
-foreach ($stream->intersectionNonStrictWith($scriptLanguages, $supportsInterfaces) as $lang) {
+foreach ($stream->intersectionCoerciveWith($scriptLanguages, $supportsInterfaces) as $lang) {
     print($lang);
 }
 // 'php', 'typescript'
@@ -1883,10 +1883,10 @@ foreach ($stream->partialIntersectionWith($numerics, $oddNumbers) as $item) {
 // 1, 3, 4, 5, 6, 7, 9
 ```
 
-### Partial Intersection Non-Strict With
+### Partial Intersection Coercive With
 Iterates partial intersection of iterable source and given iterables in non-strict type mode.
 
-```$stream->partialIntersectionNonStrictWith(int $minIntersectionCount, iterable ...$iterables)```
+```$stream->partialIntersectionCoerciveWith(int $minIntersectionCount, iterable ...$iterables)```
 
 * **scalars**: compares non-strictly by value;
 * **objects**: compares serialized;
@@ -1901,7 +1901,7 @@ $supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
 $stream = Stream::of($languages);
 
-foreach ($stream->partialIntersectionNonStrictWith(2, $scriptLanguages, $supportsInterfaces) as $lang) {
+foreach ($stream->partialIntersectionCoerciveWith(2, $scriptLanguages, $supportsInterfaces) as $lang) {
     print($lang);
 }
 // 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
