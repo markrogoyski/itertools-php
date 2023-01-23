@@ -10,7 +10,7 @@ class File
      * Reads file resource line by line.
      *
      * @param resource $fileResource
-     * @param int|null $length
+     * @param int<0, max>|null $length
      *
      * @return \Generator
      *
@@ -18,6 +18,7 @@ class File
      */
     public static function readByLine($fileResource, ?int $length = null): \Generator
     {
+        // @phpstan-ignore-next-line (expects int<0, max>, int<0, max>|null given.)
         while (($row = fgets($fileResource, $length)) !== false) {
             yield $row;
         }
@@ -27,7 +28,7 @@ class File
      * Reads data from CSV file resource like fgetcsv() function.
      *
      * @param resource $fileResource
-     * @param int|null $length
+     * @param int<0, max>|null $length
      * @param string $separator
      * @param string $enclosure
      * @param string $escape
@@ -42,8 +43,8 @@ class File
         string $separator = ",",
         string $enclosure = "\"",
         string $escape = "\\"
-    ): \Generator
-    {
+    ): \Generator {
+        // @phpstan-ignore-next-line (expects int<0, max>, int<0, max>|null given.)
         while (($row = fgetcsv($fileResource, $length, $separator, $enclosure, $escape)) !== false) {
             yield $row;
         }
@@ -60,7 +61,7 @@ class File
      * @param iterable<mixed> $data
      * @param string $suffix
      * @param string $prefix
-     * @param int|null $length
+     * @param int<0, max>|null $length
      *
      * @return int
      *
@@ -78,6 +79,7 @@ class File
         /** @var string $datum */
         foreach ($data as $datum) {
             $toWrite = "{$prefix}{$datum}{$suffix}";
+            // @phpstan-ignore-next-line (expects int<0, max>, int<0, max>|null given.)
             fputs($fileResource, $toWrite, $length);
             $bytesWrote += mb_strlen($toWrite, '8bit');
         }
