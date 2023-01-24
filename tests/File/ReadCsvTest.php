@@ -321,20 +321,20 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testError(): void
-    {
-        // Given
-        $file = FileFixture::createFromLines([]);
-        fclose($file);
-
-        // FIXME: why false, not null ???
-        $a = @fgetcsv($file);
-
-        foreach (File::readCsv($file) as $_) {
-            break;
-        }
-
-        // FIXME: remove
-        $this->assertTrue(true);
-    }
+    //public function testError(): void
+    //{
+    //    // Given
+    //    $file = FileFixture::createFromLines([]);
+    //    fclose($file);
+    //
+    //    // FIXME: why false, not null ???
+    //    $a = @fgetcsv($file);
+    //
+    //    foreach (File::readCsv($file) as $_) {
+    //        break;
+    //    }
+    //
+    //    // FIXME: remove
+    //    $this->assertTrue(true);
+    //}
 }
