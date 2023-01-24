@@ -12,6 +12,7 @@
       <directory suffix="Test.php">Summary</directory>
       <directory suffix="Test.php">Set</directory>
       <directory suffix="Test.php">Stream</directory>
+      <directory suffix="Test.php">File</directory>
       <directory suffix="Test.php">Util</directory>
     </testsuite>
   </testsuites>
