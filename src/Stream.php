@@ -564,6 +564,44 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Iterates the symmetric difference of iterable source and given iterables in strict type mode.
+     *
+     *  - scalars: compares strictly by type;
+     *  - objects: always treats different instances as not equal to each other;
+     *  - arrays: compares serialized.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return $this
+     *
+     * @see Set::symmetricDifference()
+     */
+    public function symmetricDifferenceWith(iterable ...$iterables): self
+    {
+        $this->iterable = Set::symmetricDifference($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Iterates the symmetric difference of iterable source and given iterables in non-strict type mode.
+     *
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return $this
+     *
+     * @see Set::symmetricDifferenceCoercive()
+     */
+    public function symmetricDifferenceCoerciveWith(iterable ...$iterables): self
+    {
+        $this->iterable = Set::symmetricDifferenceCoercive($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
      * Iterates partial intersection of iterable source and given iterables in strict type mode.
      *
      *  - scalars: compares strictly by type;

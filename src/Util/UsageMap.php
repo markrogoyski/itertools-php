@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools\Util;
 
+use IterTools\Reduce;
 use IterTools\Stream;
 
 class UsageMap
@@ -85,5 +86,35 @@ class UsageMap
         return Stream::of($this->addedMap[$hash] ?? [])
             ->filterTrue(fn ($count) => $count > $deletesCount)
             ->toCount();
+    }
+
+    /**
+     * Returns number of value usages with limitation by max owners.
+     *
+     * @param mixed $value
+     * @param int $maxOwnersCount
+     *
+     * @return int
+     */
+    public function getUsagesCount($value, int $maxOwnersCount = 1): int
+    {
+        $hash = UniqueExtractor::getString($value, $this->strict);
+        $deletesCount = $this->deletedMap[$hash] ?? 0;
+
+        $ownersMap = Stream::of($this->addedMap[$hash] ?? [])
+            ->map(fn ($value) => $value - $deletesCount)
+            ->filterTrue(fn ($value) => $value > 0)
+            ->toArray();
+
+        while (count($ownersMap) > $maxOwnersCount) {
+            $minValue = Reduce::toMin($ownersMap);
+            $ownersMap = Stream::of($ownersMap)
+                ->map(fn ($value) => $value - $minValue)
+                ->filterTrue(fn ($value) => $value > 0)
+                ->toArray();
+        }
+
+        /** @var array<string, int> $ownersMap */
+        return (int)Reduce::toSum($ownersMap);
     }
 }

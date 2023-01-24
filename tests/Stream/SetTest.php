@@ -132,6 +132,72 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [[1, 'a'], [2, 'b']],
             ],
+            [
+                [
+                    [1, 2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7, 8],
+                    [5, 6, 7, 8, 9, 10],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    [1, 2, '3', 4, 5, 6],
+                    [3, 4, 5, 6, 7, 8],
+                    [5, 6, 7, 8, 9, 10],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                [1, 3, 2, '3', 9, 10],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7, 8],
+                    [5, 6, 7, 8, 9, 10],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    [1, 2, '3', 4, 5, 6],
+                    [3, 4, 5, 6, 7, 8],
+                    [5, 6, 7, 8, 9, 10],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 7],
+                    ['1', 2, 3, 5, 8],
+                    [1, 2, 3, 6, 9],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                ['1', 4, 5, 6, 7, 8, 9],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 7],
+                    ['1', 2, 3, 5, 8],
+                    [1, 2, 3, 6, 9],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9],
+            ],
         ];
     }
 
@@ -452,6 +518,72 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [[1, 'a'], [2, 'b']],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5, 6]),
+                    $gen([3, 4, 5, 6, 7, 8]),
+                    $gen([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    $gen([1, 2, '3', 4, 5, 6]),
+                    $gen([3, 4, 5, 6, 7, 8]),
+                    $gen([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                [1, 3, 2, '3', 9, 10],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5, 6]),
+                    $gen([3, 4, 5, 6, 7, 8]),
+                    $gen([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    $gen([1, 2, '3', 4, 5, 6]),
+                    $gen([3, 4, 5, 6, 7, 8]),
+                    $gen([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 7]),
+                    $gen(['1', 2, 3, 5, 8]),
+                    $gen([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                ['1', 4, 5, 6, 7, 8, 9],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 7]),
+                    $gen(['1', 2, 3, 5, 8]),
+                    $gen([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9],
             ],
         ];
     }
@@ -776,6 +908,72 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [[1, 'a'], [2, 'b']],
             ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5, 6]),
+                    $iter([3, 4, 5, 6, 7, 8]),
+                    $iter([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    $iter([1, 2, '3', 4, 5, 6]),
+                    $iter([3, 4, 5, 6, 7, 8]),
+                    $iter([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                [1, 3, 2, '3', 9, 10],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5, 6]),
+                    $iter([3, 4, 5, 6, 7, 8]),
+                    $iter([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    $iter([1, 2, '3', 4, 5, 6]),
+                    $iter([3, 4, 5, 6, 7, 8]),
+                    $iter([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 7]),
+                    $iter(['1', 2, 3, 5, 8]),
+                    $iter([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                ['1', 4, 5, 6, 7, 8, 9],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 7]),
+                    $iter(['1', 2, 3, 5, 8]),
+                    $iter([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9],
+            ],
         ];
     }
 
@@ -1098,6 +1296,72 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->intersectionWith(...$iterables)
                     ->toArray(),
                 [[1, 'a'], [2, 'b']],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5, 6]),
+                    $trav([3, 4, 5, 6, 7, 8]),
+                    $trav([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    $trav([1, 2, '3', 4, 5, 6]),
+                    $trav([3, 4, 5, 6, 7, 8]),
+                    $trav([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                [1, 3, 2, '3', 9, 10],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5, 6]),
+                    $trav([3, 4, 5, 6, 7, 8]),
+                    $trav([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    $trav([1, 2, '3', 4, 5, 6]),
+                    $trav([3, 4, 5, 6, 7, 8]),
+                    $trav([5, 6, 7, 8, 9, 10]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 9, 10],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 7]),
+                    $trav(['1', 2, 3, 5, 8]),
+                    $trav([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceWith(...$iterables)
+                    ->toArray(),
+                ['1', 4, 5, 6, 7, 8, 9],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 7]),
+                    $trav(['1', 2, 3, 5, 8]),
+                    $trav([1, 2, 3, 6, 9]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->symmetricDifferenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9],
             ],
         ];
     }
