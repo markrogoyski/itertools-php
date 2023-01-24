@@ -12,7 +12,8 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class IntersectionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider dataProviderForArray
+     * @dataProvider dataProviderForArraySets
+     * @dataProvider dataProviderForArrayMultisets
      * @param        array<array> $iterables
      * @param        array $expected
      */
@@ -30,7 +31,7 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public function dataProviderForArraySets(): array
     {
         return [
             [
@@ -116,6 +117,58 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
+                    [null, 1, 2, 3, 100, null],
+                    [null, 0, 1, 2, 3, 4, null],
+                    [null, -1, 0, 1, 2, 3, 4, 5, null],
+                    [null, -2, -1, 0, 1, 2, 3, 4, 5, 6, null],
+                    [null, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, null],
+                ],
+                [null, 1, 2, 3, null],
+            ],
+            [
+                [
+                    ['1', 2, '3.3', true, false],
+                    [true, '2', 3.3, '4', true],
+                ],
+                [true],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                    ['1', '2', 3, 4, 5, 6, 7, '8', '9'],
+                    [1, 3, 5, 7, 9, 11],
+                ],
+                [3, 5, 7],
+            ],
+        ];
+    }
+
+    public function dataProviderForArrayMultisets(): array
+    {
+        return [
+            [
+                [
+                    [1, 1, 2],
+                    [2, 2, 3],
+                ],
+                [2],
+            ],
+            [
+                [
+                    [1, 1, 1, 3],
+                    [1, 1, 2],
+                ],
+                [1, 1],
+            ],
+            [
+                [
+                    [1, 1, 2, 4],
+                    [1, 1, 1, 2, 3],
+                ],
+                [1, 1, 2],
+            ],
+            [
+                [
                     [1, 1, 2, 2, 1, 1],
                     [2, 2, 1, 1, 2, 2],
                 ],
@@ -153,42 +206,24 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
-                    [null, 1, 2, 3, 100, null],
-                    [null, 0, 1, 2, 3, 4, null],
-                    [null, -1, 0, 1, 2, 3, 4, 5, null],
-                    [null, -2, -1, 0, 1, 2, 3, 4, 5, 6, null],
-                    [null, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, null],
+                    ['l', 'l', 'm', 'n', 'p', 'q', 'q', 'r'],
+                    ['l', 'm', 'm', 'p', 'q', 'r', 'r', 'r', 'r']
                 ],
-                [null, 1, 2, 3, null],
+                ['l', 'm', 'p', 'q', 'r'],
             ],
             [
                 [
-                    ['1', 2, '3.3', true, false],
-                    [true, '2', 3.3, '4', true],
+                    [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6],
+                    [4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9],
                 ],
-                [true],
+                [4, 4, 5, 5, 6, 6],
             ],
             [
                 [
-                    [1, 2, 3, 4, 5, 6, 7, 8, 9],
-                    ['1', '2', 3, 4, 5, 6, 7, '8', '9'],
-                    [1, 3, 5, 7, 9, 11],
+                    ['a', 'a', 'b', 'b', 'b', 'c', 'd', 'd'],
+                    ['b', 'b', 'c', 'c', 'c', 'd', 'd', 'e'],
                 ],
-                [3, 5, 7],
-            ],
-            [
-                [
-                    [1, 1, 1, 3],
-                    [1, 1, 2],
-                ],
-                [1, 1],
-            ],
-            [
-                [
-                    [1, 1, 2, 4],
-                    [1, 1, 1, 2, 3],
-                ],
-                [1, 1, 2],
+                ['b', 'b', 'c', 'd', 'd'],
             ],
         ];
     }
