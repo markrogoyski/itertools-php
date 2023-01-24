@@ -15,14 +15,14 @@ class Set
      * Filter out elements from the iterable only returning unique elements.
      *
      * If $strict is true:
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
-     *  - arrays: compares serialized.
+     *  - scalars: compares strictly by type
+     *  - objects: always treats different instances as not equal to each other
+     *  - arrays: compares serialized
      *
      * If $strict is false:
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
-     *  - arrays: compares serialized.
+     *  - scalars: compares non-strictly by value
+     *  - objects: compares serialized
+     *  - arrays: compares serialized
      *
      * @template T
      * @param iterable<T> $data
@@ -47,9 +47,12 @@ class Set
     /**
      * Iterates the intersection of iterables in strict type mode.
      *
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
-     *  - arrays: compares serialized.
+     * If input iterables produce duplicate items, then multiset intersection rules apply.
+     *
+     * Strict-type comparisons:
+     *  - scalars: compares strictly by type
+     *  - objects: always treats different instances as not equal to each other
+     *  - arrays: compares serialized
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -61,11 +64,14 @@ class Set
     }
 
     /**
-     * Iterates the intersection of iterables in non-strict type mode.
+     * Iterates the intersection of iterables using type coercion.
      *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
-     *  - arrays: compares serialized.
+     * If input iterables produce duplicate items, then multiset intersection rules apply.
+     *
+     * Coercive (non-strict) type comparisons:
+     *  - scalars: compares non-strictly by value
+     *  - objects: compares serialized
+     *  - arrays: compares serialized
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -79,9 +85,10 @@ class Set
     /**
      * Iterates partial intersection of iterables in strict type mode.
      *
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
-     *  - arrays: compares serialized.
+     * Strict-type comparisons:
+     *  - scalars: compares strictly by type
+     *  - objects: always treats different instances as not equal to each other
+     *  - arrays: compares serialized
      *
      * @param positive-int $minIntersectionCount
      * @param iterable<mixed> ...$iterables
@@ -94,11 +101,12 @@ class Set
     }
 
     /**
-     * Iterates partial intersection of iterables in non-strict type mode.
+     * Iterates partial intersection of iterables using type coercion.
      *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
-     *  - arrays: compares serialized.
+     * Coercive (non-strict) type comparisons:
+     *  - scalars: compares non-strictly by value
+     *  - objects: compares serialized
+     *  - arrays: compares serialized
      *
      * @param positive-int $minIntersectionCount
      * @param iterable<mixed> ...$iterables
@@ -113,9 +121,10 @@ class Set
     /**
      * Iterates the symmetric difference of iterables in strict type mode.
      *
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
-     *  - arrays: compares serialized.
+     * Strict-type comparisons:
+     *  - scalars: compares strictly by type
+     *  - objects: always treats different instances as not equal to each other
+     *  - arrays: compares serialized
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -127,11 +136,12 @@ class Set
     }
 
     /**
-     * Iterates the symmetric difference of iterables in non-strict type mode.
+     * Iterates the symmetric difference of iterables using type coercion.
      *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
-     *  - arrays: compares serialized.
+     * Coercive (non-strict) type comparisons:
+     *  - scalars: compares non-strictly by value
+     *  - objects: compares serialized
+     *  - arrays: compares serialized
      *
      * @param iterable<mixed> ...$iterables
      *

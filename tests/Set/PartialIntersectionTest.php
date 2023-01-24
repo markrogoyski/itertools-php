@@ -12,7 +12,8 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider dataProviderForArray
+     * @dataProvider dataProviderForArraySets
+     * @dataProvider dataProviderForArrayMultisets
      * @param array<array> $iterables
      * @param positive-int $minIntersectionCount
      * @param array $expected
@@ -31,7 +32,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public function dataProviderForArraySets(): array
     {
         return [
             [
@@ -149,6 +150,161 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
                 ],
                 2,
                 [1, 3, 4, 5, 6, 7, 9],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5],
+                    [1, 2, 10, 11],
+                    [1, 2, 3, 12],
+                    [1, 4, 13, 14],
+                ],
+                1,
+                [1, 2, 3, 4, 5, 10, 11, 12, 13, 14],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5],
+                    [1, 2, 10, 11],
+                    [1, 2, 3, 12],
+                    [1, 4, 13, 14],
+                ],
+                2,
+                [1, 2, 3, 4],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5],
+                    [1, 2, 10, 11],
+                    [1, 2, 3, 12],
+                    [1, 4, 13, 14],
+                ],
+                3,
+                [1, 2],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5],
+                    [1, 2, 10, 11],
+                    [1, 2, 3, 12],
+                    [1, 4, 13, 14],
+                ],
+                4,
+                [1],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5],
+                    [1, 2, 10, 11],
+                    [1, 2, 3, 12],
+                    [1, 4, 13, 14],
+                ],
+                5,
+                [],
+            ],
+        ];
+    }
+
+    public function dataProviderForArrayMultisets(): array
+    {
+        return [
+            [
+                [
+                    [1, 1, 2],
+                    [2, 2, 3],
+                ],
+                2,
+                [2],
+            ],
+            [
+                [
+                    [1, 1, 1, 3],
+                    [1, 1, 2],
+                ],
+                2,
+                [1, 1],
+            ],
+            [
+                [
+                    [1, 1, 2, 4],
+                    [1, 1, 1, 2, 3],
+                ],
+                2,
+                [1, 1, 2],
+            ],
+            [
+                [
+                    [1, 1, 2, 2, 1, 1],
+                    [2, 2, 1, 1, 2, 2],
+                ],
+                2,
+                [2, 1, 2, 1],
+            ],
+            [
+                [
+                    [1, 1, 2, 2, 1, 1],
+                    [2, 2, 1, 1, '2', '2'],
+                ],
+                2,
+                [2, 1, 2, 1],
+            ],
+            [
+                [
+                    [1, 1, 2, 2, 1, 1],
+                    [2, 2, '1', '1', 2, 2],
+                ],
+                2,
+                [2, 2],
+            ],
+            [
+                [
+                    [1, 1, 1, 1, 1],
+                    [1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
+                    [5, 5, 5, 5, 5, 1, 5, 5, 1],
+                ],
+                2,
+                [1, 1, 5, 5],
+            ],
+            [
+                [
+                    [1, 1, 1, 1, 1],
+                    [1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
+                    [5, 5, 5, 5, 5, 1, 5, 5, 1],
+                ],
+                3,
+                [1, 1],
+            ],
+            [
+                [
+                    [1, 1, 1, 1, 'a'],
+                    [1, 2, 3, 4, 5, 'a', 2, 3, 4, 5],
+                    [5, 5, 5, 5, 5, 'a', 5, 5, 1],
+                ],
+                2,
+                ['a', 1, 5, 5],
+            ],
+            [
+                [
+                    ['l', 'l', 'm', 'n', 'p', 'q', 'q', 'r'],
+                    ['l', 'm', 'm', 'p', 'q', 'r', 'r', 'r', 'r']
+                ],
+                2,
+                ['l', 'm', 'p', 'q', 'r'],
+            ],
+            [
+                [
+                    [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6],
+                    [4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9],
+                ],
+                2,
+                [4, 4, 5, 5, 6, 6],
+            ],
+            [
+                [
+                    ['a', 'a', 'b', 'b', 'b', 'c', 'd', 'd'],
+                    ['b', 'b', 'c', 'c', 'c', 'd', 'd', 'e'],
+                ],
+                2,
+                ['b', 'b', 'c', 'd', 'd'],
             ],
         ];
     }
