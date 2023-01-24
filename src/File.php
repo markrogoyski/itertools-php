@@ -17,8 +17,7 @@ class File
      */
     public static function readByLine($fileResource): \Generator
     {
-        // @phpstan-ignore-next-line (expects int<0, max>, int<0, max>|null given.)
-        while (($line = @\fgets($fileResource, null)) !== false) {
+        while (($line = @\fgets($fileResource)) !== false) {
             yield $line;
         }
     }
