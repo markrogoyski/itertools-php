@@ -201,6 +201,15 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
                 5,
                 [],
             ],
+            [
+                [
+                    ['c++', 'java', 'c#', 'go', 'haskell'],
+                    ['php', 'python', 'javascript', 'perl'],
+                    ['c++', 'java', 'c#', 'go', 'php']
+                ],
+                2,
+                ['c++', 'java', 'c#', 'go', 'php'],
+            ],
         ];
     }
 

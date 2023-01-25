@@ -12,14 +12,14 @@ use IterTools\Util\UsageMap;
 class Set
 {
     /**
-     * Filter out elements from the iterable only returning unique elements.
+     * Iterate only the distinct elements.
      *
-     * If $strict is true:
+     * Strict-type comparisons:
      *  - scalars: compares strictly by type
      *  - objects: always treats different instances as not equal to each other
      *  - arrays: compares serialized
      *
-     * If $strict is false:
+     * Coercive (non-strict) type comparisons:
      *  - scalars: compares non-strictly by value
      *  - objects: compares serialized
      *  - arrays: compares serialized

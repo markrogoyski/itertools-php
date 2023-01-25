@@ -832,27 +832,19 @@ Filter out elements from the iterable only returning unique elements.
 
 ```Set::distinct(iterable $data, bool $strict = true)```
 
-If `$strict = true`:
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
-
-If `$strict = false`:
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
+* Defaults to strict type comparisons. Set strict to false for type coercion comparisons.
 
 ```php
 use IterTools\Set;
 
-$input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
+$chessSet = ['rook', 'rook', 'knight', 'knight', 'bishop', 'bishop', 'king', 'queen', 'pawn', 'pawn', ... ];
 
-foreach (Set::distinct($input, true) as $datum) {
-    print($datum);
+foreach (Set::distinct($input) as $chessPiece) {
+    print($chessPiece);
 }
-// 1, 2, 3, '1', '2', '3'
+// rook, knight, bishop, king, queen, pawn
 
-foreach (Set::distinct($input, false) as $datum) {
+foreach (Set::distinct([1, '1', 2, '2', 3], false) as $datum) {
     print($datum);
 }
 // 1, 2, 3
@@ -863,43 +855,37 @@ Iterates intersection of iterables in strict type mode.
 
 ```Set::intersection(iterable ...$iterables)```
 
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
+If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
 
 ```php
 use IterTools\Set;
 
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
-$oddNumbers = [1, 3, 5, 7, 9, 11];
+$chessPieces = ['rook', 'knight', 'bishop', 'queen', 'king', 'pawn'];
+$shogiPieces = ['rook', 'knight', 'bishop' 'king', 'pawn', 'lance', 'gold general', 'silver general'];
 
-foreach (Set::intersection($numbers, $numerics, $oddNumbers) as $item) {
-    print($item);
+foreach (Set::intersection($chessPieces, $shogiPieces) as $commonPiece) {
+    print($commonPiece);
 }
-// 3, 5, 7
+// rook, knight, bishop, king, pawn
 ```
 
 ### Intersection Coercive
-Iterates intersection of iterables in non-strict type mode.
+Iterates intersection of iterables using type coercion.
 
 ```Set::intersectionCoercive(iterable ...$iterables)```
 
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
+If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
 
 ```php
 use IterTools\Set;
 
-$languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
-$scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
-$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
+$numbers  = [1, 2, 3, 4, 5];
+$numerics = ['1', '2', 3];
 
-foreach (Set::intersectionCoercive($languages, $scriptLanguages, $supportsInterfaces) as $lang) {
-    print($lang);
+foreach (Set::intersectionCoercive($numbers, $numerics) as $commonNumber) {
+    print($commonNumber);
 }
-// 'php', 'typescript'
+// 1, 2, 3
 ```
 
 ### Partial Intersection
@@ -907,55 +893,49 @@ Iterates partial intersection of iterables in strict type mode.
 
 ```Set::partialIntersection(int $minIntersectionCount, iterable ...$iterables)```
 
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
+* If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+* If minIntersectionCount is 1, then [multiset](https://en.wikipedia.org/wiki/Multiset) union rules apply.
 
 ```php
 use IterTools\Set;
 
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
-$oddNumbers = [1, 3, 5, 7, 9, 11];
+$staticallyTyped    = ['c++', 'java', 'c#', 'go', 'haskell'];
+$dynamicallyTyped   = ['php', 'python', 'javascript', 'typescript'];
+$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
-foreach (Set::partialIntersection(2, $numbers, $numerics, $oddNumbers) as $item) {
-    print($item);
+foreach (Set::partialIntersection(2, $staticallyTyped, $dynamicallyTyped, $supportsInterfaces) as $language) {
+    print($language);
 }
-// 1, 3, 4, 5, 6, 7, 9
+// c++, java, c#, go, php
 ```
 
 ### Partial Intersection Coercive
-Iterates partial intersection of iterables in non-strict type mode.
+Iterates partial intersection of iterables with type coercion.
 
 ```Set::partialIntersectionCoercive(int $minIntersectionCount, iterable ...$iterables)```
 
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
+* If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+* If minIntersectionCount is 1, then [multiset](https://en.wikipedia.org/wiki/Multiset) union rules apply.
 
 ```php
 use IterTools\Set;
 
-$languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
-$scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
-$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
+$set1 = [1, 2, 3],
+$set2 = ['2', '3', 4, 5],
+$set3 = [1, '2'],
 
-foreach (Set::partialIntersectionCoercive(2, $languages, $scriptLanguages, $supportsInterfaces) as $lang) {
-    print($lang);
+foreach (Set::partialIntersectionCoercive(2, $set1, $set2, $set3) as $partiallyCommonNumber) {
+    print($partiallyCommonNumber);
 }
-// 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
+// 1, 2, 3
 ```
 
 ### Symmetric difference
-Iterates the symmetric difference of iterables in strict type mode.
+Iterates the symmetric difference of iterables.
 
 ```Set::symmetricDifference(iterable ...$iterables)```
 
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
-
-Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
 
 ```php
 use IterTools\Set;
@@ -971,15 +951,12 @@ foreach (Set::symmetricDifference($a, $b, $c) as $item) {
 ```
 
 ### Symmetric difference Coercive
-Iterates the symmetric difference of iterables in non-strict type mode.
+Iterates the symmetric difference of iterables with type coercion.
 
 ```Set::symmetricDifferenceCoercive(iterable ...$iterables)```
 
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
 
-Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
 
 ```php
 use IterTools\Set;
@@ -2400,6 +2377,20 @@ foreach (Multi::chain(Single::string($letters), Single::string($numbers)) as $ch
 }
 // a, b, c, 1, 2, 3
 ```
+
+## Strict and Coercive Types
+
+When there is an option, the default will do strict type comparisons:
+
+* scalars: compares strictly by type
+* objects: always treats different instances as not equal to each other
+* arrays: compares serialized
+
+When type coercion (non-strict types) is available and enabled via optional flag:
+
+* scalars: compares by value via type juggling
+* objects: compares serialized
+* arrays: compares serialized
 
 Standards
 ---------
