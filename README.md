@@ -832,26 +832,28 @@ Filter out elements from the iterable only returning unique elements.
 
 ```Set::distinct(iterable $data, bool $strict = true)```
 
-* Defaults to strict type comparisons. Set strict to false for type coercion comparisons.
+Defaults to [strict type](#Strict-and-Coercive-Types) comparisons. Set strict to false for type coercion comparisons.
 
 ```php
 use IterTools\Set;
 
 $chessSet = ['rook', 'rook', 'knight', 'knight', 'bishop', 'bishop', 'king', 'queen', 'pawn', 'pawn', ... ];
 
-foreach (Set::distinct($input) as $chessPiece) {
+foreach (Set::distinct($chessSet) as $chessPiece) {
     print($chessPiece);
 }
 // rook, knight, bishop, king, queen, pawn
 
-foreach (Set::distinct([1, '1', 2, '2', 3], false) as $datum) {
+$mixedTypes = [1, '1', 2, '2', 3];
+
+foreach (Set::distinct($mixedTypes, false) as $datum) {
     print($datum);
 }
 // 1, 2, 3
 ```
 
 ### Intersection
-Iterates intersection of iterables in strict type mode.
+Iterates intersection of iterables.
 
 ```Set::intersection(iterable ...$iterables)```
 
@@ -947,7 +949,7 @@ $c = [1, 2, 3, 6, 9];
 foreach (Set::symmetricDifference($a, $b, $c) as $item) {
     print($item);
 }
-// '1', 4, 5, 6, 7, 8, 9
+// 1, 4, 5, 6, 7, 8, 9
 ```
 
 ### Symmetric difference Coercive
