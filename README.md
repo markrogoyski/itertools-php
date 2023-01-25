@@ -15,12 +15,11 @@ IterTools makes you an iteration superstar by providing two types of tools:
 * Stream iteration tools
 
 <table>
-<tr><th>Looping Iteration Tools Example</th><th>Stream Iteration Tools Example</th></tr>
+<tr><th>Loop Iteration Tools Example</th><th>Stream Iteration Tools Example</th></tr>
 <tr>
 <td>
 
 ```php
-$l
 foreach (Multi::zip(['a', 'b'], [1, 2]) as [$l, $n]) {
     print($l . $n);  // a1, b2
 }
