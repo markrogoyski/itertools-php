@@ -7,6 +7,35 @@ Inspired by Python—designed for PHP.
 [![Coverage Status](https://coveralls.io/repos/github/markrogoyski/itertools-php/badge.svg?branch=main)](https://coveralls.io/github/markrogoyski/itertools-php?branch=main)
 [![License](https://poser.pugx.org/markrogoyski/math-php/license)](https://packagist.org/packages/markrogoyski/itertools-php)
 
+### Features
+
+IterTools makes you an iteration superstar by providing two types of tools:
+
+* Looping tools
+* Streaming tools
+
+<table>
+<tr><th>Looping Tools Example</th><th>Streaming Tools Example</th></tr>
+<tr>
+<td>
+```php
+foreach (Multi::zip(['a', 'b'], [1, 2]) as [$l, $n]) {
+    print($l . $n);  // a1, b2
+}
+```
+</td>
+<td>
+```php
+$result = Stream::of([1, 1, 2, 2, 3, 4, 5])
+    ->distinct()                          // [1, 2, 3, 4, 5]
+    ->map(fn ($x) => $x**2)               // [1, 4, 9, 16, 25]
+    ->filterTrue(fn ($x) => $x % 2 === 0) // [4, 16]
+    ->toSum();                            // 20
+```
+</td>
+</tr>
+</table>
+
 Quick Reference
 -----------
 
@@ -119,6 +148,7 @@ Quick Reference
 | [`compress`](#Compress-1)                                                | Compress an iterable source by filtering out data that is not selected                           | `$stream->compress($selectors)`                                                  |
 | [`chunkwise`](#Chunkwise-1)                                              | Iterate by chunks                                                                                | `$stream->chunkwise($chunkSize)`                                                 |
 | [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                               | Iterate by overlapped chunks                                                                     | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                |
+| [`distinct`](#Distinct-1)                                                | Filter out elements: iterate only unique items                                                   | `$stream->distinct($strict)`                                                     |
 | [`dropWhile`](#Drop-While-1)                                             | Drop elements from the iterable source while the predicate function is true                      | `$stream->dropWhile($predicate)`                                                 |
 | [`filterTrue`](#Filter-True-1)                                           | Filter out elements from the iterable source where there predicate function is true              | `$stream->filterTrue($predicate)`                                                |
 | [`filterFalse`](#Filter-False-1)                                         | Filter out elements from the iterable source where the predicate function is false               | `$stream->filterFalse($predicate)`                                               |
@@ -143,7 +173,6 @@ Quick Reference
 | [`zipWith`](#Zip-With)                                                   | Iterate iterable source with another iterable collections simultaneously                         | `$stream->zipWith(...$iterables)`                                                |
 | [`zipLongestWith`](#Zip-Longest-With)                                    | Iterate iterable source with another iterable collections simultaneously                         | `$stream->zipLongestWith(...$iterables)`                                         |
 | [`zipEqualWith`](#Zip-Equal-With)                                        | Iterate iterable source with another iterable collections of equal lengths simultaneously        | `$stream->zipEqualWith(...$iterables)`                                           |
-| [`distinct`](#Distinct-1)                                                | Filter out elements: iterate only unique items                                                   | `$stream->distinct($strict)`                                                     |
 
 #### Stream Terminal Operations
 ##### Summary Terminal Operations
