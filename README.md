@@ -870,7 +870,7 @@ foreach (Set::intersection($chessPieces, $shogiPieces) as $commonPiece) {
 ```
 
 ### Intersection Coercive
-Iterates intersection of iterables using type coercion.
+Iterates intersection of iterables using [type coercion](#Strict-and-Coercive-Types).
 
 ```Set::intersectionCoercive(iterable ...$iterables)```
 
@@ -889,7 +889,7 @@ foreach (Set::intersectionCoercive($numbers, $numerics) as $commonNumber) {
 ```
 
 ### Partial Intersection
-Iterates partial intersection of iterables in strict type mode.
+Iterates partial intersection of iterables.
 
 ```Set::partialIntersection(int $minIntersectionCount, iterable ...$iterables)```
 
@@ -910,7 +910,7 @@ foreach (Set::partialIntersection(2, $staticallyTyped, $dynamicallyTyped, $suppo
 ```
 
 ### Partial Intersection Coercive
-Iterates partial intersection of iterables with type coercion.
+Iterates partial intersection of iterables using [type coercion](#Strict-and-Coercive-Types).
 
 ```Set::partialIntersectionCoercive(int $minIntersectionCount, iterable ...$iterables)```
 
@@ -951,7 +951,7 @@ foreach (Set::symmetricDifference($a, $b, $c) as $item) {
 ```
 
 ### Symmetric difference Coercive
-Iterates the symmetric difference of iterables with type coercion.
+Iterates the symmetric difference of iterables with [type coercion](#Strict-and-Coercive-Types).
 
 ```Set::symmetricDifferenceCoercive(iterable ...$iterables)```
 
