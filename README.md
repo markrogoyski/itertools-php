@@ -18,13 +18,16 @@ IterTools makes you an iteration superstar by providing two types of tools:
 <tr><th>Looping Tools Example</th><th>Streaming Tools Example</th></tr>
 <tr>
 <td>
+
 ```php
 foreach (Multi::zip(['a', 'b'], [1, 2]) as [$l, $n]) {
     print($l . $n);  // a1, b2
 }
 ```
+
 </td>
 <td>
+
 ```php
 $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
     ->distinct()                          // [1, 2, 3, 4, 5]
@@ -32,6 +35,7 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
     ->filterTrue(fn ($x) => $x % 2 === 0) // [4, 16]
     ->toSum();                            // 20
 ```
+
 </td>
 </tr>
 </table>
