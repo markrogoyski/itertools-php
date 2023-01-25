@@ -37,17 +37,6 @@ Quick Reference
 | [`string`](#String)                      | Iterate the characters of a string              | `Single::string($string)`                                   |
 | [`takeWhile`](#Take-While)               | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`                      |
 
-#### Set
-| Iterator                                                        | Description                                               | Code Snippet                                                             |
-|-----------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------------------|
-| [`distinct`](#Distinct)                                         | Filter out elements: iterate only unique items            | `Set::distinct($data, $strict)`                                          |
-| [`intersection`](#Intersection)                                 | Intersection of iterables in strict type mode             | `Set::intersection(...$iterables)`                                       |
-| [`intersectionCoercive`](#Intersection-Coercive)                | Intersection of iterables in non-strict type mode         | `Set::intersectionCoercive(...$iterables)`                               |
-| [`partialIntersection`](#Partial-Intersection)                  | Partial intersection of iterables in strict type mode     | `Set::partialIntersection($minIntersectionCount, ...$iterables)`         |
-| [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Partial intersection of iterables in non-strict type mode | `Set::partialIntersectionCoercive($minIntersectionCount, ...$iterables)` |
-| [`symmetricDifference`](#Symmetric-Difference)                  | Symmetric difference of iterables in strict type mode     | `Set::symmetricDifference(...$iterables)`                                |
-| [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Symmetric difference of iterables in non-strict type mode | `Set::symmetricDifferenceCoercive(...$iterables)`                        |
-
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
 | ---------------------------- | -------------------------- | -------------------------------- |
@@ -73,6 +62,17 @@ Quick Reference
 | [`runningMin`](#Running-Min)               | Running minimum accumulation    | `Math::runningMin($numbers, $initialValue)`        |
 | [`runningProduct`](#Running-Product)       | Running product accumulation    | `Math::runningProduct($numbers, $initialValue)`    |
 | [`runningTotal`](#Running-Total)           | Running total accumulation      | `Math::runningTotal($numbers, $initialValue)`      |
+
+#### Set Iteration
+| Iterator                                                        | Description                                               | Code Snippet                                                             |
+|-----------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------------------|
+| [`distinct`](#Distinct)                                         | Iterate only distinct items                               | `Set::distinct($data, $strict)`                                          |
+| [`intersection`](#Intersection)                                 | Intersection of iterables                                 | `Set::intersection(...$iterables)`                                       |
+| [`intersectionCoercive`](#Intersection-Coercive)                | Intersection of iterables with type coercion              | `Set::intersectionCoercive(...$iterables)`                               |
+| [`partialIntersection`](#Partial-Intersection)                  | Partial intersection of iterables                         | `Set::partialIntersection($minIntersectionCount, ...$iterables)`         |
+| [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Partial intersection of iterables with type coercion      | `Set::partialIntersectionCoercive($minIntersectionCount, ...$iterables)` |
+| [`symmetricDifference`](#Symmetric-Difference)                  | Symmetric difference of iterables                         | `Set::symmetricDifference(...$iterables)`                                |
+| [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Symmetric difference of iterables with type coercion      | `Set::symmetricDifferenceCoercive(...$iterables)`                        |
 
 #### Summary
 | Summary                      | Description                                             | Code Snippet                               |
@@ -124,26 +124,26 @@ Quick Reference
 | [`filterFalse`](#Filter-False-1)                                         | Filter out elements from the iterable source where the predicate function is false               | `$stream->filterFalse($predicate)`                                               |
 | [`groupBy`](#Group-By-1)                                                 | Group iterable source by a common data element                                                   | `$stream->groupBy($groupKeyFunction)`                                            |
 | [`infiniteCycle`](#Infinite-Cycle)                                       | Cycle through the elements of iterable source sequentially forever                               | `$stream->infiniteCycle()`                                                       |
+| [`intersectionWith`](#Intersection-With)                                 | Intersect iterable source and given iterables                                                    | `$stream->intersectionWith(...$iterables)`                                       |
+| [`intersectionCoerciveWith`](#Intersection-Coercive-With)                | Intersect iterable source and given iterables with type coercion                                 | `$stream->intersectionCoerciveWith(...$iterables)`                               |
 | [`limit`](#Limit-1)                                                      | Limit the stream's iteration                                                                     | `$stream->limit($limit)`                                                         |
 | [`map`](#Map-1)                                                          | Map function onto elements                                                                       | `$stream->map($function)`                                                        |
 | [`pairwise`](#Pairwise-1)                                                | Return pairs of elements from iterable source                                                    | `$stream->pairwise()`                                                            |
+| [`partialIntersectionWith`](#Partial-Intersection-With)                  | Partially intersect iterable source and given iterables                                          | `$stream->partialIntersectionWith($minIntersectionCount, ...$iterables)`         |
+| [`partialIntersectionCoerciveWith`](#Partial-Intersection-Coercive-With) | Partially intersect iterable source and given iterables with type coercion                       | `$stream->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)` |
 | [`runningAverage`](#Running-Average-1)                                   | Accumulate the running average (mean) over iterable source                                       | `$stream->runningAverage($initialValue)`                                         |
 | [`runningDifference`](#Running-Difference-1)                             | Accumulate the running difference over iterable source                                           | `$stream->runningDifference($initialValue)`                                      |
 | [`runningMax`](#Running-Max-1)                                           | Accumulate the running max over iterable source                                                  | `$stream->runningMax($initialValue)`                                             |
 | [`runningMin`](#Running-Min-1)                                           | Accumulate the running min over iterable source                                                  | `$stream->runningMin($initialValue)`                                             |
 | [`runningProduct`](#Running-Product-1)                                   | Accumulate the running product over iterable source                                              | `$stream->runningProduct($initialValue)`                                         |
 | [`runningTotal`](#Running-Total-1)                                       | Accumulate the running total over iterable source                                                | `$stream->runningTotal($initialValue)`                                           |
+| [`symmetricDifferenceWith`](#Symmetric-Difference-With)                  | Symmetric difference of iterable source and given iterables                                      | `$this->symmetricDifferenceWith(...$iterables)`                                  |
+| [`symmetricDifferenceCoerciveWith`](#Symmetric-Difference-Coercive-With) | Symmetric difference of iterable source and given iterables with type coercion                   | `$this->symmetricDifferenceCoerciveWith(...$iterables)`                          |
 | [`takeWhile`](#Take-While-1)                                             | Return elements from the iterable source as long as the predicate is true                        | `$stream->takeWhile($predicate)`                                                 |
 | [`zipWith`](#Zip-With)                                                   | Iterate iterable source with another iterable collections simultaneously                         | `$stream->zipWith(...$iterables)`                                                |
 | [`zipLongestWith`](#Zip-Longest-With)                                    | Iterate iterable source with another iterable collections simultaneously                         | `$stream->zipLongestWith(...$iterables)`                                         |
 | [`zipEqualWith`](#Zip-Equal-With)                                        | Iterate iterable source with another iterable collections of equal lengths simultaneously        | `$stream->zipEqualWith(...$iterables)`                                           |
 | [`distinct`](#Distinct-1)                                                | Filter out elements: iterate only unique items                                                   | `$stream->distinct($strict)`                                                     |
-| [`intersectionWith`](#Intersection-With)                                 | Iterates the intersection of iterable source and given iterables in strict type mode             | `$stream->intersectionWith(...$iterables)`                                       |
-| [`intersectionCoerciveWith`](#Intersection-Coercive-With)                | Iterates the intersection of iterable source and given iterables in non-strict type mode         | `$stream->intersectionCoerciveWith(...$iterables)`                               |
-| [`partialIntersectionWith`](#Partial-Intersection-With)                  | Iterates partial intersection of iterable source and given iterables in strict type mode         | `$stream->partialIntersectionWith($minIntersectionCount, ...$iterables)`         |
-| [`partialIntersectionCoerciveWith`](#Partial-Intersection-Coercive-With) | Iterates partial intersection of iterable source and given iterables in non-strict type mode     | `$stream->partialIntersectionCoerciveWith($minIntersectionCount, ...$iterables)` |
-| [`symmetricDifferenceWith`](#Symmetric-Difference-With)                  | Iterates the symmetric difference of iterable source and given iterables in strict type mode     | `$this->symmetricDifferenceWith(...$iterables)`                                  |
-| [`symmetricDifferenceCoerciveWith`](#Symmetric-Difference-Coercive-With) | Iterates the symmetric difference of iterable source and given iterables in non-strict type mode | `$this->symmetricDifferenceCoerciveWith(...$iterables)`                          |
 
 #### Stream Terminal Operations
 ##### Summary Terminal Operations
@@ -571,174 +571,6 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
 // 0, 0
 ```
 
-## Set
-### Distinct
-Filter out elements from the iterable only returning unique elements.
-
-```Set::distinct(iterable $data, bool $strict = true)```
-
-If `$strict = true`:
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
-
-If `$strict = false`:
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
-
-```php
-use IterTools\Set;
-
-$input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
-
-foreach (Set::distinct($input, true) as $datum) {
-    print($datum);
-}
-// 1, 2, 3, '1', '2', '3'
-
-foreach (Set::distinct($input, false) as $datum) {
-    print($datum);
-}
-// 1, 2, 3
-```
-
-### Intersection
-Iterates intersection of iterables in strict type mode.
-
-```Set::intersection(iterable ...$iterables)```
-
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
-
-```php
-use IterTools\Set;
-
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
-$oddNumbers = [1, 3, 5, 7, 9, 11];
-
-foreach (Set::intersection($numbers, $numerics, $oddNumbers) as $item) {
-    print($item);
-}
-// 3, 5, 7
-```
-
-### Intersection Coercive
-Iterates intersection of iterables in non-strict type mode.
-
-```Set::intersectionCoercive(iterable ...$iterables)```
-
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
-
-```php
-use IterTools\Set;
-
-$languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
-$scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
-$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
-
-foreach (Set::intersectionCoercive($languages, $scriptLanguages, $supportsInterfaces) as $lang) {
-    print($lang);
-}
-// 'php', 'typescript'
-```
-
-### Partial Intersection
-Iterates partial intersection of iterables in strict type mode.
-
-```Set::partialIntersection(int $minIntersectionCount, iterable ...$iterables)```
-
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
-
-```php
-use IterTools\Set;
-
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
-$oddNumbers = [1, 3, 5, 7, 9, 11];
-
-foreach (Set::partialIntersection(2, $numbers, $numerics, $oddNumbers) as $item) {
-    print($item);
-}
-// 1, 3, 4, 5, 6, 7, 9
-```
-
-### Partial Intersection Coercive
-Iterates partial intersection of iterables in non-strict type mode.
-
-```Set::partialIntersectionCoercive(int $minIntersectionCount, iterable ...$iterables)```
-
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
-
-```php
-use IterTools\Set;
-
-$languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
-$scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
-$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
-
-foreach (Set::partialIntersectionCoercive(2, $languages, $scriptLanguages, $supportsInterfaces) as $lang) {
-    print($lang);
-}
-// 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
-```
-
-### Symmetric difference
-Iterates the symmetric difference of iterables in strict type mode.
-
-```Set::symmetricDifference(iterable ...$iterables)```
-
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
-
-Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
-
-```php
-use IterTools\Set;
-
-$a = [1, 2, 3, 4, 7];
-$b = ['1', 2, 3, 5, 8];
-$c = [1, 2, 3, 6, 9];
-
-foreach (Set::symmetricDifference($a, $b, $c) as $item) {
-    print($item);
-}
-// '1', 4, 5, 6, 7, 8, 9
-```
-
-### Symmetric difference Coercive
-Iterates the symmetric difference of iterables in non-strict type mode.
-
-```Set::symmetricDifferenceCoercive(iterable ...$iterables)```
-
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
-
-Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
-
-```php
-use IterTools\Set;
-
-$a = [1, 2, 3, 4, 7];
-$b = ['1', 2, 3, 5, 8];
-$c = [1, 2, 3, 6, 9];
-
-foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
-    print($item);
-}
-// 4, 5, 6, 7, 8, 9
-```
-
 ## Infinite Iteration
 ### Count
 Count sequentially forever.
@@ -992,6 +824,174 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
     print($runningTotal);
 }
 // 5, 6, 8, 11, 15, 20
+```
+
+## Set
+### Distinct
+Filter out elements from the iterable only returning unique elements.
+
+```Set::distinct(iterable $data, bool $strict = true)```
+
+If `$strict = true`:
+* **scalars**: compares strictly by type;
+* **objects**: always treats different instances as not equal to each other;
+* **arrays**: compares serialized.
+
+If `$strict = false`:
+* **scalars**: compares non-strictly by value;
+* **objects**: compares serialized;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
+
+foreach (Set::distinct($input, true) as $datum) {
+    print($datum);
+}
+// 1, 2, 3, '1', '2', '3'
+
+foreach (Set::distinct($input, false) as $datum) {
+    print($datum);
+}
+// 1, 2, 3
+```
+
+### Intersection
+Iterates intersection of iterables in strict type mode.
+
+```Set::intersection(iterable ...$iterables)```
+
+* **scalars**: compares strictly by type;
+* **objects**: always treats different instances as not equal to each other;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
+
+foreach (Set::intersection($numbers, $numerics, $oddNumbers) as $item) {
+    print($item);
+}
+// 3, 5, 7
+```
+
+### Intersection Coercive
+Iterates intersection of iterables in non-strict type mode.
+
+```Set::intersectionCoercive(iterable ...$iterables)```
+
+* **scalars**: compares non-strictly by value;
+* **objects**: compares serialized;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
+$scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
+$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
+
+foreach (Set::intersectionCoercive($languages, $scriptLanguages, $supportsInterfaces) as $lang) {
+    print($lang);
+}
+// 'php', 'typescript'
+```
+
+### Partial Intersection
+Iterates partial intersection of iterables in strict type mode.
+
+```Set::partialIntersection(int $minIntersectionCount, iterable ...$iterables)```
+
+* **scalars**: compares strictly by type;
+* **objects**: always treats different instances as not equal to each other;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
+
+foreach (Set::partialIntersection(2, $numbers, $numerics, $oddNumbers) as $item) {
+    print($item);
+}
+// 1, 3, 4, 5, 6, 7, 9
+```
+
+### Partial Intersection Coercive
+Iterates partial intersection of iterables in non-strict type mode.
+
+```Set::partialIntersectionCoercive(int $minIntersectionCount, iterable ...$iterables)```
+
+* **scalars**: compares non-strictly by value;
+* **objects**: compares serialized;
+* **arrays**: compares serialized.
+
+```php
+use IterTools\Set;
+
+$languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
+$scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
+$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
+
+foreach (Set::partialIntersectionCoercive(2, $languages, $scriptLanguages, $supportsInterfaces) as $lang) {
+    print($lang);
+}
+// 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
+```
+
+### Symmetric difference
+Iterates the symmetric difference of iterables in strict type mode.
+
+```Set::symmetricDifference(iterable ...$iterables)```
+
+* **scalars**: compares strictly by type;
+* **objects**: always treats different instances as not equal to each other;
+* **arrays**: compares serialized.
+
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+$c = [1, 2, 3, 6, 9];
+
+foreach (Set::symmetricDifference($a, $b, $c) as $item) {
+    print($item);
+}
+// '1', 4, 5, 6, 7, 8, 9
+```
+
+### Symmetric difference Coercive
+Iterates the symmetric difference of iterables in non-strict type mode.
+
+```Set::symmetricDifferenceCoercive(iterable ...$iterables)```
+
+* **scalars**: compares non-strictly by value;
+* **objects**: compares serialized;
+* **arrays**: compares serialized.
+
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+$c = [1, 2, 3, 6, 9];
+
+foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
+    print($item);
+}
+// 4, 5, 6, 7, 8, 9
 ```
 
 ## Summary
