@@ -12,7 +12,7 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider dataProviderForArray
+     * @dataProvider dataProviderForArraySets
      * @param        array<array> $iterables
      * @param        array $expected
      */
@@ -30,7 +30,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public function dataProviderForArraySets(): array
     {
         return [
             [
@@ -60,6 +60,27 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
+                    [2],
+                    [],
+                ],
+                [2],
+            ],
+            [
+                [
+                    [],
+                    [2],
+                ],
+                [2],
+            ],
+            [
+                [
+                    [2],
+                    [2],
+                ],
+                [],
+            ],
+            [
+                [
                     [1, 2, 3, 4, 5],
                     [1, 2, 3, 4, 5],
                 ],
@@ -78,6 +99,60 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
                     [1, 2, 3, '4', '5'],
                 ],
                 ['1', 1, '2', 2, '3', 3, 4, '4', 5, '5'],
+            ],
+            [
+                [
+                    [null, 1, 6, null],
+                    [null, 2, 7, 11, null],
+                    [null, 3, 8, 12, 15, null],
+                    [null, 4, 9, 13, 16, 18, null],
+                    [null, 5, 10, 14, 17, 19, 20, null],
+                ],
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            ],
+            [
+                [
+                    [null, 1, 6, null],
+                    [null, '1', 7, 11, null],
+                    [null, '1.0', 8, 12, 15, null],
+                    [null, true, 9, 13, 16, 18, null],
+                    [null, 'true', 10, 14, 17, 19, 20, null],
+                ],
+                [1, '1', '1.0', true, 'true', 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            ],
+            [
+                [
+                    ['1', 2, '3.3', true, false],
+                    [true, '2', 3.3, '4', '5'],
+                ],
+                ['1', 2, '2', '3.3', 3.3, '4', false, '5'],
+            ],
+        ];
+    }
+
+    public function dataProviderForArrayMultisets(): array
+    {
+        return [
+            [
+                [
+                    [2, 2],
+                    [],
+                ],
+                [2, 2],
+            ],
+            [
+                [
+                    [2, 2],
+                    [2, 2],
+                ],
+                [2],
+            ],
+            [
+                [
+                    [2, 2, 3],
+                    [2, 2, 4],
+                ],
+                [3, 4],
             ],
             [
                 [
@@ -115,33 +190,6 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
                     ['2', '3'],
                 ],
                 ['2', 2, 2, '3', '1', '1', 3, 3],
-            ],
-            [
-                [
-                    [null, 1, 6, null],
-                    [null, 2, 7, 11, null],
-                    [null, 3, 8, 12, 15, null],
-                    [null, 4, 9, 13, 16, 18, null],
-                    [null, 5, 10, 14, 17, 19, 20, null],
-                ],
-                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
-            ],
-            [
-                [
-                    [null, 1, 6, null],
-                    [null, '1', 7, 11, null],
-                    [null, '1.0', 8, 12, 15, null],
-                    [null, true, 9, 13, 16, 18, null],
-                    [null, 'true', 10, 14, 17, 19, 20, null],
-                ],
-                [1, '1', '1.0', true, 'true', 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
-            ],
-            [
-                [
-                    ['1', 2, '3.3', true, false],
-                    [true, '2', 3.3, '4', '5'],
-                ],
-                ['1', 2, '2', '3.3', 3.3, '4', false, '5'],
             ],
         ];
     }

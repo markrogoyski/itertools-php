@@ -85,6 +85,9 @@ class Set
     /**
      * Iterates partial intersection of iterables in strict type mode.
      *
+     * If input iterables produce duplicate items, then multiset intersection rules apply.
+     * If minIntersectionCount is 1, then multiset union rules apply.
+     *
      * Strict-type comparisons:
      *  - scalars: compares strictly by type
      *  - objects: always treats different instances as not equal to each other
@@ -102,6 +105,9 @@ class Set
 
     /**
      * Iterates partial intersection of iterables using type coercion.
+     *
+     * If input iterables produce duplicate items, then multiset intersection rules apply.
+     * If minIntersectionCount is 1, then multiset union rules apply.
      *
      * Coercive (non-strict) type comparisons:
      *  - scalars: compares non-strictly by value
@@ -121,6 +127,8 @@ class Set
     /**
      * Iterates the symmetric difference of iterables in strict type mode.
      *
+     * If input iterables produce duplicate items, then multiset difference rules apply.
+     *
      * Strict-type comparisons:
      *  - scalars: compares strictly by type
      *  - objects: always treats different instances as not equal to each other
@@ -137,6 +145,8 @@ class Set
 
     /**
      * Iterates the symmetric difference of iterables using type coercion.
+     *
+     * If input iterables produce duplicate items, then multiset intersection rules apply.
      *
      * Coercive (non-strict) type comparisons:
      *  - scalars: compares non-strictly by value
