@@ -975,6 +975,41 @@ foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
 
 ## Summary
 
+### All Match
+Returns true if all elements match the predicate function.
+
+```Summary::allMatch(iterable $data, callable $predicate)```
+
+```php
+use IterTools\Summary;
+
+$finalFantasyNumbers = [4, 5, 6];
+$isOnSuperNintendo   = fn ($ff) => $ff >= 4 && $ff <= 6;
+
+$boolean = Summary::allMatch($finalFantasyNumbers, $isOnSuperNintendo);
+// true
+
+$isOnPlaystation = fn ($ff) => $ff >= 7 && $ff <= 9;
+
+$boolean = Summary::allMatch($finalFantasyNumbers, $isOnSuperNintendo);
+// false
+```
+
+### Any Match
+Returns true if any element matches the predicate function.
+
+```Summary::anyMatch(iterable $data, callable $predicate)```
+
+```php
+use IterTools\Summary;
+
+$answers          = ['fish', 'towel', 42, "don't panic"];
+$isUltimateAnswer = fn ($a) => a == 42;
+
+$boolean = Summary::anyMatch($answers, $isUltimateAnswer);
+// true
+```
+
 ### Exactly N
 Returns true if exactly n items are true according to a predicate function.
 
@@ -1042,6 +1077,21 @@ $numbers = [1, 4, 3, 2, 1];
 
 $boolean = Summary::isReversed($numbers);
 // false
+```
+
+### None Match
+Returns true if no element matches the predicate function.
+
+```Summary::noneMatch(iterable $data, callable $predicate)```
+
+```php
+use IterTools\Summary;
+
+$grades         = [45, 50, 61, 0];
+$isPassingGrade = fn ($grade) => $grade >= 70;
+
+$boolean = Summary::noneMatch($grades, $isPassingGrade);
+// true
 ```
 
 ### Same
