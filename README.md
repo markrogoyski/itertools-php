@@ -991,7 +991,7 @@ $boolean = Summary::allMatch($finalFantasyNumbers, $isOnSuperNintendo);
 
 $isOnPlaystation = fn ($ff) => $ff >= 7 && $ff <= 9;
 
-$boolean = Summary::allMatch($finalFantasyNumbers, $isOnSuperNintendo);
+$boolean = Summary::allMatch($finalFantasyNumbers, $isOnPlaystation);
 // false
 ```
 
