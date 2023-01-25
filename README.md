@@ -66,13 +66,13 @@ Quick Reference
 #### Set Iteration
 | Iterator                                                        | Description                                               | Code Snippet                                                             |
 |-----------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------------------|
-| [`distinct`](#Distinct)                                         | Iterate only distinct items                               | `Set::distinct($data, $strict)`                                          |
+| [`distinct`](#Distinct)                                         | Iterate only distinct items                               | `Set::distinct($data)`                                                   |
 | [`intersection`](#Intersection)                                 | Intersection of iterables                                 | `Set::intersection(...$iterables)`                                       |
-| [`intersectionCoercive`](#Intersection-Coercive)                | Intersection of iterables with type coercion              | `Set::intersectionCoercive(...$iterables)`                               |
-| [`partialIntersection`](#Partial-Intersection)                  | Partial intersection of iterables                         | `Set::partialIntersection($minIntersectionCount, ...$iterables)`         |
-| [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Partial intersection of iterables with type coercion      | `Set::partialIntersectionCoercive($minIntersectionCount, ...$iterables)` |
+| [`intersectionCoercive`](#Intersection-Coercive)                | Intersection with type coercion                           | `Set::intersectionCoercive(...$iterables)`                               |
+| [`partialIntersection`](#Partial-Intersection)                  | Partial intersection of iterables                         | `Set::partialIntersection($minCount, ...$iterables)`                     |
+| [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Partial intersection with type coercion                   | `Set::partialIntersectionCoercive($minCount, ...$iterables)`             |
 | [`symmetricDifference`](#Symmetric-Difference)                  | Symmetric difference of iterables                         | `Set::symmetricDifference(...$iterables)`                                |
-| [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Symmetric difference of iterables with type coercion      | `Set::symmetricDifferenceCoercive(...$iterables)`                        |
+| [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Symmetric difference with type coercion                   | `Set::symmetricDifferenceCoercive(...$iterables)`                        |
 
 #### Summary
 | Summary                      | Description                                             | Code Snippet                               |
