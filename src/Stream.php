@@ -690,6 +690,21 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns true if exactly n items in the stream are true where the predicate function is true.
+     *
+     * Default predicate if not provided is the boolean value of each data item.
+     *
+     * @param int           $n
+     * @param callable|null $predicate
+     *
+     * @return bool
+     */
+    public function exactlyN(int $n, callable $predicate = null): bool
+    {
+        return Summary::exactlyN($this->iterable, $n, $predicate);
+    }
+
+    /**
      * Returns true if no element matches the predicate function.
      *
      * Empty iterables return true.

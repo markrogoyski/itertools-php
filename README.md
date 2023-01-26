@@ -184,6 +184,7 @@ Quick Reference
 |----------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------|
 | [`allMatch`](#All-Match-1)                   | Returns true if all items in stream match predicate                              | `$stream->allMatch($predicate)`              |
 | [`anyMatch`](#Any-Match-1)                   | Returns true if any item in stream matches predicate                             | `$stream->anyMatch($predicate)`              |
+| [`exactlyN`](#Exactly-N-1)                   | Returns true if exactly n items are true according to predicate                  | `$stream->exactlyN($n, $predicate)`          |
 | [`isSorted`](#Is-Sorted-1)                   | Returns true if stream is sorted in ascending order                              | `$stream->isSorted()`                        |
 | [`isReversed`](#Is-Reversed-1)               | Returns true if stream is sorted in reverse descending order                     | `$stream->isReversed()`                      |
 | [`noneMatch`](#None-Match-1)                 | Returns true if none of the items in stream match predicate                      | `$stream->noneMatch($predicate)`             |

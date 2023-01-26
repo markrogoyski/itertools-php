@@ -108,6 +108,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 9),
             ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->exactlyN(5),
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->exactlyN(5, fn ($x) => $x < 6),
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->exactlyN(2, fn ($x) => $x <= 2),
+            ],
         ];
     }
 
@@ -184,6 +199,16 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 5],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 5),
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->exactlyN(3),
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->exactlyN(5, fn ($x) => $x > 6),
             ],
         ];
     }
