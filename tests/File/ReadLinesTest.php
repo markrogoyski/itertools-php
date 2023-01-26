@@ -75,7 +75,7 @@ class ReadLinesTest extends \PHPUnit\Framework\TestCase
     /**
      * @return void
      */
-    public function testError(): void
+    public function testErrorOnStart(): void
     {
         // Given
         $file = FileFixture::createFromLines([]);
@@ -87,6 +87,22 @@ class ReadLinesTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\UnexpectedValueException::class);
         foreach (File::readLines($file) as $_) {
             break;
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testErrorOnProcess(): void
+    {
+        /// Given
+        $file = FileFixture::createFromLines(['123', '456']);
+
+        // Then
+        $this->expectException(\UnexpectedValueException::class);
+        foreach (File::readLines($file) as $_) {
+            // When
+            fclose($file);
         }
     }
 }

@@ -19,12 +19,11 @@ class File
      */
     public static function readLines($file): \Generator
     {
-        if (!is_resource($file)) {
-            throw new \UnexpectedValueException('invalid resource');
-        }
+        static::checkIsResourceValid($file);
 
         while (($line = \fgets($file)) !== false) {
             yield $line;
+            static::checkIsResourceValid($file);
         }
     }
 
@@ -48,14 +47,24 @@ class File
         string $enclosure = "\"",
         string $escape = "\\"
     ): \Generator {
-        if (!is_resource($file)) {
-            throw new \UnexpectedValueException('invalid resource');
-        }
+        static::checkIsResourceValid($file);
 
         // @phpstan-ignore-next-line (expects int<0, max>, null given.)
         while (($row = \fgetcsv($file, null, $separator, $enclosure, $escape)) !== false) {
             /** @var array<string|null> $row */
             yield $row;
+            static::checkIsResourceValid($file);
+        }
+    }
+
+    /**
+     * @param resource $resource
+     * @return void
+     */
+    public static function checkIsResourceValid($resource): void
+    {
+        if (!is_resource($resource)) {
+            throw new \UnexpectedValueException('invalid resource');
         }
     }
 }
