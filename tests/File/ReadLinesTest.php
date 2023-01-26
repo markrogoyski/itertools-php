@@ -7,7 +7,7 @@ namespace IterTools\Tests\File;
 use IterTools\File;
 use IterTools\Tests\Fixture\FileFixture;
 
-class ReadByLineTest extends \PHPUnit\Framework\TestCase
+class ReadLinesTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderForCommon
@@ -20,7 +20,7 @@ class ReadByLineTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (File::readByLine($file) as $datum) {
+        foreach (File::readLines($file) as $datum) {
             $result[] = $datum;
         }
 
@@ -70,5 +70,23 @@ class ReadByLineTest extends \PHPUnit\Framework\TestCase
                 ["\n", "\n"],
             ],
         ];
+    }
+
+    /**
+     * @return void
+     */
+    public function testError(): void
+    {
+        // Given
+        $file = FileFixture::createFromLines([]);
+
+        // When
+        fclose($file);
+
+        // Then
+        $this->expectException(\UnexpectedValueException::class);
+        foreach (File::readLines($file) as $_) {
+            break;
+        }
     }
 }

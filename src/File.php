@@ -9,15 +9,21 @@ class File
     /**
      * Reads file resource line by line.
      *
-     * @param resource $fileResource
+     * @param resource $file
      *
      * @return \Generator<string>
      *
+     * @throws \UnexpectedValueException if invalid resource given
+     *
      * @see fgets()
      */
-    public static function readByLine($fileResource): \Generator
+    public static function readLines($file): \Generator
     {
-        while (($line = @\fgets($fileResource)) !== false) {
+        if (!is_resource($file)) {
+            throw new \UnexpectedValueException('invalid resource');
+        }
+
+        while (($line = \fgets($file)) !== false) {
             yield $line;
         }
     }
@@ -25,29 +31,30 @@ class File
     /**
      * Reads data from CSV file resource like fgetcsv() function.
      *
-     * @param resource $fileResource
+     * @param resource $file
      * @param string $separator
      * @param string $enclosure
      * @param string $escape
      *
      * @return \Generator<array<int, string|null>>
      *
-     * @throws \RuntimeException if read error occurred
+     * @throws \UnexpectedValueException if invalid resource given
      *
      * @see fgetcsv()
      */
     public static function readCsv(
-        $fileResource,
+        $file,
         string $separator = ",",
         string $enclosure = "\"",
         string $escape = "\\"
     ): \Generator {
-        // @phpstan-ignore-next-line (expects int<0, max>, int<0, max>|null given.)
-        while (($row = @\fgetcsv($fileResource, null, $separator, $enclosure, $escape)) !== false) {
-            if ($row === null) {
-                throw new \RuntimeException('cannot read from file resource');
-            }
+        if (!is_resource($file)) {
+            throw new \UnexpectedValueException('invalid resource');
+        }
 
+        // @phpstan-ignore-next-line (expects int<0, max>, null given.)
+        while (($row = \fgetcsv($file, null, $separator, $enclosure, $escape)) !== false) {
+            /** @var array<string|null> $row */
             yield $row;
         }
     }
