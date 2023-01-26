@@ -204,6 +204,11 @@ Quick Reference
 | [`toRange`](#To-Range-1)       | Reduces stream to difference of max and min values    | `$stream->toRange()`                                    |
 | [`toValue`](#To-Value-1)       | Reduces stream like array_reduce() function           | `$stream->toValue($reducer, $initialValue)`             |
 
+##### Transformation Terminal Operations
+| Terminal Operation             | Description                                           | Code Snippet                                            |
+|--------------------------------|-------------------------------------------------------|---------------------------------------------------------|
+| [`toArray`](#To-Array)         | Returns array of stream elements                      | `$stream->toArray()`                                    |
+
 ##### Side Effect Terminal Operations
 | Terminal Operation              | Description                              | Code Snippet                                          |
 |---------------------------------|------------------------------------------|-------------------------------------------------------|
@@ -1064,7 +1069,7 @@ $ages      = [18, 21, 24, 54];
 $n         = 4;
 $predicate = fn ($age) => $age >= 21;
 
-$boolean = Summary::isSorted($ages, $n, $predicate);
+$boolean = Summary::exactlyN($ages, $n, $predicate);
 // false
 ```
 
@@ -2345,6 +2350,22 @@ $input = [1, 2, 3, 4, 5];
 $result = Stream::of($iterable)
     ->toValue(fn ($carry, $item) => $carry + $item);
 // 15
+```
+
+#### Transformation Terminal Operations
+
+##### To Array
+Returns an array of stream elements.
+
+```$stream->toArray(): array```
+```php
+use IterTools\Stream;
+
+$array = Stream::of([1, 1, 2, 2, 3, 4, 5])
+    ->distinct()
+    ->map(fn ($x) => $x**2)
+    ->toArray();
+// [1, 4, 9, 16, 25]
 ```
 
 #### Side Effect Terminal Operations
