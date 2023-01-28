@@ -1348,8 +1348,8 @@ Streams are made up of:
 1. One stream source factory method to create the stream.
 2. Zero or more stream operators that transform the stream to a new stream.
 3. Terminal operation of either:
-  * Stream terminal operation to transform the stream to a value or data structure.
-  * The stream is iterated via a `foreach` loop.
+ ** Stream terminal operation to transform the stream to a value or data structure.
+ ** The stream is iterated via a `foreach` loop.
 
 ### Stream Sources
 
