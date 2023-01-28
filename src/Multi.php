@@ -19,16 +19,18 @@ class Multi
      *
      * @param iterable<mixed> ...$iterables
      *
-     * @return \MultipleIterator<mixed>
+     * @return \Generator<array<mixed>>
      */
-    public static function zip(iterable ...$iterables): \MultipleIterator
+    public static function zip(iterable ...$iterables): \Generator
     {
         $zippedIterator = new \MultipleIterator();
         foreach ($iterables as $iterable) {
             $zippedIterator->attachIterator(IteratorFactory::makeIterator($iterable));
         }
 
-        return $zippedIterator;
+        foreach ($zippedIterator as $values) {
+            yield $values;
+        }
     }
 
     /**
@@ -42,9 +44,9 @@ class Multi
      *
      * @param iterable<mixed> ...$iterables
      *
-     * @return \MultipleIterator<mixed>
+     * @return \Generator<array<mixed>>
      */
-    public static function zipLongest(iterable ...$iterables): \MultipleIterator
+    public static function zipLongest(iterable ...$iterables): \Generator
     {
         $zippedIterator = new \MultipleIterator();
         foreach ($iterables as $iterable) {
@@ -52,7 +54,9 @@ class Multi
         }
         $zippedIterator->setFlags(\MultipleIterator::MIT_NEED_ANY);
 
-        return $zippedIterator;
+        foreach ($zippedIterator as $values) {
+            yield $values;
+        }
     }
 
     /**
@@ -63,10 +67,10 @@ class Multi
      *
      * @param iterable<mixed> ...$iterables
      *
-     * @return \MultipleIterator<mixed>
+     * @return \Generator<array<mixed>>
      * @throws \LengthException if during iteration one iterable ends before the others, indicating unequal lengths
      */
-    public static function zipEqual(iterable ...$iterables): \MultipleIterator
+    public static function zipEqual(iterable ...$iterables): \Generator
     {
         $zippedIterator = new StrictMultipleIterator(\MultipleIterator::MIT_NEED_ALL);
         foreach ($iterables as $iterable) {
@@ -74,7 +78,9 @@ class Multi
         }
         $zippedIterator->setFlags(\MultipleIterator::MIT_NEED_ALL);
 
-        return $zippedIterator;
+        foreach ($zippedIterator as $values) {
+            yield $values;
+        }
     }
 
     /**

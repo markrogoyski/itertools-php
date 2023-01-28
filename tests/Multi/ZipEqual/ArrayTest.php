@@ -306,4 +306,48 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test array keys are reset as ordered sequence of integers, and not an array of multiple iterator indexes
+     */
+    public function testArrayKeysResetFromDefaultArrayKeys()
+    {
+        // Given
+        $array1 = ['a', 'b', 'c', 'd', 'e'];
+        $array2 = [1, 2, 3, 4, 5];
+
+        // And
+        $result = [];
+
+        // When
+        foreach (Multi::zipEqual($array1, $array2) as $key => [$value1, $value2]) {
+            $result[$key] = [$value1, $value2];
+        }
+
+        // Then
+        $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => ['d', 4], 4 => ['e', 5]];
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @test array keys are reset as ordered sequence of integers starting at zero
+     */
+    public function testArrayKeysResetFromCustomArrayKeys()
+    {
+        // Given
+        $array1 = ['l1' => 'a', 'l2' => 'b', 'l3' => 'c', 'l4' => 'd', 'l5' => 'e'];
+        $array2 = [2 => 1, 3 => 2, 4 => 3, 5 => 4, 6 => 5];
+
+        // And
+        $result = [];
+
+        // When
+        foreach (Multi::zipEqual($array1, $array2) as $key => [$value1, $value2]) {
+            $result[$key] = [$value1, $value2];
+        }
+
+        // Then
+        $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => ['d', 4], 4 => ['e', 5]];
+        $this->assertEquals($expected, $result);
+    }
 }

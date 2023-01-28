@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace IterTools\Tests\Multi\Zip;
 
 use IterTools\Multi;
+use IterTools\Tests\Fixture;
 
-class ArrayTest extends \PHPUnit\Framework\TestCase
+class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test         zip with two arrays of the same size
@@ -18,12 +19,10 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     public function testZipTwoArraysSameSize(array $array1, array $array2, array $expected): void
     {
         // Given
-        $result = [];
+        $iterator = Multi::zip($array1, $array2);
 
         // When
-        foreach (Multi::zip($array1, $array2) as [$value1, $value2]) {
-            $result[] = [$value1, $value2];
-        }
+        $result = iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -73,11 +72,10 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     public function testZipTwoArraysDifferentSize(array $array1, array $array2, array $expected): void
     {
         // Given
-        $result = [];
+        $iterator = Multi::zip($array1, $array2);
 
-        foreach (Multi::zip($array1, $array2) as [$value1, $value2]) {
-            $result[] = [$value1, $value2];
-        }
+        // When
+        $result = iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -143,12 +141,10 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     public function testZipThreeArraysSameSize(array $array1, array $array2, array $array3, array $expected): void
     {
         // Given
-        $result = [];
+        $iterator = Multi::zip($array1, $array2, $array3);
 
         // When
-        foreach (Multi::zip($array1, $array2, $array3) as [$value1, $value2, $value3]) {
-            $result[] = [$value1, $value2, $value3];
-        }
+        $result = iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -165,12 +161,10 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     public function testZipThreeArraysSameSizeUsingUnpacking(array $array1, array $array2, array $array3, array $expected): void
     {
         // Given
-        $result = [];
+        $iterator = Multi::zip(...[$array1, $array2, $array3]);
 
         // When
-        foreach (Multi::zip(...[$array1, $array2, $array3]) as [$value1, $value2, $value3]) {
-            $result[] = [$value1, $value2, $value3];
-        }
+        $result = iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -226,12 +220,10 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     public function testZipThreeArraysDifferentSize(array $array1, array $array2, array $array3, array $expected): void
     {
         // Given
-        $result = [];
+        $iterator = Multi::zip($array1, $array2, $array3);
 
         // When
-        foreach (Multi::zip($array1, $array2, $array3) as [$value1, $value2, $value3]) {
-            $result[] = [$value1, $value2, $value3];
-        }
+        $result = iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -271,46 +263,161 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test array keys are reset as ordered sequence of integers, and not an array of multiple iterator indexes
+     * @test         iterator_to_array with two generators of the same size
+     * @dataProvider dataProviderForZipTwoGeneratorsSameSize
+     * @param        \Generator $generator1
+     * @param        \Generator $generator2
+     * @param        array      $expected
      */
-    public function testArrayKeysResetFromDefaultArrayKeys()
+    public function testZipTwoGeneratorsSameSize(\Generator $generator1, \Generator $generator2, array $expected): void
     {
         // Given
-        $array1 = ['a', 'b', 'c', 'd', 'e'];
-        $array2 = [1, 2, 3, 4, 5];
-
-        // And
-        $result = [];
+        $iterator = Multi::zip($generator1, $generator2);
 
         // When
-        foreach (Multi::zip($array1, $array2) as $key => [$value1, $value2]) {
-            $result[$key] = [$value1, $value2];
-        }
+        $result = iterator_to_array($iterator);
 
         // Then
-        $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => ['d', 4], 4 => ['e', 5]];
         $this->assertEquals($expected, $result);
     }
 
     /**
-     * @test array keys are reset as ordered sequence of integers starting at zero
+     * @return array
      */
-    public function testArrayKeysResetFromCustomArrayKeys()
+    public function dataProviderForZipTwoGeneratorsSameSize(): array
+    {
+        return [
+            [
+                Fixture\GeneratorFixture::getGenerator([]),
+                Fixture\GeneratorFixture::getGenerator([]),
+                [],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1]),
+                Fixture\GeneratorFixture::getGenerator([2]),
+                [[1, 2]],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, 2]),
+                Fixture\GeneratorFixture::getGenerator([4, 5]),
+                [[1, 4], [2, 5]],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                Fixture\GeneratorFixture::getGenerator([4, 5, 6]),
+                [[1, 4], [2, 5], [3, 6]],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                Fixture\GeneratorFixture::getGenerator([4, 5, 6, 7, 8, 9, 1, 2, 3]),
+                [[1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9], [7, 1], [8, 2], [9, 3]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         iterator_to_array with two iterators of the same size
+     * @dataProvider dataProviderForZipTwoIteratorsSameSize
+     * @param        \Iterator $iter1
+     * @param        \Iterator $iter2
+     * @param        array     $expected
+     */
+    public function testZipTwoIteratorSameSize(\Iterator $iter1, \Iterator $iter2, array $expected): void
     {
         // Given
-        $array1 = ['l1' => 'a', 'l2' => 'b', 'l3' => 'c', 'l4' => 'd', 'l5' => 'e'];
-        $array2 = [2 => 1, 3 => 2, 4 => 3, 5 => 4, 6 => 5];
-
-        // And
-        $result = [];
+        $iterator = Multi::zip($iter1, $iter2);
 
         // When
-        foreach (Multi::zip($array1, $array2) as $key => [$value1, $value2]) {
-            $result[$key] = [$value1, $value2];
-        }
+        $result = iterator_to_array($iterator);
 
         // Then
-        $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => ['d', 4], 4 => ['e', 5]];
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderForZipTwoIteratorsSameSize(): array
+    {
+        return [
+            [
+                new Fixture\ArrayIteratorFixture([]),
+                new Fixture\ArrayIteratorFixture([]),
+                [],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1]),
+                new Fixture\ArrayIteratorFixture([2]),
+                [[1, 2]],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, 2]),
+                new Fixture\ArrayIteratorFixture([4, 5]),
+                [[1, 4], [2, 5]],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                new Fixture\ArrayIteratorFixture([4, 5, 6]),
+                [[1, 4], [2, 5], [3, 6]],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                new Fixture\ArrayIteratorFixture([4, 5, 6, 7, 8, 9, 1, 2, 3]),
+                [[1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9], [7, 1], [8, 2], [9, 3]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         iterator_to_array with two traversable objects of the same size
+     * @dataProvider dataProviderForZipTwoTraversableSameSize
+     * @param        \Traversable $iter1
+     * @param        \Traversable $iter2
+     * @param        array     $expected
+     */
+    public function testZipTwoTraversablesSameSize(\Traversable $iter1, \Traversable $iter2, array $expected): void
+    {
+        // Given
+        $iterator = Multi::zip($iter1, $iter2);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderForZipTwoTraversableSameSize(): array
+    {
+        return [
+            [
+                new Fixture\IteratorAggregateFixture([]),
+                new Fixture\IteratorAggregateFixture([]),
+                [],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1]),
+                new Fixture\IteratorAggregateFixture([2]),
+                [[1, 2]],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, 2]),
+                new Fixture\IteratorAggregateFixture([4, 5]),
+                [[1, 4], [2, 5]],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                new Fixture\IteratorAggregateFixture([4, 5, 6]),
+                [[1, 4], [2, 5], [3, 6]],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+                new Fixture\IteratorAggregateFixture([4, 5, 6, 7, 8, 9, 1, 2, 3]),
+                [[1, 4], [2, 5], [3, 6], [4, 7], [5, 8], [6, 9], [7, 1], [8, 2], [9, 3]],
+            ],
+        ];
     }
 }

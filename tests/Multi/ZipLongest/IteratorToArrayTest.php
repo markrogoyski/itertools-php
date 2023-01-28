@@ -2,28 +2,26 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Multi\Zip;
+namespace IterTools\Tests\Multi\ZipLongest;
 
 use IterTools\Multi;
 
-class ArrayTest extends \PHPUnit\Framework\TestCase
+class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @test         zip with two arrays of the same size
-     * @dataProvider dataProviderForZipTwoArraysSameSize
+     * @test         zipLongest with two arrays of the same size
+     * @dataProvider dataProviderForZipLongestTwoArraysSameSize
      * @param        array $array1
      * @param        array $array2
      * @param        array $expected
      */
-    public function testZipTwoArraysSameSize(array $array1, array $array2, array $expected): void
+    public function testZipLongestTwoArraysSameSize(array $array1, array $array2, array $expected): void
     {
         // Given
-        $result = [];
+        $iterator = Multi::zipLongest($array1, $array2);
 
         // When
-        foreach (Multi::zip($array1, $array2) as [$value1, $value2]) {
-            $result[] = [$value1, $value2];
-        }
+        $result = iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -32,7 +30,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipTwoArraysSameSize(): array
+    public function dataProviderForZipLongestTwoArraysSameSize(): array
     {
         return [
             [
@@ -64,20 +62,19 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         zip with two arrays of the different sizes
-     * @dataProvider dataProviderForZipTwoArraysDifferentSize
+     * @test         zipLongest with two arrays of the different sizes
+     * @dataProvider dataProviderForZipLongestTwoArraysDifferentSize
      * @param        array $array1
      * @param        array $array2
      * @param        array $expected
      */
-    public function testZipTwoArraysDifferentSize(array $array1, array $array2, array $expected): void
+    public function testZipLongestTwoArraysDifferentSize(array $array1, array $array2, array $expected): void
     {
         // Given
-        $result = [];
+        $iterator = Multi::zipLongest($array1, $array2);
 
-        foreach (Multi::zip($array1, $array2) as [$value1, $value2]) {
-            $result[] = [$value1, $value2];
-        }
+        // When
+        $result = iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -86,91 +83,87 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipTwoArraysDifferentSize(): array
+    public function dataProviderForZipLongestTwoArraysDifferentSize(): array
     {
         return [
             [
                 [1],
                 [],
-                [],
+                [[1, null]],
             ],
             [
                 [],
                 [2],
-                [],
+                [[null, 2]],
             ],
             [
                 [1, 2],
                 [4],
-                [[1, 4]],
+                [[1, 4], [2, null]],
             ],
             [
                 [1],
                 [4, 5],
-                [[1, 4]],
+                [[1, 4], [null, 5]],
             ],
             [
                 [1, 2, 3],
                 [4, 5],
-                [[1, 4], [2, 5]],
+                [[1, 4], [2, 5], [3, null]],
             ],
             [
                 [1, 2],
                 [4, 5, 6],
-                [[1, 4], [2, 5]],
+                [[1, 4], [2, 5], [null, 6]],
             ],
             [
                 [1, 2, 3],
                 [4],
-                [[1, 4]],
+                [[1, 4], [2, null], [3, null]],
             ],
             [
                 [1],
                 [4, 5, 6],
-                [[1, 4]],
+                [[1, 4], [null, 5], [null, 6]],
             ],
         ];
     }
 
     /**
-     * @test         zip with three arrays of the same size
-     * @dataProvider dataProviderForZipThreeArraysSameSize
+     * @test         zipLongest with three arrays of the same size
+     * @dataProvider dataProviderForZipLongestThreeArraysSameSize
      * @param        array $array1
      * @param        array $array2
      * @param        array $array3
      * @param        array $expected
      */
-    public function testZipThreeArraysSameSize(array $array1, array $array2, array $array3, array $expected): void
+    public function testZipLongestThreeArraysSameSize(array $array1, array $array2, array $array3, array $expected): void
     {
         // Given
-        $result = [];
+        $iterator = Multi::zipLongest($array1, $array2, $array3);
 
         // When
-        foreach (Multi::zip($array1, $array2, $array3) as [$value1, $value2, $value3]) {
-            $result[] = [$value1, $value2, $value3];
-        }
+        $result = iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
     }
 
     /**
-     * @test         zip with three arrays of the same size - unpacking
-     * @dataProvider dataProviderForZipThreeArraysSameSize
+     * @test         zipLongest with three arrays of the same size - unpacking
+     * @dataProvider dataProviderForZipLongestThreeArraysSameSize
      * @param        array $array1
      * @param        array $array2
      * @param        array $array3
      * @param        array $expected
      */
-    public function testZipThreeArraysSameSizeUsingUnpacking(array $array1, array $array2, array $array3, array $expected): void
+    public function testZipLongestThreeArraysSameSizeUsingUnpacking(array $array1, array $array2, array $array3, array $expected): void
     {
         // Given
-        $result = [];
+        $iterator = Multi::zipLongest(...[$array1, $array2, $array3]);
 
         // When
-        foreach (Multi::zip(...[$array1, $array2, $array3]) as [$value1, $value2, $value3]) {
-            $result[] = [$value1, $value2, $value3];
-        }
+        $result = iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -179,7 +172,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipThreeArraysSameSize(): array
+    public function dataProviderForZipLongestThreeArraysSameSize(): array
     {
         return [
             [
@@ -216,22 +209,20 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         zip with three arrays of different size
-     * @dataProvider dataProviderForZipThreeArraysDifferentSize
+     * @test         zipLongest with three arrays of different size
+     * @dataProvider dataProviderForZipLongestThreeArraysDifferentSize
      * @param        array $array1
      * @param        array $array2
      * @param        array $array3
      * @param        array $expected
      */
-    public function testZipThreeArraysDifferentSize(array $array1, array $array2, array $array3, array $expected): void
+    public function testZipLongestThreeArraysDifferentSize(array $array1, array $array2, array $array3, array $expected): void
     {
         // Given
-        $result = [];
+        $iterator = Multi::zipLongest($array1, $array2, $array3);
 
         // When
-        foreach (Multi::zip($array1, $array2, $array3) as [$value1, $value2, $value3]) {
-            $result[] = [$value1, $value2, $value3];
-        }
+        $result = iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -240,32 +231,32 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipThreeArraysDifferentSize(): array
+    public function dataProviderForZipLongestThreeArraysDifferentSize(): array
     {
         return [
             [
                 [],
                 [1],
                 [2, 3],
-                [],
+                [[null, 1, 2], [null, null, 3]],
             ],
             [
                 [1],
                 [2, 3],
                 [4, 5, 6],
-                [[1, 2, 4]],
+                [[1, 2, 4], [null, 3, 5], [null, null, 6]],
             ],
             [
                 [1, 2],
                 [4, 5, 7, 8],
                 [9, 1, 2, 3, 4, 5, 6],
-                [[1, 4, 9], [2, 5, 1]],
+                [[1, 4, 9], [2, 5, 1], [null, 7, 2], [null, 8, 3], [null, null, 4], [null, null, 5], [null, null, 6]],
             ],
             [
                 [1, 2, 3, 4],
                 [4, 5, 6],
                 [7, 8, 9, 0],
-                [[1, 4, 7], [2, 5, 8], [3, 6, 9]],
+                [[1, 4, 7], [2, 5, 8], [3, 6, 9], [4, null, 0]],
             ],
         ];
     }
@@ -276,19 +267,15 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     public function testArrayKeysResetFromDefaultArrayKeys()
     {
         // Given
-        $array1 = ['a', 'b', 'c', 'd', 'e'];
+        $array1 = ['a', 'b', 'c',];
         $array2 = [1, 2, 3, 4, 5];
 
-        // And
-        $result = [];
-
         // When
-        foreach (Multi::zip($array1, $array2) as $key => [$value1, $value2]) {
-            $result[$key] = [$value1, $value2];
-        }
+        $iterator = Multi::zipLongest($array1, $array2);
+        $result = iterator_to_array($iterator);
 
         // Then
-        $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => ['d', 4], 4 => ['e', 5]];
+        $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => [null, 4], 4 => [null, 5]];
         $this->assertEquals($expected, $result);
     }
 
@@ -298,19 +285,15 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     public function testArrayKeysResetFromCustomArrayKeys()
     {
         // Given
-        $array1 = ['l1' => 'a', 'l2' => 'b', 'l3' => 'c', 'l4' => 'd', 'l5' => 'e'];
+        $array1 = ['l1' => 'a', 'l2' => 'b', 'l3' => 'c'];
         $array2 = [2 => 1, 3 => 2, 4 => 3, 5 => 4, 6 => 5];
 
-        // And
-        $result = [];
-
         // When
-        foreach (Multi::zip($array1, $array2) as $key => [$value1, $value2]) {
-            $result[$key] = [$value1, $value2];
-        }
+        $iterator = Multi::zipLongest($array1, $array2);
+        $result = iterator_to_array($iterator);
 
         // Then
-        $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => ['d', 4], 4 => ['e', 5]];
+        $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => [null, 4], 4 => [null, 5]];
         $this->assertEquals($expected, $result);
     }
 }
