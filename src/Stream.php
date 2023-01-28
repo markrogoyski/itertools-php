@@ -658,6 +658,20 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Converts iterable source to array.
+     *
+     * @return array<mixed>
+     */
+    public function toAssociativeArray(callable $keyFunc, callable $valueFunc): array
+    {
+        $result = [];
+        foreach ($this->iterable as $item) {
+            $result[$keyFunc($item)] = $valueFunc($item);
+        }
+        return $result;
+    }
+
+    /**
      * Returns true if all elements match the predicate function.
      *
      * Empty iterables return true.

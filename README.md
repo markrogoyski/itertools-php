@@ -198,9 +198,10 @@ Quick Reference
 | [`toValue`](#To-Value-1)       | Reduces stream like array_reduce() function           | `$stream->toValue($reducer, $initialValue)`             |
 
 ##### Transformation Terminal Operations
-| Terminal Operation             | Description                                           | Code Snippet                                            |
-|--------------------------------|-------------------------------------------------------|---------------------------------------------------------|
-| [`toArray`](#To-Array)         | Returns array of stream elements                      | `$stream->toArray()`                                    |
+| Terminal Operation                            | Description                                           | Code Snippet                                            |
+|-----------------------------------------------|-------------------------------------------------------|---------------------------------------------------------|
+| [`toArray`](#To-Array)                        | Returns array of stream elements                      | `$stream->toArray()`                                    |
+| [`toAssociativeArray`](#To-Associative-Array) | Returns key-value map of stream elements              | `$stream->toAssociativeArray($keyFunc, $valueFunc)`     |
 
 ##### Side Effect Terminal Operations
 | Terminal Operation              | Description                              | Code Snippet                                          |
@@ -2337,6 +2338,24 @@ $array = Stream::of([1, 1, 2, 2, 3, 4, 5])
     ->map(fn ($x) => $x**2)
     ->toArray();
 // [1, 4, 9, 16, 25]
+```
+
+##### To Associative Array
+Returns a key-value map of stream elements.
+
+```$stream->toAssociativeArray(callable $keyFunc, callable $valueFunc): array```
+```php
+use IterTools\Stream;
+
+$keyFunc
+
+$array = Stream::of(['message 1', 'message 2', 'message 3'])
+    ->map('strtoupper')
+    ->toAssociativeArray(
+        fn ($s) => \md5(%$s),
+        fn ($s) => $s
+    );
+// [3b3f2272b3b904d342b2d0df2bf31ed4 => MESSAGE 1, 43638d919cfb8ea31979880f1a2bb146 => MESSAGE 2, ... ]
 ```
 
 #### Side Effect Terminal Operations
