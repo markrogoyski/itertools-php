@@ -333,4 +333,22 @@ class RunningMaxTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         runningMax iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array $numbers
+     * @param        array $expected
+     */
+    public function testIteratorToArray(array $numbers, array $expected)
+    {
+        // Given
+        $iterator = Math::runningMax($numbers);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

@@ -329,4 +329,22 @@ class RunningMinTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         runningMin iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array $numbers
+     * @param        array $expected
+     */
+    public function testIteratorToArray(array $numbers, array $expected)
+    {
+        // Given
+        $iterator = Math::runningMin($numbers);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

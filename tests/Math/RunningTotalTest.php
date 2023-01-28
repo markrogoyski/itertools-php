@@ -307,4 +307,22 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         runningTotal iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array $numbers
+     * @param        array $expected
+     */
+    public function testIteratorToArray(array $numbers, array $expected)
+    {
+        // Given
+        $iterator = Math::runningTotal($numbers);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }
