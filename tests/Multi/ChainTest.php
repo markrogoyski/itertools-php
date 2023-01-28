@@ -194,4 +194,23 @@ class ChainTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEquals($expected, $result);
     }
+
+    /**
+     * @test         chain iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array $first
+     * @param        array $second
+     * @param        array $expected
+     */
+    public function testIteratorToArray(array $first, array $second, array $expected)
+    {
+        // Given
+        $iterator = Multi::chain($first, $second);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

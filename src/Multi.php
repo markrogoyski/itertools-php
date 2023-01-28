@@ -89,7 +89,9 @@ class Multi
     public static function chain(iterable ...$iterables): \Generator
     {
         foreach ($iterables as $iterable) {
-            yield from $iterable;
+            foreach ($iterable as $item) {
+                yield $item;
+            }
         }
     }
 }
