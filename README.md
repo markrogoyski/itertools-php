@@ -1017,7 +1017,7 @@ foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
 ### All Match
 Returns true if all elements match the predicate function.
 
-```Summary::allMatch(iterable $data, callable $predicate)```
+```Summary::allMatch(iterable $data, callable $predicate): bool```
 
 ```php
 use IterTools\Summary;
@@ -1037,7 +1037,7 @@ $boolean = Summary::allMatch($finalFantasyNumbers, $isOnPlaystation);
 ### Any Match
 Returns true if any element matches the predicate function.
 
-```Summary::anyMatch(iterable $data, callable $predicate)```
+```Summary::anyMatch(iterable $data, callable $predicate): bool```
 
 ```php
 use IterTools\Summary;
@@ -1055,7 +1055,7 @@ Returns true if exactly n items are true according to a predicate function.
 - Predicate is optional.
 - Default predicate is boolean value of each item.
 
-```Summary::exactlyN(iterable $data, int $n, callable $predicate)```
+```Summary::exactlyN(iterable $data, int $n, callable $predicate): bool```
 
 ```php
 use IterTools\Summary;
@@ -1080,7 +1080,7 @@ Returns true if elements are sorted, otherwise false.
 - Elements must be comparable.
 - Returns true if empty or has only one element.
 
-```Summary::isSorted(iterable $data)```
+```Summary::isSorted(iterable $data): bool```
 
 ```php
 use IterTools\Summary;
@@ -1102,7 +1102,7 @@ Returns true if elements are reverse sorted, otherwise false.
 - Elements must be comparable.
 - Returns true if empty or has only one element.
 
-```Summary::isReversed(iterable $data)```
+```Summary::isReversed(iterable $data): bool```
 
 ```php
 use IterTools\Summary;
@@ -1121,7 +1121,7 @@ $boolean = Summary::isReversed($numbers);
 ### None Match
 Returns true if no element matches the predicate function.
 
-```Summary::noneMatch(iterable $data, callable $predicate)```
+```Summary::noneMatch(iterable $data, callable $predicate): bool```
 
 ```php
 use IterTools\Summary;
@@ -1138,7 +1138,7 @@ Returns true if all given collections are the same.
 
 For single iterable or empty iterables list returns true.
 
-```Summary::same(iterable ...$iterables)```
+```Summary::same(iterable ...$iterables): bool```
 
 ```php
 use IterTools\Summary;
@@ -1161,7 +1161,7 @@ Returns true if all given collections have the same lengths.
 
 For single iterable or empty iterables list returns true.
 
-```Summary::sameCount(iterable ...$iterables)```
+```Summary::sameCount(iterable ...$iterables): bool```
 
 ```php
 use IterTools\Summary;
@@ -1187,7 +1187,7 @@ Reduces to the mean average.
 
 Returns null if collection is empty.
 
-```Reduce::toAverage(iterable $data)```
+```Reduce::toAverage(iterable $data): float```
 ```php
 use IterTools\Reduce;
 
@@ -1200,7 +1200,7 @@ $finalGrade = Reduce::toAverage($numbers);
 ### To Count
 Reduces iterable to its length.
 
-```Reduce::toCount(iterable $data)```
+```Reduce::toCount(iterable $data): int```
 ```php
 use IterTools\Reduce;
 
@@ -1996,6 +1996,56 @@ $stream = Stream::of($a)
 
 #### Stream Summary Operations - Terminal
 
+##### All Match
+Returns true if all elements match the predicate function.
+
+```$stream->allMatch(callable $predicate): bool```
+
+```php
+use IterTools\Summary;
+
+$finalFantasyNumbers = [4, 5, 6];
+$isOnSuperNintendo   = fn ($ff) => $ff >= 4 && $ff <= 6;
+
+$boolean = Stream::of($finalFantasyNumbers)
+    ->allMatch($isOnSuperNintendo);
+// true
+```
+
+##### Any Match
+Returns true if any element matches the predicate function.
+
+```$stream->anyMatch(callable $predicate): bool```
+
+```php
+use IterTools\Summary;
+
+$answers          = ['fish', 'towel', 42, "don't panic"];
+$isUltimateAnswer = fn ($a) => a == 42;
+
+$boolean = Stream::of($answers)
+    ->anyMatch($answers, $isUltimateAnswer);
+// true
+```
+
+##### Exactly N
+Returns true if exactly n items are true according to a predicate function.
+
+- Predicate is optional.
+- Default predicate is boolean value of each item.
+
+```$stream->exactlyN(int $n, callable $predicate = null): bool```
+
+```php
+use IterTools\Summary;
+
+$twoTruthsAndALie = [true, true, false];
+$n                = 2;
+
+$boolean = Stream::of($twoTruthsAndALie)->exactlyN($n);
+// true
+```
+
 ##### Is Sorted
 Returns true if iterable source is sorted in ascending order; otherwise false.
 
@@ -2044,6 +2094,21 @@ $input = [1, 2, 3, 2, 1];
 $result = Stream::of($input)
     ->isReversed();
 // false
+```
+
+##### None Match
+Returns true if no element matches the predicate function.
+
+```$stream->noneMatch(callable $predicate): bool```
+
+```php
+use IterTools\Summary;
+
+$grades         = [45, 50, 61, 0];
+$isPassingGrade = fn ($grade) => $grade >= 70;
+
+$boolean = Stream::of($grades)->noneMatch($isPassingGrade);
+// true
 ```
 
 ##### Same With
