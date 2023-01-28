@@ -14,31 +14,23 @@ IterTools makes you an iteration superstar by providing two types of tools:
 * Loop iteration tools
 * Stream iteration tools
 
-<table>
-<tr><th>Loop Iteration Tools Example</th><th>Stream Iteration Tools Example</th></tr>
-<tr>
-<td>
+**Loop Iteration Tools Example**
 
 ```php
-foreach (Multi::zip(['a', 'b'], [1, 2]) as [$l, $n]) {
-    print($l . $n);  // a1, b2
+foreach (Multi::zip(['a', 'b'], [1, 2]) as [$letter, $number]) {
+    print($letter . $number);  // a1, b2
 }
 ```
 
-</td>
-<td>
+**Stream Iteration Tools Example**
 
 ```php
 $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
-    ->distinct()                          // [1, 2, 3, 4, 5]
-    ->map(fn ($x) => $x**2)               // [1, 4, 9, 16, 25]
-    ->filterTrue(fn ($x) => $x % 2 === 0) // [4, 16]
-    ->toSum();                            // 20
+    ->distinct()                     // [1, 2, 3, 4, 5]
+    ->map(fn ($x) => $x**2)          // [1, 4, 9, 16, 25]
+    ->filterTrue(fn ($x) => $x < 10) // [1, 4, 9]
+    ->toSum();                       // 14
 ```
-
-</td>
-</tr>
-</table>
 
 Quick Reference
 -----------
