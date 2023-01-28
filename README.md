@@ -1408,11 +1408,9 @@ use IterTools\Stream;
 
 $languages = ['PHP', 'Go', 'Python'];
 
-$languages = Stream::ofRandomChoice($languages, 5);
-
-foreach ($languages as $language) {
-    // 'Go', 'PHP', 'Python', 'PHP', 'PHP' (random)
-}
+$languages = Stream::ofRandomChoice($languages, 5)
+    ->toArray();
+// 'Go', 'PHP', 'Python', 'PHP', 'PHP' (random)
 ```
 
 #### Of Random Numbers
@@ -1426,6 +1424,7 @@ use IterTools\Stream;
 $min  = 1;
 $max  = 3;
 $reps = 7;
+
 $result = Stream::ofRandomNumbers($min, $max, $reps)
     ->toArray();
 // 1, 2, 2, 1, 3, 2, 1 (random)
@@ -1439,11 +1438,9 @@ Creates stream of random percentages between 0 and 1.
 ```php
 use IterTools\Stream;
 
-$stream = Stream::ofRandomPercentage(3);
-
-foreach ($stream as $percentage) {
-    // 0.8012566976245, 0.81237281724151, 0.61676896329459 [random]
-}
+$stream = Stream::ofRandomPercentage(3)
+    ->toArray();
+// 0.8012566976245, 0.81237281724151, 0.61676896329459 [random]
 ```
 
 #### Of Rock Paper Scissors
@@ -1454,11 +1451,10 @@ Creates stream of rock-paper-scissors hands.
 ```php
 use IterTools\Stream;
 
-$rps = Stream::ofRockPaperScissors(5);
+$rps = Stream::ofRockPaperScissors(5)
+    ->toArray();
+// 'paper', 'rock', 'rock', 'scissors', 'paper' [random]
 
-foreach ($rps as $hand) {
-    // 'paper', 'rock', 'rock', 'scissors', 'paper' [random]
-}
 ```
 
 ### Stream Operations
@@ -1602,11 +1598,9 @@ use IterTools\Stream;
 $input = [1, 2, 3, 4, 5];
 
 $stream = Stream::of($input)
-    ->pairwise();
-
-foreach ($stream as $item) {
-    // [1, 2], [2, 3], [3, 4], [4, 5]
-}
+    ->pairwise()
+    ->toArray();
+// [1, 2], [2, 3], [3, 4], [4, 5]
 ```
 
 #### Chunkwise
@@ -1622,11 +1616,9 @@ use IterTools\Stream;
 $friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey'];
 
 $result = Stream::of($friends)
-    ->chunkwise(2);
-
-foreach ($result as $chunk) {
-    // ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
-}
+    ->chunkwise(2)
+    ->toArray();
+// ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
 ```
 
 #### Chunkwise Overlap
@@ -1644,11 +1636,9 @@ use IterTools\Stream;
 $numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 $result = Stream::of($friends)
-    ->chunkwiseOverlap(3, 1);
-
-foreach ($result as $chunk) {
-    // [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9]
-}
+    ->chunkwiseOverlap(3, 1)
+    ->toArray()
+// [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9]
 ```
 
 #### Limit
@@ -1701,11 +1691,9 @@ $input = [1, 2, 3];
 
 $stream = Stream::of($input)
     ->zipWith([4, 5, 6])
-    ->zipWith([7, 8, 9]);
-
-foreach ($stream as $zipped) {
-    // [1, 4, 7], [2, 5, 8], [3, 6, 9]
-}
+    ->zipWith([7, 8, 9])
+    ->toArray();
+// [1, 4, 7], [2, 5, 8], [3, 6, 9]
 ```
 
 #### Zip Longest With
@@ -1898,8 +1886,8 @@ Return a stream intersecting the stream with the input iterables.
 ```php
 use IterTools\Stream;
 
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$numbers    = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics   = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
 $oddNumbers = [1, 3, 5, 7, 9, 11];
 
 $stream = Stream::of($numbers)
