@@ -66,4 +66,22 @@ class StringTest extends \PHPUnit\Framework\TestCase
             ['English 日本語', ['E', 'n', 'g', 'l', 'i', 's', 'h', ' ', '日', '本', '語']],
         ];
     }
+
+    /**
+     * @test         iterator_to_array
+     * @dataProvider dataProviderForAsciiStrings
+     * @param        string $string
+     * @param        array  $expected
+     */
+    public function testStringIteratorToArray(string $string, array $expected): void
+    {
+        // Given
+        $iterator = Single::string($string);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

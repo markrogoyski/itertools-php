@@ -645,4 +645,23 @@ class ChunkwiseTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param array $data
+     * @param int $chunkSize
+     * @param array $expected
+     */
+    public function testIteratorToArray(array $data, int $chunkSize, array $expected): void
+    {
+        // Given
+        $iterator = Single::chunkwise($data, $chunkSize);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

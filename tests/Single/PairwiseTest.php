@@ -314,4 +314,22 @@ class PairwiseTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array $data
+     * @param        array $expected
+     */
+    public function testIteratorToArray(array $data, array $expected): void
+    {
+        // Given
+        $iterator = Single::pairwise($data);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

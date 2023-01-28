@@ -223,4 +223,26 @@ class MapTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         map iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @dataProvider dataProviderForGenerator
+     * @dataProvider dataProviderForIterator
+     * @dataProvider dataProviderForTraversable
+     * @param        iterable $iterable
+     * @param        callable $mapper
+     * @param        array    $expected
+     */
+    public function testIteratorToArray(iterable $iterable, callable $mapper, array $expected): void
+    {
+        // Given
+        $iterator = Single::map($iterable, $mapper);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

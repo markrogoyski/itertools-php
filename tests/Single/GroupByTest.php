@@ -406,4 +406,23 @@ class GroupByTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         groupBy iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array    $iterable
+     * @param        callable $groupKeyFunction
+     * @param        array    $expected
+     */
+    public function testIteratorToArray(array $iterable, callable $groupKeyFunction, array $expected): void
+    {
+        // Given
+        $iterator = Single::groupBy($iterable, $groupKeyFunction);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEqualsCanonicalizing($expected, $result);
+    }
 }

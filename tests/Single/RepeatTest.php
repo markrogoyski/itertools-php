@@ -291,4 +291,22 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->fail('Expected an exception to be thrown.');
     }
+
+    /**
+     * @test         repeat iterator_to_array
+     * @dataProvider dataProviderForInteger
+     * @param        int   $integer
+     * @param        int[] $expected
+     */
+    public function testRepeatIteratorToArray(int $integer, array $expected): void
+    {
+        // Given
+        $iterator = Single::repeat($integer, self::REPETITIONS);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

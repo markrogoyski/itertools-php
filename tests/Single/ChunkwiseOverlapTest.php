@@ -1510,4 +1510,24 @@ class ChunkwiseOverlapTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param array $data
+     * @param int $chunkSize
+     * @param int $overlapSize
+     * @param array $expected
+     */
+    public function testIteratorToArray(array $data, int $chunkSize, int $overlapSize, array $expected): void
+    {
+        // Given
+        $iterator = Single::chunkwiseOverlap($data, $chunkSize, $overlapSize);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

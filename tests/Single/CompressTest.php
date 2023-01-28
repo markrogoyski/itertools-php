@@ -231,4 +231,23 @@ class CompressTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         compress iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array $data
+     * @param        array $selectors
+     * @param        array $expected
+     */
+    public function testIteratorToArray(array $data, array $selectors, array $expected)
+    {
+        // Given
+        $iterator = Single::compress($data, $selectors);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

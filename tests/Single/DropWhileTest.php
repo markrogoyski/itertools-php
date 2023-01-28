@@ -401,4 +401,23 @@ class DropWhileTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         dropWhile iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array    $iterable
+     * @param        callable $predicate
+     * @param        array    $expected
+     */
+    public function testIteratorToArray(array $iterable, callable $predicate, array $expected): void
+    {
+        // Given
+        $iterator = Single::dropWhile($iterable, $predicate);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

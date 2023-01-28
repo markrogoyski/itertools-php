@@ -290,4 +290,23 @@ class LimitTest extends \PHPUnit\Framework\TestCase
             break;
         }
     }
+
+    /**
+     * @test         limit iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array    $iterable
+     * @param        int      $limit
+     * @param        array    $expected
+     */
+    public function testIteratorToArray(array $iterable, int $limit, array $expected): void
+    {
+        // Given
+        $iterator = Single::limit($iterable, $limit);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }
