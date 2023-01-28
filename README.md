@@ -137,13 +137,13 @@ Quick Reference
 #### Stream Sources
 | Source                                           | Description                                                     | Code Snippet                                        |
 |--------------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------------|
-| [`of`](#Of)                                      | Start a fluent stream with an iterable                          | `Stream::of($iterable)`                             |
-| [`ofCoinFlips`](#Of-Coin-Flips)                  | Start a fluent stream random coin flips                         | `Stream::ofCoinFlips($repetitions)`                 |
-| [`ofEmpty`](#Of-Empty)                           | Start a fluent stream with empty iterable source                | `Stream::ofEmpty()`                                 |
-| [`ofRandomChoice`](#Of-Random-Choice)            | Start a fluent stream random selections from an array of values | `Stream::ofRandomChoice($items, $repetitions)`      |
-| [`ofRandomNumbers`](#Of-Random-Numbers)          | Start a fluent stream random numbers (integers)                 | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
-| [`ofRandomPercentage`](#Of-Random-Percentage)    | Start a fluent stream random percentages between 0 and 1        | `Stream::ofRandomPercentage($repetitions)`          |
-| [`ofRockPaperScissors`](#Of-Rock-Paper-Scissors) | Start a fluent stream rock-paper-scissors hands                 | `Stream::ofRockPaperScissors($repetitions)`         |
+| [`of`](#Of)                                      | Create a stream from an iterable                                | `Stream::of($iterable)`                             |
+| [`ofCoinFlips`](#Of-Coin-Flips)                  | Create a stream of random coin flips                            | `Stream::ofCoinFlips($repetitions)`                 |
+| [`ofEmpty`](#Of-Empty)                           | Create an empty stream                                          | `Stream::ofEmpty()`                                 |
+| [`ofRandomChoice`](#Of-Random-Choice)            | Create a stream of random selections                            | `Stream::ofRandomChoice($items, $repetitions)`      |
+| [`ofRandomNumbers`](#Of-Random-Numbers)          | Create a stream of random numbers (integers)                    | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
+| [`ofRandomPercentage`](#Of-Random-Percentage)    | Create a stream of random percentages between 0 and 1           | `Stream::ofRandomPercentage($repetitions)`          |
+| [`ofRockPaperScissors`](#Of-Rock-Paper-Scissors) | Create a stream of rock-paper-scissors hands                    | `Stream::ofRockPaperScissors($repetitions)`         |
 
 #### Stream Operations
 | Operation                                                                | Description                                                                                      | Code Snippet                                                                     |
@@ -2219,6 +2219,7 @@ Reduces to a string joining all elements.
 * Optional suffix to append to the string.
 
 ```$stream->toString(string $separator = '', string $prefix = '', string $suffix = ''): string```
+
 ```php
 use IterTools\Stream;
 
