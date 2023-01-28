@@ -70,4 +70,33 @@ class CoinFlipTest extends \PHPUnit\Framework\TestCase
         // Fail
         $this->fail('Expected \RangeException');
     }
+
+    /**
+     * @test         coinFlip iterator_to_array
+     * @dataProvider dataProviderForCoinFlip
+     * @param        int $repetitions
+     */
+    public function testCoinFlipIteratorToArray(int $repetitions): void
+    {
+        // Given
+        $iterator = Random::coinFlip($repetitions);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertCount($repetitions, $result);
+
+        // And
+        foreach ($result as $coinFlip) {
+            $this->assertIsInt($coinFlip);
+            $this->assertThat(
+                $coinFlip,
+                $this->logicalOr(
+                    $this->equalTo(0),
+                    $this->equalTo(1)
+                )
+            );
+        }
+    }
 }

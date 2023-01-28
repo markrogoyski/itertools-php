@@ -30,7 +30,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         // And
         foreach ($result as $choice) {
             $this->assertIsInt($choice);
-            $this->assertTrue(in_array($choice, $items));
+            $this->assertTrue(\in_array($choice, $items));
         }
     }
 
@@ -68,7 +68,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         // And
         foreach ($result as $choice) {
             $this->assertIsFloat($choice);
-            $this->assertTrue(in_array($choice, $items));
+            $this->assertTrue(\in_array($choice, $items));
         }
     }
 
@@ -106,7 +106,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         // And
         foreach ($result as $choice) {
             $this->assertIsString($choice);
-            $this->assertTrue(in_array($choice, $items));
+            $this->assertTrue(\in_array($choice, $items));
         }
     }
 
@@ -144,7 +144,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
 
         // And
         foreach ($result as $choice) {
-            $this->assertTrue(in_array($choice, $items, true));
+            $this->assertTrue(\in_array($choice, $items, true));
         }
     }
 
@@ -192,5 +192,29 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
 
         // Fail
         $this->fail('Expected \RangeException');
+    }
+
+    /**
+     * @test         choice iterator_to_array
+     * @dataProvider dataProviderForChoiceInt
+     * @param        int[] $items
+     * @param        int   $repetitions
+     */
+    public function testChoiceIteratorToArray(array $items, int $repetitions): void
+    {
+        // Given
+        $iterator = Random::choice($items, $repetitions);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertCount($repetitions, $result);
+
+        // And
+        foreach ($result as $choice) {
+            $this->assertIsInt($choice);
+            $this->assertTrue(\in_array($choice, $items));
+        }
     }
 }

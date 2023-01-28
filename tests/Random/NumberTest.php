@@ -98,4 +98,30 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         // Fail
         $this->fail('Expected \RangeException');
     }
+
+    /**
+     * @test         number iterator_to_array
+     * @dataProvider dataProviderForNumber
+     * @param        int $min
+     * @param        int $max
+     * @param        int $repetitions
+     */
+    public function testNumberIteratorToArray(int $min, int $max, int $repetitions): void
+    {
+        // Given
+        $iterator = Random::number($min, $max, $repetitions);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertCount($repetitions, $result);
+
+        // And
+        foreach ($result as $number) {
+            $this->assertIsInt($number);
+            $this->assertTrue($number >= $min);
+            $this->assertTrue($number <= $max);
+        }
+    }
 }

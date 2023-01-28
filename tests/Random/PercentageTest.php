@@ -65,4 +65,28 @@ class PercentageTest extends \PHPUnit\Framework\TestCase
         // Fail
         $this->fail('Expected \RangeException');
     }
+
+    /**
+     * @test         percentage iterator_to_array
+     * @dataProvider dataProviderForPercentage
+     * @param        int $repetitions
+     */
+    public function testPercentageIteratorToArray(int $repetitions): void
+    {
+        // Given
+        $iterator = Random::percentage($repetitions);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertCount($repetitions, $result);
+
+        // And
+        foreach ($result as $percentage) {
+            $this->assertIsFloat($percentage);
+            $this->assertTrue($percentage >= 0);
+            $this->assertTrue($percentage <= 1);
+        }
+    }
 }

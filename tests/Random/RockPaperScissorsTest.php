@@ -71,4 +71,34 @@ class RockPaperScissorsTest extends \PHPUnit\Framework\TestCase
         // Fail
         $this->fail('Expected \RangeException');
     }
+
+    /**
+     * @test         rockPaperScissors iterator_to_array
+     * @dataProvider dataProviderForRockPaperScissors
+     * @param        int $repetitions
+     */
+    public function testRockPaperScissorsIteratorToArray(int $repetitions): void
+    {
+        // Given
+        $iterator = Random::rockPaperScissors($repetitions);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertCount($repetitions, $result);
+
+        // And
+        foreach ($result as $rockPaperScissors) {
+            $this->assertIsString($rockPaperScissors);
+            $this->assertThat(
+                $rockPaperScissors,
+                $this->logicalOr(
+                    $this->equalTo(Random::RPS_ROCK),
+                    $this->equalTo(Random::RPS_PAPER),
+                    $this->equalTo(Random::RPS_SCISSORS)
+                )
+            );
+        }
+    }
 }
