@@ -1,6 +1,6 @@
 # IterTools PHP Change Log
 
-## v1.2.0 - TBD
+## v1.2.0 - 2023-01-28
 
 ### New Features
 * Single
@@ -12,13 +12,88 @@
   * `toMinMax`
   * `toRange`
   * `toString`
+* Set
+  * `distinct`
+  * `intersection`
+  * `intersectionCoercive`
+  * `partialIntersection`
+  * `partialIntersectionCoercive`
+  * `symmetricDifference`
+  * `symmetricDifferenceCoercive`
 * Summary
   * `allMatch`
   * `anyMatch`
   * `exactlyN`
   * `noneMatch`
-* Streams
-  * TBD
+* Stream
+  * Sources
+    * `of`
+    * `ofCoinFlips`
+    * `of Empty`
+    * `ofRandomChoice`
+    * `ofRandomNumbers`
+    * `ofRandomPercentage`
+    * `ofRockPaperScissors`
+  * Operations
+    * `chainWith`
+    * `compress`
+    * `chunkwise`
+    * `chunkwiseOverlap`
+    * `distinct`
+    * `dropWhile`
+    * `filterTrue`
+    * `filterFalse`
+    * `groupBy`
+    * `infiniteCycle`
+    * `intersectionWith`
+    * `intersectionCoerciveWith`
+    * `limit`
+    * `map`
+    * `pairwise`
+    * `partialIntersectionWith`
+    * `partialIntersectionCoerciveWith`
+    * `runningAverage`
+    * `runningDifference`
+    * `runningMax`
+    * `runningMin`
+    * `runningProduct`
+    * `runningTotal`
+    * `symmetricDifferenceWith`
+    * `symmetricDifferenceCoerciveWith`
+    * `takeWhile`
+    * `zipWith`
+    * `zipLongestWith`
+    * `zipEqualWith`
+  * Summary Terminal Operations
+    * `allMatch`
+    * `anyMatch`
+    * `exactlyN`
+    * `isSorted`
+    * `isReversed`
+    * `noneMatch`
+    * `sameWith`
+    * `sameCountWith`
+  * Reduction Terminal Operations
+    * `toAverage`
+    * `toCount`
+    * `toMax`
+    * `toMin`
+    * `toProduct`
+    * `toString`
+    * `toSum`
+    * `toMinMax`
+    * `toRange`
+    * `toValue`
+  * Transformation Terminal Operations
+    * `toArray`
+  * Side Effect Terminal Operations
+    * `callForEach`
+    * `print`
+    * `printLn`
+    * `printR`
+    * `varDump`
+### Backwards Incompatible Changes
+* Multi Zip methods reset iteration keys and return as sequence of integers rather than arrays of original keys
 
 
 ## v1.1.0 - 2023-01-10
