@@ -6,17 +6,27 @@ namespace IterTools\Tests\File;
 
 use IterTools\File;
 use IterTools\Tests\Fixture\FileFixture;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 
 class ReadCsvTest extends \PHPUnit\Framework\TestCase
 {
+    private vfsStreamDirectory $root;
+
+    protected function setUp(): void
+    {
+        $this->root = vfsStream::setup('test');
+    }
+
     /**
      * @dataProvider dataProviderForByDefault
-     * @param        resource $file
+     * @param        array $lines
      * @param        array $expected
      */
-    public function testByDefault($file, array $expected): void
+    public function testByDefault(array $lines, array $expected): void
     {
         // Given
+        $file = FileFixture::createFromLines($lines, $this->root->url());
         $result = [];
 
         // When
@@ -30,38 +40,36 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderForByDefault(): array
     {
-        $file = fn (array $lines) => FileFixture::createFromLines($lines);
-
         return [
             [
-                $file([]),
+                [],
                 [],
             ],
             [
-                $file(['']),
+                [''],
                 [],
             ],
             [
-                $file(['1']),
+                ['1'],
                 [['1']],
             ],
             [
-                $file(['1,2,3']),
+                ['1,2,3'],
                 [['1', '2', '3']],
             ],
             [
-                $file([
+                [
                     '1,2,3',
                     '',
-                ]),
+                ],
                 [['1', '2', '3']],
             ],
             [
-                $file([
+                [
                     '1,2,3',
                     '',
                     '4,5,6',
-                ]),
+                ],
                 [
                     ['1', '2', '3'],
                     [null], // TODO WTF fgetcsv()? Is it the expected behavior? I do not like it!
@@ -69,51 +77,51 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
-                $file([
+                [
                     '1,2,3',
                     ' ',
-                ]),
+                ],
                 [
                     ['1', '2', '3'],
                     [' '],
                 ],
             ],
             [
-                $file([
+                [
                     '1,2,3',
                     '2,3,4',
-                ]),
+                ],
                 [
                     ['1', '2', '3'],
                     ['2', '3', '4'],
                 ],
             ],
             [
-                $file([
+                [
                     '1,2,3,',
                     '2,3,4',
-                ]),
+                ],
                 [
                     ['1', '2', '3', ''],
                     ['2', '3', '4'],
                 ],
             ],
             [
-                $file([
+                [
                     '1,2,3,""',
                     '2,3,4',
-                ]),
+                ],
                 [
                     ['1', '2', '3', ''],
                     ['2', '3', '4'],
                 ],
             ],
             [
-                $file([
+                [
                     '1,2,3',
                     '2,3,4',
                     '5,6',
-                ]),
+                ],
                 [
                     ['1', '2', '3'],
                     ['2', '3', '4'],
@@ -121,11 +129,11 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
-                $file([
+                [
                     '1,2,"3"',
                     '2,"3",4',
                     '"5",6',
-                ]),
+                ],
                 [
                     ['1', '2', '3'],
                     ['2', '3', '4'],
@@ -133,11 +141,11 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
-                $file([
+                [
                     '1,2,"3"',
                     '2,"\n3",4',
                     '"5",6',
-                ]),
+                ],
                 [
                     ['1', '2', '3'],
                     ['2', '\n3', '4'],
@@ -145,11 +153,11 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
-                $file([
+                [
                     '1,2,"3"',
                     '2,"""3""",4',
                     '"5",6',
-                ]),
+                ],
                 [
                     ['1', '2', '3'],
                     ['2', '"3"', '4'],
@@ -161,13 +169,14 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProviderForWithConfig
-     * @param        resource $file
+     * @param        array $lines
      * @param        array $config
      * @param        array $expected
      */
-    public function testWithConfig($file, array $config, array $expected): void
+    public function testWithConfig(array $lines, array $config, array $expected): void
     {
         // Given
+        $file = FileFixture::createFromLines($lines, $this->root->url());
         $result = [];
         [$separator, $enclosure, $escape] = $config;
 
@@ -182,69 +191,67 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderForWithConfig(): array
     {
-        $file = fn (array $lines) => FileFixture::createFromLines($lines);
-
         return [
             [
-                $file([]),
+                [],
                 [",", "\"", "\\"],
                 [],
             ],
             [
-                $file([]),
+                [],
                 [";", "\"", "\\"],
                 [],
             ],
             [
-                $file([]),
+                [],
                 [",", "'", "\\"],
                 [],
             ],
             [
-                $file([]),
+                [],
                 [",", "\"", "/"],
                 [],
             ],
             [
-                $file([]),
+                [],
                 [",", "\"", ""],
                 [],
             ],
             [
-                $file(['1,2,3']),
+                ['1,2,3'],
                 [",", "\"", "\\"],
                 [['1', '2', '3']],
             ],
             [
-                $file(['1;2;3']),
+                ['1;2;3'],
                 [",", "\"", "\\"],
                 [['1;2;3']],
             ],
             [
-                $file(['1,2,3']),
+                ['1,2,3'],
                 [";", "\"", "\\"],
                 [['1,2,3']],
             ],
             [
-                $file(['1;2;3']),
+                ['1;2;3'],
                 [";", "\"", "\\"],
                 [['1', '2', '3']],
             ],
             [
-                $file(["1,'2',3"]),
+                ["1,'2',3"],
                 [",", "'", "\\"],
                 [['1', '2', '3']],
             ],
             [
-                $file(["'1','2','3'"]),
+                ["'1','2','3'"],
                 [",", "'", "\\"],
                 [['1', '2', '3']],
             ],
             [
-                $file([
+                [
                     '1,2,3',
                     '4,5,6',
-                ]),
+                ],
                 [",", "\"", "\\"],
                 [
                     ['1', '2', '3'],
@@ -252,10 +259,10 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
-                $file([
+                [
                     '1;2;3',
                     '4;5;6',
-                ]),
+                ],
                 [",", "\"", "\\"],
                 [
                     ['1;2;3'],
@@ -263,10 +270,10 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
-                $file([
+                [
                     '1,2,3',
                     '4,5,6',
-                ]),
+                ],
                 [";", "\"", "\\"],
                 [
                     ['1,2,3'],
@@ -274,10 +281,10 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
-                $file([
+                [
                     '1;2;3',
                     '4;5;6',
-                ]),
+                ],
                 [";", "\"", "\\"],
                 [
                     ['1', '2', '3'],
@@ -285,10 +292,10 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
-                $file([
+                [
                     "1,'2',3",
                     "4,'5','6'",
-                ]),
+                ],
                 [",", "'", "\\"],
                 [
                     ['1', '2', '3'],
@@ -296,10 +303,10 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
-                $file([
+                [
                     "'1','2','3'",
                     "'4','5','6'",
-                ]),
+                ],
                 [",", "'", "\\"],
                 [
                     ['1', '2', '3'],
@@ -308,10 +315,10 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
             ],
             // FIXME I do not know how to test the $escape parameter :(
             [
-                $file([
+                [
                     '\t,\n,\t',
                     '\n,\\,\t',
-                ]),
+                ],
                 [",", "'", "\\"],
                 [
                     ['\t', '\n', '\t'],
@@ -327,7 +334,7 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
     public function testErrorOnStart(): void
     {
         // Given
-        $file = FileFixture::createFromLines([]);
+        $file = FileFixture::createFromLines([], $this->root->url());
 
         // When
         fclose($file);
@@ -345,7 +352,7 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
     public function testErrorOnProcess(): void
     {
         /// Given
-        $file = FileFixture::createFromLines(['123', '456']);
+        $file = FileFixture::createFromLines(['123', '456'], $this->root->url());
 
         // Then
         $this->expectException(\UnexpectedValueException::class);

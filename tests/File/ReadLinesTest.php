@@ -6,17 +6,27 @@ namespace IterTools\Tests\File;
 
 use IterTools\File;
 use IterTools\Tests\Fixture\FileFixture;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 
 class ReadLinesTest extends \PHPUnit\Framework\TestCase
 {
+    private vfsStreamDirectory $root;
+
+    protected function setUp(): void
+    {
+        $this->root = vfsStream::setup('test');
+    }
+
     /**
      * @dataProvider dataProviderForCommon
-     * @param        resource $file
+     * @param        array $lines
      * @param        array $expected
      */
-    public function testCommon($file, array $expected): void
+    public function testCommon(array $lines, array $expected): void
     {
         // Given
+        $file = FileFixture::createFromLines($lines, $this->root->url());
         $result = [];
 
         // When
@@ -30,43 +40,41 @@ class ReadLinesTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderForCommon(): array
     {
-        $file = fn (array $lines) => FileFixture::createFromLines($lines);
-
         return [
             [
-                $file([]),
+                [],
                 [],
             ],
             [
-                $file(['']),
+                [''],
                 [],
             ],
             [
-                $file(['123']),
+                ['123'],
                 ['123'],
             ],
             [
-                $file(['123', '456', '78']),
+                ['123', '456', '78'],
                 ["123\n", "456\n", '78'],
             ],
             [
-                $file(['123', '456', '']),
+                ['123', '456', ''],
                 ["123\n", "456\n"],
             ],
             [
-                $file(['123', '', '']),
+                ['123', '', ''],
                 ["123\n", "\n"],
             ],
             [
-                $file(['123', '', '456']),
+                ['123', '', '456'],
                 ["123\n", "\n", "456"],
             ],
             [
-                $file(['', '', '456']),
+                ['', '', '456'],
                 ["\n", "\n", "456"],
             ],
             [
-                $file(['', '', '']),
+                ['', '', ''],
                 ["\n", "\n"],
             ],
         ];
@@ -78,7 +86,7 @@ class ReadLinesTest extends \PHPUnit\Framework\TestCase
     public function testErrorOnStart(): void
     {
         // Given
-        $file = FileFixture::createFromLines([]);
+        $file = FileFixture::createFromLines([], $this->root->url());
 
         // When
         fclose($file);
@@ -95,8 +103,8 @@ class ReadLinesTest extends \PHPUnit\Framework\TestCase
      */
     public function testErrorOnProcess(): void
     {
-        /// Given
-        $file = FileFixture::createFromLines(['123', '456']);
+        // Given
+        $file = FileFixture::createFromLines(['123', '456'], $this->root->url());
 
         // Then
         $this->expectException(\UnexpectedValueException::class);
