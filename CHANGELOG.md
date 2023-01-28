@@ -1,5 +1,12 @@
 # IterTools PHP Change Log
 
+## v1.3.0 - TBD
+
+### New Features
+* Stream
+  * Transformation Terminal Operations
+    * `toAssociativeArray`
+
 ## v1.2.0 - 2023-01-28
 
 ### New Features
