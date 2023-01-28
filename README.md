@@ -1757,7 +1757,7 @@ $stream = Stream::of($input)
 #### Infinite Cycle
 Return a stream cycling through the elements of stream sequentially forever.
 
-```$stream->infiniteCycle(): Stream``
+```$stream->infiniteCycle(): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1773,7 +1773,7 @@ $result = Stream::of($input)
 #### Running Average
 Return a stream accumulating the running average (mean) over the stream.
 
-```$stream->runningAverage(int|float|null $initialValue = null): Stream``
+```$stream->runningAverage(int|float|null $initialValue = null): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1789,7 +1789,7 @@ $result = Stream::of($input)
 #### Running Difference
 Return a stream accumulating the running difference over the stream.
 
-```$stream->runningDifference(int|float|null $initialValue = null): Stream``
+```$stream->runningDifference(int|float|null $initialValue = null): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1805,7 +1805,7 @@ $result = Stream::of($input)
 #### Running Max
 Return a stream accumulating the running max over the stream.
 
-```$stream->runningMax(int|float|null $initialValue = null): Stream``
+```$stream->runningMax(int|float|null $initialValue = null): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1822,7 +1822,7 @@ $result = Stream::of($input)
 #### Running Min
 Return a stream accumulating the running min over the stream.
 
-```$stream->runningMin(int|float|null $initialValue = null): Stream``
+```$stream->runningMin(int|float|null $initialValue = null): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1839,7 +1839,7 @@ $result = Stream::of($input)
 #### Running Product
 Return a stream accumulating the running product over the stream.
 
-```$stream->runningProduct(int|float|null $initialValue = null): Stream``
+```$stream->runningProduct(int|float|null $initialValue = null): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1856,7 +1856,7 @@ $result = Stream::of($input)
 #### Running Total
 Return a stream accumulating the running total over the stream.
 
-```$stream->runningTotal(int|float|null $initialValue = null): Stream``
+```$stream->runningTotal(int|float|null $initialValue = null): Stream```
 
 ```php
 use IterTools\Stream;
