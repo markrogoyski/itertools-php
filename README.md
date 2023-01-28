@@ -1451,6 +1451,23 @@ $rps = Stream::ofRockPaperScissors(5)
 
 ### Stream Operations
 
+#### Chain With
+Return a stream chaining additional sources together into a single consecutive stream.
+
+```$stream->chainWith(iterable ...$iterables): Stream```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$result = Stream::of($input)
+    ->chainWith([4, 5, 6])
+    ->chainWith([7, 8, 9])
+    ->toArray();
+// 1, 2, 3, 4, 5, 6, 7, 8, 9
+```
+
 #### Compress
 Compress to a new stream by filtering out data that is not selected.
 
@@ -1469,6 +1486,66 @@ $result = Stream::of($input)
 // 2, 3
 ```
 
+#### Chunkwise
+Return a stream consisting of chunks of elements from the stream.
+
+```$stream->chunkwise(int $chunkSize): Stream```
+
+Chunk size must be at least 1.
+
+```php
+use IterTools\Stream;
+
+$friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey'];
+
+$result = Stream::of($friends)
+    ->chunkwise(2)
+    ->toArray();
+// ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
+```
+
+#### Chunkwise Overlap
+Return a stream consisting of overlapping chunks of elements from the stream.
+
+```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): Stream```
+
+Chunk size must be at least 1.
+
+Overlap size must be less than chunk size.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+$result = Stream::of($friends)
+    ->chunkwiseOverlap(3, 1)
+    ->toArray()
+// [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9]
+```
+
+#### Distinct
+Return a stream filtering out elements from the stream only returning distinct elements.
+
+```$stream->distinct(bool $strict = true): Stream```
+
+Defaults to [strict type](#Strict-and-Coercive-Types) comparisons. Set strict to false for type coercion comparisons.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
+$stream = Stream::of($input)
+    ->distinct()
+    ->toArray();
+// 1, 2, 3, '1', '2', '3'
+
+$stream = Stream::of($input)
+    ->distinct(false)
+    ->toArray();
+// 1, 2, 3
+```
+
 #### Drop While
 Drop elements from the stream while the predicate function is true.
 
@@ -1485,24 +1562,6 @@ $result = Stream::of($input)
     ->dropWhile(fn ($value) => $value < 3)
     ->toArray();
 // 3, 4, 5
-```
-
-#### Take While
-Keep elements from the stream as long as the predicate is true.
-
-```$stream->takeWhile(callable $predicate): Stream```
-
-If no predicate is provided, the boolean value of the data is used.
-
-```php
-use IterTools\Stream;
-
-$input = [1, -1, 2, -2, 3, -3];
-
-$result = Stream::of($input)
-    ->takeWhile(fn ($value) => abs($value) < 3)
-    ->toArray();
-// 1, -1, 2, -2
 ```
 
 #### Filter True
@@ -1561,6 +1620,77 @@ foreach ($groups as $group => $item) {
 }
 ```
 
+#### Infinite Cycle
+Return a stream cycling through the elements of stream sequentially forever.
+
+```$stream->infiniteCycle(): Stream```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$result = Stream::of($input)
+    ->infiniteCycle()
+    ->print();
+// 1, 2, 3, 1, 2, 3, ...
+```
+
+### Intersection With
+Return a stream intersecting the stream with the input iterables.
+
+```$stream->intersectionWith(iterable ...$iterables): Stream```
+
+```php
+use IterTools\Stream;
+
+$numbers    = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics   = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
+
+$stream = Stream::of($numbers)
+    ->intersectionWith($numerics, $oddNumbers)
+    ->toArray();
+// 3, 5, 7
+```
+
+### Intersection Coercive With
+Return a stream intersecting the stream with the input iterables using [type coercion](#Strict-and-Coercive-Types).
+
+```$stream->intersectionCoerciveWith(iterable ...$iterables): Stream```
+
+```php
+use IterTools\Stream;
+
+$languages          = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
+$scriptLanguages    = ['php', 'python', 'javascript', 'typescript'];
+$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
+
+$stream = Stream::of($languages)
+    ->intersectionCoerciveWith($scriptLanguages, $supportsInterfaces)
+    ->toArray();
+// 'php', 'typescript'
+```
+
+#### Limit
+Return a stream up to a limit.
+
+Stops even if more data available if limit reached.
+
+```$stream->limit(int $limit): Stream```
+
+```php
+Use IterTools\Single;
+
+$matrixMovies = ['The Matrix', 'The Matrix Reloaded', 'The Matrix Revolutions', 'The Matrix Resurrections'];
+$limit        = 1;
+
+$goodMovies = Stream::of($matrixMovies)
+    ->limit($limit)
+    ->toArray();
+// 'The Matrix' (and nothing else)
+```
+
 #### Map
 Return a stream containing the result of mapping a function onto each element of the stream.
 
@@ -1595,179 +1725,40 @@ $stream = Stream::of($input)
 // [1, 2], [2, 3], [3, 4], [4, 5]
 ```
 
-#### Chunkwise
-Return a stream consisting of chunks of elements from the stream.
+### Partial Intersection With
+Return a stream partially intersecting the stream with the input iterables.
 
-```$stream->chunkwise(int $chunkSize): Stream```
-
-Chunk size must be at least 1.
+```$stream->partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables): Stream```
 
 ```php
 use IterTools\Stream;
 
-$friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey'];
+$numbers    = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics   = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
 
-$result = Stream::of($friends)
-    ->chunkwise(2)
+$stream = Stream::of($numbers)
+    ->partialIntersectionWith($numerics, $oddNumbers)
     ->toArray();
-// ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
+// 1, 3, 4, 5, 6, 7, 9
 ```
 
-#### Chunkwise Overlap
-Return a stream consisting of overlapping chunks of elements from the stream.
+### Partial Intersection Coercive With
+Return a stream partially intersecting the stream with the input iterables using [type coercion](#Strict-and-Coercive-Types).
 
-```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): Stream```
-
-Chunk size must be at least 1.
-
-Overlap size must be less than chunk size.
+```$stream->partialIntersectionCoerciveWith(int $minIntersectionCount, iterable ...$iterables): Stream```
 
 ```php
 use IterTools\Stream;
 
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$languages          = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
+$scriptLanguages    = ['php', 'python', 'javascript', 'typescript'];
+$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
-$result = Stream::of($friends)
-    ->chunkwiseOverlap(3, 1)
-    ->toArray()
-// [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9]
-```
-
-#### Limit
-Return a stream up to a limit.
-
-Stops even if more data available if limit reached.
-
-```$stream->limit(int $limit): Stream```
-
-```php
-Use IterTools\Single;
-
-$matrixMovies = ['The Matrix', 'The Matrix Reloaded', 'The Matrix Revolutions', 'The Matrix Resurrections'];
-$limit        = 1;
-
-$goodMovies = Stream::of($matrixMovies)
-    ->limit($limit)
+$stream = Stream::of($languages)
+    ->partialIntersectionCoerciveWith(2, $scriptLanguages, $supportsInterfaces)
     ->toArray();
-// 'The Matrix' (and nothing else)
-```
-
-#### Chain With
-Return a stream chaining additional sources together into a single consecutive stream.
-
-```$stream->chainWith(iterable ...$iterables): Stream```
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3];
-
-$result = Stream::of($input)
-    ->chainWith([4, 5, 6])
-    ->chainWith([7, 8, 9])
-    ->toArray();
-// 1, 2, 3, 4, 5, 6, 7, 8, 9
-```
-
-#### Zip With
-Return a stream consisting of multiple iterable collections streamed simultaneously.
-
-```$stream->zipWith(iterable ...$iterables): Stream```
-
-For uneven lengths, iterations stops when the shortest iterable is exhausted.
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3];
-
-$stream = Stream::of($input)
-    ->zipWith([4, 5, 6])
-    ->zipWith([7, 8, 9])
-    ->toArray();
-// [1, 4, 7], [2, 5, 8], [3, 6, 9]
-```
-
-#### Zip Longest With
-Return a stream consisting of multiple iterable collections streamed simultaneously.
-
-```$stream->zipLongestWith(iterable ...$iterables): Stream```
-
-* Iteration continues until the longest iterable is exhausted.
-* For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3, 4, 5];
-
-$stream = Stream::of($input)
-    ->zipLongestWith([4, 5, 6])
-    ->zipLongestWith([7, 8, 9, 10]);
-
-foreach ($stream as $zipped) {
-    // [1, 4, 7], [2, 5, 8], [3, 6, 9], [4, null, 10], [null, null, 5]
-}
-```
-
-#### Zip Equal With
-Return a stream consisting of multiple iterable collectionso f equal lengths streamed simultaneously.
-
-```$stream->zipEqualWith(iterable ...$iterables): Stream```
-
-Works like `Stream::zipWith()` method but throws \LengthException if lengths not equal,
-i.e., at least one iterator ends before the others.
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3];
-
-$stream = Stream::of($input)
-    ->zipEqualWith([4, 5, 6])
-    ->zipEqualWith([7, 8, 9]);
-
-foreach ($stream as $zipped) {
-    // [1, 4, 7], [2, 5, 8], [3, 6, 9]
-}
-```
-
-### Distinct
-Return a stream filtering out elements from the stream only returning distinct elements.
-
-```$stream->distinct(bool $strict = true): Stream```
-
-Defaults to [strict type](#Strict-and-Coercive-Types) comparisons. Set strict to false for type coercion comparisons.
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
-$stream = Stream::of($input)
-    ->distinct()
-    ->toArray();
-// 1, 2, 3, '1', '2', '3'
-
-$stream = Stream::of($input)
-    ->distinct(false)
-    ->toArray();
-// 1, 2, 3
-```
-
-#### Infinite Cycle
-Return a stream cycling through the elements of stream sequentially forever.
-
-```$stream->infiniteCycle(): Stream```
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3];
-
-$result = Stream::of($input)
-    ->infiniteCycle()
-    ->print();
-// 1, 2, 3, 1, 2, 3, ...
+// 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
 ```
 
 #### Running Average
@@ -1870,78 +1861,6 @@ $result = Stream::of($input)
 
 ```
 
-### Intersection With
-Return a stream intersecting the stream with the input iterables.
-
-```$stream->intersectionWith(iterable ...$iterables): Stream```
-
-```php
-use IterTools\Stream;
-
-$numbers    = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics   = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
-$oddNumbers = [1, 3, 5, 7, 9, 11];
-
-$stream = Stream::of($numbers)
-    ->intersectionWith($numerics, $oddNumbers)
-    ->toArray();
-// 3, 5, 7
-```
-
-### Intersection Coercive With
-Return a stream intersecting the stream with the input iterables using [type coercion](#Strict-and-Coercive-Types).
-
-```$stream->intersectionCoerciveWith(iterable ...$iterables): Stream```
-
-```php
-use IterTools\Stream;
-
-$languages          = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
-$scriptLanguages    = ['php', 'python', 'javascript', 'typescript'];
-$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
-
-$stream = Stream::of($languages)
-    ->intersectionCoerciveWith($scriptLanguages, $supportsInterfaces)
-    ->toArray();
-// 'php', 'typescript'
-```
-
-### Partial Intersection With
-Return a stream partially intersecting the stream with the input iterables.
-
-```$stream->partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables): Stream```
-
-```php
-use IterTools\Stream;
-
-$numbers    = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics   = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
-$oddNumbers = [1, 3, 5, 7, 9, 11];
-
-$stream = Stream::of($numbers)
-    ->partialIntersectionWith($numerics, $oddNumbers)
-    ->toArray();
-// 1, 3, 4, 5, 6, 7, 9
-```
-
-### Partial Intersection Coercive With
-Return a stream partially intersecting the stream with the input iterables using [type coercion](#Strict-and-Coercive-Types).
-
-```$stream->partialIntersectionCoerciveWith(int $minIntersectionCount, iterable ...$iterables): Stream```
-
-```php
-use IterTools\Stream;
-
-$languages          = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
-$scriptLanguages    = ['php', 'python', 'javascript', 'typescript'];
-$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
-
-$stream = Stream::of($languages)
-    ->partialIntersectionCoerciveWith(2, $scriptLanguages, $supportsInterfaces)
-    ->toArray();
-// 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
-```
-
 ### Symmetric difference With
 Return a stream of the symmetric difference of the stream and the given iterables.
 
@@ -1981,6 +1900,88 @@ $stream = Stream::of($a)
     ->toArray();
 // 4, 5, 6, 7, 8, 9
 ```
+
+#### Take While
+Keep elements from the stream as long as the predicate is true.
+
+```$stream->takeWhile(callable $predicate): Stream```
+
+If no predicate is provided, the boolean value of the data is used.
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($input)
+    ->takeWhile(fn ($value) => abs($value) < 3)
+    ->toArray();
+// 1, -1, 2, -2
+```
+
+#### Zip With
+Return a stream consisting of multiple iterable collections streamed simultaneously.
+
+```$stream->zipWith(iterable ...$iterables): Stream```
+
+For uneven lengths, iterations stops when the shortest iterable is exhausted.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$stream = Stream::of($input)
+    ->zipWith([4, 5, 6])
+    ->zipWith([7, 8, 9])
+    ->toArray();
+// [1, 4, 7], [2, 5, 8], [3, 6, 9]
+```
+
+#### Zip Longest With
+Return a stream consisting of multiple iterable collections streamed simultaneously.
+
+```$stream->zipLongestWith(iterable ...$iterables): Stream```
+
+* Iteration continues until the longest iterable is exhausted.
+* For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$stream = Stream::of($input)
+    ->zipLongestWith([4, 5, 6])
+    ->zipLongestWith([7, 8, 9, 10]);
+
+foreach ($stream as $zipped) {
+    // [1, 4, 7], [2, 5, 8], [3, 6, 9], [4, null, 10], [null, null, 5]
+}
+```
+
+#### Zip Equal With
+Return a stream consisting of multiple iterable collectionso f equal lengths streamed simultaneously.
+
+```$stream->zipEqualWith(iterable ...$iterables): Stream```
+
+Works like `Stream::zipWith()` method but throws \LengthException if lengths not equal,
+i.e., at least one iterator ends before the others.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$stream = Stream::of($input)
+    ->zipEqualWith([4, 5, 6])
+    ->zipEqualWith([7, 8, 9]);
+
+foreach ($stream as $zipped) {
+    // [1, 4, 7], [2, 5, 8], [3, 6, 9]
+}
+```
+
 
 ### Stream Terminal Operations
 
