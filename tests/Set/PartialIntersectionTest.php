@@ -1114,4 +1114,79 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
             [$a, $b, $c, $d, 5, []],
         ];
     }
+
+    /**
+     * @dataProvider dataProviderForIteratorToArray
+     * @param int $minIntersectionCount
+     * @param array<array> ...$sets
+     * @param array $expected
+     * @return void
+     */
+    public function testIteratorToArray(int $minIntersectionCount, array $sets, array $expected): void
+    {
+        // Given
+        $partIntersect = Set::partialIntersection($minIntersectionCount, ...$sets);
+
+        // When
+        $actual = iterator_to_array($partIntersect);
+
+        // Then
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function dataProviderForIteratorToArray(): array
+    {
+        return [
+            [
+                1,
+                [
+                    [1, 2, 3, 4, 5],
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                    [4, 5, 6, 7, 8],
+                ],
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                2,
+                [
+                    [1, 2, 3, 4, 5],
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                    [4, 5, 6, 7, 8],
+                ],
+                [2, 3, 4, 5, 6, 7],
+            ],
+            [
+                3,
+                [
+                    [1, 2, 3, 4, 5],
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                    [4, 5, 6, 7, 8],
+                ],
+                [3, 4, 5, 6],
+            ],
+            [
+                4,
+                [
+                    [1, 2, 3, 4, 5],
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                    [4, 5, 6, 7, 8],
+                ],
+                [4, 5],
+            ],
+            [
+                5,
+                [
+                    [1, 2, 3, 4, 5],
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                    [4, 5, 6, 7, 8],
+                ],
+                [],
+            ],
+        ];
+    }
 }

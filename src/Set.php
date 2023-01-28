@@ -189,7 +189,7 @@ class Set
                 $usageMap->addUsage($value, (string)$owner);
 
                 if ($usageMap->getOwnersCount($value) === $minIntersectionCount) {
-                    yield $index => $value;
+                    yield $value;
                     $usageMap->deleteUsage($value);
                 }
             }
