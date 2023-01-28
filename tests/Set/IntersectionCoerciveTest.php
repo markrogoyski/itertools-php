@@ -816,4 +816,22 @@ class IntersectionCoerciveTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array<array> $iterables
+     * @param        array $expected
+     */
+    public function testIteratorToArray(array $iterables, array $expected): void
+    {
+        // Given
+        $iterator = Set::intersectionCoercive(...$iterables);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEqualsCanonicalizing($expected, $result);
+    }
 }

@@ -711,4 +711,23 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         iterator_to_array
+     * @dataProvider dataProviderForArraySets
+     * @dataProvider dataProviderForArrayMultisets
+     * @param        array<array> $iterables
+     * @param        array $expected
+     */
+    public function testIteratorToArray(array $iterables, array $expected): void
+    {
+        // Given
+        $iterator = Set::intersection(...$iterables);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEqualsCanonicalizing($expected, $result);
+    }
 }

@@ -1346,4 +1346,23 @@ class PartialIntersectionCoerciveTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param array<array> $iterables
+     * @param positive-int $minIntersectionCount
+     * @param array $expected
+     */
+    public function testIteratorToArray(array $iterables, int $minIntersectionCount, array $expected): void
+    {
+        // Given
+        $iterator = Set::partialIntersectionCoercive($minIntersectionCount, ...$iterables);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEqualsCanonicalizing($expected, $result);
+    }
 }

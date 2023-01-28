@@ -1189,4 +1189,24 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test iterator_to_array
+     * @dataProvider dataProviderForArraySets
+     * @dataProvider dataProviderForArrayMultisets
+     * @param array<array> $iterables
+     * @param positive-int $minIntersectionCount
+     * @param array $expected
+     */
+    public function testArrayIteratorToArray(array $iterables, int $minIntersectionCount, array $expected): void
+    {
+        // Given
+        $iterator = Set::partialIntersection($minIntersectionCount, ...$iterables);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEqualsCanonicalizing($expected, $result);
+    }
 }

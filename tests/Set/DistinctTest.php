@@ -1206,4 +1206,23 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array $data
+     * @param        bool $strict
+     * @param        array $expected
+     */
+    public function testIteratorToArray(array $data, bool $strict, array $expected): void
+    {
+        // Given
+        $iterator = Set::distinct($data, $strict);
+
+        // When
+        $result = iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }
