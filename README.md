@@ -60,8 +60,8 @@ Quick Reference
 | [`chunkwiseOverlap`](#Chunkwise-Overlap) | Iterate by overlapped chunks                    | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
 | [`compress`](#Compress)                  | Filter out elements not selected                | `Single::compress($data, $selectors)`                       |
 | [`dropWhile`](#Drop-While)               | Drop elements while predicate is true           | `Single::dropWhile($data, $predicate)`                      |
-| [`filterFalse`](#Filter-False)           | Filter out elements where predicate not false   | `Single::filterFalse($data, $predicate)`                    |
-| [`filterTrue`](#Filter-True)             | Filter out elements where predicate not true    | `Single::filterTrue($data, $predicate)`                     |
+| [`filterTrue`](#Filter-True)             | Filter for elements where predicate is true     | `Single::filterTrue($data, $predicate)`                     |
+| [`filterFalse`](#Filter-False)           | Filter for elements where predicate is false    | `Single::filterFalse($data, $predicate)`                    |
 | [`groupBy`](#Group-By)                   | Group data by a common element                  | `Single::groupBy($data, $groupKeyFunction)`                 |
 | [`limit`](#Limit)                        | Iterate up to a limit                           | `Single::limit($data, $limit)`                              |
 | [`map`](#Map)                            | Map function onto each item                     | `Single::map($data, $function)`                             |
@@ -154,8 +154,8 @@ Quick Reference
 | [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                               | Iterate by overlapped chunks                                                                     | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                |
 | [`distinct`](#Distinct-1)                                                | Filter out elements: iterate only unique items                                                   | `$stream->distinct($strict)`                                                     |
 | [`dropWhile`](#Drop-While-1)                                             | Drop elements from the iterable source while the predicate function is true                      | `$stream->dropWhile($predicate)`                                                 |
-| [`filterTrue`](#Filter-True-1)                                           | Filter out elements from the iterable source where there predicate function is true              | `$stream->filterTrue($predicate)`                                                |
-| [`filterFalse`](#Filter-False-1)                                         | Filter out elements from the iterable source where the predicate function is false               | `$stream->filterFalse($predicate)`                                               |
+| [`filterTrue`](#Filter-True-1)                                           | Filter for only elements where the predicate function is true                                    | `$stream->filterTrue($predicate)`                                                |
+| [`filterFalse`](#Filter-False-1)                                         | Filter for only elements wherethe predicate function is false                                    | `$stream->filterFalse($predicate)`                                               |
 | [`groupBy`](#Group-By-1)                                                 | Group iterable source by a common data element                                                   | `$stream->groupBy($groupKeyFunction)`                                            |
 | [`infiniteCycle`](#Infinite-Cycle)                                       | Cycle through the elements of iterable source sequentially forever                               | `$stream->infiniteCycle()`                                                       |
 | [`intersectionWith`](#Intersection-With)                                 | Intersect iterable source and given iterables                                                    | `$stream->intersectionWith(...$iterables)`                                       |
@@ -427,24 +427,6 @@ foreach (Single::dropWhile($scores, $predicate) as $score) {
 // 70, 85, 65, 90
 ```
 
-### Filter False
-Filter out elements from the iterable only returning elements where the predicate function is false.
-
-If no predicate is provided, the boolean value of the data is used.
-
-```Single::filterFalse(iterable $data, callable $predicate)```
-```php
-use IterTools\Single;
-
-$starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
-
-foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $badMovie) {
-    print($badMovie);
-}
-// 1, 2, 3, 8, 9
-```
-
 ### Filter True
 Filter out elements from the iterable only returning elements where the predicate function is true.
 
@@ -461,6 +443,24 @@ foreach (Single::filterTrue($starWarsEpisodes, $goodMoviePredicate) as $goodMovi
     print($goodMovie);
 }
 // 4, 5, 6, 7
+```
+
+### Filter False
+Filter out elements from the iterable only returning elements where the predicate function is false.
+
+If no predicate is provided, the boolean value of the data is used.
+
+```Single::filterFalse(iterable $data, callable $predicate)```
+```php
+use IterTools\Single;
+
+$starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
+
+foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $badMovie) {
+    print($badMovie);
+}
+// 1, 2, 3, 8, 9
 ```
 
 ### Group By
