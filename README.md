@@ -867,7 +867,7 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
 
 ## Set
 ### Distinct
-Filter out elements from the iterable only returning unique elements.
+Filter out elements from the iterable only returning distinct elements.
 
 ```Set::distinct(iterable $data, bool $strict = true)```
 
@@ -1344,114 +1344,109 @@ $result = Reduce::toValue($input, $sum, 0);
 ### Stream Sources
 
 #### Of
-Creates iterable instance with fluent interface.
+Creates stream from an iterable.
 
-```Stream::of(iterable $iterable): self```
+```Stream::of(iterable $iterable): Stream```
 
 ```php
 use IterTools\Stream;
 
-$input = [1, 2, 3];
+$iterable = [1, 2, 3];
 
 $result = Stream::of($iterable)
-    ->chainWith(
-        [4, 5, 6],
-        [7, 8, 9]
-    )
+    ->chainWith([4, 5, 6],[7, 8, 9])
     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
     ->toValue(fn ($carry, $item) => $carry + array_sum($item));
 // 90
 ```
 
 #### Of Coin Flips
-Creates iterable instance with fluent interface of random coin flips.
+Creates stream of n random coin flips.
 
-```Stream::ofCoinFlips(int $repetitions): self```
+```Stream::ofCoinFlips(int $repetitions): Stream```
 
 ```php
 use IterTools\Stream;
 
-$result = Stream::ofCoinFlips(10);
-
-foreach ($result as $item) {
-    // 1, 0, 0, 1, 1, 1, 0, 1, 0, 0 [random]
-}
+$result = Stream::ofCoinFlips(10)
+    ->filterTrue()
+    ->toCount();
+// 5 (random)
 ```
 
 #### Of Empty
-Creates iterable instance with fluent interface from empty iterable source.
+Creates stream of nothing.
 
-```Stream::ofEmpty(): self```
+```Stream::ofEmpty(): Stream```
 
 ```php
 use IterTools\Stream;
 
 $result = Stream::ofEmpty()
-    ->chainWith([1, 2, 3]);
-
-foreach ($result as $item) {
-    // 1, 2, 3
-}
+    ->chainWith([1, 2, 3])
+    ->toArray();
+// 1, 2, 3
 ```
 
 #### Of Random Choice
-Creates iterable instance with fluent interface of random selections from an array of values.
+Creates stream of random selections from an array of values.
 
-```Stream::ofRandomChoice(array $items, int $repetitions): self```
+```Stream::ofRandomChoice(array $items, int $repetitions): Stream```
 
 ```php
 use IterTools\Stream;
 
 $languages = ['PHP', 'Go', 'Python'];
 
-$result = Stream::ofRandomChoice($languages, 5);
+$languages = Stream::ofRandomChoice($languages, 5);
 
-foreach ($result as $language) {
-    // 'Go', 'PHP', 'Python', 'PHP', 'PHP' [random]
+foreach ($languages as $language) {
+    // 'Go', 'PHP', 'Python', 'PHP', 'PHP' (random)
 }
 ```
 
 #### Of Random Numbers
-Creates iterable instance with fluent interface of random numbers (integers).
+Creates stream of random numbers (integers).
 
-```Stream::ofRandomNumbers(int $min, int $max, int $repetitions): self```
+```Stream::ofRandomNumbers(int $min, int $max, int $repetitions): Stream```
 
 ```php
 use IterTools\Stream;
 
-$result = Stream::ofRandomNumbers(1, 3, 7);
-
-foreach ($result as $item) {
-    // 1, 2, 2, 1, 3, 2, 1 [random]
-}
+$min  = 1;
+$max  = 3;
+$reps = 7;
+$result = Stream::ofRandomNumbers($min, $max, $reps)
+    ->toArray();
+// 1, 2, 2, 1, 3, 2, 1 (random)
 ```
 
 #### Of Random Percentage
-Creates iterable instance with fluent interface of random percentages between 0 and 1.
+Creates stream of random percentages between 0 and 1.
 
-```Stream::ofRandomPercentage(int $repetitions): self```
+```Stream::ofRandomPercentage(int $repetitions): Stream```
 
 ```php
 use IterTools\Stream;
 
-$result = Stream::ofRandomPercentage(3);
+$stream = Stream::ofRandomPercentage(3);
 
-foreach ($result as $item) {
+foreach ($stream as $percentage) {
     // 0.8012566976245, 0.81237281724151, 0.61676896329459 [random]
 }
 ```
 
 #### Of Rock Paper Scissors
-Creates iterable instance with fluent interface of rock-paper-scissors hands.
+Creates stream of rock-paper-scissors hands.
 
-```Stream::ofRockPaperScissors(int $repetitions): self```
+```Stream::ofRockPaperScissors(int $repetitions): Stream```
 
 ```php
 use IterTools\Stream;
 
-$result = Stream::ofRockPaperScissors(5);
+$rps = Stream::ofRockPaperScissors(5);
 
-foreach ($result as $item) {
+foreach ($rps as $hand) {
     // 'paper', 'rock', 'rock', 'scissors', 'paper' [random]
 }
 ```
@@ -1459,9 +1454,9 @@ foreach ($result as $item) {
 ### Stream Operations
 
 #### Compress
-Compress an iterable source by filtering out data that is not selected.
+Compress to a new stream by filtering out data that is not selected.
 
-```$stream->compress(iterable $selectors): self```
+```$stream->compress(iterable $selectors): Stream```
 
 Selectors indicate which data. True value selects item. False value filters out data.
 
@@ -1471,17 +1466,15 @@ use IterTools\Stream;
 $input = [1, 2, 3];
 
 $result = Stream::of($input)
-    ->compress([0, 1, 1]);
-    
-foreach ($result as $item) {
-    // 2, 3
-}
+    ->compress([0, 1, 1])
+    ->toArray();
+// 2, 3
 ```
 
 #### Drop While
-Drop elements from the iterable source while the predicate function is true.
+Drop elements from the stream while the predicate function is true.
 
-```$stream->dropWhile(callable $predicate): self```
+```$stream->dropWhile(callable $predicate): Stream```
 
 Once the predicate function returns false once, all remaining elements are returned.
 
@@ -1491,17 +1484,15 @@ use IterTools\Stream;
 $input = [1, 2, 3, 4, 5]
 
 $result = Stream::of($input)
-    ->dropWhile(fn ($value) => $value < 3);
-    
-foreach ($result as $item) {
-    // 3, 4, 5
-}
+    ->dropWhile(fn ($value) => $value < 3)
+    ->toArray();
+// 3, 4, 5
 ```
 
 #### Take While
-Return elements from the iterable source as long as the predicate is true.
+Keep elements from the stream as long as the predicate is true.
 
-```$stream->takeWhile(callable $predicate): self```
+```$stream->takeWhile(callable $predicate): Stream```
 
 If no predicate is provided, the boolean value of the data is used.
 
@@ -1511,17 +1502,15 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->takeWhile(fn ($value) => abs($value) < 3);
-
-foreach ($result as $item) {
-    // 1, -1, 2, -2
-}
+    ->takeWhile(fn ($value) => abs($value) < 3)
+    ->toArray();
+// 1, -1, 2, -2
 ```
 
 #### Filter True
-Filter out elements from the iterable source only returning elements where there predicate function is true.
+Filter out elements from the stream only keeping elements where there predicate function is true.
 
-```$stream->filterTrue(callable $predicate): self```
+```$stream->filterTrue(callable $predicate): Stream```
 
 If no predicate is provided, the boolean value of the data is used.
 
@@ -1531,17 +1520,15 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->filterTrue(fn ($value) => $value > 0);
-
-foreach ($result as $item) {
-    // 1, 2, 3
-}
+    ->filterTrue(fn ($value) => $value > 0)
+    ->toArray();
+// 1, 2, 3
 ```
 
 #### Filter False
-Filter out elements from the iterable source only returning elements where the predicate function is false.
+Filter out elements from the stream only keeping elements where the predicate function is false.
 
-```$stream->filterFalse(callable $predicate): self```
+```$stream->filterFalse(callable $predicate): Stream```
 
 If no predicate is provided, the boolean value of the data is used.
 
@@ -1551,17 +1538,15 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->filterFalse(fn ($value) => $value > 0);
-
-foreach ($result as $item) {
-    // -1, -2, -3
-}
+    ->filterFalse(fn ($value) => $value > 0)
+    ->toArray();
+// -1, -2, -3
 ```
 
 #### Group By
-Group iterable source by a common data element.
+Return a stream grouping by a common data element.
 
-```$stream->groupBy(callable $groupKeyFunction): self```
+```$stream->groupBy(callable $groupKeyFunction): Stream```
 
 The groupKeyFunction determines the key to group elements by.
 
@@ -1570,18 +1555,18 @@ use IterTools\Stream;
 
 $input = [1, -1, 2, -2, 3, -3];
 
-$result = Stream::of($input)
+$groups = Stream::of($input)
     ->groupBy(fn ($item) => $item > 0 ? 'positive' : 'negative');
 
-foreach ($result as $group => $item) {
+foreach ($groups as $group => $item) {
     // 'positive' => [1, 2, 3], 'negative' => [-1, -2, -3]
 }
 ```
 
 #### Map
-Map a function onto each element of the stream.
+Return a stream containing the result of mapping a function onto each element of the stream.
 
-```$stream->map(callable $function): self```
+```$stream->map(callable $function): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1589,37 +1574,35 @@ use IterTools\Stream;
 $grades = [100, 95, 98, 89, 100];
 
 $result = Stream::of($grades)
-    ->map(fn ($grade) => $grade === 100 ? 'A' : 'F');
-
-foreach ($result as $actualGrade) {
-    // A, F, F, F, A
-}
+    ->map(fn ($grade) => $grade === 100 ? 'A' : 'F')
+    ->toArray();
+// A, F, F, F, A
 ```
 
 #### Pairwise
-Return pairs of elements from iterable source.
+Return a stream consisting of pairs of elements from the stream.
 
-```$stream->pairwise(): self```
+```$stream->pairwise(): Stream```
 
-Returns empty generator if given collection contains less than 2 elements.
+Returns empty stream if given collection contains less than 2 elements.
 
 ```php
 use IterTools\Stream;
 
 $input = [1, 2, 3, 4, 5];
 
-$result = Stream::of($input)
+$stream = Stream::of($input)
     ->pairwise();
 
-foreach ($result as $item) {
+foreach ($stream as $item) {
     // [1, 2], [2, 3], [3, 4], [4, 5]
 }
 ```
 
 #### Chunkwise
-Return chunks of elements from iterable source.
+Return a stream consisting of chunks of elements from the stream.
 
-```$stream->chunkwise(int $chunkSize): self```
+```$stream->chunkwise(int $chunkSize): Stream```
 
 Chunk size must be at least 1.
 
@@ -1637,9 +1620,9 @@ foreach ($result as $chunk) {
 ```
 
 #### Chunkwise Overlap
-Return overlapped chunks of elements from iterable source.
+Return a stream consisting of overlapping chunks of elements from the stream.
 
-```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): self```
+```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): Stream```
 
 Chunk size must be at least 1.
 
@@ -1659,11 +1642,11 @@ foreach ($result as $chunk) {
 ```
 
 #### Limit
-Stream up to a limit.
+Return a stream up to a limit.
 
 Stops even if more data available if limit reached.
 
-```$stream->limit(int $limit)```
+```$stream->limit(int $limit): Stream```
 
 ```php
 Use IterTools\Single;
@@ -1678,11 +1661,9 @@ $goodMovies = Stream::of($matrixMovies)
 ```
 
 #### Chain With
-Chain iterable source withs given iterables together into a single iteration.
+Return a stream chaining additional sources together into a single consecutive stream.
 
-```$stream->chainWith(iterable ...$iterables): self```
-
-Makes a single continuous sequence out of multiple sequences.
+```$stream->chainWith(iterable ...$iterables): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1691,21 +1672,15 @@ $input = [1, 2, 3];
 
 $result = Stream::of($input)
     ->chainWith([4, 5, 6])
-    ->chainWith([7, 8, 9]);
-
-foreach ($result as $item) {
-    // 1, 2, 3, 4, 5, 6, 7, 8, 9
-}
+    ->chainWith([7, 8, 9])
+    ->toArray();
+// 1, 2, 3, 4, 5, 6, 7, 8, 9
 ```
 
 #### Zip With
-Iterate iterable source with another iterable collections simultaneously.
+Return a stream consisting of multiple iterable collections streamed simultaneously.
 
-```$stream->zipWith(iterable ...$iterables): self```
-
-Make an iterator that aggregates items from multiple iterators.
-
-Similar to Python's zip function.
+```$stream->zipWith(iterable ...$iterables): Stream```
 
 For uneven lengths, iterations stops when the shortest iterable is exhausted.
 
@@ -1714,48 +1689,43 @@ use IterTools\Stream;
 
 $input = [1, 2, 3];
 
-$result = Stream::of($input)
+$stream = Stream::of($input)
     ->zipWith([4, 5, 6])
     ->zipWith([7, 8, 9]);
 
-foreach ($result as $item) {
+foreach ($stream as $zipped) {
     // [1, 4, 7], [2, 5, 8], [3, 6, 9]
 }
 ```
 
 #### Zip Longest With
-Iterate iterable source with another iterable collections simultaneously.
+Return a stream consisting of multiple iterable collections streamed simultaneously.
 
-```$stream->zipLongestWith(iterable ...$iterables): self```
+```$stream->zipLongestWith(iterable ...$iterables): Stream```
 
-Make an iterator that aggregates items from multiple iterators.
-
-Similar to Python's zip_longest function.
-
-Iteration continues until the longest iterable is exhausted.
-
-For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
+* Iteration continues until the longest iterable is exhausted.
+* For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
 
 ```php
 use IterTools\Stream;
 
 $input = [1, 2, 3, 4, 5];
 
-$result = Stream::of($input)
+$stream = Stream::of($input)
     ->zipLongestWith([4, 5, 6])
     ->zipLongestWith([7, 8, 9, 10]);
 
-foreach ($result as $item) {
+foreach ($stream as $zipped) {
     // [1, 4, 7], [2, 5, 8], [3, 6, 9], [4, null, 10], [null, null, 5]
 }
 ```
 
 #### Zip Equal With
-Iterate iterable source with another iterable collections of equal lengths simultaneously.
+Return a stream consisting of multiple iterable collectionso f equal lengths streamed simultaneously.
 
-```$stream->zipEqualWith(iterable ...$iterables): self```
+```$stream->zipEqualWith(iterable ...$iterables): Stream```
 
-Works like Multi::zip() method but throws \LengthException if lengths not equal,
+Works like `Stream::zipWith()` method but throws \LengthException if lengths not equal,
 i.e., at least one iterator ends before the others.
 
 ```php
@@ -1763,52 +1733,41 @@ use IterTools\Stream;
 
 $input = [1, 2, 3];
 
-$result = Stream::of($input)
+$stream = Stream::of($input)
     ->zipEqualWith([4, 5, 6])
     ->zipEqualWith([7, 8, 9]);
 
-foreach ($result as $item) {
+foreach ($stream as $zipped) {
     // [1, 4, 7], [2, 5, 8], [3, 6, 9]
 }
 ```
 
 ### Distinct
-Filter out elements from the iterable source only returning unique elements.
+Return a stream filtering out elements from the stream only returning distinct elements.
 
-```$stream->distinct(bool $strict = true)```
+```$stream->distinct(bool $strict = true): Stream```
 
-If `$strict = true`:
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
-
-If `$strict = false`:
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
+Defaults to [strict type](#Strict-and-Coercive-Types) comparisons. Set strict to false for type coercion comparisons.
 
 ```php
 use IterTools\Stream;
 
 $input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
-
-$stream = Stream::of($input);
-
-foreach ($stream->distinct(true) as $datum) {
-    print($datum);
-}
+$stream = Stream::of($input)
+    ->distinct()
+    ->toArray();
 // 1, 2, 3, '1', '2', '3'
 
-foreach ($stream->distinct(false) as $datum) {
-    print($datum);
-}
+$stream = Stream::of($input)
+    ->distinct(false)
+    ->toArray();
 // 1, 2, 3
 ```
 
 #### Infinite Cycle
-Cycle through the elements of iterable source sequentially forever.
+Return a stream cycling through the elements of stream sequentially forever.
 
-```$stream->infiniteCycle(): self```
+```$stream->infiniteCycle(): Stream``
 
 ```php
 use IterTools\Stream;
@@ -1816,17 +1775,15 @@ use IterTools\Stream;
 $input = [1, 2, 3];
 
 $result = Stream::of($input)
-    ->infiniteCycle();
-
-foreach ($result as $item) {
-    // 1, 2, 3, 1, 2, 3, ...
-}
+    ->infiniteCycle()
+    ->print();
+// 1, 2, 3, 1, 2, 3, ...
 ```
 
 #### Running Average
-Accumulate the running average (mean) over iterable source.
+Return a stream accumulating the running average (mean) over the stream.
 
-```$stream->runningAverage(int|float|null $initialValue = null): self```
+```$stream->runningAverage(int|float|null $initialValue = null): Stream``
 
 ```php
 use IterTools\Stream;
@@ -1834,17 +1791,15 @@ use IterTools\Stream;
 $input = [1, 3, 5];
 
 $result = Stream::of($input)
-    ->runningAverage();
-
-foreach ($result as $item) {
-    // 1, 2, 3
-}
+    ->runningAverage()
+    ->toArray();
+// 1, 2, 3
 ```
 
 #### Running Difference
-Accumulate the running difference over iterable source.
+Return a stream accumulating the running difference over the stream.
 
-```$stream->runningDifference(int|float|null $initialValue = null): self```
+```$stream->runningDifference(int|float|null $initialValue = null): Stream``
 
 ```php
 use IterTools\Stream;
@@ -1852,17 +1807,15 @@ use IterTools\Stream;
 $input = [1, 2, 3, 4, 5];
 
 $result = Stream::of($input)
-    ->runningDifference();
-
-foreach ($result as $item) {
-    // -1, -3, -6, -10, -15
-}
+    ->runningDifference()
+    ->toArray();
+// -1, -3, -6, -10, -15
 ```
 
 #### Running Max
-Accumulate the running max over iterable source.
+Return a stream accumulating the running max over the stream.
 
-```$stream->runningMax(int|float|null $initialValue = null): self```
+```$stream->runningMax(int|float|null $initialValue = null): Stream``
 
 ```php
 use IterTools\Stream;
@@ -1870,17 +1823,16 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->runningMax();
+    ->runningMax()
+    ->toArray();
+// 1, 1, 2, 2, 3, 3
 
-foreach ($result as $item) {
-    // 1, 1, 2, 2, 3, 3
-}
 ```
 
 #### Running Min
-Accumulate the running min over iterable source.
+Return a stream accumulating the running min over the stream.
 
-```$stream->runningMin(int|float|null $initialValue = null): self```
+```$stream->runningMin(int|float|null $initialValue = null): Stream``
 
 ```php
 use IterTools\Stream;
@@ -1888,17 +1840,16 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->runningMin();
+    ->runningMin()
+    ->toArray();
+// 1, -1, -1, -2, -2, -3
 
-foreach ($result as $item) {
-    // 1, -1, -1, -2, -2, -3
-}
 ```
 
 #### Running Product
-Accumulate the running product over iterable source.
+Return a stream accumulating the running product over the stream.
 
-```$stream->runningProduct(int|float|null $initialValue = null): self```
+```$stream->runningProduct(int|float|null $initialValue = null): Stream``
 
 ```php
 use IterTools\Stream;
@@ -1906,17 +1857,16 @@ use IterTools\Stream;
 $input = [1, 2, 3, 4, 5];
 
 $result = Stream::of($input)
-    ->runningProduct();
+    ->runningProduct()
+    ->toArray();
+// 1, 2, 6, 24, 120
 
-foreach ($result as $item) {
-    // 1, 2, 6, 24, 120
-}
 ```
 
 #### Running Total
-Accumulate the running total over iterable source.
+Return a stream accumulating the running total over the stream.
 
-```$stream->runningTotal(int|float|null $initialValue = null): self```
+```$stream->runningTotal(int|float|null $initialValue = null): Stream``
 
 ```php
 use IterTools\Stream;
@@ -1924,21 +1874,16 @@ use IterTools\Stream;
 $input = [1, 2, 3, 4, 5];
 
 $result = Stream::of($input)
-    ->runningTotal();
+    ->runningTotal()
+    ->toArray();
+// 1, 3, 6, 10, 15
 
-foreach ($result as $item) {
-    // 1, 3, 6, 10, 15
-}
 ```
 
 ### Intersection With
-Iterates the intersection of iterable source and given iterables in strict type mode.
+Return a stream intersecting the stream with the input iterables.
 
-```$stream->intersectionWith(iterable ...$iterables)```
-
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
+```$stream->intersectionWith(iterable ...$iterables): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1947,94 +1892,70 @@ $numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 $numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
 $oddNumbers = [1, 3, 5, 7, 9, 11];
 
-$stream = Stream::of($numbers);
-
-foreach ($stream->intersectionWith($numerics, $oddNumbers) as $item) {
-    print($item);
-}
+$stream = Stream::of($numbers)
+    ->intersectionWith($numerics, $oddNumbers)
+    ->toArray();
 // 3, 5, 7
 ```
 
 ### Intersection Coercive With
-Iterates the intersection of iterable source and given iterables in non-strict type mode.
+Return a stream intersecting the stream with the input iterables using [type coercion](#Strict-and-Coercive-Types).
 
-```$stream->intersectionCoerciveWith(iterable ...$iterables)```
-
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
+```$stream->intersectionCoerciveWith(iterable ...$iterables): Stream```
 
 ```php
 use IterTools\Stream;
 
-$languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
-$scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
+$languages          = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
+$scriptLanguages    = ['php', 'python', 'javascript', 'typescript'];
 $supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
-$stream = Stream::of($languages);
-
-foreach ($stream->intersectionCoerciveWith($scriptLanguages, $supportsInterfaces) as $lang) {
-    print($lang);
-}
+$stream = Stream::of($languages)
+    ->intersectionCoerciveWith($scriptLanguages, $supportsInterfaces)
+    ->toArray();
 // 'php', 'typescript'
 ```
 
 ### Partial Intersection With
-Iterates partial intersection of iterable source and given iterables in strict type mode.
+Return a stream partially intersecting the stream with the input iterables.
 
-```$stream->partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables)```
-
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
+```$stream->partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables): Stream```
 
 ```php
 use IterTools\Stream;
 
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$numerics = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$numbers    = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics   = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
 $oddNumbers = [1, 3, 5, 7, 9, 11];
 
-$stream = Stream::of($numbers);
-
-foreach ($stream->partialIntersectionWith($numerics, $oddNumbers) as $item) {
-    print($item);
-}
+$stream = Stream::of($numbers)
+    ->partialIntersectionWith($numerics, $oddNumbers)
+    ->toArray();
 // 1, 3, 4, 5, 6, 7, 9
 ```
 
 ### Partial Intersection Coercive With
-Iterates partial intersection of iterable source and given iterables in non-strict type mode.
+Return a stream partially intersecting the stream with the input iterables using [type coercion](#Strict-and-Coercive-Types).
 
-```$stream->partialIntersectionCoerciveWith(int $minIntersectionCount, iterable ...$iterables)```
-
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
+```$stream->partialIntersectionCoerciveWith(int $minIntersectionCount, iterable ...$iterables): Stream```
 
 ```php
 use IterTools\Stream;
 
-$languages = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
-$scriptLanguages = ['php', 'python', 'javascript', 'typescript'];
+$languages          = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
+$scriptLanguages    = ['php', 'python', 'javascript', 'typescript'];
 $supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 
-$stream = Stream::of($languages);
-
-foreach ($stream->partialIntersectionCoerciveWith(2, $scriptLanguages, $supportsInterfaces) as $lang) {
-    print($lang);
-}
+$stream = Stream::of($languages)
+    ->partialIntersectionCoerciveWith(2, $scriptLanguages, $supportsInterfaces)
+    ->toArray();
 // 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
 ```
 
 ### Symmetric difference With
-Iterates the symmetric difference of iterable source and given iterables in strict type mode.
+Return a stream of the symmetric difference of the stream and the given iterables.
 
-```$stream->symmetricDifferenceWith(iterable ...$iterables)```
-
-* **scalars**: compares strictly by type;
-* **objects**: always treats different instances as not equal to each other;
-* **arrays**: compares serialized.
+```$stream->symmetricDifferenceWith(iterable ...$iterables): Stream```
 
 Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
 
@@ -2045,22 +1966,16 @@ $a = [1, 2, 3, 4, 7];
 $b = ['1', 2, 3, 5, 8];
 $c = [1, 2, 3, 6, 9];
 
-$stream = Stream::of($a);
-
-foreach ($stream->symmetricDifferenceWith($b, $c) as $item) {
-    print($item);
-}
+$stream = Stream::of($a)
+    ->symmetricDifferenceWith($b, $c)
+    ->toArray();
 // '1', 4, 5, 6, 7, 8, 9
 ```
 
 ### Symmetric difference Coercive With
-Iterates the symmetric difference of iterable source and given iterables in non-strict type mode.
+Return a stream of the symmetric difference of the stream and the given iterables using [type coercion](#Strict-and-Coercive-Types).
 
-```$stream->symmetricDifferenceCoerciveWith(iterable ...$iterables)```
-
-* **scalars**: compares non-strictly by value;
-* **objects**: compares serialized;
-* **arrays**: compares serialized.
+```$stream->symmetricDifferenceCoerciveWith(iterable ...$iterables): Stream```
 
 Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
 
@@ -2071,11 +1986,9 @@ $a = [1, 2, 3, 4, 7];
 $b = ['1', 2, 3, 5, 8];
 $c = [1, 2, 3, 6, 9];
 
-$stream = Stream::of($a);
-
-foreach ($stream->symmetricDifferenceCoerciveWith($b, $c) as $item) {
-    print($item);
-}
+$stream = Stream::of($a)
+    ->symmetricDifferenceCoerciveWith($b, $c)
+    ->toArray();
 // 4, 5, 6, 7, 8, 9
 ```
 
