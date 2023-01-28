@@ -1636,7 +1636,7 @@ $result = Stream::of($input)
 // 1, 2, 3, 1, 2, 3, ...
 ```
 
-### Intersection With
+#### Intersection With
 Return a stream intersecting the stream with the input iterables.
 
 ```$stream->intersectionWith(iterable ...$iterables): Stream```
@@ -1654,7 +1654,7 @@ $stream = Stream::of($numbers)
 // 3, 5, 7
 ```
 
-### Intersection Coercive With
+#### Intersection Coercive With
 Return a stream intersecting the stream with the input iterables using [type coercion](#Strict-and-Coercive-Types).
 
 ```$stream->intersectionCoerciveWith(iterable ...$iterables): Stream```
@@ -1725,7 +1725,7 @@ $stream = Stream::of($input)
 // [1, 2], [2, 3], [3, 4], [4, 5]
 ```
 
-### Partial Intersection With
+#### Partial Intersection With
 Return a stream partially intersecting the stream with the input iterables.
 
 ```$stream->partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables): Stream```
@@ -1743,7 +1743,7 @@ $stream = Stream::of($numbers)
 // 1, 3, 4, 5, 6, 7, 9
 ```
 
-### Partial Intersection Coercive With
+#### Partial Intersection Coercive With
 Return a stream partially intersecting the stream with the input iterables using [type coercion](#Strict-and-Coercive-Types).
 
 ```$stream->partialIntersectionCoerciveWith(int $minIntersectionCount, iterable ...$iterables): Stream```
@@ -1861,7 +1861,7 @@ $result = Stream::of($input)
 
 ```
 
-### Symmetric difference With
+#### Symmetric difference With
 Return a stream of the symmetric difference of the stream and the given iterables.
 
 ```$stream->symmetricDifferenceWith(iterable ...$iterables): Stream```
@@ -1881,7 +1881,7 @@ $stream = Stream::of($a)
 // '1', 4, 5, 6, 7, 8, 9
 ```
 
-### Symmetric difference Coercive With
+#### Symmetric difference Coercive With
 Return a stream of the symmetric difference of the stream and the given iterables using [type coercion](#Strict-and-Coercive-Types).
 
 ```$stream->symmetricDifferenceCoerciveWith(iterable ...$iterables): Stream```
@@ -1985,7 +1985,7 @@ foreach ($stream as $zipped) {
 
 ### Stream Terminal Operations
 
-#### Stream Summary Operations - Terminal
+#### Stream Summary Terminal Operations
 
 ##### All Match
 Returns true if all elements match the predicate function.
@@ -2144,7 +2144,7 @@ $result = Stream::of($input)
 // false
 ```
 
-#### Stream Reduction Operations - Terminal
+#### Stream Reduction Terminal Operations
 
 ##### To Average
 Reduces iterable source to the mean average of its items.
