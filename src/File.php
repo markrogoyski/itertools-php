@@ -61,7 +61,7 @@ class File
      * @param resource $resource
      * @return void
      */
-    public static function checkIsResourceValid($resource): void
+    private static function checkIsResourceValid($resource): void
     {
         if (!is_resource($resource)) {
             throw new \UnexpectedValueException('invalid resource');
