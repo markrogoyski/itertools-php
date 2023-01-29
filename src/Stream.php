@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Exceptions\FileException;
-use IterTools\Util\FileHelper;
 use IterTools\Util\IteratorFactory;
+use IterTools\Util\ResourceHelper;
 
 /**
  * Provides fluent interface for working with iterables.
@@ -718,18 +717,17 @@ class Stream implements \IteratorAggregate
      *
      * Elements of the iterable source must be stringifiable.
      *
-     * @param string $path
+     * @param resource $file
      * @param string $separator (optional) inserted between each item. Ex: ', ' for 1, 2, 3, ...
      * @param string $prefix    (optional) prepended to string
      * @param string $suffix    (optional) appended to string
      *
      * @return void
-     *
-     * @throws FileException
      */
-    public function toFile(string $path, string $separator = "\n", string $prefix = '', string $suffix = ''): void
+    public function toFile($file, string $separator = "\n", string $prefix = '', string $suffix = ''): void
     {
-        $file = FileHelper::openToWrite($path);
+        ResourceHelper::checkIsValid($file);
+
         $firstIteration = true;
 
         fputs($file, $prefix);
@@ -752,22 +750,16 @@ class Stream implements \IteratorAggregate
      *
      * Elements of the iterable source must be array of scalars.
      *
-     * @param string $path
+     * @param resource $file
      * @param string $separator
      * @param string $enclosure
      * @param string $escape
      *
      * @return void
-     *
-     * @throws FileException
      */
-    public function toCsvFile(
-        string $path,
-        string $separator = ',',
-        string $enclosure = '"',
-        string $escape = '\\'
-    ): void {
-        $file = FileHelper::openToWrite($path);
+    public function toCsvFile($file, string $separator = ',', string $enclosure = '"', string $escape = '\\'): void
+    {
+        ResourceHelper::checkIsValid($file);
 
         /** @var array<scalar> $row */
         foreach ($this->iterable as $row) {

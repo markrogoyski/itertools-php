@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Stream;
 
-use IterTools\Exceptions\FileException;
 use IterTools\Stream;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
@@ -23,16 +22,16 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
      * @param array $lines
      * @param string $expected
      * @return void
-     * @throws FileException
      */
     public function testToFileWithDefaultConfig(array $lines, string $expected): void
     {
         // Given
         $stream = Stream::of($lines);
         $filePath = $this->root->url().'/'.uniqid();
+        $file = fopen($filePath, 'w');
 
         // When
-        $stream->toFile($filePath);
+        $stream->toFile($file);
         $fileContents = file_get_contents($filePath);
 
         // Then
@@ -75,16 +74,16 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
      * @param array $config
      * @param string $expected
      * @return void
-     * @throws FileException
      */
     public function testToFileWithCustomConfig(array $lines, array $config, string $expected): void
     {
         // Given
         $stream = Stream::of($lines);
         $filePath = $this->root->url().'/'.uniqid();
+        $file = fopen($filePath, 'w');
 
         // When
-        $stream->toFile($filePath, ...$config);
+        $stream->toFile($file, ...$config);
         $fileContents = file_get_contents($filePath);
 
         // Then
@@ -282,16 +281,16 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
      * @param array $rows
      * @param string $expected
      * @return void
-     * @throws FileException
      */
     public function testToCsvFileWithDefaultConfig(array $rows, string $expected): void
     {
         // Given
         $stream = Stream::of($rows);
         $filePath = $this->root->url().'/'.uniqid();
+        $file = fopen($filePath, 'w');
 
         // When
-        $stream->toCsvFile($filePath);
+        $stream->toCsvFile($file);
         $fileContents = file_get_contents($filePath);
 
         // Then
@@ -372,16 +371,16 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
      * @param array{string, string, string} $config
      * @param string $expected
      * @return void
-     * @throws FileException
      */
     public function testToCsvFileWithCustomConfig(array $rows, array $config, string $expected): void
     {
         // Given
         $stream = Stream::of($rows);
         $filePath = $this->root->url().'/'.uniqid();
+        $file = fopen($filePath, 'w');
 
         // When
-        $stream->toCsvFile($filePath, ...$config);
+        $stream->toCsvFile($file, ...$config);
         $fileContents = file_get_contents($filePath);
 
         // Then
@@ -533,5 +532,35 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                 "'a, b, c'\n'd, e, f';'g, h, i'\n'j, k, l';'m, n, o';'p, q, r'\n1;2;3\n",
             ],
         ];
+    }
+
+    public function testToFileError(): void
+    {
+        // Given
+        $stream = Stream::of([1, 2, 3]);
+        $filePath = $this->root->url().'/'.uniqid();
+        $file = fopen($filePath, 'w');
+
+        // When
+        fclose($file);
+
+        // Then
+        $this->expectException(\UnexpectedValueException::class);
+        $stream->toFile($file);
+    }
+
+    public function testToCsvFileError(): void
+    {
+        // Given
+        $stream = Stream::of([1, 2, 3]);
+        $filePath = $this->root->url().'/'.uniqid();
+        $file = fopen($filePath, 'w');
+
+        // When
+        fclose($file);
+
+        // Then
+        $this->expectException(\UnexpectedValueException::class);
+        $stream->toCsvFile($file);
     }
 }
