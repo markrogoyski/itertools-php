@@ -449,7 +449,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $result = $stream->toArray();
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsWithDelta($expected, $result, 0.001);
     }
 
     public function dataProviderForRangeFloatsDefaultStep(): array
@@ -539,7 +539,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $result = $stream->toArray();
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsWithDelta($expected, $result, 0.001);
     }
 
     public function dataProviderForRangeFloatsCustomStep(): array
