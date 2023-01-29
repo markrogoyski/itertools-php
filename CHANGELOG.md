@@ -4,6 +4,8 @@
 
 ### New Features
 * Stream
+  * Source
+    * `ofRange`
   * Transformation Terminal Operations
     * `toAssociativeArray`
 

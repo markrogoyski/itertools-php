@@ -41,6 +41,20 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Creates iterable instance with fluent interface of random coin flips.
+     *
+     * @param int $repetitions
+     *
+     * @return Stream<mixed>
+     *
+     * @see Random::coinFlip()
+     */
+    public static function ofCoinFlips(int $repetitions): self
+    {
+        return new self(Random::coinFlip($repetitions));
+    }
+
+    /**
      * Creates iterable instance with fluent interface from empty iterable source.
      *
      * @return Stream<mixed>
@@ -96,17 +110,22 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Creates iterable instance with fluent interface of random coin flips.
+     * @param int|float|mixed $start First value of sequence
+     * @param int|float|mixed $end Sequence ends upon reaching this value
+     * @param int|float       $step (optional) Step increase between values. Defaults to 1.
      *
-     * @param int $repetitions
-     *
-     * @return Stream<mixed>
-     *
-     * @see Random::coinFlip()
+     * @return Stream<int|float>
      */
-    public static function ofCoinFlips(int $repetitions): self
+    public static function ofRange($start, $end, $step = 1): self
     {
-        return new self(Random::coinFlip($repetitions));
+        if (!\is_numeric($start) || !\is_numeric($end) || !\is_numeric($step)) {
+            throw new \InvalidArgumentException(
+                'Stream::ofRange values must be numeric, got: ' .
+                \print_r(['start' => $start, 'end' => $end, 'step' => $step], true)
+            );
+        }
+
+        return new self(\range($start, $end, $step));
     }
 
     /**

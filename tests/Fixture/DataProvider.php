@@ -143,6 +143,7 @@ trait DataProvider
             [Stream::ofRandomChoice([1, 2, 3, 4, 5], 5)],
             [Stream::ofRandomNumbers(1, 5, 5)],
             [Stream::ofRandomPercentage(5)],
+            [Stream::ofRange(0, 5)],
             [Stream::ofRockPaperScissors(5)],
         ];
     }

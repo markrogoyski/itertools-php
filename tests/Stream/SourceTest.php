@@ -392,4 +392,225 @@ class SourceTest extends \PHPUnit\Framework\TestCase
             [9873],
         ];
     }
+
+    /**
+     * @test         ofRange ints default step
+     * @dataProvider dataProviderForRangeIntsDefaultStep
+     * @param int $start
+     * @param int $end
+     * @param array<int> $expected
+     */
+    public function testOfRangeIntsDefaultStep(int $start, int $end, array $expected): void
+    {
+        // Given
+        $stream = Stream::ofRange($start, $end);
+
+        // When
+        $result = $stream->toArray();
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
+
+    public function dataProviderForRangeIntsDefaultStep(): array
+    {
+        return [
+            [
+                0,
+                0,
+                [0]
+            ],
+            [
+                0,
+                1,
+                [0, 1]
+            ],
+            [
+                0,
+                10,
+                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            ],
+        ];
+    }
+
+    /**
+     * @test         ofRange float default step
+     * @dataProvider dataProviderForRangeFloatsDefaultStep
+     * @param float $start
+     * @param float $end
+     * @param array<float> $expected
+     */
+    public function testOfRangeFloatsDefaultStep(float $start, float $end, array $expected): void
+    {
+        // Given
+        $stream = Stream::ofRange($start, $end);
+
+        // When
+        $result = $stream->toArray();
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
+
+    public function dataProviderForRangeFloatsDefaultStep(): array
+    {
+        return [
+            [
+                0.0,
+                0.0,
+                [0.0]
+            ],
+            [
+                0.0,
+                1.0,
+                [0.0, 1.0]
+            ],
+            [
+                0.0,
+                10.0,
+                [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
+            ],
+            [
+                0.5,
+                5.5,
+                [0.5, 1.5, 2.5, 3.5, 4.5, 5.5]
+            ],
+        ];
+    }
+
+    /**
+     * @test         ofRange ints custom step
+     * @dataProvider dataProviderForRangeIntsCustomStep
+     * @param int $start
+     * @param int $end
+     * @param int $step
+     * @param array<int> $expected
+     */
+    public function testOfRangeIntsCustomStep(int $start, int $end, int $step, array $expected): void
+    {
+        // Given
+        $stream = Stream::ofRange($start, $end, $step);
+
+        // When
+        $result = $stream->toArray();
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
+
+    public function dataProviderForRangeIntsCustomStep(): array
+    {
+        return [
+            [
+                0,
+                0,
+                2,
+                [0]
+            ],
+            [
+                0,
+                4,
+                2,
+                [0, 2, 4]
+            ],
+            [
+                0,
+                10,
+                3,
+                [0, 3, 6, 9]
+            ],
+        ];
+    }
+
+    /**
+     * @test         ofRange floats custom step
+     * @dataProvider dataProviderForRangeFloatsCustomStep
+     * @param float $start
+     * @param float $end
+     * @param float $step
+     * @param array<float> $expected
+     */
+    public function testOfRangeFloatsCustomStep(float $start, float $end, float $step, array $expected): void
+    {
+        // Given
+        $stream = Stream::ofRange($start, $end, $step);
+
+        // When
+        $result = $stream->toArray();
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
+
+    public function dataProviderForRangeFloatsCustomStep(): array
+    {
+        return [
+            [
+                0.0,
+                0.0,
+                2.0,
+                [0.0]
+            ],
+            [
+                0.0,
+                4.0,
+                2.0,
+                [0.0, 2.0, 4.0]
+            ],
+            [
+                0.0,
+                10.0,
+                3.0,
+                [0.0, 3.0, 6.0, 9.0]
+            ],
+            [
+                0.0,
+                5.0,
+                1.2,
+                [0.0, 1.2, 2.4, 3.6, 4.8]
+            ],
+        ];
+    }
+
+    /**
+     * @test         ofRange invalid arguments
+     * @dataProvider dataProviderForRangeInvalidArguments
+     * @param mixed $start
+     * @param mixed $end
+     * @param float $step
+     */
+    public function testOfRangeInvalidArguments($start, $end, $step): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        $stream = Stream::ofRange($start, $end, $step);
+    }
+
+    public function dataProviderForRangeInvalidArguments(): array
+    {
+        return [
+            [
+                [0],
+                4,
+                2,
+            ],
+            [
+                0,
+                [4],
+                2,
+            ],
+            [
+                0,
+                4,
+                [2],
+            ],
+            [
+                'a',
+                4,
+                2,
+            ],
+        ];
+    }
 }

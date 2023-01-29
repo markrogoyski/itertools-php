@@ -135,6 +135,7 @@ Quick Reference
 | [`ofRandomChoice`](#Of-Random-Choice)            | Create a stream of random selections                            | `Stream::ofRandomChoice($items, $repetitions)`      |
 | [`ofRandomNumbers`](#Of-Random-Numbers)          | Create a stream of random numbers (integers)                    | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
 | [`ofRandomPercentage`](#Of-Random-Percentage)    | Create a stream of random percentages between 0 and 1           | `Stream::ofRandomPercentage($repetitions)`          |
+| [`ofRange`](#Of-Range)                           | Create a stream of a range of numbers                           | `Stream::ofRange($start, $end, $step)`              |
 | [`ofRockPaperScissors`](#Of-Rock-Paper-Scissors) | Create a stream of rock-paper-scissors hands                    | `Stream::ofRockPaperScissors($repetitions)`         |
 
 #### Stream Operations
@@ -1436,6 +1437,19 @@ $stream = Stream::ofRandomPercentage(3)
 // 0.8012566976245, 0.81237281724151, 0.61676896329459 [random]
 ```
 
+#### Of Range
+Creates stream of a range of numbers.
+
+```Stream::ofRange(int|float $start, int|float $end, int|float $step = 1): Stream```
+
+```php
+use IterTools\Stream;
+
+$rps = Stream::ofRange(0, 5)
+    ->toArray();
+// 0, 1, 2, 3, 4, 5
+```
+
 #### Of Rock Paper Scissors
 Creates stream of rock-paper-scissors hands.
 
@@ -1447,7 +1461,6 @@ use IterTools\Stream;
 $rps = Stream::ofRockPaperScissors(5)
     ->toArray();
 // 'paper', 'rock', 'rock', 'scissors', 'paper' [random]
-
 ```
 
 ### Stream Operations
