@@ -1445,7 +1445,7 @@ Creates stream of a range of numbers.
 ```php
 use IterTools\Stream;
 
-$rps = Stream::ofRange(0, 5)
+$numbers = Stream::ofRange(0, 5)
     ->toArray();
 // 0, 1, 2, 3, 4, 5
 ```
