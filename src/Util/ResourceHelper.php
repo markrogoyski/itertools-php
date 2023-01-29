@@ -12,7 +12,7 @@ class ResourceHelper
      */
     public static function isValid($resource): bool
     {
-        return is_resource($resource);
+        return \is_resource($resource);
     }
 
     /**

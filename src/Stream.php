@@ -162,14 +162,21 @@ class Stream implements \IteratorAggregate
      * Creates iterable instance with fluent interface of CSV file rows.
      *
      * @param resource $file
+     * @param string $separator
+     * @param string $enclosure
+     * @param string $escape
      *
-     * @return Stream<mixed>
+     * @return Stream
      *
      * @see File::readCsv()
      */
-    public static function ofCsvFile($file): self
-    {
-        return new self(File::readCsv($file));
+    public static function ofCsvFile(
+        $file,
+        string $separator = ',',
+        string $enclosure = '"',
+        string $escape = '\\'
+    ): self {
+        return new self(File::readCsv($file, $separator, $enclosure, $escape));
     }
 
     // STREAM OPERATIONS

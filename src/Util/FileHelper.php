@@ -19,16 +19,16 @@ class FileHelper
      */
     public static function openToWrite(string $path)
     {
-        if (file_exists($path) && !is_writable($path)) {
+        if (\file_exists($path) && !\is_writable($path)) {
             throw new FileException(
                 "File '{$path}' is not writable",
                 FileException::FILE_IS_NOT_WRITABLE
             );
         }
 
-        $dir = dirname($path);
+        $dir = \dirname($path);
 
-        if (!is_writable($dir)) {
+        if (!\is_writable($dir)) {
             throw new FileException(
                 "Cannot create file '{$path}'",
                 FileException::CANNOT_CREATE_FILE
@@ -36,6 +36,6 @@ class FileHelper
         }
 
         /** @var resource */
-        return fopen($path, 'w');
+        return \fopen($path, 'w');
     }
 }
