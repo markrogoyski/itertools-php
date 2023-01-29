@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Set;
+namespace IterTools\Tests\Util;
 
 use IterTools\Util\UniqueExtractor;
 use IterTools\Tests\Fixture;
@@ -20,7 +20,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
         $string = UniqueExtractor::getString($var, true);
 
         // Then
-        $this->assertTrue(str_starts_with($string, $expectedPrefix), "got: $string");
+        $this->assertTrue($this->startsWith($string, $expectedPrefix), "got: $string");
     }
 
     public function dataProviderForStrict(): array
@@ -112,7 +112,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
         $string = UniqueExtractor::getString($var, false);
 
         // Then
-        $this->assertTrue(str_starts_with($string, $expectedPrefix), "got: $string");
+        $this->assertTrue($this->startsWith($string, $expectedPrefix), "got: $string");
     }
 
     public function dataProviderForNotStrict(): array
@@ -191,5 +191,10 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
                 'boolean_0'
             ],
         ];
+    }
+
+    protected function startsWith($string, $startString): bool
+    {
+        return (substr($string, 0, strlen($startString)) === $startString);
     }
 }
