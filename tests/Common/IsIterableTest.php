@@ -14,13 +14,14 @@ class IsIterableTest extends \PHPUnit\Framework\TestCase
     /**
      * @test loop tools is_iterable
      * @dataProvider dataProviderForIterableLoopTools
+     * @dataProvider dataProviderForIterableStreamTools
      * @param iterable $loopToolIterable
      * @return void
      */
     public function testLoopToolsAreIterable(iterable $loopToolIterable): void
     {
         // When
-        $isIterable = is_iterable($loopToolIterable);
+        $isIterable = \is_iterable($loopToolIterable);
 
         // Then
         $this->assertTrue($isIterable);

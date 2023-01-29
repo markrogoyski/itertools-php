@@ -8,6 +8,7 @@ use IterTools\Multi;
 use IterTools\Random;
 use IterTools\Set;
 use IterTools\Single;
+use IterTools\Stream;
 use IterTools\Tests\Fixture;
 
 trait DataProvider
@@ -21,6 +22,8 @@ trait DataProvider
             [new Fixture\IteratorAggregateFixture([])],
         ];
     }
+
+    // LOOP TOOLS
 
     public function dataProviderForIterableLoopTools(): \Generator
     {
@@ -116,6 +119,66 @@ trait DataProvider
             [Set::partialIntersectionCoercive(2, [1, 2, 3, 4, 5], [2, 3, 4])],
             [Set::symmetricDifference([1, 2, 3, 4, 5], [2, 3, 4])],
             [Set::symmetricDifferenceCoercive([1, 2, 3, 4, 5], [2, 3, 4])],
+        ];
+    }
+
+    // STREAM TOOLS
+
+    public function dataProviderForIterableStreamTools(): \Generator
+    {
+        foreach ($this->dataProviderForSourceStreamTools() as $loopTool) {
+            yield $loopTool;
+        }
+        foreach ($this->dataProviderForStreamOperations() as $loopTool) {
+            yield $loopTool;
+        }
+    }
+
+    public function dataProviderForSourceStreamTools(): array
+    {
+        return [
+            [Stream::of([1, 2, 3, 4, 5])],
+            [Stream::ofCoinFlips(5)],
+            [Stream::ofEmpty()],
+            [Stream::ofRandomChoice([1, 2, 3, 4, 5], 5)],
+            [Stream::ofRandomNumbers(1, 5, 5)],
+            [Stream::ofRandomPercentage(5)],
+            [Stream::ofRockPaperScissors(5)],
+        ];
+    }
+
+    public function dataProviderForStreamOperations(): array
+    {
+        return [
+            [Stream::of([1, 2, 3, 4, 5])->chainWith([6, 7, 8, 9, 10])],
+            [Stream::of([1, 2, 3, 4, 5])->compress([1, 1, 0, 0, 1])],
+            [Stream::of([1, 2, 3, 4, 5])->chunkwise(2)],
+            [Stream::of([1, 2, 3, 4, 5])->chunkwiseOverlap(2, 1)],
+            [Stream::of([1, 2, 3, 4, 5])->distinct()],
+            [Stream::of([1, 2, 3, 4, 5])->dropWhile(fn ($x) => $x < 2)],
+            [Stream::of([1, 2, 3, 4, 5])->filterTrue(fn ($x) => $x < 2)],
+            [Stream::of([1, 2, 3, 4, 5])->filterFalse(fn ($x) => $x < 2)],
+            [Stream::of([1, 2, 3, 4, 5])->groupBy(fn ($x) => $x < 2)],
+            [Stream::of([1, 2, 3, 4, 5])->infiniteCycle()],
+            [Stream::of([1, 2, 3, 4, 5])->intersectionWith([2, 3, 4])],
+            [Stream::of([1, 2, 3, 4, 5])->intersectionCoerciveWith([2, 3, 4])],
+            [Stream::of([1, 2, 3, 4, 5])->limit(3)],
+            [Stream::of([1, 2, 3, 4, 5])->map(fn ($x) => $x**2)],
+            [Stream::of([1, 2, 3, 4, 5])->pairwise()],
+            [Stream::of([1, 2, 3, 4, 5])->partialIntersectionWith(1, [2, 3, 4])],
+            [Stream::of([1, 2, 3, 4, 5])->partialIntersectionCoerciveWith(1, [2, 3, 4])],
+            [Stream::of([1, 2, 3, 4, 5])->runningAverage()],
+            [Stream::of([1, 2, 3, 4, 5])->runningDifference()],
+            [Stream::of([1, 2, 3, 4, 5])->runningMax()],
+            [Stream::of([1, 2, 3, 4, 5])->runningMin()],
+            [Stream::of([1, 2, 3, 4, 5])->runningProduct()],
+            [Stream::of([1, 2, 3, 4, 5])->runningTotal()],
+            [Stream::of([1, 2, 3, 4, 5])->symmetricDifferenceWith([2, 3, 4])],
+            [Stream::of([1, 2, 3, 4, 5])->symmetricDifferenceCoerciveWith([2, 3, 4])],
+            [Stream::of([1, 2, 3, 4, 5])->takeWhile(fn ($x) => $x < 2)],
+            [Stream::of([1, 2, 3, 4, 5])->zipWith([6, 7, 8, 9, 10])],
+            [Stream::of([1, 2, 3, 4, 5])->zipEqualWith([6, 7, 8, 9, 10])],
+            [Stream::of([1, 2, 3, 4, 5])->zipLongestWith([6, 7, 8, 9, 10])],
         ];
     }
 }
