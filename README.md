@@ -1625,7 +1625,7 @@ Return a stream grouping by a common data element.
 
 ```$stream->groupBy(callable $groupKeyFunction): Stream```
 
-The groupKeyFunction determines the key to group elements by.
+The `$groupKeyFunction` determines the key to group elements by.
 
 ```php
 use IterTools\Stream;
@@ -1844,7 +1844,6 @@ $result = Stream::of($input)
     ->runningMin()
     ->toArray();
 // 1, -1, -1, -2, -2, -3
-
 ```
 
 #### Running Product
@@ -1878,7 +1877,6 @@ $result = Stream::of($input)
     ->runningTotal()
     ->toArray();
 // 1, 3, 6, 10, 15
-
 ```
 
 #### Symmetric difference With
@@ -2002,11 +2000,9 @@ foreach ($stream as $zipped) {
 }
 ```
 
-
 ### Stream Terminal Operations
 
 #### Stream Summary Terminal Operations
-
 ##### All Match
 Returns true if all elements match the predicate function.
 

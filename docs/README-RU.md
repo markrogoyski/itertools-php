@@ -1550,12 +1550,34 @@ $result = Stream::of($friends)
 // [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9]
 ```
 
+#### Distinct
+Фильтрует коллекцию, сохраняя только уникальные значения.
+
+```$stream->distinct(bool $strict = true): Stream```
+
+По умолчанию выполняет сравнения в [режиме строгой типизации](#Режимы-типизации). Передайте значение `false` аргумента `$strict`, чтобы работать в режиме приведения типов.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
+$stream = Stream::of($input)
+    ->distinct()
+    ->toArray();
+// 1, 2, 3, '1', '2', '3'
+
+$stream = Stream::of($input)
+    ->distinct(false)
+    ->toArray();
+// 1, 2, 3
+```
+
 #### Drop While
 Пропускает элементы из коллекции, пока предикат возвращает ложь.
 
-```$stream->dropWhile(callable $predicate): self```
+```$stream->dropWhile(callable $predicate): Stream```
 
-После того, как предикат впервые вернул true, все последующие элементы попадают в выборку.
+После того как предикат впервые вернул true, все последующие элементы попадают в выборку.
 
 ```php
 use IterTools\Stream;
@@ -1563,37 +1585,15 @@ use IterTools\Stream;
 $input = [1, 2, 3, 4, 5]
 
 $result = Stream::of($input)
-    ->dropWhile(fn ($value) => $value < 3);
-    
-foreach ($result as $item) {
-    // 3, 4, 5
-}
-```
-
-#### Take While
-Отдает элементы из коллекции, пока предикат возвращает истину.
-
-```$stream->takeWhile(callable $predicate): self```
-
-Останавливает процесс итерации, как только предикат впервые вернет ложь.
-
-```php
-use IterTools\Stream;
-
-$input = [1, -1, 2, -2, 3, -3];
-
-$result = Stream::of($input)
-    ->takeWhile(fn ($value) => abs($value) < 3);
-
-foreach ($result as $item) {
-    // 1, -1, 2, -2
-}
+    ->dropWhile(fn ($value) => $value < 3)
+    ->toArray();
+// 3, 4, 5
 ```
 
 #### Filter True
 Возвращает из коллекции только те элементы, для которых предикат возвращает истину.
 
-```$stream->filterTrue(callable $predicate): self```
+```$stream->filterTrue(callable $predicate): Stream```
 
 Если предикат не передан, используется приведение значений коллекции к `bool`.
 
@@ -1603,17 +1603,15 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->filterTrue(fn ($value) => $value > 0);
-
-foreach ($result as $item) {
-    // 1, 2, 3
-}
+    ->filterTrue(fn ($value) => $value > 0)
+    ->toArray();
+// 1, 2, 3
 ```
 
 #### Filter False
 Возвращает из коллекции только те элементы, для которых предикат возвращает ложь.
 
-```$stream->filterFalse(callable $predicate): self```
+```$stream->filterFalse(callable $predicate): Stream```
 
 Если предикат не передан, используется приведение значений коллекции к `bool`.
 
@@ -1623,17 +1621,15 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->filterFalse(fn ($value) => $value > 0);
-
-foreach ($result as $item) {
-    // -1, -2, -3
-}
+    ->filterFalse(fn ($value) => $value > 0)
+    ->toArray();
+// -1, -2, -3
 ```
 
 #### Group By
 Группирует элементы из коллекции по заданному правилу.
 
-```$stream->groupBy(callable $groupKeyFunction): self```
+```$stream->groupBy(callable $groupKeyFunction): Stream```
 
 Функция `$groupKeyFunction` должна возвращаться общий ключ для элементов группы.
 
@@ -1650,42 +1646,56 @@ foreach ($result as $group => $item) {
 }
 ```
 
-#### Map
-Отображение коллекции с использованием callback-функции.
+#### Infinite Cycle
+Бесконечно зацикливает перебор коллекции.
 
-```$stream->map(callable $function): self```
-
-```php
-use IterTools\Stream;
-
-$grades = [100, 95, 98, 89, 100];
-
-$result = Stream::of($grades)
-    ->map(fn ($grade) => $grade === 100 ? 'A' : 'F');
-
-foreach ($result as $actualGrade) {
-    // A, F, F, F, A
-}
-```
-
-#### Pairwise
-Итерирует коллекцию попарно (с наложением).
-
-```$stream->pairwise(): self```
-
-Возвращает пустой генератор если коллекция содержит меньше 2-х элементов.
+```$stream->infiniteCycle(): Stream```
 
 ```php
 use IterTools\Stream;
 
-$input = [1, 2, 3, 4, 5];
+$input = [1, 2, 3];
 
 $result = Stream::of($input)
-    ->pairwise();
+    ->infiniteCycle()
+    ->print();
+// 1, 2, 3, 1, 2, 3, ...
+```
 
-foreach ($result as $item) {
-    // [1, 2], [2, 3], [3, 4], [4, 5]
-}
+#### Intersection With
+Пересечение хранимой в потоке коллекции с другими данными коллекциями.
+
+```$stream->intersectionWith(iterable ...$iterables): Stream```
+
+```php
+use IterTools\Stream;
+
+$numbers    = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics   = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
+
+$stream = Stream::of($numbers)
+    ->intersectionWith($numerics, $oddNumbers)
+    ->toArray();
+// 3, 5, 7
+```
+
+#### Intersection Coercive With
+Пересечение хранимой в потоке коллекции с другими данными коллекциями в режиме [приведения типов](#Режимы-типизации).
+
+```$stream->intersectionCoerciveWith(iterable ...$iterables): Stream```
+
+```php
+use IterTools\Stream;
+
+$languages          = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
+$scriptLanguages    = ['php', 'python', 'javascript', 'typescript'];
+$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
+
+$stream = Stream::of($languages)
+    ->intersectionCoerciveWith($scriptLanguages, $supportsInterfaces)
+    ->toArray();
+// 'php', 'typescript'
 ```
 
 #### Limit
@@ -1693,7 +1703,7 @@ foreach ($result as $item) {
 
 Останавливает процесс итерирования, когда число итераций достигает `$limit`.
 
-```$stream->limit(int $limit)```
+```$stream->limit(int $limit): Stream```
 
 ```php
 Use IterTools\Single;
@@ -1707,43 +1717,265 @@ $goodMovies = Stream::of($matrixMovies)
 // 'The Matrix' (and nothing else)
 ```
 
+#### Map
+Отображение хранимой в потоке коллекции с использованием callback-функции.
+
+```$stream->map(callable $function): Stream```
+
+```php
+use IterTools\Stream;
+
+$grades = [100, 95, 98, 89, 100];
+
+$result = Stream::of($grades)
+    ->map(fn ($grade) => $grade === 100 ? 'A' : 'F')
+    ->toArray();
+// A, F, F, F, A
+```
+
+#### Pairwise
+Итерирует коллекцию попарно (с наложением).
+
+```$stream->pairwise(): Stream```
+
+Возвращает пустой генератор если коллекция содержит меньше 2-х элементов.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$stream = Stream::of($input)
+    ->pairwise()
+    ->toArray();
+// [1, 2], [2, 3], [3, 4], [4, 5]
+```
+
+#### Partial Intersection With
+Возвращает поток с частичным пересечением хранимой коллекции с другими переданными в аргументах коллекциями.
+
+```$stream->partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables): Stream```
+
+```php
+use IterTools\Stream;
+
+$numbers    = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$numerics   = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
+$oddNumbers = [1, 3, 5, 7, 9, 11];
+
+$stream = Stream::of($numbers)
+    ->partialIntersectionWith($numerics, $oddNumbers)
+    ->toArray();
+// 1, 3, 4, 5, 6, 7, 9
+```
+
+#### Partial Intersection Coercive With
+Возвращает поток с частичным пересечением хранимой коллекции с другими переданными в аргументах коллекциями в режиме [приведения типов](#Режимы-типизации).
+
+```$stream->partialIntersectionCoerciveWith(int $minIntersectionCount, iterable ...$iterables): Stream```
+
+```php
+use IterTools\Stream;
+
+$languages          = ['php', 'python', 'c++', 'java', 'c#', 'javascript', 'typescript'];
+$scriptLanguages    = ['php', 'python', 'javascript', 'typescript'];
+$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
+
+$stream = Stream::of($languages)
+    ->partialIntersectionCoerciveWith(2, $scriptLanguages, $supportsInterfaces)
+    ->toArray();
+// 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
+```
+
+#### Running Average
+Возвращает поток, накапливающий среднее арифметическое элементов хранимой коллекции в процессе итерирования.
+
+```$stream->runningAverage(int|float|null $initialValue = null): Stream```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 3, 5];
+
+$result = Stream::of($input)
+    ->runningAverage();
+
+foreach ($result as $item) {
+    // 1, 2, 3
+}
+```
+
+#### Running Difference
+Возвращает поток, накапливающий разность элементов коллекции в процессе итерирования.
+
+```$stream->runningDifference(int|float|null $initialValue = null): Stream```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($input)
+    ->runningDifference()
+    ->toArray();
+// -1, -3, -6, -10, -15
+```
+
+#### Running Max
+Возвращает поток, ищущий максимальный элемент коллекции в процессе итерирования.
+
+```$stream->runningMax(int|float|null $initialValue = null): Stream```
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($input)
+    ->runningMax()
+    ->toArray();
+// 1, 1, 2, 2, 3, 3
+```
+
+#### Running Min
+Возвращает поток, ищущий минимальный элемент коллекции в процессе итерирования.
+
+```$stream->runningMin(int|float|null $initialValue = null): Stream```
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($input)
+    ->runningMin()
+    ->toArray();
+// 1, -1, -1, -2, -2, -3
+```
+
+#### Running Product
+Возвращает поток, накапливающий произведение элементов коллекции в процессе итерирования.
+
+```$stream->runningProduct(int|float|null $initialValue = null): Stream```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($input)
+    ->runningProduct()
+    ->toArray();
+// 1, 2, 6, 24, 120
+```
+
+#### Running Total
+Возвращает поток, накапливающий сумму элементов коллекции в процессе итерирования.
+
+```$stream->runningTotal(int|float|null $initialValue = null): Stream```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3, 4, 5];
+
+$result = Stream::of($input)
+    ->runningTotal()
+    ->toArray();
+// 1, 3, 6, 10, 15
+```
+
+#### Symmetric difference With
+Возвращает поток, содержащий симметрическую разность потока с заданным набором коллекций.
+
+```$stream->symmetricDifferenceWith(iterable ...$iterables): Stream```
+
+Если хотя бы в одной коллекции или в потоке встречаются повторяющиеся элементы, работают правила получения разности для [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Stream;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+$c = [1, 2, 3, 6, 9];
+
+$stream = Stream::of($a)
+    ->symmetricDifferenceWith($b, $c)
+    ->toArray();
+// '1', 4, 5, 6, 7, 8, 9
+```
+
+#### Symmetric difference Coercive With
+Возвращает поток, содержащий симметрическую разность потока с заданным набором коллекций, полученную в режиме [приведения типов](#Режимы-типизации).
+
+```$stream->symmetricDifferenceCoerciveWith(iterable ...$iterables): Stream```
+
+Если хотя бы в одной коллекции или в потоке встречаются повторяющиеся элементы, работают правила получения разности для [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Stream;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+$c = [1, 2, 3, 6, 9];
+
+$stream = Stream::of($a)
+    ->symmetricDifferenceCoerciveWith($b, $c)
+    ->toArray();
+// 4, 5, 6, 7, 8, 9
+```
+
+#### Take While
+Оставляет элементы в потоке, пока предикат возвращает истину.
+
+```$stream->takeWhile(callable $predicate): Stream```
+
+* Останавливает процесс итерации, как только предикат впервые вернет ложь.
+* Если предикат не передан, выполняется приведение элементов к булеву типу.
+
+```php
+use IterTools\Stream;
+
+$input = [1, -1, 2, -2, 3, -3];
+
+$result = Stream::of($input)
+    ->takeWhile(fn ($value) => abs($value) < 3);
+
+foreach ($result as $item) {
+    // 1, -1, 2, -2
+}
+```
+
 #### Zip With
 Параллельно итерирует коллекцию вместе с другими, пока не закончится самый короткий итератор.
 
-```$stream->zipWith(iterable ...$iterables): self```
+```$stream->zipWith(iterable ...$iterables): Stream```
 
-Создает итератор, который агрегирует данные из нескольких итераторов.
-
-Работает аналогично функции `zip()` в Python.
-
-Для коллекций разной длины продолжает процесс итерирования до момента, пока самая короткая коллекция не закончится.
+* Создает итератор, который агрегирует данные из нескольких итераторов.
+* Работает аналогично функции `zip()` в Python.
+* Для коллекций разной длины продолжает процесс итерирования до момента, пока самая короткая коллекция не закончится.
 
 ```php
 use IterTools\Stream;
 
 $input = [1, 2, 3];
 
-$result = Stream::of($input)
+$stream = Stream::of($input)
     ->zipWith([4, 5, 6])
-    ->zipWith([7, 8, 9]);
-
-foreach ($result as $item) {
-    // [1, 4, 7], [2, 5, 8], [3, 6, 9]
-}
+    ->zipWith([7, 8, 9])
+    ->toArray();
+// [1, 4, 7], [2, 5, 8], [3, 6, 9]
 ```
 
 #### Zip Longest With
 Параллельно итерирует коллекцию вместе с другими, пока не закончится самый длинный итератор.
 
-```$stream->zipLongestWith(iterable ...$iterables): self```
+```$stream->zipLongestWith(iterable ...$iterables): Stream```
 
-Создает итератор, который агрегирует данные из нескольких итераторов.
-
-Работает аналогично функции `zip_longest()` в Python.
-
-Для коллекций разной длины продолжает процесс итерирования до момента, пока самая длинная коллекция не закончится.
-
-Для коллекций разной длины отдает вместо элементов `null` для коллекций, которые закончились.
+* Создает итератор, который агрегирует данные из нескольких итераторов.
+* Работает аналогично функции `zip_longest()` в Python.
+* Для коллекций разной длины продолжает процесс итерирования до момента, пока самая длинная коллекция не закончится.
+* Для коллекций разной длины отдает вместо элементов `null` для коллекций, которые закончились.
 
 ```php
 use IterTools\Stream;
@@ -1762,7 +1994,7 @@ foreach ($result as $item) {
 #### Zip Equal With
 Параллельно итерирует коллекцию вместе с другими (все коллекции должны быть одной длины).
 
-```$stream->zipEqualWith(iterable ...$iterables): self```
+```$stream->zipEqualWith(iterable ...$iterables): Stream```
 
 Работает как `Multi::zip()`, но бросает `\LengthException`, когда выясняется, что длины коллекций разные
 (когда закончился самая короткая коллекция).
@@ -1781,169 +2013,9 @@ foreach ($result as $item) {
 }
 ```
 
-#### Distinct
-Фильтрует коллекцию, сохраняя только уникальные значения.
-
-```$stream->distinct(bool $strict = true)```
-
-Если `$strict = true`:
-* **scalars**: сравнивает строго по типу;
-* **objects**: всего считает разные экземпляры неравными;
-* **arrays**: сравнивает сериализованными.
-
-Если `$strict = false`:
-* **scalars**: сравнивает нестрого по значению;
-* **objects**: сравнивает сериализованными;
-* **arrays**: сравнивает сериализованными.
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
-
-$stream = Stream::of($input);
-
-foreach ($stream->distinct(true) as $datum) {
-    print($datum);
-}
-// 1, 2, 3, '1', '2', '3'
-
-foreach ($stream->distinct(false) as $datum) {
-    print($datum);
-}
-// 1, 2, 3
-```
-
-#### Infinite Cycle
-Бесконечно зацикливает перебор коллекции.
-
-```$stream->infiniteCycle(): self```
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3];
-
-$result = Stream::of($input)
-    ->infiniteCycle();
-
-foreach ($result as $item) {
-    // 1, 2, 3, 1, 2, 3, ...
-}
-```
-
-#### Running Average
-Накапливает среднее арифметическое элементов коллекции в процессе итерирования.
-
-```$stream->runningAverage(int|float|null $initialValue = null): self```
-
-```php
-use IterTools\Stream;
-
-$input = [1, 3, 5];
-
-$result = Stream::of($input)
-    ->runningAverage();
-
-foreach ($result as $item) {
-    // 1, 2, 3
-}
-```
-
-#### Running Difference
-Накапливает разность элементов коллекции в процессе итерирования.
-
-```$stream->runningDifference(int|float|null $initialValue = null): self```
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3, 4, 5];
-
-$result = Stream::of($input)
-    ->runningDifference();
-
-foreach ($result as $item) {
-    // -1, -3, -6, -10, -15
-}
-```
-
-#### Running Max
-Ищет максимальный элемент коллекции в процессе итерирования.
-
-```$stream->runningMax(int|float|null $initialValue = null): self```
-
-```php
-use IterTools\Stream;
-
-$input = [1, -1, 2, -2, 3, -3];
-
-$result = Stream::of($input)
-    ->runningMax();
-
-foreach ($result as $item) {
-    // 1, 1, 2, 2, 3, 3
-}
-```
-
-#### Running Min
-Ищет минимальный элемент коллекции в процессе итерирования.
-
-```$stream->runningMin(int|float|null $initialValue = null): self```
-
-```php
-use IterTools\Stream;
-
-$input = [1, -1, 2, -2, 3, -3];
-
-$result = Stream::of($input)
-    ->runningMin();
-
-foreach ($result as $item) {
-    // 1, -1, -1, -2, -2, -3
-}
-```
-
-#### Running Product
-Накапливает произведение элементов коллекции в процессе итерирования.
-
-```$stream->runningProduct(int|float|null $initialValue = null): self```
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3, 4, 5];
-
-$result = Stream::of($input)
-    ->runningProduct();
-
-foreach ($result as $item) {
-    // 1, 2, 6, 24, 120
-}
-```
-
-#### Running Total
-Накапливает сумму элементов коллекции в процессе итерирования.
-
-```$stream->runningTotal(int|float|null $initialValue = null): self```
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3, 4, 5];
-
-$result = Stream::of($input)
-    ->runningTotal();
-
-foreach ($result as $item) {
-    // 1, 3, 6, 10, 15
-}
-```
-
 ### Завершающие операции
 
 #### Саммари о коллекции
-
 ##### Is Sorted
 Возвращает истину, если коллекция отсортирована в прямом порядке, иначе ложь.
 
