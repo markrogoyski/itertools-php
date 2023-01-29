@@ -2154,7 +2154,7 @@ Returns true if iterable source and all given collections are the same.
 
 ```$stream->sameWith(iterable ...$iterables): bool```
 
-For sempty iterables list returns true.
+For empty iterables list returns true.
 
 ```php
 use IterTools\Stream;
