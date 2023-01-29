@@ -719,19 +719,32 @@ class Stream implements \IteratorAggregate
      * Elements of the iterable source must be stringifiable.
      *
      * @param string $path
+     * @param string $separator (optional) inserted between each item. Ex: ', ' for 1, 2, 3, ...
+     * @param string $prefix    (optional) prepended to string
+     * @param string $suffix    (optional) appended to string
      *
      * @return void
      *
-     * @throws Exceptions\FileException
+     * @throws FileException
      */
-    public function toFileLines(string $path): void
+    public function toFile(string $path, string $separator = "\n", string $prefix = '', string $suffix = ''): void
     {
         $file = FileHelper::openToWrite($path);
+        $firstIteration = true;
 
-        /** @var string $line */
+        fputs($file, $prefix);
+
         foreach ($this->iterable as $line) {
-            fputs($file, $line);
+            if ($firstIteration) {
+                $firstIteration = false;
+            } else {
+                $line = $separator . \strval($line);
+            }
+
+            fputs($file, \strval($line));
         }
+
+        fputs($file, $suffix);
     }
 
     /**
