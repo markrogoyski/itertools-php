@@ -193,8 +193,128 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function startsWith($string, $startString): bool
+    /**
+     * @todo Replace usage with str_starts_with when library updated to PHP 8.0 as a minimum requirement.
+     * @param string $haystack
+     * @param string $needle
+     * @return bool
+     */
+    protected function startsWith(string $haystack, string $needle): bool
     {
-        return (substr($string, 0, strlen($startString)) === $startString);
+        return (\substr($haystack, 0, \strlen($needle)) === $needle);
+    }
+
+    /**
+     * @test startsWith fixture method - true
+     * @dataProvider dataProviderForStartsWithTrue
+     * @param string $haystack
+     * @param string $needle
+     */
+    public function testFixtureStartsWithTrue(string $haystack, string $needle): void
+    {
+        // When
+        $startsWith = $this->startsWith($haystack, $needle);
+
+        // Then
+        $this->assertTrue($startsWith);
+    }
+
+    public function dataProviderForStartsWithTrue(): array
+    {
+        return [
+            [
+                '',
+                '',
+            ],
+            [
+                'a',
+                'a'
+            ],
+            [
+                'abc',
+                'a'
+            ],
+            [
+                'abc',
+                'abc'
+            ],
+            [
+                'The quick brown fox jumps over the lazy dog.',
+                'T'
+            ],
+            [
+                'The quick brown fox jumps over the lazy dog.',
+                'The'
+            ],
+            [
+                'The quick brown fox jumps over the lazy dog.',
+                'The '
+            ],
+            [
+                'The quick brown fox jumps over the lazy dog.',
+                'The quick brown fox'
+            ],
+            [
+                'The quick brown fox jumps over the lazy dog.',
+                'The quick brown fox jumps over the lazy dog.'
+            ],
+        ];
+    }
+
+    /**
+     * @test startsWith fixture method - false
+     * @dataProvider dataProviderForStartsWithFalse
+     * @param string $haystack
+     * @param string $needle
+     */
+    public function testFixtureStartsWithFalse(string $haystack, string $needle): void
+    {
+        // When
+        $startsWith = $this->startsWith($haystack, $needle);
+
+        // Then
+        $this->assertFalse($startsWith);
+    }
+
+    public function dataProviderForStartsWithFalse(): array
+    {
+        return [
+            [
+                '',
+                'a',
+            ],
+            [
+                'a',
+                'b'
+            ],
+            [
+                'abc',
+                'bc'
+            ],
+            [
+                'abc',
+                'abb'
+            ],
+            [
+                'The quick brown fox jumps over the lazy dog.',
+                'he'
+            ],
+            [
+                'The quick brown fox jumps over the lazy dog.',
+                'quick'
+            ],
+            [
+                'The quick brown fox jumps over the lazy dog.',
+                ' The'
+            ],
+            [
+                'The quick brown fox jumps over the lazy dog.',
+                'Le quick brown fox'
+            ],
+            [
+                'The quick brown fox jumps over the lazy dog.',
+                ' over the lazy dog. The quick brown fox jumps'
+            ],
+        ];
     }
 }
