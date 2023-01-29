@@ -38,6 +38,9 @@ The library methods are guaranteed to work with any `iterable` entities:
 * `Generator`
 * `Traversable`
 
+### README docs translated in other languages:
+* [Русский](docs/README-RU.md)
+
 Quick Reference
 -----------
 
