@@ -1346,7 +1346,24 @@ Streams are made up of:
 2. Zero or more stream operators that transform the stream to a new stream.
 3. Terminal operation of either:
    * Stream terminal operation to transform the stream to a value or data structure.
+   ```php
+   $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
+      ->distinct()                      // [1, 2, 3, 4, 5]
+      ->map(fn ($x) => $x**2)           // [1, 4, 9, 16, 25]
+      ->filterTrue(fn ($x) => $x < 10)  // [1, 4, 9]
+      ->toSum();                        // 14
+   ```
    * The stream is iterated via a `foreach` loop.
+   ```php
+   $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
+      ->distinct()                      // [1, 2, 3, 4, 5]
+      ->map(fn ($x) => $x**2)           // [1, 4, 9, 16, 25]
+      ->filterTrue(fn ($x) => $x < 10); // [1, 4, 9]
+   
+   foreach ($result as $item) {
+       // 1, 4, 9
+   }
+   ```
 
 ### Stream Sources
 
@@ -1513,9 +1530,8 @@ Return a stream consisting of overlapping chunks of elements from the stream.
 
 ```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): Stream```
 
-Chunk size must be at least 1.
-
-Overlap size must be less than chunk size.
+* Chunk size must be at least 1.
+* Overlap size must be less than chunk size.
 
 ```php
 use IterTools\Stream;

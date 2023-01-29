@@ -1348,8 +1348,25 @@ $result = Reduce::toValue($input, $sum, 0);
 1. Фабричные методы для создания объекта, предоставляющего текучий интерфейс (например, из данной итерируемой сущности).
 2. Методы для преобразования коллекции в потоковом режиме.
 3. Способы завершения потокового преобразования:
-    * Методы, преобразующие поток в скалярное значение или в структуру данных.
-    * Возможность проитерировать результат потока на любом этапе с использованием цикла `foreach`.
+   * Методы, преобразующие поток в скалярное значение или в структуру данных.
+   ```php
+   $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
+      ->distinct()                      // [1, 2, 3, 4, 5]
+      ->map(fn ($x) => $x**2)           // [1, 4, 9, 16, 25]
+      ->filterTrue(fn ($x) => $x < 10)  // [1, 4, 9]
+      ->toSum();                        // 14
+   ```
+   * Возможность проитерировать результат потока на любом этапе с использованием цикла `foreach`.
+   ```php
+   $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
+      ->distinct()                      // [1, 2, 3, 4, 5]
+      ->map(fn ($x) => $x**2)           // [1, 4, 9, 16, 25]
+      ->filterTrue(fn ($x) => $x < 10); // [1, 4, 9]
+   
+   foreach ($result as $item) {
+       // 1, 4, 9
+   }
+   ```
 
 ### Фабричные методы
 
@@ -1480,7 +1497,7 @@ $result = Stream::of($input)
 #### Compress
 Отфильтровывает из коллекции элементы, которые не выбраны.
 
-```$stream->compress(iterable $selectors): self```
+```$stream->compress(iterable $selectors): Stream```
 
 Массив селекторов уточняет, какие элементы помещать в выборку (значение селектора `1`),
 а какие исключать (значение селектора `0`).
@@ -1491,11 +1508,46 @@ use IterTools\Stream;
 $input = [1, 2, 3];
 
 $result = Stream::of($input)
-    ->compress([0, 1, 1]);
-    
-foreach ($result as $item) {
-    // 2, 3
-}
+    ->compress([0, 1, 1])
+    ->toArray();
+// 2, 3
+```
+
+#### Chunkwise
+Итерирует коллекцию с разбиением по чанкам.
+
+```$stream->chunkwise(int $chunkSize): Stream```
+
+Минимальный размер чанка — 1.
+
+```php
+use IterTools\Stream;
+
+$friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey'];
+
+$result = Stream::of($friends)
+    ->chunkwise(2)
+    ->toArray();
+// ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
+```
+
+#### Chunkwise Overlap
+Итерирует коллекцию с разбиением по взаимонакладывающимся чанкам.
+
+```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): Stream```
+
+* Минимальный размер чанка — 1.
+* Размер наложения должен быть меньше длины чанка.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+$result = Stream::of($friends)
+    ->chunkwiseOverlap(3, 1)
+    ->toArray()
+// [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9]
 ```
 
 #### Drop While
@@ -1633,47 +1685,6 @@ $result = Stream::of($input)
 
 foreach ($result as $item) {
     // [1, 2], [2, 3], [3, 4], [4, 5]
-}
-```
-
-#### Chunkwise
-Итерирует коллекцию с разбиением по чанкам.
-
-```$stream->chunkwise(int $chunkSize): self```
-
-Минимальный размер чанка — 1.
-
-```php
-use IterTools\Stream;
-
-$friends = ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey'];
-
-$result = Stream::of($friends)
-    ->chunkwise(2);
-
-foreach ($result as $chunk) {
-    // ['Ross', 'Rachel'], ['Chandler', 'Monica'], ['Joey']
-}
-```
-
-#### Chunkwise Overlap
-Итерирует коллекцию с разбиением по взаимонакладывающимся чанкам.
-
-```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): self```
-
-* Минимальный размер чанка — 1.
-* Размер наложения должен быть меньше длины чанка.
-
-```php
-use IterTools\Stream;
-
-$numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-$result = Stream::of($friends)
-    ->chunkwiseOverlap(3, 1);
-
-foreach ($result as $chunk) {
-    // [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9]
 }
 ```
 
