@@ -70,14 +70,14 @@ Quick Reference
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
-| ---------------------------- | -------------------------- | -------------------------------- |
+|------------------------------|----------------------------|----------------------------------|
 | [`count`](#Count)            | Count sequentially forever | `Infinite::count($start, $step)` |
 | [`cycle`](#Cycle)            | Cycle through a collection | `Infinite::cycle($collection)`   |
 | [`repeat`](#Repeat-Infinite) | Repeat an item forever     | `Infinite::repeat($item)`        |
 
 #### Random Iteration
 | Iterator                                  | Description                       | Code Snippet                               |
-| ----------------------------------------- | --------------------------------- | ------------------------------------------ |
+|-------------------------------------------|-----------------------------------|--------------------------------------------|
 | [`choice`](#Choice)                       | Random selections from list       | `Random::choice($list, $repetitions)`      |
 | [`coinFlip`](#CoinFlip)                   | Random coin flips (0 or 1)        | `Random::coinFlip($repetitions)`           |
 | [`number`](#Number)                       | Random numbers                    | `Random::number($min, $max, $repetitions)` |
@@ -86,7 +86,7 @@ Quick Reference
 
 #### Math Iteration
 | Iterator                                   | Description                     | Code Snippet                                       |
-| ------------------------------------------ | ------------------------------- | -------------------------------------------------- |
+|--------------------------------------------|---------------------------------|----------------------------------------------------|
 | [`runningAverage`](#Running-Average)       | Running average accumulation    | `Math::runningAverage($numbers, $initialValue)`    |
 | [`runningDifference`](#Running-Difference) | Running difference accumulation | `Math::runningDifference($numbers, $initialValue)` |
 | [`runningMax`](#Running-Max)               | Running maximum accumulation    | `Math::runningMax($numbers, $initialValue)`        |
@@ -94,16 +94,16 @@ Quick Reference
 | [`runningProduct`](#Running-Product)       | Running product accumulation    | `Math::runningProduct($numbers, $initialValue)`    |
 | [`runningTotal`](#Running-Total)           | Running total accumulation      | `Math::runningTotal($numbers, $initialValue)`      |
 
-#### Set Iteration
-| Iterator                                                        | Description                                               | Code Snippet                                                             |
-|-----------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------------------|
-| [`distinct`](#Distinct)                                         | Iterate only distinct items                               | `Set::distinct($data)`                                                   |
-| [`intersection`](#Intersection)                                 | Intersection of iterables                                 | `Set::intersection(...$iterables)`                                       |
-| [`intersectionCoercive`](#Intersection-Coercive)                | Intersection with type coercion                           | `Set::intersectionCoercive(...$iterables)`                               |
-| [`partialIntersection`](#Partial-Intersection)                  | Partial intersection of iterables                         | `Set::partialIntersection($minCount, ...$iterables)`                     |
-| [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Partial intersection with type coercion                   | `Set::partialIntersectionCoercive($minCount, ...$iterables)`             |
-| [`symmetricDifference`](#Symmetric-Difference)                  | Symmetric difference of iterables                         | `Set::symmetricDifference(...$iterables)`                                |
-| [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Symmetric difference with type coercion                   | `Set::symmetricDifferenceCoercive(...$iterables)`                        |
+#### Set and multiset Iteration
+| Iterator                                                        | Description                                               | Code Snippet                                                 |
+|-----------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------|
+| [`distinct`](#Distinct)                                         | Iterate only distinct items                               | `Set::distinct($data)`                                       |
+| [`intersection`](#Intersection)                                 | Intersection of iterables                                 | `Set::intersection(...$iterables)`                           |
+| [`intersectionCoercive`](#Intersection-Coercive)                | Intersection with type coercion                           | `Set::intersectionCoercive(...$iterables)`                   |
+| [`partialIntersection`](#Partial-Intersection)                  | Partial intersection of iterables                         | `Set::partialIntersection($minCount, ...$iterables)`         |
+| [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Partial intersection with type coercion                   | `Set::partialIntersectionCoercive($minCount, ...$iterables)` |
+| [`symmetricDifference`](#Symmetric-Difference)                  | Symmetric difference of iterables                         | `Set::symmetricDifference(...$iterables)`                    |
+| [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Symmetric difference with type coercion                   | `Set::symmetricDifferenceCoercive(...$iterables)`            |
 
 #### Summary
 | Summary                      | Description                                             | Code Snippet                               |
@@ -144,50 +144,50 @@ Quick Reference
 | [`ofRockPaperScissors`](#Of-Rock-Paper-Scissors) | Create a stream of rock-paper-scissors hands                    | `Stream::ofRockPaperScissors($repetitions)`         |
 
 #### Stream Operations
-| Operation                                                                | Description                                                                                      | Code Snippet                                                                     |
-|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| [`chainWith`](#Chain-With)                                               | Chain iterable source withs given iterables together into a single iteration                     | `$stream->chainWith(...$iterables)`                                              |
-| [`compress`](#Compress-1)                                                | Compress an iterable source by filtering out data that is not selected                           | `$stream->compress($selectors)`                                                  |
-| [`chunkwise`](#Chunkwise-1)                                              | Iterate by chunks                                                                                | `$stream->chunkwise($chunkSize)`                                                 |
-| [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                               | Iterate by overlapped chunks                                                                     | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                |
-| [`distinct`](#Distinct-1)                                                | Filter out elements: iterate only unique items                                                   | `$stream->distinct($strict)`                                                     |
-| [`dropWhile`](#Drop-While-1)                                             | Drop elements from the iterable source while the predicate function is true                      | `$stream->dropWhile($predicate)`                                                 |
-| [`filterTrue`](#Filter-True-1)                                           | Filter for only elements where the predicate function is true                                    | `$stream->filterTrue($predicate)`                                                |
-| [`filterFalse`](#Filter-False-1)                                         | Filter for only elements wherethe predicate function is false                                    | `$stream->filterFalse($predicate)`                                               |
-| [`groupBy`](#Group-By-1)                                                 | Group iterable source by a common data element                                                   | `$stream->groupBy($groupKeyFunction)`                                            |
-| [`infiniteCycle`](#Infinite-Cycle)                                       | Cycle through the elements of iterable source sequentially forever                               | `$stream->infiniteCycle()`                                                       |
-| [`intersectionWith`](#Intersection-With)                                 | Intersect iterable source and given iterables                                                    | `$stream->intersectionWith(...$iterables)`                                       |
-| [`intersection CoerciveWith`](#Intersection-Coercive-With)               | Intersect iterable source and given iterables with type coercion                                 | `$stream->intersectionCoerciveWith(...$iterables)`                               |
-| [`limit`](#Limit-1)                                                      | Limit the stream's iteration                                                                     | `$stream->limit($limit)`                                                         |
-| [`map`](#Map-1)                                                          | Map function onto elements                                                                       | `$stream->map($function)`                                                        |
-| [`pairwise`](#Pairwise-1)                                                | Return pairs of elements from iterable source                                                    | `$stream->pairwise()`                                                            |
-| [`partialIntersectionWith`](#Partial-Intersection-With)                  | Partially intersect iterable source and given iterables                                          | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`        |
-| [`partialIntersection CoerciveWith`](#Partial-Intersection-Coercive-With)| Partially intersect iterable source and given iterables with type coercion                       | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)`|
-| [`runningAverage`](#Running-Average-1)                                   | Accumulate the running average (mean) over iterable source                                       | `$stream->runningAverage($initialValue)`                                         |
-| [`runningDifference`](#Running-Difference-1)                             | Accumulate the running difference over iterable source                                           | `$stream->runningDifference($initialValue)`                                      |
-| [`runningMax`](#Running-Max-1)                                           | Accumulate the running max over iterable source                                                  | `$stream->runningMax($initialValue)`                                             |
-| [`runningMin`](#Running-Min-1)                                           | Accumulate the running min over iterable source                                                  | `$stream->runningMin($initialValue)`                                             |
-| [`runningProduct`](#Running-Product-1)                                   | Accumulate the running product over iterable source                                              | `$stream->runningProduct($initialValue)`                                         |
-| [`runningTotal`](#Running-Total-1)                                       | Accumulate the running total over iterable source                                                | `$stream->runningTotal($initialValue)`                                           |
-| [`symmetricDifferenceWith`](#Symmetric-Difference-With)                  | Symmetric difference of iterable source and given iterables                                      | `$this->symmetricDifferenceWith(...$iterables)`                                  |
-| [`symmetricDifference CoerciveWith`](#Symmetric-Difference-Coercive-With)| Symmetric difference of iterable source and given iterables with type coercion                   | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                         |
-| [`takeWhile`](#Take-While-1)                                             | Return elements from the iterable source as long as the predicate is true                        | `$stream->takeWhile($predicate)`                                                 |
-| [`zipWith`](#Zip-With)                                                   | Iterate iterable source with another iterable collections simultaneously                         | `$stream->zipWith(...$iterables)`                                                |
-| [`zipLongestWith`](#Zip-Longest-With)                                    | Iterate iterable source with another iterable collections simultaneously                         | `$stream->zipLongestWith(...$iterables)`                                         |
-| [`zipEqualWith`](#Zip-Equal-With)                                        | Iterate iterable source with another iterable collections of equal lengths simultaneously        | `$stream->zipEqualWith(...$iterables)`                                           |
+| Operation                                                                 | Description                                                                               | Code Snippet                                                                      |
+|---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`chainWith`](#Chain-With)                                                | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                                               |
+| [`compress`](#Compress-1)                                                 | Compress an iterable source by filtering out data that is not selected                    | `$stream->compress($selectors)`                                                   |
+| [`chunkwise`](#Chunkwise-1)                                               | Iterate by chunks                                                                         | `$stream->chunkwise($chunkSize)`                                                  |
+| [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                                | Iterate by overlapped chunks                                                              | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                 |
+| [`distinct`](#Distinct-1)                                                 | Filter out elements: iterate only unique items                                            | `$stream->distinct($strict)`                                                      |
+| [`dropWhile`](#Drop-While-1)                                              | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`                                                  |
+| [`filterTrue`](#Filter-True-1)                                            | Filter for only elements where the predicate function is true                             | `$stream->filterTrue($predicate)`                                                 |
+| [`filterFalse`](#Filter-False-1)                                          | Filter for only elements wherethe predicate function is false                             | `$stream->filterFalse($predicate)`                                                |
+| [`groupBy`](#Group-By-1)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`                                             |
+| [`infiniteCycle`](#Infinite-Cycle)                                        | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                                                        |
+| [`intersectionWith`](#Intersection-With)                                  | Intersect iterable source and given iterables                                             | `$stream->intersectionWith(...$iterables)`                                        |
+| [`intersection CoerciveWith`](#Intersection-Coercive-With)                | Intersect iterable source and given iterables with type coercion                          | `$stream->intersectionCoerciveWith(...$iterables)`                                |
+| [`limit`](#Limit-1)                                                       | Limit the stream's iteration                                                              | `$stream->limit($limit)`                                                          |
+| [`map`](#Map-1)                                                           | Map function onto elements                                                                | `$stream->map($function)`                                                         |
+| [`pairwise`](#Pairwise-1)                                                 | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                                                             |
+| [`partialIntersectionWith`](#Partial-Intersection-With)                   | Partially intersect iterable source and given iterables                                   | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`         |
+| [`partialIntersection CoerciveWith`](#Partial-Intersection-Coercive-With) | Partially intersect iterable source and given iterables with type coercion                | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
+| [`runningAverage`](#Running-Average-1)                                    | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`                                          |
+| [`runningDifference`](#Running-Difference-1)                              | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`                                       |
+| [`runningMax`](#Running-Max-1)                                            | Accumulate the running max over iterable source                                           | `$stream->runningMax($initialValue)`                                              |
+| [`runningMin`](#Running-Min-1)                                            | Accumulate the running min over iterable source                                           | `$stream->runningMin($initialValue)`                                              |
+| [`runningProduct`](#Running-Product-1)                                    | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`                                          |
+| [`runningTotal`](#Running-Total-1)                                        | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`                                            |
+| [`symmetricDifferenceWith`](#Symmetric-Difference-With)                   | Symmetric difference of iterable source and given iterables                               | `$this->symmetricDifferenceWith(...$iterables)`                                   |
+| [`symmetricDifference CoerciveWith`](#Symmetric-Difference-Coercive-With) | Symmetric difference of iterable source and given iterables with type coercion            | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                          |
+| [`takeWhile`](#Take-While-1)                                              | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                                                  |
+| [`zipWith`](#Zip-With)                                                    | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`                                                 |
+| [`zipLongestWith`](#Zip-Longest-With)                                     | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipLongestWith(...$iterables)`                                          |
+| [`zipEqualWith`](#Zip-Equal-With)                                         | Iterate iterable source with another iterable collections of equal lengths simultaneously | `$stream->zipEqualWith(...$iterables)`                                            |
 
 #### Stream Terminal Operations
 ##### Summary Terminal Operations
-| Terminal Operation                           | Description                                                                      | Code Snippet                                 |
-|----------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------|
-| [`allMatch`](#All-Match-1)                   | Returns true if all items in stream match predicate                              | `$stream->allMatch($predicate)`              |
-| [`anyMatch`](#Any-Match-1)                   | Returns true if any item in stream matches predicate                             | `$stream->anyMatch($predicate)`              |
-| [`exactlyN`](#Exactly-N-1)                   | Returns true if exactly n items are true according to predicate                  | `$stream->exactlyN($n, $predicate)`          |
-| [`isSorted`](#Is-Sorted-1)                   | Returns true if stream is sorted in ascending order                              | `$stream->isSorted()`                        |
-| [`isReversed`](#Is-Reversed-1)               | Returns true if stream is sorted in reverse descending order                     | `$stream->isReversed()`                      |
-| [`noneMatch`](#None-Match-1)                 | Returns true if none of the items in stream match predicate                      | `$stream->noneMatch($predicate)`             |
-| [`sameWith`](#Same-With)                     | Returns true if stream and all given collections are the same                    | `$stream->sameWith(...$iterables)`           |
-| [`sameCountWith`](#Same-Count-With)          | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`      |
+| Terminal Operation                           | Description                                                            | Code Snippet                                 |
+|----------------------------------------------|------------------------------------------------------------------------|----------------------------------------------|
+| [`allMatch`](#All-Match-1)                   | Returns true if all items in stream match predicate                    | `$stream->allMatch($predicate)`              |
+| [`anyMatch`](#Any-Match-1)                   | Returns true if any item in stream matches predicate                   | `$stream->anyMatch($predicate)`              |
+| [`exactlyN`](#Exactly-N-1)                   | Returns true if exactly n items are true according to predicate        | `$stream->exactlyN($n, $predicate)`          |
+| [`isSorted`](#Is-Sorted-1)                   | Returns true if stream is sorted in ascending order                    | `$stream->isSorted()`                        |
+| [`isReversed`](#Is-Reversed-1)               | Returns true if stream is sorted in reverse descending order           | `$stream->isReversed()`                      |
+| [`noneMatch`](#None-Match-1)                 | Returns true if none of the items in stream match predicate            | `$stream->noneMatch($predicate)`             |
+| [`sameWith`](#Same-With)                     | Returns true if stream and all given collections are the same          | `$stream->sameWith(...$iterables)`           |
+| [`sameCountWith`](#Same-Count-With)          | Returns true if stream and all given collections have the same lengths | `$stream->sameCountWith(...$iterables)`      |
 
 ##### Reduction Terminal Operations
 | Terminal Operation             | Description                                           | Code Snippet                                            |
@@ -464,7 +464,7 @@ foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $badMovi
 ### Group By
 Group data by a common data element.
 
-The groupKeyFunction determines the key to group elements by.
+The `$groupKeyFunction` determines the key to group elements by.
 
 ```Single::groupBy(iterable $data, callable $groupKeyFunction)```
 ```php
@@ -863,7 +863,7 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
 // 5, 6, 8, 11, 15, 20
 ```
 
-## Set
+## Set and multiset
 ### Distinct
 Filter out elements from the iterable only returning distinct elements.
 
@@ -928,7 +928,7 @@ foreach (Set::intersectionCoercive($numbers, $numerics) as $commonNumber) {
 ```
 
 ### Partial Intersection
-Iterates partial intersection of iterables.
+Iterates [M-partial intersection](https://github.com/Smoren/partial-intersection-php) of iterables.
 
 ```Set::partialIntersection(int $minIntersectionCount, iterable ...$iterables)```
 
@@ -949,7 +949,7 @@ foreach (Set::partialIntersection(2, $staticallyTyped, $dynamicallyTyped, $suppo
 ```
 
 ### Partial Intersection Coercive
-Iterates partial intersection of iterables using [type coercion](#Strict-and-Coercive-Types).
+Iterates [M-partial intersection](https://github.com/Smoren/partial-intersection-php) of iterables using [type coercion](#Strict-and-Coercive-Types).
 
 ```Set::partialIntersectionCoercive(int $minIntersectionCount, iterable ...$iterables)```
 
@@ -993,7 +993,6 @@ foreach (Set::symmetricDifference($a, $b, $c) as $item) {
 Iterates the symmetric difference of iterables with [type coercion](#Strict-and-Coercive-Types).
 
 ```Set::symmetricDifferenceCoercive(iterable ...$iterables)```
-
 
 If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
 
@@ -1214,7 +1213,7 @@ Reduces to the max value.
 - Elements must be comparable.
 - Returns null if collection is empty.
 
-```Reduce::toMax(iterable $data)```
+```Reduce::toMax(iterable $data): mixed|null```
 ```php
 use IterTools\Reduce;
 
@@ -1230,7 +1229,7 @@ Reduces to the min value.
 - Elements must be comparable.
 - Returns null if collection is empty.
 
-```Reduce::toMin(iterable $data)```
+```Reduce::toMin(iterable $data): mixed|null```
 ```php
 use IterTools\Reduce;
 
@@ -1261,7 +1260,7 @@ Reduces to the product of its elements.
 
 Returns null if collection is empty.
 
-```Reduce::toProduct(iterable $data)```
+```Reduce::toProduct(iterable $data): number|null```
 ```php
 use IterTools\Reduce;
 
@@ -1276,7 +1275,7 @@ Reduces given collection to its range (difference between max and min).
 
 ```Reduce::toRange(iterable $numbers): int|float```
 
-Returns 0 if iterable source is empty.
+Returns `0` if iterable source is empty.
 
 ```php
 use IterTools\Reduce;
@@ -1313,7 +1312,7 @@ $string = Reduce::toString($words, '-', 'Library: ', '!');
 ### To Sum
 Reduces to the sum of its elements.
 
-```Reduce::toSum(iterable $data)```
+```Reduce::toSum(iterable $data): number```
 ```php
 use IterTools\Reduce;
 
@@ -1326,7 +1325,7 @@ $sum = Reduce::toSum($parts);
 ### To Value
 Reduce elements to a single value using reducer function.
 
-```Reduce::toValue(iterable $data, callable $reducer, mixed $initialValue)```
+```Reduce::toValue(iterable $data, callable $reducer, mixed $initialValue): mixed```
 ```php
 use IterTools\Reduce;
 
@@ -1362,7 +1361,7 @@ use IterTools\Stream;
 $iterable = [1, 2, 3];
 
 $result = Stream::of($iterable)
-    ->chainWith([4, 5, 6],[7, 8, 9])
+    ->chainWith([4, 5, 6], [7, 8, 9])
     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
     ->toValue(fn ($carry, $item) => $carry + array_sum($item));
 // 90
@@ -1452,7 +1451,6 @@ use IterTools\Stream;
 $rps = Stream::ofRockPaperScissors(5)
     ->toArray();
 // 'paper', 'rock', 'rock', 'scissors', 'paper' [random]
-
 ```
 
 ### Stream Operations

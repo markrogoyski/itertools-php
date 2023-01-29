@@ -58,8 +58,8 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`chunkwiseOverlap`](#Chunkwise-Overlap) | Итерирует коллекцию, разбитую на взаимонакладывающиеся чанки              | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
 | [`compress`](#Compress)                  | Отфильтровывает невыбранные элементы                                      | `Single::compress($data, $selectors)`                       |
 | [`dropWhile`](#Drop-While)               | Пропускает элементы, пока предикат возвращает истину                      | `Single::dropWhile($data, $predicate)`                      |
-| [`filterFalse`](#Filter-False)           | Возвращает только те элементы, для которых предикат возвращает ложь       | `Single::filterFalse($data, $predicate)`                    |
-| [`filterTrue`](#Filter-True)             | Возвращает только те элементы, для которых предикат возвращает истину     | `Single::filterTrue($data, $predicate)`                     |
+| [`filterFalse`](#Filter-False)           | Возвращает только те элементы, для которых предикат возвращает ложь       | `Single::filterTrue($data, $predicate)`                     |
+| [`filterTrue`](#Filter-True)             | Возвращает только те элементы, для которых предикат возвращает истину     | `Single::filterFalse($data, $predicate)`                    |
 | [`groupBy`](#Group-By)                   | Группирует элементы коллекции                                             | `Single::groupBy($data, $groupKeyFunction)`                 |
 | [`limit`](#Limit)                        | Ограничивает итерирование коллекции заданным максимальным числом итераций | `Single::limit($data, $limit)`                              |
 | [`map`](#Map)                            | Отображение коллекции с использованием callback-функции                   | `Single::map($data, $function)`                             |
@@ -97,7 +97,7 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 #### Итерирование множеств и мультимножеств
 | Метод                                                           | Описание                                                              | Пример кода                                                  |
 |-----------------------------------------------------------------|-----------------------------------------------------------------------|--------------------------------------------------------------|
-| [`distinct`](#Distinct)                                         | Фильтрует коллекцию, сохраняя только уникальные значения              | `Set::distinct($data, $strict)`                              |
+| [`distinct`](#Distinct)                                         | Фильтрует коллекцию, сохраняя только уникальные значения              | `Set::distinct($data)`                                       |
 | [`intersection`](#Intersection)                                 | Пересечение нескольких коллекций                                      | `Set::intersection(...$iterables)`                           |
 | [`intersectionCoercive`](#Intersection-Coercive)                | Пересечение нескольких коллекций в режиме приведения типов            | `Set::intersectionCoercive(...$iterables)`                   |
 | [`partialIntersection`](#Partial-Intersection)                  | Частичное пересечение нескольких коллекций                            | `Set::partialIntersection($minCount, ...$iterables)`         |
@@ -120,7 +120,7 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 #### Редуцирование
 | Метод                      | Описание                                                                            | Пример кода                                                   |
 |----------------------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| [`toAverage`](#To-Average) | Среднее арфиметическое элементов коллекции                                          | `Reduce::toAverage($numbers)`                                 |
+| [`toAverage`](#To-Average) | Среднее арифметическое элементов коллекции                                          | `Reduce::toAverage($numbers)`                                 |
 | [`toCount`](#To-Count)     | Длина коллекции                                                                     | `Reduce::toCount($data)`                                      |
 | [`toMax`](#To-Max)         | Максимальный элемент коллекции                                                      | `Reduce::toMax($numbers)`                                     |
 | [`toMin`](#To-Min)         | Минимальный элемент коллекции                                                       | `Reduce::toMin($numbers)`                                     |
@@ -144,31 +144,37 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`ofRockPaperScissors`](#Of-Rock-Paper-Scissors) | Создает обертку для цепочечных вызовов из бесконечных случайных выборов "камень-ножницы-бумага"        | `Stream::ofRockPaperScissors($repetitions)`         |
 
 #### Цепочечные операции
-| Операция                                     | Описание                                                                                                     | Пример кода                                           |
-|----------------------------------------------|--------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
-| [`chainWith`](#Chain-With)                   | Добавляет в конец итератора другие коллекции для последовательного итерирования                              | `$stream->chainWith(...$iterables)`                   |
-| [`compress`](#Compress-1)                    | Отфильтровывает из коллекции элементы, которые не выбраны                                                    | `$stream->compress($selectors)`                       |
-| [`chunkwise`](#Chunkwise-1)                  | Итерирует коллекцию с разбиением по чанкам                                                                   | `$stream->chunkwise($chunkSize)`                      |
-| [`chunkwiseOverlap`](#Chunkwise-Overlap-1)   | Итерирует коллекцию с разбиением по взаимонакладывающимся чанкам                                             | `$stream->chunkwiseOverlap($chunkSize, $overlapSize)` |
-| [`dropWhile`](#Drop-While-1)                 | Пропускает элементы из коллекции, пока предикат возвращает ложь                                              | `$stream->dropWhile($predicate)`                      |
-| [`filterTrue`](#Filter-True-1)               | Возвращает из коллекции только те элементы, для которых предикат возвращает истину                           | `$stream->filterTrue($predicate)`                     |
-| [`filterFalse`](#Filter-False-1)             | Возвращает из коллекции только те элементы, для которых предикат возвращает ложь                             | `$stream->filterFalse($predicate)`                    |
-| [`groupBy`](#Group-By-1)                     | Группирует элементы из коллекции по заданному правилу                                                        | `$stream->groupBy($groupKeyFunction)`                 |
-| [`infiniteCycle`](#Infinite-Cycle)           | Бесконечно зацикливает перебор коллекции                                                                     | `$stream->infiniteCycle()`                            |
-| [`limit`](#Limit-1)                          | Ограничивает итерирование коллекции заданным максимальным числом итераций                                    | `$stream->limit($limit)`                              |
-| [`map`](#Map-1)                              | Отображение коллекции с использованием callback-функции                                                      | `$stream->map($function)`                             |
-| [`pairwise`](#Pairwise-1)                    | Итерирует коллекцию попарно (с наложением)                                                                   | `$stream->pairwise()`                                 |
-| [`runningAverage`](#Running-Average-1)       | Накопление среднего арифметического элементов коллекции                                                      | `$stream->runningAverage($initialValue)`              |
-| [`runningDifference`](#Running-Difference-1) | Накопление разности элементов коллекции                                                                      | `$stream->runningDifference($initialValue)`           |
-| [`runningMax`](#Running-Max-1)               | Поиск максимального значения из коллекции                                                                    | `$stream->runningMax($initialValue)`                  |
-| [`runningMin`](#Running-Min-1)               | Поиск минимального значения из коллекции                                                                     | `$stream->runningMin($initialValue)`                  |
-| [`runningProduct`](#Running-Product-1)       | Накопление произведения элементов коллекции                                                                  | `$stream->runningProduct($initialValue)`              |
-| [`runningTotal`](#Running-Total-1)           | Накопление суммы элементов коллекции                                                                         | `$stream->runningTotal($initialValue)`                |
-| [`takeWhile`](#Take-While-1)                 | Отдает элементы из коллекции, пока предикат возвращает истину                                                | `$stream->takeWhile($predicate)`                      |
-| [`zipWith`](#Zip-With)                       | Параллельно итерирует коллекцию вместе с другими, пока не закончится самый короткий итератор                 | `$stream->zipWith(...$iterables)`                     |
-| [`zipLongestWith`](#Zip-Longest-With)        | Параллельно итерирует коллекцию вместе с другими, пока не закончится самый длинный итератор                  | `$stream->zipLongestWith(...$iterables)`              |
-| [`zipEqualWith`](#Zip-Equal-With)            | Параллельно итерирует коллекцию вместе с другими одного размера, в случае разных размеров бросает исключение | `$stream->zipEqualWith(...$iterables)`                |
-| [`distinct`](#Distinct-1)                    | Фильтрует коллекцию, сохраняя только уникальные значения                                                     | `$stream->distinct($strict)`                          |
+| Операция                                                                  | Описание                                                                                                     | Пример кода                                                                       |
+|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`chainWith`](#Chain-With)                                                | Добавляет в конец итератора другие коллекции для последовательного итерирования                              | `$stream->chainWith(...$iterables)`                                               |
+| [`compress`](#Compress-1)                                                 | Отфильтровывает из коллекции элементы, которые не выбраны                                                    | `$stream->compress($selectors)`                                                   |
+| [`chunkwise`](#Chunkwise-1)                                               | Итерирует коллекцию с разбиением по чанкам                                                                   | `$stream->chunkwise($chunkSize)`                                                  |
+| [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                                | Итерирует коллекцию с разбиением по взаимонакладывающимся чанкам                                             | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                 |
+| [`distinct`](#Distinct-1)                                                 | Фильтрует коллекцию, сохраняя только уникальные значения                                                     | `$stream->distinct($strict)`                                                      |
+| [`dropWhile`](#Drop-While-1)                                              | Пропускает элементы из коллекции, пока предикат возвращает ложь                                              | `$stream->dropWhile($predicate)`                                                  |
+| [`filterTrue`](#Filter-True-1)                                            | Возвращает из коллекции только те элементы, для которых предикат возвращает истину                           | `$stream->filterTrue($predicate)`                                                 |
+| [`filterFalse`](#Filter-False-1)                                          | Возвращает из коллекции только те элементы, для которых предикат возвращает ложь                             | `$stream->filterFalse($predicate)`                                                |
+| [`groupBy`](#Group-By-1)                                                  | Группирует элементы из коллекции по заданному правилу                                                        | `$stream->groupBy($groupKeyFunction)`                                             |
+| [`infiniteCycle`](#Infinite-Cycle)                                        | Бесконечно зацикливает перебор коллекции                                                                     | `$stream->infiniteCycle()`                                                        |
+| [`intersectionWith`](#Intersection-With)                                  | Возвращает пересечение хранимой коллекции с другими коллекциями                                              | `$stream->intersectionWith(...$iterables)`                                        |
+| [`intersection CoerciveWith`](#Intersection-Coercive-With)                | Возвращает пересечение хранимой коллекции с другими коллекциями (в режиме приведения типов)                  | `$stream->intersectionCoerciveWith(...$iterables)`                                |
+| [`limit`](#Limit-1)                                                       | Ограничивает итерирование коллекции заданным максимальным числом итераций                                    | `$stream->limit($limit)`                                                          |
+| [`map`](#Map-1)                                                           | Отображение коллекции с использованием callback-функции                                                      | `$stream->map($function)`                                                         |
+| [`pairwise`](#Pairwise-1)                                                 | Итерирует коллекцию попарно (с наложением)                                                                   | `$stream->pairwise()`                                                             |
+| [`partialIntersectionWith`](#Partial-Intersection-With)                   | Возвращает частичное пересечение хранимой коллекции с другими коллекциями                                    | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`         |
+| [`partialIntersection CoerciveWith`](#Partial-Intersection-Coercive-With) | Возвращает частичное пересечение хранимой коллекции с другими коллекциями (в режиме приведения типов)        | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
+| [`runningAverage`](#Running-Average-1)                                    | Накопление среднего арифметического элементов коллекции                                                      | `$stream->runningAverage($initialValue)`                                          |
+| [`runningDifference`](#Running-Difference-1)                              | Накопление разности элементов коллекции                                                                      | `$stream->runningDifference($initialValue)`                                       |
+| [`runningMax`](#Running-Max-1)                                            | Поиск максимального значения из коллекции                                                                    | `$stream->runningMax($initialValue)`                                              |
+| [`runningMin`](#Running-Min-1)                                            | Поиск минимального значения из коллекции                                                                     | `$stream->runningMin($initialValue)`                                              |
+| [`runningProduct`](#Running-Product-1)                                    | Накопление произведения элементов коллекции                                                                  | `$stream->runningProduct($initialValue)`                                          |
+| [`runningTotal`](#Running-Total-1)                                        | Накопление суммы элементов коллекции                                                                         | `$stream->runningTotal($initialValue)`                                            |
+| [`symmetricDifferenceWith`](#Symmetric-Difference-With)                   | Возвращает симметрическую разность хранимой коллекции с другими коллекциями                                  | `$this->symmetricDifferenceWith(...$iterables)`                                   |
+| [`symmetricDifference CoerciveWith`](#Symmetric-Difference-Coercive-With) | Возвращает симметрическую разность хранимой коллекции с другими коллекциями (в режиме приведения типов)      | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                          |
+| [`takeWhile`](#Take-While-1)                                              | Отдает элементы из коллекции, пока предикат возвращает истину                                                | `$stream->takeWhile($predicate)`                                                  |
+| [`zipWith`](#Zip-With)                                                    | Параллельно итерирует коллекцию вместе с другими, пока не закончится самый короткий итератор                 | `$stream->zipWith(...$iterables)`                                                 |
+| [`zipLongestWith`](#Zip-Longest-With)                                     | Параллельно итерирует коллекцию вместе с другими, пока не закончится самый длинный итератор                  | `$stream->zipLongestWith(...$iterables)`                                          |
+| [`zipEqualWith`](#Zip-Equal-With)                                         | Параллельно итерирует коллекцию вместе с другими одного размера, в случае разных размеров бросает исключение | `$stream->zipEqualWith(...$iterables)`                                            |
 
 #### Завершающие операции
 ##### Саммари о коллекции
@@ -176,6 +182,7 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 |-------------------------------------|--------------------------------------------------------------------------------|-----------------------------------------|
 | [`allMatch`](#All-Match-1)          | Истинно, если предикат возвращает истину для всех элементов коллекции          | `$stream->allMatch($predicate)`         |
 | [`anyMatch`](#Any-Match-1)          | Истинно, если предикат возвращает истину хотя бы для одного элемента коллекции | `$stream->anyMatch($predicate)`         |
+| [`exactlyN`](#Exactly-N-1)          | Returns true if exactly n items are true according to predicate                | `$stream->exactlyN($n, $predicate)`     |
 | [`isSorted`](#Is-Sorted-1)          | Истинно, если коллекция отсортирована в прямом порядке                         | `$stream->isSorted()`                   |
 | [`isReversed`](#Is-Reversed-1)      | Истинно, если коллекция отсортирована в обратном порядке                       | `$stream->isReversed()`                 |
 | [`noneMatch`](#None-Match-1)        | Истинно, если предикат возвращает ложь для всех элементов коллекции            | `$stream->noneMatch($predicate)`        |
@@ -195,6 +202,11 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`toMinMax`](#To-Min-Max-1)    | Минимальное и максимальное значения из элементов коллекции          | `$stream->toMinMax()`                                   |
 | [`toRange`](#To-Range-1)       | Разница между максимальным и минимальным элементами коллекции       | `$stream->toRange()`                                    |
 | [`toValue`](#To-Value-1)       | Редуцирование коллекции до значения, вычисляемого callback-функцией | `$stream->toValue($reducer, $initialValue)`             |
+
+##### Операции конвертирования
+| Terminal Operation             | Description                              | Code Snippet                                            |
+|--------------------------------|------------------------------------------|---------------------------------------------------------|
+| [`toArray`](#To-Array)         | Возвращает массив из элементов коллекции | `$stream->toArray()`                                    |
 
 ##### Операции с побочными эффектами
 | Terminal Operation              | Description                                              | Code Snippet                                          |
@@ -242,7 +254,7 @@ $ php composer.phar require markrogoyski/itertools-php:1.*
 
 Использование
 -----
-Все функции работают с `iterable` сущностямм:
+Все функции работают с `iterable` сущностями:
 * `array` (тип)
 * `Generator` (тип)
 * `Iterator` (интерфейс)
@@ -398,7 +410,7 @@ foreach (Single::compress($movies, $goodMovies) as $goodMovie) {
 ### Drop While
 Пропускает элементы, пока предикат возвращает истину.
 
-После того, как предикат впервые вернул true, все последующие элементы попадают в выборку.
+После того как предикат впервые вернул true, все последующие элементы попадают в выборку.
 
 ```Single::dropWhile(iterable $data, callable $predicate)```
 ```php
@@ -411,24 +423,6 @@ foreach (Single::dropWhile($scores, $predicate) as $score) {
     print($score);
 }
 // 70, 85, 65, 90
-```
-
-### Filter False
-Возвращает только те элементы, для которых предикат возвращает ложь.
-
-Если предикат не передан, используется приведение значений коллекции к `bool`.
-
-```Single::filterFalse(iterable $data, callable $predicate)```
-```php
-use IterTools\Single;
-
-$starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
-
-foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $badMovie) {
-    print($badMovie);
-}
-// 1, 2, 3, 8, 9
 ```
 
 ### Filter True
@@ -447,6 +441,24 @@ foreach (Single::filterTrue($starWarsEpisodes, $goodMoviePredicate) as $goodMovi
     print($goodMovie);
 }
 // 4, 5, 6, 7
+```
+
+### Filter False
+Возвращает только те элементы, для которых предикат возвращает ложь.
+
+Если предикат не передан, используется приведение значений коллекции к `bool`.
+
+```Single::filterFalse(iterable $data, callable $predicate)```
+```php
+use IterTools\Single;
+
+$starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+$goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
+
+foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $badMovie) {
+    print($badMovie);
+}
+// 1, 2, 3, 8, 9
 ```
 
 ### Group By
@@ -550,7 +562,7 @@ foreach (Single::pairwise($friends) as [$leftFriend, $rightFriend]) {
 ```
 
 ### Repeat
-Повторяет данное значние заданное число раз.
+Повторяет данное значение заданное число раз.
 
 ```Single::repeat(mixed $item, int $repetitions)```
 ```php
@@ -597,38 +609,6 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
     print($freePrice);
 }
 // 0, 0
-```
-
-## Множества
-### Distinct
-Фильтрует коллекцию, сохраняя только уникальные значения.
-
-```Set::distinct(iterable $data, bool $strict = true)```
-
-Если `$strict = true`:
-* **scalars**: сравнивает строго по типу;
-* **objects**: всего считает разные экземпляры неравными;
-* **arrays**: сравнивает сериализованными.
-
-Если `$strict = false`:
-* **scalars**: сравнивает нестрого по значению;
-* **objects**: сравнивает сериализованными;
-* **arrays**: сравнивает сериализованными.
-
-```php
-use IterTools\Single;
-
-$input = [1, 2, 1, 2, 3, 3, '1', '1', '2', '3'];
-
-foreach (Set::distinct($input, true) as $datum) {
-    print($datum);
-}
-// 1, 2, 3, '1', '2', '3'
-
-foreach (Set::distinct($input, false) as $datum) {
-    print($datum);
-}
-// 1, 2, 3
 ```
 
 ## Бесконечное итерирование
@@ -886,7 +866,188 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
 // 5, 6, 8, 11, 15, 20
 ```
 
+## Итерирование множеств и мультимножеств
+### Distinct
+Фильтрует коллекцию, сохраняя только уникальные значения.
+
+```Set::distinct(iterable $data, bool $strict = true)```
+
+По умолчанию выполняет сравнения в [режиме строгой типизации](#Режимы-типизации). Передайте значение `false` аргумента `$strict`, чтобы работать в режиме приведения типов.
+
+```php
+use IterTools\Set;
+
+$chessSet = ['rook', 'rook', 'knight', 'knight', 'bishop', 'bishop', 'king', 'queen', 'pawn', 'pawn', ... ];
+
+foreach (Set::distinct($chessSet) as $chessPiece) {
+    print($chessPiece);
+}
+// rook, knight, bishop, king, queen, pawn
+
+$mixedTypes = [1, '1', 2, '2', 3];
+
+foreach (Set::distinct($mixedTypes, false) as $datum) {
+    print($datum);
+}
+// 1, 2, 3
+```
+
+### Intersection
+Итерирует пересечение коллекций.
+
+```Set::intersection(iterable ...$iterables)```
+
+Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила пересечения [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Set;
+
+$chessPieces = ['rook', 'knight', 'bishop', 'queen', 'king', 'pawn'];
+$shogiPieces = ['rook', 'knight', 'bishop' 'king', 'pawn', 'lance', 'gold general', 'silver general'];
+
+foreach (Set::intersection($chessPieces, $shogiPieces) as $commonPiece) {
+    print($commonPiece);
+}
+// rook, knight, bishop, king, pawn
+```
+
+### Intersection Coercive
+Итерирует пересечение коллекций в режиме [приведения типов](#Режимы-типизации).
+
+```Set::intersectionCoercive(iterable ...$iterables)```
+
+Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила пересечения [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Set;
+
+$numbers  = [1, 2, 3, 4, 5];
+$numerics = ['1', '2', 3];
+
+foreach (Set::intersectionCoercive($numbers, $numerics) as $commonNumber) {
+    print($commonNumber);
+}
+// 1, 2, 3
+```
+
+### Partial Intersection
+Итерирует [M-частичное пересечение](https://github.com/Smoren/partial-intersection-php) коллекций.
+
+```Set::partialIntersection(int $minIntersectionCount, iterable ...$iterables)```
+
+* Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила пересечения [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+* Если minIntersectionCount = 1, работают правила объединения [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Set;
+
+$staticallyTyped    = ['c++', 'java', 'c#', 'go', 'haskell'];
+$dynamicallyTyped   = ['php', 'python', 'javascript', 'typescript'];
+$supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
+
+foreach (Set::partialIntersection(2, $staticallyTyped, $dynamicallyTyped, $supportsInterfaces) as $language) {
+    print($language);
+}
+// c++, java, c#, go, php
+```
+
+### Partial Intersection Coercive
+Итерирует [M-частичное пересечение](https://github.com/Smoren/partial-intersection-php) коллекций в режиме [приведения типов](#Режимы-типизации).
+
+```Set::partialIntersectionCoercive(int $minIntersectionCount, iterable ...$iterables)```
+
+* Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила пересечения [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+* Если minIntersectionCount = 1, работают правила объединения [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Set;
+
+$set1 = [1, 2, 3],
+$set2 = ['2', '3', 4, 5],
+$set3 = [1, '2'],
+
+foreach (Set::partialIntersectionCoercive(2, $set1, $set2, $set3) as $partiallyCommonNumber) {
+    print($partiallyCommonNumber);
+}
+// 1, 2, 3
+```
+
+### Symmetric difference
+Итерирует симметрическую разность коллекций.
+
+```Set::symmetricDifference(iterable ...$iterables)```
+
+Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила получения разницы [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+$c = [1, 2, 3, 6, 9];
+
+foreach (Set::symmetricDifference($a, $b, $c) as $item) {
+    print($item);
+}
+// 1, 4, 5, 6, 7, 8, 9
+```
+
+### Symmetric difference Coercive
+Итерирует симметрическую разность коллекций в режиме [приведения типов](#Режимы-типизации).
+
+```Set::symmetricDifferenceCoercive(iterable ...$iterables)```
+
+Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила получения разности [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+$c = [1, 2, 3, 6, 9];
+
+foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
+    print($item);
+}
+// 4, 5, 6, 7, 8, 9
+```
+
 ## Саммари о коллекции
+
+### All Match
+Возвращает истину, если для всех элементов коллекции предикат вернул истину.
+
+```Summary::allMatch(iterable $data, callable $predicate): bool```
+
+```php
+use IterTools\Summary;
+
+$finalFantasyNumbers = [4, 5, 6];
+$isOnSuperNintendo   = fn ($ff) => $ff >= 4 && $ff <= 6;
+
+$boolean = Summary::allMatch($finalFantasyNumbers, $isOnSuperNintendo);
+// true
+
+$isOnPlaystation = fn ($ff) => $ff >= 7 && $ff <= 9;
+
+$boolean = Summary::allMatch($finalFantasyNumbers, $isOnPlaystation);
+// false
+```
+
+### Any Match
+Возвращает истину, если хотя бы для одного элемента коллекции предикат вернул истину.
+
+```Summary::anyMatch(iterable $data, callable $predicate): bool```
+
+```php
+use IterTools\Summary;
+
+$answers          = ['fish', 'towel', 42, "don't panic"];
+$isUltimateAnswer = fn ($a) => a == 42;
+
+$boolean = Summary::anyMatch($answers, $isUltimateAnswer);
+// true
+```
 
 ### Exactly N
 Истинно, если предикат возвращает истину в точности для N элементов.
@@ -894,7 +1055,7 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
 - Предикат является необязательным аргументом.
 - По умолчанию предикат выполняет преобразование значения элемента коллекции к `bool`.
 
-```Summary::exactlyN(iterable $data, int $n, callable $predicate)```
+```Summary::exactlyN(iterable $data, int $n, callable $predicate): bool```
 
 ```php
 use IterTools\Summary;
@@ -919,7 +1080,7 @@ $boolean = Summary::isSorted($ages, $n, $predicate);
 - Элементы должны быть сравнимы.
 - Для пустой коллекции или коллекции из одного элемента всегда возвращает истину.
 
-```Summary::isSorted(iterable $data)```
+```Summary::isSorted(iterable $data): bool```
 
 ```php
 use IterTools\Summary;
@@ -941,7 +1102,7 @@ $boolean = Summary::isSorted($numbers);
 - Элементы коллекции должны быть сравнимы.
 - Для пустой коллекции или коллекции из одного элемента всегда возвращает истину.
 
-```Summary::isReversed(iterable $data)```
+```Summary::isReversed(iterable $data): bool```
 
 ```php
 use IterTools\Summary;
@@ -957,12 +1118,27 @@ $boolean = Summary::isReversed($numbers);
 // false
 ```
 
+### None Match
+Возвращает истину, если для всех элементов коллекции предикат вернул ложь.
+
+```Summary::noneMatch(iterable $data, callable $predicate): bool```
+
+```php
+use IterTools\Summary;
+
+$grades         = [45, 50, 61, 0];
+$isPassingGrade = fn ($grade) => $grade >= 70;
+
+$boolean = Summary::noneMatch($grades, $isPassingGrade);
+// true
+```
+
 ### Same
 Истинно, если данные коллекции одинаковы.
 
 Если в метод передать одну коллекцию или ни одной, он вернет истину.
 
-```Summary::same(iterable ...$iterables)```
+```Summary::same(iterable ...$iterables): bool```
 
 ```php
 use IterTools\Summary;
@@ -985,7 +1161,7 @@ $boolean = Summary::same($cocaColaIngredients, $spriteIngredients);
 
 Если в метод передать одну коллекцию или ни одной, он вернет истину.
 
-```Summary::sameCount(iterable ...$iterables)```
+```Summary::sameCount(iterable ...$iterables): bool```
 
 ```php
 use IterTools\Summary;
@@ -1007,11 +1183,11 @@ $result = Summary::sameCount($batmanMovies, $matrixMovies);
 ## Reduce
 
 ### To Average
-Возвращает среднее арфиметическое элементов коллекции.
+Возвращает среднее арифметическое элементов коллекции.
 
 Для пустой коллекции возвращает `null`.
 
-```Reduce::toAverage(iterable $data)```
+```Reduce::toAverage(iterable $data): float```
 ```php
 use IterTools\Reduce;
 
@@ -1024,7 +1200,7 @@ $finalGrade = Reduce::toAverage($numbers);
 ### To Count
 Возвращает длину данной коллекции.
 
-```Reduce::toCount(iterable $data)```
+```Reduce::toCount(iterable $data): int```
 ```php
 use IterTools\Reduce;
 
@@ -1040,7 +1216,7 @@ $length = Reduce::toCount($someIterable);
 - Элементы коллекции должны быть сравнимы.
 - Для пустой коллекции возвращает `null`.
 
-```Reduce::toMax(iterable $data)```
+```Reduce::toMax(iterable $data): mixed|null```
 ```php
 use IterTools\Reduce;
 
@@ -1056,7 +1232,7 @@ $result = Reduce::toMax($numbers);
 - Элементы коллекции должны быть сравнимы.
 - Для пустой коллекции возвращает `null`.
 
-```Reduce::toMin(iterable $data)```
+```Reduce::toMin(iterable $data): mixed|null```
 ```php
 use IterTools\Reduce;
 
@@ -1087,7 +1263,7 @@ $numbers = [1, 2, 3, -1, -2, -3];
 
 Для пустой коллекции возвращает `null`.
 
-```Reduce::toProduct(iterable $data)```
+```Reduce::toProduct(iterable $data): number|null```
 ```php
 use IterTools\Reduce;
 
@@ -1139,7 +1315,7 @@ $string = Reduce::toString($words, '-', 'Library: ', '!');
 ### To Sum
 Возвращает сумму элементов коллекции.
 
-```Reduce::toSum(iterable $data)```
+```Reduce::toSum(iterable $data): number```
 ```php
 use IterTools\Reduce;
 
@@ -1152,7 +1328,7 @@ $sum = Reduce::toSum($parts);
 ### To Value
 Редуцирует коллекцию до значения, вычисляемого с использованием callback-функции.
 
-```Reduce::toValue(iterable $data, callable $reducer, mixed $initialValue)```
+```Reduce::toValue(iterable $data, callable $reducer, mixed $initialValue): mixed```
 ```php
 use IterTools\Reduce;
 
@@ -1165,23 +1341,30 @@ $result = Reduce::toValue($input, $sum, 0);
 
 ## Цепочечный вызов итераторов
 
+Предоставляет гибкий текучий интерфейс для преобразования массивов и других итерируемых сущностей с помощью конвейера операций.
+
+Данный функционал состоит из:
+
+1. Фабричные методы для создания объекта, предоставляющего текучий интерфейс (например, из данной итерируемой сущности).
+2. Методы для преобразования коллекции в потоковом режиме.
+3. Способы завершения потокового преобразования:
+    * Методы, преобразующие поток в скалярное значение или в структуру данных.
+    * Возможность проитерировать результат потока на любом этапе с использованием цикла `foreach`.
+
 ### Фабричные методы
 
 #### Of
 Создает обертку для цепочечных вызовов из данной коллекции.
 
-```Stream::of(iterable $iterable): self```
+```Stream::of(iterable $iterable): Stream```
 
 ```php
 use IterTools\Stream;
 
-$input = [1, 2, 3];
+$iterable = [1, 2, 3];
 
 $result = Stream::of($iterable)
-    ->chainWith(
-        [4, 5, 6],
-        [7, 8, 9]
-    )
+    ->chainWith([4, 5, 6], [7, 8, 9])
     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
     ->toValue(fn ($carry, $item) => $carry + array_sum($item));
 // 90
@@ -1190,97 +1373,109 @@ $result = Stream::of($iterable)
 #### Of Coin Flips
 Создает обертку для цепочечных вызовов из бесконечных случайных бросков монеты.
 
-```Stream::ofCoinFlips(int $repetitions): self```
+```Stream::ofCoinFlips(int $repetitions): Stream```
 
 ```php
 use IterTools\Stream;
 
-$result = Stream::ofCoinFlips(10);
-
-foreach ($result as $item) {
-    // 1, 0, 0, 1, 1, 1, 0, 1, 0, 0 [random]
-}
+$result = Stream::ofCoinFlips(10)
+    ->filterTrue()
+    ->toCount();
+// 5 (random)
 ```
 
 #### Of Empty
 Создает обертку для цепочечных вызовов из пустой коллекции.
 
-```Stream::ofEmpty(): self```
+```Stream::ofEmpty(): Stream```
 
 ```php
 use IterTools\Stream;
 
 $result = Stream::ofEmpty()
-    ->chainWith([1, 2, 3]);
-
-foreach ($result as $item) {
-    // 1, 2, 3
-}
+    ->chainWith([1, 2, 3])
+    ->toArray();
+// 1, 2, 3
 ```
 
 #### Of Random Choice
 Создает обертку для цепочечных вызовов из бесконечных случайных выборов элемента из списка.
 
-```Stream::ofRandomChoice(array $items, int $repetitions): self```
+```Stream::ofRandomChoice(array $items, int $repetitions): Stream```
 
 ```php
 use IterTools\Stream;
 
 $languages = ['PHP', 'Go', 'Python'];
 
-$result = Stream::ofRandomChoice($languages, 5);
-
-foreach ($result as $language) {
-    // 'Go', 'PHP', 'Python', 'PHP', 'PHP' [random]
-}
+$languages = Stream::ofRandomChoice($languages, 5)
+    ->toArray();
+// 'Go', 'PHP', 'Python', 'PHP', 'PHP' (random)
 ```
 
 #### Of Random Numbers
 Создает обертку для цепочечных вызовов из бесконечного набора случайных целых чисел.
 
-```Stream::ofRandomNumbers(int $min, int $max, int $repetitions): self```
+```Stream::ofRandomNumbers(int $min, int $max, int $repetitions): Stream```
 
 ```php
 use IterTools\Stream;
 
-$result = Stream::ofRandomNumbers(1, 3, 7);
+$min  = 1;
+$max  = 3;
+$reps = 7;
 
-foreach ($result as $item) {
-    // 1, 2, 2, 1, 3, 2, 1 [random]
-}
+$result = Stream::ofRandomNumbers($min, $max, $reps)
+    ->toArray();
+// 1, 2, 2, 1, 3, 2, 1 (random)
 ```
 
 #### Of Random Percentage
 Создает обертку для цепочечных вызовов из бесконечного набора случайных вещественных чисел между 0 и 1.
 
-```Stream::ofRandomPercentage(int $repetitions): self```
+```Stream::ofRandomPercentage(int $repetitions): Stream```
 
 ```php
 use IterTools\Stream;
 
-$result = Stream::ofRandomPercentage(3);
-
-foreach ($result as $item) {
-    // 0.8012566976245, 0.81237281724151, 0.61676896329459 [random]
-}
+$stream = Stream::ofRandomPercentage(3)
+    ->toArray();
+// 0.8012566976245, 0.81237281724151, 0.61676896329459 [random]
 ```
 
 #### Of Rock Paper Scissors
 Создает обертку для цепочечных вызовов из бесконечных случайных выборов "камень-ножницы-бумага".
 
-```Stream::ofRockPaperScissors(int $repetitions): self```
+```Stream::ofRockPaperScissors(int $repetitions): Stream```
 
 ```php
 use IterTools\Stream;
 
-$result = Stream::ofRockPaperScissors(5);
-
-foreach ($result as $item) {
-    // 'paper', 'rock', 'rock', 'scissors', 'paper' [random]
-}
+$rps = Stream::ofRockPaperScissors(5)
+    ->toArray();
+// 'paper', 'rock', 'rock', 'scissors', 'paper' [random]
 ```
 
 ### Цепочечные операции
+
+#### Chain With
+Добавляет в конец итератора другие коллекции для последовательного итерирования.
+
+```$stream->chainWith(iterable ...$iterables): Stream```
+
+Создает одну длинную последовательность из данных нескольких последовательностей.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$result = Stream::of($input)
+    ->chainWith([4, 5, 6])
+    ->chainWith([7, 8, 9])
+    ->toArray();
+// 1, 2, 3, 4, 5, 6, 7, 8, 9
+```
 
 #### Compress
 Отфильтровывает из коллекции элементы, которые не выбраны.
@@ -1499,27 +1694,6 @@ $goodMovies = Stream::of($matrixMovies)
     ->limit($limit)
     ->toArray();
 // 'The Matrix' (and nothing else)
-```
-
-#### Chain With
-Добавляет в конец итератора другие коллекции для последовательного итерирования.
-
-```$stream->chainWith(iterable ...$iterables): self```
-
-Создает одну длинную последовательность из данных нескольких последовательностей.
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3];
-
-$result = Stream::of($input)
-    ->chainWith([4, 5, 6])
-    ->chainWith([7, 8, 9]);
-
-foreach ($result as $item) {
-    // 1, 2, 3, 4, 5, 6, 7, 8, 9
-}
 ```
 
 #### Zip With
