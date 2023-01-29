@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\ResourceHelper;
+
 class File
 {
     /**
@@ -19,11 +21,11 @@ class File
      */
     public static function readLines($file): \Generator
     {
-        static::checkIsResourceValid($file);
+        ResourceHelper::checkIsValid($file);
 
         while (($line = \fgets($file)) !== false) {
             yield $line;
-            static::checkIsResourceValid($file);
+            ResourceHelper::checkIsValid($file);
         }
     }
 
@@ -47,24 +49,13 @@ class File
         string $enclosure = "\"",
         string $escape = "\\"
     ): \Generator {
-        static::checkIsResourceValid($file);
+        ResourceHelper::checkIsValid($file);
 
         // @phpstan-ignore-next-line (expects int<0, max>, null given.)
         while (($row = \fgetcsv($file, null, $separator, $enclosure, $escape)) !== false) {
             /** @var array<string|null> $row */
             yield $row;
-            static::checkIsResourceValid($file);
-        }
-    }
-
-    /**
-     * @param resource $resource
-     * @return void
-     */
-    private static function checkIsResourceValid($resource): void
-    {
-        if (!is_resource($resource)) {
-            throw new \UnexpectedValueException('invalid resource');
+            ResourceHelper::checkIsValid($file);
         }
     }
 }

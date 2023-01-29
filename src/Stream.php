@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Exceptions\FileException;
+use IterTools\Util\FileHelper;
 use IterTools\Util\IteratorFactory;
 
 /**
@@ -140,6 +142,34 @@ class Stream implements \IteratorAggregate
     public static function ofRockPaperScissors(int $repetitions): self
     {
         return new self(Random::rockPaperScissors($repetitions));
+    }
+
+    /**
+     * Creates iterable instance with fluent interface of file lines.
+     *
+     * @param resource $file
+     *
+     * @return Stream<mixed>
+     *
+     * @see File::readLines()
+     */
+    public static function ofFileLines($file): self
+    {
+        return new self(File::readLines($file));
+    }
+
+    /**
+     * Creates iterable instance with fluent interface of CSV file rows.
+     *
+     * @param resource $file
+     *
+     * @return Stream<mixed>
+     *
+     * @see File::readCsv()
+     */
+    public static function ofCsvFile($file): self
+    {
+        return new self(File::readCsv($file));
     }
 
     // STREAM OPERATIONS
@@ -674,6 +704,55 @@ class Stream implements \IteratorAggregate
             $result[] = $item;
         }
         return $result;
+    }
+
+    /**
+     * Writes iterable source to the file line by line.
+     *
+     * Elements of the iterable source must be stringifiable.
+     *
+     * @param string $path
+     *
+     * @return void
+     *
+     * @throws Exceptions\FileException
+     */
+    public function toFileLines(string $path): void
+    {
+        $file = FileHelper::openToWrite($path);
+
+        /** @var string $line */
+        foreach ($this->iterable as $line) {
+            fputs($file, $line);
+        }
+    }
+
+    /**
+     * Writes iterable source to the file line by line.
+     *
+     * Elements of the iterable source must be array of scalars.
+     *
+     * @param string $path
+     * @param string $separator
+     * @param string $enclosure
+     * @param string $escape
+     *
+     * @return void
+     *
+     * @throws FileException
+     */
+    public function toCsvFile(
+        string $path,
+        string $separator = ',',
+        string $enclosure = '"',
+        string $escape = '\\'
+    ): void {
+        $file = FileHelper::openToWrite($path);
+
+        /** @var array<scalar> $row */
+        foreach ($this->iterable as $row) {
+            fputcsv($file, $row, $separator, $enclosure, $escape);
+        }
     }
 
     /**
