@@ -8,6 +8,8 @@
     * `ofRange`
   * Transformation Terminal Operations
     * `toAssociativeArray`
+* Docs
+  * Added Russian translation of README
 
 ## v1.2.0 - 2023-01-28
 
