@@ -391,6 +391,7 @@ foreach (Single::chunkwiseOverlap($numbers, 3, 1) as $chunk) {
 Compress an iterable by filtering out data that is not selected.
 
 ```Single::compress(string $data, $selectors)```
+
 ```php
 use IterTools\Single;
 
@@ -413,6 +414,7 @@ Drop elements from the iterable while the predicate function is true.
 Once the predicate function returns false once, all remaining elements are returned.
 
 ```Single::dropWhile(iterable $data, callable $predicate)```
+
 ```php
 use IterTools\Single;
 
@@ -431,6 +433,7 @@ Filter out elements from the iterable only returning elements where the predicat
 If no predicate is provided, the boolean value of the data is used.
 
 ```Single::filterFalse(iterable $data, callable $predicate)```
+
 ```php
 use IterTools\Single;
 
@@ -449,6 +452,7 @@ Filter out elements from the iterable only returning elements where the predicat
 If no predicate is provided, the boolean value of the data is used.
 
 ```Single::filterFalse(iterable $data, callable $predicate)```
+
 ```php
 use IterTools\Single;
 
@@ -467,6 +471,7 @@ Group data by a common data element.
 The `$groupKeyFunction` determines the key to group elements by.
 
 ```Single::groupBy(iterable $data, callable $groupKeyFunction)```
+
 ```php
 use IterTools\Single;
 
@@ -562,6 +567,7 @@ foreach (Single::pairwise($friends) as [$leftFriend, $rightFriend]) {
 Repeat an item.
 
 ```Single::repeat(mixed $item, int $repetitions)```
+
 ```php
 use IterTools\Single;
 
@@ -578,6 +584,7 @@ foreach (Single::repeat($data, $repetitions) as $repeated) {
 Iterate the individual characters of a string.
 
 ```Single::string(string $string)```
+
 ```php
 use IterTools\Single;
 
@@ -596,6 +603,7 @@ Return elements from the iterable as long as the predicate is true.
 Stops iteration as soon as the predicate returns false, even if other elements later on would eventually return true (different from filterTrue).
 
 ```Single::takeWhile(iterable $data, callable $predicate)```
+
 ```php
 use IterTools\Single;
 
@@ -613,6 +621,7 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
 Count sequentially forever.
 
 ```Infinite::count(int $start = 1, int $step = 1)```
+
 ```php
 use IterTools\Infinite;
 
@@ -629,6 +638,7 @@ foreach (Infinite::count($start, $step) as $i) {
 Cycle through the elements of a collection sequentially forever.
 
 ```Infinite::cycle(iterable $iterable)```
+
 ```php
 use IterTools\Infinite;
 
@@ -644,6 +654,7 @@ foreach (Infinite::cycle($hands) as $hand) {
 Repeat an item forever.
 
 ```Infinite::repeat(mixed $item)```
+
 ```php
 use IterTools\Infinite;
 
@@ -660,6 +671,7 @@ foreach (Infinite::repeat($dialogue) as $repeated) {
 Generate random selections from an array of values.
 
 ```Random::choice(array $items, int $repetitions)```
+
 ```php
 use IterTools\Random;
 
@@ -676,6 +688,7 @@ foreach (Random::choice($cards, $repetitions) as $card) {
 Generate random coin flips (0 or 1).
 
 ```Random::coinFlip(int $repetitions)```
+
 ```php
 use IterTools\Random;
 
@@ -691,6 +704,7 @@ foreach (Random::coinFlip($repetitions) as $coinFlip) {
 Generate random numbers (integers).
 
 ```Random::number(int $min, int $max, int $repetitions)```
+
 ```php
 use IterTools\Random;
 
@@ -708,6 +722,7 @@ foreach (Random::number($min, $max, $repetitions) as $number) {
 Generate a random percentage between 0 and 1.
 
 ```Random::percentage(int $repetitions)```
+
 ```php
 use IterTools\Random;
 
@@ -723,6 +738,7 @@ foreach (Random::percentage($repetitions) as $percentage) {
 Generate random rock-paper-scissors hands.
 
 ```Random::rockPaperScissors(int $repetitions)```
+
 ```php
 use IterTools\Random;
 
@@ -739,6 +755,7 @@ foreach (Random::rockPaperScissors($repetitions) as $rpsHand) {
 Accumulate the running average over a list of numbers.
 
 ```Math::runningAverage(iterable $numbers, int|float $initialValue = null)```
+
 ```php
 use IterTools\Math;
 
@@ -754,6 +771,7 @@ foreach (Math::runningAverage($grades) as $runningAverage) {
 Accumulate the running difference over a list of numbers.
 
 ```Math::runningDifference(iterable $numbers, int|float $initialValue = null)```
+
 ```php
 use IterTools\Math;
 
@@ -781,6 +799,7 @@ foreach (Math::runningDifference($dartsScores, $startingScore) as $runningScore)
 Accumulate the running maximum over a list of numbers.
 
 ```Math::runningMax(iterable $numbers, int|float $initialValue = null)```
+
 ```php
 use IterTools\Math;
 
@@ -796,6 +815,7 @@ foreach (Math::runningMax($numbers) as $runningMax) {
 Accumulate the running minimum over a list of numbers.
 
 ```Math::runningMin(iterable $numbers, int|float $initialValue = null)```
+
 ```php
 use IterTools\Math;
 
@@ -811,6 +831,7 @@ foreach (Math::runningMin($numbers) as $runningMin) {
 Accumulate the running product over a list of numbers.
 
 ```Math::runningProduct(iterable $numbers, int|float $initialValue = null)```
+
 ```php
 use IterTools\Math;
 
@@ -839,6 +860,7 @@ foreach (Math::runningProduct($numbers, $initialValue) as $runningProduct) {
 Accumulate the running total over a list of numbers.
 
 ```Math::runningTotal(iterable $numbers, int|float $initialValue = null)```
+
 ```php
 use IterTools\Math;
 
@@ -933,7 +955,7 @@ Iterates [M-partial intersection](https://github.com/Smoren/partial-intersection
 ```Set::partialIntersection(int $minIntersectionCount, iterable ...$iterables)```
 
 * If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
-* If minIntersectionCount is 1, then [multiset](https://en.wikipedia.org/wiki/Multiset) union rules apply.
+* If `$minIntersectionCount` is 1, then [multiset](https://en.wikipedia.org/wiki/Multiset) union rules apply.
 
 ```php
 use IterTools\Set;
@@ -1010,7 +1032,6 @@ foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
 ```
 
 ## Summary
-
 ### All Match
 Returns true if all elements match the predicate function.
 
@@ -1178,13 +1199,13 @@ $result = Summary::sameCount($batmanMovies, $matrixMovies);
 ```
 
 ## Reduce
-
 ### To Average
 Reduces to the mean average.
 
 Returns null if collection is empty.
 
 ```Reduce::toAverage(iterable $data): float```
+
 ```php
 use IterTools\Reduce;
 
@@ -1198,6 +1219,7 @@ $finalGrade = Reduce::toAverage($numbers);
 Reduces iterable to its length.
 
 ```Reduce::toCount(iterable $data): int```
+
 ```php
 use IterTools\Reduce;
 
@@ -1214,6 +1236,7 @@ Reduces to the max value.
 - Returns null if collection is empty.
 
 ```Reduce::toMax(iterable $data): mixed|null```
+
 ```php
 use IterTools\Reduce;
 
@@ -1230,6 +1253,7 @@ Reduces to the min value.
 - Returns null if collection is empty.
 
 ```Reduce::toMin(iterable $data): mixed|null```
+
 ```php
 use IterTools\Reduce;
 
@@ -1261,6 +1285,7 @@ Reduces to the product of its elements.
 Returns null if collection is empty.
 
 ```Reduce::toProduct(iterable $data): number|null```
+
 ```php
 use IterTools\Reduce;
 
@@ -1293,7 +1318,8 @@ Reduces to a string joining all elements.
 * Optional prefix to prepend to the string.
 * Optional suffix to append to the string.
 
-```Reduce::toSum(iterable $data, string $separator = '', string $prefix = '', string $suffix = ''): string```
+```Reduce::toString(iterable $data, string $separator = '', string $prefix = '', string $suffix = ''): string```
+
 ```php
 use IterTools\Reduce;
 
@@ -1313,6 +1339,7 @@ $string = Reduce::toString($words, '-', 'Library: ', '!');
 Reduces to the sum of its elements.
 
 ```Reduce::toSum(iterable $data): number```
+
 ```php
 use IterTools\Reduce;
 
@@ -1326,6 +1353,7 @@ $sum = Reduce::toSum($parts);
 Reduce elements to a single value using reducer function.
 
 ```Reduce::toValue(iterable $data, callable $reducer, mixed $initialValue): mixed```
+
 ```php
 use IterTools\Reduce;
 
@@ -2123,7 +2151,7 @@ Returns true if iterable source and all given collections are the same.
 
 ```$stream->sameWith(iterable ...$iterables): bool```
 
-For single iterable or empty iterables list returns true.
+For sempty iterables list returns true.
 
 ```php
 use IterTools\Stream;
@@ -2144,7 +2172,7 @@ Returns true if iterable source and all given collections have the same lengths.
 
 ```$stream->sameCountWith(iterable ...$iterables): bool```
 
-For single iterable or empty iterables list returns true.
+For empty iterables list returns true.
 
 ```php
 use IterTools\Stream;
@@ -2271,7 +2299,7 @@ Reduces iterable source to its range (difference between max and min).
 
 ```$stream->toRange(): int|float```
 
-Returns 0 if iterable source is empty.
+Returns `0` if iterable source is empty.
 
 ```php
 use IterTools\Stream;
@@ -2325,7 +2353,7 @@ $result = Stream::of($iterable)
 ##### To Value
 Reduces iterable source like array_reduce() function.
 
-But unlike array_reduce(), it works with all iterable types.
+But unlike `array_reduce()`, it works with all `iterable` types.
 
 ```$stream->toValue(callable $reducer, mixed $initialValue): mixed```
 
@@ -2345,6 +2373,7 @@ $result = Stream::of($iterable)
 Returns an array of stream elements.
 
 ```$stream->toArray(): array```
+
 ```php
 use IterTools\Stream;
 
@@ -2361,6 +2390,7 @@ $array = Stream::of([1, 1, 2, 2, 3, 4, 5])
 Perform an action via a callable on each item in the stream.
 
 ```$stream->callForEach(callable $function): void```
+
 ```php
 use IterTools\Stream;
 
