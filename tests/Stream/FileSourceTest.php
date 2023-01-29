@@ -384,7 +384,7 @@ class FileSourceTest extends \PHPUnit\Framework\TestCase
     /**
      * @return void
      */
-    public function testOfFileLinesErrorOnStart(): void
+    public function testOfFileLinesError(): void
     {
         // Given
         $file = FileFixture::createFromLines([], $this->root->url());
@@ -401,23 +401,7 @@ class FileSourceTest extends \PHPUnit\Framework\TestCase
     /**
      * @return void
      */
-    public function testErrorOfFileLinesOnProcess(): void
-    {
-        // Given
-        $file = FileFixture::createFromLines(['123', '456'], $this->root->url());
-
-        // Then
-        $this->expectException(\UnexpectedValueException::class);
-        foreach (Stream::ofFileLines($file) as $_) {
-            // When
-            fclose($file);
-        }
-    }
-
-    /**
-     * @return void
-     */
-    public function testOfCsvFileErrorOnStart(): void
+    public function testOfCsvFileError(): void
     {
         // Given
         $file = FileFixture::createFromLines([], $this->root->url());
@@ -429,21 +413,5 @@ class FileSourceTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\UnexpectedValueException::class);
 
         Stream::ofCsvFile($file)->toArray();
-    }
-
-    /**
-     * @return void
-     */
-    public function testErrorOfCsvFileOnProcess(): void
-    {
-        // Given
-        $file = FileFixture::createFromLines(['123', '456'], $this->root->url());
-
-        // Then
-        $this->expectException(\UnexpectedValueException::class);
-        foreach (Stream::ofCsvFile($file) as $_) {
-            // When
-            fclose($file);
-        }
     }
 }

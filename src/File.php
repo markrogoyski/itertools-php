@@ -25,7 +25,6 @@ class File
 
         while (($line = \fgets($file)) !== false) {
             yield $line;
-            ResourceHelper::checkIsValid($file);
         }
     }
 
@@ -55,7 +54,6 @@ class File
         while (($row = \fgetcsv($file, null, $separator, $enclosure, $escape)) !== false) {
             /** @var array<string|null> $row */
             yield $row;
-            ResourceHelper::checkIsValid($file);
         }
     }
 }

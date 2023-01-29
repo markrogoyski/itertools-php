@@ -331,7 +331,7 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
     /**
      * @return void
      */
-    public function testErrorOnStart(): void
+    public function testError(): void
     {
         // Given
         $file = FileFixture::createFromLines([], $this->root->url());
@@ -343,22 +343,6 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\UnexpectedValueException::class);
         foreach (File::readCsv($file) as $_) {
             break;
-        }
-    }
-
-    /**
-     * @return void
-     */
-    public function testErrorOnProcess(): void
-    {
-        /// Given
-        $file = FileFixture::createFromLines(['123', '456'], $this->root->url());
-
-        // Then
-        $this->expectException(\UnexpectedValueException::class);
-        foreach (File::readCsv($file) as $_) {
-            // When
-            fclose($file);
         }
     }
 }
