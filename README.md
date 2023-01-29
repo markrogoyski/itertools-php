@@ -32,11 +32,11 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
     ->toSum();                       // 14
 ```
 
-The library methods are guaranteed to work with any `iterable` entities:
-* `array`
-* `Iterator`
-* `Generator`
-* `Traversable`
+All functions work on `iterable` collections:
+* `array` (type)
+* `Generator` (type)
+* `Iterator` (interface)
+* `Traversable` (interface)
 
 ### README docs translated in other languages:
 * [Русский](docs/README-RU.md)
