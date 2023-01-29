@@ -42,8 +42,8 @@ Quick Reference
 |-----------------------------|-----------------------------------------------------------------------------------------|-------------------------------------|
 | [`chain`](#Chain)           | Chain multiple iterables together                                                       | `Multi::chain($list1, $list2)`      |
 | [`zip`](#Zip)               | Iterate multiple collections simultaneously until the shortest iterator completes       | `Multi::zip($list1, $list2)`        |
-| [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously until the longest iterator completes        | `Multi::zipLongest($list1, $list2)` |
 | [`zipEqual`](#ZipEqual)     | Iterate multiple collections of equal length simultaneously, error if lengths not equal | `Multi::zipEqual($list1, $list2)`   |
+| [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously until the longest iterator completes        | `Multi::zipLongest($list1, $list2)` |
 
 #### Single Iteration
 | Iterator                                 | Description                                     | Code Snippet                                                |
