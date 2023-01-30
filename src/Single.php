@@ -63,7 +63,7 @@ class Single
     /**
      * Return elements indexed by callback-function.
      *
-     * @param iterable $data
+     * @param iterable<mixed> $data
      * @param callable $indexer
      *
      * @return \Generator
@@ -78,7 +78,7 @@ class Single
     /**
      * Return elements from the iterable only by given keys.
      *
-     * @param iterable $data
+     * @param iterable<mixed> $data
      * @param array<mixed> $keys
      * @param bool $strict
      *
