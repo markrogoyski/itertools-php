@@ -2,6 +2,9 @@
 
 namespace IterTools\Util;
 
+/**
+ * @internal
+ */
 class NoValueMonad
 {
     private static ?self $instance = null;

@@ -7,6 +7,9 @@ namespace IterTools\Util;
 use IterTools\Reduce;
 use IterTools\Stream;
 
+/**
+ * @internal
+ */
 class UsageMap
 {
     /**

@@ -3,6 +3,7 @@
 namespace IterTools\Util;
 
 /**
+ * @internal
  * Works like \MultipleIterator
  * but throws \LengthException if at least one iterator ends before the others while iteration process.
  *

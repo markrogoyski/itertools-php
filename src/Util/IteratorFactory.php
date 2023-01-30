@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace IterTools\Util;
 
+/**
+ * @internal
+ */
 class IteratorFactory
 {
     /**
+     * @internal
      * @param iterable<mixed> $iterable
      *
      * @return \Iterator<mixed>|\IteratorIterator<mixed>|\ArrayIterator<mixed>

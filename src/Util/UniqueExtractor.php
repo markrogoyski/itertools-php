@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools\Util;
 
 /**
+ * @internal
  * Tool for extracting unique IDs and hashes of any PHP variables and data structures.
  *
  * Based on PHP Type Tool's UniqueExtractor.
@@ -14,6 +15,7 @@ namespace IterTools\Util;
 class UniqueExtractor
 {
     /**
+     * @internal
      * Returns unique ID string of given variable by its value and type.
      *
      * If $strict is true:

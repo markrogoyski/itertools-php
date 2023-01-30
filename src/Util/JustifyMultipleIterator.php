@@ -5,6 +5,7 @@ namespace IterTools\Util;
 use IterTools\Stream;
 
 /**
+ * @internal
  * @implements \Iterator<array<mixed>>
  */
 class JustifyMultipleIterator implements \Iterator
