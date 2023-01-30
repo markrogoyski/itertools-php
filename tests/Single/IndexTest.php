@@ -323,7 +323,7 @@ class IndexTest extends \PHPUnit\Framework\TestCase
                     [1, [2], (object)['a' => 3], "4", 5.0],
                     [[11], [22], [33], [44], [55]],
                 ),
-                static function(array $value, $key): string {
+                static function (array $value, $key): string {
                     switch (true) {
                         case is_array($key):
                             return "[{$key[0]}]({$value[0]})";
@@ -340,7 +340,7 @@ class IndexTest extends \PHPUnit\Framework\TestCase
                     [[11], [22], [33], [44], [55]],
                     [1, [2], (object)['a' => 3], "4", 5.0],
                 ),
-                static function($value, array $key): string {
+                static function ($value, array $key): string {
                     switch (true) {
                         case is_array($value):
                             return "[{$key[0]}]({$value[0]})";
@@ -357,7 +357,7 @@ class IndexTest extends \PHPUnit\Framework\TestCase
                     [1, [2], (object)['a' => 3], "4", 5.0],
                     [11, [22], (object)['a' => 33], "44", 55.0],
                 ),
-                static function($value, $key): string {
+                static function ($value, $key): string {
                     switch (true) {
                         case is_array($key):
                             $key = "{$key[0]}";
