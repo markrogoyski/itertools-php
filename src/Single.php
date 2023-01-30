@@ -64,7 +64,7 @@ class Single
      * Return elements indexed by callback-function.
      *
      * @param iterable<mixed> $data
-     * @param callable $indexer
+     * @param callable(mixed $value, mixed $key): scalar $indexer
      *
      * @return \Generator
      */
