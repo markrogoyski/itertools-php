@@ -78,6 +78,8 @@ class Single
     /**
      * Return elements from the iterable only by given keys.
      *
+     * Array of keys must contain unique items.
+     *
      * @param iterable<mixed> $data
      * @param array<mixed> $keys
      * @param bool $strict
