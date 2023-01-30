@@ -61,6 +61,41 @@ class Single
     }
 
     /**
+     * Return elements indexed by callback-function.
+     *
+     * @param iterable $data
+     * @param callable $indexer
+     *
+     * @return \Generator
+     */
+    public static function index(iterable $data, callable $indexer): \Generator
+    {
+        foreach ($data as $sourceIndex => $datum) {
+            yield $indexer($datum, $sourceIndex) => $datum;
+        }
+    }
+
+    /**
+     * Return elements from the iterable only by given keys.
+     *
+     * @param iterable $data
+     * @param array<mixed> $keys
+     * @param bool $strict
+     *
+     * @return \Generator
+     */
+    public static function keysOnly(iterable $data, array $keys, bool $strict = true): \Generator
+    {
+        $map = iterator_to_array(self::index($keys, fn ($key) => UniqueExtractor::getString($key, $strict)));
+
+        foreach ($data as $key => $datum) {
+            if (isset($map[UniqueExtractor::getString($key, $strict)])) {
+                yield $key => $datum;
+            }
+        }
+    }
+
+    /**
      * Drop elements from the iterable while the predicate function is true.
      *
      * Once the predicate function returns false once, all remaining elements are returned.
