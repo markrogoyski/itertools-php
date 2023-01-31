@@ -419,6 +419,27 @@ foreach (Single::compress($movies, $goodMovies) as $goodMovie) {
 // 'A New Hope', 'Empire Strikes Back', 'Return of the Jedi', 'The Force Awakens'
 ```
 
+### Compress Associative
+Compress an iterable by filtering out data using required keys list.
+
+```Single::compressAssociative(string $data, array $keys)```
+
+```php
+use IterTools\Single;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+foreach (Single::compressAssociative($data, ['a', 'c', 'e']) as $key => $value) {
+    print("{$key}: {$value}");
+}
+// 'a: 1', 'c: 3', 'e: 5'
+```
+
 ### Drop While
 Drop elements from the iterable while the predicate function is true.
 
@@ -474,6 +495,29 @@ foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $badMovi
     print($badMovie);
 }
 // 1, 2, 3, 8, 9
+```
+
+### Filter Keys
+Filter out elements from the iterable only returning elements for which keys the predicate function is true.
+
+```Single::filterKeys(string $data, callable $filter)```
+
+```php
+use IterTools\Single;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+$compressor = fn ($key) => in_array($key, ['a', 'c', 'e']);
+
+foreach (Single::compressAssociative($data, $compressor) as $key => $value) {
+    print("{$key}: {$value}");
+}
+// 'a: 1', 'c: 3', 'e: 5'
 ```
 
 ### Group By
@@ -589,6 +633,29 @@ foreach (Single::repeat($data, $repetitions) as $repeated) {
     print($repeated);
 }
 // 'Beetlejuice', 'Beetlejuice', 'Beetlejuice'
+```
+
+### Reindex
+Return elements indexed by callback-function.
+
+```Single::reindex(string $data, callable $indexer)```
+
+```php
+use IterTools\Single;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+$indexer = fn ($key, $value) => "{$key}_{$value}";
+
+foreach (Single::reindex($data, $indexer) as $key => $value) {
+    print("{$key}: {$value}");
+}
+// 'a_1: 1', 'b_2: 2', 'c_3: 3', 'd_4: 4', 'e_5: 5'
 ```
 
 ### String
