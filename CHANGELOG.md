@@ -3,11 +3,19 @@
 ## v1.3.0 - TBD
 
 ### New Features
+* Single
+  * `compressAssociative`
+  * `reindex`
+  * `filterKeys`
 * Stream
   * Source
     * `ofRange`
     * `ofFileLines`
     * `ofCsvFile`
+  * Operations
+    * `compressAssociative`
+    * `reindex`
+    * `filterKeys`
   * Transformation Terminal Operations
     * `toAssociativeArray`
   * File Terminal Operations
