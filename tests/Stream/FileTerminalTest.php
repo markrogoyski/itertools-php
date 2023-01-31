@@ -31,7 +31,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
         $file = fopen($filePath, 'w');
 
         // When
-        $stream->toFile($file);
+        $stream->toFile($file, "\n");
         $fileContents = file_get_contents($filePath);
 
         // Then
@@ -368,11 +368,12 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProviderForToCsvFileWithCustomConfig
      * @param array $rows
+     * @param array|null $header
      * @param array{string, string, string} $config
      * @param string $expected
      * @return void
      */
-    public function testToCsvFileWithCustomConfig(array $rows, array $config, string $expected): void
+    public function testToCsvFileWithCustomConfig(array $rows, ?array $header, array $config, string $expected): void
     {
         // Given
         $stream = Stream::of($rows);
@@ -380,7 +381,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
         $file = fopen($filePath, 'w');
 
         // When
-        $stream->toCsvFile($file, ...$config);
+        $stream->toCsvFile($file, $header, ...$config);
         $fileContents = file_get_contents($filePath);
 
         // Then
@@ -392,23 +393,45 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [],
+                null,
                 [',', '"', '\\'],
                 "",
             ],
             [
                 [],
+                [1, 2, 3],
+                [',', '"', '\\'],
+                "1,2,3\n",
+            ],
+            [
+                [],
+                null,
                 [';', '"', '\\'],
                 "",
             ],
             [
                 [],
+                [1, 2, 3],
+                [';', '"', '\\'],
+                "1;2;3\n",
+            ],
+            [
+                [],
+                null,
                 [';', "'", '\\'],
                 "",
+            ],
+            [
+                [],
+                [1, 2, 3],
+                [';', "'", '\\'],
+                "1;2;3\n",
             ],
             [
                 [
                     [],
                 ],
+                null,
                 [',', '"', '\\'],
                 "\n",
             ],
@@ -416,6 +439,15 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                 [
                     [],
                 ],
+                [1, 2, 3],
+                [',', '"', '\\'],
+                "1,2,3\n\n",
+            ],
+            [
+                [
+                    [],
+                ],
+                null,
                 [';', '"', '\\'],
                 "\n",
             ],
@@ -423,13 +455,31 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                 [
                     [],
                 ],
+                [1, 2, 3],
+                [';', '"', '\\'],
+                "1;2;3\n\n",
+            ],
+            [
+                [
+                    [],
+                ],
+                null,
                 [';', "'", '\\'],
                 "\n",
+            ],
+            [
+                [
+                    [],
+                ],
+                [1, 2, 3],
+                [';', "'", '\\'],
+                "1;2;3\n\n",
             ],
             [
                 [
                     [1, 2, 3],
                 ],
+                null,
                 [',', '"', '\\'],
                 "1,2,3\n",
             ],
@@ -437,6 +487,15 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                 [
                     [1, 2, 3],
                 ],
+                [1, 2, 3],
+                [',', '"', '\\'],
+                "1,2,3\n1,2,3\n",
+            ],
+            [
+                [
+                    [1, 2, 3],
+                ],
+                null,
                 [';', '"', '\\'],
                 "1;2;3\n",
             ],
@@ -444,8 +503,25 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                 [
                     [1, 2, 3],
                 ],
+                [1, 2, 3],
+                [';', '"', '\\'],
+                "1;2;3\n1;2;3\n",
+            ],
+            [
+                [
+                    [1, 2, 3],
+                ],
+                null,
                 [';', "'", '\\'],
                 "1;2;3\n",
+            ],
+            [
+                [
+                    [1, 2, 3],
+                ],
+                [1, 2, 3],
+                [';', "'", '\\'],
+                "1;2;3\n1;2;3\n",
             ],
             [
                 [
@@ -453,6 +529,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                     [4, 5, 6, 7],
                     [8, 9, 10, 11, 12],
                 ],
+                null,
                 [',', '"', '\\'],
                 "1,2,3\n4,5,6,7\n8,9,10,11,12\n",
             ],
@@ -462,7 +539,28 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                     [4, 5, 6, 7],
                     [8, 9, 10, 11, 12],
                 ],
+                [100, 200, 300],
+                [',', '"', '\\'],
+                "100,200,300\n1,2,3\n4,5,6,7\n8,9,10,11,12\n",
+            ],
+            [
+                [
+                    [1, 2, 3],
+                    [4, 5, 6, 7],
+                    [8, 9, 10, 11, 12],
+                ],
+                [100, 200, 300],
                 [';', '"', '\\'],
+                "100;200;300\n1;2;3\n4;5;6;7\n8;9;10;11;12\n",
+            ],
+            [
+                [
+                    [1, 2, 3],
+                    [4, 5, 6, 7],
+                    [8, 9, 10, 11, 12],
+                ],
+                null,
+                [';', "'", '\\'],
                 "1;2;3\n4;5;6;7\n8;9;10;11;12\n",
             ],
             [
@@ -471,8 +569,9 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                     [4, 5, 6, 7],
                     [8, 9, 10, 11, 12],
                 ],
+                [100, 200, 300],
                 [';', "'", '\\'],
-                "1;2;3\n4;5;6;7\n8;9;10;11;12\n",
+                "100;200;300\n1;2;3\n4;5;6;7\n8;9;10;11;12\n",
             ],
             [
                 [
@@ -480,8 +579,9 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                     ["d, e, f", "g, h, i"],
                     ["j, k, l", "m, n, o", "p, q, r"],
                 ],
+                ['x, y, z', '1, 2, 3'],
                 [',', '"', '\\'],
-                "\"a, b, c\"\n\"d, e, f\",\"g, h, i\"\n\"j, k, l\",\"m, n, o\",\"p, q, r\"\n",
+                "\"x, y, z\",\"1, 2, 3\"\n\"a, b, c\"\n\"d, e, f\",\"g, h, i\"\n\"j, k, l\",\"m, n, o\",\"p, q, r\"\n",
             ],
             [
                 [
@@ -489,6 +589,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                     ["d, e, f", "g, h, i"],
                     ["j, k, l", "m, n, o", "p, q, r"],
                 ],
+                null,
                 [';', '"', '\\'],
                 "\"a, b, c\"\n\"d, e, f\";\"g, h, i\"\n\"j, k, l\";\"m, n, o\";\"p, q, r\"\n",
             ],
@@ -498,6 +599,17 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                     ["d, e, f", "g, h, i"],
                     ["j, k, l", "m, n, o", "p, q, r"],
                 ],
+                ['x, y, z', '1, 2, 3'],
+                [';', '"', '\\'],
+                "\"x, y, z\";\"1, 2, 3\"\n\"a, b, c\"\n\"d, e, f\";\"g, h, i\"\n\"j, k, l\";\"m, n, o\";\"p, q, r\"\n",
+            ],
+            [
+                [
+                    ["a, b, c"],
+                    ["d, e, f", "g, h, i"],
+                    ["j, k, l", "m, n, o", "p, q, r"],
+                ],
+                null,
                 [';', "'", '\\'],
                 "'a, b, c'\n'd, e, f';'g, h, i'\n'j, k, l';'m, n, o';'p, q, r'\n",
             ],
@@ -506,8 +618,19 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                     ["a, b, c"],
                     ["d, e, f", "g, h, i"],
                     ["j, k, l", "m, n, o", "p, q, r"],
+                ],
+                ['x, y, z', '1, 2, 3'],
+                [';', "'", '\\'],
+                "'x, y, z';'1, 2, 3'\n'a, b, c'\n'd, e, f';'g, h, i'\n'j, k, l';'m, n, o';'p, q, r'\n",
+            ],
+            [
+                [
+                    ["a, b, c"],
+                    ["d, e, f", "g, h, i"],
+                    ["j, k, l", "m, n, o", "p, q, r"],
                     [1, 2, 3],
                 ],
+                null,
                 [',', '"', '\\'],
                 "\"a, b, c\"\n\"d, e, f\",\"g, h, i\"\n\"j, k, l\",\"m, n, o\",\"p, q, r\"\n1,2,3\n",
             ],
@@ -518,6 +641,18 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                     ["j, k, l", "m, n, o", "p, q, r"],
                     [1, 2, 3],
                 ],
+                ['x, y, z', '1, 2, 3'],
+                [',', '"', '\\'],
+                "\"x, y, z\",\"1, 2, 3\"\n\"a, b, c\"\n\"d, e, f\",\"g, h, i\"\n\"j, k, l\",\"m, n, o\",\"p, q, r\"\n1,2,3\n",
+            ],
+            [
+                [
+                    ["a, b, c"],
+                    ["d, e, f", "g, h, i"],
+                    ["j, k, l", "m, n, o", "p, q, r"],
+                    [1, 2, 3],
+                ],
+                null,
                 [';', '"', '\\'],
                 "\"a, b, c\"\n\"d, e, f\";\"g, h, i\"\n\"j, k, l\";\"m, n, o\";\"p, q, r\"\n1;2;3\n",
             ],
@@ -528,8 +663,31 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
                     ["j, k, l", "m, n, o", "p, q, r"],
                     [1, 2, 3],
                 ],
+                ['x, y, z', '1, 2, 3'],
+                [';', '"', '\\'],
+                "\"x, y, z\";\"1, 2, 3\"\n\"a, b, c\"\n\"d, e, f\";\"g, h, i\"\n\"j, k, l\";\"m, n, o\";\"p, q, r\"\n1;2;3\n",
+            ],
+            [
+                [
+                    ["a, b, c"],
+                    ["d, e, f", "g, h, i"],
+                    ["j, k, l", "m, n, o", "p, q, r"],
+                    [1, 2, 3],
+                ],
+                null,
                 [';', "'", '\\'],
                 "'a, b, c'\n'd, e, f';'g, h, i'\n'j, k, l';'m, n, o';'p, q, r'\n1;2;3\n",
+            ],
+            [
+                [
+                    ["a, b, c"],
+                    ["d, e, f", "g, h, i"],
+                    ["j, k, l", "m, n, o", "p, q, r"],
+                    [1, 2, 3],
+                ],
+                ['x, y, z', '1, 2, 3'],
+                [';', "'", '\\'],
+                "'x, y, z';'1, 2, 3'\n'a, b, c'\n'd, e, f';'g, h, i'\n'j, k, l';'m, n, o';'p, q, r'\n1;2;3\n",
             ],
         ];
     }

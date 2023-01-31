@@ -719,18 +719,18 @@ class Stream implements \IteratorAggregate
      *
      * @param resource $file
      * @param string $separator (optional) inserted between each item. Ex: ', ' for 1, 2, 3, ...
-     * @param string $prefix    (optional) prepended to string
-     * @param string $suffix    (optional) appended to string
+     * @param string $header    (optional) prepended to string
+     * @param string $footer    (optional) appended to string
      *
      * @return void
      */
-    public function toFile($file, string $separator = "\n", string $prefix = '', string $suffix = ''): void
+    public function toFile($file, string $separator = \PHP_EOL, string $header = '', string $footer = ''): void
     {
         ResourceHelper::checkIsValid($file);
 
         $firstIteration = true;
 
-        fputs($file, $prefix);
+        fputs($file, $header);
 
         foreach ($this->iterable as $line) {
             if ($firstIteration) {
@@ -742,7 +742,7 @@ class Stream implements \IteratorAggregate
             fputs($file, \strval($line));
         }
 
-        fputs($file, $suffix);
+        fputs($file, $footer);
     }
 
     /**
@@ -751,15 +751,25 @@ class Stream implements \IteratorAggregate
      * Elements of the iterable source must be array of scalars.
      *
      * @param resource $file
+     * @param array<string>|null $header
      * @param string $separator
      * @param string $enclosure
      * @param string $escape
      *
      * @return void
      */
-    public function toCsvFile($file, string $separator = ',', string $enclosure = '"', string $escape = '\\'): void
-    {
+    public function toCsvFile(
+        $file,
+        ?array $header = null,
+        string $separator = ',',
+        string $enclosure = '"',
+        string $escape = '\\'
+    ): void {
         ResourceHelper::checkIsValid($file);
+
+        if ($header !== null) {
+            fputcsv($file, $header, $separator, $enclosure, $escape);
+        }
 
         /** @var array<scalar> $row */
         foreach ($this->iterable as $row) {
