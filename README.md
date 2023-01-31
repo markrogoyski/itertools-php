@@ -1626,6 +1626,28 @@ $result = Stream::of($input)
 // 2, 3
 ```
 
+#### Compress Associative
+Compress an iterable source by filtering out data using required keys list.
+
+```$stream->compressAssociative(array $keys): Stream```
+
+```php
+use IterTools\Stream;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+
+$result = Stream::of($data)
+    ->compressAssociative($data, ['a', 'c', 'e'])
+    ->toArray();
+// 'a: 1', 'c: 3', 'e: 5'
+```
+
 #### Chunkwise
 Return a stream consisting of chunks of elements from the stream.
 
@@ -1737,6 +1759,29 @@ $result = Stream::of($input)
     ->filterFalse(fn ($value) => $value > 0)
     ->toArray();
 // -1, -2, -3
+```
+
+#### Filter Keys
+Filter out elements from the iterable source only returning elements for which keys the predicate function is true.
+
+```$stream->filterKeys(callable $filter): Stream```
+
+```php
+use IterTools\Stream;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+$compressor = fn ($key) => in_array($key, ['a', 'c', 'e']);
+
+$result = Stream::of($input)
+    ->compressAssociative($compressor)
+    ->toArray();
+// 'a: 1', 'c: 3', 'e: 5'
 ```
 
 #### Group By
@@ -1898,6 +1943,29 @@ $stream = Stream::of($languages)
     ->partialIntersectionCoerciveWith(2, $scriptLanguages, $supportsInterfaces)
     ->toArray();
 // 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
+```
+
+### Reindex
+Return elements of the iterable source indexed by callback-function.
+
+```$stream->reindex(callable $indexer): Stream```
+
+```php
+use IterTools\Single;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+$indexer = fn ($key, $value) => "{$key}_{$value}";
+
+$result = Stream::of($input)
+    ->reindex($indexer)
+    ->toArray();
+// 'a_1: 1', 'b_2: 2', 'c_3: 3', 'd_4: 4', 'e_5: 5'
 ```
 
 #### Running Average
