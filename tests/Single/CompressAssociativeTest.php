@@ -8,7 +8,7 @@ use IterTools\Single;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
-class KeysOnlyTest extends \PHPUnit\Framework\TestCase
+class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderForArrayCommon
@@ -26,7 +26,7 @@ class KeysOnlyTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::keysOnly($iterable, $keys) as $key => $value) {
+        foreach (Single::compressAssociative($iterable, $keys) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -52,7 +52,7 @@ class KeysOnlyTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::keysOnly($iterable, $keys, false) as $key => $value) {
+        foreach (Single::compressAssociative($iterable, $keys, false) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -168,7 +168,7 @@ class KeysOnlyTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::keysOnly($iterable, $keys) as $key => $value) {
+        foreach (Single::compressAssociative($iterable, $keys) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -194,7 +194,7 @@ class KeysOnlyTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::keysOnly($iterable, $keys, false) as $key => $value) {
+        foreach (Single::compressAssociative($iterable, $keys, false) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -316,7 +316,7 @@ class KeysOnlyTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::keysOnly($iterable, $keys) as $key => $value) {
+        foreach (Single::compressAssociative($iterable, $keys) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -342,7 +342,7 @@ class KeysOnlyTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::keysOnly($iterable, $keys, false) as $key => $value) {
+        foreach (Single::compressAssociative($iterable, $keys, false) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -464,7 +464,7 @@ class KeysOnlyTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::keysOnly($iterable, $keys) as $key => $value) {
+        foreach (Single::compressAssociative($iterable, $keys) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -490,7 +490,7 @@ class KeysOnlyTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::keysOnly($iterable, $keys, false) as $key => $value) {
+        foreach (Single::compressAssociative($iterable, $keys, false) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -612,7 +612,7 @@ class KeysOnlyTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::keysOnly($iterable, $keys) as $key => $value) {
+        foreach (Single::compressAssociative($iterable, $keys) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -638,7 +638,7 @@ class KeysOnlyTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::keysOnly($iterable, $keys, false) as $key => $value) {
+        foreach (Single::compressAssociative($iterable, $keys, false) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }

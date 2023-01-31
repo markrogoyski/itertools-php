@@ -61,21 +61,6 @@ class Single
     }
 
     /**
-     * Return elements indexed by callback-function.
-     *
-     * @param iterable<mixed> $data
-     * @param callable(mixed $value, mixed $key): scalar $indexer
-     *
-     * @return \Generator
-     */
-    public static function index(iterable $data, callable $indexer): \Generator
-    {
-        foreach ($data as $sourceIndex => $datum) {
-            yield $indexer($datum, $sourceIndex) => $datum;
-        }
-    }
-
-    /**
      * Return elements from the iterable only by given keys.
      *
      * Array of keys must contain unique items.
@@ -86,14 +71,25 @@ class Single
      *
      * @return \Generator
      */
-    public static function keysOnly(iterable $data, array $keys, bool $strict = true): \Generator
+    public static function compressAssociative(iterable $data, array $keys, bool $strict = true): \Generator
     {
-        $map = iterator_to_array(self::index($keys, fn ($key) => UniqueExtractor::getString($key, $strict)));
+        $map = iterator_to_array(self::reindex($keys, fn ($key) => UniqueExtractor::getString($key, $strict)));
 
-        foreach ($data as $key => $datum) {
-            if (isset($map[UniqueExtractor::getString($key, $strict)])) {
-                yield $key => $datum;
-            }
+        yield from static::filterKeys($data, fn ($key) => isset($map[UniqueExtractor::getString($key, $strict)]));
+    }
+
+    /**
+     * Return elements indexed by callback-function.
+     *
+     * @param iterable<mixed> $data
+     * @param callable(mixed $value, mixed $key): scalar $indexer
+     *
+     * @return \Generator
+     */
+    public static function reindex(iterable $data, callable $indexer): \Generator
+    {
+        foreach ($data as $sourceIndex => $datum) {
+            yield $indexer($datum, $sourceIndex) => $datum;
         }
     }
 
@@ -165,6 +161,23 @@ class Single
         foreach ($data as $datum) {
             if ($predicate($datum)) {
                 yield $datum;
+            }
+        }
+    }
+
+    /**
+     * Filter out elements from the iterable only returning elements for which keys the predicate function is true.
+     *
+     * @param iterable<mixed> $data
+     * @param callable $predicate
+     *
+     * @return \Generator<mixed>
+     */
+    public static function filterKeys(iterable $data, callable $predicate): \Generator
+    {
+        foreach ($data as $key => $datum) {
+            if ($predicate($key)) {
+                yield $key => $datum;
             }
         }
     }
