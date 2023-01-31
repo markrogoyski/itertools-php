@@ -198,6 +198,39 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Return elements from the iterable source only by given keys.
+     *
+     * Array of keys must contain unique items.
+     *
+     * @param array<mixed> $keys
+     * @param bool $strict
+     *
+     * @return $this
+     *
+     * @see Single::compressAssociative()
+     */
+    public function compressAssociative(array $keys, bool $strict = true): self
+    {
+        $this->iterable = Single::compressAssociative($this->iterable, $keys, $strict);
+        return $this;
+    }
+
+    /**
+     * Return elements indexed by callback-function.
+     *
+     * @param callable(mixed $value, mixed $key): scalar $indexer
+     *
+     * @return $this
+     *
+     * @see Single::reindex()
+     */
+    public function reindex(callable $indexer): self
+    {
+        $this->iterable = Single::reindex($this->iterable, $indexer);
+        return $this;
+    }
+
+    /**
      * Drop elements from the iterable source while the predicate function is true.
      *
      * Once the predicate function returns false once, all remaining elements are returned.
@@ -262,6 +295,21 @@ class Stream implements \IteratorAggregate
     public function filterFalse(callable $predicate = null): self
     {
         $this->iterable = Single::filterFalse($this->iterable, $predicate);
+        return $this;
+    }
+
+    /**
+     * Filter out elements from the iterable only returning elements for which keys the predicate function is true.
+     *
+     * @param callable $predicate
+     *
+     * @return $this
+     *
+     * @see Single::filterKeys()
+     */
+    public function filterKeys(callable $predicate): self
+    {
+        $this->iterable = Single::filterKeys($this->iterable, $predicate);
         return $this;
     }
 
@@ -789,8 +837,8 @@ class Stream implements \IteratorAggregate
     public function toAssociativeArray(callable $keyFunc, callable $valueFunc): array
     {
         $result = [];
-        foreach ($this->iterable as $item) {
-            $result[$keyFunc($item)] = $valueFunc($item);
+        foreach ($this->iterable as $key => $item) {
+            $result[$keyFunc($item, $key)] = $valueFunc($item);
         }
         return $result;
     }
