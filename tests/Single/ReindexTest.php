@@ -11,6 +11,60 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class ReindexTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test reindex
+     */
+    public function testDemo(): void
+    {
+        // Given
+        $dbResult = [
+            [
+                'title'   => 'Star Wars: Episode IV – A New Hope',
+                'episode' => 'IV',
+                'year'    => 1977,
+            ],
+            [
+                'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+                'episode' => 'V',
+                'year'    => 1980,
+            ],
+            [
+                'title' => 'Star Wars: Episode VI – Return of the Jedi',
+                'episode' => 'VI',
+                'year' => 1983,
+            ],
+        ];
+
+        // And
+        $reindexFunc = fn (array $swFilm) => $swFilm['episode'];
+        $result = [];
+
+        // When
+        foreach (Single::reindex($dbResult, $reindexFunc) as $episode => $swFilm) {
+            $result[$episode] = $swFilm;
+        }
+
+        // Then
+        $expected = [
+            'IV' => [
+                'title'   => 'Star Wars: Episode IV – A New Hope',
+                'episode' => 'IV',
+                'year'    => 1977,
+            ],
+            'V' => [
+                'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+                'episode' => 'V',
+                'year'    => 1980,
+            ],
+            'VI' => [
+                'title' => 'Star Wars: Episode VI – Return of the Jedi',
+                'episode' => 'VI',
+                'year' => 1983,
+            ],
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param array $iterable
      * @param callable $indexer
