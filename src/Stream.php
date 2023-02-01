@@ -200,18 +200,21 @@ class Stream implements \IteratorAggregate
     /**
      * Return elements from the iterable source only by given keys.
      *
-     * Array of keys must contain unique items.
+     * Iterable source must contain only integer or string keys.
      *
-     * @param array<mixed> $keys
-     * @param bool $strict
+     * Array of keys must contain only integer or string items.
+     *
+     * @param array<int|string> $keys
      *
      * @return $this
      *
      * @see Single::compressAssociative()
      */
-    public function compressAssociative(array $keys, bool $strict = true): self
+    public function compressAssociative(array $keys): self
     {
-        $this->iterable = Single::compressAssociative($this->iterable, $keys, $strict);
+        /** @var iterable<int|string, mixed> $source */
+        $source = $this->iterable;
+        $this->iterable = Single::compressAssociative($source, $keys);
         return $this;
     }
 

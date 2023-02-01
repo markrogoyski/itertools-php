@@ -431,13 +431,6 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->compressAssociative([0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14])
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
-                [0 => 1, 2 => 3, 4 => 5, 'a' => 11, 'b' => 22],
-            ],
-            [
-                [1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->compressAssociative([0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14], false)
-                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
             ],
         ];
@@ -803,6 +796,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
             ],
+            [
+                GeneratorFixture::getKeyValueGenerator(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterKeys(fn ($key) => in_array($key, ['a', 'c', 'e', 'g']))
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                ['a' => 1, 'c' => 3, 'e' => 5],
+            ],
+            [
+                GeneratorFixture::getKeyValueGenerator([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->reindex(fn ($value, $key) => "{$key}_{$value}")
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                ['0_1' => 1, '1_2' => 2, '2_3' => 3, '3_4' => 4, '4_5' => 5],
+            ],
+            [
+                GeneratorFixture::getKeyValueGenerator(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->compressAssociative(['a', 'c', 'e', 'g'])
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                ['a' => 1, 'c' => 3, 'e' => 5],
+            ],
+            [
+                GeneratorFixture::getKeyValueGenerator([1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->compressAssociative([0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14])
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
+            ],
         ];
     }
 
@@ -1166,6 +1187,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
             ],
+            [
+                new \ArrayIterator(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterKeys(fn ($key) => in_array($key, ['a', 'c', 'e', 'g']))
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                ['a' => 1, 'c' => 3, 'e' => 5],
+            ],
+            [
+                new \ArrayIterator([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->reindex(fn ($value, $key) => "{$key}_{$value}")
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                ['0_1' => 1, '1_2' => 2, '2_3' => 3, '3_4' => 4, '4_5' => 5],
+            ],
+            [
+                new \ArrayIterator(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->compressAssociative(['a', 'c', 'e', 'g'])
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                ['a' => 1, 'c' => 3, 'e' => 5],
+            ],
+            [
+                new \ArrayIterator([1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->compressAssociative([0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14])
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
+            ],
         ];
     }
 
@@ -1528,6 +1577,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->limit(10)
                     ->toArray(),
                 [1, 2, 3, 1, 2, 3, 1, 2, 3, 1],
+            ],
+            [
+                $trav(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterKeys(fn ($key) => in_array($key, ['a', 'c', 'e', 'g']))
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                ['a' => 1, 'c' => 3, 'e' => 5],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->reindex(fn ($value, $key) => "{$key}_{$value}")
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                ['0_1' => 1, '1_2' => 2, '2_3' => 3, '3_4' => 4, '4_5' => 5],
+            ],
+            [
+                $trav(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->compressAssociative(['a', 'c', 'e', 'g'])
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                ['a' => 1, 'c' => 3, 'e' => 5],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->compressAssociative([0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14])
+                    ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
+                [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
             ],
         ];
     }

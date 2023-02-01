@@ -11,15 +11,14 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider dataProviderForArrayCommon
-     * @dataProvider dataProviderForArrayStrict
+     * @dataProvider dataProviderForArray
      * @param array $iterable
      * @param array $keys
      * @param array $expectedKeys
      * @param array $expectedValues
      * @return void
      */
-    public function testArrayStrict(array $iterable, array $keys, array $expectedKeys, array $expectedValues): void
+    public function testArray(array $iterable, array $keys, array $expectedKeys, array $expectedValues): void
     {
         // Given
         $resultKeys = [];
@@ -36,33 +35,7 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    /**
-     * @dataProvider dataProviderForArrayCommon
-     * @dataProvider dataProviderForArrayNonStrict
-     * @param array $iterable
-     * @param array $keys
-     * @param array $expectedKeys
-     * @param array $expectedValues
-     * @return void
-     */
-    public function testArrayNonStrict(array $iterable, array $keys, array $expectedKeys, array $expectedValues): void
-    {
-        // Given
-        $resultKeys = [];
-        $resultValues = [];
-
-        // When
-        foreach (Single::compressAssociative($iterable, $keys, false) as $key => $value) {
-            $resultKeys[] = $key;
-            $resultValues[] = $value;
-        }
-
-        // Then
-        $this->assertEquals($expectedKeys, $resultKeys);
-        $this->assertEquals($expectedValues, $resultValues);
-    }
-
-    public function dataProviderForArrayCommon(): array
+    public function dataProviderForArray(): array
     {
         return [
             [
@@ -125,24 +98,6 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
                 [0, 2, 'a', 'b'],
                 [1, 3, 11, 22],
             ],
-        ];
-    }
-
-    public function dataProviderForArrayStrict(): array
-    {
-        return [
-            [
-                [1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33],
-                [0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14],
-                [0, 2, 4, 'a', 'b'],
-                [1, 3, 5, 11, 22],
-            ],
-        ];
-    }
-
-    public function dataProviderForArrayNonStrict(): array
-    {
-        return [
             [
                 [1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33],
                 [0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14],
@@ -153,15 +108,14 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider dataProviderForGeneratorsCommon
-     * @dataProvider dataProviderForGeneratorsStrict
+     * @dataProvider dataProviderForGenerators
      * @param \Generator $iterable
      * @param array $keys
      * @param array $expectedKeys
      * @param array $expectedValues
      * @return void
      */
-    public function testGeneratorsStrict(\Generator $iterable, array $keys, array $expectedKeys, array $expectedValues): void
+    public function testGenerators(\Generator $iterable, array $keys, array $expectedKeys, array $expectedValues): void
     {
         // Given
         $resultKeys = [];
@@ -178,33 +132,7 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    /**
-     * @dataProvider dataProviderForGeneratorsCommon
-     * @dataProvider dataProviderForGeneratorsNonStrict
-     * @param \Generator $iterable
-     * @param array $keys
-     * @param array $expectedKeys
-     * @param array $expectedValues
-     * @return void
-     */
-    public function testGeneratorsNonStrict(\Generator $iterable, array $keys, array $expectedKeys, array $expectedValues): void
-    {
-        // Given
-        $resultKeys = [];
-        $resultValues = [];
-
-        // When
-        foreach (Single::compressAssociative($iterable, $keys, false) as $key => $value) {
-            $resultKeys[] = $key;
-            $resultValues[] = $value;
-        }
-
-        // Then
-        $this->assertEquals($expectedKeys, $resultKeys);
-        $this->assertEquals($expectedValues, $resultValues);
-    }
-
-    public function dataProviderForGeneratorsCommon(): array
+    public function dataProviderForGenerators(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -269,28 +197,6 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
                 [0, 2, 'a', 'b'],
                 [1, 3, 11, 22],
             ],
-        ];
-    }
-
-    public function dataProviderForGeneratorsStrict(): array
-    {
-        $gen = fn (array $data) => GeneratorFixture::getKeyValueGenerator($data);
-
-        return [
-            [
-                $gen([1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33]),
-                [0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14],
-                [0, 2, 4, 'a', 'b'],
-                [1, 3, 5, 11, 22],
-            ],
-        ];
-    }
-
-    public function dataProviderForGeneratorsNonStrict(): array
-    {
-        $gen = fn (array $data) => GeneratorFixture::getKeyValueGenerator($data);
-
-        return [
             [
                 $gen([1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33]),
                 [0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14],
@@ -301,15 +207,14 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider dataProviderForIteratorsCommon
-     * @dataProvider dataProviderForIteratorsStrict
+     * @dataProvider dataProviderForIterators
      * @param \Iterator $iterable
      * @param array $keys
      * @param array $expectedKeys
      * @param array $expectedValues
      * @return void
      */
-    public function testIteratorsStrict(\Iterator $iterable, array $keys, array $expectedKeys, array $expectedValues): void
+    public function testIterators(\Iterator $iterable, array $keys, array $expectedKeys, array $expectedValues): void
     {
         // Given
         $resultKeys = [];
@@ -325,34 +230,7 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedKeys, $resultKeys);
         $this->assertEquals($expectedValues, $resultValues);
     }
-
-    /**
-     * @dataProvider dataProviderForIteratorsCommon
-     * @dataProvider dataProviderForIteratorsNonStrict
-     * @param \Iterator $iterable
-     * @param array $keys
-     * @param array $expectedKeys
-     * @param array $expectedValues
-     * @return void
-     */
-    public function testIteratorsNonStrict(\Iterator $iterable, array $keys, array $expectedKeys, array $expectedValues): void
-    {
-        // Given
-        $resultKeys = [];
-        $resultValues = [];
-
-        // When
-        foreach (Single::compressAssociative($iterable, $keys, false) as $key => $value) {
-            $resultKeys[] = $key;
-            $resultValues[] = $value;
-        }
-
-        // Then
-        $this->assertEquals($expectedKeys, $resultKeys);
-        $this->assertEquals($expectedValues, $resultValues);
-    }
-
-    public function dataProviderForIteratorsCommon(): array
+    public function dataProviderForIterators(): array
     {
         $iter = fn (array $data) => new \ArrayIterator($data);
 
@@ -417,28 +295,6 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
                 [0, 2, 'a', 'b'],
                 [1, 3, 11, 22],
             ],
-        ];
-    }
-
-    public function dataProviderForIteratorsStrict(): array
-    {
-        $iter = fn (array $data) => new \ArrayIterator($data);
-
-        return [
-            [
-                $iter([1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33]),
-                [0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14],
-                [0, 2, 4, 'a', 'b'],
-                [1, 3, 5, 11, 22],
-            ],
-        ];
-    }
-
-    public function dataProviderForIteratorsNonStrict(): array
-    {
-        $iter = fn (array $data) => new \ArrayIterator($data);
-
-        return [
             [
                 $iter([1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33]),
                 [0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14],
@@ -449,15 +305,14 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider dataProviderForTraversablesCommon
-     * @dataProvider dataProviderForTraversablesStrict
+     * @dataProvider dataProviderForTraversables
      * @param \Traversable $iterable
      * @param array $keys
      * @param array $expectedKeys
      * @param array $expectedValues
      * @return void
      */
-    public function testTraversablesStrict(\Traversable $iterable, array $keys, array $expectedKeys, array $expectedValues): void
+    public function testTraversables(\Traversable $iterable, array $keys, array $expectedKeys, array $expectedValues): void
     {
         // Given
         $resultKeys = [];
@@ -474,33 +329,7 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    /**
-     * @dataProvider dataProviderForTraversablesCommon
-     * @dataProvider dataProviderForTraversablesNonStrict
-     * @param \Traversable $iterable
-     * @param array $keys
-     * @param array $expectedKeys
-     * @param array $expectedValues
-     * @return void
-     */
-    public function testTraversablesNonStrict(\Traversable $iterable, array $keys, array $expectedKeys, array $expectedValues): void
-    {
-        // Given
-        $resultKeys = [];
-        $resultValues = [];
-
-        // When
-        foreach (Single::compressAssociative($iterable, $keys, false) as $key => $value) {
-            $resultKeys[] = $key;
-            $resultValues[] = $value;
-        }
-
-        // Then
-        $this->assertEquals($expectedKeys, $resultKeys);
-        $this->assertEquals($expectedValues, $resultValues);
-    }
-
-    public function dataProviderForTraversablesCommon(): array
+    public function dataProviderForTraversables(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -565,163 +394,11 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
                 [0, 2, 'a', 'b'],
                 [1, 3, 11, 22],
             ],
-        ];
-    }
-
-    public function dataProviderForTraversablesStrict(): array
-    {
-        $trav = fn (array $data) => new IteratorAggregateFixture($data);
-
-        return [
-            [
-                $trav([1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33]),
-                [0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14],
-                [0, 2, 4, 'a', 'b'],
-                [1, 3, 5, 11, 22],
-            ],
-        ];
-    }
-
-    public function dataProviderForTraversablesNonStrict(): array
-    {
-        $trav = fn (array $data) => new IteratorAggregateFixture($data);
-
-        return [
             [
                 $trav([1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33]),
                 [0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14],
                 [0, '1', 2, '3', 4, 'a', 'b'],
                 [1, 2, 3, 4, 5, 11, 22],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider dataProviderForWithCompositeKeysCommon
-     * @dataProvider dataProviderForWithCompositeKeysStrict
-     * @param iterable $iterable
-     * @param array $keys
-     * @param array $expectedKeys
-     * @param array $expectedValues
-     * @return void
-     */
-    public function testWithCompositeKeysStrict(iterable $iterable, array $keys, array $expectedKeys, array $expectedValues): void
-    {
-        // Given
-        $resultKeys = [];
-        $resultValues = [];
-
-        // When
-        foreach (Single::compressAssociative($iterable, $keys) as $key => $value) {
-            $resultKeys[] = $key;
-            $resultValues[] = $value;
-        }
-
-        // Then
-        $this->assertEquals($expectedKeys, $resultKeys);
-        $this->assertEquals($expectedValues, $resultValues);
-    }
-
-    /**
-     * @dataProvider dataProviderForWithCompositeKeysCommon
-     * @dataProvider dataProviderForWithCompositeKeysNonStrict
-     * @param iterable $iterable
-     * @param array $keys
-     * @param array $expectedKeys
-     * @param array $expectedValues
-     * @return void
-     */
-    public function testWithCompositeKeysNonStrict(iterable $iterable, array $keys, array $expectedKeys, array $expectedValues): void
-    {
-        // Given
-        $resultKeys = [];
-        $resultValues = [];
-
-        // When
-        foreach (Single::compressAssociative($iterable, $keys, false) as $key => $value) {
-            $resultKeys[] = $key;
-            $resultValues[] = $value;
-        }
-
-        // Then
-        $this->assertEquals($expectedKeys, $resultKeys);
-        $this->assertEquals($expectedValues, $resultValues);
-    }
-
-    public function dataProviderForWithCompositeKeysCommon(): array
-    {
-        $gen = fn ($keys, $values) => GeneratorFixture::getCombined($keys, $values);
-
-        return [
-            [
-                $gen(
-                    [[1], [2], [3]],
-                    [1, 2, 3],
-                ),
-                [],
-                [],
-                [],
-            ],
-            [
-                $gen(
-                    [[1], [2], [3]],
-                    [1, 2, 3],
-                ),
-                [[1], [3]],
-                [[1], [3]],
-                [1, 3],
-            ],
-            [
-                $gen(
-                    [[1], [2], [3]],
-                    [1, 2, 3],
-                ),
-                [[1], [2], [3]],
-                [[1], [2], [3]],
-                [1, 2, 3],
-            ],
-            [
-                $gen(
-                    [[1], [2], [3]],
-                    [1, 2, 3],
-                ),
-                [1, [1], 2, [2], 3, [3]],
-                [[1], [2], [3]],
-                [1, 2, 3],
-            ],
-        ];
-    }
-
-    public function dataProviderForWithCompositeKeysStrict(): array
-    {
-        $gen = fn ($keys, $values) => GeneratorFixture::getCombined($keys, $values);
-
-        return [
-            [
-                $gen(
-                    [$o1 = (object)[1], $o2 = (object)[2], (object)[3]],
-                    [1, 2, 3],
-                ),
-                [$o1, $o2, (object)[3]],
-                [$o1, $o2],
-                [1, 2],
-            ],
-        ];
-    }
-
-    public function dataProviderForWithCompositeKeysNonStrict(): array
-    {
-        $gen = fn ($keys, $values) => GeneratorFixture::getCombined($keys, $values);
-
-        return [
-            [
-                $gen(
-                    [$o1 = (object)[1], $o2 = (object)[2], $o3 = (object)[3]],
-                    [1, 2, 3],
-                ),
-                [$o1, $o2, (object)[3]],
-                [$o1, $o2, $o3],
-                [1, 2, 3],
             ],
         ];
     }

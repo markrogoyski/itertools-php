@@ -424,6 +424,9 @@ Compress an iterable by filtering out data using required keys list.
 
 ```Single::compressAssociative(string $data, array $keys)```
 
+* Iterable data must contain only integer or string keys.
+* Array of keys must contain only integer or string items.
+
 ```php
 use IterTools\Single;
 
@@ -1630,6 +1633,9 @@ $result = Stream::of($input)
 Compress an iterable source by filtering out data using required keys list.
 
 ```$stream->compressAssociative(array $keys): Stream```
+
+* Iterable source must contain only integer or string keys.
+* Array of keys must contain only integer or string items.
 
 ```php
 use IterTools\Stream;

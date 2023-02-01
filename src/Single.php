@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\UniqueExtractor;
-
 class Single
 {
     /**
@@ -63,19 +61,23 @@ class Single
     /**
      * Return elements from the iterable only by given keys.
      *
-     * Array of keys must contain unique items.
+     * Iterable data must contain only integer or string keys.
      *
-     * @param iterable<mixed> $data
-     * @param array<mixed> $keys
-     * @param bool $strict
+     * Array of keys must contain only integer or string items.
+     *
+     * @param iterable<int|string, mixed> $data
+     * @param array<int|string> $keys
      *
      * @return \Generator
      */
-    public static function compressAssociative(iterable $data, array $keys, bool $strict = true): \Generator
+    public static function compressAssociative(iterable $data, array $keys): \Generator
     {
-        $map = iterator_to_array(self::reindex($keys, fn ($key) => UniqueExtractor::getString($key, $strict)));
-
-        yield from static::filterKeys($data, fn ($key) => isset($map[UniqueExtractor::getString($key, $strict)]));
+        $keyMap = \array_flip($keys);
+        foreach ($data as $key => $datum) {
+            if (\array_key_exists($key, $keyMap)) {
+                yield $key => $datum;
+            }
+        }
     }
 
     /**
