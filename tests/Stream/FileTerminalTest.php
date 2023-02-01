@@ -106,17 +106,17 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 ["\n", "a", ""],
-                "a",
+                "a\n",
             ],
             [
                 [],
                 ["\n", "", "b"],
-                "b",
+                "\nb",
             ],
             [
                 [],
                 ["\n", "hel", "lo"],
-                "hello",
+                "hel\n\nlo",
             ],
             [
                 [],
@@ -126,7 +126,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 ["\t", "good ", "bie"],
-                "good bie",
+                "good \t\tbie",
             ],
             [
                 [123],
@@ -141,22 +141,22 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 [123],
                 ["\n", "a", ""],
-                "a123",
+                "a\n123",
             ],
             [
                 [123],
                 ["\n", "", "b"],
-                "123b",
+                "123\nb",
             ],
             [
                 [123],
                 ["\n", "a", "b"],
-                "a123b",
+                "a\n123\nb",
             ],
             [
                 [123],
                 ["\n", "", "\n"],
-                "123\n",
+                "123\n\n",
             ],
             [
                 [123],
@@ -166,7 +166,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 [123],
                 ["\t", "a", "b"],
-                "a123b",
+                "a\t123\tb",
             ],
             [
                 ['123'],
@@ -176,7 +176,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 ['123'],
                 ["\n", "\n", "\n"],
-                "\n123\n",
+                "\n\n123\n\n",
             ],
             [
                 ['123'],
@@ -186,7 +186,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 ['123'],
                 ["\t", "\n", "\n"],
-                "\n123\n",
+                "\n\t123\t\n",
             ],
             [
                 [123, 456, 789],
@@ -196,7 +196,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 [123, 456, 789],
                 ["\n", "\t", "--"],
-                "\t123\n456\n789--",
+                "\t\n123\n456\n789\n--",
             ],
             [
                 [123, 456, 789],
@@ -206,7 +206,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 [123, 456, 789],
                 ["\t", "\t", "\t"],
-                "\t123\t456\t789\t",
+                "\t\t123\t456\t789\t\t",
             ],
             [
                 ['123', '456', '789'],
@@ -216,12 +216,12 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 ['123', '456', '789'],
                 ["\n", "\t", "\t"],
-                "\t123\n456\n789\t",
+                "\t\n123\n456\n789\n\t",
             ],
             [
                 ['123', '456', '789'],
                 ["\n", "<<", ">>"],
-                "<<123\n456\n789>>",
+                "<<\n123\n456\n789\n>>",
             ],
             [
                 ['123', '456', '789'],
@@ -231,7 +231,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 ['123', '456', '789'],
                 ["\t", "(", ")"],
-                "(123\t456\t789)",
+                "(\t123\t456\t789\t)",
             ],
             [
                 ["123\n", "45\n6", "\n789"],
@@ -241,12 +241,12 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 ["123\n", "45\n6", "\n789"],
                 ["\n", "\n", "\n"],
-                "\n123\n\n45\n6\n\n789\n",
+                "\n\n123\n\n45\n6\n\n789\n\n",
             ],
             [
                 ["123\n", "45\n6", "\n789"],
                 ["\t", "\n", "\n"],
-                "\n123\n\t45\n6\t\n789\n",
+                "\n\t123\n\t45\n6\t\n789\t\n",
             ],
             [
                 ["123\t", "45\t6", "\t789"],
@@ -261,7 +261,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 ["123\t", "45\t6", "\t789"],
                 ["\t", "\t", "\t"],
-                "\t123\t\t45\t6\t\t789\t",
+                "\t\t123\t\t45\t6\t\t789\t\t",
             ],
             [
                 ['a', 'b', 'c'],
@@ -271,7 +271,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             [
                 ['a', 'b', 'c'],
                 ["\n", "", "\n"],
-                "a\nb\nc\n",
+                "a\nb\nc\n\n",
             ],
         ];
     }

@@ -730,7 +730,9 @@ class Stream implements \IteratorAggregate
 
         $firstIteration = true;
 
-        fputs($file, $header);
+        if ($header !== '') {
+            fputs($file, $header . $separator);
+        }
 
         foreach ($this->iterable as $line) {
             if ($firstIteration) {
@@ -742,7 +744,9 @@ class Stream implements \IteratorAggregate
             fputs($file, \strval($line));
         }
 
-        fputs($file, $footer);
+        if ($footer !== '') {
+            fputs($file, $separator . $footer);
+        }
     }
 
     /**
