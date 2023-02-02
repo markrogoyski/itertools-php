@@ -1014,33 +1014,37 @@ class Stream implements \IteratorAggregate
     /**
      * Reduces iterable source to its max value.
      *
-     * Items of iterable source must be comparable.
+     * If comparator is null then items of iterable source must be comparable.
      *
      * Returns null if iterable source is empty.
+     *
+     * @param callable|null $comparator
      *
      * @return mixed
      *
      * @see Reduce::toMax()
      */
-    public function toMax()
+    public function toMax(?callable $comparator = null)
     {
-        return Reduce::toMax($this->iterable);
+        return Reduce::toMax($this->iterable, $comparator);
     }
 
     /**
      * Reduces iterable source to its min value.
      *
-     * Items of iterable source must be comparable.
+     * If comparator is null then items of iterable source must be comparable.
      *
      * Returns null if iterable source is empty.
+     *
+     * @param callable|null $comparator
      *
      * @return mixed
      *
      * @see Reduce::toMin()
      */
-    public function toMin()
+    public function toMin(?callable $comparator = null)
     {
-        return Reduce::toMin($this->iterable);
+        return Reduce::toMin($this->iterable, $comparator);
     }
 
     /**
@@ -1095,17 +1099,21 @@ class Stream implements \IteratorAggregate
     /**
      * Reduces iterable source to array of its upper and lower bounds.
      *
+     * If comparator is null then items of iterable source must be comparable.
+     *
      * Returns [null, null] if iterable source is empty.
+     *
+     * @param callable|null $comparator
      *
      * @return array{numeric, numeric}|array{null, null}
      *
      * @see Reduce::toMinMax()
      */
-    public function toMinMax(): array
+    public function toMinMax(?callable $comparator = null): array
     {
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;
-        return Reduce::toMinMax($iterable);
+        return Reduce::toMinMax($iterable, $comparator);
     }
 
     /**
