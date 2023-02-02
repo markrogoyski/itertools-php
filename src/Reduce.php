@@ -164,17 +164,31 @@ class Reduce
     /**
      * Reduces given collection to array of its upper and lower bounds.
      *
+     * If comparator is null then items of given collection must be comparable.
+     *
      * Returns [null, null] if given collection is empty.
      *
      * @param iterable<numeric> $numbers
+     * @param callable|null   $comparator
      *
      * @return array{numeric, numeric}|array{null, null}
      */
-    public static function toMinMax(iterable $numbers): array
+    public static function toMinMax(iterable $numbers, ?callable $comparator = null): array
     {
-        return static::toValue($numbers, static function ($carry, $datum) {
-            return [\min($carry[0] ?? $datum, $datum), \max($carry[1] ?? $datum, $datum)];
-        }, [null, null]);
+        if ($comparator !== null) {
+            return static::toValue($numbers, static function ($carry, $datum) use ($comparator) {
+                return [
+                    $comparator($datum, $carry[0] ?? $datum) <= 0 ? $datum : $carry[0],
+                    $comparator($datum, $carry[1] ?? $datum) >= 0 ? $datum : $carry[1],
+                ];
+            }, [null, null]);
+        }
+
+        return static::toValue(
+            $numbers,
+            fn ($carry, $datum) => [\min($carry[0] ?? $datum, $datum), \max($carry[1] ?? $datum, $datum)],
+            [null, null]
+        );
     }
 
     /**
