@@ -100,17 +100,17 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [],
-                ["\n", "", ""],
+                ["\n", null, null],
                 "",
             ],
             [
                 [],
-                ["\n", "a", ""],
+                ["\n", "a", null],
                 "a\n",
             ],
             [
                 [],
-                ["\n", "", "b"],
+                ["\n", null, "b"],
                 "\nb",
             ],
             [
@@ -125,8 +125,8 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [],
-                ["\t", "good ", "bie"],
-                "good \t\tbie",
+                ["\t", "good ", "bye"],
+                "good \t\tbye",
             ],
             [
                 [123],
@@ -135,17 +135,17 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [123],
-                ["\n", "", ""],
+                ["\n", null, null],
                 "123",
             ],
             [
                 [123],
-                ["\n", "a", ""],
+                ["\n", "a", null],
                 "a\n123",
             ],
             [
                 [123],
-                ["\n", "", "b"],
+                ["\n", null, "b"],
                 "123\nb",
             ],
             [
@@ -155,7 +155,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [123],
-                ["\n", "", "\n"],
+                ["\n", null, "\n"],
                 "123\n\n",
             ],
             [
@@ -270,7 +270,7 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['a', 'b', 'c'],
-                ["\n", "", "\n"],
+                ["\n", null, "\n"],
                 "a\nb\nc\n\n",
             ],
         ];

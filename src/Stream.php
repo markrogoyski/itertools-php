@@ -717,20 +717,20 @@ class Stream implements \IteratorAggregate
      *
      * Elements of the iterable source must be stringable.
      *
-     * @param resource $fileResource     File handle stream opened for writing
-     * @param string   $newlineSeparator (optional) inserted between each line, typically the newline character.
-     * @param string   $header           (optional) prepended to string
-     * @param string   $footer           (optional) appended to string
+     * @param resource    $fileResource     File handle stream opened for writing
+     * @param string      $newlineSeparator (optional) inserted between each line, typically the newline character.
+     * @param string|null $header           (optional) prepended to string
+     * @param string|null $footer           (optional) appended to string
      *
      * @return void
      */
-    public function toFile($fileResource, string $newlineSeparator = \PHP_EOL, string $header = '', string $footer = ''): void
+    public function toFile($fileResource, string $newlineSeparator = \PHP_EOL, ?string $header = null, ?string $footer = null): void
     {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
         $firstIteration = true;
 
-        if ($header !== '') {
+        if ($header !== null) {
             \fputs($fileResource, $header . $newlineSeparator);
         }
 
@@ -744,7 +744,7 @@ class Stream implements \IteratorAggregate
             \fputs($fileResource, \strval($line));
         }
 
-        if ($footer !== '') {
+        if ($footer !== null) {
             \fputs($fileResource, $newlineSeparator . $footer);
         }
     }
