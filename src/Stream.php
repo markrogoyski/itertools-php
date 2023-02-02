@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\IteratorFactory;
+use IterTools\Util\ResourceHelper;
 
 /**
  * Provides fluent interface for working with iterables.
@@ -140,6 +141,41 @@ class Stream implements \IteratorAggregate
     public static function ofRockPaperScissors(int $repetitions): self
     {
         return new self(Random::rockPaperScissors($repetitions));
+    }
+
+    /**
+     * Creates iterable instance with fluent interface of file lines.
+     *
+     * @param resource $file
+     *
+     * @return Stream<mixed>
+     *
+     * @see File::readLines()
+     */
+    public static function ofFileLines($file): self
+    {
+        return new self(File::readLines($file));
+    }
+
+    /**
+     * Creates iterable instance with fluent interface of CSV file rows.
+     *
+     * @param resource $file
+     * @param string $separator
+     * @param string $enclosure
+     * @param string $escape
+     *
+     * @return Stream
+     *
+     * @see File::readCsv()
+     */
+    public static function ofCsvFile(
+        $file,
+        string $separator = ',',
+        string $enclosure = '"',
+        string $escape = '\\'
+    ): self {
+        return new self(File::readCsv($file, $separator, $enclosure, $escape));
     }
 
     // STREAM OPERATIONS
@@ -674,6 +710,75 @@ class Stream implements \IteratorAggregate
             $result[] = $item;
         }
         return $result;
+    }
+
+    /**
+     * Writes iterable source to the file line by line.
+     *
+     * Elements of the iterable source must be stringifiable.
+     *
+     * @param resource $file
+     * @param string $separator (optional) inserted between each item. Ex: ', ' for 1, 2, 3, ...
+     * @param string $header    (optional) prepended to string
+     * @param string $footer    (optional) appended to string
+     *
+     * @return void
+     */
+    public function toFile($file, string $separator = \PHP_EOL, string $header = '', string $footer = ''): void
+    {
+        ResourceHelper::checkIsValid($file);
+
+        $firstIteration = true;
+
+        if ($header !== '') {
+            fputs($file, $header . $separator);
+        }
+
+        foreach ($this->iterable as $line) {
+            if ($firstIteration) {
+                $firstIteration = false;
+            } else {
+                $line = $separator . \strval($line);
+            }
+
+            fputs($file, \strval($line));
+        }
+
+        if ($footer !== '') {
+            fputs($file, $separator . $footer);
+        }
+    }
+
+    /**
+     * Writes iterable source to the file line by line.
+     *
+     * Elements of the iterable source must be array of scalars.
+     *
+     * @param resource $file
+     * @param array<string>|null $header
+     * @param string $separator
+     * @param string $enclosure
+     * @param string $escape
+     *
+     * @return void
+     */
+    public function toCsvFile(
+        $file,
+        ?array $header = null,
+        string $separator = ',',
+        string $enclosure = '"',
+        string $escape = '\\'
+    ): void {
+        ResourceHelper::checkIsValid($file);
+
+        if ($header !== null) {
+            fputcsv($file, $header, $separator, $enclosure, $escape);
+        }
+
+        /** @var array<scalar> $row */
+        foreach ($this->iterable as $row) {
+            fputcsv($file, $row, $separator, $enclosure, $escape);
+        }
     }
 
     /**
