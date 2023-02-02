@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\IteratorFactory;
-use IterTools\Util\ResourceHelper;
+use IterTools\Util\ResourcePolicy;
 
 /**
  * Provides fluent interface for working with iterables.
@@ -717,35 +717,35 @@ class Stream implements \IteratorAggregate
      *
      * Elements of the iterable source must be stringable.
      *
-     * @param resource $file    File handle stream opened for writing
-     * @param string $separator (optional) inserted between each item. Ex: ', ' for 1, 2, 3, ...
-     * @param string $header    (optional) prepended to string
-     * @param string $footer    (optional) appended to string
+     * @param resource $fileResource     File handle stream opened for writing
+     * @param string   $newlineSeparator (optional) inserted between each line, typically the newline character.
+     * @param string   $header           (optional) prepended to string
+     * @param string   $footer           (optional) appended to string
      *
      * @return void
      */
-    public function toFile($file, string $separator = \PHP_EOL, string $header = '', string $footer = ''): void
+    public function toFile($fileResource, string $newlineSeparator = \PHP_EOL, string $header = '', string $footer = ''): void
     {
-        ResourceHelper::checkIsValid($file);
+        ResourcePolicy::assertIsSatisfied($fileResource);
 
         $firstIteration = true;
 
         if ($header !== '') {
-            \fputs($file, $header . $separator);
+            \fputs($fileResource, $header . $newlineSeparator);
         }
 
         foreach ($this->iterable as $line) {
             if ($firstIteration) {
                 $firstIteration = false;
             } else {
-                $line = $separator . \strval($line);
+                $line = $newlineSeparator . \strval($line);
             }
 
-            \fputs($file, \strval($line));
+            \fputs($fileResource, \strval($line));
         }
 
         if ($footer !== '') {
-            \fputs($file, $separator . $footer);
+            \fputs($fileResource, $newlineSeparator . $footer);
         }
     }
 
@@ -754,30 +754,30 @@ class Stream implements \IteratorAggregate
      *
      * Elements of the iterable source must be array of scalars.
      *
-     * @param resource $file File handle stream opened for writing
-     * @param array<string>|null $header
-     * @param string $separator
-     * @param string $enclosure
-     * @param string $escape
+     * @param resource           $fileResource File handle stream opened for writing
+     * @param array<string>|null $header (optional) header row before data, labelling the columns
+     * @param string             $separator
+     * @param string             $enclosure
+     * @param string             $escape
      *
      * @return void
      */
     public function toCsvFile(
-        $file,
+        $fileResource,
         ?array $header = null,
         string $separator = ',',
         string $enclosure = '"',
         string $escape = '\\'
     ): void {
-        ResourceHelper::checkIsValid($file);
+        ResourcePolicy::assertIsSatisfied($fileResource);
 
         if ($header !== null) {
-            \fputcsv($file, $header, $separator, $enclosure, $escape);
+            \fputcsv($fileResource, $header, $separator, $enclosure, $escape);
         }
 
         /** @var array<scalar> $row */
         foreach ($this->iterable as $row) {
-            \fputcsv($file, $row, $separator, $enclosure, $escape);
+            \fputcsv($fileResource, $row, $separator, $enclosure, $escape);
         }
     }
 

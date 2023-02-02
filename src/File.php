@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\ResourceHelper;
+use IterTools\Util\ResourcePolicy;
 
 class File
 {
     /**
      * Iterate the lines of a file, read in from a file handle stream resource.
      *
-     * @param resource $file File handle stream opened for reading
+     * @param resource $fileResource File handle stream opened for reading
      *
      * @return \Generator<string>
      *
@@ -19,11 +19,11 @@ class File
      *
      * @see fgets()
      */
-    public static function readLines($file): \Generator
+    public static function readLines($fileResource): \Generator
     {
-        ResourceHelper::checkIsValid($file);
+        ResourcePolicy::assertIsSatisfied($fileResource);
 
-        while (($line = \fgets($file)) !== false) {
+        while (($line = \fgets($fileResource)) !== false) {
             yield $line;
         }
     }
@@ -31,10 +31,10 @@ class File
     /**
      * Iterate the lines of a CSV file, read in from a file handle stream resource.
      *
-     * @param resource $file File handle stream opened for reading
-     * @param string $separator
-     * @param string $enclosure
-     * @param string $escape
+     * @param resource $fileResource File handle stream opened for reading
+     * @param string   $separator
+     * @param string   $enclosure
+     * @param string   $escape
      *
      * @return \Generator<array<int, string|null>>
      *
@@ -43,15 +43,15 @@ class File
      * @see fgetcsv()
      */
     public static function readCsv(
-        $file,
+        $fileResource,
         string $separator = ',',
         string $enclosure = '"',
         string $escape = '\\'
     ): \Generator {
-        ResourceHelper::checkIsValid($file);
+        ResourcePolicy::assertIsSatisfied($fileResource);
 
         // @phpstan-ignore-next-line (expects int<0, max>, null given.)
-        while (($row = \fgetcsv($file, null, $separator, $enclosure, $escape)) !== false) {
+        while (($row = \fgetcsv($fileResource, null, $separator, $enclosure, $escape)) !== false) {
             /** @var array<string|null> $row */
             yield $row;
         }
