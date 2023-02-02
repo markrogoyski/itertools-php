@@ -641,6 +641,69 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toRange(),
                 13,
             ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toFirst(),
+                -3,
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toFirst(),
+                -3,
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toFirst(),
+                7,
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toLast(),
+                7,
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toLast(),
+                7,
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toLast(),
+                -3,
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toFirstAndLast(),
+                [-3, 7],
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toFirstAndLast(),
+                [-3, 7],
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toFirstAndLast(),
+                [7, -3],
+            ],
         ];
     }
 
@@ -1199,6 +1262,69 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->chainWith([6, 10, 4])
                     ->toRange(),
                 13,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toFirst(),
+                -3,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toFirst(),
+                -3,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toFirst(),
+                7,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toLast(),
+                7,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toLast(),
+                7,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toLast(),
+                -3,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toFirstAndLast(),
+                [-3, 7],
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toFirstAndLast(),
+                [-3, 7],
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toFirstAndLast(),
+                [7, -3],
             ],
         ];
     }
@@ -1759,6 +1885,69 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toRange(),
                 13,
             ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toFirst(),
+                -3,
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toFirst(),
+                -3,
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toFirst(),
+                7,
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toLast(),
+                7,
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toLast(),
+                7,
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toLast(),
+                -3,
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toFirstAndLast(),
+                [-3, 7],
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toFirstAndLast(),
+                [-3, 7],
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toFirstAndLast(),
+                [7, -3],
+            ],
         ];
     }
 
@@ -2317,6 +2506,69 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->chainWith([6, 10, 4])
                     ->toRange(),
                 13,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toFirst(),
+                -3,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toFirst(),
+                -3,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toFirst(),
+                7,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toLast(),
+                7,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toLast(),
+                7,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toLast(),
+                -3,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toFirstAndLast(),
+                [-3, 7],
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toFirstAndLast(),
+                [-3, 7],
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toFirstAndLast(),
+                [7, -3],
             ],
         ];
     }

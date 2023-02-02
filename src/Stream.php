@@ -416,6 +416,23 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Sorts iterable source.
+     *
+     * If comparator is null, then elements of the iterable source must be comparable.
+     *
+     * @param callable|null $comparator
+     *
+     * @return $this
+     *
+     * @see Single::sort()
+     */
+    public function sort(?callable $comparator = null): self
+    {
+        $this->iterable = Single::sort($this->iterable, $comparator);
+        return $this;
+    }
+
+    /**
      * Chain iterable source withs given iterables together into a single iteration.
      *
      * Makes a single continuous sequence out of multiple sequences.
@@ -1130,6 +1147,42 @@ class Stream implements \IteratorAggregate
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;
         return Reduce::toRange($iterable);
+    }
+
+    /**
+     * Returns the first element of iterable source.
+     *
+     * @return mixed
+     *
+     * @throws \LengthException if iterable source is empty.
+     */
+    public function toFirst()
+    {
+        return Reduce::toFirst($this->iterable);
+    }
+
+    /**
+     * Returns the last element of iterable source.
+     *
+     * @return mixed
+     *
+     * @throws \LengthException if iterable source is empty.
+     */
+    public function toLast()
+    {
+        return Reduce::toLast($this->iterable);
+    }
+
+    /**
+     * Returns the first element of iterable source.
+     *
+     * @return array{mixed, mixed}
+     *
+     * @throws \LengthException if iterable source is empty.
+     */
+    public function toFirstAndLast(): array
+    {
+        return Reduce::toFirstAndLast($this->iterable);
     }
 
     /**

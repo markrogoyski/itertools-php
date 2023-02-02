@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\NoValueMonad;
+
 class Reduce
 {
     /**
@@ -205,5 +207,55 @@ class Reduce
         [$min, $max] = static::toMinMax($numbers);
 
         return ($max ?? 0) - ($min ?? 0);
+    }
+
+    /**
+     * Reduces given collection to its first value.
+     *
+     * @param iterable<mixed> $data
+     * @return mixed
+     *
+     * @throws \LengthException if collection is empty
+     */
+    public static function toFirst(iterable $data)
+    {
+        foreach ($data as $datum) {
+            return $datum;
+        }
+
+        throw new \LengthException('collection is empty');
+    }
+
+    /**
+     * Reduces given collection to its last value.
+     *
+     * @param iterable<mixed> $data
+     * @return mixed
+     *
+     * @throws \LengthException if collection is empty
+     */
+    public static function toLast(iterable $data)
+    {
+        /** @var mixed|NoValueMonad $result */
+        $result = static::toValue($data, fn ($carry, $datum) => $datum, NoValueMonad::getInstance());
+
+        if ($result instanceof NoValueMonad) {
+            throw new \LengthException('collection is empty');
+        }
+
+        return $result;
+    }
+
+    /**
+     * Reduces given collection to its first and last values.
+     *
+     * @param iterable<mixed> $data
+     * @return array{mixed, mixed}
+     *
+     * @throws \LengthException if collection is empty
+     */
+    public static function toFirstAndLast(iterable $data): array
+    {
+        return [static::toFirst($data), static::toLast($data)];
     }
 }
