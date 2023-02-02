@@ -313,16 +313,15 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
                     ['4', '5', '6'],
                 ],
             ],
-            // FIXME I do not know how to test the $escape parameter :(
             [
                 [
-                    '\t,\n,\t',
-                    '\n,\\,\t',
+                    "\\,\",a\040a",
+                    "\\,\",a\040a",
                 ],
                 [",", "'", "\\"],
                 [
-                    ['\t', '\n', '\t'],
-                    ['\n', '\\', '\t'],
+                    ['\\', '"', 'a a'],
+                    ['\\', '"', 'a a'],
                 ],
             ],
         ];
