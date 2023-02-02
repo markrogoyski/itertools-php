@@ -337,10 +337,10 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
         $file = FileFixture::createFromLines([], $this->root->url());
 
         // When
-        fclose($file);
+        \fclose($file);
 
         // Then
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(\InvalidArgumentException::class);
         foreach (File::readCsv($file) as $_) {
             break;
         }

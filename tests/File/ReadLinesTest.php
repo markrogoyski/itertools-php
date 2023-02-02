@@ -89,10 +89,10 @@ class ReadLinesTest extends \PHPUnit\Framework\TestCase
         $file = FileFixture::createFromLines([], $this->root->url());
 
         // When
-        fclose($file);
+        \fclose($file);
 
         // Then
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(\InvalidArgumentException::class);
         foreach (File::readLines($file) as $_) {
             break;
         }

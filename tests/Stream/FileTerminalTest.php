@@ -28,11 +28,11 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
         // Given
         $stream = Stream::of($lines);
         $filePath = $this->root->url().'/'.uniqid();
-        $file = fopen($filePath, 'w');
+        $file = \fopen($filePath, 'w');
 
         // When
         $stream->toFile($file, "\n");
-        $fileContents = file_get_contents($filePath);
+        $fileContents = \file_get_contents($filePath);
 
         // Then
         $this->assertEquals($expected, $fileContents);
@@ -80,11 +80,11 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
         // Given
         $stream = Stream::of($lines);
         $filePath = $this->root->url().'/'.uniqid();
-        $file = fopen($filePath, 'w');
+        $file = \fopen($filePath, 'w');
 
         // When
         $stream->toFile($file, ...$config);
-        $fileContents = file_get_contents($filePath);
+        $fileContents = \file_get_contents($filePath);
 
         // Then
         $this->assertEquals($expected, $fileContents);
@@ -287,11 +287,11 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
         // Given
         $stream = Stream::of($rows);
         $filePath = $this->root->url().'/'.uniqid();
-        $file = fopen($filePath, 'w');
+        $file = \fopen($filePath, 'w');
 
         // When
         $stream->toCsvFile($file);
-        $fileContents = file_get_contents($filePath);
+        $fileContents = \file_get_contents($filePath);
 
         // Then
         $this->assertEquals($expected, $fileContents);
@@ -378,11 +378,11 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
         // Given
         $stream = Stream::of($rows);
         $filePath = $this->root->url().'/'.uniqid();
-        $file = fopen($filePath, 'w');
+        $file = \fopen($filePath, 'w');
 
         // When
         $stream->toCsvFile($file, $header, ...$config);
-        $fileContents = file_get_contents($filePath);
+        $fileContents = \file_get_contents($filePath);
 
         // Then
         $this->assertEquals($expected, $fileContents);
@@ -697,13 +697,13 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
         // Given
         $stream = Stream::of([1, 2, 3]);
         $filePath = $this->root->url().'/'.uniqid();
-        $file = fopen($filePath, 'w');
+        $file = \fopen($filePath, 'w');
 
         // When
-        fclose($file);
+        \fclose($file);
 
         // Then
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $stream->toFile($file);
     }
 
@@ -712,13 +712,13 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
         // Given
         $stream = Stream::of([1, 2, 3]);
         $filePath = $this->root->url().'/'.uniqid();
-        $file = fopen($filePath, 'w');
+        $file = \fopen($filePath, 'w');
 
         // When
-        fclose($file);
+        \fclose($file);
 
         // Then
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $stream->toCsvFile($file);
     }
 }

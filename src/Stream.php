@@ -144,9 +144,9 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Creates iterable instance with fluent interface of file lines.
+     * Create a stream sourced from the lines of a file.
      *
-     * @param resource $file
+     * @param resource $file File handle stream opened for reading
      *
      * @return Stream<mixed>
      *
@@ -158,9 +158,9 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Creates iterable instance with fluent interface of CSV file rows.
+     * Create a stream sourced from a CSG file.
      *
-     * @param resource $file
+     * @param resource $file  File handle stream opened for reading
      * @param string $separator
      * @param string $enclosure
      * @param string $escape
@@ -715,9 +715,9 @@ class Stream implements \IteratorAggregate
     /**
      * Writes iterable source to the file line by line.
      *
-     * Elements of the iterable source must be stringifiable.
+     * Elements of the iterable source must be stringable.
      *
-     * @param resource $file
+     * @param resource $file    File handle stream opened for writing
      * @param string $separator (optional) inserted between each item. Ex: ', ' for 1, 2, 3, ...
      * @param string $header    (optional) prepended to string
      * @param string $footer    (optional) appended to string
@@ -731,7 +731,7 @@ class Stream implements \IteratorAggregate
         $firstIteration = true;
 
         if ($header !== '') {
-            fputs($file, $header . $separator);
+            \fputs($file, $header . $separator);
         }
 
         foreach ($this->iterable as $line) {
@@ -741,11 +741,11 @@ class Stream implements \IteratorAggregate
                 $line = $separator . \strval($line);
             }
 
-            fputs($file, \strval($line));
+            \fputs($file, \strval($line));
         }
 
         if ($footer !== '') {
-            fputs($file, $separator . $footer);
+            \fputs($file, $separator . $footer);
         }
     }
 
@@ -754,7 +754,7 @@ class Stream implements \IteratorAggregate
      *
      * Elements of the iterable source must be array of scalars.
      *
-     * @param resource $file
+     * @param resource $file File handle stream opened for writing
      * @param array<string>|null $header
      * @param string $separator
      * @param string $enclosure
@@ -772,12 +772,12 @@ class Stream implements \IteratorAggregate
         ResourceHelper::checkIsValid($file);
 
         if ($header !== null) {
-            fputcsv($file, $header, $separator, $enclosure, $escape);
+            \fputcsv($file, $header, $separator, $enclosure, $escape);
         }
 
         /** @var array<scalar> $row */
         foreach ($this->iterable as $row) {
-            fputcsv($file, $row, $separator, $enclosure, $escape);
+            \fputcsv($file, $row, $separator, $enclosure, $escape);
         }
     }
 

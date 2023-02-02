@@ -11,7 +11,7 @@ class FileFixture
      */
     public static function createFromLines(array $lines, string $dirPath)
     {
-        return self::createFromString(implode("\n", $lines), $dirPath);
+        return self::createFromString(implode(\PHP_EOL, $lines), $dirPath);
     }
 
     /**
@@ -21,9 +21,9 @@ class FileFixture
      */
     public static function createFromString(string $string, string $dirPath)
     {
-        $fileName = uniqid();
-        file_put_contents("{$dirPath}/{$fileName}", $string);
+        $fileName = \uniqid();
+        \file_put_contents("{$dirPath}/{$fileName}", $string);
 
-        return fopen("{$dirPath}/{$fileName}", 'r');
+        return \fopen("{$dirPath}/{$fileName}", 'r');
     }
 }

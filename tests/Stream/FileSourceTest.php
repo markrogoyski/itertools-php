@@ -390,10 +390,10 @@ class FileSourceTest extends \PHPUnit\Framework\TestCase
         $file = FileFixture::createFromLines([], $this->root->url());
 
         // When
-        fclose($file);
+        \fclose($file);
 
         // Then
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         Stream::ofFileLines($file)->toArray();
     }
@@ -407,10 +407,10 @@ class FileSourceTest extends \PHPUnit\Framework\TestCase
         $file = FileFixture::createFromLines([], $this->root->url());
 
         // When
-        fclose($file);
+        \fclose($file);
 
         // Then
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         Stream::ofCsvFile($file)->toArray();
     }

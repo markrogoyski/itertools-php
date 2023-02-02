@@ -8,21 +8,12 @@ class ResourceHelper
 {
     /**
      * @param resource $resource
-     * @return bool
-     */
-    public static function isValid($resource): bool
-    {
-        return \is_resource($resource);
-    }
-
-    /**
-     * @param resource $resource
      * @return void
      */
     public static function checkIsValid($resource): void
     {
-        if (!self::isValid($resource)) {
-            throw new \UnexpectedValueException('invalid resource');
+        if (!\is_resource($resource)) {
+            throw new \InvalidArgumentException('Parameter is not a file resource: ' . \gettype($resource));
         }
     }
 }

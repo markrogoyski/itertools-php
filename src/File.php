@@ -9,13 +9,13 @@ use IterTools\Util\ResourceHelper;
 class File
 {
     /**
-     * Reads file resource line by line.
+     * Iterate the lines of a file, read in from a file handle stream resource.
      *
-     * @param resource $file
+     * @param resource $file File handle stream opened for reading
      *
      * @return \Generator<string>
      *
-     * @throws \UnexpectedValueException if invalid resource given
+     * @throws \UnexpectedValueException if file handle stream resource is invalid resource
      *
      * @see fgets()
      */
@@ -29,9 +29,9 @@ class File
     }
 
     /**
-     * Reads data from CSV file resource like fgetcsv() function.
+     * Iterate the lines of a CSV file, read in from a file handle stream resource.
      *
-     * @param resource $file
+     * @param resource $file File handle stream opened for reading
      * @param string $separator
      * @param string $enclosure
      * @param string $escape
@@ -44,9 +44,9 @@ class File
      */
     public static function readCsv(
         $file,
-        string $separator = ",",
-        string $enclosure = "\"",
-        string $escape = "\\"
+        string $separator = ',',
+        string $enclosure = '"',
+        string $escape = '\\'
     ): \Generator {
         ResourceHelper::checkIsValid($file);
 
