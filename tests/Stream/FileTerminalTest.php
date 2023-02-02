@@ -18,6 +18,76 @@ class FileTerminalTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test toFile example usage
+     */
+    public function testToFileExampleUsage(): void
+    {
+        // Given
+        $data = ['item1', 'item2', 'item3'];
+
+        // And
+        $header = '<ul>';
+        $footer = '</ul>';
+
+        // And
+        $filePath = $this->root->url().'/'.uniqid();
+        $fh       = \fopen($filePath, 'w');
+
+        // When
+        Stream::of($data)
+            ->map(fn ($item) => "  <li>$item</li>")
+            ->toFile($fh, \PHP_EOL, $header, $footer);
+        $resultWrittenToFile = \file_get_contents($filePath);
+
+        // Then
+        $expected = <<<'END_OF_EXPECTED'
+<ul>
+  <li>item1</li>
+  <li>item2</li>
+  <li>item3</li>
+</ul>
+END_OF_EXPECTED;
+
+        $this->assertEquals($expected, $resultWrittenToFile);
+    }
+
+    /**
+     * @test toCsvFile example usage
+     */
+    public function testToCsvFileExampleUsage(): void
+    {
+        // Given
+        $data = [
+            ['Star Wars: Episode IV – A New Hope', 'IV', 1977],
+            ['Star Wars: Episode V – The Empire Strikes Back', 'V', 1980],
+            ['Star Wars: Episode VI – Return of the Jedi', 'VI', 1983],
+        ];
+
+        // And
+        $header = ['title', 'episode', 'year'];
+
+        // And
+        $filePath = $this->root->url().'/'.uniqid();
+        $fh       = \fopen($filePath, 'w');
+
+        // When
+        Stream::of($data)
+            ->toCsvFile($fh, $header);
+        $resultWrittenToFile = \file_get_contents($filePath);
+
+        // Then
+        $expected = <<<'END_OF_EXPECTED'
+title,episode,year
+"Star Wars: Episode IV – A New Hope",IV,1977
+"Star Wars: Episode V – The Empire Strikes Back",V,1980
+"Star Wars: Episode VI – Return of the Jedi",VI,1983
+
+END_OF_EXPECTED;
+
+        $this->assertEquals($expected, $resultWrittenToFile);
+    }
+
+    /**
      * @dataProvider dataProviderForToFileWithDefaultConfig
      * @param array $lines
      * @param string $expected
