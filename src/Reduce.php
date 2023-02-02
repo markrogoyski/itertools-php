@@ -32,23 +32,31 @@ class Reduce
     /**
      * Reduces given iterable to its min value.
      *
-     * Items of given collection must be comparable.
+     * If comparator is null then items of given collection must be comparable.
      *
      * Returns null if given collection is empty.
      *
      * @param iterable<mixed> $data
+     * @param callable|null   $comparator
      *
      * @return mixed|null
      */
-    public static function toMin(iterable $data)
+    public static function toMin(iterable $data, ?callable $comparator = null)
     {
+        if ($comparator !== null) {
+            return static::toValue(
+                $data,
+                fn ($carry, $datum) => $comparator($datum, $carry ?? $datum) <= 0 ? $datum : $carry
+            );
+        }
+
         return static::toValue($data, fn ($carry, $datum) => \min($carry ?? $datum, $datum));
     }
 
     /**
      * Reduces given iterable to its max value.
      *
-     * Items of given collection must be comparable.
+     * If comparator is null then items of given collection must be comparable.
      *
      * Returns null if given collection is empty.
      *
