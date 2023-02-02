@@ -6,8 +6,13 @@
 * Stream
   * Source
     * `ofRange`
+    * `ofFileLines`
+    * `ofCsvFile`
   * Transformation Terminal Operations
     * `toAssociativeArray`
+  * File Terminal Operations
+    * `toFile`
+    * `toCsvFile`
 * Docs
   * Added Russian translation of README
 
