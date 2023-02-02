@@ -122,9 +122,9 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 |----------------------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------|
 | [`toAverage`](#To-Average) | Среднее арифметическое элементов коллекции                                          | `Reduce::toAverage($numbers)`                                 |
 | [`toCount`](#To-Count)     | Длина коллекции                                                                     | `Reduce::toCount($data)`                                      |
-| [`toMax`](#To-Max)         | Максимальный элемент коллекции                                                      | `Reduce::toMax($numbers)`                                     |
-| [`toMin`](#To-Min)         | Минимальный элемент коллекции                                                       | `Reduce::toMin($numbers)`                                     |
-| [`toMinMax`](#To-Min-Max)  | Минимальный и максимальный элемент коллекции                                        | `Reduce::toMinMax($numbers)`                                  |
+| [`toMax`](#To-Max)         | Максимальный элемент коллекции                                                      | `Reduce::toMax($numbers, [$comparator])`                      |
+| [`toMin`](#To-Min)         | Минимальный элемент коллекции                                                       | `Reduce::toMin($numbers, [$comparator])`                      |
+| [`toMinMax`](#To-Min-Max)  | Минимальный и максимальный элемент коллекции                                        | `Reduce::toMinMax($numbers, [$comparator])`                   |
 | [`toProduct`](#To-Product) | Произведение элементов коллекции                                                    | `Reduce::toProduct($numbers)`                                 |
 | [`toRange`](#To-Range)     | Разница между максимальным и минимальным элементами коллекции                       | `Reduce::toRange($numbers)`                                   |
 | [`toString`](#To-String)   | Преобразование коллекции в строку                                                   | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
@@ -194,12 +194,12 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 |--------------------------------|---------------------------------------------------------------------|---------------------------------------------------------|
 | [`toAverage`](#To-Average-1)   | Среднее арфиметическое элементов коллекции                          | `$stream->toAverage()`                                  |
 | [`toCount`](#To-Count-1)       | Длина коллекции                                                     | `$stream->toCount()`                                    |
-| [`toMax`](#To-Max-1)           | Максимальное значение из элементов коллекции                        | `$stream->toMax()`                                      |
-| [`toMin`](#To-Min-1)           | Минимальное значение из элементов коллекции                         | `$stream->toMin()`                                      |
+| [`toMax`](#To-Max-1)           | Максимальное значение из элементов коллекции                        | `$stream->toMax([$comparator])`                         |
+| [`toMin`](#To-Min-1)           | Минимальное значение из элементов коллекции                         | `$stream->toMin([$comparator])`                         |
+| [`toMinMax`](#To-Min-Max-1)    | Минимальное и максимальное значения из элементов коллекции          | `$stream->toMinMax([$comparator])`                      |
 | [`toProduct`](#To-Product-1)   | Произведение элементов коллекции                                    | `$stream->toProduct()`                                  |
 | [`toString`](#To-String-1)     | Преобразование коллекции в строку                                   | `$stream->toString([$separator], [$prefix], [$suffix])` |
 | [`toSum`](#To-Sum-1)           | Сумма элементов коллекции                                           | `$stream->toSum()`                                      |
-| [`toMinMax`](#To-Min-Max-1)    | Минимальное и максимальное значения из элементов коллекции          | `$stream->toMinMax()`                                   |
 | [`toRange`](#To-Range-1)       | Разница между максимальным и минимальным элементами коллекции       | `$stream->toRange()`                                    |
 | [`toValue`](#To-Value-1)       | Редуцирование коллекции до значения, вычисляемого callback-функцией | `$stream->toValue($reducer, $initialValue)`             |
 
@@ -1233,10 +1233,10 @@ $length = Reduce::toCount($someIterable);
 ### To Max
 Возвращает максимальный элемент коллекции.
 
-- Элементы коллекции должны быть сравнимы.
-- Для пустой коллекции возвращает `null`.
+```Reduce::toMax(iterable $data, callable|null $comparator = null): mixed|null```
 
-```Reduce::toMax(iterable $data): mixed|null```
+- Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
+- Для пустой коллекции возвращает `null`.
 
 ```php
 use IterTools\Reduce;
@@ -1250,10 +1250,10 @@ $result = Reduce::toMax($numbers);
 ### To Min
 Возвращает минимальный элемент коллекции.
 
-- Элементы коллекции должны быть сравнимы.
-- Для пустой коллекции возвращает `null`.
+```Reduce::toMin(iterable $data, callable|null $comparator = null): mixed|null```
 
-```Reduce::toMin(iterable $data): mixed|null```
+- Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
+- Для пустой коллекции возвращает `null`.
 
 ```php
 use IterTools\Reduce;
@@ -1267,9 +1267,10 @@ $result = Reduce::toMin($numbers);
 ### To Min Max
 Возвращает минимальный и максимальный элементы коллекции.
 
-```Reduce::toMinMax(iterable $numbers): array```
+```Reduce::toMinMax(iterable $numbers, callable|null $comparator = null): array```
 
-Для пустой коллекции возвращает `[null, null]`.
+- Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
+- Для пустой коллекции возвращает `[null, null]`.
 
 ```php
 use IterTools\Reduce;
@@ -2236,9 +2237,9 @@ $result = Stream::of($iterable)
 ##### To Max
 Возвращает максимальный элемент коллекции из потока.
 
-```$stream->toMax(): mixed```
+```$stream->toMax(callable|null $comparator = null): mixed```
 
-Элементы в коллекции должны быть сравнимы.
+Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
 
 Для пустой коллекции вернет `null`.
 
@@ -2255,9 +2256,9 @@ $result = Stream::of($iterable)
 ##### To Min
 Возвращает минимальный элемент коллекции из потока.
 
-```$stream->toMin(): mixed```
+```$stream->toMin(callable|null $comparator = null): mixed```
 
-Элементы в коллекции должны быть сравнимы.
+Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
 
 Для пустой коллекции вернет `null`.
 
@@ -2274,7 +2275,9 @@ $result = Stream::of($iterable)
 ##### To Min Max
 Возвращает минимальный и максимальный элементы коллекции из потока.
 
-```$stream->toMinMax(): array```
+```$stream->toMinMax(callable|null $comparator = null): array```
+
+Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
 
 Для пустой коллекции вернет `[null, null]`.
 
