@@ -42,9 +42,7 @@ class Reduce
      */
     public static function toMin(iterable $data)
     {
-        return static::toValue($data, static function ($carry, $datum) {
-            return \min($carry ?? $datum, $datum);
-        });
+        return static::toValue($data, fn ($carry, $datum) => \min($carry ?? $datum, $datum));
     }
 
     /**
@@ -55,14 +53,20 @@ class Reduce
      * Returns null if given collection is empty.
      *
      * @param iterable<mixed> $data
+     * @param callable|null   $comparator
      *
      * @return mixed|null
      */
-    public static function toMax(iterable $data)
+    public static function toMax(iterable $data, ?callable $comparator = null)
     {
-        return static::toValue($data, static function ($carry, $datum) {
-            return \max($carry ?? $datum, $datum);
-        });
+        if ($comparator !== null) {
+            return static::toValue(
+                $data,
+                fn ($carry, $datum) => $comparator($datum, $carry ?? $datum) >= 0 ? $datum : $carry
+            );
+        }
+
+        return static::toValue($data, fn ($carry, $datum) => \max($carry ?? $datum, $datum));
     }
 
     /**
@@ -78,9 +82,7 @@ class Reduce
             return \count($data);
         }
 
-        return static::toValue($data, static function ($carry) {
-            return $carry + 1;
-        }, 0);
+        return static::toValue($data, fn ($carry) => $carry + 1, 0);
     }
 
     /**
@@ -92,9 +94,7 @@ class Reduce
      */
     public static function toSum(iterable $data)
     {
-        return static::toValue($data, static function ($carry, $datum) {
-            return $carry + $datum;
-        }, 0);
+        return static::toValue($data, fn ($carry, $datum) => $carry + $datum, 0);
     }
 
     /**
@@ -108,9 +108,7 @@ class Reduce
      */
     public static function toProduct(iterable $data)
     {
-        return static::toValue($data, static function ($carry, $datum) {
-            return ($carry ?? 1) * $datum;
-        });
+        return static::toValue($data, fn ($carry, $datum) => ($carry ?? 1) * $datum);
     }
 
     /**
