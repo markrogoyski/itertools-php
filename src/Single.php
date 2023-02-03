@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\IteratorFactory;
-use IterTools\Util\SortHelper;
 
 class Single
 {
