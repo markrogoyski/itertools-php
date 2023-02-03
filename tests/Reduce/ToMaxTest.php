@@ -15,13 +15,13 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
      * @test         toMax array
      * @dataProvider dataProviderForArray
      * @param        array $data
-     * @param        callable|null $comparator
+     * @param        callable|null $compareBy
      * @param        int|float $expected
      */
-    public function testArray(array $data, ?callable $comparator, $expected): void
+    public function testArray(array $data, ?callable $compareBy, $expected): void
     {
         // When
-        $result = Reduce::toMax($data, $comparator);
+        $result = Reduce::toMax($data, $compareBy);
 
         // Then
         $this->assertSame($expected, $result);
@@ -472,13 +472,13 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
      * @test         toMax generators
      * @dataProvider dataProviderForGenerators
      * @param        \Generator $data
-     * @param        callable|null $comparator
+     * @param        callable|null $compareBy
      * @param        mixed $expected
      */
-    public function testGenerators(\Generator $data, ?callable $comparator, $expected): void
+    public function testGenerators(\Generator $data, ?callable $compareBy, $expected): void
     {
         // When
-        $result = Reduce::toMax($data, $comparator);
+        $result = Reduce::toMax($data, $compareBy);
 
         // Then
         $this->assertSame($expected, $result);
@@ -933,13 +933,13 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
      * @test         toMax iterators
      * @dataProvider dataProviderForIterators
      * @param        \Generator $data
-     * @param        callable|null $comparator
+     * @param        callable|null $compareBy
      * @param        mixed $expected
      */
-    public function testIterators(\Iterator $data, ?callable $comparator, $expected): void
+    public function testIterators(\Iterator $data, ?callable $compareBy, $expected): void
     {
         // When
-        $result = Reduce::toMax($data, $comparator);
+        $result = Reduce::toMax($data, $compareBy);
 
         // Then
         $this->assertSame($expected, $result);
@@ -1394,13 +1394,13 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
      * @test         toMax traversables
      * @dataProvider dataProviderForTraversables
      * @param        \Traversable $data
-     * @param        callable|null $comparator
+     * @param        callable|null $compareBy
      * @param        mixed $expected
      */
-    public function testTraversables(\Traversable $data, ?callable $comparator, $expected): void
+    public function testTraversables(\Traversable $data, ?callable $compareBy, $expected): void
     {
         // When
-        $result = Reduce::toMax($data, $comparator);
+        $result = Reduce::toMax($data, $compareBy);
 
         // Then
         $this->assertSame($expected, $result);
@@ -1847,6 +1847,60 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
                 $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
                 fn ($item) => -$item[1],
                 [2, 0, 3],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderForUsingClassMethodToCompare
+     * @param iterable $data
+     * @param callable|null $compareBy
+     * @param $expected
+     * @return void
+     */
+    public function testUsingClassMethodToCompare(iterable $data, ?callable $compareBy, $expected): void
+    {
+        // When
+        $result = Reduce::toMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public function dataProviderForUsingClassMethodToCompare(): array
+    {
+        $helper = new class () {
+            public function direct(int $value): int
+            {
+                return $value;
+            }
+
+            public function reverse(int $value): int
+            {
+                return -$value;
+            }
+        };
+
+        return [
+            [
+                [1, 3, 2, 5, 0],
+                fn ($item) => $helper->direct($item),
+                5,
+            ],
+            [
+                [1, 3, 2, 5, 0],
+                fn ($item) => $helper->reverse($item),
+                0,
+            ],
+            [
+                [1, 3, 2, 5, 0],
+                [$helper, 'direct'],
+                5,
+            ],
+            [
+                [1, 3, 2, 5, 0],
+                [$helper, 'reverse'],
+                0,
             ],
         ];
     }
