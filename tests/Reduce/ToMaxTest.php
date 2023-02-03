@@ -18,7 +18,7 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
      * @param        callable|null $comparator
      * @param        int|float $expected
      */
-    public function testArray(array $data, ?callable $comparator, $expected)
+    public function testArray(array $data, ?callable $comparator, $expected): void
     {
         // When
         $result = Reduce::toMax($data, $comparator);
@@ -475,7 +475,7 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
      * @param        callable|null $comparator
      * @param        mixed $expected
      */
-    public function testGenerators(\Generator $data, ?callable $comparator, $expected)
+    public function testGenerators(\Generator $data, ?callable $comparator, $expected): void
     {
         // When
         $result = Reduce::toMax($data, $comparator);
@@ -936,7 +936,7 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
      * @param        callable|null $comparator
      * @param        mixed $expected
      */
-    public function testIterators(\Iterator $data, ?callable $comparator, $expected)
+    public function testIterators(\Iterator $data, ?callable $comparator, $expected): void
     {
         // When
         $result = Reduce::toMax($data, $comparator);
@@ -1397,7 +1397,7 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
      * @param        callable|null $comparator
      * @param        mixed $expected
      */
-    public function testTraversables(\Traversable $data, ?callable $comparator, $expected)
+    public function testTraversables(\Traversable $data, ?callable $comparator, $expected): void
     {
         // When
         $result = Reduce::toMax($data, $comparator);

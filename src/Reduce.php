@@ -34,28 +34,23 @@ class Reduce
     /**
      * Reduces given iterable to its min value.
      *
-     * $comparableGetter must return comparable value.
+     * Callable param $compareBy must return comparable value.
      *
-     * If $comparableGetter is not proposed then items of given collection must be comparable.
+     * If $compareBy is not proposed then items of given collection must be comparable.
      *
      * Returns null if given collection is empty.
      *
      * @param iterable<mixed> $data
-     * @param callable|null   $comparableGetter
+     * @param callable|null   $compareBy
      *
      * @return mixed|null
      */
-    public static function toMin(iterable $data, callable $comparableGetter = null)
+    public static function toMin(iterable $data, callable $compareBy = null)
     {
-        if ($comparableGetter !== null) {
+        if ($compareBy !== null) {
             return static::toValue(
                 $data,
-                static function ($carry, $datum) use ($comparableGetter) {
-                    if ($comparableGetter($datum) < $comparableGetter($carry ?? $datum)) {
-                        return $datum;
-                    }
-                    return $carry ?? $datum;
-                }
+                fn ($carry, $datum) => $compareBy($datum) < $compareBy($carry ?? $datum) ? $datum : $carry ?? $datum
             );
         }
 
@@ -65,32 +60,59 @@ class Reduce
     /**
      * Reduces given iterable to its max value.
      *
-     * $comparableGetter must return comparable value.
+     * Callable param $compareBy must return comparable value.
      *
-     * If $comparableGetter is not proposed then items of given collection must be comparable.
+     * If $compareBy is not proposed then items of given collection must be comparable.
      *
      * Returns null if given collection is empty.
      *
      * @param iterable<mixed> $data
-     * @param callable|null   $comparableGetter
+     * @param callable|null   $compareBy
      *
      * @return mixed|null
      */
-    public static function toMax(iterable $data, callable $comparableGetter = null)
+    public static function toMax(iterable $data, callable $compareBy = null)
     {
-        if ($comparableGetter !== null) {
+        if ($compareBy !== null) {
             return static::toValue(
                 $data,
-                static function ($carry, $datum) use ($comparableGetter) {
-                    if ($comparableGetter($datum) > $comparableGetter($carry ?? $datum)) {
-                        return $datum;
-                    }
-                    return $carry ?? $datum;
-                }
+                fn ($carry, $datum) => $compareBy($datum) > $compareBy($carry ?? $datum) ? $datum : $carry ?? $datum
             );
         }
 
         return static::toValue($data, fn ($carry, $datum) => \max($carry ?? $datum, $datum));
+    }
+
+    /**
+     * Reduces given collection to array of its upper and lower bounds.
+     *
+     * Callable param $compareBy must return comparable value.
+     *
+     * If $compareBy is not proposed then items of given collection must be comparable.
+     *
+     * Returns [null, null] if given collection is empty.
+     *
+     * @param iterable<numeric> $numbers
+     * @param callable|null   $compareBy
+     *
+     * @return array{numeric, numeric}|array{null, null}
+     */
+    public static function toMinMax(iterable $numbers, callable $compareBy = null): array
+    {
+        if ($compareBy !== null) {
+            return static::toValue($numbers, static function (array $carry, $datum) use ($compareBy) {
+                return [
+                    $compareBy($datum) <= $compareBy($carry[0] ?? $datum) ? $datum : $carry[0] ?? $datum,
+                    $compareBy($datum) >= $compareBy($carry[1] ?? $datum) ? $datum : $carry[1] ?? $datum,
+                ];
+            }, [null, null]);
+        }
+
+        return static::toValue(
+            $numbers,
+            fn ($carry, $datum) => [\min($carry[0] ?? $datum, $datum), \max($carry[1] ?? $datum, $datum)],
+            [null, null]
+        );
     }
 
     /**
@@ -175,36 +197,6 @@ class Reduce
 
         $joined = \implode($separator, $items);
         return $prefix . $joined . $suffix;
-    }
-
-    /**
-     * Reduces given collection to array of its upper and lower bounds.
-     *
-     * If comparator is null then items of given collection must be comparable.
-     *
-     * Returns [null, null] if given collection is empty.
-     *
-     * @param iterable<numeric> $numbers
-     * @param callable|null   $comparator
-     *
-     * @return array{numeric, numeric}|array{null, null}
-     */
-    public static function toMinMax(iterable $numbers, callable $comparator = null): array
-    {
-        if ($comparator !== null) {
-            return static::toValue($numbers, static function ($carry, $datum) use ($comparator) {
-                return [
-                    $comparator($datum, $carry[0] ?? $datum) <= 0 ? $datum : $carry[0],
-                    $comparator($datum, $carry[1] ?? $datum) >= 0 ? $datum : $carry[1],
-                ];
-            }, [null, null]);
-        }
-
-        return static::toValue(
-            $numbers,
-            fn ($carry, $datum) => [\min($carry[0] ?? $datum, $datum), \max($carry[1] ?? $datum, $datum)],
-            [null, null]
-        );
     }
 
     /**

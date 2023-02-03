@@ -145,22 +145,22 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [],
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => $item),
                 null,
             ],
             [
                 [],
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => -$item),
                 null,
             ],
             [
                 [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => $item),
                 3,
             ],
             [
                 [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => -$item),
                 -3,
             ],
             [
@@ -203,12 +203,12 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [],
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => $item),
                 null,
             ],
             [
                 [],
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => -$item),
                 null,
             ],
             [
@@ -218,12 +218,12 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => $item),
                 -3,
             ],
             [
                 [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => -$item),
                 3,
             ],
             [
@@ -568,14 +568,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 [2, 3, 1, 2, -3, -2, 5, 7, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn () => false)
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [null, null],
             ],
             [
                 [2, 3, 1, 2, -3, -2, 5, 7, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn () => false)
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [null, null],
             ],
             [
@@ -589,14 +589,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 [2, 3, 1, 2, -3, -2, 5, 7, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($number) => $number > 6)
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [7, 7],
             ],
             [
                 [2, 3, 1, 2, -3, -2, 5, 7, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($number) => $number > 6)
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [7, 7],
             ],
             [
@@ -610,14 +610,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 [2, 3, 1, 2, -3, -2, 5, 7, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->chainWith([6, 10, 4])
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [-3, 10],
             ],
             [
                 [2, 3, 1, 2, -3, -2, 5, 7, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->chainWith([6, 10, 4])
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [10, -3],
             ],
             [
@@ -843,22 +843,22 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => $item),
                 null,
             ],
             [
                 $gen([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => -$item),
                 null,
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => $item),
                 3,
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => -$item),
                 -3,
             ],
             [
@@ -901,12 +901,12 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => $item),
                 null,
             ],
             [
                 $gen([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => -$item),
                 null,
             ],
             [
@@ -916,12 +916,12 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => $item),
                 -3,
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => -$item),
                 3,
             ],
             [
@@ -1190,14 +1190,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn () => false)
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [null, null],
             ],
             [
                 $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn () => false)
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [null, null],
             ],
             [
@@ -1211,14 +1211,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($number) => $number > 6)
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [7, 7],
             ],
             [
                 $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($number) => $number > 6)
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [7, 7],
             ],
             [
@@ -1232,14 +1232,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->chainWith([6, 10, 4])
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [-3, 10],
             ],
             [
                 $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->chainWith([6, 10, 4])
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [10, -3],
             ],
             [
@@ -1465,22 +1465,22 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => $item),
                 null,
             ],
             [
                 $iter([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => -$item),
                 null,
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => $item),
                 3,
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => -$item),
                 -3,
             ],
             [
@@ -1523,12 +1523,12 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => $item),
                 null,
             ],
             [
                 $iter([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => -$item),
                 null,
             ],
             [
@@ -1538,12 +1538,12 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => $item),
                 -3,
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => -$item),
                 3,
             ],
             [
@@ -1812,14 +1812,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn () => false)
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [null, null],
             ],
             [
                 $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn () => false)
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [null, null],
             ],
             [
@@ -1833,14 +1833,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($number) => $number > 6)
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [7, 7],
             ],
             [
                 $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($number) => $number > 6)
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [7, 7],
             ],
             [
@@ -1854,14 +1854,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->chainWith([6, 10, 4])
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [-3, 10],
             ],
             [
                 $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->chainWith([6, 10, 4])
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [10, -3],
             ],
             [
@@ -2087,22 +2087,22 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => $item),
                 null,
             ],
             [
                 $trav([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => -$item),
                 null,
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => $item),
                 3,
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMax(fn ($item) => -$item),
                 -3,
             ],
             [
@@ -2145,12 +2145,12 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => $item),
                 null,
             ],
             [
                 $trav([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => -$item),
                 null,
             ],
             [
@@ -2160,12 +2160,12 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => $item),
                 -3,
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                fn (iterable $iterable) => Stream::of($iterable)->toMin(fn ($item) => -$item),
                 3,
             ],
             [
@@ -2434,14 +2434,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn () => false)
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [null, null],
             ],
             [
                 $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn () => false)
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [null, null],
             ],
             [
@@ -2455,14 +2455,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($number) => $number > 6)
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [7, 7],
             ],
             [
                 $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($number) => $number > 6)
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [7, 7],
             ],
             [
@@ -2476,14 +2476,14 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->chainWith([6, 10, 4])
-                    ->toMinMax(fn ($lhs, $rhs) => $lhs <=> $rhs),
+                    ->toMinMax(fn ($item) => $item),
                 [-3, 10],
             ],
             [
                 $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->chainWith([6, 10, 4])
-                    ->toMinMax(fn ($lhs, $rhs) => $rhs <=> $lhs),
+                    ->toMinMax(fn ($item) => -$item),
                 [10, -3],
             ],
             [

@@ -39,12 +39,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [null, null],
             ],
             [
                 [],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [null, null],
             ],
             [
@@ -54,12 +54,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [0],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [0, 0],
             ],
             [
                 [0],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [0, 0],
             ],
             [
@@ -69,12 +69,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [1],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 1],
             ],
             [
                 [1],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [1, 1],
             ],
             [
@@ -84,12 +84,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [-1],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-1, -1],
             ],
             [
                 [-1],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [-1, -1],
             ],
             [
@@ -99,12 +99,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [-1, -3, -5],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-5, -1],
             ],
             [
                 [-1, -3, -5],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [-1, -5],
             ],
             [
@@ -114,12 +114,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [3, 1, 2, -3, -1, -2],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3, 3],
             ],
             [
                 [3, 1, 2, -3, -1, -2],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3, -3],
             ],
             [
@@ -129,12 +129,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [2.2, 3.3, 1.1],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1.1, 3.3],
             ],
             [
                 [2.2, 3.3, 1.1],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3.3, 1.1],
             ],
             [
@@ -144,12 +144,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [2, 3.3, 1.1],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1.1, 3.3],
             ],
             [
                 [2, 3.3, 1.1],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3.3, 1.1],
             ],
             [
@@ -159,12 +159,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [2.2, -3.3, -1.1, 2.2, 5.5],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5.5],
             ],
             [
                 [2.2, -3.3, -1.1, 2.2, 5.5],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5.5, -3.3],
             ],
             [
@@ -174,12 +174,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['2.2', '-3.3', '-1.1', '2.2', '5.5'],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5.5],
             ],
             [
                 ['2.2', '-3.3', '-1.1', '2.2', '5.5'],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5.5, -3.3],
             ],
             [
@@ -189,12 +189,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['3', '4', '1'],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 4],
             ],
             [
                 ['3', '4', '1'],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [4, 1],
             ],
             [
@@ -204,12 +204,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [2, -3.3, '-1.1', 2.2, '5'],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5],
             ],
             [
                 [2, -3.3, '-1.1', 2.2, '5'],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5, -3.3],
             ],
             [
@@ -219,22 +219,17 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[1, 2, 3], [2, 0, 3], [2, 1, 3]],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [[1, 2, 3], [2, 1, 3]],
             ],
             [
                 [[1, 2, 3], [2, 0, 3], [2, 1, 3]],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [[2, 1, 3], [1, 2, 3]],
-            ],
-            [
-                [[1, 2, 3], [2, 0, 3], [2, 1, 3]],
-                fn ($lhs, $rhs) => $lhs[1] <=> $rhs[1],
+                fn ($item) => $item[1],
                 [[2, 0, 3], [1, 2, 3]],
             ],
             [
                 [[1, 2, 3], [2, 0, 3], [2, 1, 3]],
-                fn ($lhs, $rhs) => $rhs[1] <=> $lhs[1],
+                fn ($item) => -$item[1],
                 [[1, 2, 3], [2, 0, 3]],
             ],
         ];
@@ -270,12 +265,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [null, null],
             ],
             [
                 $gen([]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [null, null],
             ],
             [
@@ -285,12 +280,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([0]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [0, 0],
             ],
             [
                 $gen([0]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [0, 0],
             ],
             [
@@ -300,12 +295,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 1],
             ],
             [
                 $gen([1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [1, 1],
             ],
             [
@@ -315,12 +310,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([-1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-1, -1],
             ],
             [
                 $gen([-1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [-1, -1],
             ],
             [
@@ -330,12 +325,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([-1, -3, -5]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-5, -1],
             ],
             [
                 $gen([-1, -3, -5]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [-1, -5],
             ],
             [
@@ -345,12 +340,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([3, 1, 2, -3, -1, -2]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3, 3],
             ],
             [
                 $gen([3, 1, 2, -3, -1, -2]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3, -3],
             ],
             [
@@ -360,12 +355,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([2.2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1.1, 3.3],
             ],
             [
                 $gen([2.2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3.3, 1.1],
             ],
             [
@@ -375,12 +370,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1.1, 3.3],
             ],
             [
                 $gen([2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3.3, 1.1],
             ],
             [
@@ -390,12 +385,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([2.2, -3.3, -1.1, 2.2, 5.5]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5.5],
             ],
             [
                 $gen([2.2, -3.3, -1.1, 2.2, 5.5]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5.5, -3.3],
             ],
             [
@@ -405,12 +400,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen(['2.2', '-3.3', '-1.1', '2.2', '5.5']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5.5],
             ],
             [
                 $gen(['2.2', '-3.3', '-1.1', '2.2', '5.5']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5.5, -3.3],
             ],
             [
@@ -420,12 +415,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen(['3', '4', '1']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 4],
             ],
             [
                 $gen(['3', '4', '1']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [4, 1],
             ],
             [
@@ -435,12 +430,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([2, -3.3, '-1.1', 2.2, '5']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5],
             ],
             [
                 $gen([2, -3.3, '-1.1', 2.2, '5']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5, -3.3],
             ],
             [
@@ -450,22 +445,17 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [[1, 2, 3], [2, 1, 3]],
             ],
             [
                 $gen([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [[2, 1, 3], [1, 2, 3]],
-            ],
-            [
-                $gen([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs[1] <=> $rhs[1],
+                fn ($item) => $item[1],
                 [[2, 0, 3], [1, 2, 3]],
             ],
             [
                 $gen([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs[1] <=> $lhs[1],
+                fn ($item) => -$item[1],
                 [[1, 2, 3], [2, 0, 3]],
             ],
         ];
@@ -501,12 +491,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [null, null],
             ],
             [
                 $trav([]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [null, null],
             ],
             [
@@ -516,12 +506,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([0]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [0, 0],
             ],
             [
                 $trav([0]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [0, 0],
             ],
             [
@@ -531,12 +521,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 1],
             ],
             [
                 $trav([1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [1, 1],
             ],
             [
@@ -546,12 +536,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([-1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-1, -1],
             ],
             [
                 $trav([-1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [-1, -1],
             ],
             [
@@ -561,12 +551,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([-1, -3, -5]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-5, -1],
             ],
             [
                 $trav([-1, -3, -5]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [-1, -5],
             ],
             [
@@ -576,12 +566,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([3, 1, 2, -3, -1, -2]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3, 3],
             ],
             [
                 $trav([3, 1, 2, -3, -1, -2]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3, -3],
             ],
             [
@@ -591,12 +581,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2.2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1.1, 3.3],
             ],
             [
                 $trav([2.2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3.3, 1.1],
             ],
             [
@@ -606,12 +596,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1.1, 3.3],
             ],
             [
                 $trav([2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3.3, 1.1],
             ],
             [
@@ -621,12 +611,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2.2, -3.3, -1.1, 2.2, 5.5]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5.5],
             ],
             [
                 $trav([2.2, -3.3, -1.1, 2.2, 5.5]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5.5, -3.3],
             ],
             [
@@ -636,12 +626,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav(['2.2', '-3.3', '-1.1', '2.2', '5.5']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5.5],
             ],
             [
                 $trav(['2.2', '-3.3', '-1.1', '2.2', '5.5']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5.5, -3.3],
             ],
             [
@@ -651,12 +641,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav(['3', '4', '1']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 4],
             ],
             [
                 $trav(['3', '4', '1']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [4, 1],
             ],
             [
@@ -666,12 +656,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2, -3.3, '-1.1', 2.2, '5']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5],
             ],
             [
                 $trav([2, -3.3, '-1.1', 2.2, '5']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5, -3.3],
             ],
             [
@@ -681,22 +671,17 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [[1, 2, 3], [2, 1, 3]],
             ],
             [
                 $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [[2, 1, 3], [1, 2, 3]],
-            ],
-            [
-                $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs[1] <=> $rhs[1],
+                fn ($item) => $item[1],
                 [[2, 0, 3], [1, 2, 3]],
             ],
             [
                 $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs[1] <=> $lhs[1],
+                fn ($item) => -$item[1],
                 [[1, 2, 3], [2, 0, 3]],
             ],
         ];
@@ -732,12 +717,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [null, null],
             ],
             [
                 $trav([]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [null, null],
             ],
             [
@@ -747,12 +732,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([0]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [0, 0],
             ],
             [
                 $trav([0]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [0, 0],
             ],
             [
@@ -762,12 +747,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 1],
             ],
             [
                 $trav([1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [1, 1],
             ],
             [
@@ -777,12 +762,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([-1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-1, -1],
             ],
             [
                 $trav([-1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [-1, -1],
             ],
             [
@@ -792,12 +777,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([-1, -3, -5]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-5, -1],
             ],
             [
                 $trav([-1, -3, -5]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [-1, -5],
             ],
             [
@@ -807,12 +792,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([3, 1, 2, -3, -1, -2]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3, 3],
             ],
             [
                 $trav([3, 1, 2, -3, -1, -2]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3, -3],
             ],
             [
@@ -822,12 +807,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2.2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1.1, 3.3],
             ],
             [
                 $trav([2.2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3.3, 1.1],
             ],
             [
@@ -837,12 +822,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1.1, 3.3],
             ],
             [
                 $trav([2, 3.3, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [3.3, 1.1],
             ],
             [
@@ -852,12 +837,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2.2, -3.3, -1.1, 2.2, 5.5]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5.5],
             ],
             [
                 $trav([2.2, -3.3, -1.1, 2.2, 5.5]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5.5, -3.3],
             ],
             [
@@ -867,12 +852,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav(['2.2', '-3.3', '-1.1', '2.2', '5.5']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5.5],
             ],
             [
                 $trav(['2.2', '-3.3', '-1.1', '2.2', '5.5']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5.5, -3.3],
             ],
             [
@@ -882,12 +867,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav(['3', '4', '1']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 4],
             ],
             [
                 $trav(['3', '4', '1']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [4, 1],
             ],
             [
@@ -897,12 +882,12 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2, -3.3, '-1.1', 2.2, '5']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [-3.3, 5],
             ],
             [
                 $trav([2, -3.3, '-1.1', 2.2, '5']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 [5, -3.3],
             ],
             [
@@ -912,22 +897,17 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [[1, 2, 3], [2, 1, 3]],
             ],
             [
                 $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [[2, 1, 3], [1, 2, 3]],
-            ],
-            [
-                $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs[1] <=> $rhs[1],
+                fn ($item) => $item[1],
                 [[2, 0, 3], [1, 2, 3]],
             ],
             [
                 $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs[1] <=> $lhs[1],
+                fn ($item) => -$item[1],
                 [[1, 2, 3], [2, 0, 3]],
             ],
         ];

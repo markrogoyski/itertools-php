@@ -1031,37 +1031,63 @@ class Stream implements \IteratorAggregate
     /**
      * Reduces iterable source to its max value.
      *
-     * If comparator is null then items of iterable source must be comparable.
+     * Callable param $compareBy must return comparable value.
+     *
+     * If $compareBy is not proposed then items of iterable source must be comparable.
      *
      * Returns null if iterable source is empty.
      *
-     * @param callable|null $comparator
+     * @param callable|null $compareBy
      *
      * @return mixed
      *
      * @see Reduce::toMax()
      */
-    public function toMax(callable $comparator = null)
+    public function toMax(callable $compareBy = null)
     {
-        return Reduce::toMax($this->iterable, $comparator);
+        return Reduce::toMax($this->iterable, $compareBy);
     }
 
     /**
      * Reduces iterable source to its min value.
      *
-     * If comparator is null then items of iterable source must be comparable.
+     * Callable param $compareBy must return comparable value.
+     *
+     * If $compareBy is not proposed then items of iterable source must be comparable.
      *
      * Returns null if iterable source is empty.
      *
-     * @param callable|null $comparator
+     * @param callable|null $compareBy
      *
      * @return mixed
      *
      * @see Reduce::toMin()
      */
-    public function toMin(callable $comparator = null)
+    public function toMin(callable $compareBy = null)
     {
-        return Reduce::toMin($this->iterable, $comparator);
+        return Reduce::toMin($this->iterable, $compareBy);
+    }
+
+    /**
+     * Reduces iterable source to array of its upper and lower bounds.
+     *
+     * Callable param $compareBy must return comparable value.
+     *
+     * If $compareBy is not proposed then items of iterable source must be comparable.
+     *
+     * Returns [null, null] if iterable source is empty.
+     *
+     * @param callable|null $compareBy
+     *
+     * @return array{numeric, numeric}|array{null, null}
+     *
+     * @see Reduce::toMinMax()
+     */
+    public function toMinMax(callable $compareBy = null): array
+    {
+        /** @var iterable<numeric> $iterable */
+        $iterable = $this->iterable;
+        return Reduce::toMinMax($iterable, $compareBy);
     }
 
     /**
@@ -1111,26 +1137,6 @@ class Stream implements \IteratorAggregate
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;
         return Reduce::toSum($iterable);
-    }
-
-    /**
-     * Reduces iterable source to array of its upper and lower bounds.
-     *
-     * If comparator is null then items of iterable source must be comparable.
-     *
-     * Returns [null, null] if iterable source is empty.
-     *
-     * @param callable|null $comparator
-     *
-     * @return array{numeric, numeric}|array{null, null}
-     *
-     * @see Reduce::toMinMax()
-     */
-    public function toMinMax(callable $comparator = null): array
-    {
-        /** @var iterable<numeric> $iterable */
-        $iterable = $this->iterable;
-        return Reduce::toMinMax($iterable, $comparator);
     }
 
     /**
