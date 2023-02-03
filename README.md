@@ -128,9 +128,9 @@ Quick Reference
 |------------------------------|-----------------------------------------------|---------------------------------------------------------------|
 | [`toAverage`](#To-Average)   | Mean average of elements                      | `Reduce::toAverage($numbers)`                                 |
 | [`toCount`](#To-Count)       | Reduce to length of iterable                  | `Reduce::toCount($data)`                                      |
-| [`toMax`](#To-Max)           | Reduce to its largest element                 | `Reduce::toMax($numbers, [$comparator])`                      |
-| [`toMin`](#To-Min)           | Reduce to its smallest element                | `Reduce::toMin($numbers, [$comparator])`                      |
-| [`toMinMax`](#To-Min-Max)    | Reduce to array of upper and lower bounds     | `Reduce::toMinMax($numbers, [$comparator])`                   |
+| [`toMax`](#To-Max)           | Reduce to its largest element                 | `Reduce::toMax($numbers, [$compareBy])`                       |
+| [`toMin`](#To-Min)           | Reduce to its smallest element                | `Reduce::toMin($numbers, [$compareBy])`                       |
+| [`toMinMax`](#To-Min-Max)    | Reduce to array of upper and lower bounds     | `Reduce::toMinMax($numbers, [$compareBy])`                    |
 | [`toProduct`](#To-Product)   | Reduce to the product of its elements         | `Reduce::toProduct($numbers)`                                 |
 | [`toRange`](#To-Range)       | Reduce to difference of max and min values    | `Reduce::toRange($numbers)`                                   |
 | [`toString`](#To-String)     | Reduce to joined string                       | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
@@ -204,9 +204,9 @@ Quick Reference
 |--------------------------------|-------------------------------------------------------|---------------------------------------------------------|
 | [`toAverage`](#To-Average-1)   | Reduces stream to the mean average of its items       | `$stream->toAverage()`                                  |
 | [`toCount`](#To-Count-1)       | Reduces stream to its length                          | `$stream->toCount()`                                    |
-| [`toMax`](#To-Max-1)           | Reduces stream to its max value                       | `$stream->toMax([$comparator])`                         |
-| [`toMin`](#To-Min-1)           | Reduces stream to its min value                       | `$stream->toMin([$comparator])`                         |
-| [`toMinMax`](#To-Min-Max-1)    | Reduces stream to array of upper and lower bounds     | `$stream->toMinMax([$comparator])`                      |
+| [`toMax`](#To-Max-1)           | Reduces stream to its max value                       | `$stream->toMax([$compareBy])`                          |
+| [`toMin`](#To-Min-1)           | Reduces stream to its min value                       | `$stream->toMin([$compareBy])`                          |
+| [`toMinMax`](#To-Min-Max-1)    | Reduces stream to array of upper and lower bounds     | `$stream->toMinMax([$compareBy])`                       |
 | [`toProduct`](#To-Product-1)   | Reduces stream to the product of its items            | `$stream->toProduct()`                                  |
 | [`toString`](#To-String-1)     | Reduces stream to joined string                       | `$stream->toString([$separator], [$prefix], [$suffix])` |
 | [`toSum`](#To-Sum-1)           | Reduces stream to the sum of its items                | `$stream->toSum()`                                      |
@@ -1360,9 +1360,10 @@ $length = Reduce::toCount($someIterable);
 ### To Max
 Reduces to the max value.
 
-```Reduce::toMax(iterable $data, callable|null $comparator = null): mixed|null```
+```Reduce::toMax(iterable $data, callable|null $compareBy = null): mixed|null```
 
-- If `$comparator` is `null` then elements must be comparable.
+- Callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not proposed then items of given collection must be comparable.
 - Returns null if collection is empty.
 
 ```php
@@ -1377,9 +1378,10 @@ $result = Reduce::toMax($numbers);
 ### To Min
 Reduces to the min value.
 
-```Reduce::toMin(iterable $data, callable|null $comparator = null): mixed|null```
+```Reduce::toMin(iterable $data, callable|null $compareBy = null): mixed|null```
 
-- If `$comparator` is `null` then elements must be comparable.
+- Callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not proposed then items of given collection must be comparable.
 - Returns null if collection is empty.
 
 ```php
@@ -1394,9 +1396,10 @@ $result = Reduce::toMin($numbers);
 ### To Min Max
 Reduces to array of its upper and lower bounds (max and min).
 
-```Reduce::toMinMax(iterable $numbers, callable|null $comparator = null): array```
+```Reduce::toMinMax(iterable $numbers, callable|null $compareBy = null): array```
 
-- If `$comparator` is `null` then elements must be comparable.
+- Callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not proposed then items of given collection must be comparable.
 - Returns `[null, null]` if given collection is empty.
 
 ```php
@@ -2481,9 +2484,11 @@ $result = Stream::of($iterable)
 ##### To Max
 Reduces iterable source to its max value.
 
-```$stream->toMax(callable|null $comparator = null): mixed```
+```$stream->toMax(callable|null $compareBy = null): mixed```
 
-If `$comparator` is `null` then items of iterable source must be comparable.
+Callable param `$compareBy` must return comparable value.
+
+If `$compareBy` is not proposed then items of iterable source must be comparable.
 
 Returns null if iterable source is empty.
 
@@ -2500,9 +2505,11 @@ $result = Stream::of($iterable)
 ##### To Min
 Reduces iterable source to its min value.
 
-```$stream->toMin(callable|null $comparator = null): mixed```
+```$stream->toMin(callable|null $compareBy = null): mixed```
 
-If `$comparator` is `null` then items of iterable source must be comparable.
+Callable param `$compareBy` must return comparable value.
+
+If `$compareBy` is not proposed then items of iterable source must be comparable.
 
 Returns null if iterable source is empty.
 
@@ -2519,9 +2526,11 @@ $result = Stream::of($iterable)
 ##### To Min Max
 Reduces iterable source to array of its upper and lower bounds (max and min).
 
-```$stream->toMinMax(callable|null $comparator = null): array```
+```$stream->toMinMax(callable|null $compareBy = null): array```
 
-If `$comparator` is `null` then items of iterable source must be comparable.
+Callable param `$compareBy` must return comparable value.
+
+If `$compareBy` is not proposed then items of iterable source must be comparable.
 
 Returns `[null, null]` if given collection is empty.
 
