@@ -7,15 +7,31 @@
   * `compressAssociative`
   * `reindex`
   * `filterKeys`
+  * `sort`
+* Reduce
+  * `toFirst`
+  * `toLast`
+  * `toFirstAndLast`
+  * `toMin` (parameter `$compareBy` added)
+  * `toMax` (parameter `$compareBy` added)
+  * `toMinMax` (parameter `$compareBy` added)
 * Stream
   * Source
     * `ofRange`
     * `ofFileLines`
     * `ofCsvFile`
-  * Operations
+  * Stream Operations
     * `compressAssociative`
     * `reindex`
     * `filterKeys`
+    * `sort`
+  * Reduction Terminal Operations
+    * `toFirst`
+    * `toLast`
+    * `toFirstAndLast`
+    * `toMin` (parameter `$compareBy` added)
+    * `toMax` (parameter `$compareBy` added)
+    * `toMinMax` (parameter `$compareBy` added)
   * Transformation Terminal Operations
     * `toAssociativeArray`
   * File Terminal Operations

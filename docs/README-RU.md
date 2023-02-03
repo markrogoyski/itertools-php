@@ -65,6 +65,7 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`map`](#Map)                            | Отображение коллекции с использованием callback-функции                   | `Single::map($data, $function)`                             |
 | [`pairwise`](#Pairwise)                  | Итерирует коллекцию попарно (с наложением)                                | `Single::pairwise($data)`                                   |
 | [`repeat`](#Repeat)                      | Повторяет данное значние заданное число раз                               | `Single::repeat($item, $repetitions)`                       |
+| [`sort`](#Sort)                          | Сортирует коллекцию                                                       | `Single::sort($data, [$comparator])`                        |
 | [`string`](#String)                      | Итерирует строку посимвольно                                              | `Single::string($string)`                                   |
 | [`takeWhile`](#Take-While)               | Отдает элементы, пока предикат возвращает истину                          | `Single::takeWhile($data, $predicate)`                      |
 
@@ -118,18 +119,21 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`sameCount`](#Same-Count)   | Истинно, если данные коллекции имеют одинаковую длину                          | `Summary::sameCount(...$iterables)`        |
 
 #### Редуцирование
-| Метод                      | Описание                                                                            | Пример кода                                                   |
-|----------------------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| [`toAverage`](#To-Average) | Среднее арифметическое элементов коллекции                                          | `Reduce::toAverage($numbers)`                                 |
-| [`toCount`](#To-Count)     | Длина коллекции                                                                     | `Reduce::toCount($data)`                                      |
-| [`toMax`](#To-Max)         | Максимальный элемент коллекции                                                      | `Reduce::toMax($numbers, [$compareBy])`                       |
-| [`toMin`](#To-Min)         | Минимальный элемент коллекции                                                       | `Reduce::toMin($numbers, [$compareBy])`                       |
-| [`toMinMax`](#To-Min-Max)  | Минимальный и максимальный элемент коллекции                                        | `Reduce::toMinMax($numbers, [$compareBy])`                    |
-| [`toProduct`](#To-Product) | Произведение элементов коллекции                                                    | `Reduce::toProduct($numbers)`                                 |
-| [`toRange`](#To-Range)     | Разница между максимальным и минимальным элементами коллекции                       | `Reduce::toRange($numbers)`                                   |
-| [`toString`](#To-String)   | Преобразование коллекции в строку                                                   | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
-| [`toSum`](#To-Sum)         | Сумма элементов коллекции                                                           | `Reduce::toSum($numbers)`                                     |
-| [`toValue`](#To-Value)     | Редуцирование коллекции до значения, вычисляемого с использованием callback-функции | `Reduce::toValue($data, $reducer, $initialValue)`             |
+| Метод                                  | Описание                                                                            | Пример кода                                                   |
+|----------------------------------------|-------------------------------------------------------------------------------------|---------------------------------------------------------------|
+| [`toAverage`](#To-Average)             | Среднее арифметическое элементов коллекции                                          | `Reduce::toAverage($numbers)`                                 |
+| [`toCount`](#To-Count)                 | Длина коллекции                                                                     | `Reduce::toCount($data)`                                      |
+| [`toFirst`](#To-First)                 | Первый элемент коллекции                                                            | `Reduce::toFirst()`                                           |
+| [`toFirstAndLast`](#To-First-And-Last) | Первый и последни элементы коллекции                                                | `Reduce::toFirstAndLast()`                                    |
+| [`toLast`](#To-Last)                   | Последний элемент коллекции                                                         | `Reduce::toLast()`                                            |
+| [`toMax`](#To-Max)                     | Максимальный элемент коллекции                                                      | `Reduce::toMax($numbers, [$compareBy])`                       |
+| [`toMin`](#To-Min)                     | Минимальный элемент коллекции                                                       | `Reduce::toMin($numbers, [$compareBy])`                       |
+| [`toMinMax`](#To-Min-Max)              | Минимальный и максимальный элемент коллекции                                        | `Reduce::toMinMax($numbers, [$compareBy])`                    |
+| [`toProduct`](#To-Product)             | Произведение элементов коллекции                                                    | `Reduce::toProduct($numbers)`                                 |
+| [`toRange`](#To-Range)                 | Разница между максимальным и минимальным элементами коллекции                       | `Reduce::toRange($numbers)`                                   |
+| [`toString`](#To-String)               | Преобразование коллекции в строку                                                   | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
+| [`toSum`](#To-Sum)                     | Сумма элементов коллекции                                                           | `Reduce::toSum($numbers)`                                     |
+| [`toValue`](#To-Value)                 | Редуцирование коллекции до значения, вычисляемого с использованием callback-функции | `Reduce::toValue($data, $reducer, $initialValue)`             |
 
 ### Цепочечный вызов итераторов
 #### Фабричные методы
@@ -169,6 +173,7 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`runningMin`](#Running-Min-1)                                            | Поиск минимального значения из коллекции                                                                     | `$stream->runningMin($initialValue)`                                              |
 | [`runningProduct`](#Running-Product-1)                                    | Накопление произведения элементов коллекции                                                                  | `$stream->runningProduct($initialValue)`                                          |
 | [`runningTotal`](#Running-Total-1)                                        | Накопление суммы элементов коллекции                                                                         | `$stream->runningTotal($initialValue)`                                            |
+| [`sort`](#Sort-1)                                                         | Сортирует хранимую коллекцию                                                                                 | `$stream->sort([$comparator])`                                                    |
 | [`symmetricDifferenceWith`](#Symmetric-Difference-With)                   | Возвращает симметрическую разность хранимой коллекции с другими коллекциями                                  | `$this->symmetricDifferenceWith(...$iterables)`                                   |
 | [`symmetricDifference CoerciveWith`](#Symmetric-Difference-Coercive-With) | Возвращает симметрическую разность хранимой коллекции с другими коллекциями (в режиме приведения типов)      | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                          |
 | [`takeWhile`](#Take-While-1)                                              | Отдает элементы из коллекции, пока предикат возвращает истину                                                | `$stream->takeWhile($predicate)`                                                  |
@@ -190,18 +195,21 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`sameCountWith`](#Same-Count-With) | Истинно, если данные коллекции имеют одинаковую длину                          | `$stream->sameCountWith(...$iterables)` |
 
 ##### Редуцирование
-| Terminal Operation             | Description                                                         | Code Snippet                                            |
-|--------------------------------|---------------------------------------------------------------------|---------------------------------------------------------|
-| [`toAverage`](#To-Average-1)   | Среднее арфиметическое элементов коллекции                          | `$stream->toAverage()`                                  |
-| [`toCount`](#To-Count-1)       | Длина коллекции                                                     | `$stream->toCount()`                                    |
-| [`toMax`](#To-Max-1)           | Максимальное значение из элементов коллекции                        | `$stream->toMax([$comparator])`                         |
-| [`toMin`](#To-Min-1)           | Минимальное значение из элементов коллекции                         | `$stream->toMin([$comparator])`                         |
-| [`toMinMax`](#To-Min-Max-1)    | Минимальное и максимальное значения из элементов коллекции          | `$stream->toMinMax([$comparator])`                      |
-| [`toProduct`](#To-Product-1)   | Произведение элементов коллекции                                    | `$stream->toProduct()`                                  |
-| [`toString`](#To-String-1)     | Преобразование коллекции в строку                                   | `$stream->toString([$separator], [$prefix], [$suffix])` |
-| [`toSum`](#To-Sum-1)           | Сумма элементов коллекции                                           | `$stream->toSum()`                                      |
-| [`toRange`](#To-Range-1)       | Разница между максимальным и минимальным элементами коллекции       | `$stream->toRange()`                                    |
-| [`toValue`](#To-Value-1)       | Редуцирование коллекции до значения, вычисляемого callback-функцией | `$stream->toValue($reducer, $initialValue)`             |
+| Terminal Operation                       | Description                                                         | Code Snippet                                            |
+|------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------|
+| [`toAverage`](#To-Average-1)             | Среднее арфиметическое элементов коллекции                          | `$stream->toAverage()`                                  |
+| [`toCount`](#To-Count-1)                 | Длина коллекции                                                     | `$stream->toCount()`                                    |
+| [`toFirst`](#To-First-1)                 | Первый элемент коллекции                                            | `$stream->toFirst()`                                    |
+| [`toFirstAndLast`](#To-First-And-Last-1) | Первый и последни элементы коллекции                                | `$stream->toFirstAndLast()`                             |
+| [`toLast`](#To-Last-1)                   | Последний элемент коллекции                                         | `$stream->toLast()`                                     |
+| [`toMax`](#To-Max-1)                     | Максимальное значение из элементов коллекции                        | `$stream->toMax([$compareBy])`                          |
+| [`toMin`](#To-Min-1)                     | Минимальное значение из элементов коллекции                         | `$stream->toMin([$compareBy])`                          |
+| [`toMinMax`](#To-Min-Max-1)              | Минимальное и максимальное значения из элементов коллекции          | `$stream->toMinMax([$compareBy])`                       |
+| [`toProduct`](#To-Product-1)             | Произведение элементов коллекции                                    | `$stream->toProduct()`                                  |
+| [`toString`](#To-String-1)               | Преобразование коллекции в строку                                   | `$stream->toString([$separator], [$prefix], [$suffix])` |
+| [`toSum`](#To-Sum-1)                     | Сумма элементов коллекции                                           | `$stream->toSum()`                                      |
+| [`toRange`](#To-Range-1)                 | Разница между максимальным и минимальным элементами коллекции       | `$stream->toRange()`                                    |
+| [`toValue`](#To-Value-1)                 | Редуцирование коллекции до значения, вычисляемого callback-функцией | `$stream->toValue($reducer, $initialValue)`             |
 
 ##### Операции конвертации
 | Terminal Operation             | Description                              | Code Snippet                                            |
@@ -580,6 +588,24 @@ foreach (Single::repeat($data, $repetitions) as $repeated) {
     print($repeated);
 }
 // 'Beetlejuice', 'Beetlejuice', 'Beetlejuice'
+```
+
+### Sort
+Сортирует коллекцию.
+
+```Single::sort(iterable $data, callable $comparator = null)```
+
+Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
+
+```php
+use IterTools\Single;
+
+$data = [3, 4, 5, 9, 8, 7, 1, 6, 2];
+
+foreach (Single::sort($data) as $datum) {
+    print($datum);
+}
+// 1, 2, 3, 4, 5, 6, 7, 8, 9
 ```
 
 ### String
@@ -1230,10 +1256,58 @@ $length = Reduce::toCount($someIterable);
 // 3
 ```
 
+### To First
+Возвращает первый элемент коллекции.
+
+```Reduce::toFirst(iterable $data): mixed```
+
+Бросает `\LengthException` если коллекция пуста.
+
+```php
+use IterTools\Reduce;
+
+$input = [10, 20, 30];
+
+$result = Reduce::toFirst($input);
+// 10
+```
+
+### To First And Last
+Возвращает первый и последний элементы коллекции.
+
+```Reduce::toFirstAndLast(iterable $data): array{mixed, mixed}```
+
+Бросает `\LengthException` если хранимая в потоке коллекция пуста.
+
+```php
+use IterTools\Reduce;
+
+$input = [10, 20, 30];
+
+$result = Reduce::toFirstAndLast($input);
+// [10, 30]
+```
+
+### To Last
+Возвращает последний элемент коллекции.
+
+```Reduce::toLast(iterable $data): mixed```
+
+Бросает `\LengthException` если коллекция пуста.
+
+```php
+use IterTools\Reduce;
+
+$input = [10, 20, 30];
+
+$result = Reduce::toLast($input);
+// 30
+```
+
 ### To Max
 Возвращает максимальный элемент коллекции.
 
-```Reduce::toMax(iterable $data, callable|null $compareBy = null): mixed|null```
+```Reduce::toMax(iterable $data, callable $compareBy = null): mixed|null```
 
 - Функция `$compareBy` должна возвращать сравнимое значение.
 - Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
@@ -1251,7 +1325,7 @@ $result = Reduce::toMax($numbers);
 ### To Min
 Возвращает минимальный элемент коллекции.
 
-```Reduce::toMin(iterable $data, callable|null $compareBy = null): mixed|null```
+```Reduce::toMin(iterable $data, callable $compareBy = null): mixed|null```
 
 - Функция `$compareBy` должна возвращать сравнимое значение.
 - Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
@@ -1269,7 +1343,7 @@ $result = Reduce::toMin($numbers);
 ### To Min Max
 Возвращает минимальный и максимальный элементы коллекции.
 
-```Reduce::toMinMax(iterable $numbers, callable|null $compareBy = null): array```
+```Reduce::toMinMax(iterable $numbers, callable $compareBy = null): array```
 
 - Функция `$compareBy` должна возвращать сравнимое значение.
 - Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
@@ -1915,6 +1989,24 @@ $result = Stream::of($input)
 // 1, 3, 6, 10, 15
 ```
 
+### Sort
+Сортирует хранимую в потоке коллекцию.
+
+```$stream->sort(callable $comparator = null)```
+
+Если `$comparator` не передан, элементы хранимой коллекции должны быть сравнимы.
+
+```php
+use IterTools\Stream;
+
+$input = [3, 4, 5, 9, 8, 7, 1, 6, 2];
+
+$result = Stream::of($input)
+    ->sort()
+    ->toArray();
+// 1, 2, 3, 4, 5, 6, 7, 8, 9
+```
+
 #### Symmetric difference With
 Возвращает поток, содержащий симметрическую разность исходного потока с заданным набором коллекций.
 
@@ -2237,10 +2329,61 @@ $result = Stream::of($iterable)
 // 5
 ```
 
+### To First
+Возвращает первый элемент из коллекции в потоке.
+
+```$stream->toFirst(): mixed```
+
+Бросает `\LengthException` если хранимая в потоке коллекция пуста.
+
+```php
+use IterTools\Stream;
+
+$input = [10, 20, 30];
+
+$result = Stream::of($input)
+    ->toFirst();
+// 10
+```
+
+### To First And Last
+Возвращает первый и последний элементы из коллекции в потоке.
+
+```$stream->toFirstAndLast(): array{mixed, mixed}```
+
+Бросает `\LengthException` если хранимая в потоке коллекция пуста.
+
+```php
+use IterTools\Stream;
+
+$input = [10, 20, 30];
+
+$result = Stream::of($input)
+    ->toFirstAndLast();
+// [10, 30]
+```
+
+### To Last
+Возвращает последний элемент из коллекции в потоке.
+
+```$stream->toLast(): mixed```
+
+Бросает `\LengthException` если хранимая в потоке коллекция пуста.
+
+```php
+use IterTools\Stream;
+
+$input = [10, 20, 30];
+
+$result = Stream::of($input)
+    ->toLast();
+// 30
+```
+
 ##### To Max
 Возвращает максимальный элемент коллекции из потока.
 
-```$stream->toMax(callable|null $compareBy = null): mixed```
+```$stream->toMax(callable $compareBy = null): mixed```
 
 Функция `$compareBy` должна возвращать сравнимое значение.
 
@@ -2261,7 +2404,7 @@ $result = Stream::of($iterable)
 ##### To Min
 Возвращает минимальный элемент коллекции из потока.
 
-```$stream->toMin(callable|null $compareBy = null): mixed```
+```$stream->toMin(callable $compareBy = null): mixed```
 
 Функция `$compareBy` должна возвращать сравнимое значение.
 
@@ -2282,7 +2425,7 @@ $result = Stream::of($iterable)
 ##### To Min Max
 Возвращает минимальный и максимальный элементы коллекции из потока.
 
-```$stream->toMinMax(callable|null $compareBy = null): array```
+```$stream->toMinMax(callable $compareBy = null): array```
 
 Функция `$compareBy` должна возвращать сравнимое значение.
 
