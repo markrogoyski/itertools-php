@@ -426,7 +426,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Single::sort()
      */
-    public function sort(?callable $comparator = null): self
+    public function sort(callable $comparator = null): self
     {
         $this->iterable = Single::sort($this->iterable, $comparator);
         return $this;
@@ -1041,7 +1041,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toMax()
      */
-    public function toMax(?callable $comparator = null)
+    public function toMax(callable $comparator = null)
     {
         return Reduce::toMax($this->iterable, $comparator);
     }
@@ -1059,7 +1059,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toMin()
      */
-    public function toMin(?callable $comparator = null)
+    public function toMin(callable $comparator = null)
     {
         return Reduce::toMin($this->iterable, $comparator);
     }
@@ -1126,7 +1126,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toMinMax()
      */
-    public function toMinMax(?callable $comparator = null): array
+    public function toMinMax(callable $comparator = null): array
     {
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;

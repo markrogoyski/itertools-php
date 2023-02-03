@@ -43,7 +43,7 @@ class Reduce
      *
      * @return mixed|null
      */
-    public static function toMin(iterable $data, ?callable $comparator = null)
+    public static function toMin(iterable $data, callable $comparator = null)
     {
         if ($comparator !== null) {
             return static::toValue(
@@ -67,7 +67,7 @@ class Reduce
      *
      * @return mixed|null
      */
-    public static function toMax(iterable $data, ?callable $comparator = null)
+    public static function toMax(iterable $data, callable $comparator = null)
     {
         if ($comparator !== null) {
             return static::toValue(
@@ -175,7 +175,7 @@ class Reduce
      *
      * @return array{numeric, numeric}|array{null, null}
      */
-    public static function toMinMax(iterable $numbers, ?callable $comparator = null): array
+    public static function toMinMax(iterable $numbers, callable $comparator = null): array
     {
         if ($comparator !== null) {
             return static::toValue($numbers, static function ($carry, $datum) use ($comparator) {

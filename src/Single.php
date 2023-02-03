@@ -361,7 +361,7 @@ class Single
      *
      * @return \Generator
      */
-    public static function sort(iterable $data, ?callable $comparator = null): \Generator
+    public static function sort(iterable $data, callable $comparator = null): \Generator
     {
         $result = iterator_to_array(IteratorFactory::makeIterator($data));
 
