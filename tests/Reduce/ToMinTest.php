@@ -37,12 +37,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 null,
             ],
             [
                 [],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 null,
             ],
             [
@@ -52,12 +52,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [0],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 0,
             ],
             [
                 [0],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 0,
             ],
             [
@@ -67,12 +67,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [INF],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 INF,
             ],
             [
                 [INF],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -82,12 +82,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [-INF],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 [-INF],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 -INF,
             ],
             [
@@ -97,12 +97,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [INF, -INF],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 [INF, -INF],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -112,12 +112,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [INF, -INF, 10, -1],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 [INF, -INF, 10, -1],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -127,12 +127,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [1, 2, 3],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 [1, 2, 3],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -142,12 +142,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [3, 2, 1],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 [3, 2, 1],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -157,12 +157,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [3, 2, 1],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 [3, 2, 1],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -172,12 +172,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [2.1, 1],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 [2.1, 1],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.1,
             ],
             [
@@ -187,12 +187,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [2, 1.1],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 [2, 1.1],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2,
             ],
             [
@@ -202,12 +202,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [2.2, 1.1],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 [2.2, 1.1],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.2,
             ],
             [
@@ -217,12 +217,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [1.1, 2.2],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 [1.1, 2.2],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.2,
             ],
             [
@@ -232,12 +232,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['a', 'b', 'c'],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 ['a', 'b', 'c'],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -247,12 +247,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['b', 'c', 'a'],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 ['b', 'c', 'a'],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -262,12 +262,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['c', 'b', 'a'],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 ['c', 'b', 'a'],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -277,13 +277,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['ab', 'ba', 'b'],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'ab',
-            ],
-            [
-                ['ab', 'ba', 'b'],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                'ba',
             ],
             [
                 ['ba', 'b', 'ab'],
@@ -292,13 +287,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['ba', 'b', 'ab'],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'ab',
-            ],
-            [
-                ['ba', 'b', 'ab'],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                'ba',
             ],
             [
                 [[]],
@@ -307,12 +297,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[]],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [],
-            ],
-            [
-                [[]],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [],
             ],
             [
@@ -322,12 +307,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[2]],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [2],
-            ],
-            [
-                [[2]],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [2],
             ],
             [
@@ -337,12 +317,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[], []],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [],
-            ],
-            [
-                [[], []],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [],
             ],
             [
@@ -352,13 +327,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[], [2]],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                [[], [2]],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2],
             ],
             [
                 [[2], []],
@@ -367,13 +337,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[2], []],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                [[2], []],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2],
             ],
             [
                 [[], [null]],
@@ -382,13 +347,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[], [null]],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                [[], [null]],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [null],
             ],
             [
                 [[null], []],
@@ -397,13 +357,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[null], []],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                [[null], []],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [null],
             ],
             [
                 [[null], [null]],
@@ -412,12 +367,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[null], [null]],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [null],
-            ],
-            [
-                [[null], [null]],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [null],
             ],
             [
@@ -427,13 +377,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[1, 2], [2]],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [2],
-            ],
-            [
-                [[1, 2], [2]],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [1, 2],
             ],
             [
                 [[3, 2], [2]],
@@ -442,28 +387,18 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[3, 2], [2]],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [2],
             ],
             [
-                [[3, 2], [2]],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [3, 2],
-            ],
-            [
                 [[1, 2], [2, 1]],
                 null,
                 [1, 2],
             ],
             [
                 [[1, 2], [2, 1]],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2],
-            ],
-            [
-                [[1, 2], [2, 1]],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1],
             ],
             [
                 [[2, 1], [1, 2]],
@@ -472,13 +407,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[2, 1], [1, 2]],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2],
-            ],
-            [
-                [[2, 1], [1, 2]],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1],
             ],
             [
                 [['a'], ['b']],
@@ -487,28 +417,18 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [['a'], ['b']],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 ['a'],
             ],
             [
-                [['a'], ['b']],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                ['b'],
-            ],
-            [
                 [['a', 'a'], ['b']],
                 null,
                 ['b'],
             ],
             [
                 [['a', 'a'], ['b']],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 ['b'],
-            ],
-            [
-                [['a', 'a'], ['b']],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                ['a', 'a'],
             ],
             [
                 [[1, 2, 3], [2, 0, 3], [2, 1, 3]],
@@ -517,22 +437,17 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[1, 2, 3], [2, 0, 3], [2, 1, 3]],
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2, 3],
             ],
             [
                 [[1, 2, 3], [2, 0, 3], [2, 1, 3]],
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1, 3],
-            ],
-            [
-                [[1, 2, 3], [2, 0, 3], [2, 1, 3]],
-                fn ($lhs, $rhs) => $lhs[1] <=> $rhs[1],
+                fn ($item) => $item[1],
                 [2, 0, 3],
             ],
             [
                 [[1, 2, 3], [2, 0, 3], [2, 1, 3]],
-                fn ($lhs, $rhs) => $rhs[1] <=> $lhs[1],
+                fn ($item) => -$item[1],
                 [1, 2, 3],
             ],
         ];
@@ -568,12 +483,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 null,
             ],
             [
                 $gen([]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 null,
             ],
             [
@@ -583,12 +498,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([0]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 0,
             ],
             [
                 $gen([0]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 0,
             ],
             [
@@ -598,12 +513,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([INF]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 INF,
             ],
             [
                 $gen([INF]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -613,12 +528,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([-INF]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 $gen([-INF]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 -INF,
             ],
             [
@@ -628,12 +543,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([INF, -INF]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 $gen([INF, -INF]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -643,12 +558,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([INF, -INF, 10, -1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 $gen([INF, -INF, 10, -1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -658,12 +573,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([1, 2, 3]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $gen([1, 2, 3]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -673,12 +588,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([3, 2, 1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $gen([3, 2, 1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -688,12 +603,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([3, 2, 1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $gen([3, 2, 1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -703,12 +618,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([2.1, 1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $gen([2.1, 1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.1,
             ],
             [
@@ -718,12 +633,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([2, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 $gen([2, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2,
             ],
             [
@@ -733,12 +648,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([2.2, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 $gen([2.2, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.2,
             ],
             [
@@ -748,12 +663,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([1.1, 2.2]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 $gen([1.1, 2.2]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.2,
             ],
             [
@@ -763,12 +678,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen(['a', 'b', 'c']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 $gen(['a', 'b', 'c']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -778,12 +693,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen(['b', 'c', 'a']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 $gen(['b', 'c', 'a']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -793,12 +708,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen(['c', 'b', 'a']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 $gen(['c', 'b', 'a']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -808,13 +723,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen(['ab', 'ba', 'b']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'ab',
-            ],
-            [
-                $gen(['ab', 'ba', 'b']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                'ba',
             ],
             [
                 $gen(['ba', 'b', 'ab']),
@@ -823,13 +733,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen(['ba', 'b', 'ab']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'ab',
-            ],
-            [
-                $gen(['ba', 'b', 'ab']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                'ba',
             ],
             [
                 $gen([[]]),
@@ -838,12 +743,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [],
-            ],
-            [
-                $gen([[]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [],
             ],
             [
@@ -853,12 +753,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [2],
-            ],
-            [
-                $gen([[2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [2],
             ],
             [
@@ -868,12 +763,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[], []]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [],
-            ],
-            [
-                $gen([[], []]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [],
             ],
             [
@@ -883,13 +773,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[], [2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $gen([[], [2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2],
             ],
             [
                 $gen([[2], []]),
@@ -898,13 +783,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[2], []]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $gen([[2], []]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2],
             ],
             [
                 $gen([[], [null]]),
@@ -913,13 +793,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[], [null]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $gen([[], [null]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [null],
             ],
             [
                 $gen([[null], []]),
@@ -928,13 +803,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[null], []]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $gen([[null], []]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [null],
             ],
             [
                 $gen([[null], [null]]),
@@ -943,12 +813,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[null], [null]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [null],
-            ],
-            [
-                $gen([[null], [null]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [null],
             ],
             [
@@ -958,13 +823,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[1, 2], [2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [2],
-            ],
-            [
-                $gen([[1, 2], [2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [1, 2],
             ],
             [
                 $gen([[3, 2], [2]]),
@@ -973,28 +833,18 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[3, 2], [2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [2],
             ],
             [
-                $gen([[3, 2], [2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [3, 2],
-            ],
-            [
                 $gen([[1, 2], [2, 1]]),
                 null,
                 [1, 2],
             ],
             [
                 $gen([[1, 2], [2, 1]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2],
-            ],
-            [
-                $gen([[1, 2], [2, 1]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1],
             ],
             [
                 $gen([[2, 1], [1, 2]]),
@@ -1003,13 +853,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[2, 1], [1, 2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2],
-            ],
-            [
-                $gen([[2, 1], [1, 2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1],
             ],
             [
                 $gen([['a'], ['b']]),
@@ -1018,28 +863,18 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([['a'], ['b']]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 ['a'],
             ],
             [
-                $gen([['a'], ['b']]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                ['b'],
-            ],
-            [
                 $gen([['a', 'a'], ['b']]),
                 null,
                 ['b'],
             ],
             [
                 $gen([['a', 'a'], ['b']]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 ['b'],
-            ],
-            [
-                $gen([['a', 'a'], ['b']]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                ['a', 'a'],
             ],
             [
                 $gen([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
@@ -1048,22 +883,17 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2, 3],
             ],
             [
                 $gen([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1, 3],
-            ],
-            [
-                $gen([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs[1] <=> $rhs[1],
+                fn ($item) => $item[1],
                 [2, 0, 3],
             ],
             [
                 $gen([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs[1] <=> $lhs[1],
+                fn ($item) => -$item[1],
                 [1, 2, 3],
             ],
         ];
@@ -1099,12 +929,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 null,
             ],
             [
                 $iter([]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 null,
             ],
             [
@@ -1114,12 +944,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([0]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 0,
             ],
             [
                 $iter([0]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 0,
             ],
             [
@@ -1129,12 +959,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([INF]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 INF,
             ],
             [
                 $iter([INF]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -1144,12 +974,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([-INF]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 $iter([-INF]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 -INF,
             ],
             [
@@ -1159,12 +989,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([INF, -INF]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 $iter([INF, -INF]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -1174,12 +1004,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([INF, -INF, 10, -1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 $iter([INF, -INF, 10, -1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -1189,12 +1019,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([1, 2, 3]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $iter([1, 2, 3]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -1204,12 +1034,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([3, 2, 1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $iter([3, 2, 1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -1219,12 +1049,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([3, 2, 1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $iter([3, 2, 1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -1234,12 +1064,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([2.1, 1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $iter([2.1, 1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.1,
             ],
             [
@@ -1249,12 +1079,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([2, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 $iter([2, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2,
             ],
             [
@@ -1264,12 +1094,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([2.2, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 $iter([2.2, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.2,
             ],
             [
@@ -1279,12 +1109,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([1.1, 2.2]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 $iter([1.1, 2.2]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.2,
             ],
             [
@@ -1294,12 +1124,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter(['a', 'b', 'c']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 $iter(['a', 'b', 'c']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -1309,12 +1139,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter(['b', 'c', 'a']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 $iter(['b', 'c', 'a']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -1324,12 +1154,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter(['c', 'b', 'a']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 $iter(['c', 'b', 'a']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -1339,13 +1169,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter(['ab', 'ba', 'b']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'ab',
-            ],
-            [
-                $iter(['ab', 'ba', 'b']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                'ba',
             ],
             [
                 $iter(['ba', 'b', 'ab']),
@@ -1354,13 +1179,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter(['ba', 'b', 'ab']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'ab',
-            ],
-            [
-                $iter(['ba', 'b', 'ab']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                'ba',
             ],
             [
                 $iter([[]]),
@@ -1369,12 +1189,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [],
-            ],
-            [
-                $iter([[]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [],
             ],
             [
@@ -1384,12 +1199,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [2],
-            ],
-            [
-                $iter([[2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [2],
             ],
             [
@@ -1399,12 +1209,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[], []]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [],
-            ],
-            [
-                $iter([[], []]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [],
             ],
             [
@@ -1414,13 +1219,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[], [2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $iter([[], [2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2],
             ],
             [
                 $iter([[2], []]),
@@ -1429,13 +1229,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[2], []]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $iter([[2], []]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2],
             ],
             [
                 $iter([[], [null]]),
@@ -1444,13 +1239,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[], [null]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $iter([[], [null]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [null],
             ],
             [
                 $iter([[null], []]),
@@ -1459,13 +1249,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[null], []]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $iter([[null], []]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [null],
             ],
             [
                 $iter([[null], [null]]),
@@ -1474,12 +1259,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[null], [null]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [null],
-            ],
-            [
-                $iter([[null], [null]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [null],
             ],
             [
@@ -1489,13 +1269,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[1, 2], [2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [2],
-            ],
-            [
-                $iter([[1, 2], [2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [1, 2],
             ],
             [
                 $iter([[3, 2], [2]]),
@@ -1504,28 +1279,18 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[3, 2], [2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [2],
             ],
             [
-                $iter([[3, 2], [2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [3, 2],
-            ],
-            [
                 $iter([[1, 2], [2, 1]]),
                 null,
                 [1, 2],
             ],
             [
                 $iter([[1, 2], [2, 1]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2],
-            ],
-            [
-                $iter([[1, 2], [2, 1]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1],
             ],
             [
                 $iter([[2, 1], [1, 2]]),
@@ -1534,13 +1299,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[2, 1], [1, 2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2],
-            ],
-            [
-                $iter([[2, 1], [1, 2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1],
             ],
             [
                 $iter([['a'], ['b']]),
@@ -1549,28 +1309,18 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([['a'], ['b']]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 ['a'],
             ],
             [
-                $iter([['a'], ['b']]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                ['b'],
-            ],
-            [
                 $iter([['a', 'a'], ['b']]),
                 null,
                 ['b'],
             ],
             [
                 $iter([['a', 'a'], ['b']]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 ['b'],
-            ],
-            [
-                $iter([['a', 'a'], ['b']]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                ['a', 'a'],
             ],
             [
                 $iter([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
@@ -1579,22 +1329,17 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2, 3],
             ],
             [
                 $iter([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1, 3],
-            ],
-            [
-                $iter([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs[1] <=> $rhs[1],
+                fn ($item) => $item[1],
                 [2, 0, 3],
             ],
             [
                 $iter([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs[1] <=> $lhs[1],
+                fn ($item) => -$item[1],
                 [1, 2, 3],
             ],
         ];
@@ -1630,12 +1375,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 null,
             ],
             [
                 $trav([]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 null,
             ],
             [
@@ -1645,12 +1390,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([0]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 0,
             ],
             [
                 $trav([0]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 0,
             ],
             [
@@ -1660,12 +1405,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([INF]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 INF,
             ],
             [
                 $trav([INF]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -1675,12 +1420,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([-INF]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 $trav([-INF]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 -INF,
             ],
             [
@@ -1690,12 +1435,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([INF, -INF]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 $trav([INF, -INF]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -1705,12 +1450,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([INF, -INF, 10, -1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 -INF,
             ],
             [
                 $trav([INF, -INF, 10, -1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 INF,
             ],
             [
@@ -1720,12 +1465,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([1, 2, 3]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $trav([1, 2, 3]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -1735,12 +1480,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([3, 2, 1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $trav([3, 2, 1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -1750,12 +1495,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([3, 2, 1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $trav([3, 2, 1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 3,
             ],
             [
@@ -1765,12 +1510,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2.1, 1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1,
             ],
             [
                 $trav([2.1, 1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.1,
             ],
             [
@@ -1780,12 +1525,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 $trav([2, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2,
             ],
             [
@@ -1795,12 +1540,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2.2, 1.1]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 $trav([2.2, 1.1]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.2,
             ],
             [
@@ -1810,12 +1555,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([1.1, 2.2]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 1.1,
             ],
             [
                 $trav([1.1, 2.2]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -$item,
                 2.2,
             ],
             [
@@ -1825,12 +1570,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav(['a', 'b', 'c']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 $trav(['a', 'b', 'c']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -1840,12 +1585,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav(['b', 'c', 'a']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 $trav(['b', 'c', 'a']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -1855,12 +1600,12 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav(['c', 'b', 'a']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'a',
             ],
             [
                 $trav(['c', 'b', 'a']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => -ord($item),
                 'c',
             ],
             [
@@ -1870,13 +1615,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav(['ab', 'ba', 'b']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'ab',
-            ],
-            [
-                $trav(['ab', 'ba', 'b']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                'ba',
             ],
             [
                 $trav(['ba', 'b', 'ab']),
@@ -1885,13 +1625,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav(['ba', 'b', 'ab']),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 'ab',
-            ],
-            [
-                $trav(['ba', 'b', 'ab']),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                'ba',
             ],
             [
                 $trav([[]]),
@@ -1900,12 +1635,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [],
-            ],
-            [
-                $trav([[]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [],
             ],
             [
@@ -1915,12 +1645,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [2],
-            ],
-            [
-                $trav([[2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [2],
             ],
             [
@@ -1930,12 +1655,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[], []]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [],
-            ],
-            [
-                $trav([[], []]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [],
             ],
             [
@@ -1945,13 +1665,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[], [2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $trav([[], [2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2],
             ],
             [
                 $trav([[2], []]),
@@ -1960,13 +1675,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[2], []]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $trav([[2], []]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2],
             ],
             [
                 $trav([[], [null]]),
@@ -1975,13 +1685,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[], [null]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $trav([[], [null]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [null],
             ],
             [
                 $trav([[null], []]),
@@ -1990,13 +1695,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[null], []]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [],
-            ],
-            [
-                $trav([[null], []]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [null],
             ],
             [
                 $trav([[null], [null]]),
@@ -2005,12 +1705,7 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[null], [null]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
-                [null],
-            ],
-            [
-                $trav([[null], [null]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
+                fn ($item) => $item,
                 [null],
             ],
             [
@@ -2020,13 +1715,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[1, 2], [2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [2],
-            ],
-            [
-                $trav([[1, 2], [2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [1, 2],
             ],
             [
                 $trav([[3, 2], [2]]),
@@ -2035,28 +1725,18 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[3, 2], [2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [2],
             ],
             [
-                $trav([[3, 2], [2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [3, 2],
-            ],
-            [
                 $trav([[1, 2], [2, 1]]),
                 null,
                 [1, 2],
             ],
             [
                 $trav([[1, 2], [2, 1]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2],
-            ],
-            [
-                $trav([[1, 2], [2, 1]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1],
             ],
             [
                 $trav([[2, 1], [1, 2]]),
@@ -2065,13 +1745,8 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[2, 1], [1, 2]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2],
-            ],
-            [
-                $trav([[2, 1], [1, 2]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1],
             ],
             [
                 $trav([['a'], ['b']]),
@@ -2080,28 +1755,18 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([['a'], ['b']]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 ['a'],
             ],
             [
-                $trav([['a'], ['b']]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                ['b'],
-            ],
-            [
                 $trav([['a', 'a'], ['b']]),
                 null,
                 ['b'],
             ],
             [
                 $trav([['a', 'a'], ['b']]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 ['b'],
-            ],
-            [
-                $trav([['a', 'a'], ['b']]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                ['a', 'a'],
             ],
             [
                 $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
@@ -2110,22 +1775,17 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs <=> $rhs,
+                fn ($item) => $item,
                 [1, 2, 3],
             ],
             [
                 $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs <=> $lhs,
-                [2, 1, 3],
-            ],
-            [
-                $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $lhs[1] <=> $rhs[1],
+                fn ($item) => $item[1],
                 [2, 0, 3],
             ],
             [
                 $trav([[1, 2, 3], [2, 0, 3], [2, 1, 3]]),
-                fn ($lhs, $rhs) => $rhs[1] <=> $lhs[1],
+                fn ($item) => -$item[1],
                 [1, 2, 3],
             ],
         ];

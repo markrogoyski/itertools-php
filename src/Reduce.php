@@ -34,21 +34,28 @@ class Reduce
     /**
      * Reduces given iterable to its min value.
      *
-     * If comparator is null then items of given collection must be comparable.
+     * $comparableGetter must return comparable value.
+     *
+     * If $comparableGetter is not proposed then items of given collection must be comparable.
      *
      * Returns null if given collection is empty.
      *
      * @param iterable<mixed> $data
-     * @param callable|null   $comparator
+     * @param callable|null   $comparableGetter
      *
      * @return mixed|null
      */
-    public static function toMin(iterable $data, callable $comparator = null)
+    public static function toMin(iterable $data, callable $comparableGetter = null)
     {
-        if ($comparator !== null) {
+        if ($comparableGetter !== null) {
             return static::toValue(
                 $data,
-                fn ($carry, $datum) => $comparator($datum, $carry ?? $datum) <= 0 ? $datum : $carry
+                static function ($carry, $datum) use ($comparableGetter) {
+                    if ($comparableGetter($datum) < $comparableGetter($carry ?? $datum)) {
+                        return $datum;
+                    }
+                    return $carry ?? $datum;
+                }
             );
         }
 
@@ -58,21 +65,28 @@ class Reduce
     /**
      * Reduces given iterable to its max value.
      *
-     * If comparator is null then items of given collection must be comparable.
+     * $comparableGetter must return comparable value.
+     *
+     * If $comparableGetter is not proposed then items of given collection must be comparable.
      *
      * Returns null if given collection is empty.
      *
      * @param iterable<mixed> $data
-     * @param callable|null   $comparator
+     * @param callable|null   $comparableGetter
      *
      * @return mixed|null
      */
-    public static function toMax(iterable $data, callable $comparator = null)
+    public static function toMax(iterable $data, callable $comparableGetter = null)
     {
-        if ($comparator !== null) {
+        if ($comparableGetter !== null) {
             return static::toValue(
                 $data,
-                fn ($carry, $datum) => $comparator($datum, $carry ?? $datum) >= 0 ? $datum : $carry
+                static function ($carry, $datum) use ($comparableGetter) {
+                    if ($comparableGetter($datum) > $comparableGetter($carry ?? $datum)) {
+                        return $datum;
+                    }
+                    return $carry ?? $datum;
+                }
             );
         }
 
