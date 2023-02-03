@@ -270,4 +270,47 @@ class ToFirstAndLastTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LengthException::class);
         Reduce::toFirstAndLast($data);
     }
+
+    /**
+     * @dataProvider dataProviderForRewindableIterators
+     * @param \NoRewindIterator $data
+     * @param array $expected
+     * @return void
+     */
+    public function testRewindableIterators(\NoRewindIterator $data, array $expected): void
+    {
+        // When
+        $result = Reduce::toFirstAndLast($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public function dataProviderForRewindableIterators(): array
+    {
+        $iter = fn (array $data) => new \NoRewindIterator(new \ArrayIterator($data));
+
+        return [
+            [
+                $iter([1]),
+                [1, 1],
+            ],
+            [
+                $iter([1.1]),
+                [1.1, 1.1],
+            ],
+            [
+                $iter([null]),
+                [null, null],
+            ],
+            [
+                $iter(['a']),
+                ['a', 'a'],
+            ],
+            [
+                $iter(['abc']),
+                ['abc', 'abc'],
+            ],
+        ];
+    }
 }
