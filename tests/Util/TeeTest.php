@@ -372,6 +372,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProviderForIterators
+     * @dataProvider dataProviderForNestedIterators
      * @param \Iterator<scalar, mixed> $data
      * @param int $relatedCount
      * @param array $expected
@@ -469,6 +470,86 @@ class TeeTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter(['a' => 1, 'b' => 2, 'c' => 3]),
+                3,
+                [
+                    ['a' => 1, 'b' => 2, 'c' => 3],
+                    ['a' => 1, 'b' => 2, 'c' => 3],
+                    ['a' => 1, 'b' => 2, 'c' => 3],
+                ],
+            ],
+        ];
+    }
+
+    public function dataProviderForNestedIterators(): array
+    {
+        $nested = fn ($data) => new \IteratorIterator(new \IteratorIterator(new \ArrayIterator($data)));
+
+        return [
+            [
+                $nested([]),
+                1,
+                [
+                    [],
+                ],
+            ],
+            [
+                $nested([]),
+                2,
+                [
+                    [],
+                    [],
+                ],
+            ],
+            [
+                $nested([]),
+                3,
+                [
+                    [],
+                    [],
+                    [],
+                ],
+            ],
+            [
+                $nested([1, 2, 3, 4, 5]),
+                1,
+                [
+                    [1, 2, 3, 4, 5],
+                ],
+            ],
+            [
+                $nested([1, 2, 3, 4, 5]),
+                2,
+                [
+                    [1, 2, 3, 4, 5],
+                    [1, 2, 3, 4, 5],
+                ],
+            ],
+            [
+                $nested([1, 2, 3, 4, 5]),
+                3,
+                [
+                    [1, 2, 3, 4, 5],
+                    [1, 2, 3, 4, 5],
+                    [1, 2, 3, 4, 5],
+                ],
+            ],
+            [
+                $nested(['a' => 1, 'b' => 2, 'c' => 3]),
+                1,
+                [
+                    ['a' => 1, 'b' => 2, 'c' => 3],
+                ],
+            ],
+            [
+                $nested(['a' => 1, 'b' => 2, 'c' => 3]),
+                2,
+                [
+                    ['a' => 1, 'b' => 2, 'c' => 3],
+                    ['a' => 1, 'b' => 2, 'c' => 3],
+                ],
+            ],
+            [
+                $nested(['a' => 1, 'b' => 2, 'c' => 3]),
                 3,
                 [
                     ['a' => 1, 'b' => 2, 'c' => 3],
