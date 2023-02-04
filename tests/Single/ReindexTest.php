@@ -11,9 +11,9 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class ReindexTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @test reindex
+     * @test reindex example usage
      */
-    public function testDemo(): void
+    public function testExampleUsage(): void
     {
         // Given
         $dbResult = [

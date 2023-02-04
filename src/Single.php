@@ -84,14 +84,14 @@ class Single
      * Return elements indexed by callback-function.
      *
      * @param iterable<mixed> $data
-     * @param callable(mixed $value, mixed $key): scalar $indexer
+     * @param callable(mixed $value, mixed $key): mixed $reindexer
      *
      * @return \Generator
      */
-    public static function reindex(iterable $data, callable $indexer): \Generator
+    public static function reindex(iterable $data, callable $reindexer): \Generator
     {
-        foreach ($data as $sourceIndex => $datum) {
-            yield $indexer($datum, $sourceIndex) => $datum;
+        foreach ($data as $index => $datum) {
+            yield $reindexer($datum, $index) => $datum;
         }
     }
 

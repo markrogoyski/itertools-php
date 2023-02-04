@@ -69,7 +69,7 @@ Quick Reference
 | [`limit`](#Limit)                              | Iterate up to a limit                               | `Single::limit($data, $limit)`                              |
 | [`map`](#Map)                                  | Map function onto each item                         | `Single::map($data, $function)`                             |
 | [`pairwise`](#Pairwise)                        | Iterate successive overlapping pairs                | `Single::pairwise($data)`                                   |
-| [`reindex`](#Reindex)                          | Return elements indexed by callback-function        | `Single::reindex($data, $indexer)`                          |
+| [`reindex`](#Reindex)                          | Reindex keys of key-value iterable                  | `Single::reindex($data, $reindexer)`                        |
 | [`repeat`](#Repeat)                            | Repeat an item                                      | `Single::repeat($item, $repetitions)`                       |
 | [`string`](#String)                            | Iterate the characters of a string                  | `Single::string($string)`                                   |
 | [`takeWhile`](#Take-While)                     | Iterate elements while predicate is true            | `Single::takeWhile($data, $predicate)`                      |
@@ -172,7 +172,7 @@ Quick Reference
 | [`pairwise`](#Pairwise-1)                                                 | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                                                             |
 | [`partialIntersectionWith`](#Partial-Intersection-With)                   | Partially intersect iterable source and given iterables                                   | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`         |
 | [`partialIntersection CoerciveWith`](#Partial-Intersection-Coercive-With) | Partially intersect iterable source and given iterables with type coercion                | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
-| [`reindex`](#Reindex-1)                                                   | Return elements indexed by callback-function                                              | `$stream->reindex($indexer)`                                                      |
+| [`reindex`](#Reindex-1)                                                   | Reindex keys of key-value stream                                                          | `$stream->reindex($reindexer)`                                                    |
 | [`runningAverage`](#Running-Average-1)                                    | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`                                          |
 | [`runningDifference`](#Running-Difference-1)                              | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`                                       |
 | [`runningMax`](#Running-Max-1)                                            | Accumulate the running max over iterable source                                           | `$stream->runningMax($initialValue)`                                              |
@@ -646,7 +646,7 @@ foreach (Single::repeat($data, $repetitions) as $repeated) {
 ```
 
 ### Reindex
-Return elements indexed by callback-function.
+Reindex keys of key-value iterable using indexer function.
 
 ```Single::reindex(string $data, callable $indexer)```
 
@@ -654,18 +654,43 @@ Return elements indexed by callback-function.
 use IterTools\Single;
 
 $data = [
-    'a' => 1,
-    'b' => 2,
-    'c' => 3,
-    'd' => 4,
-    'e' => 5,
+    [
+        'title'   => 'Star Wars: Episode IV – A New Hope',
+        'episode' => 'IV',
+        'year'    => 1977,
+    ],
+    [
+        'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+        'episode' => 'V',
+        'year'    => 1980,
+    ],
+    [
+        'title' => 'Star Wars: Episode VI – Return of the Jedi',
+        'episode' => 'VI',
+        'year' => 1983,
+    ],
 ];
-$indexer = fn ($key, $value) => "{$key}_{$value}";
+$reindexFunc = fn (array $swFilm) => $swFilm['episode'];
 
-foreach (Single::reindex($data, $indexer) as $key => $value) {
-    print("{$key}: {$value}");
+$reindexedData = [];
+foreach (Single::reindex($data, $reindexFunc) as $key => $filmData) {
+    $reindexedData[$key] = $filmData;
 }
-// 'a_1: 1', 'b_2: 2', 'c_3: 3', 'd_4: 4', 'e_5: 5'
+// 'IV' => [
+//     'title'   => 'Star Wars: Episode IV – A New Hope',
+//     'episode' => 'IV',
+//     'year'    => 1977,
+// ],
+// 'V' => [
+//     'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+//     'episode' => 'V',
+//     'year'    => 1980,
+// ],
+// 'VI' => [
+//     'title' => 'Star Wars: Episode VI – Return of the Jedi',
+//     'episode' => 'VI',
+//     'year' => 1983,
+// ],
 ```
 
 ### String
@@ -1637,12 +1662,11 @@ $result = Stream::of($input)
 ```
 
 #### Compress Associative
-Compress an iterable source by filtering out data using required keys list.
+Compress to a new stream by filtering out keys that are not selected.
 
 ```$stream->compressAssociative(array $keys): Stream```
 
-* Iterable source must contain only integer or string keys.
-* Array of keys must contain only integer or string items.
+* Standard PHP array/iterator keys only (string, integer).
 
 ```php
 use IterTools\Stream;
@@ -1966,7 +1990,7 @@ $stream = Stream::of($languages)
 ```
 
 ### Reindex
-Return elements of the iterable source indexed by callback-function.
+Return a new stream of key-value elements reindexed by the key indexer function.
 
 ```$stream->reindex(callable $indexer): Stream```
 
@@ -1974,18 +1998,42 @@ Return elements of the iterable source indexed by callback-function.
 use IterTools\Single;
 
 $data = [
-    'a' => 1,
-    'b' => 2,
-    'c' => 3,
-    'd' => 4,
-    'e' => 5,
+    [
+        'title'   => 'Star Wars: Episode IV – A New Hope',
+        'episode' => 'IV',
+        'year'    => 1977,
+    ],
+    [
+        'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+        'episode' => 'V',
+        'year'    => 1980,
+    ],
+    [
+        'title' => 'Star Wars: Episode VI – Return of the Jedi',
+        'episode' => 'VI',
+        'year' => 1983,
+    ],
 ];
-$indexer = fn ($key, $value) => "{$key}_{$value}";
+$reindexFunc = fn (array $swFilm) => $swFilm['episode'];
 
-$result = Stream::of($input)
-    ->reindex($indexer)
-    ->toArray();
-// 'a_1: 1', 'b_2: 2', 'c_3: 3', 'd_4: 4', 'e_5: 5'
+$reindexResult = Stream::of($data)
+    ->reindex($reindexFunc)
+    ->toAssociativeArray();
+// 'IV' => [
+//     'title'   => 'Star Wars: Episode IV – A New Hope',
+//     'episode' => 'IV',
+//     'year'    => 1977,
+// ],
+// 'V' => [
+//     'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+//     'episode' => 'V',
+//     'year'    => 1980,
+// ],
+// 'VI' => [
+//     'title' => 'Star Wars: Episode VI – Return of the Jedi',
+//     'episode' => 'VI',
+//     'year' => 1983,
+// ],
 ```
 
 #### Running Average
