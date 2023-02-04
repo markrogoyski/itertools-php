@@ -689,21 +689,23 @@ $reindexedData = [];
 foreach (Single::reindex($data, $reindexFunc) as $key => $filmData) {
     $reindexedData[$key] = $filmData;
 }
-// 'IV' => [
-//     'title'   => 'Star Wars: Episode IV – A New Hope',
-//     'episode' => 'IV',
-//     'year'    => 1977,
-// ],
-// 'V' => [
-//     'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
-//     'episode' => 'V',
-//     'year'    => 1980,
-// ],
-// 'VI' => [
-//     'title' => 'Star Wars: Episode VI – Return of the Jedi',
-//     'episode' => 'VI',
-//     'year' => 1983,
-// ],
+// [
+//     'IV' => [
+//         'title'   => 'Star Wars: Episode IV – A New Hope',
+//         'episode' => 'IV',
+//         'year'    => 1977,
+//     ],
+//     'V' => [
+//         'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+//         'episode' => 'V',
+//         'year'    => 1980,
+//     ],
+//     'VI' => [
+//         'title' => 'Star Wars: Episode VI – Return of the Jedi',
+//         'episode' => 'VI',
+//         'year' => 1983,
+//     ],
+// ]
 ```
 
 ### String
@@ -2043,21 +2045,23 @@ $reindexFunc = fn (array $swFilm) => $swFilm['episode'];
 $reindexResult = Stream::of($data)
     ->reindex($reindexFunc)
     ->toAssociativeArray();
-// 'IV' => [
-//     'title'   => 'Star Wars: Episode IV – A New Hope',
-//     'episode' => 'IV',
-//     'year'    => 1977,
-// ],
-// 'V' => [
-//     'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
-//     'episode' => 'V',
-//     'year'    => 1980,
-// ],
-// 'VI' => [
-//     'title' => 'Star Wars: Episode VI – Return of the Jedi',
-//     'episode' => 'VI',
-//     'year' => 1983,
-// ],
+// [
+//     'IV' => [
+//         'title'   => 'Star Wars: Episode IV – A New Hope',
+//         'episode' => 'IV',
+//         'year'    => 1977,
+//     ],
+//     'V' => [
+//         'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+//         'episode' => 'V',
+//         'year'    => 1980,
+//     ],
+//     'VI' => [
+//         'title' => 'Star Wars: Episode VI – Return of the Jedi',
+//         'episode' => 'VI',
+//         'year' => 1983,
+//     ],
+// ]
 ```
 
 #### Running Average
