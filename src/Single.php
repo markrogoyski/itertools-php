@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\UniqueExtractor;
-
 class Single
 {
     /**
@@ -57,6 +55,43 @@ class Single
             if ($selector) {
                 yield $datum;
             }
+        }
+    }
+
+    /**
+     * Return elements from the iterable only by given keys.
+     *
+     * Iterable data must contain only integer or string keys.
+     *
+     * Array of keys must contain only integer or string items.
+     *
+     * @param iterable<int|string, mixed> $data
+     * @param array<int|string> $keys
+     *
+     * @return \Generator
+     */
+    public static function compressAssociative(iterable $data, array $keys): \Generator
+    {
+        $keyMap = \array_flip($keys);
+        foreach ($data as $key => $datum) {
+            if (\array_key_exists($key, $keyMap)) {
+                yield $key => $datum;
+            }
+        }
+    }
+
+    /**
+     * Return elements indexed by callback-function.
+     *
+     * @param iterable<mixed> $data
+     * @param callable(mixed $value, mixed $key): scalar $indexer
+     *
+     * @return \Generator
+     */
+    public static function reindex(iterable $data, callable $indexer): \Generator
+    {
+        foreach ($data as $sourceIndex => $datum) {
+            yield $indexer($datum, $sourceIndex) => $datum;
         }
     }
 
@@ -128,6 +163,23 @@ class Single
         foreach ($data as $datum) {
             if ($predicate($datum)) {
                 yield $datum;
+            }
+        }
+    }
+
+    /**
+     * Filter out elements from the iterable only returning elements for which keys the predicate function is true.
+     *
+     * @param iterable<mixed> $data
+     * @param callable $predicate
+     *
+     * @return \Generator<mixed>
+     */
+    public static function filterKeys(iterable $data, callable $predicate): \Generator
+    {
+        foreach ($data as $key => $datum) {
+            if ($predicate($key)) {
+                yield $key => $datum;
             }
         }
     }

@@ -55,21 +55,24 @@ Quick Reference
 | [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously until the longest iterator completes        | `Multi::zipLongest($list1, $list2)` |
 
 #### Single Iteration
-| Iterator                                 | Description                                     | Code Snippet                                                |
-|------------------------------------------|-------------------------------------------------|-------------------------------------------------------------|
-| [`chunkwise`](#Chunkwise)                | Iterate by chunks                               | `Single::chunkwise($data, $chunkSize)`                      |
-| [`chunkwiseOverlap`](#Chunkwise-Overlap) | Iterate by overlapped chunks                    | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
-| [`compress`](#Compress)                  | Filter out elements not selected                | `Single::compress($data, $selectors)`                       |
-| [`dropWhile`](#Drop-While)               | Drop elements while predicate is true           | `Single::dropWhile($data, $predicate)`                      |
-| [`filterTrue`](#Filter-True)             | Filter for elements where predicate is true     | `Single::filterTrue($data, $predicate)`                     |
-| [`filterFalse`](#Filter-False)           | Filter for elements where predicate is false    | `Single::filterFalse($data, $predicate)`                    |
-| [`groupBy`](#Group-By)                   | Group data by a common element                  | `Single::groupBy($data, $groupKeyFunction)`                 |
-| [`limit`](#Limit)                        | Iterate up to a limit                           | `Single::limit($data, $limit)`                              |
-| [`map`](#Map)                            | Map function onto each item                     | `Single::map($data, $function)`                             |
-| [`pairwise`](#Pairwise)                  | Iterate successive overlapping pairs            | `Single::pairwise($data)`                                   |
-| [`repeat`](#Repeat)                      | Repeat an item                                  | `Single::repeat($item, $repetitions)`                       |
-| [`string`](#String)                      | Iterate the characters of a string              | `Single::string($string)`                                   |
-| [`takeWhile`](#Take-While)               | Iterate elements while predicate is true        | `Single::takeWhile($data, $predicate)`                      |
+| Iterator                                       | Description                                         | Code Snippet                                                |
+|------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------|
+| [`chunkwise`](#Chunkwise)                      | Iterate by chunks                                   | `Single::chunkwise($data, $chunkSize)`                      |
+| [`chunkwiseOverlap`](#Chunkwise-Overlap)       | Iterate by overlapped chunks                        | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
+| [`compress`](#Compress)                        | Filter out elements not selected                    | `Single::compress($data, $selectors)`                       |
+| [`compressAssociative`](#Compress-Associative) | Filter out elements only by given keys              | `Single::compressAssociative($data, $keys)`                 |
+| [`dropWhile`](#Drop-While)                     | Drop elements while predicate is true               | `Single::dropWhile($data, $predicate)`                      |
+| [`filterTrue`](#Filter-True)                   | Filter for elements where predicate is true         | `Single::filterTrue($data, $predicate)`                     |
+| [`filterFalse`](#Filter-False)                 | Filter for elements where predicate is false        | `Single::filterFalse($data, $predicate)`                    |
+| [`filterKeys`](#Filter-Keys)                   | Filter for elements where predicate for key is true | `Single::filterKeys($data, $predicate)`                     |
+| [`groupBy`](#Group-By)                         | Group data by a common element                      | `Single::groupBy($data, $groupKeyFunction)`                 |
+| [`limit`](#Limit)                              | Iterate up to a limit                               | `Single::limit($data, $limit)`                              |
+| [`map`](#Map)                                  | Map function onto each item                         | `Single::map($data, $function)`                             |
+| [`pairwise`](#Pairwise)                        | Iterate successive overlapping pairs                | `Single::pairwise($data)`                                   |
+| [`reindex`](#Reindex)                          | Return elements indexed by callback-function        | `Single::reindex($data, $indexer)`                          |
+| [`repeat`](#Repeat)                            | Repeat an item                                      | `Single::repeat($item, $repetitions)`                       |
+| [`string`](#String)                            | Iterate the characters of a string                  | `Single::string($string)`                                   |
+| [`takeWhile`](#Take-While)                     | Iterate elements while predicate is true            | `Single::takeWhile($data, $predicate)`                      |
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
@@ -152,12 +155,14 @@ Quick Reference
 |---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
 | [`chainWith`](#Chain-With)                                                | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                                               |
 | [`compress`](#Compress-1)                                                 | Compress an iterable source by filtering out data that is not selected                    | `$stream->compress($selectors)`                                                   |
+| [`compressAssociative`](#Compress-Associative-1)                          | Filter out elements of only by given keys                                                 | `$stream->compressAssociative($keys)`                                             |
 | [`chunkwise`](#Chunkwise-1)                                               | Iterate by chunks                                                                         | `$stream->chunkwise($chunkSize)`                                                  |
 | [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                                | Iterate by overlapped chunks                                                              | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                 |
 | [`distinct`](#Distinct-1)                                                 | Filter out elements: iterate only unique items                                            | `$stream->distinct($strict)`                                                      |
 | [`dropWhile`](#Drop-While-1)                                              | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`                                                  |
 | [`filterTrue`](#Filter-True-1)                                            | Filter for only elements where the predicate function is true                             | `$stream->filterTrue($predicate)`                                                 |
 | [`filterFalse`](#Filter-False-1)                                          | Filter for only elements wherethe predicate function is false                             | `$stream->filterFalse($predicate)`                                                |
+| [`filterKeys`](#Filter-Keys-1)                                            | Filter for elements where predicate for key is true                                       | `$stream->filterKeys($predicate)`                                                 |
 | [`groupBy`](#Group-By-1)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`                                             |
 | [`infiniteCycle`](#Infinite-Cycle)                                        | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                                                        |
 | [`intersectionWith`](#Intersection-With)                                  | Intersect iterable source and given iterables                                             | `$stream->intersectionWith(...$iterables)`                                        |
@@ -167,6 +172,7 @@ Quick Reference
 | [`pairwise`](#Pairwise-1)                                                 | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                                                             |
 | [`partialIntersectionWith`](#Partial-Intersection-With)                   | Partially intersect iterable source and given iterables                                   | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`         |
 | [`partialIntersection CoerciveWith`](#Partial-Intersection-Coercive-With) | Partially intersect iterable source and given iterables with type coercion                | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
+| [`reindex`](#Reindex-1)                                                   | Return elements indexed by callback-function                                              | `$stream->reindex($indexer)`                                                      |
 | [`runningAverage`](#Running-Average-1)                                    | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`                                          |
 | [`runningDifference`](#Running-Difference-1)                              | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`                                       |
 | [`runningMax`](#Running-Max-1)                                            | Accumulate the running max over iterable source                                           | `$stream->runningMax($initialValue)`                                              |
@@ -413,6 +419,30 @@ foreach (Single::compress($movies, $goodMovies) as $goodMovie) {
 // 'A New Hope', 'Empire Strikes Back', 'Return of the Jedi', 'The Force Awakens'
 ```
 
+### Compress Associative
+Compress an iterable by filtering out data using required keys list.
+
+```Single::compressAssociative(string $data, array $keys)```
+
+* Iterable data must contain only integer or string keys.
+* Array of keys must contain only integer or string items.
+
+```php
+use IterTools\Single;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+foreach (Single::compressAssociative($data, ['a', 'c', 'e']) as $key => $value) {
+    print("{$key}: {$value}");
+}
+// 'a: 1', 'c: 3', 'e: 5'
+```
+
 ### Drop While
 Drop elements from the iterable while the predicate function is true.
 
@@ -468,6 +498,29 @@ foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $badMovi
     print($badMovie);
 }
 // 1, 2, 3, 8, 9
+```
+
+### Filter Keys
+Filter out elements from the iterable only returning elements for which keys the predicate function is true.
+
+```Single::filterKeys(string $data, callable $filter)```
+
+```php
+use IterTools\Single;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+$compressor = fn ($key) => in_array($key, ['a', 'c', 'e']);
+
+foreach (Single::compressAssociative($data, $compressor) as $key => $value) {
+    print("{$key}: {$value}");
+}
+// 'a: 1', 'c: 3', 'e: 5'
 ```
 
 ### Group By
@@ -583,6 +636,29 @@ foreach (Single::repeat($data, $repetitions) as $repeated) {
     print($repeated);
 }
 // 'Beetlejuice', 'Beetlejuice', 'Beetlejuice'
+```
+
+### Reindex
+Return elements indexed by callback-function.
+
+```Single::reindex(string $data, callable $indexer)```
+
+```php
+use IterTools\Single;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+$indexer = fn ($key, $value) => "{$key}_{$value}";
+
+foreach (Single::reindex($data, $indexer) as $key => $value) {
+    print("{$key}: {$value}");
+}
+// 'a_1: 1', 'b_2: 2', 'c_3: 3', 'd_4: 4', 'e_5: 5'
 ```
 
 ### String
@@ -1553,6 +1629,31 @@ $result = Stream::of($input)
 // 2, 3
 ```
 
+#### Compress Associative
+Compress an iterable source by filtering out data using required keys list.
+
+```$stream->compressAssociative(array $keys): Stream```
+
+* Iterable source must contain only integer or string keys.
+* Array of keys must contain only integer or string items.
+
+```php
+use IterTools\Stream;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+
+$result = Stream::of($data)
+    ->compressAssociative($data, ['a', 'c', 'e'])
+    ->toArray();
+// 'a: 1', 'c: 3', 'e: 5'
+```
+
 #### Chunkwise
 Return a stream consisting of chunks of elements from the stream.
 
@@ -1664,6 +1765,29 @@ $result = Stream::of($input)
     ->filterFalse(fn ($value) => $value > 0)
     ->toArray();
 // -1, -2, -3
+```
+
+#### Filter Keys
+Filter out elements from the iterable source only returning elements for which keys the predicate function is true.
+
+```$stream->filterKeys(callable $filter): Stream```
+
+```php
+use IterTools\Stream;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+$compressor = fn ($key) => in_array($key, ['a', 'c', 'e']);
+
+$result = Stream::of($input)
+    ->compressAssociative($compressor)
+    ->toArray();
+// 'a: 1', 'c: 3', 'e: 5'
 ```
 
 #### Group By
@@ -1825,6 +1949,29 @@ $stream = Stream::of($languages)
     ->partialIntersectionCoerciveWith(2, $scriptLanguages, $supportsInterfaces)
     ->toArray();
 // 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
+```
+
+### Reindex
+Return elements of the iterable source indexed by callback-function.
+
+```$stream->reindex(callable $indexer): Stream```
+
+```php
+use IterTools\Single;
+
+$data = [
+    'a' => 1,
+    'b' => 2,
+    'c' => 3,
+    'd' => 4,
+    'e' => 5,
+];
+$indexer = fn ($key, $value) => "{$key}_{$value}";
+
+$result = Stream::of($input)
+    ->reindex($indexer)
+    ->toArray();
+// 'a_1: 1', 'b_2: 2', 'c_3: 3', 'd_4: 4', 'e_5: 5'
 ```
 
 #### Running Average

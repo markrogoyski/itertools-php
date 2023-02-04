@@ -132,6 +132,24 @@ class TransformationTest extends \PHPUnit\Framework\TestCase
                     ),
                 ['1' => 1, '2' => 2, '3' => 3],
             ],
+            [
+                ['a' => 1, 'b' => 2, 'c' => 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toAssociativeArray(
+                        fn ($value, $key) => $key,
+                        fn ($value) => $value,
+                    ),
+                ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
+            [
+                ['a' => 1, 'b' => 2, 'c' => 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toAssociativeArray(
+                        fn ($value, $key) => "{$key}_{$value}",
+                        fn ($value) => $value,
+                    ),
+                ['a_1' => 1, 'b_2' => 2, 'c_3' => 3],
+            ],
         ];
     }
 }
