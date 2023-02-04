@@ -833,15 +833,25 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Converts iterable source to array.
+     * Converts iterable source to an associative array.
+     *
+     * @param callable|null $keyFunc fn ($value, $key) => Custom Logic
+     * @param callable|null $valueFunc fn ($value, $key) => Custom logic
      *
      * @return array<mixed>
      */
-    public function toAssociativeArray(callable $keyFunc, callable $valueFunc): array
+    public function toAssociativeArray(callable $keyFunc = null, callable $valueFunc = null): array
     {
+        if ($keyFunc === null) {
+            $keyFunc = fn ($item, $key) => $key;
+        }
+        if ($valueFunc === null) {
+            $valueFunc = fn ($item, $key) => $item;
+        }
+
         $result = [];
         foreach ($this->iterable as $key => $item) {
-            $result[$keyFunc($item, $key)] = $valueFunc($item);
+            $result[$keyFunc($item, $key)] = $valueFunc($item, $key);
         }
         return $result;
     }

@@ -72,6 +72,12 @@ class TransformationTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
+                    ->toAssociativeArray(),
+                [],
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
                     ->toAssociativeArray(
                         fn ($x) => $x,
                         fn ($x) => $x,
@@ -99,6 +105,12 @@ class TransformationTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3, 4, 5],
                 fn (iterable $iterable) => Stream::of($iterable)
+                    ->toAssociativeArray(),
+                [1, 2, 3, 4, 5],
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
                     ->toAssociativeArray(
                         fn ($x) => $x,
                         fn ($x) => $x,
@@ -122,6 +134,12 @@ class TransformationTest extends \PHPUnit\Framework\TestCase
                         fn ($x) => \chr($x),
                     ),
                 ['65' => 'A', '66' => 'B', '67' => 'C'],
+            ],
+            [
+                ['a' => 1, 'b' => 2, 'c' => 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toAssociativeArray(),
+                ['a' => 1, 'b' => 2, 'c' => 3],
             ],
             [
                 ['a' => 1, 'b' => 2, 'c' => 3],

@@ -11,6 +11,42 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test compressAssociative example usage
+     */
+    public function testExampleUsage(): void
+    {
+        // Given
+        $starWarsEpisodes = [
+            'I'    => 'The Phantom Menace',
+            'II'   => 'Attack of the Clones',
+            'III'  => 'Revenge of the Sith',
+            'IV'   => 'A New Hope',
+            'V'    => 'The Empire Strikes Back',
+            'VI'   => 'Return of the Jedi',
+            'VII'  => 'The Force Awakens',
+            'VIII' => 'The Last Jedi',
+            'IX'   => 'The Rise of Skywalker',
+        ];
+
+        // And
+        $originalTrilogyNumbers = ['IV', 'V', 'VI'];
+
+        // Then
+        $originalTrilogy = [];
+        foreach (Single::compressAssociative($starWarsEpisodes, $originalTrilogyNumbers) as $episode => $title) {
+            $originalTrilogy[$episode] = $title;
+        }
+
+        // Then
+        $expected = [
+            'IV'   => 'A New Hope',
+            'V'    => 'The Empire Strikes Back',
+            'VI'   => 'Return of the Jedi',
+        ];
+        $this->assertEquals($expected, $originalTrilogy);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param array $iterable
      * @param array $keys

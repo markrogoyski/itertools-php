@@ -60,7 +60,7 @@ Quick Reference
 | [`chunkwise`](#Chunkwise)                      | Iterate by chunks                                   | `Single::chunkwise($data, $chunkSize)`                      |
 | [`chunkwiseOverlap`](#Chunkwise-Overlap)       | Iterate by overlapped chunks                        | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
 | [`compress`](#Compress)                        | Filter out elements not selected                    | `Single::compress($data, $selectors)`                       |
-| [`compressAssociative`](#Compress-Associative) | Filter out elements only by given keys              | `Single::compressAssociative($data, $keys)`                 |
+| [`compressAssociative`](#Compress-Associative) | Filter out elements by keys not selected            | `Single::compressAssociative($data, $selectorKeys)`         |
 | [`dropWhile`](#Drop-While)                     | Drop elements while predicate is true               | `Single::dropWhile($data, $predicate)`                      |
 | [`filterTrue`](#Filter-True)                   | Filter for elements where predicate is true         | `Single::filterTrue($data, $predicate)`                     |
 | [`filterFalse`](#Filter-False)                 | Filter for elements where predicate is false        | `Single::filterFalse($data, $predicate)`                    |
@@ -154,8 +154,8 @@ Quick Reference
 | Operation                                                                 | Description                                                                               | Code Snippet                                                                      |
 |---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
 | [`chainWith`](#Chain-With)                                                | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                                               |
-| [`compress`](#Compress-1)                                                 | Compress an iterable source by filtering out data that is not selected                    | `$stream->compress($selectors)`                                                   |
-| [`compressAssociative`](#Compress-Associative-1)                          | Filter out elements of only by given keys                                                 | `$stream->compressAssociative($keys)`                                             |
+| [`compress`](#Compress-1)                                                 | Compress source by filtering out data not selected                                        | `$stream->compress($selectors)`                                                   |
+| [`compressAssociative`](#Compress-Associative-1)                          | Compress source by filtering out keys not selected                                        | `$stream->compressAssociative($selectorKeys)`                                     |
 | [`chunkwise`](#Chunkwise-1)                                               | Iterate by chunks                                                                         | `$stream->chunkwise($chunkSize)`                                                  |
 | [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                                | Iterate by overlapped chunks                                                              | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                 |
 | [`distinct`](#Distinct-1)                                                 | Filter out elements: iterate only unique items                                            | `$stream->distinct($strict)`                                                      |
@@ -420,27 +420,34 @@ foreach (Single::compress($movies, $goodMovies) as $goodMovie) {
 ```
 
 ### Compress Associative
-Compress an iterable by filtering out data using required keys list.
+Compress an iterable by filtering out keys that are not selected.
 
-```Single::compressAssociative(string $data, array $keys)```
+```Single::compressAssociative(string $data, array $selectorKeys)```
 
-* Iterable data must contain only integer or string keys.
-* Array of keys must contain only integer or string items.
+* Standard PHP array/iterator keys only (string, integer).
 
 ```php
 use IterTools\Single;
 
-$data = [
-    'a' => 1,
-    'b' => 2,
-    'c' => 3,
-    'd' => 4,
-    'e' => 5,
+$starWarsEpisodes = [
+    'I'    => 'The Phantom Menace',
+    'II'   => 'Attack of the Clones',
+    'III'  => 'Revenge of the Sith',
+    'IV'   => 'A New Hope',
+    'V'    => 'The Empire Strikes Back',
+    'VI'   => 'Return of the Jedi',
+    'VII'  => 'The Force Awakens',
+    'VIII' => 'The Last Jedi',
+    'IX'   => 'The Rise of Skywalker',
 ];
-foreach (Single::compressAssociative($data, ['a', 'c', 'e']) as $key => $value) {
-    print("{$key}: {$value}");
+$originalTrilogyNumbers = ['IV', 'V', 'VI'];
+
+foreach (Single::compressAssociative($starWarsEpisodes, $originalTrilogyNumbers) as $episode => $title) {
+    print("$episode: $title" . \PHP_EOL);
 }
-// 'a: 1', 'c: 3', 'e: 5'
+// IV: A New Hope
+// V: The Empire Strikes Back
+// VI: Return of the Jedi
 ```
 
 ### Drop While
@@ -503,7 +510,7 @@ foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $badMovi
 ### Filter Keys
 Filter out elements from the iterable only returning elements for which keys the predicate function is true.
 
-```Single::filterKeys(string $data, callable $filter)```
+```Single::filterKeys(string $data, callable $predicate)```
 
 ```php
 use IterTools\Single;
@@ -515,9 +522,9 @@ $data = [
     'd' => 4,
     'e' => 5,
 ];
-$compressor = fn ($key) => in_array($key, ['a', 'c', 'e']);
+$predicate = fn ($key) => in_array($key, ['a', 'c', 'e']);
 
-foreach (Single::compressAssociative($data, $compressor) as $key => $value) {
+foreach (Single::filterKeys($data, $$predicate) as $key => $value) {
     print("{$key}: {$value}");
 }
 // 'a: 1', 'c: 3', 'e: 5'
@@ -1640,18 +1647,25 @@ Compress an iterable source by filtering out data using required keys list.
 ```php
 use IterTools\Stream;
 
-$data = [
-    'a' => 1,
-    'b' => 2,
-    'c' => 3,
-    'd' => 4,
-    'e' => 5,
+$starWarsEpisodes = [
+    'I'    => 'The Phantom Menace',
+    'II'   => 'Attack of the Clones',
+    'III'  => 'Revenge of the Sith',
+    'IV'   => 'A New Hope',
+    'V'    => 'The Empire Strikes Back',
+    'VI'   => 'Return of the Jedi',
+    'VII'  => 'The Force Awakens',
+    'VIII' => 'The Last Jedi',
+    'IX'   => 'The Rise of Skywalker',
 ];
+$sequelTrilogyNumbers = ['VII', 'VIII', 'IX'];
 
-$result = Stream::of($data)
-    ->compressAssociative($data, ['a', 'c', 'e'])
-    ->toArray();
-// 'a: 1', 'c: 3', 'e: 5'
+$sequelTrilogy = Stream::of($starWarsEpisodes)
+    ->compressAssociative($sequelTrilogyNumbers)
+    ->toAssociativeArray();
+// 'VII'  => 'The Force Awakens',
+// 'VIII' => 'The Last Jedi',
+// 'IX'   => 'The Rise of Skywalker',
 ```
 
 #### Chunkwise
