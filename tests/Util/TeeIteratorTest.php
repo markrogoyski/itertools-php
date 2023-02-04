@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace IterTools\Tests\Util;
 
 use IterTools\Util\IteratorFactory;
-use IterTools\Tests\Fixture;
 use IterTools\Util\TeeIterator;
 
 class TeeIteratorTest extends \PHPUnit\Framework\TestCase
