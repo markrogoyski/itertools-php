@@ -22,6 +22,10 @@ class RelatedIterator implements \Iterator
      * @var int
      */
     private int $id;
+    /**
+     * @var bool
+     */
+    private bool $isRewinded = false;
 
     /**
      * @param TeeIterator<TKey, TValue> $parentIterator
@@ -80,10 +84,14 @@ class RelatedIterator implements \Iterator
     /**
      * {@inheritDoc}
      *
-     * @throws \LogicException always
+     * @throws \LogicException for repeated calls
      */
     public function rewind(): void
     {
-        throw new \LogicException();
+        if (!$this->isRewinded) {
+            $this->isRewinded = true;
+        } else {
+            throw new \LogicException('RelatedIterator cannot be rewinded repeatedly');
+        }
     }
 }

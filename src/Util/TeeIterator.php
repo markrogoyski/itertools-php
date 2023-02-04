@@ -31,15 +31,21 @@ class TeeIterator extends \NoRewindIterator
 
     /**
      * @param \Iterator<TKey, TValue> $iterator
-     * @param int $relatedCount
+     * @param positive-int $relatedCount
      */
     public function __construct(\Iterator $iterator, int $relatedCount)
     {
         parent::__construct($iterator);
+        $iterator->rewind();
 
         for ($i=0; $i<$relatedCount; ++$i) {
             $this->related[] = new RelatedIterator($this, $i);
             $this->positions[] = 0;
+        }
+
+        if (parent::valid()) {
+            $this->cacheKeys[] = parent::key();
+            $this->cacheValues[] = parent::current();
         }
     }
 
@@ -62,20 +68,26 @@ class TeeIterator extends \NoRewindIterator
             throw new \LogicException();
         }
 
-        [$relPos, $minPos, $maxPos] = [$this->getPosition($related), \min($this->positions), \max($this->positions)];
-
-        if ($relPos === $minPos) {
-            unset($this->cacheKeys[$minPos]);
-            unset($this->cacheValues[$minPos]);
+        if (!$related->valid()) {
+            return;
         }
+
+        [$relPos, $minPos, $maxPos] = [$this->getPosition($related), \min($this->positions), \max($this->positions)];
 
         if ($relPos === $maxPos) {
             parent::next();
-            $this->cacheKeys[$maxPos] = parent::key();
-            $this->cacheValues[$maxPos] = parent::current();
+            if (parent::valid()) {
+                $this->cacheKeys[] = parent::key();
+                $this->cacheValues[] = parent::current();
+            }
         }
 
         $this->incrementPosition($related);
+
+        if ($minPos < \min($this->positions)) {
+            unset($this->cacheKeys[$minPos]);
+            unset($this->cacheValues[$minPos]);
+        }
     }
 
     /**
@@ -89,7 +101,7 @@ class TeeIterator extends \NoRewindIterator
             throw new \LogicException();
         }
 
-        return $this->cacheValues[$this->getPosition($related)];
+        return $this->cacheValues[$this->getPosition($related)] ?? parent::current();
     }
 
     /**
@@ -105,7 +117,7 @@ class TeeIterator extends \NoRewindIterator
             throw new \LogicException();
         }
 
-        return $this->cacheKeys[$this->getPosition($related)];
+        return $this->cacheKeys[$this->getPosition($related)] ?? parent::key();
     }
 
     /**

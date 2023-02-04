@@ -37,7 +37,7 @@ class IteratorFactory
 
     /**
      * @param iterable<TKey, TValue> $iterable
-     * @param int $count
+     * @param positive-int $count
      *
      * @return array<RelatedIterator<TKey, TValue>>
      */
