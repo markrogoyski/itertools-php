@@ -42,6 +42,47 @@ class ExampleUsageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test filterKeys example usage
+     */
+    public function filterKeysExampleUsage(): void
+    {
+        // Given
+        $olympics = [
+            2000 => 'Sydney',
+            2002 => 'Salt Lake City',
+            2004 => 'Athens',
+            2006 => 'Turin',
+            2008 => 'Beijing',
+            2010 => 'Vancouver',
+            2012 => 'London',
+            2014 => 'Sochi',
+            2016 => 'Rio de Janeiro',
+            2018 => 'Pyeongchang',
+            2020 => 'Tokyo',
+            2022 => 'Beijing',
+        ];
+
+        // And
+        $winterFilter = fn ($year) => $year % 4 === 2;
+
+        // When
+        $winterOlympics = Stream::of($olympics)
+            ->filterKeys($winterFilter)
+            ->toArray();
+
+        // Then
+        $expected = [
+            'Salt Lake City',
+            'Turin',
+            'Vancouver',
+            'Sochi',
+            'Pyeongchang',
+            'Beijing',
+        ];
+        $this->assertEquals($expected, $winterOlympics);
+    }
+
+    /**
      * @test reindex example usage
      */
     public function reindexExampleUsage(): void

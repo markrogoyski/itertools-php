@@ -11,6 +11,49 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class FilterKeysTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test filterKeys example usage
+     */
+    public function filterKeysExampleUsage(): void
+    {
+        // Given
+        $olympics = [
+            2000 => 'Sydney',
+            2002 => 'Salt Lake City',
+            2004 => 'Athens',
+            2006 => 'Turin',
+            2008 => 'Beijing',
+            2010 => 'Vancouver',
+            2012 => 'London',
+            2014 => 'Sochi',
+            2016 => 'Rio de Janeiro',
+            2018 => 'Pyeongchang',
+            2020 => 'Tokyo',
+            2022 => 'Beijing',
+        ];
+
+        // And
+        $summerFilter = fn ($year) => $year % 4 === 0;
+
+        // When
+        $summerOlympics = [];
+        foreach (Single::filterKeys($olympics, $summerFilter) as $year => $hostCity) {
+            $summerOlympics[$year] = $hostCity;
+        }
+
+        // Then
+        $expected = [
+            2000 => 'Sydney',
+            2004 => 'Athens',
+            2008 => 'Beijing',
+            2012 => 'London',
+            2016 => 'Rio de Janeiro',
+            2020 => 'Tokyo',
+        ];
+        $this->assertEquals($expected, $summerOlympics);
+    }
+
+    /**
+     * @test filterKeys
      * @dataProvider dataProviderForArray
      * @param array $iterable
      * @param callable $filter

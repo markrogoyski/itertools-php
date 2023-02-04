@@ -64,7 +64,7 @@ Quick Reference
 | [`dropWhile`](#Drop-While)                     | Drop elements while predicate is true               | `Single::dropWhile($data, $predicate)`                      |
 | [`filterTrue`](#Filter-True)                   | Filter for elements where predicate is true         | `Single::filterTrue($data, $predicate)`                     |
 | [`filterFalse`](#Filter-False)                 | Filter for elements where predicate is false        | `Single::filterFalse($data, $predicate)`                    |
-| [`filterKeys`](#Filter-Keys)                   | Filter for elements where predicate for key is true | `Single::filterKeys($data, $predicate)`                     |
+| [`filterKeys`](#Filter-Keys)                   | Filter for keys where predicate is true             | `Single::filterKeys($data, $predicate)`                     |
 | [`groupBy`](#Group-By)                         | Group data by a common element                      | `Single::groupBy($data, $groupKeyFunction)`                 |
 | [`limit`](#Limit)                              | Iterate up to a limit                               | `Single::limit($data, $limit)`                              |
 | [`map`](#Map)                                  | Map function onto each item                         | `Single::map($data, $function)`                             |
@@ -162,7 +162,7 @@ Quick Reference
 | [`dropWhile`](#Drop-While-1)                                              | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`                                                  |
 | [`filterTrue`](#Filter-True-1)                                            | Filter for only elements where the predicate function is true                             | `$stream->filterTrue($predicate)`                                                 |
 | [`filterFalse`](#Filter-False-1)                                          | Filter for only elements wherethe predicate function is false                             | `$stream->filterFalse($predicate)`                                                |
-| [`filterKeys`](#Filter-Keys-1)                                            | Filter for elements where predicate for key is true                                       | `$stream->filterKeys($predicate)`                                                 |
+| [`filterKeys`](#Filter-Keys-1)                                            | Filter for keys where predicate function is true                                          | `$stream->filterKeys($predicate)`                                                 |
 | [`groupBy`](#Group-By-1)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`                                             |
 | [`infiniteCycle`](#Infinite-Cycle)                                        | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                                                        |
 | [`intersectionWith`](#Intersection-With)                                  | Intersect iterable source and given iterables                                             | `$stream->intersectionWith(...$iterables)`                                        |
@@ -515,19 +515,32 @@ Filter out elements from the iterable only returning elements for which keys the
 ```php
 use IterTools\Single;
 
-$data = [
-    'a' => 1,
-    'b' => 2,
-    'c' => 3,
-    'd' => 4,
-    'e' => 5,
+$olympics = [
+    2000 => 'Sydney',
+    2002 => 'Salt Lake City',
+    2004 => 'Athens',
+    2006 => 'Turin',
+    2008 => 'Beijing',
+    2010 => 'Vancouver',
+    2012 => 'London',
+    2014 => 'Sochi',
+    2016 => 'Rio de Janeiro',
+    2018 => 'Pyeongchang',
+    2020 => 'Tokyo',
+    2022 => 'Beijing',
 ];
-$predicate = fn ($key) => in_array($key, ['a', 'c', 'e']);
 
-foreach (Single::filterKeys($data, $$predicate) as $key => $value) {
-    print("{$key}: {$value}");
+$summerFilter = fn ($year) => $year % 4 === 0;
+
+foreach (Single::filterKeys($olympics, $summerFilter) as $year => $hostCity) {
+    print("$year: $hostCity" . \PHP_EOL);
 }
-// 'a: 1', 'c: 3', 'e: 5'
+// 2000: Sydney
+// 2004: Athens
+// 2008: Beijing
+// 2012: London
+// 2016: Rio de Janeiro
+// 2020: Tokyo
 ```
 
 ### Group By
@@ -1806,26 +1819,37 @@ $result = Stream::of($input)
 ```
 
 #### Filter Keys
-Filter out elements from the iterable source only returning elements for which keys the predicate function is true.
+Filter out elements from stream only keeping elements where the predicate function on the keys are true.
 
 ```$stream->filterKeys(callable $filter): Stream```
 
 ```php
-use IterTools\Stream;
-
-$data = [
-    'a' => 1,
-    'b' => 2,
-    'c' => 3,
-    'd' => 4,
-    'e' => 5,
+$olympics = [
+    2000 => 'Sydney',
+    2002 => 'Salt Lake City',
+    2004 => 'Athens',
+    2006 => 'Turin',
+    2008 => 'Beijing',
+    2010 => 'Vancouver',
+    2012 => 'London',
+    2014 => 'Sochi',
+    2016 => 'Rio de Janeiro',
+    2018 => 'Pyeongchang',
+    2020 => 'Tokyo',
+    2022 => 'Beijing',
 ];
-$compressor = fn ($key) => in_array($key, ['a', 'c', 'e']);
 
-$result = Stream::of($input)
-    ->compressAssociative($compressor)
-    ->toArray();
-// 'a: 1', 'c: 3', 'e: 5'
+$winterFilter = fn ($year) => $year % 4 === 2;
+
+foreach (Single::filterKeys($olympics, $winterFilter) as $year => $hostCity) {
+    print("$year: $hostCity" . \PHP_EOL);
+}
+// 2002: Salt Lake City
+// 2006: Turin
+// 2010: Vancouver
+// 2014: Sochi
+// 2018: Pyeongchang
+// 2022: Beijing
 ```
 
 #### Group By
