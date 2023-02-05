@@ -158,7 +158,7 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Create a stream sourced from a CSG file.
+     * Create a stream sourced from a CSV file.
      *
      * @param resource $file  File handle stream opened for reading
      * @param string $separator
@@ -775,7 +775,7 @@ class Stream implements \IteratorAggregate
      *
      * @return void
      */
-    public function toFile($fileResource, string $newlineSeparator = \PHP_EOL, ?string $header = null, ?string $footer = null): void
+    public function toFile($fileResource, string $newlineSeparator = \PHP_EOL, string $header = null, string $footer = null): void
     {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
@@ -815,7 +815,7 @@ class Stream implements \IteratorAggregate
      */
     public function toCsvFile(
         $fileResource,
-        ?array $header = null,
+        array $header = null,
         string $separator = ',',
         string $enclosure = '"',
         string $escape = '\\'

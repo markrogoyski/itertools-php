@@ -111,6 +111,12 @@ Quick Reference
 | [`symmetricDifference`](#Symmetric-Difference)                  | Symmetric difference of iterables                         | `Set::symmetricDifference(...$iterables)`                    |
 | [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Symmetric difference with type coercion                   | `Set::symmetricDifferenceCoercive(...$iterables)`            |
 
+#### File Iteration
+| Iterator                                                        | Description                                               | Code Snippet                                                 |
+|-----------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------|
+| [`readCsv`](#Read-CSV)                                          | Intersection a CSV file line by line                      | `File::readCsv($fileHandle)`                                 |
+| [`readLines`](#Read-Lines)                                      | Iterate a file line by line                               | `File::readLines($fileHandle)`                               |
+
 #### Summary
 | Summary                      | Description                                             | Code Snippet                               |
 |------------------------------|---------------------------------------------------------|--------------------------------------------|
@@ -143,7 +149,9 @@ Quick Reference
 |--------------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------------|
 | [`of`](#Of)                                      | Create a stream from an iterable                                | `Stream::of($iterable)`                             |
 | [`ofCoinFlips`](#Of-Coin-Flips)                  | Create a stream of random coin flips                            | `Stream::ofCoinFlips($repetitions)`                 |
+| [`ofCsvFile`](#Of-CSV-File)                      | Create a stream from a CSV file                                 | `Stream::ofCsvFile($fileHandle)`                    |
 | [`ofEmpty`](#Of-Empty)                           | Create an empty stream                                          | `Stream::ofEmpty()`                                 |
+| [`ofFileLines`](#Of-File-Lines)                  | Create a stream from lines of a file                            | `Stream::ofFileLines($fileHandle)`                  |
 | [`ofRandomChoice`](#Of-Random-Choice)            | Create a stream of random selections                            | `Stream::ofRandomChoice($items, $repetitions)`      |
 | [`ofRandomNumbers`](#Of-Random-Numbers)          | Create a stream of random numbers (integers)                    | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
 | [`ofRandomPercentage`](#Of-Random-Percentage)    | Create a stream of random percentages between 0 and 1           | `Stream::ofRandomPercentage($repetitions)`          |
@@ -220,13 +228,15 @@ Quick Reference
 | [`toAssociativeArray`](#To-Associative-Array) | Returns key-value map of stream elements              | `$stream->toAssociativeArray($keyFunc, $valueFunc)`     |
 
 ##### Side Effect Terminal Operations
-| Terminal Operation              | Description                              | Code Snippet                                          |
-|---------------------------------|------------------------------------------|-------------------------------------------------------|
-| [`callForEach`](#Call-For-Each) | Perform action via function on each item | `$stream->callForEach($function)`                     |
-| [`print`](#Print)               | `print` each item in the stream          | `$stream->print([$separator], [$prefix], [$suffix])`  |
-| [`printLn`](#Print-Line)        | `print` each item on a new line          | `$stream->printLn()`                                  |
-| [`printR`](#Print-R)            | `print_r` each item                      | `$stream->printR()`                                   |
-| [`var_dump`](#Var-Dump)         | `var_dump` each item                     | `$stream->varDump()`                                  |
+| Terminal Operation              | Description                                    | Code Snippet                                          |
+|---------------------------------|------------------------------------------------|-------------------------------------------------------|
+| [`callForEach`](#Call-For-Each) | Perform action via function on each item       | `$stream->callForEach($function)`                     |
+| [`print`](#Print)               | `print` each item in the stream                | `$stream->print([$separator], [$prefix], [$suffix])`  |
+| [`printLn`](#Print-Line)        | `print` each item on a new line                | `$stream->printLn()`                                  |
+| [`printR`](#Print-R)            | `print_r` each item                            | `$stream->printR()`                                   |
+| [`toCsvFile`](#To-CSV-File)     | Write the contents of the stream to a CSV file | `$stream->toCsvFile($fileHandle, [$headers])`         |
+| [`toFile`](#To-File)            | Write the contents of the stream to a file     | `$stream->toFile($fileHandle)`                        |
+| [`var_dump`](#Var-Dump)         | `var_dump` each item                           | `$stream->varDump()`                                  |
 
 Setup
 -----
@@ -1159,6 +1169,39 @@ foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
 // 4, 5, 6, 7, 8, 9
 ```
 
+## File
+### Read CSV
+Iterate the lines of a CSV file.
+
+```File::readCsv(resource $fileHandle, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
+
+```php
+use IterTools\File;
+
+$fileHandle = \fopen('path/to/file.csv', 'r');
+
+foreach (File::readCsv($fileHandle) as $row) {
+    print_r($row);
+}
+// Each column field is an element of the array
+```
+
+### Read Lines
+Iterate the lines of a file.
+
+```File::readLines(resource $fileHandle)```
+
+```php
+use IterTools\File;
+
+$fileHandle = \fopen('path/to/file.txt', 'r');
+
+foreach (File::readLines($fileHandle) as $line) {
+    print($line);
+}
+```
+
+
 ## Summary
 ### All Match
 Returns true if all elements match the predicate function.
@@ -1554,6 +1597,20 @@ $result = Stream::ofCoinFlips(10)
 // 5 (random)
 ```
 
+#### Of CSV File
+Creates a stream of rows of a CSV file.
+
+```Stream::ofCsvFile(resource $fileHandle, string $separator = ',', string $enclosure = '"', string = $escape = '\\'): Stream```
+
+```php
+use IterTools\Stream;
+
+$fileHandle = \fopen('path/to/file.csv', 'r');
+
+$result = Stream::of($fileHandle)
+    ->toArray();
+```
+
 #### Of Empty
 Creates stream of nothing.
 
@@ -1566,6 +1623,21 @@ $result = Stream::ofEmpty()
     ->chainWith([1, 2, 3])
     ->toArray();
 // 1, 2, 3
+```
+
+#### Of File Lines
+Creates a stream of lines of a file.
+
+```Stream::ofFileLines(resource $fileHandle): Stream```
+
+```php
+use IterTools\Stream;
+
+$fileHandle = \fopen('path/to/file.txt', 'r');
+
+$result = Stream::of($fileHandle)
+    ->map('strtoupper');
+    ->toArray();
 ```
 
 #### Of Random Choice
@@ -2728,6 +2800,52 @@ $items = [$string, $array, $object];
 
 Stream::of($words)->printR();
 // print_r output
+```
+
+##### To CSV File
+Write the contents of the stream to a CSV file.
+
+```$stream->toCsvFile(resource $fileHandle, array $header = null, string 'separator = ',', string $enclosure = '"', string $escape = '\\'): void```
+
+```php
+use IterTools\Stream;
+
+$starWarsMovies = [
+    ['Star Wars: Episode IV – A New Hope', 'IV', 1977],
+    ['Star Wars: Episode V – The Empire Strikes Back', 'V', 1980],
+    ['Star Wars: Episode VI – Return of the Jedi', 'VI', 1983],
+];
+$header = ['title', 'episode', 'year'];
+
+Stream::of($data)
+    ->toCsvFile($fh, $header);
+// title,episode,year
+// "Star Wars: Episode IV – A New Hope",IV,1977
+// "Star Wars: Episode V – The Empire Strikes Back",V,1980
+// "Star Wars: Episode VI – Return of the Jedi",VI,1983
+```
+
+##### To File
+Write the contents of the stream to a file.
+
+```$stream->toFile(resource $fileHandle, string $newLineSeparator = \PHP_EOL, string $header = null, string $footer = null): void```
+
+```php
+use IterTools\Stream;
+
+$data = ['item1', 'item2', 'item3'];
+$header = '<ul>';
+$footer = '</ul>';
+
+Stream::of($data)
+    ->map(fn ($item) => "  <li>$item</li>")
+    ->toFile($fh, \PHP_EOL, $header, $footer);
+
+// <ul>
+//   <li>item1</li>
+//   <li>item2</li>
+//   <li>item3</li>
+// </ul>
 ```
 
 ##### Var Dump
