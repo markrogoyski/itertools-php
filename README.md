@@ -1093,7 +1093,6 @@ Iterates [M-partial intersection](https://github.com/Smoren/partial-intersection
 ```Set::partialIntersection(int $minIntersectionCount, iterable ...$iterables)```
 
 * If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
-* If `$minIntersectionCount` is 1, then [multiset](https://en.wikipedia.org/wiki/Multiset) union rules apply.
 
 ```php
 use IterTools\Set;
