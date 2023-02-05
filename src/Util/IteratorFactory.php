@@ -39,7 +39,7 @@ class IteratorFactory
      * @param iterable<TKey, TValue> $iterable
      * @param positive-int $count
      *
-     * @return array<RelatedIterator<TKey, TValue>>
+     * @return array<\Iterator<TKey, TValue>>
      */
     public static function tee(iterable $iterable, int $count): array
     {
