@@ -12,9 +12,9 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class SingleTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param array    $input
+     * @param array $input
      * @param callable $streamFactoryFunc
-     * @param array    $expected
+     * @param array $expected
      * @return void
      * @dataProvider dataProviderForArray
      */
@@ -433,13 +433,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
             ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toArray(),
+                [7, 5, 3, 3, 2, 2, 1, -2, -3],
+            ],
         ];
     }
 
     /**
      * @param \Generator $input
-     * @param callable   $streamFactoryFunc
-     * @param array      $expected
+     * @param callable $streamFactoryFunc
+     * @param array $expected
      * @return void
      * @dataProvider dataProviderForGenerator
      */
@@ -824,13 +845,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
             ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toArray(),
+                [7, 5, 3, 3, 2, 2, 1, -2, -3],
+            ],
         ];
     }
 
     /**
      * @param \Iterator $input
-     * @param callable  $streamFactoryFunc
-     * @param array     $expected
+     * @param callable $streamFactoryFunc
+     * @param array $expected
      * @return void
      * @dataProvider dataProviderForIterator
      */
@@ -1215,13 +1257,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
             ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toArray(),
+                [7, 5, 3, 3, 2, 2, 1, -2, -3],
+            ],
         ];
     }
 
     /**
      * @param \Traversable $input
-     * @param callable     $streamFactoryFunc
-     * @param array        $expected
+     * @param callable $streamFactoryFunc
+     * @param array $expected
      * @return void
      * @dataProvider dataProviderForTraversable
      */
@@ -1606,6 +1669,27 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
             ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toArray(),
+                [7, 5, 3, 3, 2, 2, 1, -2, -3],
+            ],
         ];
     }
 
@@ -1616,7 +1700,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
 
         // And
         $expected = ['pos' => [1, 2, 3], 'neg' => [-1, -2, -3]];
-        $result   = [];
+        $result = [];
 
         // When
         foreach (Stream::of($data)->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg') as $groupKey => $groupData) {
@@ -1634,13 +1718,13 @@ class SingleTest extends \PHPUnit\Framework\TestCase
 
         // And
         $expected = ['pos' => [1, 3], 'neg' => [-1, -3]];
-        $result   = [];
+        $result = [];
 
         // When
         foreach (
             Stream::of($data)
-                ->filterFalse(fn($value) => $value % 2 === 0)
-                ->groupBy(fn($item) => $item > 0 ? 'pos' : 'neg') as $groupKey => $groupData
+                ->filterFalse(fn ($value) => $value % 2 === 0)
+                ->groupBy(fn ($item) => $item > 0 ? 'pos' : 'neg') as $groupKey => $groupData
         ) {
             $result[$groupKey] = $groupData;
         }

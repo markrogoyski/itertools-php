@@ -416,6 +416,23 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Sorts iterable source.
+     *
+     * If comparator is null, then elements of the iterable source must be comparable.
+     *
+     * @param callable|null $comparator
+     *
+     * @return $this
+     *
+     * @see Single::sort()
+     */
+    public function sort(callable $comparator = null): self
+    {
+        $this->iterable = Single::sort($this->iterable, $comparator);
+        return $this;
+    }
+
+    /**
      * Chain iterable source withs given iterables together into a single iteration.
      *
      * Makes a single continuous sequence out of multiple sequences.
@@ -1014,33 +1031,63 @@ class Stream implements \IteratorAggregate
     /**
      * Reduces iterable source to its max value.
      *
-     * Items of iterable source must be comparable.
+     * Callable param $compareBy must return comparable value.
+     *
+     * If $compareBy is not proposed then items of iterable source must be comparable.
      *
      * Returns null if iterable source is empty.
+     *
+     * @param callable|null $compareBy
      *
      * @return mixed
      *
      * @see Reduce::toMax()
      */
-    public function toMax()
+    public function toMax(callable $compareBy = null)
     {
-        return Reduce::toMax($this->iterable);
+        return Reduce::toMax($this->iterable, $compareBy);
     }
 
     /**
      * Reduces iterable source to its min value.
      *
-     * Items of iterable source must be comparable.
+     * Callable param $compareBy must return comparable value.
+     *
+     * If $compareBy is not proposed then items of iterable source must be comparable.
      *
      * Returns null if iterable source is empty.
+     *
+     * @param callable|null $compareBy
      *
      * @return mixed
      *
      * @see Reduce::toMin()
      */
-    public function toMin()
+    public function toMin(callable $compareBy = null)
     {
-        return Reduce::toMin($this->iterable);
+        return Reduce::toMin($this->iterable, $compareBy);
+    }
+
+    /**
+     * Reduces iterable source to array of its upper and lower bounds.
+     *
+     * Callable param $compareBy must return comparable value.
+     *
+     * If $compareBy is not proposed then items of iterable source must be comparable.
+     *
+     * Returns [null, null] if iterable source is empty.
+     *
+     * @param callable|null $compareBy
+     *
+     * @return array{numeric, numeric}|array{null, null}
+     *
+     * @see Reduce::toMinMax()
+     */
+    public function toMinMax(callable $compareBy = null): array
+    {
+        /** @var iterable<numeric> $iterable */
+        $iterable = $this->iterable;
+        return Reduce::toMinMax($iterable, $compareBy);
     }
 
     /**
@@ -1093,22 +1140,6 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Reduces iterable source to array of its upper and lower bounds.
-     *
-     * Returns [null, null] if iterable source is empty.
-     *
-     * @return array{numeric, numeric}|array{null, null}
-     *
-     * @see Reduce::toMinMax()
-     */
-    public function toMinMax(): array
-    {
-        /** @var iterable<numeric> $iterable */
-        $iterable = $this->iterable;
-        return Reduce::toMinMax($iterable);
-    }
-
-    /**
      * Reduces iterable source to its amplitude.
      *
      * Returns 0 if iterable source is empty.
@@ -1122,6 +1153,42 @@ class Stream implements \IteratorAggregate
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;
         return Reduce::toRange($iterable);
+    }
+
+    /**
+     * Returns the first element of iterable source.
+     *
+     * @return mixed
+     *
+     * @throws \LengthException if iterable source is empty.
+     */
+    public function toFirst()
+    {
+        return Reduce::toFirst($this->iterable);
+    }
+
+    /**
+     * Returns the last element of iterable source.
+     *
+     * @return mixed
+     *
+     * @throws \LengthException if iterable source is empty.
+     */
+    public function toLast()
+    {
+        return Reduce::toLast($this->iterable);
+    }
+
+    /**
+     * Returns the first element of iterable source.
+     *
+     * @return array{mixed, mixed}
+     *
+     * @throws \LengthException if iterable source is empty.
+     */
+    public function toFirstAndLast(): array
+    {
+        return Reduce::toFirstAndLast($this->iterable);
     }
 
     /**

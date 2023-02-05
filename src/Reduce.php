@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\NoValueMonad;
+
 class Reduce
 {
     /**
@@ -32,37 +34,85 @@ class Reduce
     /**
      * Reduces given iterable to its min value.
      *
-     * Items of given collection must be comparable.
+     * Callable param $compareBy must return comparable value.
+     *
+     * If $compareBy is not proposed then items of given collection must be comparable.
      *
      * Returns null if given collection is empty.
      *
      * @param iterable<mixed> $data
+     * @param callable|null   $compareBy
      *
      * @return mixed|null
      */
-    public static function toMin(iterable $data)
+    public static function toMin(iterable $data, callable $compareBy = null)
     {
-        return static::toValue($data, static function ($carry, $datum) {
-            return \min($carry ?? $datum, $datum);
-        });
+        if ($compareBy !== null) {
+            return static::toValue(
+                $data,
+                fn ($carry, $datum) => $compareBy($datum) < $compareBy($carry ?? $datum) ? $datum : $carry ?? $datum
+            );
+        }
+
+        return static::toValue($data, fn ($carry, $datum) => \min($carry ?? $datum, $datum));
     }
 
     /**
      * Reduces given iterable to its max value.
      *
-     * Items of given collection must be comparable.
+     * Callable param $compareBy must return comparable value.
+     *
+     * If $compareBy is not proposed then items of given collection must be comparable.
      *
      * Returns null if given collection is empty.
      *
      * @param iterable<mixed> $data
+     * @param callable|null   $compareBy
      *
      * @return mixed|null
      */
-    public static function toMax(iterable $data)
+    public static function toMax(iterable $data, callable $compareBy = null)
     {
-        return static::toValue($data, static function ($carry, $datum) {
-            return \max($carry ?? $datum, $datum);
-        });
+        if ($compareBy !== null) {
+            return static::toValue(
+                $data,
+                fn ($carry, $datum) => $compareBy($datum) > $compareBy($carry ?? $datum) ? $datum : $carry ?? $datum
+            );
+        }
+
+        return static::toValue($data, fn ($carry, $datum) => \max($carry ?? $datum, $datum));
+    }
+
+    /**
+     * Reduces given collection to array of its upper and lower bounds.
+     *
+     * Callable param $compareBy must return comparable value.
+     *
+     * If $compareBy is not proposed then items of given collection must be comparable.
+     *
+     * Returns [null, null] if given collection is empty.
+     *
+     * @param iterable<numeric> $numbers
+     * @param callable|null   $compareBy
+     *
+     * @return array{numeric, numeric}|array{null, null}
+     */
+    public static function toMinMax(iterable $numbers, callable $compareBy = null): array
+    {
+        if ($compareBy !== null) {
+            return static::toValue($numbers, static function (array $carry, $datum) use ($compareBy) {
+                return [
+                    $compareBy($datum) <= $compareBy($carry[0] ?? $datum) ? $datum : $carry[0] ?? $datum,
+                    $compareBy($datum) >= $compareBy($carry[1] ?? $datum) ? $datum : $carry[1] ?? $datum,
+                ];
+            }, [null, null]);
+        }
+
+        return static::toValue(
+            $numbers,
+            fn ($carry, $datum) => [\min($carry[0] ?? $datum, $datum), \max($carry[1] ?? $datum, $datum)],
+            [null, null]
+        );
     }
 
     /**
@@ -78,9 +128,7 @@ class Reduce
             return \count($data);
         }
 
-        return static::toValue($data, static function ($carry) {
-            return $carry + 1;
-        }, 0);
+        return static::toValue($data, fn ($carry) => $carry + 1, 0);
     }
 
     /**
@@ -92,9 +140,7 @@ class Reduce
      */
     public static function toSum(iterable $data)
     {
-        return static::toValue($data, static function ($carry, $datum) {
-            return $carry + $datum;
-        }, 0);
+        return static::toValue($data, fn ($carry, $datum) => $carry + $datum, 0);
     }
 
     /**
@@ -108,9 +154,7 @@ class Reduce
      */
     public static function toProduct(iterable $data)
     {
-        return static::toValue($data, static function ($carry, $datum) {
-            return ($carry ?? 1) * $datum;
-        });
+        return static::toValue($data, fn ($carry, $datum) => ($carry ?? 1) * $datum);
     }
 
     /**
@@ -156,22 +200,6 @@ class Reduce
     }
 
     /**
-     * Reduces given collection to array of its upper and lower bounds.
-     *
-     * Returns [null, null] if given collection is empty.
-     *
-     * @param iterable<numeric> $numbers
-     *
-     * @return array{numeric, numeric}|array{null, null}
-     */
-    public static function toMinMax(iterable $numbers): array
-    {
-        return static::toValue($numbers, static function ($carry, $datum) {
-            return [\min($carry[0] ?? $datum, $datum), \max($carry[1] ?? $datum, $datum)];
-        }, [null, null]);
-    }
-
-    /**
      * Reduces given collection to its range.
      *
      * Returns 0 if given collection is empty.
@@ -185,5 +213,55 @@ class Reduce
         [$min, $max] = static::toMinMax($numbers);
 
         return ($max ?? 0) - ($min ?? 0);
+    }
+
+    /**
+     * Reduces given collection to its first value.
+     *
+     * @param iterable<mixed> $data
+     * @return mixed
+     *
+     * @throws \LengthException if collection is empty
+     */
+    public static function toFirst(iterable $data)
+    {
+        foreach ($data as $datum) {
+            return $datum;
+        }
+
+        throw new \LengthException('collection is empty');
+    }
+
+    /**
+     * Reduces given collection to its last value.
+     *
+     * @param iterable<mixed> $data
+     * @return mixed
+     *
+     * @throws \LengthException if collection is empty
+     */
+    public static function toLast(iterable $data)
+    {
+        /** @var mixed|NoValueMonad $result */
+        $result = static::toValue($data, fn ($carry, $datum) => $datum, NoValueMonad::getInstance());
+
+        if ($result instanceof NoValueMonad) {
+            throw new \LengthException('collection is empty');
+        }
+
+        return $result;
+    }
+
+    /**
+     * Reduces given collection to its first and last values.
+     *
+     * @param iterable<mixed> $data
+     * @return array{mixed, mixed}
+     *
+     * @throws \LengthException if collection is empty
+     */
+    public static function toFirstAndLast(iterable $data): array
+    {
+        return [static::toFirst($data), static::toLast($data)];
     }
 }

@@ -55,24 +55,25 @@ Quick Reference
 | [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously until the longest iterator completes        | `Multi::zipLongest($list1, $list2)` |
 
 #### Single Iteration
-| Iterator                                       | Description                                         | Code Snippet                                                |
-|------------------------------------------------|-----------------------------------------------------|-------------------------------------------------------------|
-| [`chunkwise`](#Chunkwise)                      | Iterate by chunks                                   | `Single::chunkwise($data, $chunkSize)`                      |
-| [`chunkwiseOverlap`](#Chunkwise-Overlap)       | Iterate by overlapped chunks                        | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
-| [`compress`](#Compress)                        | Filter out elements not selected                    | `Single::compress($data, $selectors)`                       |
-| [`compressAssociative`](#Compress-Associative) | Filter out elements by keys not selected            | `Single::compressAssociative($data, $selectorKeys)`         |
-| [`dropWhile`](#Drop-While)                     | Drop elements while predicate is true               | `Single::dropWhile($data, $predicate)`                      |
-| [`filterTrue`](#Filter-True)                   | Filter for elements where predicate is true         | `Single::filterTrue($data, $predicate)`                     |
-| [`filterFalse`](#Filter-False)                 | Filter for elements where predicate is false        | `Single::filterFalse($data, $predicate)`                    |
-| [`filterKeys`](#Filter-Keys)                   | Filter for keys where predicate is true             | `Single::filterKeys($data, $predicate)`                     |
-| [`groupBy`](#Group-By)                         | Group data by a common element                      | `Single::groupBy($data, $groupKeyFunction)`                 |
-| [`limit`](#Limit)                              | Iterate up to a limit                               | `Single::limit($data, $limit)`                              |
-| [`map`](#Map)                                  | Map function onto each item                         | `Single::map($data, $function)`                             |
-| [`pairwise`](#Pairwise)                        | Iterate successive overlapping pairs                | `Single::pairwise($data)`                                   |
-| [`reindex`](#Reindex)                          | Reindex keys of key-value iterable                  | `Single::reindex($data, $reindexer)`                        |
-| [`repeat`](#Repeat)                            | Repeat an item                                      | `Single::repeat($item, $repetitions)`                       |
-| [`string`](#String)                            | Iterate the characters of a string                  | `Single::string($string)`                                   |
-| [`takeWhile`](#Take-While)                     | Iterate elements while predicate is true            | `Single::takeWhile($data, $predicate)`                      |
+| Iterator                                       | Description                                  | Code Snippet                                                |
+|------------------------------------------------|----------------------------------------------|-------------------------------------------------------------|
+| [`chunkwise`](#Chunkwise)                      | Iterate by chunks                            | `Single::chunkwise($data, $chunkSize)`                      |
+| [`chunkwiseOverlap`](#Chunkwise-Overlap)       | Iterate by overlapped chunks                 | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
+| [`compress`](#Compress)                        | Filter out elements not selected             | `Single::compress($data, $selectors)`                       |
+| [`compressAssociative`](#Compress-Associative) | Filter out elements by keys not selected     | `Single::compressAssociative($data, $selectorKeys)`         |
+| [`dropWhile`](#Drop-While)                     | Drop elements while predicate is true        | `Single::dropWhile($data, $predicate)`                      |
+| [`filterTrue`](#Filter-True)                   | Filter for elements where predicate is true  | `Single::filterTrue($data, $predicate)`                     |
+| [`filterFalse`](#Filter-False)                 | Filter for elements where predicate is false | `Single::filterFalse($data, $predicate)`                    |
+| [`filterKeys`](#Filter-Keys)                   | Filter for keys where predicate is true      | `Single::filterKeys($data, $predicate)`                     |
+| [`groupBy`](#Group-By)                         | Group data by a common element               | `Single::groupBy($data, $groupKeyFunction)`                 |
+| [`limit`](#Limit)                              | Iterate up to a limit                        | `Single::limit($data, $limit)`                              |
+| [`map`](#Map)                                  | Map function onto each item                  | `Single::map($data, $function)`                             |
+| [`pairwise`](#Pairwise)                        | Iterate successive overlapping pairs         | `Single::pairwise($data)`                                   |
+| [`reindex`](#Reindex)                          | Reindex keys of key-value iterable           | `Single::reindex($data, $reindexer)`                        |
+| [`repeat`](#Repeat)                            | Repeat an item                               | `Single::repeat($item, $repetitions)`                       |
+| [`sort`](#Sort)                                | Sorts a collection                           | `Single::sort($data, [$comparator])`                        |
+| [`string`](#String)                            | Iterate the characters of a string           | `Single::string($string)`                                   |
+| [`takeWhile`](#Take-While)                     | Iterate elements while predicate is true     | `Single::takeWhile($data, $predicate)`                      |
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
@@ -130,18 +131,21 @@ Quick Reference
 | [`sameCount`](#Same-Count)   | True if iterables have the same lengths                 | `Summary::sameCount(...$iterables)`        |
 
 #### Reduce
-| Reducer                      | Description                                   | Code Snippet                                                  |
-|------------------------------|-----------------------------------------------|---------------------------------------------------------------|
-| [`toAverage`](#To-Average)   | Mean average of elements                      | `Reduce::toAverage($numbers)`                                 |
-| [`toCount`](#To-Count)       | Reduce to length of iterable                  | `Reduce::toCount($data)`                                      |
-| [`toMax`](#To-Max)           | Reduce to its largest element                 | `Reduce::toMax($numbers)`                                     |
-| [`toMin`](#To-Min)           | Reduce to its smallest element                | `Reduce::toMin($numbers)`                                     |
-| [`toMinMax`](#To-Min-Max)    | Reduce to array of upper and lower bounds     | `Reduce::toMinMax($numbers)`                                  |
-| [`toProduct`](#To-Product)   | Reduce to the product of its elements         | `Reduce::toProduct($numbers)`                                 |
-| [`toRange`](#To-Range)       | Reduce to difference of max and min values    | `Reduce::toRange($numbers)`                                   |
-| [`toString`](#To-String)     | Reduce to joined string                       | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
-| [`toSum`](#To-Sum)           | Reduce to the sum of its elements             | `Reduce::toSum($numbers)`                                     |
-| [`toValue`](#To-Value)       | Reduce to value using callable reducer        | `Reduce::toValue($data, $reducer, $initialValue)`             |
+| Reducer                                | Description                                | Code Snippet                                                  |
+|----------------------------------------|--------------------------------------------|---------------------------------------------------------------|
+| [`toAverage`](#To-Average)             | Mean average of elements                   | `Reduce::toAverage($numbers)`                                 |
+| [`toCount`](#To-Count)                 | Reduce to length of iterable               | `Reduce::toCount($data)`                                      |
+| [`toFirst`](#To-First)                 | Reduce to its first value                  | `Reduce::toFirst()`                                           |
+| [`toFirstAndLast`](#To-First-And-Last) | Reduce to its first and last values        | `Reduce::toFirstAndLast()`                                    |
+| [`toLast`](#To-Last)                   | Reduce to its last value                   | `Reduce::toLast()`                                            |
+| [`toMax`](#To-Max)                     | Reduce to its largest element              | `Reduce::toMax($numbers, [$compareBy])`                       |
+| [`toMin`](#To-Min)                     | Reduce to its smallest element             | `Reduce::toMin($numbers, [$compareBy])`                       |
+| [`toMinMax`](#To-Min-Max)              | Reduce to array of upper and lower bounds  | `Reduce::toMinMax($numbers, [$compareBy])`                    |
+| [`toProduct`](#To-Product)             | Reduce to the product of its elements      | `Reduce::toProduct($numbers)`                                 |
+| [`toRange`](#To-Range)                 | Reduce to difference of max and min values | `Reduce::toRange($numbers)`                                   |
+| [`toString`](#To-String)               | Reduce to joined string                    | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
+| [`toSum`](#To-Sum)                     | Reduce to the sum of its elements          | `Reduce::toSum($numbers)`                                     |
+| [`toValue`](#To-Value)                 | Reduce to value using callable reducer     | `Reduce::toValue($data, $reducer, $initialValue)`             |
 
 ### Stream Iteration Tools
 #### Stream Sources
@@ -187,6 +191,7 @@ Quick Reference
 | [`runningMin`](#Running-Min-1)                                            | Accumulate the running min over iterable source                                           | `$stream->runningMin($initialValue)`                                              |
 | [`runningProduct`](#Running-Product-1)                                    | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`                                          |
 | [`runningTotal`](#Running-Total-1)                                        | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`                                            |
+| [`sort`](#Sort-1)                                                         | Sorts the iterable source                                                                 | `$stream->sort([$comparator])`                                                    |
 | [`symmetricDifferenceWith`](#Symmetric-Difference-With)                   | Symmetric difference of iterable source and given iterables                               | `$this->symmetricDifferenceWith(...$iterables)`                                   |
 | [`symmetricDifference CoerciveWith`](#Symmetric-Difference-Coercive-With) | Symmetric difference of iterable source and given iterables with type coercion            | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                          |
 | [`takeWhile`](#Take-While-1)                                              | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                                                  |
@@ -208,18 +213,21 @@ Quick Reference
 | [`sameCountWith`](#Same-Count-With)          | Returns true if stream and all given collections have the same lengths | `$stream->sameCountWith(...$iterables)`      |
 
 ##### Reduction Terminal Operations
-| Terminal Operation             | Description                                           | Code Snippet                                            |
-|--------------------------------|-------------------------------------------------------|---------------------------------------------------------|
-| [`toAverage`](#To-Average-1)   | Reduces stream to the mean average of its items       | `$stream->toAverage()`                                  |
-| [`toCount`](#To-Count-1)       | Reduces stream to its length                          | `$stream->toCount()`                                    |
-| [`toMax`](#To-Max-1)           | Reduces stream to its max value                       | `$stream->toMax()`                                      |
-| [`toMin`](#To-Min-1)           | Reduces stream to its min value                       | `$stream->toMin()`                                      |
-| [`toProduct`](#To-Product-1)   | Reduces stream to the product of its items            | `$stream->toProduct()`                                  |
-| [`toString`](#To-String-1)     | Reduces stream to joined string                       | `$stream->toString([$separator], [$prefix], [$suffix])` |
-| [`toSum`](#To-Sum-1)           | Reduces stream to the sum of its items                | `$stream->toSum()`                                      |
-| [`toMinMax`](#To-Min-Max-1)    | Reduces stream to array of upper and lower bounds     | `$stream->toMinMax()`                                   |
-| [`toRange`](#To-Range-1)       | Reduces stream to difference of max and min values    | `$stream->toRange()`                                    |
-| [`toValue`](#To-Value-1)       | Reduces stream like array_reduce() function           | `$stream->toValue($reducer, $initialValue)`             |
+| Terminal Operation                       | Description                                        | Code Snippet                                            |
+|------------------------------------------|----------------------------------------------------|---------------------------------------------------------|
+| [`toAverage`](#To-Average-1)             | Reduces stream to the mean average of its items    | `$stream->toAverage()`                                  |
+| [`toCount`](#To-Count-1)                 | Reduces stream to its length                       | `$stream->toCount()`                                    |
+| [`toFirst`](#To-First-1)                 | Reduces stream to its first value                  | `$stream->toFirst()`                                    |
+| [`toFirstAndLast`](#To-First-And-Last-1) | Reduces stream to its first and last values        | `$stream->toFirstAndLast()`                             |
+| [`toLast`](#To-Last-1)                   | Reduces stream to its last value                   | `$stream->toLast()`                                     |
+| [`toMax`](#To-Max-1)                     | Reduces stream to its max value                    | `$stream->toMax([$compareBy])`                          |
+| [`toMin`](#To-Min-1)                     | Reduces stream to its min value                    | `$stream->toMin([$compareBy])`                          |
+| [`toMinMax`](#To-Min-Max-1)              | Reduces stream to array of upper and lower bounds  | `$stream->toMinMax([$compareBy])`                       |
+| [`toProduct`](#To-Product-1)             | Reduces stream to the product of its items         | `$stream->toProduct()`                                  |
+| [`toString`](#To-String-1)               | Reduces stream to joined string                    | `$stream->toString([$separator], [$prefix], [$suffix])` |
+| [`toSum`](#To-Sum-1)                     | Reduces stream to the sum of its items             | `$stream->toSum()`                                      |
+| [`toRange`](#To-Range-1)                 | Reduces stream to difference of max and min values | `$stream->toRange()`                                    |
+| [`toValue`](#To-Value-1)                 | Reduces stream like array_reduce() function        | `$stream->toValue($reducer, $initialValue)`             |
 
 ##### Transformation Terminal Operations
 | Terminal Operation                            | Description                                           | Code Snippet                                            |
@@ -716,6 +724,24 @@ foreach (Single::reindex($data, $reindexFunc) as $key => $filmData) {
 //         'year' => 1983,
 //     ],
 // ]
+```
+
+### Sort
+Sorts given collection.
+
+```Single::sort(iterable $data, callable $comparator = null)```
+
+If comparator is not proposed, the elements of given iterable must be comparable.
+
+```php
+use IterTools\Single;
+
+$data = [3, 4, 5, 9, 8, 7, 1, 6, 2];
+
+foreach (Single::sort($data) as $datum) {
+    print($datum);
+}
+// 1, 2, 3, 4, 5, 6, 7, 8, 9
 ```
 
 ### String
@@ -1399,13 +1425,62 @@ $length = Reduce::toCount($someIterable);
 // 3
 ```
 
+### To First
+Reduces iterable to its first element.
+
+```Reduce::toFirst(iterable $data): mixed```
+
+Throws `\LengthException` if collection is empty.
+
+```php
+use IterTools\Reduce;
+
+$input = [10, 20, 30];
+
+$result = Reduce::toFirst($input);
+// 10
+```
+
+### To First And Last
+Reduces iterable to its first and last elements.
+
+```Reduce::toFirstAndLast(iterable $data): array{mixed, mixed}```
+
+Throws `\LengthException` if collection is empty.
+
+```php
+use IterTools\Reduce;
+
+$input = [10, 20, 30];
+
+$result = Reduce::toFirstAndLast($input);
+// [10, 30]
+```
+
+### To Last
+Reduces iterable to its last element.
+
+```Reduce::toLast(iterable $data): mixed```
+
+Throws `\LengthException` if collection is empty.
+
+```php
+use IterTools\Reduce;
+
+$input = [10, 20, 30];
+
+$result = Reduce::toLast($input);
+// 30
+```
+
 ### To Max
 Reduces to the max value.
 
-- Elements must be comparable.
-- Returns null if collection is empty.
+```Reduce::toMax(iterable $data, callable $compareBy = null): mixed|null```
 
-```Reduce::toMax(iterable $data): mixed|null```
+- Callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not proposed then items of given collection must be comparable.
+- Returns null if collection is empty.
 
 ```php
 use IterTools\Reduce;
@@ -1419,10 +1494,11 @@ $result = Reduce::toMax($numbers);
 ### To Min
 Reduces to the min value.
 
-- Elements must be comparable.
-- Returns null if collection is empty.
+```Reduce::toMin(iterable $data, callable $compareBy = null): mixed|null```
 
-```Reduce::toMin(iterable $data): mixed|null```
+- Callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not proposed then items of given collection must be comparable.
+- Returns null if collection is empty.
 
 ```php
 use IterTools\Reduce;
@@ -1436,9 +1512,11 @@ $result = Reduce::toMin($numbers);
 ### To Min Max
 Reduces to array of its upper and lower bounds (max and min).
 
-```Reduce::toMinMax(iterable $numbers): array```
+```Reduce::toMinMax(iterable $numbers, callable $compareBy = null): array```
 
-Returns `[null, null]` if given collection is empty.
+- Callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not proposed then items of given collection must be comparable.
+- Returns `[null, null]` if given collection is empty.
 
 ```php
 use IterTools\Reduce;
@@ -2233,6 +2311,24 @@ $result = Stream::of($input)
 // 1, 3, 6, 10, 15
 ```
 
+### Sort
+Sorts the iterable source.
+
+```$stream->sort(callable $comparator = null)```
+
+If comparator is not proposed, the elements of the iterable source must be comparable.
+
+```php
+use IterTools\Stream;
+
+$input = [3, 4, 5, 9, 8, 7, 1, 6, 2];
+
+$result = Stream::of($input)
+    ->sort()
+    ->toArray();
+// 1, 2, 3, 4, 5, 6, 7, 8, 9
+```
+
 #### Symmetric difference With
 Return a stream of the symmetric difference of the stream and the given iterables.
 
@@ -2548,12 +2644,65 @@ $result = Stream::of($iterable)
 // 5
 ```
 
+### To First
+Reduces iterable source to its first element.
+
+```$stream->toFirst(): mixed```
+
+Throws `\LengthException` if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$input = [10, 20, 30];
+
+$result = Stream::of($input)
+    ->toFirst();
+// 10
+```
+
+### To First And Last
+Reduces iterable source to its first and last elements.
+
+```$stream->toFirstAndLast(): array{mixed, mixed}```
+
+Throws `\LengthException` if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$input = [10, 20, 30];
+
+$result = Stream::of($input)
+    ->toFirstAndLast();
+// [10, 30]
+```
+
+### To Last
+Reduces iterable source to its last element.
+
+```$stream->toLast(): mixed```
+
+Throws `\LengthException` if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$input = [10, 20, 30];
+
+$result = Stream::of($input)
+    ->toLast();
+// 30
+```
+
 ##### To Max
 Reduces iterable source to its max value.
 
-```$stream->toMax(): mixed```
+```$stream->toMax(callable $compareBy = null): mixed```
 
-Items of iterable source must be comparable.
+Callable param `$compareBy` must return comparable value.
+
+If `$compareBy` is not proposed then items of iterable source must be comparable.
 
 Returns null if iterable source is empty.
 
@@ -2570,9 +2719,11 @@ $result = Stream::of($iterable)
 ##### To Min
 Reduces iterable source to its min value.
 
-```$stream->toMin(): mixed```
+```$stream->toMin(callable $compareBy = null): mixed```
 
-Items of iterable source must be comparable.
+Callable param `$compareBy` must return comparable value.
+
+If `$compareBy` is not proposed then items of iterable source must be comparable.
 
 Returns null if iterable source is empty.
 
@@ -2589,7 +2740,11 @@ $result = Stream::of($iterable)
 ##### To Min Max
 Reduces iterable source to array of its upper and lower bounds (max and min).
 
-```$stream->toMinMax(): array```
+```$stream->toMinMax(callable $compareBy = null): array```
+
+Callable param `$compareBy` must return comparable value.
+
+If `$compareBy` is not proposed then items of iterable source must be comparable.
 
 Returns `[null, null]` if given collection is empty.
 
