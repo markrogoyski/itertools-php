@@ -19,6 +19,38 @@ class ReadLinesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test readLines example usage
+     */
+    public function testReadCsvExampleUseCase(): void
+    {
+        // Given
+        $fileText = <<<'CSV_END'
+This is the first line.
+This is the second line.
+Third line goes here.
+四番目の行はここですよ。
+And the last line.
+CSV_END;
+        $file = FileFixture::createFromString($fileText, $this->root->url());
+
+        // When
+        $result = [];
+        foreach (File::readLines($file) as $line) {
+            $result[] = $line;
+        }
+
+        // Then
+        $expected = [
+            "This is the first line.\n",
+            "This is the second line.\n",
+            "Third line goes here.\n",
+            "四番目の行はここですよ。\n",
+            "And the last line.",
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * @dataProvider dataProviderForCommon
      * @param        array $lines
      * @param        array $expected

@@ -19,6 +19,46 @@ class ReadCsvTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test readCsv example usage
+     */
+    public function testReadCsvExampleUseCase(): void
+    {
+        // Given
+        $csvText = <<<'CSV_END'
+I,The Phantom Menace,1999,George Lucas
+II,Attack of the Clones,2002,George Lucas
+III,Revenge of the Sith,2005,George Lucas
+IV,A New Hope,1977,George Lucas
+V,The Empire Strikes Back,1980,Irvin Kershner
+VI,Return of the Jedi,1983,Richard Marquand
+VII,The Force Awakens,2015,J.J. Abrams
+VIII,The Last Jedi,2017,Rian Johnson
+IX,Rise of Skywalker,2019,J.J. Abrams
+CSV_END;
+        $file = FileFixture::createFromString($csvText, $this->root->url());
+
+        // When
+        $result = [];
+        foreach (File::readCsv($file) as $movieData) {
+            $result[] = $movieData;
+        }
+
+        // Then
+        $expected = [
+            ['I', 'The Phantom Menace', '1999', 'George Lucas'],
+            ['II', 'Attack of the Clones', '2002', 'George Lucas'],
+            ['III', 'Revenge of the Sith', '2005', 'George Lucas'],
+            ['IV', 'A New Hope', '1977', 'George Lucas'],
+            ['V', 'The Empire Strikes Back', '1980', 'Irvin Kershner'],
+            ['VI', 'Return of the Jedi', '1983', 'Richard Marquand'],
+            ['VII', 'The Force Awakens', '2015', 'J.J. Abrams'],
+            ['VIII', 'The Last Jedi', '2017', 'Rian Johnson'],
+            ['IX', 'Rise of Skywalker', '2019', 'J.J. Abrams'],
+        ];
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * @dataProvider dataProviderForByDefault
      * @param        array $lines
      * @param        array $expected
