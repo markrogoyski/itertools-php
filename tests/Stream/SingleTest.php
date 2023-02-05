@@ -573,6 +573,43 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
             ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toArray(),
+                [7, 5, 3, 3, 2, 2, 1, -2, -3],
+            ],
+            [
+                [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->retro()
+                    ->toArray(),
+                [5, 4, 3, 2, 1],
+            ],
+            [
+                [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->retro()
+                    ->toAssociativeArray(),
+                [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
+            ],
         ];
     }
 
@@ -1052,6 +1089,43 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
             ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toArray(),
+                [7, 5, 3, 3, 2, 2, 1, -2, -3],
+            ],
+            [
+                $gen([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->retro()
+                    ->toArray(),
+                [5, 4, 3, 2, 1],
+            ],
+            [
+                $gen([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->retro()
+                    ->toAssociativeArray(),
+                [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
+            ],
         ];
     }
 
@@ -1523,6 +1597,43 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
             ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toArray(),
+                [7, 5, 3, 3, 2, 2, 1, -2, -3],
+            ],
+            [
+                $iter([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->retro()
+                    ->toArray(),
+                [5, 4, 3, 2, 1],
+            ],
+            [
+                $iter([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->retro()
+                    ->toAssociativeArray(),
+                [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
+            ],
         ];
     }
 
@@ -1993,6 +2104,43 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->compressAssociative([0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14])
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 [0 => 1, '1' => 2, 2 => 3, '3' => 4, 4 => 5, 'a' => 11, 'b' => 22],
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort()
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $lhs <=> $rhs)
+                    ->toArray(),
+                [-3, -2, 1, 2, 2, 3, 3, 5, 7],
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+                    ->toArray(),
+                [7, 5, 3, 3, 2, 2, 1, -2, -3],
+            ],
+            [
+                $trav([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->retro()
+                    ->toArray(),
+                [5, 4, 3, 2, 1],
+            ],
+            [
+                $trav([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->retro()
+                    ->toAssociativeArray(),
+                [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
             ],
         ];
     }

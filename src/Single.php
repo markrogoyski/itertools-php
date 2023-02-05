@@ -394,7 +394,7 @@ class Single
     /**
      * Reverse given iterable.
      *
-     * @param iterable $data
+     * @param iterable<mixed> $data
      *
      * @return \Generator
      */
