@@ -135,8 +135,8 @@ Quick Reference
 |----------------------------------------|--------------------------------------------|---------------------------------------------------------------|
 | [`toAverage`](#To-Average)             | Mean average of elements                   | `Reduce::toAverage($numbers)`                                 |
 | [`toCount`](#To-Count)                 | Reduce to length of iterable               | `Reduce::toCount($data)`                                      |
-| [`toFirst`](#To-First)                 | Reduce to its first value                  | `Reduce::toFirst()`                                           |
-| [`toFirstAndLast`](#To-First-And-Last) | Reduce to its first and last values        | `Reduce::toFirstAndLast()`                                    |
+| [`toFirst`](#To-First)                 | Reduce to its first value                  | `Reduce::toFirst($data)`                                      |
+| [`toFirstAndLast`](#To-First-And-Last) | Reduce to its first and last values        | `Reduce::toFirstAndLast($data)`                               |
 | [`toLast`](#To-Last)                   | Reduce to its last value                   | `Reduce::toLast()`                                            |
 | [`toMax`](#To-Max)                     | Reduce to its largest element              | `Reduce::toMax($numbers, [$compareBy])`                       |
 | [`toMin`](#To-Min)                     | Reduce to its smallest element             | `Reduce::toMin($numbers, [$compareBy])`                       |
@@ -1436,7 +1436,7 @@ use IterTools\Reduce;
 
 $medals = ['gold', 'silver', 'bronze'];
 
-$first = Reduce::toFirst($input);
+$first = Reduce::toFirst($medals);
 // gold
 ```
 
@@ -1452,7 +1452,7 @@ use IterTools\Reduce;
 
 $weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-$firstAndLast = Reduce::toFirstAndLast($input);
+$firstAndLast = Reduce::toFirstAndLast($weekdays);
 // [Monday, Friday]
 ```
 
@@ -1468,7 +1468,7 @@ use IterTools\Reduce;
 
 $gnomesThreePhasePlan = ['Collect underpants', '?', 'Profit'];
 
-$lastPhase = Reduce::toLast($input);
+$lastPhase = Reduce::toLast($gnomesThreePhasePlan);
 // Profit
 ```
 
