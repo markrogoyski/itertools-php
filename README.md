@@ -731,7 +731,7 @@ Sorts given collection.
 
 ```Single::sort(iterable $data, callable $comparator = null)```
 
-If comparator is not proposed, the elements of given iterable must be comparable.
+Uses default sorting if optional comparator function not provided.
 
 ```php
 use IterTools\Single;
@@ -1434,10 +1434,10 @@ Throws `\LengthException` if collection is empty.
 ```php
 use IterTools\Reduce;
 
-$input = [10, 20, 30];
+$medals = ['gold', 'silver', 'bronze'];
 
-$result = Reduce::toFirst($input);
-// 10
+$first = Reduce::toFirst($input);
+// gold
 ```
 
 ### To First And Last
@@ -1450,10 +1450,10 @@ Throws `\LengthException` if collection is empty.
 ```php
 use IterTools\Reduce;
 
-$input = [10, 20, 30];
+$weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-$result = Reduce::toFirstAndLast($input);
-// [10, 30]
+$firstAndLast = Reduce::toFirstAndLast($input);
+// [Monday, Friday]
 ```
 
 ### To Last
@@ -1466,10 +1466,10 @@ Throws `\LengthException` if collection is empty.
 ```php
 use IterTools\Reduce;
 
-$input = [10, 20, 30];
+$gnomesThreePhasePlan = ['Collect underpants', '?', 'Profit'];
 
-$result = Reduce::toLast($input);
-// 30
+$lastPhase = Reduce::toLast($input);
+// Profit
 ```
 
 ### To Max
@@ -1477,8 +1477,8 @@ Reduces to the max value.
 
 ```Reduce::toMax(iterable $data, callable $compareBy = null): mixed|null```
 
-- Callable param `$compareBy` must return comparable value.
-- If `$compareBy` is not proposed then items of given collection must be comparable.
+- Optional callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not provided then items of given collection must be comparable.
 - Returns null if collection is empty.
 
 ```php
@@ -1488,6 +1488,28 @@ $numbers = [5, 3, 1, 2, 4];
 
 $result = Reduce::toMax($numbers);
 // 5
+
+$movieRatings = [
+    [
+        'title' => 'Star Wars: Episode IV - A New Hope',
+        'rating' => 4.6
+    ],
+    [
+        'title' => 'Star Wars: Episode V - The Empire Strikes Back',
+        'rating' => 4.8
+    ],
+    [
+        'title' => 'Star Wars: Episode VI - Return of the Jedi',
+        'rating' => 4.6
+    ],
+];
+$compareBy = fn ($movie) => $movie['rating'];
+
+$highestRatedMovie = Reduce::toMax($movieRatings, $compareBy);
+// [
+//     'title' => 'Star Wars: Episode V - The Empire Strikes Back',
+//     'rating' => 4.8
+// ];
 ```
 
 ### To Min
@@ -1495,8 +1517,8 @@ Reduces to the min value.
 
 ```Reduce::toMin(iterable $data, callable $compareBy = null): mixed|null```
 
-- Callable param `$compareBy` must return comparable value.
-- If `$compareBy` is not proposed then items of given collection must be comparable.
+- Optional callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not provided then items of given collection must be comparable.
 - Returns null if collection is empty.
 
 ```php
@@ -1506,6 +1528,33 @@ $numbers = [5, 3, 1, 2, 4];
 
 $result = Reduce::toMin($numbers);
 // 1
+
+
+$movieRatings = [
+    [
+        'title' => 'The Matrix',
+        'rating' => 4.7
+    ],
+    [
+        'title' => 'The Matrix Reloaded',
+        'rating' => 4.3
+    ],
+    [
+        'title' => 'The Matrix Revolutions',
+        'rating' => 3.9
+    ],
+    [
+        'title' => 'The Matrix Resurrections',
+        'rating' => 2.5
+    ],
+];
+$compareBy = fn ($movie) => $movie['rating'];
+
+$lowestRatedMovie = Reduce::toMin($movieRatings, $compareBy);
+// [
+//     'title' => 'The Matrix Resurrections',
+//     'rating' => 2.5
+// ]
 ```
 
 ### To Min Max
@@ -1513,17 +1562,53 @@ Reduces to array of its upper and lower bounds (max and min).
 
 ```Reduce::toMinMax(iterable $numbers, callable $compareBy = null): array```
 
-- Callable param `$compareBy` must return comparable value.
-- If `$compareBy` is not proposed then items of given collection must be comparable.
+- Optional callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not provided then items of given collection must be comparable.
 - Returns `[null, null]` if given collection is empty.
 
 ```php
 use IterTools\Reduce;
 
-$numbers = [1, 2, 3, -1, -2, -3];
+$numbers = [1, 2, 7, -1, -2, -3];
 
 [$min, $max] = Reduce::toMinMax($numbers);
-// [-3, 3]
+// [-3, 7]
+
+$reportCard = [
+    [
+        'subject' => 'history',
+        'grade' => 90
+    ],
+    [
+        'subject' => 'math',
+        'grade' => 98
+    ],
+    [
+        'subject' => 'science',
+        'grade' => 92
+    ],
+    [
+        'subject' => 'english',
+        'grade' => 85
+    ],
+    [
+        'subject' => 'programming',
+        'grade' => 100
+    ],
+];
+$compareBy = fn ($class) => $class['grade'];
+
+$bestAndWorstSubject = Reduce::toMinMax($reportCard, $compareBy);
+// [
+//     [
+//         'subject' => 'english',
+//         'grade' => 85
+//     ],
+//     [
+//         'subject' => 'programming',
+//         'grade' => 100
+//     ],
+// ]
 ```
 
 ### To Product
@@ -2699,11 +2784,9 @@ Reduces iterable source to its max value.
 
 ```$stream->toMax(callable $compareBy = null): mixed```
 
-Callable param `$compareBy` must return comparable value.
-
-If `$compareBy` is not proposed then items of iterable source must be comparable.
-
-Returns null if iterable source is empty.
+- Optional callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not provided then items of given collection must be comparable.
+- Returns null if collection is empty.
 
 ```php
 use IterTools\Stream;
@@ -2720,11 +2803,9 @@ Reduces iterable source to its min value.
 
 ```$stream->toMin(callable $compareBy = null): mixed```
 
-Callable param `$compareBy` must return comparable value.
-
-If `$compareBy` is not proposed then items of iterable source must be comparable.
-
-Returns null if iterable source is empty.
+- Optional callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not provided then items of given collection must be comparable.
+- Returns null if collection is empty.
 
 ```php
 use IterTools\Stream;
@@ -2741,20 +2822,18 @@ Reduces iterable source to array of its upper and lower bounds (max and min).
 
 ```$stream->toMinMax(callable $compareBy = null): array```
 
-Callable param `$compareBy` must return comparable value.
-
-If `$compareBy` is not proposed then items of iterable source must be comparable.
-
-Returns `[null, null]` if given collection is empty.
+- Optional callable param `$compareBy` must return comparable value.
+- If `$compareBy` is not provided then items of given collection must be comparable.
+- Returns `[null, null]` if given collection is empty.
 
 ```php
 use IterTools\Stream;
 
-$numbers = [1, 2, 3, -1, -2, -3];
+$numbers = [1, 2, 7, -1, -2, -3];
 
 [$min, $max] = Stream::of($numbers)
     ->toMinMax();
-// [-3, 3]
+// [-3, 7]
 ```
 
 ##### To Product

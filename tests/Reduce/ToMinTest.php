@@ -54,14 +54,14 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
         $compareBy = fn ($movie) => $movie['rating'];
 
         // When
-        $highestRatedMovie = Reduce::toMin($movieRatings, $compareBy);
+        $lowestRatedMovie = Reduce::toMin($movieRatings, $compareBy);
 
         // Then
         $expected = [
             'title' => 'The Matrix Resurrections',
             'rating' => 2.5
         ];
-        $this->assertEquals($expected, $highestRatedMovie);
+        $this->assertEquals($expected, $lowestRatedMovie);
     }
 
     /**
