@@ -72,13 +72,18 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         $j = 0;
         while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
-                if ($i > $j++) {
+                if ($i > $j) {
+                    continue;
+                }
+
+                if (!$iterator->valid()) {
                     continue;
                 }
 
                 $result[$i][$iterator->key()] = $iterator->current();
                 $iterator->next();
             }
+            $j++;
         }
 
         // Then
@@ -226,13 +231,18 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         $j = 0;
         while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
-                if ($i > $j++) {
+                if ($i > $j) {
+                    continue;
+                }
+
+                if (!$iterator->valid()) {
                     continue;
                 }
 
                 $result[$i][$iterator->key()] = $iterator->current();
                 $iterator->next();
             }
+            $j++;
         }
 
         // Then
@@ -387,13 +397,18 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         $j = 0;
         while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
-                if ($i > $j++) {
+                if ($i > $j) {
+                    continue;
+                }
+
+                if (!$iterator->valid()) {
                     continue;
                 }
 
                 $result[$i][$iterator->key()] = $iterator->current();
                 $iterator->next();
             }
+            $j++;
         }
 
         // Then
@@ -623,13 +638,18 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         $j = 0;
         while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
-                if ($i > $j++) {
+                if ($i > $j) {
+                    continue;
+                }
+
+                if (!$iterator->valid()) {
                     continue;
                 }
 
                 $result[$i][$iterator->key()] = $iterator->current();
                 $iterator->next();
             }
+            $j++;
         }
 
         // Then
