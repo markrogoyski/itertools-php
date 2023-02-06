@@ -374,14 +374,15 @@ class Stream implements \IteratorAggregate
      *
      * @param int $chunkSize
      * @param int $overlapSize
+     * @param bool $excludeIncompleteTail
      *
      * @return $this
      *
      * @see Single::chunkwiseOverlap()
      */
-    public function chunkwiseOverlap(int $chunkSize, int $overlapSize): self
+    public function chunkwiseOverlap(int $chunkSize, int $overlapSize, bool $excludeIncompleteTail = false): self
     {
-        $this->iterable = Single::chunkwiseOverlap($this->iterable, $chunkSize, $overlapSize);
+        $this->iterable = Single::chunkwiseOverlap($this->iterable, $chunkSize, $overlapSize, $excludeIncompleteTail);
         return $this;
     }
 
