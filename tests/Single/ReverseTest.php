@@ -8,7 +8,7 @@ use IterTools\Single;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
-class RetroTest extends \PHPUnit\Framework\TestCase
+class ReverseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderForArray
@@ -23,7 +23,7 @@ class RetroTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::retro($data) as $key => $value) {
+        foreach (Single::reverse($data) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -72,7 +72,7 @@ class RetroTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::retro($data) as $key => $value) {
+        foreach (Single::reverse($data) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -123,7 +123,7 @@ class RetroTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::retro($data) as $key => $value) {
+        foreach (Single::reverse($data) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -174,7 +174,7 @@ class RetroTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::retro($data) as $key => $value) {
+        foreach (Single::reverse($data) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }
@@ -225,7 +225,7 @@ class RetroTest extends \PHPUnit\Framework\TestCase
         $resultValues = [];
 
         // When
-        foreach (Single::retro($data) as $key => $value) {
+        foreach (Single::reverse($data) as $key => $value) {
             $resultKeys[] = $key;
             $resultValues[] = $value;
         }

@@ -469,11 +469,11 @@ class Stream implements \IteratorAggregate
      *
      * @return $this
      *
-     * @see Single::retro()
+     * @see Single::reverse()
      */
-    public function retro(): self
+    public function reverse(): self
     {
-        $this->iterable = Single::retro($this->iterable);
+        $this->iterable = Single::reverse($this->iterable);
         return $this;
     }
 

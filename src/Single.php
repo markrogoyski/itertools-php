@@ -398,7 +398,7 @@ class Single
      *
      * @return \Generator
      */
-    public static function retro(iterable $data): \Generator
+    public static function reverse(iterable $data): \Generator
     {
         $keyStack = [];
         $valueStack = [];

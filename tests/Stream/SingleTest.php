@@ -598,7 +598,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->retro()
+                    ->reverse()
                     ->toArray(),
                 [5, 4, 3, 2, 1],
             ],
@@ -606,7 +606,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->retro()
+                    ->reverse()
                     ->toAssociativeArray(),
                 [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
             ],
@@ -1114,7 +1114,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 $gen([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->retro()
+                    ->reverse()
                     ->toArray(),
                 [5, 4, 3, 2, 1],
             ],
@@ -1122,7 +1122,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 $gen([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->retro()
+                    ->reverse()
                     ->toAssociativeArray(),
                 [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
             ],
@@ -1622,7 +1622,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 $iter([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->retro()
+                    ->reverse()
                     ->toArray(),
                 [5, 4, 3, 2, 1],
             ],
@@ -1630,7 +1630,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 $iter([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->retro()
+                    ->reverse()
                     ->toAssociativeArray(),
                 [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
             ],
@@ -2130,7 +2130,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 $trav([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->retro()
+                    ->reverse()
                     ->toArray(),
                 [5, 4, 3, 2, 1],
             ],
@@ -2138,7 +2138,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                 $trav([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
-                    ->retro()
+                    ->reverse()
                     ->toAssociativeArray(),
                 [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
             ],
