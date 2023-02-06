@@ -15,6 +15,22 @@ class ToFirstAndLastTest extends \PHPUnit\Framework\TestCase
     use DataProvider;
 
     /**
+     * @test toFirstAndLast example usage
+     */
+    public function testToFirstAndLastExampleUsage(): void
+    {
+        // Given
+        $data     = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+        $expected = ['a', 'z'];
+
+        // When
+        $firstAndLast = Reduce::toFirstAndLast($data);
+
+        // Then
+        $this->assertEquals($expected, $firstAndLast);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param        array $data
      * @param        mixed $expected
@@ -267,12 +283,15 @@ class ToFirstAndLastTest extends \PHPUnit\Framework\TestCase
      */
     public function testErrorOnEmptyCollection(iterable $data): void
     {
+        // Then
         $this->expectException(\LengthException::class);
+
+        // When
         Reduce::toFirstAndLast($data);
     }
 
     /**
-     * @dataProvider dataProviderForRewindableIterators
+     * @dataProvider dataProviderForNonRewindableIterators
      * @param \NoRewindIterator $data
      * @param array $expected
      * @return void
@@ -286,7 +305,7 @@ class ToFirstAndLastTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForRewindableIterators(): array
+    public function dataProviderForNonRewindableIterators(): array
     {
         $iter = fn (array $data) => new \NoRewindIterator(new \ArrayIterator($data));
 
@@ -310,6 +329,14 @@ class ToFirstAndLastTest extends \PHPUnit\Framework\TestCase
             [
                 $iter(['abc']),
                 ['abc', 'abc'],
+            ],
+            [
+                $iter([1, 2]),
+                [1, 2],
+            ],
+            [
+                $iter([1, 2, 3, 4, 5]),
+                [1, 5],
             ],
         ];
     }

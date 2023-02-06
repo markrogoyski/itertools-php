@@ -34,14 +34,13 @@ class Reduce
     /**
      * Reduces given iterable to its min value.
      *
-     * Callable param $compareBy must return comparable value.
-     *
-     * If $compareBy is not proposed then items of given collection must be comparable.
+     * Optional callable param $compareBy must return comparable value.
+     * If $compareBy is not provided then items of given collection must be comparable.
      *
      * Returns null if given collection is empty.
      *
      * @param iterable<mixed> $data
-     * @param callable|null   $compareBy
+     * @param callable|null   $compareBy (optional) function to extract comparable value from element. Ex: $item->getSomeValue()
      *
      * @return mixed|null
      */
@@ -50,7 +49,9 @@ class Reduce
         if ($compareBy !== null) {
             return static::toValue(
                 $data,
-                fn ($carry, $datum) => $compareBy($datum) < $compareBy($carry ?? $datum) ? $datum : $carry ?? $datum
+                fn ($carry, $datum) => $compareBy($datum) < $compareBy($carry ?? $datum)
+                    ? $datum
+                    : $carry ?? $datum
             );
         }
 
@@ -60,14 +61,13 @@ class Reduce
     /**
      * Reduces given iterable to its max value.
      *
-     * Callable param $compareBy must return comparable value.
-     *
-     * If $compareBy is not proposed then items of given collection must be comparable.
+     * Optional callable param $compareBy must return comparable value.
+     * If $compareBy is not provided then items of given collection must be comparable.
      *
      * Returns null if given collection is empty.
      *
      * @param iterable<mixed> $data
-     * @param callable|null   $compareBy
+     * @param callable|null   $compareBy (optional) function to extract comparable value from element. Ex: $item->getSomeValue()
      *
      * @return mixed|null
      */
@@ -76,7 +76,9 @@ class Reduce
         if ($compareBy !== null) {
             return static::toValue(
                 $data,
-                fn ($carry, $datum) => $compareBy($datum) > $compareBy($carry ?? $datum) ? $datum : $carry ?? $datum
+                fn ($carry, $datum) => $compareBy($datum) > $compareBy($carry ?? $datum)
+                    ? $datum
+                    : $carry ?? $datum
             );
         }
 
@@ -93,7 +95,7 @@ class Reduce
      * Returns [null, null] if given collection is empty.
      *
      * @param iterable<numeric> $numbers
-     * @param callable|null   $compareBy
+     * @param callable|null     $compareBy
      *
      * @return array{numeric, numeric}|array{null, null}
      */
@@ -102,15 +104,22 @@ class Reduce
         if ($compareBy !== null) {
             return static::toValue($numbers, static function (array $carry, $datum) use ($compareBy) {
                 return [
-                    $compareBy($datum) <= $compareBy($carry[0] ?? $datum) ? $datum : $carry[0] ?? $datum,
-                    $compareBy($datum) >= $compareBy($carry[1] ?? $datum) ? $datum : $carry[1] ?? $datum,
+                    $compareBy($datum) <= $compareBy($carry[0] ?? $datum)
+                        ? $datum
+                        : $carry[0] ?? $datum,
+                    $compareBy($datum) >= $compareBy($carry[1] ?? $datum)
+                        ? $datum
+                        : $carry[1] ?? $datum,
                 ];
             }, [null, null]);
         }
 
         return static::toValue(
             $numbers,
-            fn ($carry, $datum) => [\min($carry[0] ?? $datum, $datum), \max($carry[1] ?? $datum, $datum)],
+            fn ($carry, $datum) => [
+                \min($carry[0] ?? $datum, $datum),
+                \max($carry[1] ?? $datum, $datum)
+            ],
             [null, null]
         );
     }

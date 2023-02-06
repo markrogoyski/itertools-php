@@ -14,6 +14,69 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
     protected const ROUND_PRECISION = 0.0001;
 
     /**
+     * @test toMinMax example usage without custom comparator
+     */
+    public function testToMinMaxWithoutCustomComparator(): void
+    {
+        // Given
+        $data     = [5, 4, 1, 9, 3];
+        $expected = [1, 9];
+
+        // When
+        $minMax = Reduce::toMinMax($data);
+
+        // Then
+        $this->assertEquals($expected, $minMax);
+    }
+
+    /**
+     * @test toMinMax example usage custom comparator
+     */
+    public function testToMinMaxUsingCustomComparator(): void
+    {
+        // Given
+        $reportCard = [
+            [
+                'subject' => 'history',
+                'grade' => 90
+            ],
+            [
+                'subject' => 'math',
+                'grade' => 98
+            ],
+            [
+                'subject' => 'science',
+                'grade' => 92
+            ],
+            [
+                'subject' => 'english',
+                'grade' => 85
+            ],
+            [
+                'subject' => 'programming',
+                'grade' => 100
+            ],
+        ];
+        $compareBy = fn ($class) => $class['grade'];
+
+        // When
+        $bestAndWorstSubject = Reduce::toMinMax($reportCard, $compareBy);
+
+        // Then
+        $expected = [
+            [
+                'subject' => 'english',
+                'grade' => 85
+            ],
+            [
+                'subject' => 'programming',
+                'grade' => 100
+            ],
+        ];
+        $this->assertEquals($expected, $bestAndWorstSubject);
+    }
+
+    /**
      * @test         toMinMax array
      * @dataProvider dataProviderForArray
      * @param        array $data

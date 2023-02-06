@@ -12,6 +12,87 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class SortTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test sort example usage without custom comparator
+     */
+    public function testSortWithoutCustomComparator(): void
+    {
+        // Given
+        $data     = [5, 4, 1, 9, 3, 3, 5, 10, 2];
+        $expected = [1, 2, 3, 3, 4, 5, 5, 9, 10];
+
+        // When
+        $sorted = [];
+        foreach (Single::sort($data) as $datum) {
+            $sorted[] = $datum;
+        }
+
+        // Then
+        $this->assertEquals($expected, $sorted);
+    }
+
+    /**
+     * @test sort example usage using custom comparator
+     */
+    public function testSortUsingCustomComparator(): void
+    {
+        // Given
+        $chessPieces = [
+            [
+                'name' => 'bishop',
+                'value' => 3,
+            ],
+            [
+                'name' => 'knight',
+                'value' => 3,
+            ],
+            [
+                'name' => 'pawn',
+                'value' => 1,
+            ],
+            [
+                'name' => 'queen',
+                'value' => 9,
+            ],
+            [
+                'name' => 'rook',
+                'value' => 5,
+            ],
+        ];
+        $comparator = fn ($lhs, $rhs) => $lhs['value'] <=> $rhs['value'];
+
+        // When
+        $sortedByValue = [];
+        foreach (Single::sort($chessPieces, $comparator) as $chessPiece) {
+            $sortedByValue[] = $chessPiece;
+        }
+
+        // Then
+        $expected = [
+            [
+                'name' => 'pawn',
+                'value' => 1,
+            ],
+            [
+                'name' => 'bishop',
+                'value' => 3,
+            ],
+            [
+                'name' => 'knight',
+                'value' => 3,
+            ],
+            [
+                'name' => 'rook',
+                'value' => 5,
+            ],
+            [
+                'name' => 'queen',
+                'value' => 9,
+            ],
+        ];
+        $this->assertEquals($expected, $sortedByValue);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param array $data
      * @param callable|null $comparator

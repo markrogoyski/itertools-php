@@ -12,6 +12,59 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class ToMinTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test toMin example usage without custom comparator
+     */
+    public function testToMinWithoutCustomComparator(): void
+    {
+        // Given
+        $data     = [5, 4, 1, 9, 3];
+        $expected = 1;
+
+        // When
+        $max = Reduce::toMin($data);
+
+        // Then
+        $this->assertEquals($expected, $max);
+    }
+
+    /**
+     * @test toMin example usage custom comparator
+     */
+    public function testToMinUsingCustomComparator(): void
+    {
+        // Given
+        $movieRatings = [
+            [
+                'title' => 'The Matrix',
+                'rating' => 4.7
+            ],
+            [
+                'title' => 'The Matrix Reloaded',
+                'rating' => 4.3
+            ],
+            [
+                'title' => 'The Matrix Revolutions',
+                'rating' => 3.9
+            ],
+            [
+                'title' => 'The Matrix Resurrections',
+                'rating' => 2.5
+            ],
+        ];
+        $compareBy = fn ($movie) => $movie['rating'];
+
+        // When
+        $highestRatedMovie = Reduce::toMin($movieRatings, $compareBy);
+
+        // Then
+        $expected = [
+            'title' => 'The Matrix Resurrections',
+            'rating' => 2.5
+        ];
+        $this->assertEquals($expected, $highestRatedMovie);
+    }
+
+    /**
      * @test         toMin array
      * @dataProvider dataProviderForArray
      * @param        array $data

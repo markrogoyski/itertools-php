@@ -12,6 +12,55 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class ToMaxTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test toMax example usage without custom comparator
+     */
+    public function testToMaxWithoutCustomComparator(): void
+    {
+        // Given
+        $data     = [5, 4, 1, 9, 3];
+        $expected = 9;
+
+        // When
+        $max = Reduce::toMax($data);
+
+        // Then
+        $this->assertEquals($expected, $max);
+    }
+
+    /**
+     * @test toMax example usage custom comparator
+     */
+    public function testToMaxUsingCustomComparator(): void
+    {
+        // Given
+        $movieRatings = [
+            [
+                'title' => 'Star Wars: Episode IV - A New Hope',
+                'rating' => 4.6
+            ],
+            [
+                'title' => 'Star Wars: Episode V - The Empire Strikes Back',
+                'rating' => 4.8
+            ],
+            [
+                'title' => 'Star Wars: Episode VI - Return of the Jedi',
+                'rating' => 4.6
+            ],
+        ];
+        $compareBy = fn ($movie) => $movie['rating'];
+
+        // When
+        $highestRatedMovie = Reduce::toMax($movieRatings, $compareBy);
+
+        // Then
+        $expected = [
+            'title' => 'Star Wars: Episode V - The Empire Strikes Back',
+            'rating' => 4.8
+        ];
+        $this->assertEquals($expected, $highestRatedMovie);
+    }
+
+    /**
      * @test         toMax array
      * @dataProvider dataProviderForArray
      * @param        array $data

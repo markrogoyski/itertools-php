@@ -416,11 +416,11 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Sorts iterable source.
+     * Sorts the stream.
      *
      * If comparator is null, then elements of the iterable source must be comparable.
      *
-     * @param callable|null $comparator
+     * @param callable|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
      * @return $this
      *

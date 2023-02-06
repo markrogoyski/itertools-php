@@ -15,6 +15,22 @@ class ToFirstTest extends \PHPUnit\Framework\TestCase
     use DataProvider;
 
     /**
+     * @test toFirst example usage
+     */
+    public function testToFirstAndLastExampleUsage(): void
+    {
+        // Given
+        $data     = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+        $expected = 'a';
+
+        // When
+        $firstAndLast = Reduce::toFirst($data);
+
+        // Then
+        $this->assertEquals($expected, $firstAndLast);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param        array $data
      * @param        mixed $expected
@@ -267,7 +283,10 @@ class ToFirstTest extends \PHPUnit\Framework\TestCase
      */
     public function testErrorOnEmptyCollection(iterable $data): void
     {
+        // Then
         $this->expectException(\LengthException::class);
+
+        // When
         Reduce::toFirst($data);
     }
 }
