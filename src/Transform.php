@@ -9,7 +9,7 @@ use IterTools\Util\Iterators\TeeIterator;
 class Transform
 {
     /**
-     * Converts iterable source to array.
+     * Converts iterable source to array without saving keys.
      *
      * @template T
      *
