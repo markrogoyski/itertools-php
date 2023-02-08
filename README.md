@@ -401,7 +401,7 @@ foreach (Single::chunkwise($movies, 3) as $trilogy) {
 ### Chunkwise Overlap
 Return overlapped chunks of elements.
 
-```Single::chunkwiseOverlap(iterable $data, int $chunkSize, int $overlapSize)```
+```Single::chunkwiseOverlap(iterable $data, int $chunkSize, int $overlapSize, bool $includeIncompleteTail = true)```
 
 * Chunk size must be at least 1.
 * Overlap size must be less than chunk size.
@@ -1961,7 +1961,7 @@ $result = Stream::of($friends)
 #### Chunkwise Overlap
 Return a stream consisting of overlapping chunks of elements from the stream.
 
-```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): Stream```
+```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize, bool $includeIncompleteTail = true): Stream```
 
 * Chunk size must be at least 1.
 * Overlap size must be less than chunk size.
