@@ -15,6 +15,7 @@
   * `toMax` (parameter `$compareBy` added)
   * `toMinMax` (parameter `$compareBy` added)
 * Sort
+  * `asort`
   * `sort`
 * Stream
   * Source
