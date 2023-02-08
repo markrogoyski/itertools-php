@@ -71,7 +71,6 @@ Quick Reference
 | [`pairwise`](#Pairwise)                        | Iterate successive overlapping pairs         | `Single::pairwise($data)`                                   |
 | [`reindex`](#Reindex)                          | Reindex keys of key-value iterable           | `Single::reindex($data, $reindexer)`                        |
 | [`repeat`](#Repeat)                            | Repeat an item                               | `Single::repeat($item, $repetitions)`                       |
-| [`sort`](#Sort)                                | Sorts a collection                           | `Single::sort($data, [$comparator])`                        |
 | [`string`](#String)                            | Iterate the characters of a string           | `Single::string($string)`                                   |
 | [`takeWhile`](#Take-While)                     | Iterate elements while predicate is true     | `Single::takeWhile($data, $predicate)`                      |
 
@@ -111,6 +110,12 @@ Quick Reference
 | [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Partial intersection with type coercion                   | `Set::partialIntersectionCoercive($minCount, ...$iterables)` |
 | [`symmetricDifference`](#Symmetric-Difference)                  | Symmetric difference of iterables                         | `Set::symmetricDifference(...$iterables)`                    |
 | [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Symmetric difference with type coercion                   | `Set::symmetricDifferenceCoercive(...$iterables)`            |
+
+#### Sort Iteration
+| Iterator                                       | Description                                  | Code Snippet                                              |
+|------------------------------------------------|----------------------------------------------|-----------------------------------------------------------|
+| [`asort`](#ASort)                              | Iterate a sorted collection maintaining keys | `Sort::asort($data, [$comparator])`                       |
+| [`sort`](#Sort)                                | Iterate a sorted collection                  | `Sort::sort($data, [$comparator])`                        |
 
 #### File Iteration
 | Iterator                                                        | Description                                               | Code Snippet                                                 |
@@ -726,24 +731,6 @@ foreach (Single::reindex($data, $reindexFunc) as $key => $filmData) {
 // ]
 ```
 
-### Sort
-Sorts given collection.
-
-```Single::sort(iterable $data, callable $comparator = null)```
-
-Uses default sorting if optional comparator function not provided.
-
-```php
-use IterTools\Single;
-
-$data = [3, 4, 5, 9, 8, 7, 1, 6, 2];
-
-foreach (Single::sort($data) as $datum) {
-    print($datum);
-}
-// 1, 2, 3, 4, 5, 6, 7, 8, 9
-```
-
 ### String
 Iterate the individual characters of a string.
 
@@ -1191,6 +1178,53 @@ foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
     print($item);
 }
 // 4, 5, 6, 7, 8, 9
+```
+
+## Sort Iteration
+### ASort
+Iterate the collection sorted while maintaining the associative key index relations.
+
+```Single::sort(iterable $data, callable $comparator = null)```
+
+Uses default sorting if optional comparator function not provided.
+
+```php
+use IterTools\Single;
+
+$worldPopulations = [
+    'China'      => 1_439_323_776,
+    'India'      => 1_380_004_385,
+    'Indonesia'  => 273_523_615,
+    'Pakistan'   => 220_892_340,
+    'USA'        => 331_002_651,
+];
+
+foreach (Sort::sort($worldPopulations) as $country => $population) {
+    print("$country: $population" . \PHP_EOL);
+}
+// Pakistan: 220,892,340
+// Indonesia: 273,523,615
+// USA: 331,002,651
+// India: 1,380,004,385
+// China: 1,439,323,776
+```
+
+### Sort
+Iterate the collection sorted.
+
+```Single::sort(iterable $data, callable $comparator = null)```
+
+Uses default sorting if optional comparator function not provided.
+
+```php
+use IterTools\Single;
+
+$data = [3, 4, 5, 9, 8, 7, 1, 6, 2];
+
+foreach (Sort::sort($data) as $datum) {
+    print($datum);
+}
+// 1, 2, 3, 4, 5, 6, 7, 8, 9
 ```
 
 ## File
