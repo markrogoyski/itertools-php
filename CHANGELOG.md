@@ -41,6 +41,8 @@
     * `toCsvFile`
 * Docs
   * Added Russian translation of README
+### Improvements
+* Add option whether to include incomplete chunks at the end of a `chunkwiseOverlap`
 
 ## v1.2.0 - 2023-01-28
 
