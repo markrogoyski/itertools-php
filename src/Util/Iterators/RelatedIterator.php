@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Util;
+namespace IterTools\Util\Iterators;
 
 /**
  * @internal

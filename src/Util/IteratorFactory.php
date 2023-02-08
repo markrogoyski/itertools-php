@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools\Util;
 
+use IterTools\Util\Iterators\TeeIterator;
+
 /**
  * @internal
  *
