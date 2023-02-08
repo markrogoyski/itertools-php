@@ -34,30 +34,6 @@ class Transform
     }
 
     /**
-     * Return several independent iterators from a single iterable.
-     *
-     * Once a tee() has been created, the original iterable should not be used anywhere else;
-     * otherwise, the iterable could get advanced without the tee objects being informed.
-     *
-     * This tool may require significant auxiliary storage (depending on how much temporary data needs to be stored).
-     * In general, if one iterator uses most or all of the data before another iterator starts,
-     * it is faster to use toArray() instead of tee().
-     *
-     * @template TKey
-     * @template TValue
-     *
-     * @param iterable<TKey, TValue> $iterable
-     * @param positive-int $count
-     *
-     * @return array<\Iterator<TKey, TValue>>
-     */
-    public static function tee(iterable $iterable, int $count): array
-    {
-        $iterator = static::toIterator($iterable);
-        return (new TeeIterator($iterator, $count))->getRelatedIterators();
-    }
-
-    /**
      * Converts iterable source to array.
      *
      * @template T
@@ -104,5 +80,29 @@ class Transform
             $result[$keyFunc($item, $key)] = $valueFunc($item, $key);
         }
         return $result;
+    }
+
+    /**
+     * Return several independent iterators from a single iterable.
+     *
+     * Once a tee() has been created, the original iterable should not be used anywhere else;
+     * otherwise, the iterable could get advanced without the tee objects being informed.
+     *
+     * This tool may require significant auxiliary storage (depending on how much temporary data needs to be stored).
+     * In general, if one iterator uses most or all of the data before another iterator starts,
+     * it is faster to use toArray() instead of tee().
+     *
+     * @template TKey
+     * @template TValue
+     *
+     * @param iterable<TKey, TValue> $iterable
+     * @param positive-int $count
+     *
+     * @return array<\Iterator<TKey, TValue>>
+     */
+    public static function tee(iterable $iterable, int $count): array
+    {
+        $iterator = static::toIterator($iterable);
+        return (new TeeIterator($iterator, $count))->getRelatedIterators();
     }
 }
