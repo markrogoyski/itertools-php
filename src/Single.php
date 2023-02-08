@@ -240,7 +240,7 @@ class Single
      */
     public static function pairwise(iterable $data): \Generator
     {
-        $chunked = static::chunkwiseOverlap($data, 2, 1, true);
+        $chunked = static::chunkwiseOverlap($data, 2, 1, false);
 
         foreach ($chunked as $chunk) {
             /** @var array{T, T} $chunk */
@@ -275,7 +275,7 @@ class Single
      * @param iterable<T> $data
      * @param int $chunkSize
      * @param int $overlapSize
-     * @param bool $excludeIncompleteTail
+     * @param bool $includeIncompleteTail
      *
      * @return \Generator<array<T>>
      */
@@ -283,7 +283,7 @@ class Single
         iterable $data,
         int $chunkSize,
         int $overlapSize,
-        bool $excludeIncompleteTail = false
+        bool $includeIncompleteTail = true
     ): \Generator {
         if ($chunkSize < 1) {
             throw new \InvalidArgumentException("Chunk size must be ≥ 1. Got {$chunkSize}");
@@ -307,7 +307,7 @@ class Single
             }
         }
 
-        if (!$isLastIterationYielded && \count($chunk) > 0 && !$excludeIncompleteTail) {
+        if (!$isLastIterationYielded && \count($chunk) > 0 && $includeIncompleteTail) {
             yield $chunk;
         }
     }
