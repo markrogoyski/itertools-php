@@ -1184,7 +1184,7 @@ foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
 ### ASort
 Iterate the collection sorted while maintaining the associative key index relations.
 
-```Single::sort(iterable $data, callable $comparator = null)```
+```Sort::sort(iterable $data, callable $comparator = null)```
 
 Uses default sorting if optional comparator function not provided.
 
@@ -1212,7 +1212,7 @@ foreach (Sort::sort($worldPopulations) as $country => $population) {
 ### Sort
 Iterate the collection sorted.
 
-```Single::sort(iterable $data, callable $comparator = null)```
+```Sort::sort(iterable $data, callable $comparator = null)```
 
 Uses default sorting if optional comparator function not provided.
 
