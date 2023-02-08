@@ -9,31 +9,6 @@ use IterTools\Util\Iterators\TeeIterator;
 class Transform
 {
     /**
-     * @template TKey
-     * @template TValue
-     *
-     * @param iterable<TKey, TValue> $iterable
-     *
-     * @return \Iterator<TKey, TValue>
-     */
-    public static function toIterator(iterable $iterable): \Iterator
-    {
-        switch (true) {
-            case $iterable instanceof \Iterator:
-                return $iterable;
-
-            case $iterable instanceof \Traversable:
-                // @phpstan-ignore-next-line
-                return new \IteratorIterator($iterable);
-
-            case \is_array($iterable):
-                return new \ArrayIterator($iterable);
-        }
-
-        throw new \LogicException(\gettype($iterable) . ' type is not an expected iterable type (Iterator|Traversable|array)');
-    }
-
-    /**
      * Converts iterable source to array.
      *
      * @template T
@@ -80,6 +55,33 @@ class Transform
             $result[$keyFunc($item, $key)] = $valueFunc($item, $key);
         }
         return $result;
+    }
+
+    /**
+     * Converts given iterable to Iterator.
+     *
+     * @template TKey
+     * @template TValue
+     *
+     * @param iterable<TKey, TValue> $iterable
+     *
+     * @return \Iterator<TKey, TValue>
+     */
+    public static function toIterator(iterable $iterable): \Iterator
+    {
+        switch (true) {
+            case $iterable instanceof \Iterator:
+                return $iterable;
+
+            case $iterable instanceof \Traversable:
+                // @phpstan-ignore-next-line
+                return new \IteratorIterator($iterable);
+
+            case \is_array($iterable):
+                return new \ArrayIterator($iterable);
+        }
+
+        throw new \LogicException(\gettype($iterable) . ' type is not an expected iterable type (Iterator|Traversable|array)');
     }
 
     /**
