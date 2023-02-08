@@ -1,8 +1,10 @@
 <?php
 
-namespace IterTools\Util;
+namespace IterTools\Util\Iterators;
 
 use IterTools\Stream;
+use IterTools\Util\IteratorFactory;
+use IterTools\Util\NoValueMonad;
 
 /**
  * @internal

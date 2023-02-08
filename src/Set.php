@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\JustifyMultipleIterator;
+use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\NoValueMonad;
 use IterTools\Util\UniqueExtractor;
 use IterTools\Util\UsageMap;

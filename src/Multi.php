@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\IteratorFactory;
-use IterTools\Util\StrictMultipleIterator;
+use IterTools\Util\Iterators\StrictMultipleIterator;
 
 class Multi
 {

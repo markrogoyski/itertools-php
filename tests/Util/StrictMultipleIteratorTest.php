@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace IterTools\Tests\Util;
 
 use IterTools\Util\IteratorFactory;
-use IterTools\Util\StrictMultipleIterator;
+use IterTools\Util\Iterators\StrictMultipleIterator;
 
 class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
 {
