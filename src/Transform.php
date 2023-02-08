@@ -34,6 +34,15 @@ class Transform
     }
 
     /**
+     * Return several independent iterators from a single iterable.
+     *
+     * Once a tee() has been created, the original iterable should not be used anywhere else;
+     * otherwise, the iterable could get advanced without the tee objects being informed.
+     *
+     * This tool may require significant auxiliary storage (depending on how much temporary data needs to be stored).
+     * In general, if one iterator uses most or all of the data before another iterator starts,
+     * it is faster to use toArray() instead of tee().
+     *
      * @template TKey
      * @template TValue
      *
@@ -49,32 +58,51 @@ class Transform
     }
 
     /**
-     * @template TValue
+     * Converts iterable source to array.
      *
-     * @param iterable<TValue> $iterable
-     * @return array<TValue>
+     * @template T
+     *
+     * @param iterable<T> $iterable
+     *
+     * @return array<T>
      */
     public static function toArray(iterable $iterable): array
     {
-        // TODO implement
-        return [];
+        $result = [];
+        foreach ($iterable as $item) {
+            $result[] = $item;
+        }
+        return $result;
     }
 
     /**
      * Converts given iterable to an associative array.
      *
-     * @param iterable<mixed> $iterable
-     * @param callable|null $keyFunc fn ($value, $key) => Custom Logic
-     * @param callable|null $valueFunc fn ($value, $key) => Custom logic
+     * @template TKey
+     * @template TValue
      *
-     * @return array<mixed>
+     * @param iterable<TKey, TValue> $iterable
+     * @param callable(mixed $value, mixed $key): mixed|null $keyFunc
+     * @param callable(mixed $value, mixed $key): mixed|null $valueFunc
+     *
+     * @return array<TKey|numeric|string, TValue|mixed>
      */
-    public function toAssociativeArray(
+    public static function toAssociativeArray(
         iterable $iterable,
         callable $keyFunc = null,
         callable $valueFunc = null
     ): array {
-        // TODO implement
-        return [];
+        if ($keyFunc === null) {
+            $keyFunc = fn ($item, $key) => $key;
+        }
+        if ($valueFunc === null) {
+            $valueFunc = fn ($item, $key) => $item;
+        }
+
+        $result = [];
+        foreach ($iterable as $key => $item) {
+            $result[$keyFunc($item, $key)] = $valueFunc($item, $key);
+        }
+        return $result;
     }
 }

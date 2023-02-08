@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Util;
+namespace IterTools\Tests\Transform;
 
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 use IterTools\Transform;

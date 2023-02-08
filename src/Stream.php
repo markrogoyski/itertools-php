@@ -802,14 +802,27 @@ class Stream implements \IteratorAggregate
      * Converts iterable source to array.
      *
      * @return array<mixed>
+     *
+     * @see Transform::toArray()
      */
     public function toArray(): array
     {
-        $result = [];
-        foreach ($this->iterable as $item) {
-            $result[] = $item;
-        }
-        return $result;
+        return Transform::toArray($this->iterable);
+    }
+
+    /**
+     * Converts iterable source to an associative array.
+     *
+     * @param callable|null $keyFunc fn ($value, $key) => Custom Logic
+     * @param callable|null $valueFunc fn ($value, $key) => Custom logic
+     *
+     * @return array<mixed>
+     *
+     * @see Transform::toAssociativeArray()
+     */
+    public function toAssociativeArray(callable $keyFunc = null, callable $valueFunc = null): array
+    {
+        return Transform::toAssociativeArray($this->iterable, $keyFunc, $valueFunc);
     }
 
     /**
@@ -879,30 +892,6 @@ class Stream implements \IteratorAggregate
         foreach ($this->iterable as $row) {
             \fputcsv($fileResource, $row, $separator, $enclosure, $escape);
         }
-    }
-
-    /**
-     * Converts iterable source to an associative array.
-     *
-     * @param callable|null $keyFunc fn ($value, $key) => Custom Logic
-     * @param callable|null $valueFunc fn ($value, $key) => Custom logic
-     *
-     * @return array<mixed>
-     */
-    public function toAssociativeArray(callable $keyFunc = null, callable $valueFunc = null): array
-    {
-        if ($keyFunc === null) {
-            $keyFunc = fn ($item, $key) => $key;
-        }
-        if ($valueFunc === null) {
-            $valueFunc = fn ($item, $key) => $item;
-        }
-
-        $result = [];
-        foreach ($this->iterable as $key => $item) {
-            $result[$keyFunc($item, $key)] = $valueFunc($item, $key);
-        }
-        return $result;
     }
 
     /**
