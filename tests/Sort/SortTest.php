@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Single;
+namespace IterTools\Tests\Sort;
 
-use IterTools\Single;
+use IterTools\Sort;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -22,7 +22,7 @@ class SortTest extends \PHPUnit\Framework\TestCase
 
         // When
         $sorted = [];
-        foreach (Single::sort($data) as $datum) {
+        foreach (Sort::sort($data) as $datum) {
             $sorted[] = $datum;
         }
 
@@ -62,7 +62,7 @@ class SortTest extends \PHPUnit\Framework\TestCase
 
         // When
         $sortedByValue = [];
-        foreach (Single::sort($chessPieces, $comparator) as $chessPiece) {
+        foreach (Sort::sort($chessPieces, $comparator) as $chessPiece) {
             $sortedByValue[] = $chessPiece;
         }
 
@@ -104,7 +104,7 @@ class SortTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::sort($data, $comparator) as $datum) {
+        foreach (Sort::sort($data, $comparator) as $datum) {
             $result[] = $datum;
         }
 
@@ -320,7 +320,7 @@ class SortTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::sort($data, $comparator) as $datum) {
+        foreach (Sort::sort($data, $comparator) as $datum) {
             $result[] = $datum;
         }
 
@@ -538,7 +538,7 @@ class SortTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::sort($data, $comparator) as $datum) {
+        foreach (Sort::sort($data, $comparator) as $datum) {
             $result[] = $datum;
         }
 
@@ -756,7 +756,7 @@ class SortTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::sort($data, $comparator) as $datum) {
+        foreach (Sort::sort($data, $comparator) as $datum) {
             $result[] = $datum;
         }
 

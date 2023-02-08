@@ -7,7 +7,6 @@
   * `compressAssociative`
   * `reindex`
   * `filterKeys`
-  * `sort`
 * Reduce
   * `toFirst`
   * `toLast`
@@ -15,6 +14,8 @@
   * `toMin` (parameter `$compareBy` added)
   * `toMax` (parameter `$compareBy` added)
   * `toMinMax` (parameter `$compareBy` added)
+* Sort
+  * `sort`
 * Stream
   * Source
     * `ofRange`

@@ -8,6 +8,7 @@ use IterTools\Multi;
 use IterTools\Random;
 use IterTools\Set;
 use IterTools\Single;
+use IterTools\Sort;
 use IterTools\Stream;
 use IterTools\Tests\Fixture;
 
@@ -45,6 +46,9 @@ trait DataProvider
         foreach ($this->dataProviderForSetLoopTools() as $loopTool) {
             yield $loopTool;
         }
+        foreach ($this->dataProviderForSortLoopTools() as $loopTool) {
+            yield $loopTool;
+        }
     }
 
     public function dataProviderForMultiLoopTools(): array
@@ -74,7 +78,6 @@ trait DataProvider
             [Single::pairwise([1, 2, 3, 4, 5])],
             [Single::reindex([1, 2, 3, 4, 5], fn ($x) => $x)],
             [Single::repeat(10, 5)],
-            [Single::sort([5, 4, 1, 3, 2])],
             [Single::string('abcdefg')],
             [Single::takeWhile([1, 2, 3, 4, 5], fn ($x) => $x < 2)],
         ];
@@ -123,6 +126,13 @@ trait DataProvider
             [Set::partialIntersectionCoercive(2, [1, 2, 3, 4, 5], [2, 3, 4])],
             [Set::symmetricDifference([1, 2, 3, 4, 5], [2, 3, 4])],
             [Set::symmetricDifferenceCoercive([1, 2, 3, 4, 5], [2, 3, 4])],
+        ];
+    }
+
+    public function dataProviderForSortLoopTools(): array
+    {
+        return [
+            [Sort::sort([5, 4, 1, 3, 2])],
         ];
     }
 

@@ -428,7 +428,7 @@ class Stream implements \IteratorAggregate
      */
     public function sort(callable $comparator = null): self
     {
-        $this->iterable = Single::sort($this->iterable, $comparator);
+        $this->iterable = Sort::sort($this->iterable, $comparator);
         return $this;
     }
 
