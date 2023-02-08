@@ -826,6 +826,27 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Return several independent streams from current stream.
+     *
+     * Once a tee() has been created, the original iterable should not be used anywhere else;
+     * otherwise, the iterable could get advanced without the tee objects being informed.
+     *
+     * This tool may require significant auxiliary storage (depending on how much temporary data needs to be stored).
+     * In general, if one iterator uses most or all of the data before another iterator starts,
+     * it is faster to use toArray() instead of tee().
+     *
+     * @param positive-int $count
+     *
+     * @return array<Stream>
+     *
+     * @see Transform::tee()
+     */
+    public function tee(int $count): array
+    {
+        return array_map(fn ($it) => new self($it), Transform::tee($this->iterable, $count));
+    }
+
+    /**
      * Writes iterable source to the file line by line.
      *
      * Elements of the iterable source must be stringable.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Stream;
 
+use IterTools\Multi;
 use IterTools\Stream;
 
 class TransformationTest extends \PHPUnit\Framework\TestCase
@@ -167,6 +168,135 @@ class TransformationTest extends \PHPUnit\Framework\TestCase
                         fn ($value) => $value,
                     ),
                 ['a_1' => 1, 'b_2' => 2, 'c_3' => 3],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderForTee
+     * @param $input $input
+     * @param int $count
+     * @param array<callable(Stream $stream): Stream> $extraOperations
+     * @param array<array> $expected
+     * @return void
+     */
+    public function testTee(array $input, int $count, array $extraOperations, array $expected): void
+    {
+        // Given
+        $inputStream = Stream::of($input);
+        $result = [];
+
+        // When
+        $streams = $inputStream->tee($count);
+        /**
+         * @var Stream $stream
+         * @var callable(Stream $stream): Stream $func
+         */
+        foreach (Multi::zipEqual($streams, $extraOperations) as [$stream, $func]) {
+            $result[] = $func($stream)->toArray();
+        }
+
+        // Then
+        $this->assertCount($count, $streams);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function dataProviderForTee(): array
+    {
+        return [
+            [
+                [],
+                1,
+                [
+                    fn (Stream $stream) => $stream,
+                ],
+                [
+                    [],
+                ],
+            ],
+            [
+                [],
+                2,
+                [
+                    fn (Stream $stream) => $stream,
+                    fn (Stream $stream) => $stream,
+                ],
+                [
+                    [],
+                    [],
+                ],
+            ],
+            [
+                [1, 2, 3],
+                1,
+                [
+                    fn (Stream $stream) => $stream,
+                ],
+                [
+                    [1, 2, 3],
+                ],
+            ],
+            [
+                [1, 2, 3],
+                1,
+                [
+                    fn (Stream $stream) => $stream->map(fn ($item) => $item * 2),
+                ],
+                [
+                    [2, 4, 6],
+                ],
+            ],
+            [
+                [1, 2, 3],
+                2,
+                [
+                    fn (Stream $stream) => $stream,
+                    fn (Stream $stream) => $stream,
+                ],
+                [
+                    [1, 2, 3],
+                    [1, 2, 3],
+                ],
+            ],
+            [
+                [1, 2, 3],
+                2,
+                [
+                    fn (Stream $stream) => $stream,
+                    fn (Stream $stream) => $stream->map(fn ($item) => $item * 2),
+                ],
+                [
+                    [1, 2, 3],
+                    [2, 4, 6],
+                ],
+            ],
+            [
+                [1, 2, 3],
+                3,
+                [
+                    fn (Stream $stream) => $stream,
+                    fn (Stream $stream) => $stream->map(fn ($item) => $item * 2),
+                    fn (Stream $stream) => $stream->map(fn ($item) => $item ** 3),
+                ],
+                [
+                    [1, 2, 3],
+                    [2, 4, 6],
+                    [1, 8, 27],
+                ],
+            ],
+            [
+                [1, 2, 3],
+                3,
+                [
+                    fn (Stream $stream) => $stream,
+                    fn (Stream $stream) => $stream->map(fn ($item) => $item * 2),
+                    fn (Stream $stream) => $stream->map(fn ($item) => $item ** 3)->filterTrue(fn ($item) => $item < 10),
+                ],
+                [
+                    [1, 2, 3],
+                    [2, 4, 6],
+                    [1, 8],
+                ],
             ],
         ];
     }
