@@ -72,11 +72,28 @@ class Single
      */
     public static function compressAssociative(iterable $data, array $keys): \Generator
     {
-        $keyMap = \array_flip($keys);
-        foreach ($data as $key => $datum) {
-            if (\array_key_exists($key, $keyMap)) {
-                yield $key => $datum;
-            }
+        switch (true) {
+            case is_array($data):
+                foreach ($keys as $key) {
+                    if (array_key_exists($key, $data)) {
+                        yield $key => $data[$key];
+                    }
+                }
+                break;
+            case $data instanceof \ArrayAccess:
+                foreach ($keys as $key) {
+                    if ($data->offsetExists($key)) {
+                        yield $key => $data[$key];
+                    }
+                }
+                break;
+            default:
+                $keyMap = \array_flip($keys);
+                foreach ($data as $key => $datum) {
+                    if (\array_key_exists($key, $keyMap)) {
+                        yield $key => $datum;
+                    }
+                }
         }
     }
 
