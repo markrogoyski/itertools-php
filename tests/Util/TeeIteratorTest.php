@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Util;
 
-use IterTools\Util\IteratorFactory;
+use IterTools\Transform;
 use IterTools\Util\Iterators\TeeIterator;
 
 class TeeIteratorTest extends \PHPUnit\Framework\TestCase
@@ -12,7 +12,7 @@ class TeeIteratorTest extends \PHPUnit\Framework\TestCase
     public function testErrorNextOnNull(): void
     {
         // Given
-        $sourceIterator = IteratorFactory::makeIterator([1, 2, 3]);
+        $sourceIterator = Transform::toIterator([1, 2, 3]);
 
         // When
         $iterator = new TeeIterator($sourceIterator, 1);
@@ -25,7 +25,7 @@ class TeeIteratorTest extends \PHPUnit\Framework\TestCase
     public function testErrorCurrentOnNull(): void
     {
         // Given
-        $sourceIterator = IteratorFactory::makeIterator([1, 2, 3]);
+        $sourceIterator = Transform::toIterator([1, 2, 3]);
 
         // When
         $iterator = new TeeIterator($sourceIterator, 1);
@@ -38,7 +38,7 @@ class TeeIteratorTest extends \PHPUnit\Framework\TestCase
     public function testErrorKeyOnNull(): void
     {
         // Given
-        $sourceIterator = IteratorFactory::makeIterator([1, 2, 3]);
+        $sourceIterator = Transform::toIterator([1, 2, 3]);
 
         // When
         $iterator = new TeeIterator($sourceIterator, 1);
@@ -51,7 +51,7 @@ class TeeIteratorTest extends \PHPUnit\Framework\TestCase
     public function testErrorValidOnNull(): void
     {
         // Given
-        $sourceIterator = IteratorFactory::makeIterator([1, 2, 3]);
+        $sourceIterator = Transform::toIterator([1, 2, 3]);
 
         // When
         $iterator = new TeeIterator($sourceIterator, 1);
@@ -64,7 +64,7 @@ class TeeIteratorTest extends \PHPUnit\Framework\TestCase
     public function testRelatedNotValid(): void
     {
         // Given
-        $sourceIterator = IteratorFactory::makeIterator([]);
+        $sourceIterator = Transform::toIterator([]);
 
         // When
         $teeIterator = new TeeIterator($sourceIterator, 1);
@@ -85,7 +85,7 @@ class TeeIteratorTest extends \PHPUnit\Framework\TestCase
     public function testRelatedCannotBeRewindedRepeatedly(): void
     {
         // Given
-        $sourceIterator = IteratorFactory::makeIterator([]);
+        $sourceIterator = Transform::toIterator([]);
 
         // When
         $teeIterator = new TeeIterator($sourceIterator, 1);

@@ -3,7 +3,7 @@
 namespace IterTools\Util\Iterators;
 
 use IterTools\Stream;
-use IterTools\Util\IteratorFactory;
+use IterTools\Transform;
 use IterTools\Util\NoValueMonad;
 
 /**
@@ -27,7 +27,7 @@ class JustifyMultipleIterator implements \Iterator
     public function __construct(iterable ...$iterables)
     {
         foreach ($iterables as $iterable) {
-            $this->iterators[] = IteratorFactory::makeIterator($iterable);
+            $this->iterators[] = Transform::toIterator($iterable);
         }
     }
 

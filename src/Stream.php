@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\IteratorFactory;
 use IterTools\Util\ResourcePolicy;
 
 /**
@@ -1308,6 +1307,6 @@ class Stream implements \IteratorAggregate
      */
     public function getIterator(): \Iterator
     {
-        return IteratorFactory::makeIterator($this->iterable);
+        return Transform::toIterator($this->iterable);
     }
 }

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\IteratorFactory;
-
 class Sort
 {
     /**
@@ -20,7 +18,7 @@ class Sort
      */
     public static function asort(iterable $data, callable $comparator = null): \Generator
     {
-        $array = \iterator_to_array(IteratorFactory::makeIterator($data), true);
+        $array = \iterator_to_array(Transform::toIterator($data), true);
 
         if ($comparator === null) {
             \asort($array);
@@ -45,7 +43,7 @@ class Sort
      */
     public static function sort(iterable $data, callable $comparator = null): \Generator
     {
-        $array = \iterator_to_array(IteratorFactory::makeIterator($data));
+        $array = \iterator_to_array(Transform::toIterator($data));
 
         if ($comparator === null) {
             \sort($array);
