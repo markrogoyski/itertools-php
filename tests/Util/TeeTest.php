@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace IterTools\Tests\Util;
 
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
-use IterTools\Util\IteratorFactory;
+use IterTools\Transform;
 
 class TeeTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,7 +18,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testChainArray(array $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
@@ -41,7 +41,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testZipArray(array $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
@@ -65,7 +65,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testLadderArray(array $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
@@ -177,7 +177,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testChainGenerators(\Generator $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
@@ -200,7 +200,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testZipGenerators(\Generator $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
@@ -224,7 +224,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testLadderGenerators(\Generator $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
@@ -342,7 +342,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testChainIterators(\Iterator $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
@@ -365,7 +365,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testZipIterators(\Iterator $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
@@ -390,7 +390,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testLadderIterators(\Iterator $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
@@ -584,7 +584,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testChainTraversables(\Traversable $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
@@ -607,7 +607,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testZipTraversables(\Traversable $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
@@ -631,7 +631,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testLadderTraversables(\Traversable $data, int $relatedCount, array $expected): void
     {
         // Given
-        $iterators = IteratorFactory::tee($data, $relatedCount);
+        $iterators = Transform::tee($data, $relatedCount);
         $result = array_fill(0, $relatedCount, []);
 
         // When
