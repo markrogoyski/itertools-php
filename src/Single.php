@@ -437,4 +437,33 @@ class Single
             yield \array_pop($keyStack) => \array_pop($valueStack);
         }
     }
+
+    /**
+     * Extract a slice of the collection.
+     *
+     * @template T
+     *
+     * @param iterable<T> $data
+     * @param int<0, max> $start
+     * @param int<0, max>|null $count
+     * @param positive-int $step
+     *
+     * @return \Generator<T>
+     */
+    public static function slice(iterable $data, int $start = 0, ?int $count = null, int $step = 1): \Generator
+    {
+        $index = 0;
+        $yielded = 0;
+        foreach ($data as $datum) {
+            if ($index++ < $start || ($index - $start - 1) % $step !== 0) {
+                continue;
+            }
+
+            if ($yielded++ === $count && $count !== null) {
+                break;
+            }
+
+            yield $datum;
+        }
+    }
 }
