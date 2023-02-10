@@ -462,6 +462,23 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Extract a slice of the stream.
+     *
+     * @param int<0, max> $start
+     * @param int<0, max>|null $count
+     * @param positive-int $step
+     *
+     * @return $this
+     *
+     * @see Single::slice()
+     */
+    public function slice(int $start = 0, ?int $count = null, int $step = 1): self
+    {
+        $this->iterable = Single::slice($this->iterable, $start, $count, $step);
+        return $this;
+    }
+
+    /**
      * Sorts the stream.
      *
      * If comparator is null, then elements of the iterable source must be comparable.
