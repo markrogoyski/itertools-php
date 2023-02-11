@@ -270,7 +270,7 @@ class Stream implements \IteratorAggregate
     /**
      * Filter out elements from the iterable source only returning elements where there predicate function is true.
      *
-     * @param callable|null $predicate
+     * @param callable $predicate
      *
      * @return $this
      *

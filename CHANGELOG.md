@@ -5,6 +5,7 @@
 ### New Features
 * Single
   * `compressAssociative`
+  * `filter`
   * `reindex`
   * `filterKeys`
 * Reduce
@@ -25,6 +26,7 @@
   * Stream Operations
     * `asort`
     * `compressAssociative`
+    * `filter`
     * `reindex`
     * `filterKeys`
     * `sort`
