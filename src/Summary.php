@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\UniqueExtractor;
+use IterTools\Util\UsageMap;
+
 /**
  * Tools to get summarized answers about iterables.
  */
@@ -194,5 +197,61 @@ class Summary
         }
 
         return $count === $n;
+    }
+
+    /**
+     * Returns true if given collections are permutations of each other (using strict-type comparisons).
+     *
+     * Returns true if no collections given or for single collection.
+     *
+     * Strict-type comparisons:
+     *  - scalars: compares strictly by type
+     *  - objects: always treats different instances as not equal to each other
+     *  - arrays: compares serialized
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return bool
+     */
+    public static function arePermutations(iterable ...$iterables): bool
+    {
+        return static::arePermutationsInternal(true, ...$iterables);
+    }
+
+    /**
+     * Internal function helper for arePermutations() and arePermutationsCoercive()
+     *
+     * @param bool $strict
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return bool
+     */
+    protected static function arePermutationsInternal(bool $strict, iterable ...$iterables): bool
+    {
+        if (count($iterables) < 2) {
+            return true;
+        }
+
+        $usageMap = new UsageMap($strict);
+        $map = [];
+
+        try {
+            foreach (Multi::zipEqual(...$iterables) as $values) {
+                foreach ($values as $collectionIndex => $value) {
+                    $hash = $usageMap->addUsage($value, \strval($collectionIndex));
+                    $map[$hash] = $value;
+                }
+            }
+        } catch (\LengthException $e) {
+            return false;
+        }
+
+        foreach ($map as $value) {
+            if (!$usageMap->isUsedSameTimes($value, count($iterables))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

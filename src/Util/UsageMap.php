@@ -39,9 +39,9 @@ class UsageMap
      * @param mixed $value
      * @param string $owner
      *
-     * @return void
+     * @return string unique hash string
      */
-    public function addUsage($value, string $owner): void
+    public function addUsage($value, string $owner): string
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
 
@@ -54,6 +54,8 @@ class UsageMap
         }
 
         $this->addedMap[$hash][$owner]++;
+
+        return $hash;
     }
 
     /**
@@ -61,9 +63,9 @@ class UsageMap
      *
      * @param mixed $value
      *
-     * @return void
+     * @return string unique hash string
      */
-    public function deleteUsage($value): void
+    public function deleteUsage($value): string
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
 
@@ -72,6 +74,8 @@ class UsageMap
         }
 
         $this->deletedMap[$hash]++;
+
+        return $hash;
     }
 
     /**
@@ -119,5 +123,29 @@ class UsageMap
 
         /** @var array<string, int> $ownersMap */
         return (int)Reduce::toSum($ownersMap);
+    }
+
+    /**
+     * Returns true if all owners have used given value the same number of times.
+     *
+     * @param mixed $value
+     * @param int $ownersCount
+     *
+     * @return bool
+     */
+    public function isUsedSameTimes($value, int $ownersCount): bool
+    {
+        $hash = UniqueExtractor::getString($value, $this->strict);
+        $map = $this->addedMap[$hash] ?? [];
+
+        if (count($map) !== $ownersCount) {
+            return false;
+        }
+
+        $differentUsageCounts = Stream::of($map)
+            ->distinct()
+            ->toCount();
+
+        return $differentUsageCounts <= 1;
     }
 }
