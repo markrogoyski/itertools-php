@@ -434,6 +434,23 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Sorts the stream, maintaining index key associations
+     *
+     * If comparator is null, then elements of the iterable source must be comparable.
+     *
+     * @param callable|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
+     *
+     * @return $this
+     *
+     * @see Single::asort()
+     */
+    public function asort(callable $comparator = null): self
+    {
+        $this->iterable = Sort::asort($this->iterable, $comparator);
+        return $this;
+    }
+
+    /**
      * Chain iterable source withs given iterables together into a single iteration.
      *
      * Makes a single continuous sequence out of multiple sequences.
