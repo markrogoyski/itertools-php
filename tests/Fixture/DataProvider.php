@@ -11,6 +11,7 @@ use IterTools\Single;
 use IterTools\Sort;
 use IterTools\Stream;
 use IterTools\Tests\Fixture;
+use IterTools\Transform;
 
 trait DataProvider
 {
@@ -47,6 +48,9 @@ trait DataProvider
             yield $loopTool;
         }
         foreach ($this->dataProviderForSortLoopTools() as $loopTool) {
+            yield $loopTool;
+        }
+        foreach ($this->dataProviderForTransformLoopTools() as $loopTool) {
             yield $loopTool;
         }
     }
@@ -140,6 +144,16 @@ trait DataProvider
         ];
     }
 
+    public function dataProviderForTransformLoopTools(): array
+    {
+        return [
+            [Transform::tee([1, 2, 3, 4, 5], 2)],
+            [Transform::toArray([1, 2, 3, 4, 5])],
+            [Transform::toAssociativeArray([1, 2, 3, 4, 5])],
+            [Transform::toIterator([1, 2, 3, 4, 5])],
+        ];
+    }
+
     // STREAM TOOLS
 
     public function dataProviderForIterableStreamTools(): \Generator
@@ -169,6 +183,7 @@ trait DataProvider
     public function dataProviderForStreamOperations(): array
     {
         return [
+            [Stream::of([1, 2, 3, 4, 5])->asort()],
             [Stream::of([1, 2, 3, 4, 5])->chainWith([6, 7, 8, 9, 10])],
             [Stream::of([1, 2, 3, 4, 5])->compress([1, 1, 0, 0, 1])],
             [Stream::of([1, 2, 3, 4, 5])->compressAssociative(['0', '1', '4'])],
@@ -199,10 +214,10 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->runningProduct()],
             [Stream::of([1, 2, 3, 4, 5])->runningTotal()],
             [Stream::of([1, 2, 3, 4, 5])->sort()],
-            [Stream::of([1, 2, 3, 4, 5])->asort()],
             [Stream::of([1, 2, 3, 4, 5])->symmetricDifferenceWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->symmetricDifferenceCoerciveWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->takeWhile(fn ($x) => $x < 2)],
+            [Stream::of([1, 2, 3, 4, 5])->tee(2)],
             [Stream::of([1, 2, 3, 4, 5])->zipWith([6, 7, 8, 9, 10])],
             [Stream::of([1, 2, 3, 4, 5])->zipEqualWith([6, 7, 8, 9, 10])],
             [Stream::of([1, 2, 3, 4, 5])->zipLongestWith([6, 7, 8, 9, 10])],

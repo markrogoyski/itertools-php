@@ -10,6 +10,51 @@ use IterTools\Transform;
 class TeeTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test tee example usage
+     */
+    public function testTeeExampleUsageSplittingIterators(): void
+    {
+        // Given
+        $data = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+        $count = 3;
+
+        // When
+        [$iter1, $iter2, $iter3] = Transform::tee($data, $count);
+
+        // Then
+        $this->assertEquals($data, \iterator_to_array($iter1));
+        $this->assertEquals($data, \iterator_to_array($iter2));
+        $this->assertEquals($data, \iterator_to_array($iter3));
+    }
+
+    /**
+     * @test tee example usage
+     */
+    public function testTeeExampleUsageIteratingMultipleIterators(): void
+    {
+        // Given
+        $data = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+        $count = 3;
+
+        // And
+        $result = [];
+        $i = 0;
+
+        // When
+        foreach (Transform::tee($data, $count) as $week) {
+            foreach ($week as $day) {
+                $result[$i][] = $day;
+            }
+            $i++;
+        }
+
+        // Then
+        $this->assertEquals($data, $result[0]);
+        $this->assertEquals($data, $result[1]);
+        $this->assertEquals($data, $result[2]);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param array<scalar, mixed> $data
      * @param int $relatedCount
@@ -19,7 +64,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
         foreach ($iterators as $i => $iterator) {
@@ -42,10 +87,10 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
-        while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
+        while (\array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
                 $result[$i][$iterator->key()] = $iterator->current();
                 $iterator->next();
@@ -66,11 +111,11 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
         $j = 0;
-        while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
+        while (\array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
                 if ($i > $j) {
                     continue;
@@ -178,7 +223,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
         foreach ($iterators as $i => $iterator) {
@@ -201,10 +246,10 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
-        while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
+        while (\array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
                 $result[$i][$iterator->key()] = $iterator->current();
                 $iterator->next();
@@ -225,11 +270,11 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
         $j = 0;
-        while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
+        while (\array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
                 if ($i > $j) {
                     continue;
@@ -343,7 +388,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
         foreach ($iterators as $i => $iterator) {
@@ -366,10 +411,10 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
-        while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
+        while (\array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
                 $result[$i][$iterator->key()] = $iterator->current();
                 $iterator->next();
@@ -391,11 +436,11 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
         $j = 0;
-        while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
+        while (\array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
                 if ($i > $j) {
                     continue;
@@ -585,7 +630,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
         foreach ($iterators as $i => $iterator) {
@@ -608,10 +653,10 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
-        while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
+        while (\array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
                 $result[$i][$iterator->key()] = $iterator->current();
                 $iterator->next();
@@ -632,11 +677,11 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $iterators = Transform::tee($data, $relatedCount);
-        $result = array_fill(0, $relatedCount, []);
+        $result = \array_fill(0, $relatedCount, []);
 
         // When
         $j = 0;
-        while (array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
+        while (\array_reduce($iterators, fn (bool $carry, \Iterator $it) => $carry ?: $it->valid(), false)) {
             foreach ($iterators as $i => $iterator) {
                 if ($i > $j) {
                     continue;
@@ -734,5 +779,28 @@ class TeeTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * @test         tee iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param array  $data
+     * @param int   $relatedCount
+     */
+    public function testIteratorToArray(array $data, int $relatedCount): void
+    {
+        // Given
+        $iterator = Transform::tee($data, $relatedCount);
+
+        // When
+        $results = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($relatedCount, count($results));
+
+        // And
+        foreach ($results as $result) {
+            $this->assertEquals($data, \iterator_to_array($result));
+        }
     }
 }
