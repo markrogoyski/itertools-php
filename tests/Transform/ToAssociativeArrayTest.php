@@ -10,6 +10,30 @@ use IterTools\Transform;
 class ToAssociativeArrayTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test example usage
+     */
+    public function testExampleUsage(): void
+    {
+        // Given
+        $messages = ['message 1', 'message 2', 'message 3'];
+
+        // And
+        $keyFunc   = fn ($msg) => \md5($msg);
+        $valueFunc = fn ($msg) => strtoupper($msg);
+
+        // When
+        $associativeArray = Transform::toAssociativeArray($messages, $keyFunc, $valueFunc);
+
+        // Then
+        $expected = [
+            '1db65a6a0a818fd39655b95e33ada11d' => 'MESSAGE 1',
+            '83b2330607fe8f817ce6d24249dea373' => 'MESSAGE 2',
+            '037805d3ad7b10c5b8425427b516b5ce' => 'MESSAGE 3',
+        ];
+        $this->assertEquals($expected, $associativeArray);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param array $input
      * @param callable|null $keyFunc

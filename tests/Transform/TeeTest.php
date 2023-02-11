@@ -12,7 +12,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     /**
      * @test tee example usage
      */
-    public function testTeeExampleUsageSplittingIterators(): void
+    public function testTeeExampleUsageArrayDestructuring(): void
     {
         // Given
         $data = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];

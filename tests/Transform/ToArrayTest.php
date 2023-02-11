@@ -10,6 +10,30 @@ use IterTools\Transform;
 class ToArrayTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test toArray example usage
+     */
+    public function toArrayExampleUsage(): void
+    {
+        // Given
+        $data = [1, 2, 3, 4, 5];
+
+        // And
+        $iterator    = new \ArrayIterator($data);
+        $traversable = new Fixture\IteratorAggregateFixture($data);
+        $generator   = fn ($a) => yield from $a;
+
+        // When
+        $arrayFromIterator    = Transform::toArray($iterator);
+        $arrayFromTraversable = Transform::toArray($traversable);
+        $arrayFromGenerator   = Transform::toArray($generator($data));
+
+        // Then
+        $this->assertEquals($data, $arrayFromIterator);
+        $this->assertEquals($data, $arrayFromTraversable);
+        $this->assertEquals($data, $arrayFromGenerator);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param array $input
      * @param array $expected

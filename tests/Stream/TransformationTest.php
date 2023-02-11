@@ -300,4 +300,28 @@ class TransformationTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test tee array destructuring
+     */
+    public function testTeeArrayDestructuring(): void
+    {
+        // Given
+        $daysOfWeek = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+        $count = 3;
+
+        // When
+        [$week1Stream, $week2Stream, $week3Stream] = Stream::of($daysOfWeek)
+            ->tee($count);
+
+        // Then
+        $this->assertInstanceOf(Stream::class, $week1Stream);
+        $this->assertInstanceOf(Stream::class, $week2Stream);
+        $this->assertInstanceOf(Stream::class, $week3Stream);
+
+        // And
+        $this->assertEquals($daysOfWeek, $week1Stream->toArray());
+        $this->assertEquals($daysOfWeek, $week2Stream->toArray());
+        $this->assertEquals($daysOfWeek, $week3Stream->toArray());
+    }
 }
