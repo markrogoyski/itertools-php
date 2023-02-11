@@ -420,7 +420,7 @@ class GroupByTest extends \PHPUnit\Framework\TestCase
         $iterator = Single::groupBy($iterable, $groupKeyFunction);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);

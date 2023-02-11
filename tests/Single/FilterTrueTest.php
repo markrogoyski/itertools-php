@@ -471,9 +471,9 @@ class FilterTrueTest extends \PHPUnit\Framework\TestCase
         $iterator = Single::filterTrue($iterable, $predicate);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, \array_values($result));
     }
 }

@@ -304,7 +304,7 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         $iterator = Single::repeat($integer, self::REPETITIONS);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);

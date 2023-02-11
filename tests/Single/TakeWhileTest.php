@@ -438,6 +438,28 @@ class TakeWhileTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test takeWhile with associative array
+     */
+    public function testAssociativeArray(): void
+    {
+        // Given
+        $iterable  = ['a' => 50, 'b' => 60, 'c' => 70, 'd' => 85, 'e' => 65, 'f' => 90];
+        $predicate = fn ($x) => $x <= 65;
+
+        // And
+        $expected = ['a' => 50, 'b' => 60];
+
+        // When
+        $result = [];
+        foreach (Single::takeWhile($iterable, $predicate) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * @test         takeWhile iterator_to_array
      * @dataProvider dataProviderForArray
      * @param        array    $iterable
@@ -450,7 +472,7 @@ class TakeWhileTest extends \PHPUnit\Framework\TestCase
         $iterator = Single::takeWhile($iterable, $predicate);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);

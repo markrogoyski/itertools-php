@@ -225,6 +225,28 @@ class MapTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test map with associative array
+     */
+    public function testAssociativeArray(): void
+    {
+        // Given
+        $iterable = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5];
+        $func     = fn ($x) => $x**2;
+
+        // And
+        $expected = ['a' => 1, 'b' => 4, 'c' => 9, 'd' => 16, 'e' => 25];
+
+        // When
+        $result = [];
+        foreach (Single::map($iterable, $func) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * @test         map iterator_to_array
      * @dataProvider dataProviderForArray
      * @dataProvider dataProviderForGenerator
@@ -240,7 +262,7 @@ class MapTest extends \PHPUnit\Framework\TestCase
         $iterator = Single::map($iterable, $mapper);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);

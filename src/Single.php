@@ -110,11 +110,11 @@ class Single
     public static function dropWhile(iterable $data, callable $predicate): \Generator
     {
         $drop = true;
-        foreach ($data as $datum) {
+        foreach ($data as $key => $datum) {
             if ($drop === true) {
                 if (!$predicate($datum)) {
                     $drop = false;
-                    yield $datum;
+                    yield $key => $datum;
                     continue;
                 }
                 continue;
@@ -139,9 +139,9 @@ class Single
             $predicate = fn($datum) => \boolval($datum);
         }
 
-        foreach ($data as $datum) {
+        foreach ($data as $key => $datum) {
             if (!$predicate($datum)) {
-                yield $datum;
+                yield $key => $datum;
             }
         }
     }
@@ -162,9 +162,9 @@ class Single
             $predicate = fn($datum) => \boolval($datum);
         }
 
-        foreach ($data as $datum) {
+        foreach ($data as $key => $datum) {
             if ($predicate($datum)) {
-                yield $datum;
+                yield $key => $datum;
             }
         }
     }
@@ -219,9 +219,9 @@ class Single
      */
     public static function takeWhile(iterable $data, callable $predicate): \Generator
     {
-        foreach ($data as $datum) {
+        foreach ($data as $key => $datum) {
             if ($predicate($datum)) {
-                yield $datum;
+                yield $key => $datum;
             } else {
                 break;
             }
@@ -327,11 +327,11 @@ class Single
         }
 
         $i = 0;
-        foreach ($data as $datum) {
+        foreach ($data as $key => $datum) {
             if ($i >= $limit) {
                 return;
             }
-            yield $datum;
+            yield $key => $datum;
             $i++;
         }
     }
@@ -346,8 +346,8 @@ class Single
      */
     public static function map(iterable $data, callable $func): \Generator
     {
-        foreach ($data as $datum) {
-            yield $func($datum);
+        foreach ($data as $key => $datum) {
+            yield $key => $func($datum);
         }
     }
 }

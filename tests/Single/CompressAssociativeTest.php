@@ -438,4 +438,26 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         compressAssociative iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param array $iterable
+     * @param array $keys
+     * @param array $expectedKeys
+     * @param array $expectedValues
+     * @return void
+     */
+    public function testIteratorToArray(array $iterable, array $keys, array $expectedKeys, array $expectedValues): void
+    {
+        // Given
+        $iterator = Single::compressAssociative($iterable, $keys);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expectedKeys, \array_keys($result));
+        $this->assertEquals($expectedValues, array_values($result));
+    }
 }

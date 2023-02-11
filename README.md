@@ -170,6 +170,7 @@ Quick Reference
 #### Stream Operations
 | Operation                                                                 | Description                                                                               | Code Snippet                                                                      |
 |---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`asort`](#ASort-1)                                                       | Sorts the iterable source maintaining keys                                                | `$stream->asort([$comparator])`                                                    |
 | [`chainWith`](#Chain-With)                                                | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                                               |
 | [`compress`](#Compress-1)                                                 | Compress source by filtering out data not selected                                        | `$stream->compress($selectors)`                                                   |
 | [`compressAssociative`](#Compress-Associative-1)                          | Compress source by filtering out keys not selected                                        | `$stream->compressAssociative($selectorKeys)`                                     |

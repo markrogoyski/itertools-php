@@ -439,4 +439,23 @@ class ReindexTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         reindex iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param array $iterable
+     * @param callable $indexer
+     * @param array $expected
+     */
+    public function testIteratorToArray(array $iterable, callable $indexer, array $expected): void
+    {
+        // Given
+        $iterator = Single::reindex($iterable, $indexer);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
 }

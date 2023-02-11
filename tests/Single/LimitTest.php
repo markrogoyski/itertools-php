@@ -292,6 +292,28 @@ class LimitTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test limit with associative array
+     */
+    public function testAssociativeArray(): void
+    {
+        // Given
+        $iterable = ['a' => 50, 'b' => 60, 'c' => 70, 'd' => 85, 'e' => 65, 'f' => 90];
+        $limit    = 2;
+
+        // And
+        $expected = ['a' => 50, 'b' => 60];
+
+        // When
+        $result = [];
+        foreach (Single::limit($iterable, $limit) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * @test         limit iterator_to_array
      * @dataProvider dataProviderForArray
      * @param        array    $iterable
@@ -304,7 +326,7 @@ class LimitTest extends \PHPUnit\Framework\TestCase
         $iterator = Single::limit($iterable, $limit);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);

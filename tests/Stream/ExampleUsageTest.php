@@ -134,4 +134,74 @@ class ExampleUsageTest extends \PHPUnit\Framework\TestCase
         ];
         $this->assertEquals($expected, $reindexResult);
     }
+
+    /**
+     * @test filter / asort example usage
+     */
+    public function filterAsortExampleUsage(): void
+    {
+        // Given
+        $worldPopulations = [
+            'Bangladesh' => 164_689_383,
+            'Brazil'     => 212_559_417,
+            'China'      => 1_439_323_776,
+            'India'      => 1_380_004_385,
+            'Indonesia'  => 273_523_615,
+            'Mexico'     => 128_932_753,
+            'Nigeria'    => 206_139_589,
+            'Pakistan'   => 220_892_340,
+            'Russia'     => 145_934_462,
+            'USA'        => 331_002_651,
+        ];
+
+        // When
+        $sortedAndFiltered = Stream::of($worldPopulations)
+            ->filterTrue(fn ($pop) => $pop > 300_000_000)
+            ->asort()
+            ->toAssociativeArray();
+
+        // Then
+        $expected = [
+            'USA'   => 331_002_651,
+            'India' => 1_380_004_385,
+            'China' => 1_439_323_776,
+        ];
+        $this->assertEquals($expected, $sortedAndFiltered);
+    }
+
+    /**
+     * @test map / filter / sort / reduce example usage
+     */
+    public function mapFilterSortReduceExampleUsage(): void
+    {
+        // Given
+        $worldPopulations = [
+            'Bangladesh' => 164_689_383,
+            'Brazil'     => 212_559_417,
+            'China'      => 1_439_323_776,
+            'India'      => 1_380_004_385,
+            'Indonesia'  => 273_523_615,
+            'Mexico'     => 128_932_753,
+            'Nigeria'    => 206_139_589,
+            'Pakistan'   => 220_892_340,
+            'Russia'     => 145_934_462,
+            'USA'        => 331_002_651,
+        ];
+
+        // When
+        $sortedAndFiltered = Stream::of($worldPopulations)
+            ->map(fn ($pop) => \round($pop, -6))
+            ->map('intval')
+            ->filterTrue(fn ($pop) => $pop > 300_000_000)
+            ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
+            ->toAssociativeArray();
+
+        // Then
+        $expected = [
+            1_439_000_000,
+            1_380_000_000,
+            331_000_000,
+        ];
+        $this->assertEquals($expected, $sortedAndFiltered);
+    }
 }
