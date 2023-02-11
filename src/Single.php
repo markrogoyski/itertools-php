@@ -252,7 +252,7 @@ class Single
                 ? $itemKeyFunction($item)
                 : null;
             $itemGroups = is_iterable($group)
-                ? Stream::of($group)->toArray()
+                ? Transform::toArray($group)
                 : [$group];
 
             foreach ($itemGroups as $itemGroup) {
