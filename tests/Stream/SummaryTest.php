@@ -123,6 +123,41 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->exactlyN(2, fn ($x) => $x <= 2),
             ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                [0],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                [1],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                [1, 1, 0, 0],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                [2, 4, 6],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                [1, 3, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                [2, 4, 6, 1, 3, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
         ];
     }
 
@@ -209,6 +244,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3, 4, 5],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->exactlyN(5, fn ($x) => $x > 6),
+            ],
+            [
+                [1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                [1, 1, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                [1, 2, 2, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                [2, 4, 1, 6, 3, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                [1, 3, 5, 2, 4, 6],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
             ],
         ];
     }
@@ -312,6 +372,41 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 9),
             ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $gen([0]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $gen([1]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $gen([1, 1, 0, 0]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $gen([2, 4, 6]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $gen([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $gen([2, 4, 6, 1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
         ];
     }
 
@@ -389,6 +484,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $gen([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 5),
+            ],
+            [
+                $gen([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $gen([1, 1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $gen([1, 2, 2, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $gen([2, 4, 1, 6, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $gen([1, 3, 5, 2, 4, 6]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
             ],
         ];
     }
@@ -492,6 +612,41 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 9),
             ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $iter([0]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $iter([1]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $iter([1, 1, 0, 0]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $iter([2, 4, 6]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $iter([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $iter([2, 4, 6, 1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
         ];
     }
 
@@ -569,6 +724,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $iter([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 5),
+            ],
+            [
+                $iter([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $iter([1, 1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $iter([1, 2, 2, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $iter([2, 4, 1, 6, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $iter([1, 3, 5, 2, 4, 6]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
             ],
         ];
     }
@@ -672,6 +852,41 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 9),
             ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $trav([0]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $trav([1]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $trav([1, 1, 0, 0]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(),
+            ],
+            [
+                $trav([2, 4, 6]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $trav([1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $trav([2, 4, 6, 1, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
         ];
     }
 
@@ -749,6 +964,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $trav([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 5),
+            ],
+            [
+                $trav([1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $trav([1, 1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $trav([1, 2, 2, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $trav([2, 4, 1, 6, 3, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $trav([1, 3, 5, 2, 4, 6]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isPartitioned(fn ($item) => $item % 2 === 0),
             ],
         ];
     }
