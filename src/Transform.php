@@ -85,14 +85,12 @@ class Transform
     }
 
     /**
-     * Return several independent iterators from a single iterable.
+     * Return several independent (duplicated) iterators from a single iterable.
      *
-     * Once a tee() has been created, the original iterable should not be used anywhere else;
-     * otherwise, the iterable could get advanced without the tee objects being informed.
+     * Once tee has been called to duplicate iterators, it is advisable to not use the original input iterator any further.
      *
-     * This tool may require significant auxiliary storage (depending on how much temporary data needs to be stored).
-     * In general, if one iterator uses most or all of the data before another iterator starts,
-     * it is faster to use toArray() instead of tee().
+     * Duplicating iterators can use up memory. Consider if tee is the right solution. For example, arrays and most
+     * iterators can be rewound and reiterated without need for duplication.
      *
      * @template TKey
      * @template TValue
