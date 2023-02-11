@@ -195,4 +195,41 @@ class Summary
 
         return $count === $n;
     }
+
+    /**
+     * Returns true if all elements of given collection that satisfy the predicate
+     * appear before all elements that don't.
+     *
+     * Returns true for empty collection or for collection with single item.
+     *
+     * Default predicate if not provided is the boolean value of each data item.
+     *
+     * @see https://en.cppreference.com/w/cpp/algorithm/is_partitioned
+     *
+     * @param iterable<mixed> $data
+     * @param callable|null $predicate
+     *
+     * @return bool
+     */
+    public static function isPartitioned(iterable $data, callable $predicate = null): bool
+    {
+        $allTrue = true;
+
+        foreach ($data as $datum) {
+            $status = ($predicate !== null)
+                ? $predicate($datum)
+                : boolval($datum);
+
+            if ($allTrue && !$status) {
+                $allTrue = false;
+                continue;
+            }
+
+            if (!$allTrue && $status) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
