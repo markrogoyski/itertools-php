@@ -209,6 +209,8 @@ class Summary
      *  - objects: always treats different instances as not equal to each other
      *  - arrays: compares serialized
      *
+     * @see https://en.cppreference.com/w/cpp/algorithm/is_permutation
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return bool
