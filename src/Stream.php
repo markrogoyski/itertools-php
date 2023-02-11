@@ -1087,6 +1087,50 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns true if stream and given collections are permutations of each other (using strict-type comparisons).
+     *
+     * Returns true if no collections given.
+     *
+     * Strict-type comparisons:
+     *  - scalars: compares strictly by type
+     *  - objects: always treats different instances as not equal to each other
+     *  - arrays: compares serialized
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return bool
+     *
+     * @see Summary::arePermutations()
+     * @see https://en.cppreference.com/w/cpp/algorithm/is_permutation
+     */
+    public function arePermutationsWith(iterable ...$iterables): bool
+    {
+        return Summary::arePermutations($this->iterable, ...$iterables);
+    }
+
+    /**
+     * Returns true if stream and given collections are permutations of each other (using type coercion).
+     *
+     * Returns true if no collections given.
+     *
+     * Coercive (non-strict) type comparisons:
+     *  - scalars: compares non-strictly by value
+     *  - objects: compares serialized
+     *  - arrays: compares serialized
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return bool
+     *
+     * @see Summary::arePermutationsCoercive()
+     * @see https://en.cppreference.com/w/cpp/algorithm/is_permutation
+     */
+    public function arePermutationsCoerciveWith(iterable ...$iterables): bool
+    {
+        return Summary::arePermutationsCoercive($this->iterable, ...$iterables);
+    }
+
+    /**
      * Reduces iterable source to the mean average of its items.
      *
      * Returns null if iterable source is empty.

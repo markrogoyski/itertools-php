@@ -209,11 +209,11 @@ class Summary
      *  - objects: always treats different instances as not equal to each other
      *  - arrays: compares serialized
      *
-     * @see https://en.cppreference.com/w/cpp/algorithm/is_permutation
-     *
      * @param iterable<mixed> ...$iterables
      *
      * @return bool
+     *
+     * @see https://en.cppreference.com/w/cpp/algorithm/is_permutation
      */
     public static function arePermutations(iterable ...$iterables): bool
     {
@@ -230,11 +230,11 @@ class Summary
      *  - objects: compares serialized
      *  - arrays: compares serialized
      *
-     * @see https://en.cppreference.com/w/cpp/algorithm/is_permutation
-     *
      * @param iterable<mixed> ...$iterables
      *
      * @return bool
+     *
+     * @see https://en.cppreference.com/w/cpp/algorithm/is_permutation
      */
     public static function arePermutationsCoercive(iterable ...$iterables): bool
     {
