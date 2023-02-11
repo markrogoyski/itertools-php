@@ -790,17 +790,15 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     public function testIteratorToArray(array $data, int $relatedCount): void
     {
         // Given
-        $iterator = Transform::tee($data, $relatedCount);
-
-        // When
-        $results = \iterator_to_array($iterator);
+        $iterators = Transform::tee($data, $relatedCount);
 
         // Then
-        $this->assertEquals($relatedCount, count($results));
+        $this->assertEquals($relatedCount, count($iterators));
 
-        // And
-        foreach ($results as $result) {
-            $this->assertEquals($data, \iterator_to_array($result));
+        // And When
+        foreach ($iterators as $iterator) {
+            // Then
+            $this->assertEquals($data, \iterator_to_array($iterator));
         }
     }
 }
