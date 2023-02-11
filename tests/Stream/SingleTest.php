@@ -608,7 +608,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn ($value) => $value > 0)
                     ->reverse()
                     ->toAssociativeArray(),
-                [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
+                [10 => 5, 9 => 4, 8 => 3, 7 => 2, 6 => 1],
             ],
         ];
     }
@@ -1124,7 +1124,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn ($value) => $value > 0)
                     ->reverse()
                     ->toAssociativeArray(),
-                [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
+                [10 => 5, 9 => 4, 8 => 3, 7 => 2, 6 => 1],
             ],
         ];
     }
@@ -1632,7 +1632,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn ($value) => $value > 0)
                     ->reverse()
                     ->toAssociativeArray(),
-                [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
+                [10 => 5, 9 => 4, 8 => 3, 7 => 2, 6 => 1],
             ],
         ];
     }
@@ -2140,7 +2140,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn ($value) => $value > 0)
                     ->reverse()
                     ->toAssociativeArray(),
-                [4 => 5, 3 => 4, 2 => 3, 1 => 2, 0 => 1],
+                [10 => 5, 9 => 4, 8 => 3, 7 => 2, 6 => 1],
             ],
         ];
     }
