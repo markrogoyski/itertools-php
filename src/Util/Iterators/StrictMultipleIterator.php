@@ -1,6 +1,6 @@
 <?php
 
-namespace IterTools\Util;
+namespace IterTools\Util\Iterators;
 
 /**
  * @internal

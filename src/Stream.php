@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\IteratorFactory;
 use IterTools\Util\ResourcePolicy;
 
 /**
@@ -803,14 +802,48 @@ class Stream implements \IteratorAggregate
      * Converts iterable source to array.
      *
      * @return array<mixed>
+     *
+     * @see Transform::toArray()
      */
     public function toArray(): array
     {
-        $result = [];
-        foreach ($this->iterable as $item) {
-            $result[] = $item;
-        }
-        return $result;
+        return Transform::toArray($this->iterable);
+    }
+
+    /**
+     * Converts iterable source to an associative array.
+     *
+     * @param callable|null $keyFunc fn ($value, $key) => Custom Logic
+     * @param callable|null $valueFunc fn ($value, $key) => Custom logic
+     *
+     * @return array<mixed>
+     *
+     * @see Transform::toAssociativeArray()
+     */
+    public function toAssociativeArray(callable $keyFunc = null, callable $valueFunc = null): array
+    {
+        return Transform::toAssociativeArray($this->iterable, $keyFunc, $valueFunc);
+    }
+
+    /**
+     * Return several independent streams from current stream.
+     *
+     * Once a tee() has been created, the original iterable should not be used anywhere else;
+     * otherwise, the iterable could get advanced without the tee objects being informed.
+     *
+     * This tool may require significant auxiliary storage (depending on how much temporary data needs to be stored).
+     * In general, if one iterator uses most or all of the data before another iterator starts,
+     * it is faster to use toArray() instead of tee().
+     *
+     * @param positive-int $count
+     *
+     * @return array<Stream>
+     *
+     * @see Transform::tee()
+     */
+    public function tee(int $count): array
+    {
+        return array_map(fn ($it) => new self($it), Transform::tee($this->iterable, $count));
     }
 
     /**
@@ -880,30 +913,6 @@ class Stream implements \IteratorAggregate
         foreach ($this->iterable as $row) {
             \fputcsv($fileResource, $row, $separator, $enclosure, $escape);
         }
-    }
-
-    /**
-     * Converts iterable source to an associative array.
-     *
-     * @param callable|null $keyFunc fn ($value, $key) => Custom Logic
-     * @param callable|null $valueFunc fn ($value, $key) => Custom logic
-     *
-     * @return array<mixed>
-     */
-    public function toAssociativeArray(callable $keyFunc = null, callable $valueFunc = null): array
-    {
-        if ($keyFunc === null) {
-            $keyFunc = fn ($item, $key) => $key;
-        }
-        if ($valueFunc === null) {
-            $valueFunc = fn ($item, $key) => $item;
-        }
-
-        $result = [];
-        foreach ($this->iterable as $key => $item) {
-            $result[$keyFunc($item, $key)] = $valueFunc($item, $key);
-        }
-        return $result;
     }
 
     /**
@@ -1308,6 +1317,6 @@ class Stream implements \IteratorAggregate
      */
     public function getIterator(): \Iterator
     {
-        return IteratorFactory::makeIterator($this->iterable);
+        return Transform::toIterator($this->iterable);
     }
 }

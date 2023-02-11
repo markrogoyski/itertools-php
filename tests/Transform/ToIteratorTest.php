@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Util;
+namespace IterTools\Tests\Transform;
 
-use IterTools\Util\IteratorFactory;
 use IterTools\Tests\Fixture;
+use IterTools\Transform;
 
-class MakeIteratorTest extends \PHPUnit\Framework\TestCase
+class ToIteratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test makeIterator array to iterator
      */
-    public function testMakeArrayAnIterator(): void
+    public function testArray(): void
     {
         // Given
         $array = [1, 2, 3, 4, 5];
 
         // When
-        $iterator = IteratorFactory::makeIterator($array);
+        $iterator = Transform::toIterator($array);
 
         // Then
         $this->assertIsIterable($iterator);
@@ -28,13 +28,13 @@ class MakeIteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @test makeIterator iterator to iterator
      */
-    public function testMakeIteratorAnIterator(): void
+    public function testIterator(): void
     {
         // Given
         $arrayIterator = new Fixture\ArrayIteratorFixture([1, 2, 3, 4, 5]);
 
         // When
-        $iterator = IteratorFactory::makeIterator($arrayIterator);
+        $iterator = Transform::toIterator($arrayIterator);
 
         // Then
         $this->assertIsIterable($iterator);
@@ -44,13 +44,13 @@ class MakeIteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @test makeIterator traversable to iterator
      */
-    public function testMakeTraversableAnIterator(): void
+    public function testTraversable(): void
     {
         // Given
         $iteratorAggregate = new Fixture\IteratorAggregateFixture([1, 2, 3, 4, 5]);
 
         // When
-        $iterator = IteratorFactory::makeIterator($iteratorAggregate);
+        $iterator = Transform::toIterator($iteratorAggregate);
 
         // Then
         $this->assertIsIterable($iterator);
@@ -60,13 +60,13 @@ class MakeIteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @test makeIterator generator to iterator
      */
-    public function testMakeGeneratorAnIterator(): void
+    public function testGenerator(): void
     {
         // Given
         $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4, 5]);
 
         // When
-        $iterator = IteratorFactory::makeIterator($generator);
+        $iterator = Transform::toIterator($generator);
 
         // Then
         $this->assertIsIterable($iterator);

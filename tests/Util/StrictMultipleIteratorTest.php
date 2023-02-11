@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Util;
 
-use IterTools\Util\IteratorFactory;
-use IterTools\Util\StrictMultipleIterator;
+use IterTools\Transform;
+use IterTools\Util\Iterators\StrictMultipleIterator;
 
 class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
 {
@@ -33,7 +33,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([]));
+        $iterator->attachIterator(Transform::toIterator([]));
 
         // When
         $isValid = $iterator->valid();
@@ -51,7 +51,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([0]));
+        $iterator->attachIterator(Transform::toIterator([0]));
 
         // When
         $isValid = $iterator->valid();
@@ -69,7 +69,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([1, 2, 3]));
+        $iterator->attachIterator(Transform::toIterator([1, 2, 3]));
 
         // When
         $isValid = $iterator->valid();
@@ -87,8 +87,8 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([1]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([0]));
+        $iterator->attachIterator(Transform::toIterator([1]));
+        $iterator->attachIterator(Transform::toIterator([0]));
 
         // When
         $isValid = $iterator->valid();
@@ -106,8 +106,8 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([1, 2, 3]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([3, 4, 5]));
+        $iterator->attachIterator(Transform::toIterator([1, 2, 3]));
+        $iterator->attachIterator(Transform::toIterator([3, 4, 5]));
 
         // When
         $isValid = $iterator->valid();
@@ -125,9 +125,9 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([1]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([3]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([5]));
+        $iterator->attachIterator(Transform::toIterator([1]));
+        $iterator->attachIterator(Transform::toIterator([3]));
+        $iterator->attachIterator(Transform::toIterator([5]));
 
         // When
         $isValid = $iterator->valid();
@@ -145,9 +145,9 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([1, 2, 3]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([3, 4, 5]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([5, 6, 7]));
+        $iterator->attachIterator(Transform::toIterator([1, 2, 3]));
+        $iterator->attachIterator(Transform::toIterator([3, 4, 5]));
+        $iterator->attachIterator(Transform::toIterator([5, 6, 7]));
 
         // When
         $isValid = $iterator->valid();
@@ -165,8 +165,8 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([1, 2]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([3, 4, 5]));
+        $iterator->attachIterator(Transform::toIterator([1, 2]));
+        $iterator->attachIterator(Transform::toIterator([3, 4, 5]));
 
         // And
         $iterator->next();
@@ -188,8 +188,8 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([1, 2, 3]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([3, 4]));
+        $iterator->attachIterator(Transform::toIterator([1, 2, 3]));
+        $iterator->attachIterator(Transform::toIterator([3, 4]));
 
         // And
         $iterator->next();
@@ -211,9 +211,9 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([0, 1, 2]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([0, 3, 4, 5]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([0, 5, 6, 7]));
+        $iterator->attachIterator(Transform::toIterator([0, 1, 2]));
+        $iterator->attachIterator(Transform::toIterator([0, 3, 4, 5]));
+        $iterator->attachIterator(Transform::toIterator([0, 5, 6, 7]));
 
         // And
         $iterator->next();
@@ -236,9 +236,9 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([0, 1, 2, 3]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([0, 3, 4]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([0, 5, 6, 7]));
+        $iterator->attachIterator(Transform::toIterator([0, 1, 2, 3]));
+        $iterator->attachIterator(Transform::toIterator([0, 3, 4]));
+        $iterator->attachIterator(Transform::toIterator([0, 5, 6, 7]));
 
         // And
         $iterator->next();
@@ -261,9 +261,9 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
         $iterator = new StrictMultipleIterator();
 
         // And
-        $iterator->attachIterator(IteratorFactory::makeIterator([0, 1, 2, 3]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([0, 3, 4, 5]));
-        $iterator->attachIterator(IteratorFactory::makeIterator([0, 5, 6]));
+        $iterator->attachIterator(Transform::toIterator([0, 1, 2, 3]));
+        $iterator->attachIterator(Transform::toIterator([0, 3, 4, 5]));
+        $iterator->attachIterator(Transform::toIterator([0, 5, 6]));
 
         // And
         $iterator->next();
