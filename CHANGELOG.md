@@ -23,6 +23,7 @@
     * `ofFileLines`
     * `ofCsvFile`
   * Stream Operations
+    * `asort`
     * `compressAssociative`
     * `reindex`
     * `filterKeys`
@@ -43,6 +44,7 @@
   * Added Russian translation of README
 ### Improvements
 * Add option whether to include incomplete chunks at the end of a `chunkwiseOverlap`
+* Keys preserved during iteration when it makes sense to do so
 
 ## v1.2.0 - 2023-01-28
 
