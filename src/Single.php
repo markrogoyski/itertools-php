@@ -124,9 +124,26 @@ class Single
     }
 
     /**
-     * Filter out elements from the iterable only returning elements where the predicate function is false.
+     * Filter out elements from the iterable only returning elements where there predicate function is true.
      *
-     * If no predicate is provided, the boolean value of the data is used.
+     * @param iterable<mixed> $data
+     * @param callable        $predicate
+     *
+     * @return \Generator<mixed>
+     */
+    public static function filter(iterable $data, callable $predicate): \Generator
+    {
+        foreach ($data as $key => $datum) {
+            if ($predicate($datum)) {
+                yield $key => $datum;
+            }
+        }
+    }
+
+    /**
+     * Filter out elements from the iterable that are naturally false.
+     *
+     * If predicate is provided, filters iterable to only elements where predicate is false.
      *
      * @param iterable<mixed> $data
      * @param callable|null $predicate
@@ -147,9 +164,9 @@ class Single
     }
 
     /**
-     * Filter out elements from the iterable only returning elements where there predicate function is true.
+     * Filter out elements from the iterable that are naturally true.
      *
-     * If no predicate is provided, the boolean value of the data is used.
+     * If predicate is provided, filters iterable to only elements where predicate is true.
      *
      * @param iterable<mixed> $data
      * @param callable|null $predicate

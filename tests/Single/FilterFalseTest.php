@@ -10,6 +10,55 @@ use IterTools\Tests\Fixture;
 class FilterFalseTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test filterFalse example usage
+     */
+    public function testFilterFalseExampleUsage(): void
+    {
+        // Given
+        $reportCardGrades = [100, 0, 95, 85, 0, 94, 0];
+        $expected         = [0, 0, 0];
+
+        // When
+        $allZeros = [];
+        foreach (Single::filterFalse($reportCardGrades) as $zeroGrade) {
+            $allZeros[] = $zeroGrade;
+        }
+
+        // Then
+        $this->assertEquals($expected, $allZeros);
+    }
+
+    /**
+     * @test filterFalse example usage with keys
+     */
+    public function testFilterFalseExampleUsageWithKeys(): void
+    {
+        // Given
+        $weeklyAlerts = [
+            'Sunday'    => 0,
+            'Monday'    => 1,
+            'Tuesday'   => 1,
+            'Wednesday' => 2,
+            'Thursday'  => 1,
+            'Friday'    => 2,
+            'Saturday'  => 0,
+        ];
+        $expected = [
+            'Sunday'   => 0,
+            'Saturday' => 0,
+        ];
+
+        // When
+        $daysWithoutAlerts = [];
+        foreach (Single::filterFalse($weeklyAlerts) as $day => $alerts) {
+            $daysWithoutAlerts[$day] = $alerts;
+        }
+
+        // Then
+        $this->assertEquals($expected, $daysWithoutAlerts);
+    }
+
+    /**
      * @test         filterFalse array
      * @dataProvider dataProviderForArray
      * @param        array    $iterable

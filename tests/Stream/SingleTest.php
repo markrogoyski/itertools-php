@@ -45,6 +45,20 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
+                    ->filter(fn ($value) => $value > 0)
+                    ->toArray(),
+                [],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filter(fn ($value) => $value > 0)
+                    ->toArray(),
+                [1, 2, 3],
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->toArray(),
                 [],
@@ -55,6 +69,13 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn ($value) => $value > 0)
                     ->toArray(),
                 [1, 2, 3],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue()
+                    ->toArray(),
+                [1, -1, 2, -2, 3, -3],
             ],
             [
                 [],
@@ -105,6 +126,38 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
+                    ->filter(fn ($value) => $value > 0)
+                    ->compress([0, 1, 1])
+                    ->toArray(),
+                [],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filter(fn ($value) => $value > 0)
+                    ->compress([0, 1, 1])
+                    ->toArray(),
+                [2, 3],
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filter(fn ($value) => $value > 0)
+                    ->compress([0, 1, 1])
+                    ->toArray(),
+                [],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filter(fn ($value) => $value > 0)
+                    ->compress([0, 1, 1])
+                    ->toArray(),
+                [2, 3],
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->compress([0, 1, 1])
                     ->toArray(),
@@ -148,6 +201,13 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->filterFalse(fn ($value) => $value > 0)
                     ->toArray(),
                 [-1, -2, -3],
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse()
+                    ->toArray(),
+                [],
             ],
             [
                 [],

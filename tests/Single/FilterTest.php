@@ -7,29 +7,10 @@ namespace IterTools\Tests\Single;
 use IterTools\Single;
 use IterTools\Tests\Fixture;
 
-class FilterTrueTest extends \PHPUnit\Framework\TestCase
+class FilterTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @test filterTrue example usage
-     */
-    public function testFilterTrueExampleUsage(): void
-    {
-        // Given
-        $reportCardGrades = [100, 0, 95, 85, 0, 94, 0];
-        $expected         = [100, 95, 85, 94];
-
-        // When
-        $goodGrades = [];
-        foreach (Single::filterTrue($reportCardGrades) as $goodGrade) {
-            $goodGrades[] = $goodGrade;
-        }
-
-        // Then
-        $this->assertEquals($expected, $goodGrades);
-    }
-
-    /**
-     * @test         filterTrue array
+     * @test         filter array
      * @dataProvider dataProviderForArray
      * @param        array    $iterable
      * @param        callable $predicate
@@ -41,7 +22,7 @@ class FilterTrueTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::filterTrue($iterable, $predicate) as $item) {
+        foreach (Single::filter($iterable, $predicate) as $item) {
             $result[] = $item;
         }
 
@@ -136,28 +117,7 @@ class FilterTrueTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test filterTrue with no predicate
-     */
-    public function testNoPredicate()
-    {
-        // Given
-        $data = [-1, 0, 1, 2, 3, true, false, null, [], [0], [1], 'a', ''];
-
-        // And
-        $result   = [];
-        $expected = [-1, 1, 2, 3, true, [0], [1], 'a'];
-
-        // When
-        foreach (Single::filterTrue($data) as $item) {
-            $result[] = $item;
-        }
-
-        // Then
-        $this->assertEquals($expected, $result);
-    }
-
-    /**
-     * @test         filterTrue generator
+     * @test         filter generator
      * @dataProvider dataProviderForGenerator
      * @param        \Generator $iterable
      * @param        callable   $predicate
@@ -169,7 +129,7 @@ class FilterTrueTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::filterTrue($iterable, $predicate) as $item) {
+        foreach (Single::filter($iterable, $predicate) as $item) {
             $result[] = $item;
         }
 
@@ -264,7 +224,7 @@ class FilterTrueTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         filterTrue iterator
+     * @test         filter iterator
      * @dataProvider dataProviderForIterator
      * @param        \Iterator $iterable
      * @param        callable  $predicate
@@ -276,7 +236,7 @@ class FilterTrueTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::filterTrue($iterable, $predicate) as $item) {
+        foreach (Single::filter($iterable, $predicate) as $item) {
             $result[] = $item;
         }
 
@@ -371,7 +331,7 @@ class FilterTrueTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         filterTrue traversable
+     * @test         filter traversable
      * @dataProvider dataProviderForTraversable
      * @param        \Traversable $iterable
      * @param        callable  $predicate
@@ -383,7 +343,7 @@ class FilterTrueTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Single::filterTrue($iterable, $predicate) as $item) {
+        foreach (Single::filter($iterable, $predicate) as $item) {
             $result[] = $item;
         }
 
@@ -478,7 +438,7 @@ class FilterTrueTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         filterTrue iterator_to_array
+     * @test         filter iterator_to_array
      * @dataProvider dataProviderForArray
      * @param        array    $iterable
      * @param        callable $predicate
@@ -487,7 +447,7 @@ class FilterTrueTest extends \PHPUnit\Framework\TestCase
     public function testIteratorToArray(array $iterable, callable $predicate, array $expected): void
     {
         // Given
-        $iterator = Single::filterTrue($iterable, $predicate);
+        $iterator = Single::filter($iterable, $predicate);
 
         // When
         $result = \iterator_to_array($iterator);

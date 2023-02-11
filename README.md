@@ -26,10 +26,10 @@ foreach (Multi::zip(['a', 'b'], [1, 2]) as [$letter, $number]) {
 
 ```php
 $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
-    ->distinct()                     // [1, 2, 3, 4, 5]
-    ->map(fn ($x) => $x**2)          // [1, 4, 9, 16, 25]
-    ->filterTrue(fn ($x) => $x < 10) // [1, 4, 9]
-    ->toSum();                       // 14
+    ->distinct()                 // [1, 2, 3, 4, 5]
+    ->map(fn ($x) => $x**2)      // [1, 4, 9, 16, 25]
+    ->filter(fn ($x) => $x < 10) // [1, 4, 9]
+    ->toSum();                   // 14
 ```
 
 All functions work on `iterable` collections:
@@ -62,8 +62,9 @@ Quick Reference
 | [`compress`](#Compress)                        | Filter out elements not selected             | `Single::compress($data, $selectors)`                       |
 | [`compressAssociative`](#Compress-Associative) | Filter out elements by keys not selected     | `Single::compressAssociative($data, $selectorKeys)`         |
 | [`dropWhile`](#Drop-While)                     | Drop elements while predicate is true        | `Single::dropWhile($data, $predicate)`                      |
-| [`filterTrue`](#Filter-True)                   | Filter for elements where predicate is true  | `Single::filterTrue($data, $predicate)`                     |
-| [`filterFalse`](#Filter-False)                 | Filter for elements where predicate is false | `Single::filterFalse($data, $predicate)`                    |
+| [`filter`](#Filter)                            | Filter for elements where predicate is true  | `Single::filterTrue($data, $predicate)`                     |
+| [`filterTrue`](#Filter-True)                   | Filter for truthy elements                   | `Single::filterTrue($data)`                                 |
+| [`filterFalse`](#Filter-False)                 | Filter for falsy elements                    | `Single::filterFalse($data)`                                |
 | [`filterKeys`](#Filter-Keys)                   | Filter for keys where predicate is true      | `Single::filterKeys($data, $predicate)`                     |
 | [`groupBy`](#Group-By)                         | Group data by a common element               | `Single::groupBy($data, $groupKeyFunction)`                 |
 | [`limit`](#Limit)                              | Iterate up to a limit                        | `Single::limit($data, $limit)`                              |
@@ -178,8 +179,9 @@ Quick Reference
 | [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                                | Iterate by overlapped chunks                                                              | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                 |
 | [`distinct`](#Distinct-1)                                                 | Filter out elements: iterate only unique items                                            | `$stream->distinct($strict)`                                                      |
 | [`dropWhile`](#Drop-While-1)                                              | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`                                                  |
-| [`filterTrue`](#Filter-True-1)                                            | Filter for only elements where the predicate function is true                             | `$stream->filterTrue($predicate)`                                                 |
-| [`filterFalse`](#Filter-False-1)                                          | Filter for only elements wherethe predicate function is false                             | `$stream->filterFalse($predicate)`                                                |
+| [`filter`](#Filter-1)                                                     | Filter for only elements where the predicate function is true                             | `$stream->filterTrue($predicate)`                                                 |
+| [`filterTrue`](#Filter-True-1)                                            | Filter for only truthy elements                                                           | `$stream->filterTrue()`                                                           |
+| [`filterFalse`](#Filter-False-1)                                          | Filter for only falsy elements                                                            | `$stream->filterFalse()`                                                          |
 | [`filterKeys`](#Filter-Keys-1)                                            | Filter for keys where predicate function is true                                          | `$stream->filterKeys($predicate)`                                                 |
 | [`groupBy`](#Group-By-1)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`                                             |
 | [`infiniteCycle`](#Infinite-Cycle)                                        | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                                                        |
@@ -493,12 +495,10 @@ foreach (Single::dropWhile($scores, $predicate) as $score) {
 // 70, 85, 65, 90
 ```
 
-### Filter True
+### Filter
 Filter out elements from the iterable only returning elements where the predicate function is true.
 
-If no predicate is provided, the boolean value of the data is used.
-
-```Single::filterFalse(iterable $data, callable $predicate)```
+```Single::filter(iterable $data, callable $predicate)```
 
 ```php
 use IterTools\Single;
@@ -506,10 +506,26 @@ use IterTools\Single;
 $starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 $goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
 
-foreach (Single::filterTrue($starWarsEpisodes, $goodMoviePredicate) as $goodMovie) {
+foreach (Single::filter($starWarsEpisodes, $goodMoviePredicate) as $goodMovie) {
     print($goodMovie);
 }
 // 4, 5, 6, 7
+```
+
+### Filter True
+Filter out elements from the iterable only returning elements that are truthy.
+
+```Single::filterTrue(iterable $data)```
+
+```php
+use IterTools\Single;
+
+$reportCardGrades = [100, 0, 95, 85, 0, 94, 0];
+
+foreach (Single::filterTrue($reportCardGrades) as $goodGrade) {
+    print($goodGrade);
+}
+// 100, 0, 95, 85, 94
 ```
 
 ### Filter False
@@ -522,13 +538,12 @@ If no predicate is provided, the boolean value of the data is used.
 ```php
 use IterTools\Single;
 
-$starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
+$alerts = [0, 1, 1, 0, 1, 0, 0, 1, 1];
 
-foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $badMovie) {
-    print($badMovie);
+foreach (Single::filterFalse($alerts) as $noAlert) {
+    print($noAlert);
 }
-// 1, 2, 3, 8, 9
+// 0, 0, 0, 0
 ```
 
 ### Filter Keys
@@ -1743,17 +1758,17 @@ Streams are made up of:
    * Stream terminal operation to transform the stream to a value or data structure.
    ```php
    $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
-      ->distinct()                      // [1, 2, 3, 4, 5]
-      ->map(fn ($x) => $x**2)           // [1, 4, 9, 16, 25]
-      ->filterTrue(fn ($x) => $x < 10)  // [1, 4, 9]
-      ->toSum();                        // 14
+      ->distinct()                  // [1, 2, 3, 4, 5]
+      ->map(fn ($x) => $x**2)       // [1, 4, 9, 16, 25]
+      ->filter(fn ($x) => $x < 10)  // [1, 4, 9]
+      ->toSum();                    // 14
    ```
    * The stream is iterated via a `foreach` loop.
    ```php
    $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
-      ->distinct()                      // [1, 2, 3, 4, 5]
-      ->map(fn ($x) => $x**2)           // [1, 4, 9, 16, 25]
-      ->filterTrue(fn ($x) => $x < 10); // [1, 4, 9]
+      ->distinct()                  // [1, 2, 3, 4, 5]
+      ->map(fn ($x) => $x**2)       // [1, 4, 9, 16, 25]
+      ->filter(fn ($x) => $x < 10); // [1, 4, 9]
    
    foreach ($result as $item) {
        // 1, 4, 9
@@ -1927,7 +1942,7 @@ $worldPopulations = [
 ];
 
 $result = Stream::of($worldPopulations)
-    ->filterTrue(fn ($pop) => $pop > 300_000_000)
+    ->filter(fn ($pop) => $pop > 300_000_000)
     ->asort()
     ->toAssociativeArray();
 // USA   => 331_002_651,
@@ -2078,12 +2093,10 @@ $result = Stream::of($input)
 // 3, 4, 5
 ```
 
-#### Filter True
+#### Filter
 Filter out elements from the stream only keeping elements where there predicate function is true.
 
 ```$stream->filterTrue(callable $predicate): Stream```
-
-If no predicate is provided, the boolean value of the data is used.
 
 ```php
 use IterTools\Stream;
@@ -2096,22 +2109,36 @@ $result = Stream::of($input)
 // 1, 2, 3
 ```
 
-#### Filter False
-Filter out elements from the stream only keeping elements where the predicate function is false.
+#### Filter True
+Filter out elements from the stream only keeping elements that are truthy.
 
-```$stream->filterFalse(callable $predicate): Stream```
-
-If no predicate is provided, the boolean value of the data is used.
+```$stream->filterTrue(): Stream```
 
 ```php
 use IterTools\Stream;
 
-$input = [1, -1, 2, -2, 3, -3];
+$input = [0, 1, 2, 3, 0, 4];
 
 $result = Stream::of($input)
-    ->filterFalse(fn ($value) => $value > 0)
+    ->filterTrue()
     ->toArray();
-// -1, -2, -3
+// 1, 2, 3, 4
+```
+
+#### Filter False
+Filter out elements from the stream only keeping elements that are falsy.
+
+```$stream->filterFalse(): Stream```
+
+```php
+use IterTools\Stream;
+
+$input = [0, 1, 2, 3, 0, 4];
+
+$result = Stream::of($input)
+    ->filterFalse()
+    ->toArray();
+// 0, 0
 ```
 
 #### Filter Keys

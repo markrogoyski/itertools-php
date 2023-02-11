@@ -270,7 +270,22 @@ class Stream implements \IteratorAggregate
     /**
      * Filter out elements from the iterable source only returning elements where there predicate function is true.
      *
-     * If no predicate is provided, the boolean value of the data is used.
+     * @param callable|null $predicate
+     *
+     * @return $this
+     *
+     * @see Single::filter()
+     */
+    public function filter(callable $predicate): self
+    {
+        $this->iterable = Single::filterTrue($this->iterable, $predicate);
+        return $this;
+    }
+
+    /**
+     * Filter the stream to only elements that are naturally true.
+     *
+     * If predicate is provided, filters iterable to only elements where predicate is true.
      *
      * @param callable|null $predicate
      *
@@ -285,9 +300,9 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Filter out elements from the iterable source only returning elements where the predicate function is false.
+     * Filter the stream to only elements that are naturally false.
      *
-     * If no predicate is provided, the boolean value of the data is used.
+     * If predicate is provided, filters iterable to only elements where predicate is false.
      *
      * @param callable|null $predicate
      *
