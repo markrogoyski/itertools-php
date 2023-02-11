@@ -221,7 +221,31 @@ class Summary
     }
 
     /**
+     * Returns true if given collections are permutations of each other (using type coercion).
+     *
+     * Returns true if no collections given or for single collection.
+     *
+     * Coercive (non-strict) type comparisons:
+     *  - scalars: compares non-strictly by value
+     *  - objects: compares serialized
+     *  - arrays: compares serialized
+     *
+     * @see https://en.cppreference.com/w/cpp/algorithm/is_permutation
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return bool
+     */
+    public static function arePermutationsCoercive(iterable ...$iterables): bool
+    {
+        return static::arePermutationsInternal(false, ...$iterables);
+    }
+
+    /**
      * Internal function helper for arePermutations() and arePermutationsCoercive()
+     *
+     * @see Summary::arePermutations()
+     * @see Summary::arePermutationsCoercive()
      *
      * @param bool $strict
      * @param iterable<mixed> ...$iterables
