@@ -97,6 +97,7 @@ class TeeIterator extends \NoRewindIterator
      *
      * @param RelatedIterator<TKey, TValue>|null $related
      */
+    #[\ReturnTypeWillChange]
     public function current(RelatedIterator $related = null)
     {
         if ($related === null) {
@@ -113,6 +114,7 @@ class TeeIterator extends \NoRewindIterator
      *
      * @return TKey
      */
+    #[\ReturnTypeWillChange]
     public function key(RelatedIterator $related = null)
     {
         if ($related === null) {

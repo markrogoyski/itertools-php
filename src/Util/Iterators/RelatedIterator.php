@@ -58,6 +58,7 @@ class RelatedIterator implements \Iterator
      *
      * @return TValue
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->parentIterator->current($this);
@@ -68,6 +69,7 @@ class RelatedIterator implements \Iterator
      *
      * @return TKey
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->parentIterator->key($this);
