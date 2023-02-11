@@ -525,7 +525,7 @@ $reportCardGrades = [100, 0, 95, 85, 0, 94, 0];
 foreach (Single::filterTrue($reportCardGrades) as $goodGrade) {
     print($goodGrade);
 }
-// 100, 0, 95, 85, 94
+// 100, 95, 85, 94
 ```
 
 ### Filter False
@@ -1208,11 +1208,11 @@ Uses default sorting if optional comparator function not provided.
 use IterTools\Single;
 
 $worldPopulations = [
-    'China'      => 1_439_323_776,
-    'India'      => 1_380_004_385,
-    'Indonesia'  => 273_523_615,
-    'Pakistan'   => 220_892_340,
-    'USA'        => 331_002_651,
+    'China'     => 1_439_323_776,
+    'India'     => 1_380_004_385,
+    'Indonesia' => 273_523_615,
+    'Pakistan'  => 220_892_340,
+    'USA'       => 331_002_651,
 ];
 
 foreach (Sort::sort($worldPopulations) as $country => $population) {
@@ -1935,10 +1935,10 @@ If comparator is not provided, the elements of the iterable source must be compa
 use IterTools\Stream;
 
 $worldPopulations = [
-    'China'      => 1_439_323_776,
-    'India'      => 1_380_004_385,
-    'Indonesia'  => 273_523_615,
-    'USA'        => 331_002_651,
+    'China'     => 1_439_323_776,
+    'India'     => 1_380_004_385,
+    'Indonesia' => 273_523_615,
+    'USA'       => 331_002_651,
 ];
 
 $result = Stream::of($worldPopulations)
@@ -2096,7 +2096,7 @@ $result = Stream::of($input)
 #### Filter
 Filter out elements from the stream only keeping elements where there predicate function is true.
 
-```$stream->filterTrue(callable $predicate): Stream```
+```$stream->filter(callable $predicate): Stream```
 
 ```php
 use IterTools\Stream;
@@ -2104,7 +2104,7 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->filterTrue(fn ($value) => $value > 0)
+    ->filter(fn ($value) => $value > 0)
     ->toArray();
 // 1, 2, 3
 ```
