@@ -1,5 +1,14 @@
 # IterTools PHP Change Log
 
+## v1.4.0 - TBD
+
+### New Features
+* Transform
+  * `tee`
+  * `toArray`
+  * `toAssociativeArray`
+  * `toIterator`
+
 ## v1.3.0 - 2023-02-11
 
 ### New Features
