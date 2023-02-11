@@ -133,6 +133,7 @@ trait DataProvider
     {
         return [
             [Sort::sort([5, 4, 1, 3, 2])],
+            [Sort::asort([5, 4, 1, 3, 2])],
         ];
     }
 
@@ -192,6 +193,7 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->runningProduct()],
             [Stream::of([1, 2, 3, 4, 5])->runningTotal()],
             [Stream::of([1, 2, 3, 4, 5])->sort()],
+            [Stream::of([1, 2, 3, 4, 5])->asort()],
             [Stream::of([1, 2, 3, 4, 5])->symmetricDifferenceWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->symmetricDifferenceCoerciveWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->takeWhile(fn ($x) => $x < 2)],
