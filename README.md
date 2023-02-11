@@ -124,6 +124,14 @@ Quick Reference
 | [`readCsv`](#Read-CSV)                                          | Intersection a CSV file line by line                      | `File::readCsv($fileHandle)`                                 |
 | [`readLines`](#Read-Lines)                                      | Iterate a file line by line                               | `File::readLines($fileHandle)`                               |
 
+#### Transform Iteration
+| Iterator                                       | Description                                  | Code Snippet                                                      |
+|------------------------------------------------|----------------------------------------------|-------------------------------------------------------------------|
+| [`tee`](#Tee)                                  | Iterate duplicate iterators                  | `Transform::tee($data, $count)`                                   |
+| [`toArray`](#To-Array)                         | Transform iterable to an array               | `Transform::toArray($data)`                                       |
+| [`toAssociativeArray`](#To-Associative-Array)  | Transform iterable to an associative array   | `Transform::toAssociativeArray($data, [$keyFunc], [$valueFunc])`  |
+| [`toIterator`](#To-Iterator)                   | Transform iterable to an iterator            | `Transform::toIterator($data)`                                    |
+
 #### Summary
 | Summary                      | Description                                             | Code Snippet                               |
 |------------------------------|---------------------------------------------------------|--------------------------------------------|
@@ -238,10 +246,11 @@ Quick Reference
 | [`toValue`](#To-Value-1)                 | Reduces stream like array_reduce() function        | `$stream->toValue($reducer, $initialValue)`             |
 
 ##### Transformation Terminal Operations
-| Terminal Operation                            | Description                                           | Code Snippet                                            |
-|-----------------------------------------------|-------------------------------------------------------|---------------------------------------------------------|
-| [`toArray`](#To-Array)                        | Returns array of stream elements                      | `$stream->toArray()`                                    |
-| [`toAssociativeArray`](#To-Associative-Array) | Returns key-value map of stream elements              | `$stream->toAssociativeArray($keyFunc, $valueFunc)`     |
+| Terminal Operation                              | Description                                           | Code Snippet                                            |
+|-------------------------------------------------|-------------------------------------------------------|---------------------------------------------------------|
+| [`toArray`](#To-Array-1)                        | Returns array of stream elements                      | `$stream->toArray()`                                    |
+| [`toAssociativeArray`](#To-Associative-Array-1) | Returns key-value map of stream elements              | `$stream->toAssociativeArray($keyFunc, $valueFunc)`     |
+| [`tee`](#Tee-1)                                 | Returns array of multiple identical Streams           | `$stream->tee($count)`                                  |
 
 ##### Side Effect Terminal Operations
 | Terminal Operation              | Description                                    | Code Snippet                                          |
@@ -1275,6 +1284,68 @@ foreach (File::readLines($fileHandle) as $line) {
 }
 ```
 
+## Transform
+### Tee
+Return several independent (duplicated) iterators from a single iterable.
+
+```Transform::tee(iterable $data, int $count): array```
+
+```php
+use IterTools\Transform;
+
+$daysOfWeek = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+$count = 3;
+
+[$week1, $week2, $week3] = Transform::tee($data, $count);
+// Each $week contains iterator containing ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
+```
+
+### To Array
+Transforms any iterable to an array.
+
+```Transform::toArray(iterable $data): array```
+
+```php
+use IterTools\Transform;
+
+$iterator = new \ArrayIterator([1, 2, 3, 4, 5]);
+
+$array = Transform::toArray($iterator);
+```
+
+### To Associative Array
+Transforms any iterable to an associative array.
+
+```Transform::toAssociativeArray(iterable $data, callable $keyFunc = null, callable $valueFunc = null): array```
+
+```php
+use IterTools\Transform;
+
+$messages = ['message 1', 'message 2', 'message 3'];
+
+$keyFunc   = fn ($msg) => \md5($msg);
+$valueFunc = fn ($msg) => strtoupper($msg);
+
+$associativeArray = Transform::toAssociativeArray($messages, $keyFunc, $valueFunc);
+// [
+//     '1db65a6a0a818fd39655b95e33ada11d' => 'MESSAGE 1',
+//     '83b2330607fe8f817ce6d24249dea373' => 'MESSAGE 2',
+//     '037805d3ad7b10c5b8425427b516b5ce' => 'MESSAGE 3',
+// ]
+```
+
+### To Iterator
+Transforms any iterable to an iterator.
+
+```Transform::toArray(iterable $data): array```
+
+```php
+use IterTools\Transform;
+
+$array = [1, 2, 3, 4, 5];
+
+$iterator = Transform::toIterator($array);
+```
 
 ## Summary
 ### All Match
@@ -3035,6 +3106,7 @@ $array = Stream::of([1, 1, 2, 2, 3, 4, 5])
 Returns a key-value map of stream elements.
 
 ```$stream->toAssociativeArray(callable $keyFunc, callable $valueFunc): array```
+
 ```php
 use IterTools\Stream;
 
@@ -3043,10 +3115,27 @@ $keyFunc
 $array = Stream::of(['message 1', 'message 2', 'message 3'])
     ->map('strtoupper')
     ->toAssociativeArray(
-        fn ($s) => \md5(%$s),
+        fn ($s) => \md5($s),
         fn ($s) => $s
     );
 // [3b3f2272b3b904d342b2d0df2bf31ed4 => MESSAGE 1, 43638d919cfb8ea31979880f1a2bb146 => MESSAGE 2, ... ]
+```
+
+##### Tee
+Return several independent (duplicated) streams.
+
+```$stream->tee(int $count): array```
+
+```php
+use IterTools\Transform;
+
+$daysOfWeek = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+$count = 3;
+
+[$week1Stream, $week2Stream, $week3Stream] = Stream::of($daysOfWeek)
+    ->tee($count);
+
+// Each $weekStream contains ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
 ```
 
 #### Side Effect Terminal Operations
