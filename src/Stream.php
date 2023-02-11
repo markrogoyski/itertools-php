@@ -465,6 +465,19 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Reverse the iterable source.
+     *
+     * @return $this
+     *
+     * @see Single::reverse()
+     */
+    public function reverse(): self
+    {
+        $this->iterable = Single::reverse($this->iterable);
+        return $this;
+    }
+
+    /**
      * Chain iterable source withs given iterables together into a single iteration.
      *
      * Makes a single continuous sequence out of multiple sequences.

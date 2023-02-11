@@ -365,4 +365,26 @@ class Single
             yield $key => $func($datum);
         }
     }
+
+    /**
+     * Reverse given iterable.
+     *
+     * @param iterable<mixed> $data
+     *
+     * @return \Generator
+     */
+    public static function reverse(iterable $data): \Generator
+    {
+        $keyStack = [];
+        $valueStack = [];
+
+        foreach ($data as $key => $datum) {
+            $keyStack[] = $key;
+            $valueStack[] = $datum;
+        }
+
+        while (count($keyStack)) {
+            yield array_pop($keyStack) => array_pop($valueStack);
+        }
+    }
 }
