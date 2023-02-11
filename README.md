@@ -1909,6 +1909,32 @@ $rps = Stream::ofRockPaperScissors(5)
 
 ### Stream Operations
 
+### ASort
+Sorts the stream, maintaining keys.
+
+```$stream->asort(callable $comparator = null)```
+
+If comparator is not provided, the elements of the iterable source must be comparable.
+
+```php
+use IterTools\Stream;
+
+$worldPopulations = [
+    'China'      => 1_439_323_776,
+    'India'      => 1_380_004_385,
+    'Indonesia'  => 273_523_615,
+    'USA'        => 331_002_651,
+];
+
+$result = Stream::of($worldPopulations)
+    ->filterTrue(fn ($pop) => $pop > 300_000_000)
+    ->asort()
+    ->toAssociativeArray();
+// USA   => 331_002_651,
+// India => 1_380_004_385,
+// China => 1_439_323_776,
+```
+
 #### Chain With
 Return a stream chaining additional sources together into a single consecutive stream.
 
@@ -2431,11 +2457,11 @@ $result = Stream::of($input)
 ```
 
 ### Sort
-Sorts the iterable source.
+Sorts the stream.
 
 ```$stream->sort(callable $comparator = null)```
 
-If comparator is not proposed, the elements of the iterable source must be comparable.
+If comparator is not provided, the elements of the iterable source must be comparable.
 
 ```php
 use IterTools\Stream;
