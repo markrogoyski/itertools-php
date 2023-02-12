@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace IterTools\Tests\Single;
 
 use IterTools\Single;
-use IterTools\Tests\Fixture\ArrayAccessIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
@@ -468,71 +467,71 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
 
     public function dataProviderForArrayAccessIterators(): array
     {
-        $wrap = fn (array $data) => new ArrayAccessIteratorFixture($data);
+        $iter = fn (array $data) => new \ArrayIterator($data);
 
         return [
             [
-                $wrap([]),
+                $iter([]),
                 [],
                 [],
                 [],
             ],
             [
-                $wrap([1, 2, 3]),
+                $iter([1, 2, 3]),
                 [],
                 [],
                 [],
             ],
             [
-                $wrap([]),
+                $iter([]),
                 [1, 2, 3],
                 [],
                 [],
             ],
             [
-                $wrap([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                $iter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
                 [-2, -4, 1000],
                 [],
                 [],
             ],
             [
-                $wrap([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                $iter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
                 [-2, 1, -4, 3, 1000],
                 [1, 3],
                 [2, 4],
             ],
             [
-                $wrap([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                $iter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
                 [0, 2, 4, 6, 8],
                 [0, 2, 4, 6, 8],
                 [1, 3, 5, 7, 9],
             ],
             [
-                $wrap(['a' => 11, 'b' => 22, 'c' => 33]),
+                $iter(['a' => 11, 'b' => 22, 'c' => 33]),
                 ['a', 'b', 'c'],
                 ['a', 'b', 'c'],
                 [11, 22, 33],
             ],
             [
-                $wrap([1, 2, 3, 'a' => 11, 'b' => 22, 'c' => 33]),
+                $iter([1, 2, 3, 'a' => 11, 'b' => 22, 'c' => 33]),
                 ['a', 'b', 'c'],
                 ['a', 'b', 'c'],
                 [11, 22, 33],
             ],
             [
-                $wrap([1, 2, 3, 'a' => 11, 'b' => 22, 'c' => 33]),
+                $iter([1, 2, 3, 'a' => 11, 'b' => 22, 'c' => 33]),
                 ['a', 'b', 0, 2],
                 ['a', 'b', 0, 2],
                 [11, 22, 1, 3],
             ],
             [
-                $wrap([1, 2, 3, 'a' => 11, 'b' => 22, 'c' => 33]),
+                $iter([1, 2, 3, 'a' => 11, 'b' => 22, 'c' => 33]),
                 ['a', 'b', 'd', 0, 2, 4],
                 ['a', 'b', 0, 2],
                 [11, 22, 1, 3],
             ],
             [
-                $wrap([1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33]),
+                $iter([1, 2, 3, 4, 5, 'a' => 11, 'b' => 22, 'c' => 33]),
                 [0, '1', 2, '3', 4, 'a', 10, 'b', 12, 'd', 14],
                 [0, '1', 2, '3', 4, 'a', 'b'],
                 [1, 2, 3, 4, 5, 11, 22],
