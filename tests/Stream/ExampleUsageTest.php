@@ -204,4 +204,21 @@ class ExampleUsageTest extends \PHPUnit\Framework\TestCase
         ];
         $this->assertEquals($expected, $sortedAndFiltered);
     }
+
+    /**
+     * @test reverse / toString example usage
+     */
+    public function reverseExampleUsage(): void
+    {
+        // Given
+        $words = ['are', 'you', 'as' ,'bored', 'as', 'I', 'am'];
+
+        // When
+        $reversed = Stream::of($words)
+            ->reverse()
+            ->toString(' ');
+
+        // Then
+        $this->assertEquals('am I as bored as you are', $reversed);
+    }
 }

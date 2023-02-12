@@ -71,7 +71,8 @@ Quick Reference
 | [`map`](#Map)                                  | Map function onto each item                  | `Single::map($data, $function)`                             |
 | [`pairwise`](#Pairwise)                        | Iterate successive overlapping pairs         | `Single::pairwise($data)`                                   |
 | [`reindex`](#Reindex)                          | Reindex keys of key-value iterable           | `Single::reindex($data, $reindexer)`                        |
-| [`repeat`](#Repeat)                            | Repeat an item                               | `Single::repeat($item, $repetitions)`                       |
+| [`repeat`](#Repeat)                            | Repeat an item a number of times             | `Single::repeat($item, $repetitions)`                       |
+| [`reverse`](#Reverse)                          | Iterate elements in reverse order            | `Single::reverse($data)`                                    |
 | [`string`](#String)                            | Iterate the characters of a string           | `Single::string($string)`                                   |
 | [`takeWhile`](#Take-While)                     | Iterate elements while predicate is true     | `Single::takeWhile($data, $predicate)`                      |
 
@@ -201,6 +202,7 @@ Quick Reference
 | [`partialIntersectionWith`](#Partial-Intersection-With)                   | Partially intersect iterable source and given iterables                                   | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`         |
 | [`partialIntersection CoerciveWith`](#Partial-Intersection-Coercive-With) | Partially intersect iterable source and given iterables with type coercion                | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
 | [`reindex`](#Reindex-1)                                                   | Reindex keys of key-value stream                                                          | `$stream->reindex($reindexer)`                                                    |
+| [`reverse`](#Reverse-1)                                                   | Reverse elements of the stream                                                            | `$stream->reverse()`                                                              |
 | [`runningAverage`](#Running-Average-1)                                    | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`                                          |
 | [`runningDifference`](#Running-Difference-1)                              | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`                                       |
 | [`runningMax`](#Running-Max-1)                                            | Accumulate the running max over iterable source                                           | `$stream->runningMax($initialValue)`                                              |
@@ -754,6 +756,22 @@ foreach (Single::reindex($data, $reindexFunc) as $key => $filmData) {
 //         'year' => 1983,
 //     ],
 // ]
+```
+
+### Reverse
+Reverse the elements of an iterable.
+
+```Single::reverse(iterable $data)```
+
+```php
+use IterTools\Single;
+
+$words = ['Alice', 'answers', 'your', 'questions', 'Bob'];
+
+foreach (Single::reverse($words) as $word) {
+    print($word . ' ');
+}
+// Bob questions your answers Alice
 ```
 
 ### String
@@ -2454,6 +2472,22 @@ $reindexResult = Stream::of($data)
 //         'year' => 1983,
 //     ],
 // ]
+```
+
+#### Reverse
+Reverse the elements of a stream.
+
+```$stream->reverse(): Stream```
+
+```php
+use IterTools\Stream;
+
+$words = ['are', 'you', 'as' ,'bored', 'as', 'I', 'am'];
+
+$reversed = Stream::of($words)
+    ->reverse()
+    ->toString(' ');
+// am I as bored as you are
 ```
 
 #### Running Average

@@ -3,11 +3,18 @@
 ## v1.4.0 - TBD
 
 ### New Features
+* Single
+  * `reverse`
 * Transform
   * `tee`
   * `toArray`
   * `toAssociativeArray`
   * `toIterator`
+* Stream
+  * Stream Operations
+    * `reverse`
+  ` Transformation`
+    * `tee`
 
 ## v1.3.0 - 2023-02-11
 
