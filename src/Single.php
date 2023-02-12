@@ -383,8 +383,8 @@ class Single
             $valueStack[] = $datum;
         }
 
-        while (count($keyStack)) {
-            yield array_pop($keyStack) => array_pop($valueStack);
+        while (\count($keyStack) > 0) {
+            yield \array_pop($keyStack) => \array_pop($valueStack);
         }
     }
 }

@@ -266,4 +266,24 @@ class ReverseTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         reverse iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array $iterable
+     * @param        array $expectedKeys
+     * @param        array $expectedValues
+     */
+    public function testIteratorToArray(array $iterable, array $expectedKeys, array $expectedValues): void
+    {
+        // Given
+        $iterator = Single::reverse($iterable);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expectedKeys, \array_keys($result));
+        $this->assertEquals($expectedValues, \array_values($result));
+    }
 }

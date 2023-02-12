@@ -85,6 +85,7 @@ trait DataProvider
             [Single::pairwise([1, 2, 3, 4, 5])],
             [Single::reindex([1, 2, 3, 4, 5], fn ($x) => $x)],
             [Single::repeat(10, 5)],
+            [Single::reverse([1, 2, 3, 4, 5])],
             [Single::string('abcdefg')],
             [Single::takeWhile([1, 2, 3, 4, 5], fn ($x) => $x < 2)],
         ];
@@ -207,6 +208,7 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->partialIntersectionWith(1, [2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->partialIntersectionCoerciveWith(1, [2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->reindex(fn ($x) => $x)],
+            [Stream::of([1, 2, 3, 4, 5])->reverse()],
             [Stream::of([1, 2, 3, 4, 5])->runningAverage()],
             [Stream::of([1, 2, 3, 4, 5])->runningDifference()],
             [Stream::of([1, 2, 3, 4, 5])->runningMax()],
