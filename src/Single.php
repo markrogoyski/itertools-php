@@ -378,8 +378,13 @@ class Single
     public static function flatMap(iterable $data, callable $func): \Generator
     {
         foreach ($data as $datum) {
-            foreach ($func($datum, $func) as $product) {
-                yield $product;
+            $unflattened = $func($datum, $func);
+            if (is_iterable($unflattened)) {
+                foreach ($func($datum, $func) as $unflattenedItem) {
+                    yield $unflattenedItem;
+                }
+            } else {
+                yield $unflattened;
             }
         }
     }

@@ -116,6 +116,23 @@ class FlatMapTest extends \PHPUnit\Framework\TestCase
                     : [$item],
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             ],
+            [
+                [[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10],
+                fn ($item, $func) => is_iterable($item)
+                    ? Single::flatMap($item, $func)
+                    : $item,
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn ($item) => $item + 1,
+                [2, 3, 4, 5, 6]
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item,
+                [1, 2, 2, 3, 4, 4, 5]
+            ],
         ];
     }
 
@@ -225,6 +242,23 @@ class FlatMapTest extends \PHPUnit\Framework\TestCase
                     ? Single::flatMap($item, $func)
                     : [$item],
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $gen([[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10]),
+                fn ($item, $func) => is_iterable($item)
+                    ? Single::flatMap($item, $func)
+                    : $item,
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $gen([1, 2, 3, 4, 5]),
+                fn ($item) => $item + 1,
+                [2, 3, 4, 5, 6]
+            ],
+            [
+                $gen([1, 2, 3, 4, 5]),
+                fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item,
+                [1, 2, 2, 3, 4, 4, 5]
             ],
         ];
     }
@@ -336,6 +370,23 @@ class FlatMapTest extends \PHPUnit\Framework\TestCase
                     : [$item],
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             ],
+            [
+                $iter([[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10]),
+                fn ($item, $func) => is_iterable($item)
+                    ? Single::flatMap($item, $func)
+                    : $item,
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $iter([1, 2, 3, 4, 5]),
+                fn ($item) => $item + 1,
+                [2, 3, 4, 5, 6]
+            ],
+            [
+                $iter([1, 2, 3, 4, 5]),
+                fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item,
+                [1, 2, 2, 3, 4, 4, 5]
+            ],
         ];
     }
 
@@ -446,6 +497,64 @@ class FlatMapTest extends \PHPUnit\Framework\TestCase
                     : [$item],
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             ],
+            [
+                $trav([[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10]),
+                fn ($item, $func) => is_iterable($item)
+                    ? Single::flatMap($item, $func)
+                    : $item,
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn ($item) => $item + 1,
+                [2, 3, 4, 5, 6]
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item,
+                [1, 2, 2, 3, 4, 4, 5]
+            ],
         ];
+    }
+
+    public function testForAllTheTypes(): void
+    {
+        $gen = fn ($data) => GeneratorFixture::getGenerator($data);
+        $iter = fn ($data) => new ArrayIteratorFixture($data);
+        $trav = fn ($data) => new IteratorAggregateFixture($data);
+        $stdObj = new \stdClass();
+        $anonObj = new class () {
+        };
+        $resource = \fopen('php://input', 'r');
+        $closure = fn ($x) => $x + 1;
+
+        // Given
+        $input = [
+            1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure,
+            [1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure],
+            $gen([1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure]),
+            $iter([1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure]),
+            $trav([1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure]),
+            [[1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure]],
+            [[1], $gen([1]), $iter([1]), $trav([1])],
+        ];
+        $result = [];
+
+        // When
+        foreach (Single::flatMap($input, fn ($item) => $item) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $expected = [
+            1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure,
+            1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure,
+            1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure,
+            1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure,
+            1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure,
+            [1, 1.1, '1', 'abc', true, false, null, \INF, -\INF, $stdObj, $anonObj, $resource, $closure],
+            [1], $gen([1]), $iter([1]), $trav([1]),
+        ];
+        $this->assertEquals($expected, $result);
     }
 }
