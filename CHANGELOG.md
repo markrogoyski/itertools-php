@@ -4,6 +4,7 @@
 
 ### New Features
 * Single
+  * `flatMap`
   * `reverse`
 * Transform
   * `tee`
@@ -12,6 +13,7 @@
   * `toIterator`
 * Stream
   * Stream Operations
+    * `flatMap`
     * `reverse`
   ` Transformation`
     * `tee`

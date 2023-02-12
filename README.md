@@ -66,6 +66,7 @@ Quick Reference
 | [`filterTrue`](#Filter-True)                   | Filter for truthy elements                   | `Single::filterTrue($data)`                                 |
 | [`filterFalse`](#Filter-False)                 | Filter for falsy elements                    | `Single::filterFalse($data)`                                |
 | [`filterKeys`](#Filter-Keys)                   | Filter for keys where predicate is true      | `Single::filterKeys($data, $predicate)`                     |
+| [`flatMap`](#Flat-Map)                         | Map function onto items and flatten result   | `Single::flaMap($data, $mapper)`                            |
 | [`groupBy`](#Group-By)                         | Group data by a common element               | `Single::groupBy($data, $groupKeyFunction)`                 |
 | [`limit`](#Limit)                              | Iterate up to a limit                        | `Single::limit($data, $limit)`                              |
 | [`map`](#Map)                                  | Map function onto each item                  | `Single::map($data, $function)`                             |
@@ -192,6 +193,7 @@ Quick Reference
 | [`filterTrue`](#Filter-True-1)                                            | Filter for only truthy elements                                                           | `$stream->filterTrue()`                                                           |
 | [`filterFalse`](#Filter-False-1)                                          | Filter for only falsy elements                                                            | `$stream->filterFalse()`                                                          |
 | [`filterKeys`](#Filter-Keys-1)                                            | Filter for keys where predicate function is true                                          | `$stream->filterKeys($predicate)`                                                 |
+| [`flatMap`](#Flat-Map-1)                                                  | Map function onto elements and flatten result                                             | `$stream->flatMap($function)`                                                 |
 | [`groupBy`](#Group-By-1)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`                                             |
 | [`infiniteCycle`](#Infinite-Cycle)                                        | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                                                        |
 | [`intersectionWith`](#Intersection-With)                                  | Intersect iterable source and given iterables                                             | `$stream->intersectionWith(...$iterables)`                                        |
@@ -560,7 +562,7 @@ foreach (Single::filterFalse($alerts) as $noAlert) {
 ### Filter Keys
 Filter out elements from the iterable only returning elements for which keys the predicate function is true.
 
-```Single::filterKeys(string $data, callable $predicate)```
+```Single::filterKeys(iterable $data, callable $predicate)```
 
 ```php
 use IterTools\Single;
@@ -591,6 +593,23 @@ foreach (Single::filterKeys($olympics, $summerFilter) as $year => $hostCity) {
 // 2012: London
 // 2016: Rio de Janeiro
 // 2020: Tokyo
+```
+
+### Flat Map
+Map a function only the elements of the iterable and then flatten the results.
+
+```Single::flatMap(string $data, callable $predicate)```
+
+```php
+use IterTools\Single;
+
+$data   = [1, 2, 3, 4, 5];
+$mapper = fn ($item) => [$item, -$item];
+
+foreach (Single::flatMap($data, $mapper) as $number) {
+    print($number . ' ');
+}
+// 1 -1 2 -2 3 -3 4 -4 5 -5
 ```
 
 ### Group By
@@ -2253,15 +2272,31 @@ $olympics = [
 
 $winterFilter = fn ($year) => $year % 4 === 2;
 
-foreach (Single::filterKeys($olympics, $winterFilter) as $year => $hostCity) {
-    print("$year: $hostCity" . \PHP_EOL);
+$result = Stream::of($olympics)
+    ->filterKeys($winterFilter)
+    ->toAssociativeArray();
 }
-// 2002: Salt Lake City
-// 2006: Turin
-// 2010: Vancouver
-// 2014: Sochi
-// 2018: Pyeongchang
-// 2022: Beijing
+// 2002 => Salt Lake City
+// 2006 => Turin
+// 2010 => Vancouver
+// 2014 => Sochi
+// 2018 => Pyeongchang
+// 2022 => Beijing
+```
+
+#### Flat Map
+Map a function onto the elements of the stream and flatten the results.
+
+```$stream->flatMap(callable $mapper): Stream```
+
+```php
+$data    = [1, 2, 3, 4, 5];
+$mapper  fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item;
+
+$result = Stream::of($data)
+    ->flatMap($mapper)
+    ->toArray();
+// [1, 2, 2, 3, 4, 4, 5]
 ```
 
 #### Group By

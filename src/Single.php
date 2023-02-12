@@ -367,18 +367,20 @@ class Single
     }
 
     /**
-     * Returns a new collection formed by applying a given callback function to each element
+     * Returns a new collection formed by applying a given callback mapper function to each element
      * of the given collection, and then flattening the result by one level.
      *
+     * The mapper function can return scalar or collections as a result.
+     *
      * @param iterable<mixed> $data
-     * @param callable $func
+     * @param callable        $mapper
      *
      * @return \Generator
      */
-    public static function flatMap(iterable $data, callable $func): \Generator
+    public static function flatMap(iterable $data, callable $mapper): \Generator
     {
         foreach ($data as $datum) {
-            $unflattened = $func($datum, $func);
+            $unflattened = $mapper($datum, $mapper);
             if (\is_iterable($unflattened)) {
                 foreach ($unflattened as $flattenedItem) {
                     yield $flattenedItem;
