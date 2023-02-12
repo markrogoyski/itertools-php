@@ -399,7 +399,7 @@ class Single
     public static function breed(iterable $data, callable $breeder): \Generator
     {
         foreach ($data as $datum) {
-            foreach ($breeder($datum) as $product) {
+            foreach ($breeder($datum, $breeder) as $product) {
                 yield $product;
             }
         }

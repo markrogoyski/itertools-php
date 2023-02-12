@@ -109,6 +109,13 @@ class BreedTest extends \PHPUnit\Framework\TestCase
                 fn ($animal) => Single::repeat($animal['name'], $animal['eggs']),
                 ['bird', 'bird', 'lizard', 'lizard', 'lizard', 'echidna'],
             ],
+            [
+                [[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10],
+                fn ($item, $breeder) => is_iterable($item)
+                    ? Single::breed($item, $breeder)
+                    : [$item],
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
         ];
     }
 
@@ -211,6 +218,13 @@ class BreedTest extends \PHPUnit\Framework\TestCase
                 ]),
                 fn ($animal) => Single::repeat($animal['name'], $animal['eggs']),
                 ['bird', 'bird', 'lizard', 'lizard', 'lizard', 'echidna'],
+            ],
+            [
+                $gen([[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10]),
+                fn ($item, $breeder) => is_iterable($item)
+                    ? Single::breed($item, $breeder)
+                    : [$item],
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             ],
         ];
     }
@@ -315,6 +329,13 @@ class BreedTest extends \PHPUnit\Framework\TestCase
                 fn ($animal) => Single::repeat($animal['name'], $animal['eggs']),
                 ['bird', 'bird', 'lizard', 'lizard', 'lizard', 'echidna'],
             ],
+            [
+                $iter([[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10]),
+                fn ($item, $breeder) => is_iterable($item)
+                    ? Single::breed($item, $breeder)
+                    : [$item],
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
         ];
     }
 
@@ -417,6 +438,13 @@ class BreedTest extends \PHPUnit\Framework\TestCase
                 ]),
                 fn ($animal) => Single::repeat($animal['name'], $animal['eggs']),
                 ['bird', 'bird', 'lizard', 'lizard', 'lizard', 'echidna'],
+            ],
+            [
+                $trav([[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10]),
+                fn ($item, $breeder) => is_iterable($item)
+                    ? Single::breed($item, $breeder)
+                    : [$item],
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             ],
         ];
     }
