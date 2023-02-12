@@ -379,9 +379,9 @@ class Single
     {
         foreach ($data as $datum) {
             $unflattened = $func($datum, $func);
-            if (is_iterable($unflattened)) {
-                foreach ($func($datum, $func) as $unflattenedItem) {
-                    yield $unflattenedItem;
+            if (\is_iterable($unflattened)) {
+                foreach ($unflattened as $flattenedItem) {
+                    yield $flattenedItem;
                 }
             } else {
                 yield $unflattened;
