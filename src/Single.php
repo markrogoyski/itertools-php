@@ -367,6 +367,24 @@ class Single
     }
 
     /**
+     * Returns a new collection formed by applying a given callback function to each element
+     * of the given collection, and then flattening the result by one level.
+     *
+     * @param iterable<mixed> $data
+     * @param callable $func
+     *
+     * @return \Generator
+     */
+    public static function flatMap(iterable $data, callable $func): \Generator
+    {
+        foreach ($data as $datum) {
+            foreach ($func($datum, $func) as $product) {
+                yield $product;
+            }
+        }
+    }
+
+    /**
      * Reverse given iterable.
      *
      * @param iterable<mixed> $data
@@ -385,23 +403,6 @@ class Single
 
         while (\count($keyStack) > 0) {
             yield \array_pop($keyStack) => \array_pop($valueStack);
-        }
-    }
-
-    /**
-     * Breeds items of given collection using producing function.
-     *
-     * @param iterable<mixed> $data
-     * @param callable $breeder
-     *
-     * @return \Generator
-     */
-    public static function breed(iterable $data, callable $breeder): \Generator
-    {
-        foreach ($data as $datum) {
-            foreach ($breeder($datum, $breeder) as $product) {
-                yield $product;
-            }
         }
     }
 }

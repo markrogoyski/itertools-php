@@ -431,6 +431,22 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns a new collection formed by applying a given callback function
+     * to each element of the stream, and then flattening the result by one level.
+     *
+     * @param callable $func
+     *
+     * @return $this
+     *
+     * @see Single::flatMap()
+     */
+    public function flatMap(callable $func): self
+    {
+        $this->iterable = Single::flatMap($this->iterable, $func);
+        return $this;
+    }
+
+    /**
      * Sorts the stream.
      *
      * If comparator is null, then elements of the iterable source must be comparable.
@@ -474,21 +490,6 @@ class Stream implements \IteratorAggregate
     public function reverse(): self
     {
         $this->iterable = Single::reverse($this->iterable);
-        return $this;
-    }
-
-    /**
-     * Breeds items of the stream using producing function.
-     *
-     * @param callable $breeder
-     *
-     * @return $this
-     *
-     * @see Single::breed()
-     */
-    public function breed(callable $breeder): self
-    {
-        $this->iterable = Single::breed($this->iterable, $breeder);
         return $this;
     }
 

@@ -9,21 +9,21 @@ use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
-class BreedTest extends \PHPUnit\Framework\TestCase
+class FlatMapTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderForArray
      * @param array $iterable
-     * @param callable $breeder
+     * @param callable $func
      * @param array $expected
      */
-    public function testArray(array $iterable, callable $breeder, array $expected): void
+    public function testArray(array $iterable, callable $func, array $expected): void
     {
         // Given
         $result = [];
 
         // When
-        foreach (Single::breed($iterable, $breeder) as $item) {
+        foreach (Single::flatMap($iterable, $func) as $item) {
             $result[] = $item;
         }
 
@@ -111,8 +111,8 @@ class BreedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10],
-                fn ($item, $breeder) => is_iterable($item)
-                    ? Single::breed($item, $breeder)
+                fn ($item, $func) => is_iterable($item)
+                    ? Single::flatMap($item, $func)
                     : [$item],
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             ],
@@ -122,16 +122,16 @@ class BreedTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProviderForGenerators
      * @param \Generator $iterable
-     * @param callable $breeder
+     * @param callable $func
      * @param array $expected
      */
-    public function testGenerators(\Generator $iterable, callable $breeder, array $expected): void
+    public function testGenerators(\Generator $iterable, callable $func, array $expected): void
     {
         // Given
         $result = [];
 
         // When
-        foreach (Single::breed($iterable, $breeder) as $item) {
+        foreach (Single::flatMap($iterable, $func) as $item) {
             $result[] = $item;
         }
 
@@ -221,8 +221,8 @@ class BreedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10]),
-                fn ($item, $breeder) => is_iterable($item)
-                    ? Single::breed($item, $breeder)
+                fn ($item, $func) => is_iterable($item)
+                    ? Single::flatMap($item, $func)
                     : [$item],
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             ],
@@ -232,16 +232,16 @@ class BreedTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProviderForIterators
      * @param \Iterator $iterable
-     * @param callable $breeder
+     * @param callable $func
      * @param array $expected
      */
-    public function testIterators(\Iterator $iterable, callable $breeder, array $expected): void
+    public function testIterators(\Iterator $iterable, callable $func, array $expected): void
     {
         // Given
         $result = [];
 
         // When
-        foreach (Single::breed($iterable, $breeder) as $item) {
+        foreach (Single::flatMap($iterable, $func) as $item) {
             $result[] = $item;
         }
 
@@ -331,8 +331,8 @@ class BreedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10]),
-                fn ($item, $breeder) => is_iterable($item)
-                    ? Single::breed($item, $breeder)
+                fn ($item, $func) => is_iterable($item)
+                    ? Single::flatMap($item, $func)
                     : [$item],
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             ],
@@ -342,16 +342,16 @@ class BreedTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProviderForTraversables
      * @param \Traversable $iterable
-     * @param callable $breeder
+     * @param callable $func
      * @param array $expected
      */
-    public function testTraversables(\Traversable $iterable, callable $breeder, array $expected): void
+    public function testTraversables(\Traversable $iterable, callable $func, array $expected): void
     {
         // Given
         $result = [];
 
         // When
-        foreach (Single::breed($iterable, $breeder) as $item) {
+        foreach (Single::flatMap($iterable, $func) as $item) {
             $result[] = $item;
         }
 
@@ -441,8 +441,8 @@ class BreedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([[1, 2, [3, [4, 5]], 6], [7], [8, 9], 10]),
-                fn ($item, $breeder) => is_iterable($item)
-                    ? Single::breed($item, $breeder)
+                fn ($item, $func) => is_iterable($item)
+                    ? Single::flatMap($item, $func)
                     : [$item],
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             ],

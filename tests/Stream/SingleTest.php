@@ -614,7 +614,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->breed(fn ($item) => Single::repeat($item, $item + 1))
+                    ->flatMap(fn ($item) => Single::repeat($item, $item + 1))
                     ->toArray(),
                 [1, 1, 2, 2, 2, 3, 3, 3, 3],
             ],
@@ -1137,7 +1137,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->breed(fn ($item) => Single::repeat($item, $item + 1))
+                    ->flatMap(fn ($item) => Single::repeat($item, $item + 1))
                     ->toArray(),
                 [1, 1, 2, 2, 2, 3, 3, 3, 3],
             ],
@@ -1652,7 +1652,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->breed(fn ($item) => Single::repeat($item, $item + 1))
+                    ->flatMap(fn ($item) => Single::repeat($item, $item + 1))
                     ->toArray(),
                 [1, 1, 2, 2, 2, 3, 3, 3, 3],
             ],
@@ -2167,7 +2167,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->breed(fn ($item) => Single::repeat($item, $item + 1))
+                    ->flatMap(fn ($item) => Single::repeat($item, $item + 1))
                     ->toArray(),
                 [1, 1, 2, 2, 2, 3, 3, 3, 3],
             ],
