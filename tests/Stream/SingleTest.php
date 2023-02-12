@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Stream;
 
+use IterTools\Single;
 use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
@@ -610,6 +611,13 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toAssociativeArray(),
                 [10 => 5, 9 => 4, 8 => 3, 7 => 2, 6 => 1],
             ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->breed(fn ($item) => Single::repeat($item, $item + 1))
+                    ->toArray(),
+                [1, 1, 2, 2, 2, 3, 3, 3, 3],
+            ],
         ];
     }
 
@@ -1126,6 +1134,13 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toAssociativeArray(),
                 [10 => 5, 9 => 4, 8 => 3, 7 => 2, 6 => 1],
             ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->breed(fn ($item) => Single::repeat($item, $item + 1))
+                    ->toArray(),
+                [1, 1, 2, 2, 2, 3, 3, 3, 3],
+            ],
         ];
     }
 
@@ -1634,6 +1649,13 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toAssociativeArray(),
                 [10 => 5, 9 => 4, 8 => 3, 7 => 2, 6 => 1],
             ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->breed(fn ($item) => Single::repeat($item, $item + 1))
+                    ->toArray(),
+                [1, 1, 2, 2, 2, 3, 3, 3, 3],
+            ],
         ];
     }
 
@@ -2141,6 +2163,13 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->reverse()
                     ->toAssociativeArray(),
                 [10 => 5, 9 => 4, 8 => 3, 7 => 2, 6 => 1],
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->breed(fn ($item) => Single::repeat($item, $item + 1))
+                    ->toArray(),
+                [1, 1, 2, 2, 2, 3, 3, 3, 3],
             ],
         ];
     }

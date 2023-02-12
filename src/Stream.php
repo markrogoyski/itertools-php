@@ -478,6 +478,21 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Breeds items of the stream using producing function.
+     *
+     * @param callable $breeder
+     *
+     * @return $this
+     *
+     * @see Single::breed()
+     */
+    public function breed(callable $breeder): self
+    {
+        $this->iterable = Single::breed($this->iterable, $breeder);
+        return $this;
+    }
+
+    /**
      * Chain iterable source withs given iterables together into a single iteration.
      *
      * Makes a single continuous sequence out of multiple sequences.

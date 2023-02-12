@@ -387,4 +387,21 @@ class Single
             yield \array_pop($keyStack) => \array_pop($valueStack);
         }
     }
+
+    /**
+     * Breeds items of given collection using producing function.
+     *
+     * @param iterable<mixed> $data
+     * @param callable $breeder
+     *
+     * @return \Generator
+     */
+    public static function breed(iterable $data, callable $breeder): \Generator
+    {
+        foreach ($data as $datum) {
+            foreach ($breeder($datum) as $product) {
+                yield $product;
+            }
+        }
+    }
 }
