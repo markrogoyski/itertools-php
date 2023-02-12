@@ -367,6 +367,29 @@ class Single
     }
 
     /**
+     * Returns a new collection formed by applying a given callback function to each element
+     * of the given collection, and then flattening the result by one level.
+     *
+     * @param iterable<mixed> $data
+     * @param callable $func
+     *
+     * @return \Generator
+     */
+    public static function flatMap(iterable $data, callable $func): \Generator
+    {
+        foreach ($data as $datum) {
+            $unflattened = $func($datum, $func);
+            if (is_iterable($unflattened)) {
+                foreach ($func($datum, $func) as $unflattenedItem) {
+                    yield $unflattenedItem;
+                }
+            } else {
+                yield $unflattened;
+            }
+        }
+    }
+
+    /**
      * Reverse given iterable.
      *
      * @param iterable<mixed> $data
