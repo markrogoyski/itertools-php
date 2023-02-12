@@ -133,6 +133,26 @@ class FlatMapTest extends \PHPUnit\Framework\TestCase
                 fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item,
                 [1, 2, 2, 3, 4, 4, 5]
             ],
+            [
+                [1, 2, [3], [4, 5], 6, []],
+                fn ($x) => $x,
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                [0, 1, 2, 3, 4, 5],
+                fn ($item) => [$item, $item, [$item]],
+                [0, 0, [0], 1, 1, [1], 2, 2, [2], 3, 3, [3], 4, 4, [4], 5, 5, [5]],
+            ],
+            [
+                ["it's Sunny in", "", "California"],
+                fn ($words) => \explode(' ', $words),
+                ["it's","Sunny","in", "", "California"],
+            ],
+            [
+                [5, 4, -3, 20, 17, -33, -4, 18],
+                fn ($x) => $x < 0 ? [] : ($x % 2 === 0 ? [$x] : [$x - 1, 1]),
+                [4, 1, 4, 20, 16, 1, 18],
+            ],
         ];
     }
 
@@ -259,6 +279,26 @@ class FlatMapTest extends \PHPUnit\Framework\TestCase
                 $gen([1, 2, 3, 4, 5]),
                 fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item,
                 [1, 2, 2, 3, 4, 4, 5]
+            ],
+            [
+                $gen([1, 2, [3], [4, 5], 6, []]),
+                fn ($x) => $x,
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                $gen([0, 1, 2, 3, 4, 5]),
+                fn ($item) => [$item, $item, [$item]],
+                [0, 0, [0], 1, 1, [1], 2, 2, [2], 3, 3, [3], 4, 4, [4], 5, 5, [5]],
+            ],
+            [
+                $gen(["it's Sunny in", "", "California"]),
+                fn ($words) => \explode(' ', $words),
+                ["it's","Sunny","in", "", "California"],
+            ],
+            [
+                $gen([5, 4, -3, 20, 17, -33, -4, 18]),
+                fn ($x) => $x < 0 ? [] : ($x % 2 === 0 ? [$x] : [$x - 1, 1]),
+                [4, 1, 4, 20, 16, 1, 18],
             ],
         ];
     }
@@ -387,6 +427,26 @@ class FlatMapTest extends \PHPUnit\Framework\TestCase
                 fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item,
                 [1, 2, 2, 3, 4, 4, 5]
             ],
+            [
+                $iter([1, 2, [3], [4, 5], 6, []]),
+                fn ($x) => $x,
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                $iter([0, 1, 2, 3, 4, 5]),
+                fn ($item) => [$item, $item, [$item]],
+                [0, 0, [0], 1, 1, [1], 2, 2, [2], 3, 3, [3], 4, 4, [4], 5, 5, [5]],
+            ],
+            [
+                $iter(["it's Sunny in", "", "California"]),
+                fn ($words) => \explode(' ', $words),
+                ["it's","Sunny","in", "", "California"],
+            ],
+            [
+                $iter([5, 4, -3, 20, 17, -33, -4, 18]),
+                fn ($x) => $x < 0 ? [] : ($x % 2 === 0 ? [$x] : [$x - 1, 1]),
+                [4, 1, 4, 20, 16, 1, 18],
+            ],
         ];
     }
 
@@ -513,6 +573,26 @@ class FlatMapTest extends \PHPUnit\Framework\TestCase
                 $trav([1, 2, 3, 4, 5]),
                 fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item,
                 [1, 2, 2, 3, 4, 4, 5]
+            ],
+            [
+                $trav([1, 2, [3], [4, 5], 6, []]),
+                fn ($x) => $x,
+                [1, 2, 3, 4, 5, 6],
+            ],
+            [
+                $trav([0, 1, 2, 3, 4, 5]),
+                fn ($item) => [$item, $item, [$item]],
+                [0, 0, [0], 1, 1, [1], 2, 2, [2], 3, 3, [3], 4, 4, [4], 5, 5, [5]],
+            ],
+            [
+                $trav(["it's Sunny in", "", "California"]),
+                fn ($words) => \explode(' ', $words),
+                ["it's","Sunny","in", "", "California"],
+            ],
+            [
+                $trav([5, 4, -3, 20, 17, -33, -4, 18]),
+                fn ($x) => $x < 0 ? [] : ($x % 2 === 0 ? [$x] : [$x - 1, 1]),
+                [4, 1, 4, 20, 16, 1, 18],
             ],
         ];
     }
