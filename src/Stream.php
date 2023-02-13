@@ -447,6 +447,21 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Flatten a stream.
+     *
+     * @param int $dimensions
+     *
+     * @return $this
+     *
+     * @see Single::flatten()
+     */
+    public function flatten(int $dimensions = 1): self
+    {
+        $this->iterable = Single::flatten($this->iterable, $dimensions);
+        return $this;
+    }
+
+    /**
      * Sorts the stream.
      *
      * If comparator is null, then elements of the iterable source must be comparable.

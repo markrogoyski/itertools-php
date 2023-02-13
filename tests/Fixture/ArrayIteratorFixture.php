@@ -47,6 +47,6 @@ class ArrayIteratorFixture implements \Iterator
      */
     public function valid(): bool
     {
-        return array_key_exists($this->i, $this->values);
+        return \array_key_exists($this->i, $this->values);
     }
 }

@@ -625,6 +625,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6, 7, 8],
             ],
+            [
+                [1, 2, [3, 4], [5, 6], 7, 8],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten()
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                [1, 2, [3, 4], [5, 6], 7, 8],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(1)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                [1, 2, [3, 4], [5, 6], 7, 8],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(2)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                [1, 2, [3, 4], [5, 6], 7, 8],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(0)
+                    ->toArray(),
+                [1, 2, [3, 4], [5, 6], 7, 8],
+            ],
         ];
     }
 
@@ -1155,6 +1183,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6, 7, 8],
             ],
+            [
+                $gen([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten()
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                $gen([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(1)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                $gen([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(2)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                $gen([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(0)
+                    ->toArray(),
+                [1, 2, [3, 4], [5, 6], 7, 8],
+            ],
         ];
     }
 
@@ -1677,6 +1733,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6, 7, 8],
             ],
+            [
+                $iter([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten()
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                $iter([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(1)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                $iter([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(2)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                $iter([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(0)
+                    ->toArray(),
+                [1, 2, [3, 4], [5, 6], 7, 8],
+            ],
         ];
     }
 
@@ -2198,6 +2282,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->flatMap(fn ($item) => $item)
                     ->toArray(),
                 [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                $trav([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten()
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                $trav([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(1)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                $trav([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(2)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8],
+            ],
+            [
+                $trav([1, 2, [3, 4], [5, 6], 7, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->flatten(0)
+                    ->toArray(),
+                [1, 2, [3, 4], [5, 6], 7, 8],
             ],
         ];
     }

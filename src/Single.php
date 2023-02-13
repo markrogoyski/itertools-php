@@ -202,6 +202,31 @@ class Single
     }
 
     /**
+     * Flatten an iterable by a number of dimensions.
+     *
+     * Ex: [[1, 2], [3, 4], 5] => [1, 2, 3, 4, 5] // Flattened by one dimension
+     *
+     * @param iterable<mixed> $data
+     * @param int             $dimensions
+     *
+     * @return \Generator<mixed>
+     */
+    public static function flatten(iterable $data, int $dimensions = 1): \Generator
+    {
+        if ($dimensions < 1) {
+            return yield from $data;
+        }
+
+        foreach ($data as $datum) {
+            if (\is_iterable($datum)) {
+                yield from self::flatten($datum, $dimensions - 1);
+            } else {
+                yield $datum;
+            }
+        }
+    }
+
+    /**
      * Group data by a common data element.
      *
      * The groupKeyFunction determines the key to group elements by.

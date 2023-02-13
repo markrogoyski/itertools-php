@@ -637,4 +637,23 @@ class FlatMapTest extends \PHPUnit\Framework\TestCase
         ];
         $this->assertEquals($expected, $result);
     }
+
+    /**
+     * @test         flatMap iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array    $iterable
+     * @param        callable $func
+     * @param        array    $expected
+     */
+    public function testIteratorToArray(array $iterable, callable $func, array $expected): void
+    {
+        // Given
+        $iterator = Single::flatMap($iterable, $func);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, \array_values($result));
+    }
 }
