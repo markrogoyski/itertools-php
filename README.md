@@ -67,6 +67,7 @@ Quick Reference
 | [`filterFalse`](#Filter-False)                 | Filter for falsy elements                    | `Single::filterFalse($data)`                                |
 | [`filterKeys`](#Filter-Keys)                   | Filter for keys where predicate is true      | `Single::filterKeys($data, $predicate)`                     |
 | [`flatMap`](#Flat-Map)                         | Map function onto items and flatten result   | `Single::flaMap($data, $mapper)`                            |
+| [`flatten`](#Flatten)                          | Flatten multidimensional iterable            | `Single::flatten($data, [$dimensions])`                     |
 | [`groupBy`](#Group-By)                         | Group data by a common element               | `Single::groupBy($data, $groupKeyFunction)`                 |
 | [`limit`](#Limit)                              | Iterate up to a limit                        | `Single::limit($data, $limit)`                              |
 | [`map`](#Map)                                  | Map function onto each item                  | `Single::map($data, $function)`                             |
@@ -193,7 +194,8 @@ Quick Reference
 | [`filterTrue`](#Filter-True-1)                                            | Filter for only truthy elements                                                           | `$stream->filterTrue()`                                                           |
 | [`filterFalse`](#Filter-False-1)                                          | Filter for only falsy elements                                                            | `$stream->filterFalse()`                                                          |
 | [`filterKeys`](#Filter-Keys-1)                                            | Filter for keys where predicate function is true                                          | `$stream->filterKeys($predicate)`                                                 |
-| [`flatMap`](#Flat-Map-1)                                                  | Map function onto elements and flatten result                                             | `$stream->flatMap($function)`                                                 |
+| [`flatMap`](#Flat-Map-1)                                                  | Map function onto elements and flatten result                                             | `$stream->flatMap($function)`                                                     |
+| [`flatten`](#Flatten-1)                                                   | Flatten multidimensional stream                                                           | `$stream->flatten($dimensions)`                                                   |
 | [`groupBy`](#Group-By-1)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`                                             |
 | [`infiniteCycle`](#Infinite-Cycle)                                        | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                                                        |
 | [`intersectionWith`](#Intersection-With)                                  | Intersect iterable source and given iterables                                             | `$stream->intersectionWith(...$iterables)`                                        |
@@ -598,7 +600,7 @@ foreach (Single::filterKeys($olympics, $summerFilter) as $year => $hostCity) {
 ### Flat Map
 Map a function only the elements of the iterable and then flatten the results.
 
-```Single::flatMap(string $data, callable $predicate)```
+```Single::flatMap(iterable $data, callable $mapper)```
 
 ```php
 use IterTools\Single;
@@ -610,6 +612,23 @@ foreach (Single::flatMap($data, $mapper) as $number) {
     print($number . ' ');
 }
 // 1 -1 2 -2 3 -3 4 -4 5 -5
+```
+
+### Flatten
+Flatten a multidimensional iterable.
+
+```Single::flatten(iterable $data, int $dimensions = 1)```
+
+```php
+use IterTools\Single;
+
+$multidimensional = [1, [2, 3], [4, 5]];
+
+$flattened = [];
+foreach (Single::flatten($multidimensional) as $number) {
+    $flattened[] = $number;
+}
+// [1, 2, 3, 4, 5]
 ```
 
 ### Group By
@@ -2297,6 +2316,20 @@ $result = Stream::of($data)
     ->flatMap($mapper)
     ->toArray();
 // [1, 2, 2, 3, 4, 4, 5]
+```
+
+#### Flatten
+Flatten a multidimensional stream.
+
+```$stream->flatten(int $dimensions = 1): Stream```
+
+```php
+$data = [1, [2, 3], [4, 5]];
+
+$result = Stream::of($data)
+    ->flatten($mapper)
+    ->toArray();
+// [1, 2, 3, 4, 5]
 ```
 
 #### Group By

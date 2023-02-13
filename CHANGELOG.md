@@ -5,6 +5,7 @@
 ### New Features
 * Single
   * `flatMap`
+  * `flatten`
   * `reverse`
 * Transform
   * `tee`
@@ -14,6 +15,7 @@
 * Stream
   * Stream Operations
     * `flatMap`
+    * `flatten`
     * `reverse`
   ` Transformation`
     * `tee`
