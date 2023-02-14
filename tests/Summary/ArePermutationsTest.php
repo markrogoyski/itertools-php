@@ -12,6 +12,26 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class ArePermutationsTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test arePermutations example usage
+     */
+    public function testArePermutationsExampleUsage(): void
+    {
+        // Given
+        $iter = ['i', 't', 'e', 'r'];
+        $rite = ['r', 'i', 't', 'e'];
+        $reit = ['r', 'e', 'i', 't'];
+        $tier = ['t', 'i', 'e', 'r'];
+        $tire = ['t', 'i', 'r', 'e'];
+        $trie = ['t', 'r', 'i', 'e'];
+
+        // When
+        $arePermutations = Summary::arePermutations($iter, $rite, $reit, $tier, $tire, $trie);
+
+        // Then
+        $this->assertTrue($arePermutations);
+    }
+
+    /**
      * @dataProvider dataProviderForArrayTrue
      * @param        iterable ...$iterables
      */

@@ -136,16 +136,18 @@ Quick Reference
 | [`toIterator`](#To-Iterator)                   | Transform iterable to an iterator            | `Transform::toIterator($data)`                                    |
 
 #### Summary
-| Summary                      | Description                                             | Code Snippet                               |
-|------------------------------|---------------------------------------------------------|--------------------------------------------|
-| [`allMatch`](#All-Match)     | True if all items are true according to predicate       | `Summary::allMatch($data, $predicate)`     |
-| [`anyMatch`](#Any-Match)     | True if any item is true according to predicate         | `Summary::anyMatch($data, $predicate)`     |
-| [`exactlyN`](#Exactly-N)     | True if exactly n items are true according to predicate | `Summary::exactlyN($data, $n, $predicate)` |
-| [`isSorted`](#Is-Sorted)     | True if iterable sorted                                 | `Summary::isSorted($data)`                 |
-| [`isReversed`](#Is-Reversed) | True if iterable reverse sorted                         | `Summary::isReversed($data)`               |
-| [`noneMatch`](#None-Match)   | True if none of items true according to predicate       | `Summary::noneMatch($data, $predicate)`    |
-| [`same`](#Same)              | True if iterables are the same                          | `Summary::same(...$iterables)`             |
-| [`sameCount`](#Same-Count)   | True if iterables have the same lengths                 | `Summary::sameCount(...$iterables)`        |
+| Summary                                                 | Description                                                         | Code Snippet                                      |
+|---------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------|
+| [`allMatch`](#All-Match)                                | True if all items are true according to predicate                   | `Summary::allMatch($data, $predicate)`            |
+| [`anyMatch`](#Any-Match)                                | True if any item is true according to predicate                     | `Summary::anyMatch($data, $predicate)`            |
+| [`arePermutations`](#Are-Permutations)                  | True if iterables are permutations of each other                    | `Summary::arePermutations(...$iterables)`         |
+| [`arePermutationsCoercive`](#Are-Permutations-Coercive) | True if iterables are permutations of each other with type coercion | `Summary::arePermutationsCoercive(...$iterables)` |
+| [`exactlyN`](#Exactly-N)                                | True if exactly n items are true according to predicate             | `Summary::exactlyN($data, $n, $predicate)`        |
+| [`isSorted`](#Is-Sorted)                                | True if iterable sorted                                             | `Summary::isSorted($data)`                        |
+| [`isReversed`](#Is-Reversed)                            | True if iterable reverse sorted                                     | `Summary::isReversed($data)`                      |
+| [`noneMatch`](#None-Match)                              | True if none of items true according to predicate                   | `Summary::noneMatch($data, $predicate)`           |
+| [`same`](#Same)                                         | True if iterables are the same                                      | `Summary::same(...$iterables)`                    |
+| [`sameCount`](#Same-Count)                              | True if iterables have the same lengths                             | `Summary::sameCount(...$iterables)`               |
 
 #### Reduce
 | Reducer                                | Description                                | Code Snippet                                                  |
@@ -223,16 +225,18 @@ Quick Reference
 
 #### Stream Terminal Operations
 ##### Summary Terminal Operations
-| Terminal Operation                           | Description                                                            | Code Snippet                                 |
-|----------------------------------------------|------------------------------------------------------------------------|----------------------------------------------|
-| [`allMatch`](#All-Match-1)                   | Returns true if all items in stream match predicate                    | `$stream->allMatch($predicate)`              |
-| [`anyMatch`](#Any-Match-1)                   | Returns true if any item in stream matches predicate                   | `$stream->anyMatch($predicate)`              |
-| [`exactlyN`](#Exactly-N-1)                   | Returns true if exactly n items are true according to predicate        | `$stream->exactlyN($n, $predicate)`          |
-| [`isSorted`](#Is-Sorted-1)                   | Returns true if stream is sorted in ascending order                    | `$stream->isSorted()`                        |
-| [`isReversed`](#Is-Reversed-1)               | Returns true if stream is sorted in reverse descending order           | `$stream->isReversed()`                      |
-| [`noneMatch`](#None-Match-1)                 | Returns true if none of the items in stream match predicate            | `$stream->noneMatch($predicate)`             |
-| [`sameWith`](#Same-With)                     | Returns true if stream and all given collections are the same          | `$stream->sameWith(...$iterables)`           |
-| [`sameCountWith`](#Same-Count-With)          | Returns true if stream and all given collections have the same lengths | `$stream->sameCountWith(...$iterables)`      |
+| Terminal Operation                                               | Description                                                             | Code Snippet                                           |
+|------------------------------------------------------------------|-------------------------------------------------------------------------|--------------------------------------------------------|
+| [`allMatch`](#All-Match-1)                                       | Returns true if all items in stream match predicate                     | `$stream->allMatch($predicate)`                        |
+| [`anyMatch`](#Any-Match-1)                                       | Returns true if any item in stream matches predicate                    | `$stream->anyMatch($predicate)`                        |
+| [`arePermutationsWith`](#Are-Permutations-With)                  | Returns true if all iterables permutations of stream                    | `$stream->arePermutationsWith(...$iterables)`          |
+| [`arePermutationsCoerciveWith`](#Are-Permutations-Coercive-With) | Returns true if all iterables permutations of stream with type coercion | `$stream->arePermutationsCoerciveWith(...$iterables)`  |
+| [`exactlyN`](#Exactly-N-1)                                       | Returns true if exactly n items are true according to predicate         | `$stream->exactlyN($n, $predicate)`                    |
+| [`isSorted`](#Is-Sorted-1)                                       | Returns true if stream is sorted in ascending order                     | `$stream->isSorted()`                                  |
+| [`isReversed`](#Is-Reversed-1)                                   | Returns true if stream is sorted in reverse descending order            | `$stream->isReversed()`                                |
+| [`noneMatch`](#None-Match-1)                                     | Returns true if none of the items in stream match predicate             | `$stream->noneMatch($predicate)`                       |
+| [`sameWith`](#Same-With)                                         | Returns true if stream and all given collections are the same           | `$stream->sameWith(...$iterables)`                     |
+| [`sameCountWith`](#Same-Count-With)                              | Returns true if stream and all given collections have the same lengths  | `$stream->sameCountWith(...$iterables)`                |
 
 ##### Reduction Terminal Operations
 | Terminal Operation                       | Description                                        | Code Snippet                                            |
@@ -1439,6 +1443,41 @@ $boolean = Summary::anyMatch($answers, $isUltimateAnswer);
 // true
 ```
 
+### Are Permutations
+Returns true if all iterables are permutations of each other.
+
+```Summary::arePermutations(iterable ...$iterables): bool```
+
+```php
+use IterTools\Summary;
+
+$iter = ['i', 't', 'e', 'r'];
+$rite = ['r', 'i', 't', 'e'];
+$reit = ['r', 'e', 'i', 't'];
+$tier = ['t', 'i', 'e', 'r'];
+$tire = ['t', 'i', 'r', 'e'];
+$trie = ['t', 'r', 'i', 'e'];
+
+$boolean = Summary::arePermutations($iter, $rite, $reit, $tier, $tire, $trie);
+// true
+```
+
+### Are Permutations Coercive
+Returns true if all iterables are permutations of each other with type coercion.
+
+```Summary::arePermutationsCoercive(iterable ...$iterables): bool```
+
+```php
+use IterTools\Summary;
+
+$set1 = [1, 2.0, '3'];
+$set2 = [2.0, '1', 3];
+$set3 = [3, 2, 1];
+
+$boolean = Summary::arePermutationsCoercive($set1, $set2, $set3);
+// true
+```
+
 ### Exactly N
 Returns true if exactly n items are true according to a predicate function.
 
@@ -1896,7 +1935,7 @@ Streams are made up of:
       ->distinct()                  // [1, 2, 3, 4, 5]
       ->map(fn ($x) => $x**2)       // [1, 4, 9, 16, 25]
       ->filter(fn ($x) => $x < 10); // [1, 4, 9]
-   
+
    foreach ($result as $item) {
        // 1, 4, 9
    }
@@ -2827,6 +2866,41 @@ $isUltimateAnswer = fn ($a) => a == 42;
 
 $boolean = Stream::of($answers)
     ->anyMatch($answers, $isUltimateAnswer);
+// true
+```
+
+##### Are Permutations With
+Returns true if all iterables are permutations with stream.
+
+```$stream->arePermutationsWith(...$iterables): bool```
+
+```php
+use IterTools\Summary;
+
+$rite = ['r', 'i', 't', 'e'];
+$reit = ['r', 'e', 'i', 't'];
+$tier = ['t', 'i', 'e', 'r'];
+$tire = ['t', 'i', 'r', 'e'];
+$trie = ['t', 'r', 'i', 'e'];
+
+$boolean = Stream::of(['i', 't', 'e', 'r'])
+    ->arePermutationsWith($rite, $reit, $tier, $tire, $trie);
+// true
+```
+
+##### Are Permutations Coercive With
+Returns true if all iterables are permutations with stream with type coercion.
+
+```$stream->arePermutationsCoerciveWith(...$iterables): bool```
+
+```php
+use IterTools\Summary;
+
+$set2 = [2.0, '1', 3];
+$set3 = [3, 2, 1];
+
+$boolean = Stream::of([1, 2.0, '3'])
+    ->arePermutationsCoerciveWith($set2, $set3);
 // true
 ```
 

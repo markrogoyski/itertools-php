@@ -12,6 +12,23 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class ArePermutationsCoerciveTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test arePermutations example usage
+     */
+    public function arePermutationsCoercive(): void
+    {
+        // Given
+        $set1 = [1, 2.0, '3'];
+        $set2 = [2.0, '1', 3];
+        $set3 = [3, 2, 1];
+
+        // When
+        $arePermutations = Summary::arePermutationsCoercive($set1, $set2, $set3);
+
+        // Then
+        $this->assertTrue($arePermutations);
+    }
+
+    /**
      * @dataProvider dataProviderForArrayTrue
      * @param        iterable ...$iterables
      */
