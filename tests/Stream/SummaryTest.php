@@ -123,6 +123,46 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->exactlyN(2, fn ($x) => $x <= 2),
             ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(),
+            ],
+            [
+                [1, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 1]),
+            ],
+            [
+                [1, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 1, 2], [2, 1, 1], [1, 2, 1]),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 1, 2], [1, 3, 2]),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['1', '2', '3']),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['1', '3', '2']),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['3', '2', '1'], [2.0, 1.0, 3.0]),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['3', 2.0, 1], ['2', 1.0, 3]),
+            ],
         ];
     }
 
@@ -209,6 +249,56 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3, 4, 5],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->exactlyN(5, fn ($x) => $x > 6),
+            ],
+            [
+                [1, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 2]),
+            ],
+            [
+                [1, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 1, 2], [2, 1, 1], [1, 2, 2]),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 2, 2], [1, 3, 2]),
+            ],
+            [
+                [1, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 2, 2]),
+            ],
+            [
+                [1, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 1, 2], [2, 1, 1], [1, 2, 2]),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 2, 3], [2, 1, 3], [3, 2, 2], [1, 3, 2]),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['1', '2', '3']),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['1', '3', '2']),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['3', '2', '1'], [2.0, 1.0, 3.0]),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['3', 2.0, 1], ['2', 1.0, 3]),
             ],
         ];
     }
@@ -312,6 +402,46 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 9),
             ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(),
+            ],
+            [
+                $gen([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 1]),
+            ],
+            [
+                $gen([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 1, 2], [2, 1, 1], [1, 2, 1]),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 1, 2], [1, 3, 2]),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['1', '2', '3']),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['1', '3', '2']),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['3', '2', '1'], [2.0, 1.0, 3.0]),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['3', 2.0, 1], ['2', 1.0, 3]),
+            ],
         ];
     }
 
@@ -389,6 +519,56 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $gen([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 5),
+            ],
+            [
+                $gen([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 2]),
+            ],
+            [
+                $gen([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 1, 2], [2, 1, 1], [1, 2, 2]),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 2, 2], [1, 3, 2]),
+            ],
+            [
+                $gen([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 2, 2]),
+            ],
+            [
+                $gen([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 1, 2], [2, 1, 1], [1, 2, 2]),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 2, 3], [2, 1, 3], [3, 2, 2], [1, 3, 2]),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['1', '2', '3']),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['1', '3', '2']),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['3', '2', '1'], [2.0, 1.0, 3.0]),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['3', 2.0, 1], ['2', 1.0, 3]),
             ],
         ];
     }
@@ -492,6 +672,46 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 9),
             ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(),
+            ],
+            [
+                $iter([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 1]),
+            ],
+            [
+                $iter([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 1, 2], [2, 1, 1], [1, 2, 1]),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 1, 2], [1, 3, 2]),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['1', '2', '3']),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['1', '3', '2']),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['3', '2', '1'], [2.0, 1.0, 3.0]),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['3', 2.0, 1], ['2', 1.0, 3]),
+            ],
         ];
     }
 
@@ -569,6 +789,56 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $iter([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 5),
+            ],
+            [
+                $iter([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 2]),
+            ],
+            [
+                $iter([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 1, 2], [2, 1, 1], [1, 2, 2]),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 2, 2], [1, 3, 2]),
+            ],
+            [
+                $iter([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 2, 2]),
+            ],
+            [
+                $iter([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 1, 2], [2, 1, 1], [1, 2, 2]),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 2, 3], [2, 1, 3], [3, 2, 2], [1, 3, 2]),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['1', '2', '3']),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['1', '3', '2']),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['3', '2', '1'], [2.0, 1.0, 3.0]),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['3', 2.0, 1], ['2', 1.0, 3]),
             ],
         ];
     }
@@ -672,6 +942,46 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 9),
             ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(),
+            ],
+            [
+                $trav([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 1]),
+            ],
+            [
+                $trav([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 1, 2], [2, 1, 1], [1, 2, 1]),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 1, 2], [1, 3, 2]),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['1', '2', '3']),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['1', '3', '2']),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['3', '2', '1'], [2.0, 1.0, 3.0]),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith(['3', 2.0, 1], ['2', 1.0, 3]),
+            ],
         ];
     }
 
@@ -749,6 +1059,56 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $trav([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->noneMatch(fn ($x) => $x === 5),
+            ],
+            [
+                $trav([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 2]),
+            ],
+            [
+                $trav([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 1, 2], [2, 1, 1], [1, 2, 2]),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 2, 2], [1, 3, 2]),
+            ],
+            [
+                $trav([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 2, 2]),
+            ],
+            [
+                $trav([1, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 1, 2], [2, 1, 1], [1, 2, 2]),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([1, 2, 3], [2, 1, 3], [3, 2, 2], [1, 3, 2]),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['1', '2', '3']),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['1', '3', '2']),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['3', '2', '1'], [2.0, 1.0, 3.0]),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['3', 2.0, 1], ['2', 1.0, 3]),
             ],
         ];
     }
