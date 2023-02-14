@@ -15,15 +15,15 @@ class UsageMap
     /**
      * @var array<string, array<string, int>>
      */
-    protected array $addedMap = [];
+    private array $addedMap = [];
     /**
      * @var array<string, int>
      */
-    protected array $deletedMap = [];
+    private array $deletedMap = [];
     /**
      * @var bool
      */
-    protected bool $strict;
+    private bool $strict;
 
     /**
      * @param bool $strict
@@ -133,12 +133,12 @@ class UsageMap
      *
      * @return bool
      */
-    public function isUsedSameTimes($value, int $ownersCount): bool
+    public function hasSameOwnerCount($value, int $ownersCount): bool
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
         $map = $this->addedMap[$hash] ?? [];
 
-        if (count($map) !== $ownersCount) {
+        if (\count($map) !== $ownersCount) {
             return false;
         }
 

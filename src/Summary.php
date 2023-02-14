@@ -273,7 +273,7 @@ class Summary
         }
 
         foreach ($map as $value) {
-            if (!$usageMap->isUsedSameTimes($value, \count($iterables))) {
+            if (!$usageMap->hasSameOwnerCount($value, \count($iterables))) {
                 return false;
             }
         }
