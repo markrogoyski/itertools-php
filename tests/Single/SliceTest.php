@@ -1664,4 +1664,109 @@ class SliceTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider dataProviderForInvalidArgumentStart
+     * @param array $config
+     * @return void
+     */
+    public function testInvalidArgumentStart(array $config): void
+    {
+        // Given
+        $input = [1, 2, 3];
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Parameter 'start' cannot be negative");
+
+        // When
+        foreach (Single::slice($input, ...$config) as $_) {
+            $this->fail();
+        }
+    }
+
+    public function dataProviderForInvalidArgumentStart(): array
+    {
+        return [
+            [[-1]],
+            [[-2]],
+            [[-1, null]],
+            [[-2, null]],
+            [[-1, 2]],
+            [[-1, null, 0]],
+            [[-1, 2, 0]],
+            [[-1, null, 2]],
+            [[-1, 2, 2]],
+            [[-1, -2, 2]],
+            [[-1, 2, -2]],
+            [[-1, -2, -2]],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderForInvalidArgumentCount
+     * @param array $config
+     * @return void
+     */
+    public function testInvalidArgumentCount(array $config): void
+    {
+        // Given
+        $input = [1, 2, 3];
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Parameter 'count' cannot be negative");
+
+        // When
+        foreach (Single::slice($input, ...$config) as $_) {
+            $this->fail();
+        }
+    }
+
+    public function dataProviderForInvalidArgumentCount(): array
+    {
+        return [
+            [[0, -1]],
+            [[1, -1]],
+            [[0, -2]],
+            [[0, -1, 1]],
+            [[0, -2, 2]],
+            [[0, -1, -1]],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderForInvalidArgumentStep
+     * @param array $config
+     * @return void
+     */
+    public function testInvalidArgumentStep(array $config): void
+    {
+        // Given
+        $input = [1, 2, 3];
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Parameter 'step' must be positive");
+
+        // When
+        foreach (Single::slice($input, ...$config) as $_) {
+            $this->fail();
+        }
+    }
+
+    public function dataProviderForInvalidArgumentStep(): array
+    {
+        return [
+            [[0, null, 0]],
+            [[0, null, -1]],
+            [[0, null, -2]],
+            [[0, 0, 0]],
+            [[0, 0, -1]],
+            [[0, 0, -2]],
+            [[0, 1, 0]],
+            [[0, 1, -1]],
+            [[0, 1, -2]],
+        ];
+    }
 }

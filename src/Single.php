@@ -452,6 +452,21 @@ class Single
      */
     public static function slice(iterable $data, int $start = 0, ?int $count = null, int $step = 1): \Generator
     {
+        /* @phpstan-ignore-next-line */
+        if ($start < 0) {
+            throw new \InvalidArgumentException("Parameter 'start' cannot be negative");
+        }
+
+        /* @phpstan-ignore-next-line */
+        if ($count !== null && $count < 0) {
+            throw new \InvalidArgumentException("Parameter 'count' cannot be negative");
+        }
+
+        /* @phpstan-ignore-next-line */
+        if ($step <= 0) {
+            throw new \InvalidArgumentException("Parameter 'step' must be positive");
+        }
+
         $index = 0;
         $yielded = 0;
         foreach ($data as $datum) {
