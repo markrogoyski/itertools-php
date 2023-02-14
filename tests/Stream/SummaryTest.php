@@ -144,6 +144,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 1, 2], [1, 3, 2]),
             ],
             [
+                ['i', 't', 'e', 'r'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith(['r', 'i', 't', 'e'], ['r', 'e', 'i', 't'], ['t', 'i', 'e', 'r'], ['t', 'i', 'r', 'e'], ['t', 'r', 'i', 'e']),
+            ],
+            [
                 [1, 2, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->arePermutationsCoerciveWith(['1', '2', '3']),
@@ -162,6 +167,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->arePermutationsCoerciveWith(['3', 2.0, 1], ['2', 1.0, 3]),
+            ],
+            [
+                [1, 2.0, '3'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith([2.0, '1', 3], [3, 2, 1]),
             ],
         ];
     }
@@ -423,6 +433,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 1, 2], [1, 3, 2]),
             ],
             [
+                $gen(['i', 't', 'e', 'r']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith($gen(['r', 'i', 't', 'e']), $gen(['r', 'e', 'i', 't']), $gen(['t', 'i', 'e', 'r']), $gen(['t', 'i', 'r', 'e']), $gen(['t', 'r', 'i', 'e'])),
+            ],
+            [
                 $gen([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->arePermutationsCoerciveWith(['1', '2', '3']),
@@ -441,6 +456,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $gen([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->arePermutationsCoerciveWith(['3', 2.0, 1], ['2', 1.0, 3]),
+            ],
+            [
+                $gen([1, 2.0, '3']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith($gen([2.0, '1', 3]), $gen([3, 2, 1])),
             ],
         ];
     }
@@ -693,6 +713,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 1, 2], [1, 3, 2]),
             ],
             [
+                $iter(['i', 't', 'e', 'r']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsWith($iter(['r', 'i', 't', 'e']), $iter(['r', 'e', 'i', 't']), $iter(['t', 'i', 'e', 'r']), $iter(['t', 'i', 'r', 'e']), $iter(['t', 'r', 'i', 'e'])),
+            ],
+            [
                 $iter([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->arePermutationsCoerciveWith(['1', '2', '3']),
@@ -711,6 +736,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $iter([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->arePermutationsCoerciveWith(['3', 2.0, 1], ['2', 1.0, 3]),
+            ],
+            [
+                $iter([1, 2.0, '3']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith($iter([2.0, '1', 3]), $iter([3, 2, 1])),
             ],
         ];
     }
@@ -963,6 +993,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->arePermutationsWith([1, 2, 3], [2, 1, 3], [3, 1, 2], [1, 3, 2]),
             ],
             [
+                $trav(['i', 't', 'e', 'r']),
+                fn (iterable $travable) => Stream::of($travable)
+                    ->arePermutationsWith($trav(['r', 'i', 't', 'e']), $trav(['r', 'e', 'i', 't']), $trav(['t', 'i', 'e', 'r']), $trav(['t', 'i', 'r', 'e']), $trav(['t', 'r', 'i', 'e'])),
+            ],
+            [
                 $trav([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->arePermutationsCoerciveWith(['1', '2', '3']),
@@ -981,6 +1016,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $trav([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->arePermutationsCoerciveWith(['3', 2.0, 1], ['2', 1.0, 3]),
+            ],
+            [
+                $trav([1, 2.0, '3']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->arePermutationsCoerciveWith($trav([2.0, '1', 3]), $trav([3, 2, 1])),
             ],
         ];
     }
