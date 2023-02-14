@@ -7,6 +7,9 @@
   * `flatMap`
   * `flatten`
   * `reverse`
+* Summary
+  * `arePermutations`
+  * `arePermutationsCoercive`
 * Transform
   * `tee`
   * `toArray`
@@ -17,6 +20,9 @@
     * `flatMap`
     * `flatten`
     * `reverse`
+  * Summary Terminal Operations
+    * `arePermutationsWith`
+    * `arePermutationsCoerciveWith`
   ` Transformation`
     * `tee`
 
