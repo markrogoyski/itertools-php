@@ -138,6 +138,9 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
             [[true, [2], null], [[2], null, true]],
             [[true, [2], null], [null, true, [2]]],
             [[true, [2], null], [null, [2], true]],
+            [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+            [[1, 2, 3, 4, 5], [2, 3, 4, 5, 1], [1, 2, 3, 4, 5], [2, 4, 1, 3, 5]],
+            [['a', 'b', 'c'], ['a', 'c', 'b'], ['b', 'a', 'c'], ['b', 'c', 'a'], ['c', 'a', 'b'], ['c', 'b', 'a']],
         ];
     }
 
@@ -182,6 +185,13 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
             [[1.0, '2', [3], null], [1.1, '2', [3], null], [1.1, '2', [3], null]],
             [[1.0, '2', [3], null], [1.1, '2.0', [3], null], [1.1, '1', [], null]],
             [[1.0, '2', [3], null], [1.1, '2.0', [3], null], [1.1, '1', [], false]],
+            [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1]],
+            [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]],
+            [['a', 'b', 'c'], ['a', 'c', 'b'], ['b', 'a', 'c'], ['b', 'c', 'a'], ['c', 'a', 'b'], ['c', 'b', 'c']],
+            [['a', 'b', 'c'], ['a', 'c', 'b'], ['b', 'b', 'c'], ['b', 'c', 'a'], ['c', 'a', 'b'], ['c', 'b', 'a']],
+            [['a', 'b', 'c'], ['a', 'c', 'c'], ['b', 'a', 'c'], ['b', 'c', 'a'], ['c', 'a', 'b'], ['c', 'b', 'a']],
+            [['a', 'b', 'c'], ['a', 'c', 'b'], ['b', 'a'], ['b', 'c', 'a'], ['c', 'a', 'b'], ['c', 'b', 'a']],
+            [['a', 'b', 'c'], ['c', 'b'], ['b', 'a', 'c'], ['b', 'c', 'a'], ['c', 'a', 'b'], ['c', 'b', 'a']],
         ];
     }
 
@@ -314,6 +324,9 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
             [$gen([true, [2], null]), $gen([[2], null, true])],
             [$gen([true, [2], null]), $gen([null, true, [2]])],
             [$gen([true, [2], null]), $gen([null, [2], true])],
+            [$gen([1, 1, 1, 1, 1]), $gen([1, 1, 1, 1, 1]), $gen([1, 1, 1, 1, 1])],
+            [$gen([1, 2, 3, 4, 5]), $gen([2, 3, 4, 5, 1]), $gen([1, 2, 3, 4, 5]), $gen([2, 4, 1, 3, 5])],
+            [$gen(['a', 'b', 'c']), $gen(['a', 'c', 'b']), $gen(['b', 'a', 'c']), $gen(['b', 'c', 'a']), $gen(['c', 'a', 'b']), $gen(['c', 'b', 'a'])],
         ];
     }
 
@@ -360,6 +373,11 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
             [$gen([1.0, '2', [3], null]), $gen([1.1, '2', [3], null]), $gen([1.1, '2', [3], null])],
             [$gen([1.0, '2', [3], null]), $gen([1.1, '2.0', [3], null]), $gen([1.1, '1', [], null])],
             [$gen([1.0, '2', [3], null]), $gen([1.1, '2.0', [3], null]), $gen([1.1, '1', [], false])],
+            [$gen(['a', 'b', 'c']), $gen(['a', 'c', 'b']), $gen(['b', 'a', 'c']), $gen(['b', 'c', 'a']), $gen(['c', 'a', 'b']), $gen(['c', 'b', 'c'])],
+            [$gen(['a', 'b', 'c']), $gen(['a', 'c', 'b']), $gen(['b', 'b', 'c']), $gen(['b', 'c', 'a']), $gen(['c', 'a', 'b']), $gen(['c', 'b', 'a'])],
+            [$gen(['a', 'b', 'c']), $gen(['a', 'c', 'c']), $gen(['b', 'a', 'c']), $gen(['b', 'c', 'a']), $gen(['c', 'a', 'b']), $gen(['c', 'b', 'a'])],
+            [$gen(['a', 'b', 'c']), $gen(['a', 'c', 'b']), $gen(['b', 'a']), $gen(['b', 'c', 'a']), $gen(['c', 'a', 'b']), $gen(['c', 'b', 'a'])],
+            [$gen(['a', 'b', 'c']), $gen(['c', 'b']), $gen(['b', 'a', 'c']), $gen(['b', 'c', 'a']), $gen(['c', 'a', 'b']), $gen(['c', 'b', 'a'])],
         ];
     }
 
@@ -492,6 +510,9 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
             [$iter([true, [2], null]), $iter([[2], null, true])],
             [$iter([true, [2], null]), $iter([null, true, [2]])],
             [$iter([true, [2], null]), $iter([null, [2], true])],
+            [$iter([1, 1, 1, 1, 1]), $iter([1, 1, 1, 1, 1]), $iter([1, 1, 1, 1, 1])],
+            [$iter([1, 2, 3, 4, 5]), $iter([2, 3, 4, 5, 1]), $iter([1, 2, 3, 4, 5]), $iter([2, 4, 1, 3, 5])],
+            [$iter(['a', 'b', 'c']), $iter(['a', 'c', 'b']), $iter(['b', 'a', 'c']), $iter(['b', 'c', 'a']), $iter(['c', 'a', 'b']), $iter(['c', 'b', 'a'])],
         ];
     }
 
@@ -538,6 +559,11 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
             [$iter([1.0, '2', [3], null]), $iter([1.1, '2', [3], null]), $iter([1.1, '2', [3], null])],
             [$iter([1.0, '2', [3], null]), $iter([1.1, '2.0', [3], null]), $iter([1.1, '1', [], null])],
             [$iter([1.0, '2', [3], null]), $iter([1.1, '2.0', [3], null]), $iter([1.1, '1', [], false])],
+            [$iter(['a', 'b', 'c']), $iter(['a', 'c', 'b']), $iter(['b', 'a', 'c']), $iter(['b', 'c', 'a']), $iter(['c', 'a', 'b']), $iter(['c', 'b', 'c'])],
+            [$iter(['a', 'b', 'c']), $iter(['a', 'c', 'b']), $iter(['b', 'b', 'c']), $iter(['b', 'c', 'a']), $iter(['c', 'a', 'b']), $iter(['c', 'b', 'a'])],
+            [$iter(['a', 'b', 'c']), $iter(['a', 'c', 'c']), $iter(['b', 'a', 'c']), $iter(['b', 'c', 'a']), $iter(['c', 'a', 'b']), $iter(['c', 'b', 'a'])],
+            [$iter(['a', 'b', 'c']), $iter(['a', 'c', 'b']), $iter(['b', 'a']), $iter(['b', 'c', 'a']), $iter(['c', 'a', 'b']), $iter(['c', 'b', 'a'])],
+            [$iter(['a', 'b', 'c']), $iter(['c', 'b']), $iter(['b', 'a', 'c']), $iter(['b', 'c', 'a']), $iter(['c', 'a', 'b']), $iter(['c', 'b', 'a'])],
         ];
     }
 
@@ -670,6 +696,9 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
             [$trav([true, [2], null]), $trav([[2], null, true])],
             [$trav([true, [2], null]), $trav([null, true, [2]])],
             [$trav([true, [2], null]), $trav([null, [2], true])],
+            [$trav([1, 1, 1, 1, 1]), $trav([1, 1, 1, 1, 1]), $trav([1, 1, 1, 1, 1])],
+            [$trav([1, 2, 3, 4, 5]), $trav([2, 3, 4, 5, 1]), $trav([1, 2, 3, 4, 5]), $trav([2, 4, 1, 3, 5])],
+            [$trav(['a', 'b', 'c']), $trav(['a', 'c', 'b']), $trav(['b', 'a', 'c']), $trav(['b', 'c', 'a']), $trav(['c', 'a', 'b']), $trav(['c', 'b', 'a'])],
         ];
     }
 
@@ -716,6 +745,11 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
             [$trav([1.0, '2', [3], null]), $trav([1.1, '2', [3], null]), $trav([1.1, '2', [3], null])],
             [$trav([1.0, '2', [3], null]), $trav([1.1, '2.0', [3], null]), $trav([1.1, '1', [], null])],
             [$trav([1.0, '2', [3], null]), $trav([1.1, '2.0', [3], null]), $trav([1.1, '1', [], false])],
+            [$trav(['a', 'b', 'c']), $trav(['a', 'c', 'b']), $trav(['b', 'a', 'c']), $trav(['b', 'c', 'a']), $trav(['c', 'a', 'b']), $trav(['c', 'b', 'c'])],
+            [$trav(['a', 'b', 'c']), $trav(['a', 'c', 'b']), $trav(['b', 'b', 'c']), $trav(['b', 'c', 'a']), $trav(['c', 'a', 'b']), $trav(['c', 'b', 'a'])],
+            [$trav(['a', 'b', 'c']), $trav(['a', 'c', 'c']), $trav(['b', 'a', 'c']), $trav(['b', 'c', 'a']), $trav(['c', 'a', 'b']), $trav(['c', 'b', 'a'])],
+            [$trav(['a', 'b', 'c']), $trav(['a', 'c', 'b']), $trav(['b', 'a']), $trav(['b', 'c', 'a']), $trav(['c', 'a', 'b']), $trav(['c', 'b', 'a'])],
+            [$trav(['a', 'b', 'c']), $trav(['c', 'b']), $trav(['b', 'a', 'c']), $trav(['b', 'c', 'a']), $trav(['c', 'a', 'b']), $trav(['c', 'b', 'a'])],
         ];
     }
 }

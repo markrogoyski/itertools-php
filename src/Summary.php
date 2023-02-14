@@ -217,7 +217,7 @@ class Summary
      */
     public static function arePermutations(iterable ...$iterables): bool
     {
-        return static::arePermutationsInternal(true, ...$iterables);
+        return self::arePermutationsInternal(true, ...$iterables);
     }
 
     /**
@@ -238,7 +238,7 @@ class Summary
      */
     public static function arePermutationsCoercive(iterable ...$iterables): bool
     {
-        return static::arePermutationsInternal(false, ...$iterables);
+        return self::arePermutationsInternal(false, ...$iterables);
     }
 
     /**
@@ -252,9 +252,9 @@ class Summary
      *
      * @return bool
      */
-    protected static function arePermutationsInternal(bool $strict, iterable ...$iterables): bool
+    private static function arePermutationsInternal(bool $strict, iterable ...$iterables): bool
     {
-        if (count($iterables) < 2) {
+        if (\count($iterables) < 2) {
             return true;
         }
 
@@ -273,7 +273,7 @@ class Summary
         }
 
         foreach ($map as $value) {
-            if (!$usageMap->isUsedSameTimes($value, count($iterables))) {
+            if (!$usageMap->isUsedSameTimes($value, \count($iterables))) {
                 return false;
             }
         }
