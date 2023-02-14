@@ -255,7 +255,7 @@ class Single
                 ? Transform::toArray($group)
                 : [$group];
 
-            foreach ($itemGroups as $itemGroup) {
+            foreach (Set::distinct($itemGroups) as $itemGroup) {
                 if ($itemKey === null) {
                     $groups[$itemGroup][] = $item;
                 } else {

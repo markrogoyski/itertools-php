@@ -378,6 +378,48 @@ class GroupByTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
+            [
+                [
+                    ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                    ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                ],
+                fn ($x) => $x['interests'],
+                null,
+                [
+                    'programming' => [
+                        ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                    ],
+                    'books' => [
+                        ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                    ],
+                    'music' => [
+                        ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                    ],
+                ],
+            ],
+            [
+                [
+                    ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                    ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                ],
+                fn ($x) => $x['interests'],
+                fn ($x) => $x['name'],
+                [
+                    'programming' => [
+                        'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                    ],
+                    'books' => [
+                        'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        'Laura' => ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                    ],
+                    'music' => [
+                        'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        'Laura' => ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -487,6 +529,48 @@ class GroupByTest extends \PHPUnit\Framework\TestCase
                     ],
                     'wine' => [
                         'Laura' => ['name' => 'Laura', 'interests' => ['math', 'fantasy', 'wine', 'music']],
+                    ],
+                ],
+                [
+                    Fixture\GeneratorFixture::getGenerator([
+                        ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                    ]),
+                    fn ($x) => $x['interests'],
+                    null,
+                    [
+                        'programming' => [
+                            ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ],
+                        'books' => [
+                            ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
+                        'music' => [
+                            ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
+                    ],
+                ],
+                [
+                    Fixture\GeneratorFixture::getGenerator([
+                        ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                    ]),
+                    fn ($x) => $x['interests'],
+                    fn ($x) => $x['name'],
+                    [
+                        'programming' => [
+                            'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ],
+                        'books' => [
+                            'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            'Laura' => ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
+                        'music' => [
+                            'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            'Laura' => ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
                     ],
                 ],
             ],
@@ -601,6 +685,48 @@ class GroupByTest extends \PHPUnit\Framework\TestCase
                         'Laura' => ['name' => 'Laura', 'interests' => ['math', 'fantasy', 'wine', 'music']],
                     ],
                 ],
+                [
+                    new Fixture\ArrayIteratorFixture([
+                        ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                    ]),
+                    fn ($x) => $x['interests'],
+                    null,
+                    [
+                        'programming' => [
+                            ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ],
+                        'books' => [
+                            ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
+                        'music' => [
+                            ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
+                    ],
+                ],
+                [
+                    new Fixture\ArrayIteratorFixture([
+                        ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                    ]),
+                    fn ($x) => $x['interests'],
+                    fn ($x) => $x['name'],
+                    [
+                        'programming' => [
+                            'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ],
+                        'books' => [
+                            'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            'Laura' => ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
+                        'music' => [
+                            'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            'Laura' => ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
+                    ],
+                ],
             ],
         ];
     }
@@ -711,6 +837,48 @@ class GroupByTest extends \PHPUnit\Framework\TestCase
                     ],
                     'wine' => [
                         'Laura' => ['name' => 'Laura', 'interests' => ['math', 'fantasy', 'wine', 'music']],
+                    ],
+                ],
+                [
+                    new Fixture\IteratorAggregateFixture([
+                        ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                    ]),
+                    fn ($x) => $x['interests'],
+                    null,
+                    [
+                        'programming' => [
+                            ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ],
+                        'books' => [
+                            ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
+                        'music' => [
+                            ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
+                    ],
+                ],
+                [
+                    new Fixture\IteratorAggregateFixture([
+                        ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                    ]),
+                    fn ($x) => $x['interests'],
+                    fn ($x) => $x['name'],
+                    [
+                        'programming' => [
+                            'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                        ],
+                        'books' => [
+                            'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            'Laura' => ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
+                        'music' => [
+                            'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'music']],
+                            'Laura' => ['name' => 'Laura', 'interests' => ['books', 'music', 'music']],
+                        ],
                     ],
                 ],
             ],
