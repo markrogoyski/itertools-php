@@ -11,6 +11,7 @@
 * Summary
   * `arePermutations`
   * `arePermutationsCoercive`
+  * `isPartitioned`
 * Transform
   * `tee`
   * `toArray`
@@ -25,6 +26,7 @@
   * Summary Terminal Operations
     * `arePermutationsWith`
     * `arePermutationsCoerciveWith`
+    * `isPartitioned`
   ` Transformation`
     * `tee`
 ### Improvements
