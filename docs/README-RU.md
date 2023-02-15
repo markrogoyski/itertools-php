@@ -26,10 +26,10 @@ foreach (Multi::zip(['a', 'b'], [1, 2]) as [$letter, $number]) {
 
 ```php
 $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
-    ->distinct()                     // [1, 2, 3, 4, 5]
-    ->map(fn ($x) => $x**2)          // [1, 4, 9, 16, 25]
-    ->filterTrue(fn ($x) => $x < 10) // [1, 4, 9]
-    ->toSum();                       // 14
+    ->distinct()                 // [1, 2, 3, 4, 5]
+    ->map(fn ($x) => $x**2)      // [1, 4, 9, 16, 25]
+    ->filter(fn ($x) => $x < 10) // [1, 4, 9]
+    ->toSum();                   // 14
 ```
 
 Методы библиотеки гарантировано работают с любыми `iterable` сущностями:
@@ -48,26 +48,33 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 |-----------------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
 | [`chain`](#Chain)           | Последовательно итерирует коллекции                                                         | `Multi::chain($list1, $list2)`      |
 | [`zip`](#Zip)               | Параллельно итерирует коллекции, пока не закончится самый короткий итератор                 | `Multi::zip($list1, $list2)`        |
-| [`zipLongest`](#ZipLongest) | Параллельно итерирует коллекции, пока не закончится самый длинный итератор                  | `Multi::zipLongest($list1, $list2)` |
 | [`zipEqual`](#ZipEqual)     | Параллельно итерирует коллекции одного размера, в случае разных размеров бросает исключение | `Multi::zipEqual($list1, $list2)`   |
+| [`zipLongest`](#ZipLongest) | Параллельно итерирует коллекции, пока не закончится самый длинный итератор                  | `Multi::zipLongest($list1, $list2)` |
 
 #### Итерирование одной коллекции
-| Метод                                    | Описание                                                                  | Пример кода                                                 |
-|------------------------------------------|---------------------------------------------------------------------------|-------------------------------------------------------------|
-| [`chunkwise`](#Chunkwise)                | Итерирует коллекцию, разбитую на чанки                                    | `Single::chunkwise($data, $chunkSize)`                      |
-| [`chunkwiseOverlap`](#Chunkwise-Overlap) | Итерирует коллекцию, разбитую на взаимонакладывающиеся чанки              | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
-| [`compress`](#Compress)                  | Отфильтровывает невыбранные элементы                                      | `Single::compress($data, $selectors)`                       |
-| [`dropWhile`](#Drop-While)               | Пропускает элементы, пока предикат возвращает истину                      | `Single::dropWhile($data, $predicate)`                      |
-| [`filterFalse`](#Filter-False)           | Возвращает только те элементы, для которых предикат возвращает ложь       | `Single::filterTrue($data, $predicate)`                     |
-| [`filterTrue`](#Filter-True)             | Возвращает только те элементы, для которых предикат возвращает истину     | `Single::filterFalse($data, $predicate)`                    |
-| [`groupBy`](#Group-By)                   | Группирует элементы коллекции                                             | `Single::groupBy($data, $groupKeyFunction)`                 |
-| [`limit`](#Limit)                        | Ограничивает итерирование коллекции заданным максимальным числом итераций | `Single::limit($data, $limit)`                              |
-| [`map`](#Map)                            | Отображение коллекции с использованием callback-функции                   | `Single::map($data, $function)`                             |
-| [`pairwise`](#Pairwise)                  | Итерирует коллекцию попарно (с наложением)                                | `Single::pairwise($data)`                                   |
-| [`repeat`](#Repeat)                      | Повторяет данное значние заданное число раз                               | `Single::repeat($item, $repetitions)`                       |
-| [`sort`](#Sort)                          | Сортирует коллекцию                                                       | `Single::sort($data, [$comparator])`                        |
-| [`string`](#String)                      | Итерирует строку посимвольно                                              | `Single::string($string)`                                   |
-| [`takeWhile`](#Take-While)               | Отдает элементы, пока предикат возвращает истину                          | `Single::takeWhile($data, $predicate)`                      |
+| Метод                                          | Описание                                                                     | Пример кода                                                 |
+|------------------------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------------|
+| [`chunkwise`](#Chunkwise)                      | Итерирует коллекцию, разбитую на чанки                                       | `Single::chunkwise($data, $chunkSize)`                      |
+| [`chunkwiseOverlap`](#Chunkwise-Overlap)       | Итерирует коллекцию, разбитую на взаимонакладывающиеся чанки                 | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
+| [`compress`](#Compress)                        | Возвращает элементы из коллекции, выбранные селектором                       | `Single::compress($data, $selectors)`                       |
+| [`compressAssociative`](#Compress-Associative) | Возвращает элементы из коллекции по заданным ключам                          | `Single::compressAssociative($data, $selectorKeys)`         |
+| [`dropWhile`](#Drop-While)                     | Пропускает элементы, пока предикат возвращает истину                         | `Single::dropWhile($data, $predicate)`                      |
+| [`filter`](#Filter)                            | Возвращает только те элементы, для которых предикат возвращает истину        | `Single::filter($data)`                                     |
+| [`filterTrue`](#Filter-True)                   | Возвращает только истинные элементы из коллекции                             | `Single::filterTrue($data)`                                 |
+| [`filterFalse`](#Filter-False)                 | Возвращает только ложные элементы из коллекции                               | `Single::filterFalse($data, $predicate)`                    |
+| [`filterKeys`](#Filter-Keys)                   | Возвращает только те элементы, для ключей которых предикат возвращает истину | `Single::filterKeys($data, $predicate)`                     |
+| [`flatMap`](#Flat-Map)                         | Отображение коллекции с уплощением результата на 1 уровень вложенности       | `Single::flaMap($data, $mapper)`                            |
+| [`flatten`](#Flatten)                          | Многоуровневое уплощение коллекции                                           | `Single::flatten($data, [$dimensions])`                     |
+| [`groupBy`](#Group-By)                         | Группирует элементы коллекции                                                | `Single::groupBy($data, $groupKeyFunction, [$itemKeyFunc])` |
+| [`limit`](#Limit)                              | Ограничивает итерирование коллекции заданным максимальным числом итераций    | `Single::limit($data, $limit)`                              |
+| [`map`](#Map)                                  | Отображение коллекции с использованием callback-функции                      | `Single::map($data, $function)`                             |
+| [`pairwise`](#Pairwise)                        | Итерирует коллекцию попарно (с наложением)                                   | `Single::pairwise($data)`                                   |
+| [`reindex`](#Reindex)                          | Переиндексирует key-value коллекцию                                          | `Single::reindex($data, $reindexer)`                        |
+| [`repeat`](#Repeat)                            | Повторяет данное значние заданное число раз                                  | `Single::repeat($item, $repetitions)`                       |
+| [`reverse`](#Reverse)                          | Итерирует коллекцию в обратном порядке                                       | `Single::reverse($data)`                                    |
+| [`slice`](#Slice)                              | Возвращает подвыборку коллекции                                              | `Single::slice($data, [$start], [$count], [$step])`         |
+| [`string`](#String)                            | Итерирует строку посимвольно                                                 | `Single::string($string)`                                   |
+| [`takeWhile`](#Take-While)                     | Отдает элементы, пока предикат возвращает истину                             | `Single::takeWhile($data, $predicate)`                      |
 
 #### Бесконечное итерирование
 | Метод                        | Описание                                             | Пример кода                      |
@@ -106,17 +113,40 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`symmetricDifference`](#Symmetric-Difference)                  | Симметрическая разница нескольких коллекций                           | `Set::symmetricDifference(...$iterables)`                    |
 | [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Симметрическая разница нескольких коллекций в режиме приведения типов | `Set::symmetricDifferenceCoercive(...$iterables)`            |
 
+#### Итерирование с сортировкой
+| Iterator          | Description                              | Code Snippet                        |
+|-------------------|------------------------------------------|-------------------------------------|
+| [`asort`](#ASort) | Сортирует коллекцию с сохранением ключей | `Sort::asort($data, [$comparator])` |
+| [`sort`](#Sort)   | Сортирует коллекцию                      | `Sort::sort($data, [$comparator])`  |
+
+#### Итерирование файлов
+| Iterator                   | Description                                   | Code Snippet                   |
+|----------------------------|-----------------------------------------------|--------------------------------|
+| [`readCsv`](#Read-CSV)     | Итерирует коллекции ячеек CSV-файла построчно | `File::readCsv($fileHandle)`   |
+| [`readLines`](#Read-Lines) | Итерирует содержимое файла построчно          | `File::readLines($fileHandle)` |
+
+#### Преобразование итерируемых сущностей
+| Iterator                                      | Description                                                    | Code Snippet                                                     |
+|-----------------------------------------------|----------------------------------------------------------------|------------------------------------------------------------------|
+| [`tee`](#Tee)                                 | Создает несколько одинаковых независимых итераторов из данного | `Transform::tee($data, $count)`                                  |
+| [`toArray`](#To-Array)                        | Преобразует итерируемую коллекцию в массив                     | `Transform::toArray($data)`                                      |
+| [`toAssociativeArray`](#To-Associative-Array) | Преобразует итерируемую коллекцию в ассоциативный массив       | `Transform::toAssociativeArray($data, [$keyFunc], [$valueFunc])` |
+| [`toIterator`](#To-Iterator)                  | Преобразует итерируемую коллекцию в итератор                   | `Transform::toIterator($data)`                                   |
+
 #### Саммари о коллекции
-| Метод                        | Описание                                                                       | Пример кода                                |
-|------------------------------|--------------------------------------------------------------------------------|--------------------------------------------|
-| [`allMatch`](#All-Match)     | Истинно, если предикат возвращает истину для всех элементов коллекции          | `Summary::allMatch($data, $predicate)`     |
-| [`anyMatch`](#Any-Match)     | Истинно, если предикат возвращает истину хотя бы для одного элемента коллекции | `Summary::anyMatch($data, $predicate)`     |
-| [`exactlyN`](#Exactly-N)     | Истинно, если предикат возвращает истину в точности для N элементов            | `Summary::exactlyN($data, $n, $predicate)` |
-| [`isSorted`](#Is-Sorted)     | Истинно, если коллекция отсортирована в прямом порядке                         | `Summary::isSorted($data)`                 |
-| [`isReversed`](#Is-Reversed) | Истинно, если коллекция отсортирована в обратном порядке                       | `Summary::isReversed($data)`               |
-| [`noneMatch`](#None-Match)   | Истинно, если предикат возвращает ложь для всех элементов коллекции            | `Summary::noneMatch($data, $predicate)`    |
-| [`same`](#Same)              | Истинно, если данные коллекции одинаковы                                       | `Summary::same(...$iterables)`             |
-| [`sameCount`](#Same-Count)   | Истинно, если данные коллекции имеют одинаковую длину                          | `Summary::sameCount(...$iterables)`        |
+| Метод                                                   | Описание                                                                                             | Пример кода                                       |
+|---------------------------------------------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------------|
+| [`allMatch`](#All-Match)                                | Истинно, если предикат возвращает истину для всех элементов коллекции                                | `Summary::allMatch($data, $predicate)`            |
+| [`anyMatch`](#Any-Match)                                | Истинно, если предикат возвращает истину хотя бы для одного элемента коллекции                       | `Summary::anyMatch($data, $predicate)`            |
+| [`arePermutations`](#Are-Permutations)                  | Истинно, если коллекции являются перестановками друг друга                                           | `Summary::arePermutations(...$iterables)`         |
+| [`arePermutationsCoercive`](#Are-Permutations-Coercive) | Истинно, если коллекции являются перестановками друг друга (в режиме приведения типов)               | `Summary::arePermutationsCoercive(...$iterables)` |
+| [`exactlyN`](#Exactly-N)                                | Истинно, если предикат возвращает истину в точности для N элементов                                  | `Summary::exactlyN($data, $n, $predicate)`        |
+| [`isPartitioned`](#Is-Partitioned)                      | Истинно, если истинные элементы находятся в коллекции перед ложными (истинность определяет предикат) | `Summary::isPartitioned($data, $predicate)`       |
+| [`isSorted`](#Is-Sorted)                                | Истинно, если коллекция отсортирована в прямом порядке                                               | `Summary::isSorted($data)`                        |
+| [`isReversed`](#Is-Reversed)                            | Истинно, если коллекция отсортирована в обратном порядке                                             | `Summary::isReversed($data)`                      |
+| [`noneMatch`](#None-Match)                              | Истинно, если предикат возвращает ложь для всех элементов коллекции                                  | `Summary::noneMatch($data, $predicate)`           |
+| [`same`](#Same)                                         | Истинно, если данные коллекции одинаковы                                                             | `Summary::same(...$iterables)`                    |
+| [`sameCount`](#Same-Count)                              | Истинно, если данные коллекции имеют одинаковую длину                                                | `Summary::sameCount(...$iterables)`               |
 
 #### Редуцирование
 | Метод                                  | Описание                                                                            | Пример кода                                                   |
@@ -137,27 +167,36 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 
 ### Цепочечный вызов итераторов
 #### Фабричные методы
-| Источник                                         | Описание                                                                                               | Пример кода                                         |
-|--------------------------------------------------|--------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
-| [`of`](#Of)                                      | Создает обертку для цепочечных вызовов из данной коллекции                                             | `Stream::of($iterable)`                             |
-| [`ofCoinFlips`](#Of-Coin-Flips)                  | Создает обертку для цепочечных вызовов из бесконечных случайных бросков монеты                         | `Stream::ofCoinFlips($repetitions)`                 |
-| [`ofEmpty`](#Of-Empty)                           | Создает обертку для цепочечных вызовов из пустой коллекции                                             | `Stream::ofEmpty()`                                 |
-| [`ofRandomChoice`](#Of-Random-Choice)            | Создает обертку для цепочечных вызовов из бесконечных случайных выборов элемента из списка             | `Stream::ofRandomChoice($items, $repetitions)`      |
-| [`ofRandomNumbers`](#Of-Random-Numbers)          | Создает обертку для цепочечных вызовов из бесконечного набора случайных целых чисел                    | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
-| [`ofRandomPercentage`](#Of-Random-Percentage)    | Создает обертку для цепочечных вызовов из бесконечного набора случайных вещественных чисел между 0 и 1 | `Stream::ofRandomPercentage($repetitions)`          |
-| [`ofRockPaperScissors`](#Of-Rock-Paper-Scissors) | Создает обертку для цепочечных вызовов из бесконечных случайных выборов "камень-ножницы-бумага"        | `Stream::ofRockPaperScissors($repetitions)`         |
+| Источник                                         | Описание                                                                                             | Пример кода                                         |
+|--------------------------------------------------|------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| [`of`](#Of)                                      | Создает поток для цепочечных вызовов из данной коллекции                                             | `Stream::of($iterable)`                             |
+| [`ofCoinFlips`](#Of-Coin-Flips)                  | Создает поток для цепочечных вызовов из бесконечных случайных бросков монеты                         | `Stream::ofCoinFlips($repetitions)`                 |
+| [`ofCsvFile`](#Of-CSV-File)                      | Создает поток для цепочечных вызовов из строк CSV-файла                                              | `Stream::ofCsvFile($fileHandle)`                    |
+| [`ofFileLines`](#Of-File-Lines)                  | Создает поток для цепочечных вызовов из строк файла                                                  | `Stream::ofFileLines($fileHandle)`                  |
+| [`ofEmpty`](#Of-Empty)                           | Создает поток для цепочечных вызовов из пустой коллекции                                             | `Stream::ofEmpty()`                                 |
+| [`ofRandomChoice`](#Of-Random-Choice)            | Создает поток для цепочечных вызовов из бесконечных случайных выборов элемента из списка             | `Stream::ofRandomChoice($items, $repetitions)`      |
+| [`ofRandomNumbers`](#Of-Random-Numbers)          | Создает поток для цепочечных вызовов из бесконечного набора случайных целых чисел                    | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
+| [`ofRandomPercentage`](#Of-Random-Percentage)    | Создает поток для цепочечных вызовов из бесконечного набора случайных вещественных чисел между 0 и 1 | `Stream::ofRandomPercentage($repetitions)`          |
+| [`ofRange`](#Of-Range)                           | Создает поток для цепочечных вызовов из арифметической прогрессии                                    | `Stream::ofRange($start, $end, $step)`              |
+| [`ofRockPaperScissors`](#Of-Rock-Paper-Scissors) | Создает поток для цепочечных вызовов из бесконечных случайных выборов "камень-ножницы-бумага"        | `Stream::ofRockPaperScissors($repetitions)`         |
 
 #### Цепочечные операции
 | Операция                                                                  | Описание                                                                                                     | Пример кода                                                                       |
 |---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`asort`](#ASort-1)                                                       | Сортирует коллекцию с сохранением ключей                                                                     | `$stream->asort([$comparator])`                                                   |
 | [`chainWith`](#Chain-With)                                                | Добавляет в конец итератора другие коллекции для последовательного итерирования                              | `$stream->chainWith(...$iterables)`                                               |
 | [`compress`](#Compress-1)                                                 | Отфильтровывает из коллекции элементы, которые не выбраны                                                    | `$stream->compress($selectors)`                                                   |
+| [`compressAssociative`](#Compress-Associative-1)                          | Compress source by filtering out keys not selected                                                           | `$stream->compressAssociative($selectorKeys)`                                     |
 | [`chunkwise`](#Chunkwise-1)                                               | Итерирует коллекцию с разбиением по чанкам                                                                   | `$stream->chunkwise($chunkSize)`                                                  |
 | [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                                | Итерирует коллекцию с разбиением по взаимонакладывающимся чанкам                                             | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                 |
 | [`distinct`](#Distinct-1)                                                 | Фильтрует коллекцию, сохраняя только уникальные значения                                                     | `$stream->distinct($strict)`                                                      |
 | [`dropWhile`](#Drop-While-1)                                              | Пропускает элементы из коллекции, пока предикат возвращает ложь                                              | `$stream->dropWhile($predicate)`                                                  |
-| [`filterTrue`](#Filter-True-1)                                            | Возвращает из коллекции только те элементы, для которых предикат возвращает истину                           | `$stream->filterTrue($predicate)`                                                 |
-| [`filterFalse`](#Filter-False-1)                                          | Возвращает из коллекции только те элементы, для которых предикат возвращает ложь                             | `$stream->filterFalse($predicate)`                                                |
+| [`filter`](#Filter-1)                                                     | Возвращает из коллекции только те элементы, для которых предикат возвращает истину                           | `$stream->filterTrue($predicate)`                                                 |
+| [`filterTrue`](#Filter-True-1)                                            | Возвращает только истинные элементы из коллекции                                                             | `$stream->filterTrue($predicate)`                                                 |
+| [`filterFalse`](#Filter-False-1)                                          | Возвращает только ложные элементы из коллекции                                                               | `$stream->filterFalse($predicate)`                                                |
+| [`filterKeys`](#Filter-Keys-1)                                            | Возвращает только те элементы, для ключей которых предикат возвращает истину                                 | `$stream->filterKeys($predicate)`                                                 |
+| [`flatMap`](#Flat-Map-1)                                                  | Отображение коллекции с уплощением результата на 1 уровень вложенности                                       | `$stream->flatMap($function)`                                                     |
+| [`flatten`](#Flatten-1)                                                   | Многоуровневое уплощение коллекции                                                                           | `$stream->flatten($dimensions)`                                                   |
 | [`groupBy`](#Group-By-1)                                                  | Группирует элементы из коллекции по заданному правилу                                                        | `$stream->groupBy($groupKeyFunction)`                                             |
 | [`infiniteCycle`](#Infinite-Cycle)                                        | Бесконечно зацикливает перебор коллекции                                                                     | `$stream->infiniteCycle()`                                                        |
 | [`intersectionWith`](#Intersection-With)                                  | Возвращает пересечение хранимой коллекции с другими коллекциями                                              | `$stream->intersectionWith(...$iterables)`                                        |
@@ -167,12 +206,15 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`pairwise`](#Pairwise-1)                                                 | Итерирует коллекцию попарно (с наложением)                                                                   | `$stream->pairwise()`                                                             |
 | [`partialIntersectionWith`](#Partial-Intersection-With)                   | Возвращает частичное пересечение хранимой коллекции с другими коллекциями                                    | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`         |
 | [`partialIntersection CoerciveWith`](#Partial-Intersection-Coercive-With) | Возвращает частичное пересечение хранимой коллекции с другими коллекциями (в режиме приведения типов)        | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
+| [`reindex`](#Reindex-1)                                                   | Переиндексирует key-value коллекцию                                                                          | `$stream->reindex($reindexer)`                                                    |
+| [`reverse`](#Reverse-1)                                                   | Итерирует коллекцию в обратном порядке                                                                       | `$stream->reverse()`                                                              |
 | [`runningAverage`](#Running-Average-1)                                    | Накопление среднего арифметического элементов коллекции                                                      | `$stream->runningAverage($initialValue)`                                          |
 | [`runningDifference`](#Running-Difference-1)                              | Накопление разности элементов коллекции                                                                      | `$stream->runningDifference($initialValue)`                                       |
 | [`runningMax`](#Running-Max-1)                                            | Поиск максимального значения из коллекции                                                                    | `$stream->runningMax($initialValue)`                                              |
 | [`runningMin`](#Running-Min-1)                                            | Поиск минимального значения из коллекции                                                                     | `$stream->runningMin($initialValue)`                                              |
 | [`runningProduct`](#Running-Product-1)                                    | Накопление произведения элементов коллекции                                                                  | `$stream->runningProduct($initialValue)`                                          |
 | [`runningTotal`](#Running-Total-1)                                        | Накопление суммы элементов коллекции                                                                         | `$stream->runningTotal($initialValue)`                                            |
+| [`slice`](#Slice-1)                                                       | Возвращает подвыборку коллекции                                                                              | `$stream->slice([start], [$count], [step])`                                       |
 | [`sort`](#Sort-1)                                                         | Сортирует хранимую коллекцию                                                                                 | `$stream->sort([$comparator])`                                                    |
 | [`symmetricDifferenceWith`](#Symmetric-Difference-With)                   | Возвращает симметрическую разность хранимой коллекции с другими коллекциями                                  | `$this->symmetricDifferenceWith(...$iterables)`                                   |
 | [`symmetricDifference CoerciveWith`](#Symmetric-Difference-Coercive-With) | Возвращает симметрическую разность хранимой коллекции с другими коллекциями (в режиме приведения типов)      | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                          |
@@ -183,16 +225,19 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 
 #### Завершающие операции
 ##### Саммари о коллекции
-| Операция                            | Описание                                                                       | Пример кода                             |
-|-------------------------------------|--------------------------------------------------------------------------------|-----------------------------------------|
-| [`allMatch`](#All-Match-1)          | Истинно, если предикат возвращает истину для всех элементов коллекции          | `$stream->allMatch($predicate)`         |
-| [`anyMatch`](#Any-Match-1)          | Истинно, если предикат возвращает истину хотя бы для одного элемента коллекции | `$stream->anyMatch($predicate)`         |
-| [`exactlyN`](#Exactly-N-1)          | Returns true if exactly n items are true according to predicate                | `$stream->exactlyN($n, $predicate)`     |
-| [`isSorted`](#Is-Sorted-1)          | Истинно, если коллекция отсортирована в прямом порядке                         | `$stream->isSorted()`                   |
-| [`isReversed`](#Is-Reversed-1)      | Истинно, если коллекция отсортирована в обратном порядке                       | `$stream->isReversed()`                 |
-| [`noneMatch`](#None-Match-1)        | Истинно, если предикат возвращает ложь для всех элементов коллекции            | `$stream->noneMatch($predicate)`        |
-| [`sameWith`](#Same-With)            | Истинно, если данные коллекции одинаковы                                       | `$stream->sameWith(...$iterables)`      |
-| [`sameCountWith`](#Same-Count-With) | Истинно, если данные коллекции имеют одинаковую длину                          | `$stream->sameCountWith(...$iterables)` |
+| Операция                                                         | Описание                                                                                             | Пример кода                                           |
+|------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| [`allMatch`](#All-Match-1)                                       | Истинно, если предикат возвращает истину для всех элементов коллекции                                | `$stream->allMatch($predicate)`                       |
+| [`anyMatch`](#Any-Match-1)                                       | Истинно, если предикат возвращает истину хотя бы для одного элемента коллекции                       | `$stream->anyMatch($predicate)`                       |
+| [`arePermutationsWith`](#Are-Permutations-With)                  | Истинно, если коллекции являются перестановками друг друга                                           | `$stream->arePermutationsWith(...$iterables)`         |
+| [`arePermutationsCoerciveWith`](#Are-Permutations-Coercive-With) | Истинно, если коллекции являются перестановками друг друга (в режиме приведения типов)               | `$stream->arePermutationsCoerciveWith(...$iterables)` |
+| [`exactlyN`](#Exactly-N-1)                                       | Истинно, если предикат возвращает истину в точности для N элементов                                  | `$stream->exactlyN($n, $predicate)`                   |
+| [`isPartitioned`](#Is-Partitioned-1)                             | Истинно, если истинные элементы находятся в коллекции перед ложными (истинность определяет предикат) | `$stream::isPartitioned($predicate)`                  |
+| [`isSorted`](#Is-Sorted-1)                                       | Истинно, если коллекция отсортирована в прямом порядке                                               | `$stream->isSorted()`                                 |
+| [`isReversed`](#Is-Reversed-1)                                   | Истинно, если коллекция отсортирована в обратном порядке                                             | `$stream->isReversed()`                               |
+| [`noneMatch`](#None-Match-1)                                     | Истинно, если предикат возвращает ложь для всех элементов коллекции                                  | `$stream->noneMatch($predicate)`                      |
+| [`sameWith`](#Same-With)                                         | Истинно, если данные коллекции одинаковы                                                             | `$stream->sameWith(...$iterables)`                    |
+| [`sameCountWith`](#Same-Count-With)                              | Истинно, если данные коллекции имеют одинаковую длину                                                | `$stream->sameCountWith(...$iterables)`               |
 
 ##### Редуцирование
 | Terminal Operation                       | Description                                                         | Code Snippet                                            |
@@ -211,19 +256,23 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`toRange`](#To-Range-1)                 | Разница между максимальным и минимальным элементами коллекции       | `$stream->toRange()`                                    |
 | [`toValue`](#To-Value-1)                 | Редуцирование коллекции до значения, вычисляемого callback-функцией | `$stream->toValue($reducer, $initialValue)`             |
 
-##### Операции конвертации
-| Terminal Operation             | Description                              | Code Snippet                                            |
-|--------------------------------|------------------------------------------|---------------------------------------------------------|
-| [`toArray`](#To-Array)         | Возвращает массив из элементов коллекции | `$stream->toArray()`                                    |
+##### Операции трансформации
+| Terminal Operation                              | Description                                                 | Code Snippet                                            |
+|-------------------------------------------------|-------------------------------------------------------------|---------------------------------------------------------|
+| [`toArray`](#To-Array)                          | Возвращает массив из элементов потока                       | `$stream->toArray()`                                    |
+| [`toAssociativeArray`](#To-Associative-Array-1) | Возвращает ассоциативный массив из элементов потока         | `$stream->toAssociativeArray($keyFunc, $valueFunc)`     |
+| [`tee`](#Tee-1)                                 | Создает несколько одинаковых независимых потоков из данного | `$stream->tee($count)`                                  |
 
 ##### Операции с побочными эффектами
-| Terminal Operation              | Description                                              | Code Snippet                                          |
-|---------------------------------|----------------------------------------------------------|-------------------------------------------------------|
-| [`callForEach`](#Call-For-Each) | Вызывает callback-функцию для каждого элемента коллекции | `$stream->callForEach($function)`                     |
-| [`print`](#Print)               | `print` каждого элемента коллекции                       | `$stream->print([$separator], [$prefix], [$suffix])`  |
-| [`printLn`](#Print-Line)        | `print` каждого элемента коллекции с новой строки        | `$stream->printLn()`                                  |
-| [`printR`](#Print-R)            | `print_r` каждого элемента коллекции                     | `$stream->printR()`                                   |
-| [`var_dump`](#Var-Dump)         | `var_dump` каждого элемента коллекции                    | `$stream->varDump()`                                  |
+| Terminal Operation              | Description                                           | Code Snippet                                          |
+|---------------------------------|-------------------------------------------------------|-------------------------------------------------------|
+| [`callForEach`](#Call-For-Each) | Вызывает callback-функцию для каждого элемента потока | `$stream->callForEach($function)`                     |
+| [`print`](#Print)               | `print` каждого элемента потока                       | `$stream->print([$separator], [$prefix], [$suffix])`  |
+| [`printLn`](#Print-Line)        | `print` каждого элемента потока с новой строки        | `$stream->printLn()`                                  |
+| [`printR`](#Print-R)            | `print_r` каждого элемента потока                     | `$stream->printR()`                                   |
+| [`toCsvFile`](#To-CSV-File)     | Записывает содержимое потока в CSV файл               | `$stream->toCsvFile($fileHandle, [$headers])`         |
+| [`toFile`](#To-File)            | Записывает содержимое потока в файл                   | `$stream->toFile($fileHandle)`                        |
+| [`var_dump`](#Var-Dump)         | `var_dump` каждого элемента потока                    | `$stream->varDump()`                                  |
 
 Установка
 -----
@@ -380,7 +429,7 @@ foreach (Single::chunkwise($movies, 3) as $trilogy) {
 ### Chunkwise Overlap
 Итерирует коллекцию, разбитую на взаимонакладывающиеся чанки.
 
-```Single::chunkwiseOverlap(iterable $data, int $chunkSize, int $overlapSize)```
+```Single::chunkwiseOverlap(iterable $data, int $chunkSize, int $overlapSize, bool $includeIncompleteTail = true)```
 
 * Минимальный размер чанка — 1.
 * Размер наложения должен быть меньше длины чанка.
@@ -416,6 +465,35 @@ foreach (Single::compress($movies, $goodMovies) as $goodMovie) {
 // 'A New Hope', 'Empire Strikes Back', 'Return of the Jedi', 'The Force Awakens'
 ```
 
+### Compress Associative
+Возвращает элементы из коллекции по заданным ключам.
+
+```Single::compressAssociative(string $data, array $selectorKeys)```
+
+* Ключами могут быть только строки или целые числа (по аналогии с ключами PHP-массивов).
+
+```php
+use IterTools\Single;
+$starWarsEpisodes = [
+    'I'    => 'The Phantom Menace',
+    'II'   => 'Attack of the Clones',
+    'III'  => 'Revenge of the Sith',
+    'IV'   => 'A New Hope',
+    'V'    => 'The Empire Strikes Back',
+    'VI'   => 'Return of the Jedi',
+    'VII'  => 'The Force Awakens',
+    'VIII' => 'The Last Jedi',
+    'IX'   => 'The Rise of Skywalker',
+];
+$originalTrilogyNumbers = ['IV', 'V', 'VI'];
+foreach (Single::compressAssociative($starWarsEpisodes, $originalTrilogyNumbers) as $episode => $title) {
+    print("$episode: $title" . \PHP_EOL);
+}
+// IV: A New Hope
+// V: The Empire Strikes Back
+// VI: Return of the Jedi
+```
+
 ### Drop While
 Пропускает элементы, пока предикат возвращает истину.
 
@@ -435,12 +513,10 @@ foreach (Single::dropWhile($scores, $predicate) as $score) {
 // 70, 85, 65, 90
 ```
 
-### Filter True
+### Filter
 Возвращает только те элементы, для которых предикат возвращает истину.
 
-По умолчанию (если не передан) предикат приводит элементы коллекции к `bool`.
-
-```Single::filterFalse(iterable $data, callable $predicate)```
+```Single::filter(iterable $data, callable $predicate)```
 
 ```php
 use IterTools\Single;
@@ -448,37 +524,116 @@ use IterTools\Single;
 $starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 $goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
 
-foreach (Single::filterTrue($starWarsEpisodes, $goodMoviePredicate) as $goodMovie) {
+foreach (Single::filter($starWarsEpisodes, $goodMoviePredicate) as $goodMovie) {
     print($goodMovie);
 }
 // 4, 5, 6, 7
 ```
 
-### Filter False
-Возвращает только те элементы, для которых предикат возвращает ложь.
+### Filter True
+Возвращает только истинные элементы из коллекции. Истинность определяется предикатом.
 
-По умолчанию (если не передан) предикат приводит элементы коллекции к `bool`.
+Если предикат не передан, значения элементов коллекции приводятся к `bool` для оценки.
 
-```Single::filterFalse(iterable $data, callable $predicate)```
+```Single::filterFalse(iterable $data, callable $predicate = null)```
 
 ```php
 use IterTools\Single;
 
-$starWarsEpisodes   = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-$goodMoviePredicate = fn ($episode) => $episode > 3 && $episode < 8;
-
-foreach (Single::filterFalse($starWarsEpisodes, $goodMoviePredicate) as $badMovie) {
-    print($badMovie);
+$reportCardGrades = [100, 0, 95, 85, 0, 94, 0];
+foreach (Single::filterTrue($reportCardGrades) as $goodGrade) {
+    print($goodGrade);
 }
-// 1, 2, 3, 8, 9
+// 100, 95, 85, 94
+```
+
+### Filter False
+Возвращает только ложные элементы из коллекции. Истинность определяется предикатом.
+
+Если предикат не передан, значения элементов коллекции приводятся к `bool` для оценки.
+
+```Single::filterFalse(iterable $data, callable $predicate = null)```
+
+```php
+use IterTools\Single;
+
+$alerts = [0, 1, 1, 0, 1, 0, 0, 1, 1];
+foreach (Single::filterFalse($alerts) as $noAlert) {
+    print($noAlert);
+}
+// 0, 0, 0, 0
+```
+
+### Filter Keys
+Возвращает только те элементы, для ключей которых предикат возвращает истину.
+
+```Single::filterKeys(iterable $data, callable $predicate)```
+```php
+use IterTools\Single;
+
+$olympics = [
+    2000 => 'Sydney',
+    2002 => 'Salt Lake City',
+    2004 => 'Athens',
+    2006 => 'Turin',
+    2008 => 'Beijing',
+    2010 => 'Vancouver',
+    2012 => 'London',
+    2014 => 'Sochi',
+    2016 => 'Rio de Janeiro',
+    2018 => 'Pyeongchang',
+    2020 => 'Tokyo',
+    2022 => 'Beijing',
+];
+$summerFilter = fn ($year) => $year % 4 === 0;
+foreach (Single::filterKeys($olympics, $summerFilter) as $year => $hostCity) {
+    print("$year: $hostCity" . \PHP_EOL);
+}
+// 2000: Sydney
+// 2004: Athens
+// 2008: Beijing
+// 2012: London
+// 2016: Rio de Janeiro
+// 2020: Tokyo
+```
+
+### Flat Map
+Отображение коллекции с уплощением результата на 1 уровень вложенности.
+
+```Single::flatMap(iterable $data, callable $mapper)```
+
+```php
+use IterTools\Single;
+$data   = [1, 2, 3, 4, 5];
+$mapper = fn ($item) => [$item, -$item];
+foreach (Single::flatMap($data, $mapper) as $number) {
+    print($number . ' ');
+}
+// 1 -1 2 -2 3 -3 4 -4 5 -5
+```
+
+### Flatten
+Многоуровневое уплощение коллекции.
+
+```Single::flatten(iterable $data, int $dimensions = 1)```
+
+```php
+use IterTools\Single;
+$multidimensional = [1, [2, 3], [4, 5]];
+$flattened = [];
+foreach (Single::flatten($multidimensional) as $number) {
+    $flattened[] = $number;
+}
+// [1, 2, 3, 4, 5]
 ```
 
 ### Group By
 Группирует элементы коллекции по заданному правилу.
 
-Функция `$groupKeyFunction` должна возвращать общий ключ для элементов группы.
+```Single::groupBy(iterable $data, callable $groupKeyFunction, callable $itemKeyFunction = null)```
 
-```Single::groupBy(iterable $data, callable $groupKeyFunction)```
+* Функция `$groupKeyFunction` должна возвращать общий ключ (или коллекцию ключей) для элементов группы.
+* Функция `$itemKeyFunction` (опциональный аргумент) позволяет назначить кастомные индексы эелементам в группе.
 
 ```php
 use IterTools\Single;
@@ -590,22 +745,81 @@ foreach (Single::repeat($data, $repetitions) as $repeated) {
 // 'Beetlejuice', 'Beetlejuice', 'Beetlejuice'
 ```
 
-### Sort
-Сортирует коллекцию.
+### Reindex
+Переиндексирует key-value коллекцию, используя функцию-индексатор.
 
-```Single::sort(iterable $data, callable $comparator = null)```
-
-Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
+```Single::reindex(string $data, callable $indexer)```
 
 ```php
 use IterTools\Single;
-
-$data = [3, 4, 5, 9, 8, 7, 1, 6, 2];
-
-foreach (Single::sort($data) as $datum) {
-    print($datum);
+$data = [
+    [
+        'title'   => 'Star Wars: Episode IV – A New Hope',
+        'episode' => 'IV',
+        'year'    => 1977,
+    ],
+    [
+        'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+        'episode' => 'V',
+        'year'    => 1980,
+    ],
+    [
+        'title' => 'Star Wars: Episode VI – Return of the Jedi',
+        'episode' => 'VI',
+        'year' => 1983,
+    ],
+];
+$reindexFunc = fn (array $swFilm) => $swFilm['episode'];
+$reindexedData = [];
+foreach (Single::reindex($data, $reindexFunc) as $key => $filmData) {
+    $reindexedData[$key] = $filmData;
 }
-// 1, 2, 3, 4, 5, 6, 7, 8, 9
+// [
+//     'IV' => [
+//         'title'   => 'Star Wars: Episode IV – A New Hope',
+//         'episode' => 'IV',
+//         'year'    => 1977,
+//     ],
+//     'V' => [
+//         'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+//         'episode' => 'V',
+//         'year'    => 1980,
+//     ],
+//     'VI' => [
+//         'title' => 'Star Wars: Episode VI – Return of the Jedi',
+//         'episode' => 'VI',
+//         'year' => 1983,
+//     ],
+// ]
+```
+
+### Reverse
+Итерирует коллекцию в обратном порядке.
+
+```Single::reverse(iterable $data)```
+
+```php
+use IterTools\Single;
+$words = ['Alice', 'answers', 'your', 'questions', 'Bob'];
+foreach (Single::reverse($words) as $word) {
+    print($word . ' ');
+}
+// Bob questions your answers Alice
+```
+
+### Slice
+Возвращает подвыборку коллекции.
+
+```Single::slice(iterable $data, int $start = 0, int $count = null, int $step = 1)```
+
+```php
+use IterTools\Single;
+$olympics = [1992, 1994, 1996, 1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022];
+$winterOlympics = [];
+foreach (Single::slice($olympics, 1, 8, 2) as $winterYear) {
+    $winterOlympics[] = $winterYear;
+}
+// [1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022]
 ```
 
 ### String
@@ -1058,6 +1272,131 @@ foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
 // 4, 5, 6, 7, 8, 9
 ```
 
+## Итерирование с сортировкой
+### ASort
+Сортирует коллекцию с сохранением ключей.
+
+```Sort::sort(iterable $data, callable $comparator = null)```
+
+Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
+
+```php
+use IterTools\Single;
+$worldPopulations = [
+    'China'     => 1_439_323_776,
+    'India'     => 1_380_004_385,
+    'Indonesia' => 273_523_615,
+    'Pakistan'  => 220_892_340,
+    'USA'       => 331_002_651,
+];
+foreach (Sort::sort($worldPopulations) as $country => $population) {
+    print("$country: $population" . \PHP_EOL);
+}
+// Pakistan: 220,892,340
+// Indonesia: 273,523,615
+// USA: 331,002,651
+// India: 1,380,004,385
+// China: 1,439,323,776
+```
+
+### Sort
+Сортирует коллекцию.
+
+```Single::sort(iterable $data, callable $comparator = null)```
+
+Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
+
+```php
+use IterTools\Single;
+
+$data = [3, 4, 5, 9, 8, 7, 1, 6, 2];
+
+foreach (Single::sort($data) as $datum) {
+    print($datum);
+}
+// 1, 2, 3, 4, 5, 6, 7, 8, 9
+```
+
+## Итерирование файлов
+### Read CSV
+Итерирует коллекции ячеек CSV-файла построчно.
+
+```File::readCsv(resource $fileHandle, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
+
+```php
+use IterTools\File;
+$fileHandle = \fopen('path/to/file.csv', 'r');
+foreach (File::readCsv($fileHandle) as $row) {
+    print_r($row);
+}
+// Each column field is an element of the array
+```
+
+### Read Lines
+Итерирует содержимое файла построчно.
+
+```File::readLines(resource $fileHandle)```
+```php
+use IterTools\File;
+$fileHandle = \fopen('path/to/file.txt', 'r');
+foreach (File::readLines($fileHandle) as $line) {
+    print($line);
+}
+```
+
+## Transform
+### Tee
+Создает несколько одинаковых независимых итераторов из данного.
+
+```Transform::tee(iterable $data, int $count): array```
+
+```php
+use IterTools\Transform;
+$daysOfWeek = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+$count = 3;
+[$week1, $week2, $week3] = Transform::tee($data, $count);
+// Each $week contains iterator containing ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
+```
+
+### To Array
+Преобразует итерируемую коллекцию в массив.
+
+```Transform::toArray(iterable $data): array```
+
+```php
+use IterTools\Transform;
+$iterator = new \ArrayIterator([1, 2, 3, 4, 5]);
+$array = Transform::toArray($iterator);
+```
+
+### To Associative Array
+Преобразует итерируемую коллекцию в ассоциативный массив.
+
+```Transform::toAssociativeArray(iterable $data, callable $keyFunc = null, callable $valueFunc = null): array```
+
+```php
+use IterTools\Transform;
+$messages = ['message 1', 'message 2', 'message 3'];
+$keyFunc   = fn ($msg) => \md5($msg);
+$valueFunc = fn ($msg) => strtoupper($msg);
+$associativeArray = Transform::toAssociativeArray($messages, $keyFunc, $valueFunc);
+// [
+//     '1db65a6a0a818fd39655b95e33ada11d' => 'MESSAGE 1',
+//     '83b2330607fe8f817ce6d24249dea373' => 'MESSAGE 2',
+//     '037805d3ad7b10c5b8425427b516b5ce' => 'MESSAGE 3',
+// ]
+```
+
+### To Iterator
+Преобразует итерируемую коллекцию в итератор.
+
+```Transform::toArray(iterable $data): array```
+```php
+use IterTools\Transform;
+$array = [1, 2, 3, 4, 5];
+$iterator = Transform::toIterator($array);
+```
+
 ## Саммари о коллекции
 ### All Match
 Возвращает истину, если для всех элементов коллекции предикат вернул истину.
@@ -1094,6 +1433,38 @@ $boolean = Summary::anyMatch($answers, $isUltimateAnswer);
 // true
 ```
 
+### Are Permutations
+Возарщает истину, если коллекции являются перестановками друг друга.
+
+```Summary::arePermutations(iterable ...$iterables): bool```
+
+```php
+use IterTools\Summary;
+$iter = ['i', 't', 'e', 'r'];
+$rite = ['r', 'i', 't', 'e'];
+$reit = ['r', 'e', 'i', 't'];
+$tier = ['t', 'i', 'e', 'r'];
+$tire = ['t', 'i', 'r', 'e'];
+$trie = ['t', 'r', 'i', 'e'];
+$boolean = Summary::arePermutations($iter, $rite, $reit, $tier, $tire, $trie);
+// true
+```
+
+### Are Permutations Coercive
+Возвращает истину, если коллекции являются перестановками друг друга
+(в режиме [приведения типов](#Режимы-типизации)).
+
+```Summary::arePermutationsCoercive(iterable ...$iterables): bool```
+
+```php
+use IterTools\Summary;
+$set1 = [1, 2.0, '3'];
+$set2 = [2.0, '1', 3];
+$set3 = [3, 2, 1];
+$boolean = Summary::arePermutationsCoercive($set1, $set2, $set3);
+// true
+```
+
 ### Exactly N
 Истинно, если предикат возвращает истину в точности для N элементов.
 
@@ -1117,6 +1488,21 @@ $predicate = fn ($age) => $age >= 21;
 
 $boolean = Summary::isSorted($ages, $n, $predicate);
 // false
+```
+
+### Is Partitioned
+Возвращает истину, если все истинные элементы находятся в коллекции перед ложными (истинность определяет предикат).
+
+- Возвращает истину для пустой коллекции и для коллекции с одним элементом.
+- Если предикат не был передан, истинность элемента получается через приведение его значения к булевому типу.
+
+```Summary::isPartitioned(iterable $data, callable $predicate = null): bool```
+
+```php
+use IterTools\Summary;
+$numbers          = [0, 2, 4, 1, 3, 5];
+$evensBeforeOdds = fn ($item) => $item % 2 === 0;
+$boolean = Summary::isPartitioned($numbers, $evensBeforeOdds);
 ```
 
 ### Is Sorted
@@ -1320,6 +1706,27 @@ $numbers = [5, 3, 1, 2, 4];
 
 $result = Reduce::toMax($numbers);
 // 5
+
+$movieRatings = [
+    [
+        'title' => 'Star Wars: Episode IV - A New Hope',
+        'rating' => 4.6
+    ],
+    [
+        'title' => 'Star Wars: Episode V - The Empire Strikes Back',
+        'rating' => 4.8
+    ],
+    [
+        'title' => 'Star Wars: Episode VI - Return of the Jedi',
+        'rating' => 4.6
+    ],
+];
+$compareBy = fn ($movie) => $movie['rating'];
+$highestRatedMovie = Reduce::toMax($movieRatings, $compareBy);
+// [
+//     'title' => 'Star Wars: Episode V - The Empire Strikes Back',
+//     'rating' => 4.8
+// ];
 ```
 
 ### To Min
@@ -1338,6 +1745,31 @@ $numbers = [5, 3, 1, 2, 4];
 
 $result = Reduce::toMin($numbers);
 // 1
+
+$movieRatings = [
+    [
+        'title' => 'The Matrix',
+        'rating' => 4.7
+    ],
+    [
+        'title' => 'The Matrix Reloaded',
+        'rating' => 4.3
+    ],
+    [
+        'title' => 'The Matrix Revolutions',
+        'rating' => 3.9
+    ],
+    [
+        'title' => 'The Matrix Resurrections',
+        'rating' => 2.5
+    ],
+];
+$compareBy = fn ($movie) => $movie['rating'];
+$lowestRatedMovie = Reduce::toMin($movieRatings, $compareBy);
+// [
+//     'title' => 'The Matrix Resurrections',
+//     'rating' => 2.5
+// ]
 ```
 
 ### To Min Max
@@ -1352,10 +1784,45 @@ $result = Reduce::toMin($numbers);
 ```php
 use IterTools\Reduce;
 
-$numbers = [1, 2, 3, -1, -2, -3];
+$numbers = [1, 2, 7, -1, -2, -3];;
 
 [$min, $max] = Reduce::toMinMax($numbers);
-// [-3, 3]
+// [-3, 7]
+
+$reportCard = [
+    [
+        'subject' => 'history',
+        'grade' => 90
+    ],
+    [
+        'subject' => 'math',
+        'grade' => 98
+    ],
+    [
+        'subject' => 'science',
+        'grade' => 92
+    ],
+    [
+        'subject' => 'english',
+        'grade' => 85
+    ],
+    [
+        'subject' => 'programming',
+        'grade' => 100
+    ],
+];
+$compareBy = fn ($class) => $class['grade'];
+$bestAndWorstSubject = Reduce::toMinMax($reportCard, $compareBy);
+// [
+//     [
+//         'subject' => 'english',
+//         'grade' => 85
+//     ],
+//     [
+//         'subject' => 'programming',
+//         'grade' => 100
+//     ],
+// ]
 ```
 
 ### To Product
@@ -1505,6 +1972,18 @@ $result = Stream::ofCoinFlips(10)
 // 5 (random)
 ```
 
+#### Of CSV File
+Создает поток из строк CSV-файла.
+
+```Stream::ofCsvFile(resource $fileHandle, string $separator = ',', string $enclosure = '"', string = $escape = '\\'): Stream```
+
+```php
+use IterTools\Stream;
+$fileHandle = \fopen('path/to/file.csv', 'r');
+$result = Stream::of($fileHandle)
+    ->toArray();
+```
+
 #### Of Empty
 Создает поток из пустой коллекции.
 
@@ -1517,6 +1996,18 @@ $result = Stream::ofEmpty()
     ->chainWith([1, 2, 3])
     ->toArray();
 // 1, 2, 3
+```
+
+#### Of File Lines
+Создает поток из строк файла.
+
+```Stream::ofFileLines(resource $fileHandle): Stream```
+```php
+use IterTools\Stream;
+$fileHandle = \fopen('path/to/file.txt', 'r');
+$result = Stream::of($fileHandle)
+    ->map('strtoupper');
+    ->toArray();
 ```
 
 #### Of Random Choice
@@ -1564,6 +2055,18 @@ $stream = Stream::ofRandomPercentage(3)
 // 0.8012566976245, 0.81237281724151, 0.61676896329459 [random]
 ```
 
+#### Of Range
+Создает поток для цепочечных вызовов из арифметической прогрессии.
+
+```Stream::ofRange(int|float $start, int|float $end, int|float $step = 1): Stream```
+
+```php
+use IterTools\Stream;
+$numbers = Stream::ofRange(0, 5)
+    ->toArray();
+// 0, 1, 2, 3, 4, 5
+```
+
 #### Of Rock Paper Scissors
 Создает поток из бесконечных случайных выборов "камень-ножницы-бумага".
 
@@ -1578,6 +2081,30 @@ $rps = Stream::ofRockPaperScissors(5)
 ```
 
 ### Цепочечные операции
+
+#### ASort
+Сортирует коллекцию в потоке с сохранением ключей.
+
+```$stream->asort(callable $comparator = null)```
+
+Если `$comparator` не передан, элементы хранимой коллекции должны быть сравнимы.
+
+```php
+use IterTools\Stream;
+$worldPopulations = [
+    'China'     => 1_439_323_776,
+    'India'     => 1_380_004_385,
+    'Indonesia' => 273_523_615,
+    'USA'       => 331_002_651,
+];
+$result = Stream::of($worldPopulations)
+    ->filter(fn ($pop) => $pop > 300_000_000)
+    ->asort()
+    ->toAssociativeArray();
+// USA   => 331_002_651,
+// India => 1_380_004_385,
+// China => 1_439_323_776,
+```
 
 #### Chain With
 Добавляет в конец потокового итератора другие коллекции для последовательного итерирования.
@@ -1617,6 +2144,35 @@ $result = Stream::of($input)
 // 2, 3
 ```
 
+#### Compress Associative
+Выбирает из хранимой коллекции элементы по заданным ключам.
+
+```$stream->compressAssociative(array $keys): Stream```
+
+* Ключами могут быть только строки или целые числа (по аналогии с ключами PHP-массивов).
+
+```php
+use IterTools\Stream;
+$starWarsEpisodes = [
+    'I'    => 'The Phantom Menace',
+    'II'   => 'Attack of the Clones',
+    'III'  => 'Revenge of the Sith',
+    'IV'   => 'A New Hope',
+    'V'    => 'The Empire Strikes Back',
+    'VI'   => 'Return of the Jedi',
+    'VII'  => 'The Force Awakens',
+    'VIII' => 'The Last Jedi',
+    'IX'   => 'The Rise of Skywalker',
+];
+$sequelTrilogyNumbers = ['VII', 'VIII', 'IX'];
+$sequelTrilogy = Stream::of($starWarsEpisodes)
+    ->compressAssociative($sequelTrilogyNumbers)
+    ->toAssociativeArray();
+// 'VII'  => 'The Force Awakens',
+// 'VIII' => 'The Last Jedi',
+// 'IX'   => 'The Rise of Skywalker',
+```
+
 #### Chunkwise
 Итерирует элементы из потока с разбиением по чанкам.
 
@@ -1638,7 +2194,7 @@ $result = Stream::of($friends)
 #### Chunkwise Overlap
 Итерирует элементы из потока с разбиением по взаимонакладывающимся чанкам.
 
-```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize): Stream```
+```$stream->chunkwiseOverlap(int $chunkSize, int $overlapSize, bool $includeIncompleteTail = true): Stream```
 
 * Минимальный размер чанка — 1.
 * Размер наложения должен быть меньше длины чанка.
@@ -1694,10 +2250,10 @@ $result = Stream::of($input)
 // 3, 4, 5
 ```
 
-#### Filter True
+#### Filter
 Возвращает из потока только те элементы, для которых предикат возвращает истину.
 
-```$stream->filterTrue(callable $predicate): Stream```
+```$stream->filter(callable $predicate): Stream```
 
 По умолчанию (если не передан) предикат приводит элементы коллекции к `bool`.
 
@@ -1707,27 +2263,104 @@ use IterTools\Stream;
 $input = [1, -1, 2, -2, 3, -3];
 
 $result = Stream::of($input)
-    ->filterTrue(fn ($value) => $value > 0)
+    ->filter(fn ($value) => $value > 0)
     ->toArray();
 // 1, 2, 3
 ```
 
-#### Filter False
-Возвращает из потока только те элементы, для которых предикат возвращает ложь.
+#### Filter True
+Возвращает из потока только истинные элементы. Истинность определяется предикатом.
 
-```$stream->filterFalse(callable $predicate): Stream```
+```$stream->filterTrue(callable $predicate = null): Stream```
+
+По умолчанию (если не передан) предикат приводит элементы коллекции к `bool`.
+
+```php
+use IterTools\Stream;
+$input = [0, 1, 2, 3, 0, 4];
+$result = Stream::of($input)
+    ->filterTrue()
+    ->toArray();
+// 1, 2, 3, 4
+```
+
+#### Filter False
+Возвращает из потока только ложные элементы. Истинность определяется предикатом.
+
+```$stream->filterFalse(callable $predicate = null): Stream```
 
 По умолчанию (если не передан) предикат приводит элементы коллекции к `bool`.
 
 ```php
 use IterTools\Stream;
 
-$input = [1, -1, 2, -2, 3, -3];
+$input = [0, 1, 2, 3, 0, 4];
 
 $result = Stream::of($input)
     ->filterFalse(fn ($value) => $value > 0)
+    ->filterFalse()
     ->toArray();
-// -1, -2, -3
+// 0, 0
+```
+
+#### Filter Keys
+Возвращает из потока только те элементы, для ключей которых предикат возвращает истину.
+
+```$stream->filterKeys(callable $filter): Stream```
+
+```php
+$olympics = [
+    2000 => 'Sydney',
+    2002 => 'Salt Lake City',
+    2004 => 'Athens',
+    2006 => 'Turin',
+    2008 => 'Beijing',
+    2010 => 'Vancouver',
+    2012 => 'London',
+    2014 => 'Sochi',
+    2016 => 'Rio de Janeiro',
+    2018 => 'Pyeongchang',
+    2020 => 'Tokyo',
+    2022 => 'Beijing',
+];
+$winterFilter = fn ($year) => $year % 4 === 2;
+$result = Stream::of($olympics)
+    ->filterKeys($winterFilter)
+    ->toAssociativeArray();
+}
+// 2002 => Salt Lake City
+// 2006 => Turin
+// 2010 => Vancouver
+// 2014 => Sochi
+// 2018 => Pyeongchang
+// 2022 => Beijing
+```
+
+#### Flat Map
+Отображение коллекции из потока с уплощением результата на 1 уровень вложенности.
+
+```$stream->flatMap(callable $mapper): Stream```
+
+```php
+$data    = [1, 2, 3, 4, 5];
+$mapper  fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item;
+$result = Stream::of($data)
+    ->flatMap($mapper)
+    ->toArray();
+// [1, 2, 2, 3, 4, 4, 5]
+```
+
+#### Flatten
+Многоуровневое уплощение коллекции из потока.
+
+```$stream->flatten(int $dimensions = 1): Stream```
+
+```php
+$data = [1, [2, 3], [4, 5]];
+$result = Stream::of($data)
+    ->flatten($mapper)
+    ->toArray();
+// [1, 2, 3, 4, 5]
 ```
 
 #### Group By
@@ -1891,6 +2524,67 @@ $stream = Stream::of($languages)
 // 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
 ```
 
+#### Reindex
+Переиндексирует key-value коллекцию из потока, используя функцию-индексатор.
+
+```$stream->reindex(callable $indexer): Stream```
+
+```php
+use IterTools\Single;
+$data = [
+    [
+        'title'   => 'Star Wars: Episode IV – A New Hope',
+        'episode' => 'IV',
+        'year'    => 1977,
+    ],
+    [
+        'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+        'episode' => 'V',
+        'year'    => 1980,
+    ],
+    [
+        'title' => 'Star Wars: Episode VI – Return of the Jedi',
+        'episode' => 'VI',
+        'year' => 1983,
+    ],
+];
+$reindexFunc = fn (array $swFilm) => $swFilm['episode'];
+$reindexResult = Stream::of($data)
+    ->reindex($reindexFunc)
+    ->toAssociativeArray();
+// [
+//     'IV' => [
+//         'title'   => 'Star Wars: Episode IV – A New Hope',
+//         'episode' => 'IV',
+//         'year'    => 1977,
+//     ],
+//     'V' => [
+//         'title'   => 'Star Wars: Episode V – The Empire Strikes Back',
+//         'episode' => 'V',
+//         'year'    => 1980,
+//     ],
+//     'VI' => [
+//         'title' => 'Star Wars: Episode VI – Return of the Jedi',
+//         'episode' => 'VI',
+//         'year' => 1983,
+//     ],
+// ]
+```
+
+#### Reverse
+Итерирует коллекцию из потока в обратном порядке.
+
+```$stream->reverse(): Stream```
+
+```php
+use IterTools\Stream;
+$words = ['are', 'you', 'as', 'bored', 'as', 'I', 'am'];
+$reversed = Stream::of($words)
+    ->reverse()
+    ->toString(' ');
+// am I as bored as you are
+```
+
 #### Running Average
 Накапливает среднее арифметическое элементов из потока в процессе итерирования.
 
@@ -1989,7 +2683,21 @@ $result = Stream::of($input)
 // 1, 3, 6, 10, 15
 ```
 
-### Sort
+#### Slice
+Выделяет подвыборку коллекции из потока.
+
+```$stream->slice(int $start = 0, int $count = null, int $step = 1)```
+
+```php
+use IterTools\Stream;
+$olympics = [1992, 1994, 1996, 1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022];
+$summerOlympics = Stream::of($olympics)
+    ->slice(0, 8, 2)
+    ->toArray();
+// [1992, 1996, 2000, 2004, 2008, 2012, 2016, 2020]
+```
+
+#### Sort
 Сортирует хранимую в потоке коллекцию.
 
 ```$stream->sort(callable $comparator = null)```
@@ -2137,7 +2845,7 @@ foreach ($result as $item) {
 
 ### Завершающие операции
 
-#### Саммари о коллекции
+#### Саммари о потоке
 ##### All Match
 Возвращает истину, если для всех элементов из потока предикат возвращает истину.
 
@@ -2170,6 +2878,37 @@ $boolean = Stream::of($answers)
 // true
 ```
 
+##### Are Permutations With
+Возарщает истину, если коллекция из потока и переданные коллекции являются перестановками друг друга.
+
+```$stream->arePermutationsWith(...$iterables): bool```
+```php
+use IterTools\Summary;
+$rite = ['r', 'i', 't', 'e'];
+$reit = ['r', 'e', 'i', 't'];
+$tier = ['t', 'i', 'e', 'r'];
+$tire = ['t', 'i', 'r', 'e'];
+$trie = ['t', 'r', 'i', 'e'];
+$boolean = Stream::of(['i', 't', 'e', 'r'])
+    ->arePermutationsWith($rite, $reit, $tier, $tire, $trie);
+// true
+```
+
+##### Are Permutations Coercive With
+Возарщает истину, если коллекция из потока и переданные коллекции являются перестановками друг друга
+(в режиме [приведения типов](#Режимы-типизации)).
+
+```$stream->arePermutationsCoerciveWith(...$iterables): bool```
+
+```php
+use IterTools\Summary;
+$set2 = [2.0, '1', 3];
+$set3 = [3, 2, 1];
+$boolean = Stream::of([1, 2.0, '3'])
+    ->arePermutationsCoerciveWith($set2, $set3);
+// true
+```
+
 ##### Exactly N
 Возвращает истину, если в точности для n элементов из потока предикат возвращает истину.
 
@@ -2185,6 +2924,24 @@ $twoTruthsAndALie = [true, true, false];
 $n                = 2;
 
 $boolean = Stream::of($twoTruthsAndALie)->exactlyN($n);
+// true
+```
+
+##### Is Partitioned
+Возвращает истину, если все истинные элементы коллеции из потока находятся в коллекции перед ложными
+(истинность определяет предикат).
+
+- Возвращает истину для пустой коллекции и для коллекции с одним элементом.
+- Если предикат не был передан, истинность элемента получается через приведение его значения к булевому типу.
+
+```$stream->isPartitioned(callable $predicate = null): bool```
+
+```php
+use IterTools\Summary;
+$numbers          = [0, 2, 4, 1, 3, 5];
+$evensBeforeOdds = fn ($item) => $item % 2 === 0;
+$boolean = Stream::($numbers)
+    ->isPartitioned($evensBeforeOdds);
 // true
 ```
 
@@ -2329,7 +3086,7 @@ $result = Stream::of($iterable)
 // 5
 ```
 
-### To First
+##### To First
 Возвращает первый элемент из коллекции в потоке.
 
 ```$stream->toFirst(): mixed```
@@ -2346,7 +3103,7 @@ $result = Stream::of($input)
 // 10
 ```
 
-### To First And Last
+##### To First And Last
 Возвращает первый и последний элементы из коллекции в потоке.
 
 ```$stream->toFirstAndLast(): array{mixed, mixed}```
@@ -2363,7 +3120,7 @@ $result = Stream::of($input)
 // [10, 30]
 ```
 
-### To Last
+##### To Last
 Возвращает последний элемент из коллекции в потоке.
 
 ```$stream->toLast(): mixed```
@@ -2385,11 +3142,9 @@ $result = Stream::of($input)
 
 ```$stream->toMax(callable $compareBy = null): mixed```
 
-Функция `$compareBy` должна возвращать сравнимое значение.
-
-Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
-
-Для пустой коллекции вернет `null`.
+- Функция `$compareBy` должна возвращать сравнимое значение.
+- Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
+- Для пустой коллекции вернет `null`.
 
 ```php
 use IterTools\Stream;
@@ -2406,11 +3161,9 @@ $result = Stream::of($iterable)
 
 ```$stream->toMin(callable $compareBy = null): mixed```
 
-Функция `$compareBy` должна возвращать сравнимое значение.
-
-Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
-
-Для пустой коллекции вернет `null`.
+- Функция `$compareBy` должна возвращать сравнимое значение.
+- Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
+- Для пустой коллекции вернет `null`.
 
 ```php
 use IterTools\Stream;
@@ -2427,11 +3180,9 @@ $result = Stream::of($iterable)
 
 ```$stream->toMinMax(callable $compareBy = null): array```
 
-Функция `$compareBy` должна возвращать сравнимое значение.
-
-Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
-
-Для пустой коллекции вернет `[null, null]`.
+- Функция `$compareBy` должна возвращать сравнимое значение.
+- Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
+- Для пустой коллекции вернет `[null, null]`.
 
 ```php
 use IterTools\Stream;
@@ -2550,6 +3301,36 @@ $array = Stream::of([1, 1, 2, 2, 3, 4, 5])
 // [1, 4, 9, 16, 25]
 ```
 
+##### To Associative Array
+Возвращает ассоциативный массив всех элементов из потока.
+
+```$stream->toAssociativeArray(callable $keyFunc, callable $valueFunc): array```
+
+```php
+use IterTools\Stream;
+$keyFunc
+$array = Stream::of(['message 1', 'message 2', 'message 3'])
+    ->map('strtoupper')
+    ->toAssociativeArray(
+        fn ($s) => \md5($s),
+        fn ($s) => $s
+    );
+// [3b3f2272b3b904d342b2d0df2bf31ed4 => MESSAGE 1, 43638d919cfb8ea31979880f1a2bb146 => MESSAGE 2, ... ]
+```
+
+##### Tee
+Создает несколько одинаковых независимых потоков из данного.
+
+```$stream->tee(int $count): array```
+```php
+use IterTools\Transform;
+$daysOfWeek = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
+$count = 3;
+[$week1Stream, $week2Stream, $week3Stream] = Stream::of($daysOfWeek)
+    ->tee($count);
+// Each $weekStream contains ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
+```
+
 #### Операции с побочными эффектами
 
 ##### Call For Each
@@ -2623,6 +3404,47 @@ Stream::of($words)->printR();
 // print_r output
 ```
 
+##### To CSV File
+Записывает содержимое потока в CSV файл.
+
+```$stream->toCsvFile(resource $fileHandle, array $header = null, string 'separator = ',', string $enclosure = '"', string $escape = '\\'): void```
+
+```php
+use IterTools\Stream;
+$starWarsMovies = [
+    ['Star Wars: Episode IV – A New Hope', 'IV', 1977],
+    ['Star Wars: Episode V – The Empire Strikes Back', 'V', 1980],
+    ['Star Wars: Episode VI – Return of the Jedi', 'VI', 1983],
+];
+$header = ['title', 'episode', 'year'];
+Stream::of($data)
+    ->toCsvFile($fh, $header);
+// title,episode,year
+// "Star Wars: Episode IV – A New Hope",IV,1977
+// "Star Wars: Episode V – The Empire Strikes Back",V,1980
+// "Star Wars: Episode VI – Return of the Jedi",VI,1983
+```
+
+##### To File
+Записывает содержимое потока в файл.
+
+```$stream->toFile(resource $fileHandle, string $newLineSeparator = \PHP_EOL, string $header = null, string $footer = null): void```
+
+```php
+use IterTools\Stream;
+$data = ['item1', 'item2', 'item3'];
+$header = '<ul>';
+$footer = '</ul>';
+Stream::of($data)
+    ->map(fn ($item) => "  <li>$item</li>")
+    ->toFile($fh, \PHP_EOL, $header, $footer);
+// <ul>
+//   <li>item1</li>
+//   <li>item2</li>
+//   <li>item3</li>
+// </ul>
+```
+
 ##### Var Dump
 Вызывает `var_dump()` для каждого элемента из потока.
 
@@ -2639,6 +3461,7 @@ Stream::of($words)->varDump();
 
 ## Композиция вызовов
 IterTools позволяет комбинировать вызовы методов, чтобы получать новые коллекции.
+
 #### Zip Strings
 ```php
 use IterTools\Multi;
