@@ -244,11 +244,8 @@ class Single
         callable $groupKeyFunction,
         callable $itemKeyFunction = null
     ): \Generator {
+        $itemKeyFunction ??= fn ($x) => null;
         $groups = [];
-
-        $itemKeyFunction = $itemKeyFunction !== null
-            ? $itemKeyFunction
-            : fn ($x) => null;
 
         foreach ($data as $item) {
             $group = $groupKeyFunction($item);

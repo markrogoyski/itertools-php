@@ -298,7 +298,7 @@ class Summary
      */
     public static function isPartitioned(iterable $data, callable $predicate = null): bool
     {
-        $predicate = $predicate ?? fn ($item) => \boolval($item);
+        $predicate ??= fn ($item) => \boolval($item);
 
         $allTrueSoFar = true;
 
