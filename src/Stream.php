@@ -1027,6 +1027,25 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns true if all elements in stream that satisfy the predicate
+     * appear before all elements that don't.
+     *
+     * Returns true for empty stream or for stream storing only single item.
+     *
+     * Default predicate if not provided is the boolean value of each data item.
+     *
+     * @see https://en.cppreference.com/w/cpp/algorithm/is_partitioned
+     *
+     * @param callable|null $predicate
+     *
+     * @return bool
+     */
+    public function isPartitioned(callable $predicate = null): bool
+    {
+        return Summary::isPartitioned($this->iterable, $predicate);
+    }
+
+    /**
      * Returns true if no element matches the predicate function.
      *
      * Empty iterables return true.
