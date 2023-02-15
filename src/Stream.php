@@ -333,17 +333,20 @@ class Stream implements \IteratorAggregate
     /**
      * Group iterable source by a common data element.
      *
-     * The groupKeyFunction determines the key to group elements by.
+     * The groupKeyFunction determines the key (or multiple keys) to group elements by.
+     *
+     * The itemKeyFunction (optional) determines the key of element in group.
      *
      * @param callable $groupKeyFunction
+     * @param callable|null $itemKeyFunction
      *
      * @return $this
      *
      * @see Single::groupBy()
      */
-    public function groupBy(callable $groupKeyFunction): self
+    public function groupBy(callable $groupKeyFunction, callable $itemKeyFunction = null): self
     {
-        $this->iterable = Single::groupBy($this->iterable, $groupKeyFunction);
+        $this->iterable = Single::groupBy($this->iterable, $groupKeyFunction, $itemKeyFunction);
         return $this;
     }
 

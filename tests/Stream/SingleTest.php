@@ -2493,4 +2493,45 @@ class SingleTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);
     }
+
+    public function testGroupByWithMultipleGroupsAndItemKeys(): void
+    {
+        // Given
+        $input = [
+            ['name' => 'Sam', 'interests' => ['programming', 'books', 'slacking', 'music']],
+            ['name' => 'Laura', 'interests' => ['math', 'fantasy', 'wine', 'music']],
+            ['name' => 'Alice', 'interests' => ['music', 'programming', 'fantasy']],
+            ['name' => 'Anonymous', 'interests' => []],
+        ];
+        $expected = [
+            'programming' => [
+                'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'slacking', 'music']],
+                'Alice' => ['name' => 'Alice', 'interests' => ['music', 'programming', 'fantasy']],
+            ],
+            'books' => [
+                'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'slacking', 'music']],
+            ],
+            'slacking' => [
+                'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'slacking', 'music']],
+            ],
+            'music' => [
+                'Sam' => ['name' => 'Sam', 'interests' => ['programming', 'books', 'slacking', 'music']],
+                'Alice' => ['name' => 'Alice', 'interests' => ['music', 'programming', 'fantasy']],
+            ],
+            'fantasy' => [
+                'Alice' => ['name' => 'Alice', 'interests' => ['music', 'programming', 'fantasy']],
+            ],
+        ];
+
+        // When
+        $result = Stream::of($input)
+            ->filterFalse(fn (array $profile) => in_array('math', $profile['interests']))
+            ->groupBy(
+                fn (array $profile) => $profile['interests'],
+                fn (array $profile) => $profile['name'],
+            )
+            ->toAssociativeArray();
+
+        $this->assertEquals($expected, $result);
+    }
 }

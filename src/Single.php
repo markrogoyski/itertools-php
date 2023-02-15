@@ -229,19 +229,41 @@ class Single
     /**
      * Group data by a common data element.
      *
-     * The groupKeyFunction determines the key to group elements by.
+     * The groupKeyFunction determines the key (or multiple keys) to group elements by.
+     *
+     * The itemKeyFunction (optional) determines the key of element in group.
      *
      * @param iterable<mixed> $data
      * @param callable        $groupKeyFunction
+     * @param callable|null   $itemKeyFunction
      *
      * @return \Generator<mixed>
      */
-    public static function groupBy(iterable $data, callable $groupKeyFunction): \Generator
-    {
+    public static function groupBy(
+        iterable $data,
+        callable $groupKeyFunction,
+        callable $itemKeyFunction = null
+    ): \Generator {
         $groups = [];
-        foreach ($data as $groupItem) {
-            $groups[$groupKeyFunction($groupItem)][] = $groupItem;
+
+        foreach ($data as $item) {
+            $group = $groupKeyFunction($item);
+            $itemKey = $itemKeyFunction !== null
+                ? $itemKeyFunction($item)
+                : null;
+            $itemGroups = is_iterable($group)
+                ? Transform::toArray($group)
+                : [$group];
+
+            foreach (Set::distinct($itemGroups) as $itemGroup) {
+                if ($itemKey === null) {
+                    $groups[$itemGroup][] = $item;
+                } else {
+                    $groups[$itemGroup][$itemKey] = $item;
+                }
+            }
         }
+
         foreach ($groups as $groupName => $groupData) {
             yield $groupName => $groupData;
         }
