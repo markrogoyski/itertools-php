@@ -27,8 +27,11 @@
     * `arePermutationsWith`
     * `arePermutationsCoerciveWith`
     * `isPartitioned`
-  ` Transformation`
+  * Transformation
     * `tee`
+    * `toArray`
+    * `toAssociativeArray`
+    * `toIterator`
 ### Improvements
 * `Single::groupBy`
   * Allows the original grouping function to further separate into groups if the result of the grouping function is a list.
