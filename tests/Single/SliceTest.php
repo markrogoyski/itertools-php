@@ -12,6 +12,31 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class SliceTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test slice example usage
+     */
+    public function testSliceExampleUsage(): void
+    {
+        // Given
+        $olympics = [1992, 1994, 1996, 1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022];
+
+        // And
+        $summerOlympics = [];
+        $winterOlympics = [];
+
+        // When
+        foreach (Single::slice($olympics, 0, 8, 2) as $summerYear) {
+            $summerOlympics[] = $summerYear;
+        }
+        foreach (Single::slice($olympics, 1, 8, 2) as $winterYear) {
+            $winterOlympics[] = $winterYear;
+        }
+
+        // Then
+        $this->assertEquals([1992, 1996, 2000, 2004, 2008, 2012, 2016, 2020], $summerOlympics);
+        $this->assertEquals([1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022], $winterOlympics);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param array $iterable
      * @param array $config

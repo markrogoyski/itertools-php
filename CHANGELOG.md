@@ -7,6 +7,7 @@
   * `flatMap`
   * `flatten`
   * `reverse`
+  * `slice`
 * Summary
   * `arePermutations`
   * `arePermutationsCoercive`
@@ -20,6 +21,7 @@
     * `flatMap`
     * `flatten`
     * `reverse`
+    * `slice`
   * Summary Terminal Operations
     * `arePermutationsWith`
     * `arePermutationsCoerciveWith`

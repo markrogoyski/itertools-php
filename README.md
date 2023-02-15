@@ -75,6 +75,7 @@ Quick Reference
 | [`reindex`](#Reindex)                          | Reindex keys of key-value iterable           | `Single::reindex($data, $reindexer)`                        |
 | [`repeat`](#Repeat)                            | Repeat an item a number of times             | `Single::repeat($item, $repetitions)`                       |
 | [`reverse`](#Reverse)                          | Iterate elements in reverse order            | `Single::reverse($data)`                                    |
+| [`slice`](#Slice)                              | Extract a slice of the iterable              | `Single::slice($data, [$start], [$count], [$step])`         |
 | [`string`](#String)                            | Iterate the characters of a string           | `Single::string($string)`                                   |
 | [`takeWhile`](#Take-While)                     | Iterate elements while predicate is true     | `Single::takeWhile($data, $predicate)`                      |
 
@@ -215,7 +216,8 @@ Quick Reference
 | [`runningMin`](#Running-Min-1)                                            | Accumulate the running min over iterable source                                           | `$stream->runningMin($initialValue)`                                              |
 | [`runningProduct`](#Running-Product-1)                                    | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`                                          |
 | [`runningTotal`](#Running-Total-1)                                        | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`                                            |
-| [`sort`](#Sort-1)                                                         | Sorts the iterable source                                                                 | `$stream->sort([$comparator])`                                                    |
+| [`slice`](#Slice-1)                                                       | Extract a slice of the stream                                                             | `$stream->slice([start], [$count], [step])`                                       |
+| [`sort`](#Sort-1)                                                         | Sorts the stream                                                                          | `$stream->sort([$comparator])`                                                    |
 | [`symmetricDifferenceWith`](#Symmetric-Difference-With)                   | Symmetric difference of iterable source and given iterables                               | `$this->symmetricDifferenceWith(...$iterables)`                                   |
 | [`symmetricDifference CoerciveWith`](#Symmetric-Difference-Coercive-With) | Symmetric difference of iterable source and given iterables with type coercion            | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                          |
 | [`takeWhile`](#Take-While-1)                                              | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                                                  |
@@ -815,6 +817,23 @@ foreach (Single::reverse($words) as $word) {
     print($word . ' ');
 }
 // Bob questions your answers Alice
+```
+
+### Slice
+Extract a slice of the iterable.
+
+```Single::slice(iterable $data, int $start = 0, int $count = null, int $step = 1)```
+
+```php
+use IterTools\Single;
+
+$olympics = [1992, 1994, 1996, 1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022];
+$winterOlympics = [];
+
+foreach (Single::slice($olympics, 1, 8, 2) as $winterYear) {
+    $winterOlympics[] = $winterYear;
+}
+// [1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022]
 ```
 
 ### String
@@ -2695,6 +2714,22 @@ $result = Stream::of($input)
     ->runningTotal()
     ->toArray();
 // 1, 3, 6, 10, 15
+```
+
+### Slice
+Extract a slice of the stream.
+
+```$stream->slice(int $start = 0, int $count = null, int $step = 1)```
+
+```php
+use IterTools\Stream;
+
+$olympics = [1992, 1994, 1996, 1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022];
+
+$summerOlympics = Stream::of($olympics)
+    ->slice(0, 8, 2)
+    ->toArray();
+// [1992, 1996, 2000, 2004, 2008, 2012, 2016, 2020]
 ```
 
 ### Sort
