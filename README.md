@@ -68,7 +68,7 @@ Quick Reference
 | [`filterKeys`](#Filter-Keys)                   | Filter for keys where predicate is true      | `Single::filterKeys($data, $predicate)`                     |
 | [`flatMap`](#Flat-Map)                         | Map function onto items and flatten result   | `Single::flaMap($data, $mapper)`                            |
 | [`flatten`](#Flatten)                          | Flatten multidimensional iterable            | `Single::flatten($data, [$dimensions])`                     |
-| [`groupBy`](#Group-By)                         | Group data by a common element               | `Single::groupBy($data, $groupKeyFunction)`                 |
+| [`groupBy`](#Group-By)                         | Group data by a common element               | `Single::groupBy($data, $groupKeyFunction, [$itemKeyFunc])` |
 | [`limit`](#Limit)                              | Iterate up to a limit                        | `Single::limit($data, $limit)`                              |
 | [`map`](#Map)                                  | Map function onto each item                  | `Single::map($data, $function)`                             |
 | [`pairwise`](#Pairwise)                        | Iterate successive overlapping pairs         | `Single::pairwise($data)`                                   |
@@ -198,7 +198,7 @@ Quick Reference
 | [`filterKeys`](#Filter-Keys-1)                                            | Filter for keys where predicate function is true                                          | `$stream->filterKeys($predicate)`                                                 |
 | [`flatMap`](#Flat-Map-1)                                                  | Map function onto elements and flatten result                                             | `$stream->flatMap($function)`                                                     |
 | [`flatten`](#Flatten-1)                                                   | Flatten multidimensional stream                                                           | `$stream->flatten($dimensions)`                                                   |
-| [`groupBy`](#Group-By-1)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction)`                                             |
+| [`groupBy`](#Group-By-1)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction, [$itemKeyFunc])`                             |
 | [`infiniteCycle`](#Infinite-Cycle)                                        | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                                                        |
 | [`intersectionWith`](#Intersection-With)                                  | Intersect iterable source and given iterables                                             | `$stream->intersectionWith(...$iterables)`                                        |
 | [`intersection CoerciveWith`](#Intersection-Coercive-With)                | Intersect iterable source and given iterables with type coercion                          | `$stream->intersectionCoerciveWith(...$iterables)`                                |
@@ -638,9 +638,10 @@ foreach (Single::flatten($multidimensional) as $number) {
 ### Group By
 Group data by a common data element.
 
-The `$groupKeyFunction` determines the key to group elements by.
+```Single::groupBy(iterable $data, callable $groupKeyFunction, callable $itemKeyFunction = null)```
 
-```Single::groupBy(iterable $data, callable $groupKeyFunction)```
+* The `$groupKeyFunction` determines the key to group elements by.
+* The optional `$itemKeyFunction` allows custom indexes within each group member.
 
 ```php
 use IterTools\Single;
@@ -2374,9 +2375,10 @@ $result = Stream::of($data)
 #### Group By
 Return a stream grouping by a common data element.
 
-```$stream->groupBy(callable $groupKeyFunction): Stream```
+```$stream->groupBy(callable $groupKeyFunction, callable $itemKeyFunction = null): Stream```
 
-The `$groupKeyFunction` determines the key to group elements by.
+* The `$groupKeyFunction` determines the key to group elements by.
+* The optional `$itemKeyFunction` allows custom indexes within each group member.
 
 ```php
 use IterTools\Stream;

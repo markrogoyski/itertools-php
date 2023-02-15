@@ -25,6 +25,10 @@
     * `arePermutationsCoerciveWith`
   ` Transformation`
     * `tee`
+### Improvements
+* `Single::groupBy`
+  * Allows the original grouping function to further separate into groups if the result of the grouping function is a list.
+  * A new parameter added to take a function to index the values within each group.
 
 ## v1.3.0 - 2023-02-11
 
