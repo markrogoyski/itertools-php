@@ -88,6 +88,7 @@ trait DataProvider
             [Single::reindex([1, 2, 3, 4, 5], fn ($x) => $x)],
             [Single::repeat(10, 5)],
             [Single::reverse([1, 2, 3, 4, 5])],
+            [Single::slice([1, 2, 3, 4, 5], 1, 4)],
             [Single::string('abcdefg')],
             [Single::takeWhile([1, 2, 3, 4, 5], fn ($x) => $x < 2)],
         ];
@@ -219,6 +220,7 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->runningMin()],
             [Stream::of([1, 2, 3, 4, 5])->runningProduct()],
             [Stream::of([1, 2, 3, 4, 5])->runningTotal()],
+            [Stream::of([1, 2, 3, 4, 5])->slice(0, 3)],
             [Stream::of([1, 2, 3, 4, 5])->sort()],
             [Stream::of([1, 2, 3, 4, 5])->symmetricDifferenceWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->symmetricDifferenceCoerciveWith([2, 3, 4])],

@@ -475,7 +475,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Single::slice()
      */
-    public function slice(int $start = 0, ?int $count = null, int $step = 1): self
+    public function slice(int $start = 0, int $count = null, int $step = 1): self
     {
         $this->iterable = Single::slice($this->iterable, $start, $count, $step);
         return $this;

@@ -1666,6 +1666,25 @@ class SliceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider dataProviderForArray
+     * @param array $iterable
+     * @param array $config
+     * @param array $expected
+     * @return void
+     */
+    public function testIteratorToArray(array $iterable, array $config, array $expected): void
+    {
+        // Given
+        $iterator = Single::slice($iterable, ...$config);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
      * @dataProvider dataProviderForInvalidArgumentStart
      * @param array $config
      * @return void
