@@ -246,13 +246,15 @@ class Single
     ): \Generator {
         $groups = [];
 
+        $itemKeyFunction = $itemKeyFunction !== null
+            ? $itemKeyFunction
+            : fn ($x) => null;
+
         foreach ($data as $item) {
             $group = $groupKeyFunction($item);
-            $itemKey = $itemKeyFunction !== null
-                ? $itemKeyFunction($item)
-                : null;
-            $itemGroups = is_iterable($group)
-                ? Transform::toArray($group)
+            $itemKey = $itemKeyFunction($item);
+            $itemGroups = \is_iterable($group)
+                ? $group
                 : [$group];
 
             foreach (Set::distinct($itemGroups) as $itemGroup) {

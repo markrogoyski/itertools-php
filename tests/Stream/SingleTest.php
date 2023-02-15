@@ -2494,6 +2494,48 @@ class SingleTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
+    public function testGroupByWithMultipleGroups(): void
+    {
+        // Given
+        $input = [
+            ['name' => 'Sam', 'interests' => ['programming', 'books', 'slacking', 'music']],
+            ['name' => 'Laura', 'interests' => ['math', 'fantasy', 'wine', 'music']],
+            ['name' => 'Alice', 'interests' => ['music', 'programming', 'fantasy']],
+            ['name' => 'Anonymous', 'interests' => []],
+        ];
+        $expected = [
+            'programming' => [
+                ['name' => 'Sam', 'interests' => ['programming', 'books', 'slacking', 'music']],
+                ['name' => 'Alice', 'interests' => ['music', 'programming', 'fantasy']],
+            ],
+            'books' => [
+                ['name' => 'Sam', 'interests' => ['programming', 'books', 'slacking', 'music']],
+            ],
+            'slacking' => [
+                ['name' => 'Sam', 'interests' => ['programming', 'books', 'slacking', 'music']],
+            ],
+            'music' => [
+                ['name' => 'Sam', 'interests' => ['programming', 'books', 'slacking', 'music']],
+                ['name' => 'Alice', 'interests' => ['music', 'programming', 'fantasy']],
+            ],
+            'fantasy' => [
+                ['name' => 'Alice', 'interests' => ['music', 'programming', 'fantasy']],
+            ],
+        ];
+
+        // And
+        $notInterestedInMath = fn (array $profile) => !\in_array('math', $profile['interests']);
+
+        // When
+        $result = Stream::of($input)
+            ->filter($notInterestedInMath)
+            ->groupBy(fn (array $profile) => $profile['interests'])
+            ->toAssociativeArray();
+
+        // Then
+        $this->assertEquals($expected, $result);
+    }
+
     public function testGroupByWithMultipleGroupsAndItemKeys(): void
     {
         // Given
@@ -2523,15 +2565,19 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
+        // And
+        $notInterestedInMath = fn (array $profile) => !\in_array('math', $profile['interests']);
+
         // When
         $result = Stream::of($input)
-            ->filterFalse(fn (array $profile) => in_array('math', $profile['interests']))
+            ->filter($notInterestedInMath)
             ->groupBy(
                 fn (array $profile) => $profile['interests'],
                 fn (array $profile) => $profile['name'],
             )
             ->toAssociativeArray();
 
+        // Then
         $this->assertEquals($expected, $result);
     }
 }
