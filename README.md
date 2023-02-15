@@ -1528,10 +1528,10 @@ $boolean = Summary::exactlyN($ages, $n, $predicate);
 ### Is Partitioned
 Returns true if all elements of given collection that satisfy the predicate appear before all elements that don't.
 
-```Summary::isPartitioned(iterable $data, callable $predicate = null): bool```
-
 - Returns true for empty collection or for collection with single item.
 - Default predicate if not provided is the boolean value of each data item.
+
+```Summary::isPartitioned(iterable $data, callable $predicate = null): bool```
 
 ```php
 use IterTools\Summary;
@@ -2981,10 +2981,10 @@ $boolean = Stream::of($twoTruthsAndALie)->exactlyN($n);
 ##### Is Partitioned
 Returns true if all elements of given collection that satisfy the predicate appear before all elements that don't.
 
-```$stream->isPartitioned(callable $predicate = null): bool```
-
 - Returns true for empty collection or for collection with single item.
 - Default predicate if not provided is the boolean value of each data item.
+
+```$stream->isPartitioned(callable $predicate = null): bool```
 
 ```php
 use IterTools\Summary;
@@ -2993,7 +2993,7 @@ $numbers          = [0, 2, 4, 1, 3, 5];
 $evensBeforeOdds = fn ($item) => $item % 2 === 0;
 
 $boolean = Stream::($numbers)
-    ->isPartitioned($numbers, $evensBeforeOdds);
+    ->isPartitioned($evensBeforeOdds);
 // true
 ```
 
