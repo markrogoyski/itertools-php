@@ -98,63 +98,63 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [null],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [1],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [0],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [true],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [false],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [true, false],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [0, 0],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [1, 1],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [1, 0],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [1, 1, 0],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [1, 0, 0],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [1, 1, 0, 0],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [true, true, false, false],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [true, 1, '1', 'abc', INF, -INF, [1, 2, 3], (object)[2, 3, 4], false, 0, '0', '', [], null],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
         ];
     }
@@ -266,7 +266,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [false, false, true, true],
@@ -296,51 +296,51 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [false, true],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [0, 1],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [0, 1, 1],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [1, 0, 1],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [0, 0, 1],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [0, 0, 1, 1],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [false, false, true, true],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [true, false, true, false],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [true, 1, '1', 'abc', INF, -INF, [1, 2, 3], false, (object)[2, 3, 4], 0, '0', '', [], null],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [false, 0, '0', '', [], null, true, 1, '1', 'abc', INF, -INF, [1, 2, 3], (object)[2, 3, 4]],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 [1, '1', 'abc', INF, false, 0, '0', '', [], null, true, -INF, [1, 2, 3], (object)[2, 3, 4]],
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
         ];
     }
@@ -482,63 +482,63 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $gen([]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([null]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([true]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([true, false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([1, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([1, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([1, 1, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([1, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([1, 1, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([true, true, false, false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([true, 1, '1', 'abc', INF, -INF, [1, 2, 3], (object)[2, 3, 4], false, 0, '0', '', [], null]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
         ];
     }
@@ -654,7 +654,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([false, false, true, true]),
@@ -686,51 +686,51 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $gen([false, true]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([0, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([0, 1, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([1, 0, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([0, 0, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([0, 0, 1, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([false, false, true, true]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([true, false, true, false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([true, 1, '1', 'abc', INF, -INF, [1, 2, 3], false, (object)[2, 3, 4], 0, '0', '', [], null]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([false, 0, '0', '', [], null, true, 1, '1', 'abc', INF, -INF, [1, 2, 3], (object)[2, 3, 4]]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $gen([1, '1', 'abc', INF, false, 0, '0', '', [], null, true, -INF, [1, 2, 3], (object)[2, 3, 4]]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
         ];
     }
@@ -874,63 +874,63 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $iter([]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([null]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([true]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([true, false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([1, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([1, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([1, 1, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([1, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([1, 1, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([true, true, false, false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([true, 1, '1', 'abc', INF, -INF, [1, 2, 3], (object)[2, 3, 4], false, 0, '0', '', [], null]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
         ];
     }
@@ -1046,7 +1046,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([false, false, true, true]),
@@ -1078,51 +1078,51 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $iter([false, true]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([0, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([0, 1, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([1, 0, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([0, 0, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([0, 0, 1, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([false, false, true, true]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([true, false, true, false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([true, 1, '1', 'abc', INF, -INF, [1, 2, 3], false, (object)[2, 3, 4], 0, '0', '', [], null]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([false, 0, '0', '', [], null, true, 1, '1', 'abc', INF, -INF, [1, 2, 3], (object)[2, 3, 4]]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $iter([1, '1', 'abc', INF, false, 0, '0', '', [], null, true, -INF, [1, 2, 3], (object)[2, 3, 4]]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
         ];
     }
@@ -1266,63 +1266,63 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $trav([]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([null]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([true]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([true, false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([1, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([1, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([1, 1, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([1, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([1, 1, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([true, true, false, false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([true, 1, '1', 'abc', INF, -INF, [1, 2, 3], (object)[2, 3, 4], false, 0, '0', '', [], null]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
         ];
     }
@@ -1438,7 +1438,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([false, false, true, true]),
@@ -1470,51 +1470,51 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $trav([false, true]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([0, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([0, 1, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([1, 0, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([0, 0, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([0, 0, 1, 1]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([false, false, true, true]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([true, false, true, false]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([true, 1, '1', 'abc', INF, -INF, [1, 2, 3], false, (object)[2, 3, 4], 0, '0', '', [], null]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([false, 0, '0', '', [], null, true, 1, '1', 'abc', INF, -INF, [1, 2, 3], (object)[2, 3, 4]]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
             [
                 $trav([1, '1', 'abc', INF, false, 0, '0', '', [], null, true, -INF, [1, 2, 3], (object)[2, 3, 4]]),
-                fn ($item) => boolval($item),
+                fn ($item) => \boolval($item),
             ],
         ];
     }

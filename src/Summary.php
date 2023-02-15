@@ -298,19 +298,19 @@ class Summary
      */
     public static function isPartitioned(iterable $data, callable $predicate = null): bool
     {
-        $allTrue = true;
+        $predicate = $predicate ?? fn ($item) => \boolval($item);
+
+        $allTrueSoFar = true;
 
         foreach ($data as $datum) {
-            $status = ($predicate !== null)
-                ? $predicate($datum)
-                : boolval($datum);
+            $currentItemTrue = $predicate($datum);
 
-            if ($allTrue && !$status) {
-                $allTrue = false;
+            if ($allTrueSoFar && !$currentItemTrue) {
+                $allTrueSoFar = false;
                 continue;
             }
 
-            if (!$allTrue && $status) {
+            if (!$allTrueSoFar && $currentItemTrue) {
                 return false;
             }
         }
