@@ -860,6 +860,57 @@ class Stream implements \IteratorAggregate
         return $this;
     }
 
+    // STREAM DEBUG OPERATIONS
+
+    /**
+     * Peek at each element in between other Stream operations
+     * to do some action without modifying the stream.
+     *
+     * Useful for debugging purposes.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function peek(callable $callback): self
+    {
+        [$this->iterable, $buffer] = Transform::tee($this->iterable, 2);
+        $callback(Stream::of($buffer));
+
+        return $this;
+    }
+
+    /**
+     * Print each item of stream between other Stream operations without modifying the stream.
+     *
+     * Useful for debugging purposes.
+     *
+     * @param string $separator
+     * @param string $prefix
+     * @param string $suffix
+     *
+     * @return $this
+     */
+    public function peekPrint(string $separator = '', string $prefix = '', string $suffix = ''): self
+    {
+        $this->peek(fn (Stream $stream) => $stream->print($separator, $prefix, $suffix));
+        return $this;
+    }
+
+    /**
+     * Call print_r() function of arrayed stream between other
+     * Stream operations without modifying the stream.
+     *
+     * Useful for debugging purposes.
+     *
+     * @return $this
+     */
+    public function peekPrintR(): self
+    {
+        $this->peek(fn (Stream $stream) => $stream->printR());
+        return $this;
+    }
+
     // STREAM TERMINAL OPERATIONS
 
     /**
