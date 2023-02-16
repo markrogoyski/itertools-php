@@ -186,7 +186,7 @@ Quick Reference
 #### Stream Operations
 | Operation                                                                 | Description                                                                               | Code Snippet                                                                      |
 |---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| [`asort`](#ASort-1)                                                       | Sorts the iterable source maintaining keys                                                | `$stream->asort([$comparator])`                                                    |
+| [`asort`](#ASort-1)                                                       | Sorts the iterable source maintaining keys                                                | `$stream->asort([$comparator])`                                                   |
 | [`chainWith`](#Chain-With)                                                | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                                               |
 | [`compress`](#Compress-1)                                                 | Compress source by filtering out data not selected                                        | `$stream->compress($selectors)`                                                   |
 | [`compressAssociative`](#Compress-Associative-1)                          | Compress source by filtering out keys not selected                                        | `$stream->compressAssociative($selectorKeys)`                                     |
@@ -1485,7 +1485,7 @@ $boolean = Summary::arePermutations($iter, $rite, $reit, $tier, $tire, $trie);
 ```
 
 ### Are Permutations Coercive
-Returns true if all iterables are permutations of each other with type coercion.
+Returns true if all iterables are permutations of each other with [type coercion](#Strict-and-Coercive-Types).
 
 ```Summary::arePermutationsCoercive(iterable ...$iterables): bool```
 
@@ -2129,7 +2129,7 @@ $rps = Stream::ofRockPaperScissors(5)
 
 ### Stream Operations
 
-### ASort
+#### ASort
 Sorts the stream, maintaining keys.
 
 ```$stream->asort(callable $comparator = null)```
@@ -2572,7 +2572,7 @@ $stream = Stream::of($languages)
 // 'php', 'python', 'java', 'typescript', 'c#', 'javascript'
 ```
 
-### Reindex
+#### Reindex
 Return a new stream of key-value elements reindexed by the key indexer function.
 
 ```$stream->reindex(callable $indexer): Stream```
@@ -2735,7 +2735,7 @@ $result = Stream::of($input)
 // 1, 3, 6, 10, 15
 ```
 
-### Slice
+#### Slice
 Extract a slice of the stream.
 
 ```$stream->slice(int $start = 0, int $count = null, int $step = 1)```
@@ -2751,7 +2751,7 @@ $summerOlympics = Stream::of($olympics)
 // [1992, 1996, 2000, 2004, 2008, 2012, 2016, 2020]
 ```
 
-### Sort
+#### Sort
 Sorts the stream.
 
 ```$stream->sort(callable $comparator = null)```
@@ -2945,7 +2945,7 @@ $boolean = Stream::of(['i', 't', 'e', 'r'])
 ```
 
 ##### Are Permutations Coercive With
-Returns true if all iterables are permutations with stream with type coercion.
+Returns true if all iterables are permutations with stream with [type coercion](#Strict-and-Coercive-Types).
 
 ```$stream->arePermutationsCoerciveWith(...$iterables): bool```
 
@@ -3138,7 +3138,7 @@ $result = Stream::of($iterable)
 // 5
 ```
 
-### To First
+##### To First
 Reduces iterable source to its first element.
 
 ```$stream->toFirst(): mixed```
@@ -3155,7 +3155,7 @@ $result = Stream::of($input)
 // 10
 ```
 
-### To First And Last
+##### To First And Last
 Reduces iterable source to its first and last elements.
 
 ```$stream->toFirstAndLast(): array{mixed, mixed}```
@@ -3172,7 +3172,7 @@ $result = Stream::of($input)
 // [10, 30]
 ```
 
-### To Last
+##### To Last
 Reduces iterable source to its last element.
 
 ```$stream->toLast(): mixed```
