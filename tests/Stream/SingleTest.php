@@ -688,6 +688,48 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [3, 5, 7],
             ],
+            [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(0)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(0, 1)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(10, 10)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(3)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(3, 2)
+                    ->toArray(),
+                [1, 2, 6, 7, 8, 9, 10],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(10, 2)
+                    ->toArray(),
+                [1, 2],
+            ],
         ];
     }
 
@@ -1281,6 +1323,48 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [3, 5, 7],
             ],
+            [
+                $gen([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(0)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $gen([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(0, 1)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $gen([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(10, 10)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $gen([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(3)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $gen([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(3, 2)
+                    ->toArray(),
+                [1, 2, 6, 7, 8, 9, 10],
+            ],
+            [
+                $gen([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(10, 2)
+                    ->toArray(),
+                [1, 2],
+            ],
         ];
     }
 
@@ -1866,6 +1950,48 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [3, 5, 7],
             ],
+            [
+                $iter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(0)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $iter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(0, 1)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $iter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(10, 10)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $iter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(3)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $iter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(3, 2)
+                    ->toArray(),
+                [1, 2, 6, 7, 8, 9, 10],
+            ],
+            [
+                $iter([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(10, 2)
+                    ->toArray(),
+                [1, 2],
+            ],
         ];
     }
 
@@ -2450,6 +2576,48 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->slice(2, 3, 2)
                     ->toArray(),
                 [3, 5, 7],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(0)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(0, 1)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(10, 10)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(3)
+                    ->toArray(),
+                [4, 5, 6, 7, 8, 9, 10],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(3, 2)
+                    ->toArray(),
+                [1, 2, 6, 7, 8, 9, 10],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->skip(10, 2)
+                    ->toArray(),
+                [1, 2],
             ],
         ];
     }
