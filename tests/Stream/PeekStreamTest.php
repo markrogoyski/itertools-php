@@ -8,7 +8,7 @@ use IterTools\Stream;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
-class PeekTest extends \PHPUnit\Framework\TestCase
+class PeekStreamTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderForArray
@@ -26,8 +26,10 @@ class PeekTest extends \PHPUnit\Framework\TestCase
         $peeked = [];
 
         // When
-        $stream->peek(static function ($item) use (&$peeked) {
-            $peeked[] = $item;
+        $stream->peekStream(static function (iterable $buffer) use (&$peeked) {
+            foreach ($buffer as $key => $item) {
+                $peeked[$key] = $item;
+            }
         });
 
         // And when
@@ -130,7 +132,7 @@ class PeekTest extends \PHPUnit\Framework\TestCase
                     ->asort(),
                 fn (Stream $stream) => $stream
                     ->map(fn ($x) => $x + 1),
-                [1, 3],
+                ['a' => 1, 'c' => 3],
                 ['a' => 2, 'c' => 4],
             ],
         ];
@@ -152,8 +154,10 @@ class PeekTest extends \PHPUnit\Framework\TestCase
         $peeked = [];
 
         // When
-        $stream->peek(static function ($item) use (&$peeked) {
-            $peeked[] = $item;
+        $stream->peekStream(static function (iterable $buffer) use (&$peeked) {
+            foreach ($buffer as $key => $item) {
+                $peeked[$key] = $item;
+            }
         });
 
         // And when
@@ -258,7 +262,7 @@ class PeekTest extends \PHPUnit\Framework\TestCase
                     ->asort(),
                 fn (Stream $stream) => $stream
                     ->map(fn ($x) => $x + 1),
-                [1, 3],
+                ['a' => 1, 'c' => 3],
                 ['a' => 2, 'c' => 4],
             ],
         ];
@@ -280,8 +284,10 @@ class PeekTest extends \PHPUnit\Framework\TestCase
         $peeked = [];
 
         // When
-        $stream->peek(static function ($item) use (&$peeked) {
-            $peeked[] = $item;
+        $stream->peekStream(static function (iterable $buffer) use (&$peeked) {
+            foreach ($buffer as $key => $item) {
+                $peeked[$key] = $item;
+            }
         });
 
         // And when
@@ -386,7 +392,7 @@ class PeekTest extends \PHPUnit\Framework\TestCase
                     ->asort(),
                 fn (Stream $stream) => $stream
                     ->map(fn ($x) => $x + 1),
-                [1, 3],
+                ['a' => 1, 'c' => 3],
                 ['a' => 2, 'c' => 4],
             ],
         ];
@@ -408,8 +414,10 @@ class PeekTest extends \PHPUnit\Framework\TestCase
         $peeked = [];
 
         // When
-        $stream->peek(static function ($item) use (&$peeked) {
-            $peeked[] = $item;
+        $stream->peekStream(static function (iterable $buffer) use (&$peeked) {
+            foreach ($buffer as $key => $item) {
+                $peeked[$key] = $item;
+            }
         });
 
         // And when
@@ -514,7 +522,7 @@ class PeekTest extends \PHPUnit\Framework\TestCase
                     ->asort(),
                 fn (Stream $stream) => $stream
                     ->map(fn ($x) => $x + 1),
-                [1, 3],
+                ['a' => 1, 'c' => 3],
                 ['a' => 2, 'c' => 4],
             ],
         ];

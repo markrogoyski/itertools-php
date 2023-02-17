@@ -875,6 +875,27 @@ class Stream implements \IteratorAggregate
     public function peek(callable $callback): self
     {
         [$this->iterable, $buffer] = Transform::tee($this->iterable, 2);
+
+        foreach ($buffer as $element) {
+            $callback($element);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Peek the stream in between other Stream operations
+     * to do some action without modifying the stream.
+     *
+     * Useful for debugging purposes.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function peekStream(callable $callback): self
+    {
+        [$this->iterable, $buffer] = Transform::tee($this->iterable, 2);
         $callback(Stream::of($buffer));
 
         return $this;
@@ -893,7 +914,7 @@ class Stream implements \IteratorAggregate
      */
     public function peekPrint(string $separator = '', string $prefix = '', string $suffix = ''): self
     {
-        $this->peek(fn (Stream $stream) => $stream->print($separator, $prefix, $suffix));
+        $this->peekStream(fn (Stream $stream) => $stream->print($separator, $prefix, $suffix));
         return $this;
     }
 
@@ -907,7 +928,7 @@ class Stream implements \IteratorAggregate
      */
     public function peekPrintR(): self
     {
-        $this->peek(fn (Stream $stream) => $stream->printR());
+        $this->peekStream(fn (Stream $stream) => $stream->printR());
         return $this;
     }
 
