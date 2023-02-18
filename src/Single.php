@@ -502,4 +502,29 @@ class Single
             yield $datum;
         }
     }
+
+    /**
+     * Skip the n elements in the iterable after offset.
+     *
+     * @param iterable<mixed> $data
+     * @param int<0, max> $count
+     * @param int<0, max> $offset
+     *
+     * @return \Generator
+     */
+    public static function skip(iterable $data, int $count, int $offset = 0): \Generator
+    {
+        /* @phpstan-ignore-next-line */
+        if ($count < 0 || $offset < 0) {
+            throw new \InvalidArgumentException();
+        }
+
+        $skipped = -$offset;
+        foreach ($data as $key => $datum) {
+            if ($skipped < 0 || $skipped >= $count) {
+                yield $key => $datum;
+            }
+            ++$skipped;
+        }
+    }
 }

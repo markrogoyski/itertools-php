@@ -482,6 +482,22 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Skip the n elements in the stream after offset.
+     *
+     * @param int<0, max> $count
+     * @param int<0, max> $offset
+     *
+     * @return $this
+     *
+     * @see Single::skip()
+     */
+    public function skip(int $count, int $offset = 0): self
+    {
+        $this->iterable = Single::skip($this->iterable, $count, $offset);
+        return $this;
+    }
+
+    /**
      * Sorts the stream.
      *
      * If comparator is null, then elements of the iterable source must be comparable.
