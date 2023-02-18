@@ -1,5 +1,19 @@
 # IterTools PHP Change Log
 
+## v1.5.0 - TBD
+
+### New Features
+* Single
+  * `skip`
+* Stream
+  * Stream Operations
+    * `skip`
+  * Debug Operations
+    * `peek`
+    * `peekPrint`
+    * `peekPrintR`
+    * `peekStream`
+
 ## v1.4.0 - 2023-02-15
 
 ### New Features
