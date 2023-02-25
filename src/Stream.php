@@ -1418,6 +1418,8 @@ class Stream implements \IteratorAggregate
      * @return mixed
      *
      * @throws \LengthException if iterable source is empty.
+     *
+     * @see Reduce::toFirst()
      */
     public function toFirst()
     {
@@ -1430,6 +1432,8 @@ class Stream implements \IteratorAggregate
      * @return mixed
      *
      * @throws \LengthException if iterable source is empty.
+     *
+     * @see Reduce::toLast()
      */
     public function toLast()
     {
@@ -1442,10 +1446,26 @@ class Stream implements \IteratorAggregate
      * @return array{mixed, mixed}
      *
      * @throws \LengthException if iterable source is empty.
+     *
+     * @see Reduce::toFirstAndLast()
      */
     public function toFirstAndLast(): array
     {
         return Reduce::toFirstAndLast($this->iterable);
+    }
+
+    /**
+     * Returns the random element of stream.
+     *
+     * @return mixed
+     *
+     * @throws \LengthException if iterable source is empty.
+     *
+     * @see Reduce::toRandomValue()
+     */
+    public function toRandomValue()
+    {
+        return Reduce::toRandomValue($this->iterable);
     }
 
     /**

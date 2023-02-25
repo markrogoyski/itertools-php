@@ -6,11 +6,14 @@ namespace IterTools\Tests\Stream;
 
 use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
+use IterTools\Tests\Fixture\DataProvider;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
 class ReduceTest extends \PHPUnit\Framework\TestCase
 {
+    use DataProvider;
+
     /**
      * @param array    $input
      * @param callable $reducingStreamFactoryFunc
@@ -2571,5 +2574,77 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 [7, -3],
             ],
         ];
+    }
+
+    /**
+     * @dataProvider dataProviderForToRandomValue
+     * @param iterable $data
+     * @param array $expected
+     * @return void
+     */
+    public function testToRandomValue(iterable $data, array $expected): void
+    {
+        // Given
+        $result = Stream::of($data)->toRandomValue();
+
+        // Then
+        $this->assertContains($result, $expected);
+    }
+
+    public function dataProviderForToRandomValue(): array
+    {
+        $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
+        $iter = fn ($data) => new \ArrayIterator($data);
+        $trav = fn ($data) => new IteratorAggregateFixture($data);
+
+        return [
+            [
+                [1, 2, 3],
+                [1, 2, 3],
+            ],
+            [
+                $gen([1, 2, 3]),
+                [1, 2, 3],
+            ],
+            [
+                $iter([1, 2, 3]),
+                [1, 2, 3],
+            ],
+            [
+                $trav([1, 2, 3]),
+                [1, 2, 3],
+            ],
+            [
+                ['a' => 'aa', 'b' => 'bb', 'c' => 'cc'],
+                ['aa', 'bb', 'cc'],
+            ],
+            [
+                $gen(['a' => 'aa', 'b' => 'bb', 'c' => 'cc']),
+                ['aa', 'bb', 'cc'],
+            ],
+            [
+                $iter(['a' => 'aa', 'b' => 'bb', 'c' => 'cc']),
+                ['aa', 'bb', 'cc'],
+            ],
+            [
+                $trav(['a' => 'aa', 'b' => 'bb', 'c' => 'cc']),
+                ['aa', 'bb', 'cc'],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderForEmptyIterable
+     * @param iterable $data
+     * @return void
+     */
+    public function testToRandomValueErrorOnEmpty(iterable $data): void
+    {
+        // Then
+        $this->expectException(\LengthException::class);
+        $this->expectExceptionMessage('Given iterable must be non-empty');
+
+        // When
+        Stream::of($data)->toRandomValue();
     }
 }

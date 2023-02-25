@@ -187,7 +187,7 @@ class ToRandomValueTest extends \PHPUnit\Framework\TestCase
     public function testErrorOnEmpty(iterable $data): void
     {
         // Then
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\LengthException::class);
         $this->expectExceptionMessage('Given iterable must be non-empty');
 
         // When
