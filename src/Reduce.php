@@ -273,4 +273,41 @@ class Reduce
     {
         return [static::toFirst($data), static::toLast($data)];
     }
+
+    /**
+     * Reduces given collection to value of it's random element.
+     *
+     * @param iterable $data
+     *
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException if given iterable is empty
+     */
+    public static function toRandomValue(iterable $data)
+    {
+        if (\is_countable($data)) {
+            if (\count($data) === 0) {
+                throw new \InvalidArgumentException('Given iterable must be non-empty');
+            }
+
+            $targetIndex = \mt_rand(0, \count($data) - 1);
+
+            $index = 0;
+            foreach ($data as $datum) {
+                if ($targetIndex === $index) {
+                    return $datum;
+                }
+
+                ++$index;
+            }
+        }
+
+        $data = Transform::toArray($data);
+
+        if (\count($data) === 0) {
+            throw new \InvalidArgumentException('Given iterable must be non-empty');
+        }
+
+        return $data[array_rand($data)];
+    }
 }
