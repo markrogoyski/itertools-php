@@ -317,4 +317,22 @@ class Summary
 
         return true;
     }
+
+    /**
+     * Returns true if given iterable is empty.
+     *
+     * @param iterable<mixed> $data
+     *
+     * @return bool
+     */
+    public static function isEmpty(iterable $data): bool
+    {
+        $iterator = Transform::toIterator($data);
+
+        if ($data instanceof \IteratorAggregate) {
+            $iterator->rewind();
+        }
+
+        return !$iterator->valid();
+    }
 }
