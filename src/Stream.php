@@ -1166,6 +1166,22 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns true if all elements in stream are unique.
+     *
+     * Empty iterables return true.
+     *
+     * @param bool $strict
+     *
+     * @return bool
+     *
+     * @see Summary::allUnique()
+     */
+    public function allUnique(bool $strict = true): bool
+    {
+        return Summary::allUnique($this->iterable, $strict);
+    }
+
+    /**
      * Returns true if iterable source is sorted in ascending order; otherwise false.
      *
      * Items of iterable source must be comparable.

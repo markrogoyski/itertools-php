@@ -77,7 +77,7 @@ class Summary
     }
 
     /**
-     * Return true if given collection includes only unique elements.
+     * Return true if all elements in given collection are unique.
      *
      * Empty iterables return true.
      *
