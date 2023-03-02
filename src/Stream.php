@@ -876,6 +876,44 @@ class Stream implements \IteratorAggregate
         return $this;
     }
 
+    /**
+     * Iterates union of iterable source and given iterables in strict type mode.
+     *
+     *  - scalars: compares strictly by type;
+     *  - objects: always treats different instances as not equal to each other;
+     *  - arrays: compares serialized.
+     *
+     * @param array<iterable<mixed>> ...$iterables
+     *
+     * @return $this
+     *
+     * @see Set::union()
+     */
+    public function unionWith(iterable ...$iterables): self
+    {
+        $this->iterable = Set::union($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Iterates union of iterable source and given iterables in non-strict type mode.
+     *
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param array<iterable<mixed>> ...$iterables
+     *
+     * @return $this
+     *
+     * @see Set::unionCoercive()
+     */
+    public function unionCoerciveWith(iterable ...$iterables): self
+    {
+        $this->iterable = Set::unionCoercive($this->iterable, ...$iterables);
+        return $this;
+    }
+
     // STREAM DEBUG OPERATIONS
 
     /**
