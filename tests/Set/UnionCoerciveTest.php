@@ -9,7 +9,7 @@ use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
-class UnionTest extends \PHPUnit\Framework\TestCase
+class UnionCoerciveTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderForArraySets
@@ -23,7 +23,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Set::union(...$iterables) as $datum) {
+        foreach (Set::unionCoercive(...$iterables) as $datum) {
             $result[] = $datum;
         }
 
@@ -59,7 +59,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 2],
             ],
             [
-                [[1, 2], [2, 3]],
+                [['1', '2'], [2, 3]],
                 [1, 2, 3],
             ],
             [
@@ -67,7 +67,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3, 4],
             ],
             [
-                [[1, 2], [3, 4], [4, 5]],
+                [[1, 2], [3, 4], ['4', 5]],
                 [1, 2, 3, 4, 5],
             ],
             [
@@ -79,7 +79,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                     [1, 2.2, '3', true, null, [1], (object)[1]],
                     [1.0, 2.2, 3, false, INF, [1], (object)[2]],
                 ],
-                [1, 1.0, 2.2, '3', 3, true, false, null, INF, [1], (object)[1], (object)[2]],
+                [1, 2.2, '3', true, false, INF, [1], (object)[1], (object)[2]],
             ],
         ];
     }
@@ -92,31 +92,31 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 1],
             ],
             [
-                [[1], [1, 1]],
+                [[1], [1, '1']],
                 [1, 1],
             ],
             [
-                [[1, 1], [1, 1]],
+                [[1, '1'], [1, 1]],
                 [1, 1],
             ],
             [
-                [[1, 1, 1], [1, 1]],
+                [[1, 1, 1], ['1', 1]],
                 [1, 1, 1],
             ],
             [
-                [[1, 2], [1, 1]],
+                [[1, 2], ['1', 1]],
                 [1, 1, 2],
             ],
             [
-                [[1, 2], [3, 3]],
+                [[1, 2], [3, '3']],
                 [1, 2, 3, 3],
             ],
             [
-                [[1, 2], [3, 3], [4, 5, 5]],
+                [[1, 2], [3, '3'], [4, 5, 5]],
                 [1, 2, 3, 3, 4, 5, 5],
             ],
             [
-                [[1], [1, 1, 2], [1, 1, 1, 3]],
+                [[1], [1, 1, 2], [1, '1', 1, 3]],
                 [1, 1, 1, 2, 3],
             ],
             [
@@ -124,7 +124,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                     [1, 1, 2.2, '3', true, null, [1], [1], (object)[1]],
                     [1.0, 1.0, 2.2, 3, false, INF, [1], (object)[2]],
                 ],
-                [1, 1, 1.0, 1.0, 2.2, '3', 3, true, false, null, INF, [1], [1], (object)[1], (object)[2]],
+                [1, 1, 2.2, '3', true, false, INF, [1], [1], (object)[1], (object)[2]],
             ],
         ];
     }
@@ -141,7 +141,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Set::union(...$iterables) as $datum) {
+        foreach (Set::unionCoercive(...$iterables) as $datum) {
             $result[] = $datum;
         }
 
@@ -179,7 +179,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 2],
             ],
             [
-                [$gen([1, 2]), $gen([2, 3])],
+                [$gen(['1', '2']), $gen([2, 3])],
                 [1, 2, 3],
             ],
             [
@@ -187,7 +187,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3, 4],
             ],
             [
-                [$gen([1, 2]), $gen([3, 4]), $gen([4, 5])],
+                [$gen([1, 2]), $gen([3, 4]), $gen(['4', 5])],
                 [1, 2, 3, 4, 5],
             ],
             [
@@ -199,7 +199,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                     $gen([1, 2.2, '3', true, null, [1], (object)[1]]),
                     $gen([1.0, 2.2, 3, false, INF, [1], (object)[2]]),
                 ],
-                [1, 1.0, 2.2, '3', 3, true, false, null, INF, [1], (object)[1], (object)[2]],
+                [1, 2.2, '3', true, false, INF, [1], (object)[1], (object)[2]],
             ],
         ];
     }
@@ -214,31 +214,31 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 1],
             ],
             [
-                [$gen([1]), $gen([1, 1])],
+                [$gen([1]), $gen([1, '1'])],
                 [1, 1],
             ],
             [
-                [$gen([1, 1]), $gen([1, 1])],
+                [$gen([1, '1']), $gen([1, 1])],
                 [1, 1],
             ],
             [
-                [$gen([1, 1, 1]), $gen([1, 1])],
+                [$gen([1, 1, 1]), $gen(['1', 1])],
                 [1, 1, 1],
             ],
             [
-                [$gen([1, 2]), $gen([1, 1])],
+                [$gen([1, 2]), $gen(['1', 1])],
                 [1, 1, 2],
             ],
             [
-                [$gen([1, 2]), $gen([3, 3])],
+                [$gen([1, 2]), $gen([3, '3'])],
                 [1, 2, 3, 3],
             ],
             [
-                [$gen([1, 2]), $gen([3, 3]), $gen([4, 5, 5])],
+                [$gen([1, 2]), $gen([3, '3']), $gen([4, 5, 5])],
                 [1, 2, 3, 3, 4, 5, 5],
             ],
             [
-                [$gen([1]), $gen([1, 1, 2]), $gen([1, 1, 1, 3])],
+                [$gen([1]), $gen([1, 1, 2]), $gen([1, '1', 1, 3])],
                 [1, 1, 1, 2, 3],
             ],
             [
@@ -246,7 +246,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                     $gen([1, 1, 2.2, '3', true, null, [1], [1], (object)[1]]),
                     $gen([1.0, 1.0, 2.2, 3, false, INF, [1], (object)[2]]),
                 ],
-                [1, 1, 1.0, 1.0, 2.2, '3', 3, true, false, null, INF, [1], [1], (object)[1], (object)[2]],
+                [1, 1, 2.2, '3', true, false, INF, [1], [1], (object)[1], (object)[2]],
             ],
         ];
     }
@@ -263,7 +263,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Set::union(...$iterables) as $datum) {
+        foreach (Set::unionCoercive(...$iterables) as $datum) {
             $result[] = $datum;
         }
 
@@ -301,7 +301,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 2],
             ],
             [
-                [$iter([1, 2]), $iter([2, 3])],
+                [$iter(['1', '2']), $iter([2, 3])],
                 [1, 2, 3],
             ],
             [
@@ -309,7 +309,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3, 4],
             ],
             [
-                [$iter([1, 2]), $iter([3, 4]), $iter([4, 5])],
+                [$iter([1, 2]), $iter([3, 4]), $iter(['4', 5])],
                 [1, 2, 3, 4, 5],
             ],
             [
@@ -321,7 +321,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                     $iter([1, 2.2, '3', true, null, [1], (object)[1]]),
                     $iter([1.0, 2.2, 3, false, INF, [1], (object)[2]]),
                 ],
-                [1, 1.0, 2.2, '3', 3, true, false, null, INF, [1], (object)[1], (object)[2]],
+                [1, 2.2, '3', true, false, INF, [1], (object)[1], (object)[2]],
             ],
         ];
     }
@@ -336,31 +336,31 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 1],
             ],
             [
-                [$iter([1]), $iter([1, 1])],
+                [$iter([1]), $iter([1, '1'])],
                 [1, 1],
             ],
             [
-                [$iter([1, 1]), $iter([1, 1])],
+                [$iter([1, '1']), $iter([1, 1])],
                 [1, 1],
             ],
             [
-                [$iter([1, 1, 1]), $iter([1, 1])],
+                [$iter([1, 1, 1]), $iter(['1', 1])],
                 [1, 1, 1],
             ],
             [
-                [$iter([1, 2]), $iter([1, 1])],
+                [$iter([1, 2]), $iter(['1', 1])],
                 [1, 1, 2],
             ],
             [
-                [$iter([1, 2]), $iter([3, 3])],
+                [$iter([1, 2]), $iter([3, '3'])],
                 [1, 2, 3, 3],
             ],
             [
-                [$iter([1, 2]), $iter([3, 3]), $iter([4, 5, 5])],
+                [$iter([1, 2]), $iter([3, '3']), $iter([4, 5, 5])],
                 [1, 2, 3, 3, 4, 5, 5],
             ],
             [
-                [$iter([1]), $iter([1, 1, 2]), $iter([1, 1, 1, 3])],
+                [$iter([1]), $iter([1, 1, 2]), $iter([1, '1', 1, 3])],
                 [1, 1, 1, 2, 3],
             ],
             [
@@ -368,7 +368,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                     $iter([1, 1, 2.2, '3', true, null, [1], [1], (object)[1]]),
                     $iter([1.0, 1.0, 2.2, 3, false, INF, [1], (object)[2]]),
                 ],
-                [1, 1, 1.0, 1.0, 2.2, '3', 3, true, false, null, INF, [1], [1], (object)[1], (object)[2]],
+                [1, 1, 2.2, '3', true, false, INF, [1], [1], (object)[1], (object)[2]],
             ],
         ];
     }
@@ -385,7 +385,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Set::union(...$iterables) as $datum) {
+        foreach (Set::unionCoercive(...$iterables) as $datum) {
             $result[] = $datum;
         }
 
@@ -423,7 +423,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 2],
             ],
             [
-                [$trav([1, 2]), $trav([2, 3])],
+                [$trav(['1', '2']), $trav([2, 3])],
                 [1, 2, 3],
             ],
             [
@@ -431,7 +431,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3, 4],
             ],
             [
-                [$trav([1, 2]), $trav([3, 4]), $trav([4, 5])],
+                [$trav([1, 2]), $trav([3, 4]), $trav(['4', 5])],
                 [1, 2, 3, 4, 5],
             ],
             [
@@ -443,7 +443,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                     $trav([1, 2.2, '3', true, null, [1], (object)[1]]),
                     $trav([1.0, 2.2, 3, false, INF, [1], (object)[2]]),
                 ],
-                [1, 1.0, 2.2, '3', 3, true, false, null, INF, [1], (object)[1], (object)[2]],
+                [1, 2.2, '3', true, false, INF, [1], (object)[1], (object)[2]],
             ],
         ];
     }
@@ -458,31 +458,31 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [1, 1],
             ],
             [
-                [$trav([1]), $trav([1, 1])],
+                [$trav([1]), $trav([1, '1'])],
                 [1, 1],
             ],
             [
-                [$trav([1, 1]), $trav([1, 1])],
+                [$trav([1, '1']), $trav([1, 1])],
                 [1, 1],
             ],
             [
-                [$trav([1, 1, 1]), $trav([1, 1])],
+                [$trav([1, 1, 1]), $trav(['1', 1])],
                 [1, 1, 1],
             ],
             [
-                [$trav([1, 2]), $trav([1, 1])],
+                [$trav([1, 2]), $trav(['1', 1])],
                 [1, 1, 2],
             ],
             [
-                [$trav([1, 2]), $trav([3, 3])],
+                [$trav([1, 2]), $trav([3, '3'])],
                 [1, 2, 3, 3],
             ],
             [
-                [$trav([1, 2]), $trav([3, 3]), $trav([4, 5, 5])],
+                [$trav([1, 2]), $trav([3, '3']), $trav([4, 5, 5])],
                 [1, 2, 3, 3, 4, 5, 5],
             ],
             [
-                [$trav([1]), $trav([1, 1, 2]), $trav([1, 1, 1, 3])],
+                [$trav([1]), $trav([1, 1, 2]), $trav([1, '1', 1, 3])],
                 [1, 1, 1, 2, 3],
             ],
             [
@@ -490,10 +490,11 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                     $trav([1, 1, 2.2, '3', true, null, [1], [1], (object)[1]]),
                     $trav([1.0, 1.0, 2.2, 3, false, INF, [1], (object)[2]]),
                 ],
-                [1, 1, 1.0, 1.0, 2.2, '3', 3, true, false, null, INF, [1], [1], (object)[1], (object)[2]],
+                [1, 1, 2.2, '3', true, false, INF, [1], [1], (object)[1], (object)[2]],
             ],
         ];
     }
+
 
     /**
      * @dataProvider dataProviderForMixedSets
@@ -507,7 +508,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         $result = [];
 
         // When
-        foreach (Set::union(...$iterables) as $datum) {
+        foreach (Set::unionCoercive(...$iterables) as $datum) {
             $result[] = $datum;
         }
 
@@ -527,7 +528,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                 [],
             ],
             [
-                [[1], $gen([1, 2]), $iter([3, 4]), $trav([4, 5])],
+                [[1], $gen(['1', 2]), $iter([3, 4]), $trav([4, 5])],
                 [1, 2, 3, 4, 5],
             ],
             [
@@ -541,7 +542,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                     $iter([1.0, 2.2, 3, false, INF, [1], (object)[2]]),
                     $trav([1.0, 2.2, 3, false, INF, [1]]),
                 ],
-                [1, 1.0, 2.2, '3', 3, true, false, null, INF, [1], (object)[1], (object)[2]],
+                [1, 2.2, '3', true, false, INF, [1], (object)[1], (object)[2]],
             ],
         ];
     }
@@ -554,23 +555,23 @@ class UnionTest extends \PHPUnit\Framework\TestCase
 
         return [
             [
-                [[], $gen([]), $iter([]), $trav([1, 1])],
+                [[], $gen([]), $iter([]), $trav([1, '1'])],
                 [1, 1],
             ],
             [
-                [[1, 1], $gen([1, 1]), $iter([1, 1]), $trav([1, 1])],
+                [[1, '1'], $gen([1, 1]), $iter(['1', 1]), $trav([1, 1])],
                 [1, 1],
             ],
             [
-                [[1], $gen([]), $iter([1, 1, 1]), $trav([1, 1])],
+                [[1], $gen([]), $iter([1, '1', 1]), $trav([1, 1])],
                 [1, 1, 1],
             ],
             [
-                [[1, 1], $gen([1, 2]), $iter([3, 3]), $trav([4, 5, 5])],
+                [[1, '1'], $gen([1, 2]), $iter([3, 3]), $trav([4, 5, 5])],
                 [1, 1, 2, 3, 3, 4, 5, 5],
             ],
             [
-                [[1, 2], $gen([1]), $iter([1, 1, 2]), $trav([1, 1, 1, 3])],
+                [[1, 2], $gen([1]), $iter([1, '1', 2]), $trav([1, '1', '1', 3])],
                 [1, 1, 1, 2, 3],
             ],
             [
@@ -580,7 +581,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
                     $iter([1.0, 1.0, 2.2, 3, false, INF, [1], (object)[2]]),
                     $trav([1.0, 1.0, 2.2, 3, false, INF, [1]]),
                 ],
-                [1, 1, 1.0, 1.0, 2.2, '3', 3, true, false, null, INF, [1], [1], (object)[1], (object)[2]],
+                [1, 1, 2.2, '3', true, false, INF, [1], [1], (object)[1], (object)[2]],
             ],
         ];
     }
