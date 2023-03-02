@@ -125,6 +125,45 @@ class Set
     }
 
     /**
+     * Iterates union of given iterables in strict type mode.
+     *
+     * If input iterables produce duplicate items, then multiset intersection rules apply.
+     *
+     * Strict-type comparisons:
+     *  - scalars: compares strictly by type
+     *  - objects: always treats different instances as not equal to each other
+     *  - arrays: compares serialized
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator
+     */
+    public static function union(iterable ...$iterables): \Generator
+    {
+        return static::partialIntersection(1, ...$iterables);
+    }
+
+
+    /**
+     * Iterates union of given iterables in strict type mode.
+     *
+     * If input iterables produce duplicate items, then multiset intersection rules apply.
+     *
+     * Coercive (non-strict) type comparisons:
+     *  - scalars: compares non-strictly by value
+     *  - objects: compares serialized
+     *  - arrays: compares serialized
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator
+     */
+    public static function unionCoercive(iterable ...$iterables): \Generator
+    {
+        return static::partialIntersectionCoercive(1, ...$iterables);
+    }
+
+    /**
      * Iterates the symmetric difference of iterables in strict type mode.
      *
      * If input iterables produce duplicate items, then multiset difference rules apply.
