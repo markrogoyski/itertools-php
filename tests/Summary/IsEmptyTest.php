@@ -42,6 +42,9 @@ class IsEmptyTest extends \PHPUnit\Framework\TestCase
     public function dataProviderForArrayFalse(): array
     {
         return [
+            [[0]],
+            [[[]]],
+            [[null]],
             [[1]],
             [[1, 2]],
             [[1, 2, 3]],
@@ -69,6 +72,9 @@ class IsEmptyTest extends \PHPUnit\Framework\TestCase
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
 
         return [
+            [$gen([0])],
+            [$gen([[]])],
+            [$gen([null])],
             [$gen([1])],
             [$gen([1, 2])],
             [$gen([1, 2, 3])],
@@ -96,6 +102,9 @@ class IsEmptyTest extends \PHPUnit\Framework\TestCase
         $iter = fn ($data) => new \ArrayIterator($data);
 
         return [
+            [$iter([0])],
+            [$iter([[]])],
+            [$iter([null])],
             [$iter([1])],
             [$iter([1, 2])],
             [$iter([1, 2, 3])],
@@ -123,6 +132,9 @@ class IsEmptyTest extends \PHPUnit\Framework\TestCase
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
         return [
+            [$trav([0])],
+            [$trav([[]])],
+            [$trav([null])],
             [$trav([1])],
             [$trav([1, 2])],
             [$trav([1, 2, 3])],
