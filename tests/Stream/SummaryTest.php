@@ -214,6 +214,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->sort()
                     ->isPartitioned(fn ($item) => $item < 0),
             ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isEmpty(),
+            ],
         ];
     }
 
@@ -375,6 +380,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 5, 2, 4, 6],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isEmpty(),
             ],
         ];
     }
@@ -569,6 +579,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->sort()
                     ->isPartitioned(fn ($item) => $item < 0),
             ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isEmpty(),
+            ],
         ];
     }
 
@@ -721,6 +736,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $gen([1, 3, 5, 2, 4, 6]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isEmpty(),
             ],
         ];
     }
@@ -915,6 +935,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->sort()
                     ->isPartitioned(fn ($item) => $item < 0),
             ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isEmpty(),
+            ],
         ];
     }
 
@@ -1067,6 +1092,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $iter([1, 3, 5, 2, 4, 6]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isEmpty(),
             ],
         ];
     }
@@ -1261,6 +1291,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                     ->sort()
                     ->isPartitioned(fn ($item) => $item < 0),
             ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isEmpty(),
+            ],
         ];
     }
 
@@ -1413,6 +1448,11 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $trav([1, 3, 5, 2, 4, 6]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isPartitioned(fn ($item) => $item % 2 === 0),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->isEmpty(),
             ],
         ];
     }

@@ -1108,6 +1108,8 @@ class Stream implements \IteratorAggregate
      * @param callable|null $predicate
      *
      * @return bool
+     *
+     * @see Summary::exactlyN()
      */
     public function exactlyN(int $n, callable $predicate = null): bool
     {
@@ -1127,10 +1129,24 @@ class Stream implements \IteratorAggregate
      * @param callable|null $predicate
      *
      * @return bool
+     *
+     * @see Summary::isPartitioned()
      */
     public function isPartitioned(callable $predicate = null): bool
     {
         return Summary::isPartitioned($this->iterable, $predicate);
+    }
+
+    /**
+     * Returns true if stream is empty.
+     *
+     * @return bool
+     *
+     * @see Summary::isEmpty()
+     */
+    public function isEmpty(): bool
+    {
+        return Summary::isEmpty($this->iterable);
     }
 
     /**
