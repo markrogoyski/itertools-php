@@ -77,6 +77,31 @@ class Summary
     }
 
     /**
+     * Return true if all elements in given collection are unique.
+     *
+     * Empty iterables return true.
+     *
+     * @param iterable<mixed> $data
+     * @param bool $strict
+     *
+     * @return bool
+     */
+    public static function allUnique(iterable $data, bool $strict = true): bool
+    {
+        $usageMap = [];
+
+        foreach ($data as $datum) {
+            $hash = UniqueExtractor::getString($datum, $strict);
+            if (array_key_exists($hash, $usageMap)) {
+                return false;
+            }
+            $usageMap[$hash] = true;
+        }
+
+        return true;
+    }
+
+    /**
      * Returns true if given collection is sorted in ascending order; otherwise false.
      *
      * Items of given collection must be comparable.

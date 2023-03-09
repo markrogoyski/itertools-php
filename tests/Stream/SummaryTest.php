@@ -219,6 +219,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isEmpty(),
             ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                [1, '1', true, [1], (object)[1]],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
         ];
     }
 
@@ -385,6 +410,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isEmpty(),
+            ],
+            [
+                [1, 2, 3, 4, 5, 1],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                [1, 2, 3, 4, 5, '1'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                [1, '1', true, [1], (object)[1]],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
             ],
         ];
     }
@@ -584,6 +624,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isEmpty(),
             ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                $gen([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                $gen([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                $gen([1, '1', true, [1], (object)[1]]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
         ];
     }
 
@@ -741,6 +806,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $gen([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isEmpty(),
+            ],
+            [
+                $gen([1, 2, 3, 4, 5, 1]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                $gen([1, 2, 3, 4, 5, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                $gen([1, '1', true, [1], (object)[1]]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
             ],
         ];
     }
@@ -940,6 +1020,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isEmpty(),
             ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                $iter([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                $iter([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                $iter([1, '1', true, [1], (object)[1]]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
         ];
     }
 
@@ -1097,6 +1202,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $iter([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isEmpty(),
+            ],
+            [
+                $iter([1, 2, 3, 4, 5, 1]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                $iter([1, 2, 3, 4, 5, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                $iter([1, '1', true, [1], (object)[1]]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
             ],
         ];
     }
@@ -1296,6 +1416,31 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isEmpty(),
             ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                $trav([1, '1', true, [1], (object)[1]]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
         ];
     }
 
@@ -1453,6 +1598,21 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $trav([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->isEmpty(),
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, 1]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(),
+            ],
+            [
+                $trav([1, 2, 3, 4, 5, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
+            ],
+            [
+                $trav([1, '1', true, [1], (object)[1]]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->allUnique(false),
             ],
         ];
     }
