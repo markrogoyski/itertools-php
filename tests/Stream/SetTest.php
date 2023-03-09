@@ -198,6 +198,50 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [4, 5, 6, 7, 8, 9],
             ],
+            [
+                [
+                    [],
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionWith(...$iterables)
+                    ->toArray(),
+                [2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5],
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    [],
+                    [2, 3, '4', 5, '6'],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionCoerciveWith(...$iterables)
+                    ->toArray(),
+                [2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    [1, '2', 3, '4', 5],
+                    [2, '3', 4, '5', '6'],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
+            ],
         ];
     }
 
@@ -584,6 +628,50 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->symmetricDifferenceCoerciveWith(...$iterables)
                     ->toArray(),
                 [4, 5, 6, 7, 8, 9],
+            ],
+            [
+                [
+                    $gen([]),
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionWith(...$iterables)
+                    ->toArray(),
+                [2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5]),
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    $gen([]),
+                    [2, 3, '4', 5, '6'],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionCoerciveWith(...$iterables)
+                    ->toArray(),
+                [2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    $gen([1, '2', 3, '4', 5]),
+                    [2, '3', 4, '5', '6'],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
             ],
         ];
     }
@@ -974,6 +1062,50 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [4, 5, 6, 7, 8, 9],
             ],
+            [
+                [
+                    $iter([]),
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionWith(...$iterables)
+                    ->toArray(),
+                [2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5]),
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    $iter([]),
+                    [2, 3, '4', 5, '6'],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionCoerciveWith(...$iterables)
+                    ->toArray(),
+                [2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    $iter([1, '2', 3, '4', 5]),
+                    [2, '3', 4, '5', '6'],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
+            ],
         ];
     }
 
@@ -1362,6 +1494,50 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->symmetricDifferenceCoerciveWith(...$iterables)
                     ->toArray(),
                 [4, 5, 6, 7, 8, 9],
+            ],
+            [
+                [
+                    $trav([]),
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionWith(...$iterables)
+                    ->toArray(),
+                [2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5]),
+                    [2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    $trav([]),
+                    [2, 3, '4', 5, '6'],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionCoerciveWith(...$iterables)
+                    ->toArray(),
+                [2, 3, 4, 5, 6, 7],
+            ],
+            [
+                [
+                    $trav([1, '2', 3, '4', 5]),
+                    [2, '3', 4, '5', '6'],
+                    [3, 4, 5, 6, 7],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->unionCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3, 4, 5, 6, 7],
             ],
         ];
     }
