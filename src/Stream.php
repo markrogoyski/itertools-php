@@ -928,9 +928,9 @@ class Stream implements \IteratorAggregate
      */
     public function peek(callable $callback): self
     {
-        [$this->iterable, $buffer] = Transform::tee($this->iterable, 2);
+        [$this->iterable, $peekable] = Transform::tee($this->iterable, 2);
 
-        foreach ($buffer as $element) {
+        foreach ($peekable as $element) {
             $callback($element);
         }
 
@@ -949,8 +949,8 @@ class Stream implements \IteratorAggregate
      */
     public function peekStream(callable $callback): self
     {
-        [$this->iterable, $buffer] = Transform::tee($this->iterable, 2);
-        $callback(Stream::of($buffer));
+        [$this->iterable, $peekable] = Transform::tee($this->iterable, 2);
+        $callback(Stream::of($peekable));
 
         return $this;
     }
