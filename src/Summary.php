@@ -92,7 +92,7 @@ class Summary
 
         foreach ($data as $datum) {
             $hash = UniqueExtractor::getString($datum, $strict);
-            if (array_key_exists($hash, $usageMap)) {
+            if (\array_key_exists($hash, $usageMap)) {
                 return false;
             }
             $usageMap[$hash] = true;

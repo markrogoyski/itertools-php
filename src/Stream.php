@@ -896,7 +896,7 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Iterates union of iterable source and given iterables in non-strict type mode.
+     * Iterates union of iterable source and given iterables using type coercion.
      *
      *  - scalars: compares non-strictly by value;
      *  - objects: compares serialized;

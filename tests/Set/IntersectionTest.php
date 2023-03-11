@@ -725,7 +725,7 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
         $iterator = Set::intersection(...$iterables);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);

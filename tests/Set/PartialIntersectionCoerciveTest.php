@@ -1360,7 +1360,7 @@ class PartialIntersectionCoerciveTest extends \PHPUnit\Framework\TestCase
         $iterator = Set::partialIntersectionCoercive($minIntersectionCount, ...$iterables);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);

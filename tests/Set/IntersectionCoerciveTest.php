@@ -829,7 +829,7 @@ class IntersectionCoerciveTest extends \PHPUnit\Framework\TestCase
         $iterator = Set::intersectionCoercive(...$iterables);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);

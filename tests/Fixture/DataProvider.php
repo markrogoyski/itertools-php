@@ -138,6 +138,8 @@ trait DataProvider
             [Set::partialIntersectionCoercive(2, [1, 2, 3, 4, 5], [2, 3, 4])],
             [Set::symmetricDifference([1, 2, 3, 4, 5], [2, 3, 4])],
             [Set::symmetricDifferenceCoercive([1, 2, 3, 4, 5], [2, 3, 4])],
+            [Set::union([1, 2, 3, 4, 5], [2, 3, 4])],
+            [Set::unionCoercive([1, 2, 3, 4, 5], [2, 3, 4])],
         ];
     }
 
@@ -229,6 +231,8 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->symmetricDifferenceCoerciveWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->takeWhile(fn ($x) => $x < 2)],
             [Stream::of([1, 2, 3, 4, 5])->tee(2)],
+            [Stream::of([1, 2, 3, 4, 5])->unionWith([2, 3, 4])],
+            [Stream::of([1, 2, 3, 4, 5])->unionCoerciveWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->zipWith([6, 7, 8, 9, 10])],
             [Stream::of([1, 2, 3, 4, 5])->zipEqualWith([6, 7, 8, 9, 10])],
             [Stream::of([1, 2, 3, 4, 5])->zipLongestWith([6, 7, 8, 9, 10])],

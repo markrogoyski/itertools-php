@@ -145,7 +145,7 @@ class Set
 
 
     /**
-     * Iterates union of given iterables in strict type mode.
+     * Iterates union of given iterables using type coercion.
      *
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      *

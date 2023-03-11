@@ -1220,7 +1220,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
         $iterator = Set::distinct($data, $strict);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
