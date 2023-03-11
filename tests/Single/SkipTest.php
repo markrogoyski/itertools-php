@@ -1105,4 +1105,25 @@ class SkipTest extends \PHPUnit\Framework\TestCase
             [[-2, -2]],
         ];
     }
+
+    /**
+     * @test         skip iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param        array  $data
+     * @param        array $params
+     * @param        array $expectedKeys
+     * @param        array $expectedValues
+     */
+    public function testIteratorToArray(array $data, array $params, array $expectedKeys, array $expectedValues): void
+    {
+        // Given
+        $iterator = Single::skip($data, ...$params);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expectedKeys, \array_keys($result));
+        $this->assertEquals($expectedValues, \array_values($result));
+    }
 }

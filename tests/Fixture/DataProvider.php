@@ -213,6 +213,7 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->pairwise()],
             [Stream::of([1, 2, 3, 4, 5])->partialIntersectionWith(1, [2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->partialIntersectionCoerciveWith(1, [2, 3, 4])],
+            [Stream::of([1, 2, 3, 4, 5])->peek(fn ($x) => $x)],
             [Stream::of([1, 2, 3, 4, 5])->reindex(fn ($x) => $x)],
             [Stream::of([1, 2, 3, 4, 5])->reverse()],
             [Stream::of([1, 2, 3, 4, 5])->runningAverage()],

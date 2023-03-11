@@ -275,7 +275,7 @@ class Reduce
     }
 
     /**
-     * Reduces given collection to value of it's random element.
+     * Reduces given collection random value in from within it.
      *
      * @param iterable<mixed> $data
      *
@@ -308,6 +308,6 @@ class Reduce
             throw new \LengthException('Given iterable must be non-empty');
         }
 
-        return $data[array_rand($data)];
+        return $data[\array_rand($data)];
     }
 }

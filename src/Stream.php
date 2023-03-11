@@ -1525,7 +1525,7 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Returns the random element of stream.
+     * Returns a random element of stream.
      *
      * @return mixed
      *
