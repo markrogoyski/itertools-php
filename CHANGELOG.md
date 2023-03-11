@@ -3,16 +3,31 @@
 ## v1.5.0 - TBD
 
 ### New Features
+* Reduce
+  * `toRandomValue`
+* Set
+  * `union`
+  * `unionCoercive`
 * Single
   * `skip`
+* Summary
+  * `allUnique`
+  * `isEmpty`
 * Stream
   * Stream Operations
     * `skip`
+    * `unionWith`
+    * `unionCoerciveWith`
   * Debug Operations
     * `peek`
     * `peekPrint`
     * `peekPrintR`
     * `peekStream`
+  * Reduction Terminal Operations
+    * `toRandomValue`
+  * Summary Terminal Operations
+    * `allUnique`
+    * `isEmpty`
 
 ## v1.4.0 - 2023-02-15
 
