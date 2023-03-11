@@ -75,6 +75,7 @@ Quick Reference
 | [`reindex`](#Reindex)                          | Reindex keys of key-value iterable           | `Single::reindex($data, $reindexer)`                        |
 | [`repeat`](#Repeat)                            | Repeat an item a number of times             | `Single::repeat($item, $repetitions)`                       |
 | [`reverse`](#Reverse)                          | Iterate elements in reverse order            | `Single::reverse($data)`                                    |
+| [`skip`](#Skip)                                | Iterate after skipping elements              | `Single::skip($data, $count, [$offset])`                    |
 | [`slice`](#Slice)                              | Extract a slice of the iterable              | `Single::slice($data, [$start], [$count], [$step])`         |
 | [`string`](#String)                            | Iterate the characters of a string           | `Single::string($string)`                                   |
 | [`takeWhile`](#Take-While)                     | Iterate elements while predicate is true     | `Single::takeWhile($data, $predicate)`                      |
@@ -217,7 +218,8 @@ Quick Reference
 | [`runningMin`](#Running-Min-1)                                            | Accumulate the running min over iterable source                                           | `$stream->runningMin($initialValue)`                                              |
 | [`runningProduct`](#Running-Product-1)                                    | Accumulate the running product over iterable source                                       | `$stream->runningProduct($initialValue)`                                          |
 | [`runningTotal`](#Running-Total-1)                                        | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`                                            |
-| [`slice`](#Slice-1)                                                       | Extract a slice of the stream                                                             | `$stream->slice([start], [$count], [step])`                                       |
+| [`skip`](#Skip-1)                                                         | Skip some elements of the stream                                                          | `$stream->skip($count, [$offset])`                                                |
+| [`slice`](#Slice-1)                                                       | Extract a slice of the stream                                                             | `$stream->slice([$start], [$count], [$step])`                                     |
 | [`sort`](#Sort-1)                                                         | Sorts the stream                                                                          | `$stream->sort([$comparator])`                                                    |
 | [`symmetricDifferenceWith`](#Symmetric-Difference-With)                   | Symmetric difference of iterable source and given iterables                               | `$this->symmetricDifferenceWith(...$iterables)`                                   |
 | [`symmetricDifference CoerciveWith`](#Symmetric-Difference-Coercive-With) | Symmetric difference of iterable source and given iterables with type coercion            | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                          |
@@ -819,6 +821,32 @@ foreach (Single::reverse($words) as $word) {
     print($word . ' ');
 }
 // Bob questions your answers Alice
+```
+
+### Skip
+Skip n elements in the iterable after optional offset offset.
+
+```Single::skip(iterable $data, int $count, int $offset = 0)```
+
+```php
+use IterTools\Single;
+
+$movies = [
+    'The Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith',
+    'A New Hope', 'The Empire Strikes Back', 'Return of the Jedi',
+    'The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker'
+];
+
+$prequelsRemoved = [];
+foreach (Single::skip($movies, 3) as $nonPrequel) {
+    $prequelsRemoved[] = $nonPrequel;
+} // Episodes IV - IX
+
+$onlyTheBest = [];
+foreach (Single::skip($prequelsRemoved, 3, 3) as $nonSequel) {
+    $onlyTheBest[] = $nonSequel;
+}
+// 'A New Hope', 'The Empire Strikes Back', 'Return of the Jedi'
 ```
 
 ### Slice
@@ -2733,6 +2761,27 @@ $result = Stream::of($input)
     ->runningTotal()
     ->toArray();
 // 1, 3, 6, 10, 15
+```
+
+#### Skip
+Skip some elements of the stream.
+
+```$stream->slice(int $start = 0, int $count = null, int $step = 1)```
+
+```php
+use IterTools\Stream;
+
+$movies = [
+    'The Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith',
+    'A New Hope', 'The Empire Strikes Back', 'Return of the Jedi',
+    'The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker'
+];
+
+$onlyTheBest = Stream::of($movies)
+    ->skip(3)
+    ->skip(3, 3)
+    ->toArray();
+// 'A New Hope', 'The Empire Strikes Back', 'Return of the Jedi'
 ```
 
 #### Slice

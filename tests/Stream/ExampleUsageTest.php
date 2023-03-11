@@ -221,4 +221,26 @@ class ExampleUsageTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEquals('am I as bored as you are', $reversed);
     }
+
+    /**
+     * @test skip used repeatedly example usage
+     */
+    public function testSkipExampleUsage(): void
+    {
+        // Given
+        $movies = [
+            'The Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith',
+            'A New Hope', 'The Empire Strikes Back', 'Return of the Jedi',
+            'The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker'
+        ];
+
+        // When
+        $onlyTheBest = Stream::of($movies)
+            ->skip(3)
+            ->skip(3, 3)
+            ->toArray();
+
+        // Then
+        $this->assertEquals(['A New Hope', 'The Empire Strikes Back', 'Return of the Jedi'], $onlyTheBest);
+    }
 }

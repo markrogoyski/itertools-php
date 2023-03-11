@@ -12,6 +12,34 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class SkipTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test skip example usage
+     */
+    public function testSkipExampleUsage(): void
+    {
+        // Given
+        $movies = [
+            'The Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith',
+            'A New Hope', 'The Empire Strikes Back', 'Return of the Jedi',
+            'The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker'
+        ];
+
+        // When
+        $prequelsRemoved = [];
+        foreach (Single::skip($movies, 3) as $nonPrequel) {
+            $prequelsRemoved[] = $nonPrequel;
+        }
+
+        // And When
+        $onlyTheBest = [];
+        foreach (Single::skip($prequelsRemoved, 3, 3) as $nonSequel) {
+            $onlyTheBest[] = $nonSequel;
+        }
+
+        // Then
+        $this->assertEquals(['A New Hope', 'The Empire Strikes Back', 'Return of the Jedi'], $onlyTheBest);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param array $data
      * @param array $params

@@ -504,7 +504,7 @@ class Single
     }
 
     /**
-     * Skip the n elements in the iterable after offset.
+     * Skip n elements in the iterable after optional offset offset.
      *
      * @param iterable<mixed> $data
      * @param int<0, max> $count
