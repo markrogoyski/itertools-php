@@ -707,6 +707,18 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toFirstAndLast(),
                 [7, -3],
             ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toNth(0),
+                1,
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toNth(2),
+                3,
+            ],
         ];
     }
 
@@ -1328,6 +1340,18 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
                     ->toFirstAndLast(),
                 [7, -3],
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toNth(0),
+                1,
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toNth(2),
+                3,
             ],
         ];
     }
@@ -1951,6 +1975,18 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toFirstAndLast(),
                 [7, -3],
             ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toNth(0),
+                1,
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toNth(2),
+                3,
+            ],
         ];
     }
 
@@ -2572,6 +2608,18 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->sort(fn ($lhs, $rhs) => $rhs <=> $lhs)
                     ->toFirstAndLast(),
                 [7, -3],
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toNth(0),
+                1,
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toNth(2),
+                3,
             ],
         ];
     }

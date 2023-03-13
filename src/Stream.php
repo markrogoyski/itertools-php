@@ -1555,6 +1555,19 @@ class Stream implements \IteratorAggregate
         return Reduce::toValue($this->iterable, $reducer, $initialValue);
     }
 
+    /**
+     * Reduces iterable source to its nth element.
+     *
+     * @param int $position
+     * @return mixed
+     *
+     * @see Reduce::toNth()
+     */
+    public function toNth(int $position)
+    {
+        return Reduce::toNth($this->iterable, $position);
+    }
+
     // TERMINAL OPERATIONS WITH SIDE EFFECTS - PRINT
 
     /**

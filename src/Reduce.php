@@ -310,4 +310,33 @@ class Reduce
 
         return $data[\array_rand($data)];
     }
+
+    /**
+     * Reduces given iterable to the value at the nth position.
+     *
+     * @template T
+     *
+     * @param iterable<T> $data
+     * @param int $position
+     *
+     * @return T
+     *
+     * @throws \LengthException if given iterable does not contain item with target position.
+     */
+    public static function toNth(iterable $data, int $position)
+    {
+        if (\is_countable($data) && \count($data) <= $position) {
+            throw new \LengthException("Given iterable does not contain item with position {$position}");
+        }
+
+        $i = 0;
+        foreach ($data as $datum) {
+            if ($i === $position) {
+                return $datum;
+            }
+            ++$i;
+        }
+
+        throw new \LengthException("Given iterable does not contain item with position {$position}");
+    }
 }
