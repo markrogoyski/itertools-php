@@ -13,6 +13,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderForArraySets
+     * @dataProvider dataProviderForArrayMultisets
      * @param        array<array> $iterables
      * @param        array $expected
      */
@@ -145,7 +146,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
                     [2, 2],
                     [2, 2],
                 ],
-                [2],
+                [],
             ],
             [
                 [
@@ -687,6 +688,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
     /**
      * @test         iterator_to_array
      * @dataProvider dataProviderForArraySets
+     * @dataProvider dataProviderForArrayMultisets
      * @param        array<array> $iterables
      * @param        array $expected
      */
