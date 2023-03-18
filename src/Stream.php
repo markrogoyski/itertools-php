@@ -917,8 +917,7 @@ class Stream implements \IteratorAggregate
     // STREAM DEBUG OPERATIONS
 
     /**
-     * Peek at each element in between other Stream operations
-     * to do some action without modifying the stream.
+     * Peek at each element between other Stream operations to do some action without modifying the stream.
      *
      * Useful for debugging purposes.
      *
@@ -938,8 +937,7 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Peek the stream in between other Stream operations
-     * to do some action without modifying the stream.
+     * Peek at the entire stream between other Stream operations to do some action without modifying the stream.
      *
      * Useful for debugging purposes.
      *
@@ -956,7 +954,7 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Print each item of stream between other Stream operations without modifying the stream.
+     * Peek at each element between other Stream operations to print each item without modifying the stream.
      *
      * Useful for debugging purposes.
      *
@@ -973,8 +971,7 @@ class Stream implements \IteratorAggregate
     }
 
     /**
-     * Call print_r() function of arrayed stream between other
-     * Stream operations without modifying the stream.
+     * Peek at each element between other Stream operations to print_r each item without modifying the stream.
      *
      * Useful for debugging purposes.
      *

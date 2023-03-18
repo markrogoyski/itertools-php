@@ -279,6 +279,14 @@ Quick Reference
 | [`toFile`](#To-File)            | Write the contents of the stream to a file     | `$stream->toFile($fileHandle)`                        |
 | [`var_dump`](#Var-Dump)         | `var_dump` each item                           | `$stream->varDump()`                                  |
 
+#### Stream Debug Operations
+| Debug Operation                   | Description                                              | Code Snippet                          |
+|-----------------------------------|----------------------------------------------------------|---------------------------------------|
+| [`peek`](#Peek)                   | Peek at each element between stream operations           | `$stream->peek($peekFunc)`            |
+| [`peekStream`](#Peek-Stream)      | Peek at the entire stream between operations             | `$stream->peekStream($peekFunc)`      |
+| [`peekPrint`](#Peek-Print)        | Peek at each element by printing between operations      | `$stream->peekPrint()`                |
+| [`peekPrintR`](#Peek-PrintR)      | Peek at each element by doing print-r between operations | `$stream->peekPrintR()`               |
+
 Setup
 -----
 
@@ -3569,6 +3577,68 @@ $items = [$string, $array, $object];
 
 Stream::of($words)->varDump();
 // var_dump output
+```
+
+### Stream Terminal Operations
+
+#### Peek
+Peek at each element between other Stream operations to do some action without modifying the stream.
+
+```$stream->peek(callable $callback): void```
+
+```php
+use IterTools\Stream;
+
+$logger = new SimpleLog\Logger('/tmp/log.txt', 'iterTools');
+
+Stream::of(['some', 'items'])
+  ->map('strtoupper')
+  ->peek(fn ($x) => $logger->info($x))
+  ->foreach($someComplexCallable);
+```
+
+#### Peek Stream
+Peek at the entire stream between other Stream operations to do some action without modifying the stream.
+
+```$stream->peekStream(callable $callback): void```
+
+```php
+use IterTools\Stream;
+
+$logger = new SimpleLog\Logger('/tmp/log.txt', 'iterTools');
+
+Stream::of(['some', 'items'])
+  ->map('strtoupper')
+  ->peekStream(fn ($stream) => $logger->info($stream))
+  ->foreach($someComplexCallable);
+```
+
+#### Peek Print
+Peek at each element between other Stream operations to print each item without modifying the stream.
+
+```$stream->peek(callable $callback): void```
+
+```php
+use IterTools\Stream;
+
+Stream::of(['some', 'items'])
+  ->map('strtoupper')
+  ->peekPrint()
+  ->foreach($someComplexCallable);
+```
+
+#### Peek PrintR
+Peek at each element between other Stream operations to `print_r` each item without modifying the stream.
+
+```$stream->peekPrintR(callable $callback): void```
+
+```php
+use IterTools\Stream;
+
+Stream::of(['some', 'items'])
+  ->map('strtoupper')
+  ->peekPrintR()
+  ->foreach($someComplexCallable);
 ```
 
 ## Composition
