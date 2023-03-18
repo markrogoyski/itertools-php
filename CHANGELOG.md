@@ -28,6 +28,8 @@
   * Summary Terminal Operations
     * `allUnique`
     * `isEmpty`
+### Bug Fixes
+* `Summary::allMatch` now returns true on empty iterables, as was documented.
 
 ## v1.4.0 - 2023-02-15
 

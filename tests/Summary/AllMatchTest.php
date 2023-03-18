@@ -25,7 +25,7 @@ class AllMatchTest extends \PHPUnit\Framework\TestCase
         $result = Summary::allMatch($data, $predicate);
 
         // Then
-        $this->assertFalse($result);
+        $this->assertTrue($result);
     }
 
 

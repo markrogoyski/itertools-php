@@ -24,16 +24,13 @@ class Summary
      */
     public static function allMatch(iterable $data, callable $predicate): bool
     {
-        $count = 0;
-
         foreach ($data as $datum) {
             if ($predicate($datum) === false) {
                 return false;
             }
-            $count++;
         }
 
-        return $count > 0;
+        return true;
     }
 
     /**
