@@ -167,6 +167,7 @@ Quick Reference
 | [`toMax`](#To-Max)                     | Reduce to its largest element              | `Reduce::toMax($numbers, [$compareBy])`                       |
 | [`toMin`](#To-Min)                     | Reduce to its smallest element             | `Reduce::toMin($numbers, [$compareBy])`                       |
 | [`toMinMax`](#To-Min-Max)              | Reduce to array of upper and lower bounds  | `Reduce::toMinMax($numbers, [$compareBy])`                    |
+| [`toNth`](#To-Nth)                     | Reduce to value at nth position            | `Reduce::toNth($data, $position)`                             |
 | [`toProduct`](#To-Product)             | Reduce to the product of its elements      | `Reduce::toProduct($numbers)`                                 |
 | [`toRandomValue`](#To-Random-Value)    | Reduce to random value from iterable       | `Reduce::toRandomValue($data)`                                |
 | [`toRange`](#To-Range)                 | Reduce to difference of max and min values | `Reduce::toRange($numbers)`                                   |
@@ -264,6 +265,7 @@ Quick Reference
 | [`toMax`](#To-Max-1)                     | Reduces stream to its max value                    | `$stream->toMax([$compareBy])`                          |
 | [`toMin`](#To-Min-1)                     | Reduces stream to its min value                    | `$stream->toMin([$compareBy])`                          |
 | [`toMinMax`](#To-Min-Max-1)              | Reduces stream to array of upper and lower bounds  | `$stream->toMinMax([$compareBy])`                       |
+| [`toNth`](#To-Nth-1)                     | Reduces stream to value at nth position            | `$stream->toNth($position)`                             |
 | [`toProduct`](#To-Product-1)             | Reduces stream to the product of its items         | `$stream->toProduct()`                                  |
 | [`toString`](#To-String-1)               | Reduces stream to joined string                    | `$stream->toString([$separator], [$prefix], [$suffix])` |
 | [`toSum`](#To-Sum-1)                     | Reduces stream to the sum of its items             | `$stream->toSum()`                                      |
@@ -1982,6 +1984,20 @@ $bestAndWorstSubject = Reduce::toMinMax($reportCard, $compareBy);
 // ]
 ```
 
+### To Nth
+Reduces to value at the nth position.
+
+```Reduce::toNth(iterable $data, int $position): mixed```
+
+```php
+use IterTools\Reduce;
+
+$lotrMovies = ['The Fellowship of the Ring', 'The Two Towers', 'The Return of the King'];
+
+$rotk = Reduce::toNth($lotrMovies, 2);
+// 20
+```
+
 ### To Product
 Reduces to the product of its elements.
 
@@ -3449,7 +3465,7 @@ $result = Stream::of($iterable)
 ```
 
 ##### To Min Max
-Reduces iterable source to array of its upper and lower bounds (max and min).
+Reduces stream to array of its upper and lower bounds (max and min).
 
 ```$stream->toMinMax(callable $compareBy = null): array```
 
@@ -3467,8 +3483,25 @@ $numbers = [1, 2, 7, -1, -2, -3];
 // [-3, 7]
 ```
 
+##### To Nth
+Reduces stream to value at the nth position.
+
+```$stream->toNth(int $position): mixed```
+
+Returns null if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$lotrMovies = ['The Fellowship of the Ring', 'The Two Towers', 'The Return of the King'];
+
+$result = Stream::of($lotrMovies)
+    ->toNth(2);
+// The Return of the King
+```
+
 ##### To Product
-Reduces iterable source to the product of its items.
+Reduces stream to the product of its items.
 
 ```$stream->toProduct(): mixed```
 

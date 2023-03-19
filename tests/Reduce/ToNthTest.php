@@ -13,6 +13,21 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class ToNthTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test toNth example usage
+     */
+    public function testExampleUsage(): void
+    {
+        // Given
+        $lotrMovies = ['The Fellowship of the Ring', 'The Two Towers', 'The Return of the King'];
+
+        // When
+        $rotk = Reduce::toNth($lotrMovies, 2);
+
+        // Then
+        $this->assertEquals('The Return of the King', $rotk);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param array $data
      * @param int $position
