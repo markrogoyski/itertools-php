@@ -164,6 +164,7 @@ Quick Reference
 | [`toMin`](#To-Min)                     | Reduce to its smallest element             | `Reduce::toMin($numbers, [$compareBy])`                       |
 | [`toMinMax`](#To-Min-Max)              | Reduce to array of upper and lower bounds  | `Reduce::toMinMax($numbers, [$compareBy])`                    |
 | [`toProduct`](#To-Product)             | Reduce to the product of its elements      | `Reduce::toProduct($numbers)`                                 |
+| [`toRandomValue`](#To-Random-Value)    | Reduce to random value from iterable       | `Reduce::toRandomValue($data)`                                |
 | [`toRange`](#To-Range)                 | Reduce to difference of max and min values | `Reduce::toRange($numbers)`                                   |
 | [`toString`](#To-String)               | Reduce to joined string                    | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
 | [`toSum`](#To-Sum)                     | Reduce to the sum of its elements          | `Reduce::toSum($numbers)`                                     |
@@ -258,6 +259,7 @@ Quick Reference
 | [`toProduct`](#To-Product-1)             | Reduces stream to the product of its items         | `$stream->toProduct()`                                  |
 | [`toString`](#To-String-1)               | Reduces stream to joined string                    | `$stream->toString([$separator], [$prefix], [$suffix])` |
 | [`toSum`](#To-Sum-1)                     | Reduces stream to the sum of its items             | `$stream->toSum()`                                      |
+| [`toRange`](#To-Random-Value-1)          | Reduces stream to random value within it           | `$stream->toRandomValue()`                              |
 | [`toRange`](#To-Range-1)                 | Reduces stream to difference of max and min values | `$stream->toRange()`                                    |
 | [`toValue`](#To-Value-1)                 | Reduces stream like array_reduce() function        | `$stream->toValue($reducer, $initialValue)`             |
 
@@ -1918,6 +1920,20 @@ $number = Reduce::toProduct($primeFactors);
 // 20
 ```
 
+### To Random Value
+Reduces given collection to a random value within it.
+
+```Reduce::toRandomValue(iterable $data): mixed```
+
+```php
+use IterTools\Reduce;
+
+$sfWakeupOptions = ['mid', 'low', 'overhead', 'throw', 'meaty'];
+
+$wakeupOption = Reduce::toRandomValue($sfWakeupOptions);
+// e.g., throw
+```
+
 ### To Range
 Reduces given collection to its range (difference between max and min).
 
@@ -3320,8 +3336,24 @@ $result = Stream::of($iterable)
 // 120
 ```
 
+##### To Random Value
+Reduces stream to a random value within it.
+
+```$stream->toRandomValue(): mixed```
+
+```php
+use IterTools\Stream;
+
+$rpsHands = ['rock', 'paper', 'scissors']
+
+$range = Stream::of($numbers)
+    ->map('strtoupper')
+    ->toRandomValue();
+// e.g., rock
+```
+
 ##### To Range
-Reduces iterable source to its range (difference between max and min).
+Reduces stream to its range (difference between max and min).
 
 ```$stream->toRange(): int|float```
 
