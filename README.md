@@ -267,7 +267,7 @@ Quick Reference
 | [`toProduct`](#To-Product-1)             | Reduces stream to the product of its items         | `$stream->toProduct()`                                  |
 | [`toString`](#To-String-1)               | Reduces stream to joined string                    | `$stream->toString([$separator], [$prefix], [$suffix])` |
 | [`toSum`](#To-Sum-1)                     | Reduces stream to the sum of its items             | `$stream->toSum()`                                      |
-| [`toRange`](#To-Random-Value-1)          | Reduces stream to random value within it           | `$stream->toRandomValue()`                              |
+| [`toRandomValue`](#To-Random-Value-1)    | Reduces stream to random value within it           | `$stream->toRandomValue()`                              |
 | [`toRange`](#To-Range-1)                 | Reduces stream to difference of max and min values | `$stream->toRange()`                                    |
 | [`toValue`](#To-Value-1)                 | Reduces stream like array_reduce() function        | `$stream->toValue($reducer, $initialValue)`             |
 
@@ -1356,7 +1356,7 @@ foreach (Set::union($a, $b, $c) as $item) {
 ### Union Coercive
 Iterates the union of iterables with [type coercion](#Strict-and-Coercive-Types).
 
-```Set::union(iterable ...$iterables)```
+```Set::unionCoercive(iterable ...$iterables)```
 
 If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) union rules apply.
 
@@ -1367,7 +1367,7 @@ $a = ['1', 2, 3];
 $b = [3, 4];
 $c = [1, 2, 3, 6, 7];
 
-foreach (Set::union($a, $b, $c) as $item) {
+foreach (Set::unionCoercive($a, $b, $c) as $item) {
     print($item);
 }
 //1, 2, 3, 4, 6, 7
@@ -1550,11 +1550,6 @@ $items = ['fingerprints', 'snowflakes', 'eyes', 'DNA']
 
 $boolean = Summary::allUnique($items);
 // true
-
-$isOnPlaystation = fn ($ff) => $ff >= 7 && $ff <= 9;
-
-$boolean = Summary::allMatch($finalFantasyNumbers, $isOnPlaystation);
-// false
 ```
 
 ### Any Match
@@ -3004,7 +2999,7 @@ $stream = Stream::of($input)
 #### Union Coercive With
 Return a stream consisting of the union of the stream and the input iterables using [type coercion](#Strict-and-Coercive-Types).
 
-```$stream->unionWith(iterable ...$iterables): Stream```
+```$stream->unionCoerciveWith(iterable ...$iterables): Stream```
 
 Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) union rules apply.
 
@@ -3014,7 +3009,7 @@ use IterTools\Stream;
 $input = [1, 2, 3];
 
 $stream = Stream::of($input)
-    ->unionWith(['3', 4, 5, 6])
+    ->unionCoerciveWith(['3', 4, 5, 6])
     ->toArray();
 // [1, 2, 3, 4, 5, 6]
 ```
