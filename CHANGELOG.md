@@ -1,6 +1,6 @@
 # IterTools PHP Change Log
 
-## v1.5.0 - TBD
+## v1.5.0 - 2023-03-19
 
 ### New Features
 * Reduce
