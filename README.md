@@ -141,6 +141,7 @@ Quick Reference
 | Summary                                                 | Description                                                              | Code Snippet                                      |
 |---------------------------------------------------------|--------------------------------------------------------------------------|---------------------------------------------------|
 | [`allMatch`](#All-Match)                                | True if all items are true according to predicate                        | `Summary::allMatch($data, $predicate)`            |
+| [`allUnique`](#All-Unique)                              | True if all items are unique                                             | `Summary::allUnique($data, [$strict])`            |
 | [`anyMatch`](#Any-Match)                                | True if any item is true according to predicate                          | `Summary::anyMatch($data, $predicate)`            |
 | [`arePermutations`](#Are-Permutations)                  | True if iterables are permutations of each other                         | `Summary::arePermutations(...$iterables)`         |
 | [`arePermutationsCoercive`](#Are-Permutations-Coercive) | True if iterables are permutations of each other with type coercion      | `Summary::arePermutationsCoercive(...$iterables)` |
@@ -195,7 +196,7 @@ Quick Reference
 | [`compressAssociative`](#Compress-Associative-1)                          | Compress source by filtering out keys not selected                                        | `$stream->compressAssociative($selectorKeys)`                                     |
 | [`chunkwise`](#Chunkwise-1)                                               | Iterate by chunks                                                                         | `$stream->chunkwise($chunkSize)`                                                  |
 | [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                                | Iterate by overlapped chunks                                                              | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                 |
-| [`distinct`](#Distinct-1)                                                 | Filter out elements: iterate only unique items                                            | `$stream->distinct($strict)`                                                      |
+| [`distinct`](#Distinct-1)                                                 | Filter out elements: iterate only unique items                                            | `$stream->distinct([$strict])`                                                    |
 | [`dropWhile`](#Drop-While-1)                                              | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`                                                  |
 | [`filter`](#Filter-1)                                                     | Filter for only elements where the predicate function is true                             | `$stream->filterTrue($predicate)`                                                 |
 | [`filterTrue`](#Filter-True-1)                                            | Filter for only truthy elements                                                           | `$stream->filterTrue()`                                                           |
@@ -235,6 +236,7 @@ Quick Reference
 | Terminal Operation                                               | Description                                                                      | Code Snippet                                           |
 |------------------------------------------------------------------|----------------------------------------------------------------------------------|--------------------------------------------------------|
 | [`allMatch`](#All-Match-1)                                       | Returns true if all items in stream match predicate                              | `$stream->allMatch($predicate)`                        |
+| [`allUnique`](#All-Unique-1)                                     | Returns true if all items in stream are unique                                   | `$stream->allUnique([$strict]])`                       |
 | [`anyMatch`](#Any-Match-1)                                       | Returns true if any item in stream matches predicate                             | `$stream->anyMatch($predicate)`                        |
 | [`arePermutationsWith`](#Are-Permutations-With)                  | Returns true if all iterables permutations of stream                             | `$stream->arePermutationsWith(...$iterables)`          |
 | [`arePermutationsCoerciveWith`](#Are-Permutations-Coercive-With) | Returns true if all iterables permutations of stream with type coercion          | `$stream->arePermutationsCoerciveWith(...$iterables)`  |
@@ -1482,6 +1484,27 @@ $finalFantasyNumbers = [4, 5, 6];
 $isOnSuperNintendo   = fn ($ff) => $ff >= 4 && $ff <= 6;
 
 $boolean = Summary::allMatch($finalFantasyNumbers, $isOnSuperNintendo);
+// true
+
+$isOnPlaystation = fn ($ff) => $ff >= 7 && $ff <= 9;
+
+$boolean = Summary::allMatch($finalFantasyNumbers, $isOnPlaystation);
+// false
+```
+
+### All Unique
+Returns true if all elements are unique.
+
+```Summary::allUnique(iterable $data, bool $strict = true): bool```
+
+Defaults to [strict type](#Strict-and-Coercive-Types) comparisons. Set strict to false for type coercion comparisons.
+
+```php
+use IterTools\Summary;
+
+$items = ['fingerprints', 'snowflakes', 'eyes', 'DNA']
+
+$boolean = Summary::allUnique($items);
 // true
 
 $isOnPlaystation = fn ($ff) => $ff >= 7 && $ff <= 9;
@@ -2995,6 +3018,23 @@ $isOnSuperNintendo   = fn ($ff) => $ff >= 4 && $ff <= 6;
 
 $boolean = Stream::of($finalFantasyNumbers)
     ->allMatch($isOnSuperNintendo);
+// true
+```
+
+##### All Unique
+Returns true if all elements are unique.
+
+```$stream->allUnique(bool $strict = true): bool```
+
+Defaults to [strict type](#Strict-and-Coercive-Types) comparisons. Set strict to false for type coercion comparisons.
+
+```php
+use IterTools\Summary;
+
+$items = ['fingerprints', 'snowflakes', 'eyes', 'DNA']
+
+$boolean = Stream::of($items)
+    ->allUnique();
 // true
 ```
 
