@@ -143,7 +143,6 @@ class Set
         return static::partialIntersection(1, ...$iterables);
     }
 
-
     /**
      * Iterates union of given iterables using type coercion.
      *

@@ -116,6 +116,8 @@ Quick Reference
 | [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Partial intersection with type coercion                   | `Set::partialIntersectionCoercive($minCount, ...$iterables)` |
 | [`symmetricDifference`](#Symmetric-Difference)                  | Symmetric difference of iterables                         | `Set::symmetricDifference(...$iterables)`                    |
 | [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Symmetric difference with type coercion                   | `Set::symmetricDifferenceCoercive(...$iterables)`            |
+| [`union`](#Union)                                               | Union of iterables                                        | `Set::union(...$iterables)`                                  |
+| [`unionCoercive`](#Union-Coercive)                              | Union with type coercion                                  | `Set::unionCoercive(...$iterables)`                          |
 
 #### Sort Iteration
 | Iterator                                       | Description                                  | Code Snippet                                              |
@@ -227,6 +229,8 @@ Quick Reference
 | [`symmetricDifferenceWith`](#Symmetric-Difference-With)                   | Symmetric difference of iterable source and given iterables                               | `$this->symmetricDifferenceWith(...$iterables)`                                   |
 | [`symmetricDifference CoerciveWith`](#Symmetric-Difference-Coercive-With) | Symmetric difference of iterable source and given iterables with type coercion            | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                          |
 | [`takeWhile`](#Take-While-1)                                              | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                                                  |
+| [`unionWith`](#Union-With)                                                | Union of stream with iterables                                                            | `$stream->unionWith(...$iterables)`                                               |
+| [`unionCoerciveWith`](#Union-Coercive-With)                               | Union of stream with iterables with type coercion                                         | `$stream->unionCoerciveWith(...$iterables)`                                       |
 | [`zipWith`](#Zip-With)                                                    | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`                                                 |
 | [`zipLongestWith`](#Zip-Longest-With)                                     | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipLongestWith(...$iterables)`                                          |
 | [`zipEqualWith`](#Zip-Equal-With)                                         | Iterate iterable source with another iterable collections of equal lengths simultaneously | `$stream->zipEqualWith(...$iterables)`                                            |
@@ -1327,6 +1331,46 @@ foreach (Set::symmetricDifferenceCoercive($a, $b, $c) as $item) {
     print($item);
 }
 // 4, 5, 6, 7, 8, 9
+```
+
+### Union
+Iterates the union of iterables.
+
+```Set::union(iterable ...$iterables)```
+
+If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) union rules apply.
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3];
+$b = [3, 4];
+$c = [1, 2, 3, 6, 7];
+
+foreach (Set::union($a, $b, $c) as $item) {
+    print($item);
+}
+//1, 2, 3, 4, 6, 7
+```
+
+### Union Coercive
+Iterates the union of iterables with [type coercion](#Strict-and-Coercive-Types).
+
+```Set::union(iterable ...$iterables)```
+
+If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) union rules apply.
+
+```php
+use IterTools\Set;
+
+$a = ['1', 2, 3];
+$b = [3, 4];
+$c = [1, 2, 3, 6, 7];
+
+foreach (Set::union($a, $b, $c) as $item) {
+    print($item);
+}
+//1, 2, 3, 4, 6, 7
 ```
 
 ## Sort Iteration
@@ -2937,6 +2981,42 @@ $result = Stream::of($input)
     ->takeWhile(fn ($value) => abs($value) < 3)
     ->toArray();
 // 1, -1, 2, -2
+```
+
+#### Union With
+Return a stream consisting of the union of the stream and the input iterables.
+
+```$stream->unionWith(iterable ...$iterables): Stream```
+
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) union rules apply.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$stream = Stream::of($input)
+    ->unionWith([3, 4, 5, 6])
+    ->toArray();
+// [1, 2, 3, 4, 5, 6]
+```
+
+#### Union Coercive With
+Return a stream consisting of the union of the stream and the input iterables using [type coercion](#Strict-and-Coercive-Types).
+
+```$stream->unionWith(iterable ...$iterables): Stream```
+
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) union rules apply.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$stream = Stream::of($input)
+    ->unionWith(['3', 4, 5, 6])
+    ->toArray();
+// [1, 2, 3, 4, 5, 6]
 ```
 
 #### Zip With

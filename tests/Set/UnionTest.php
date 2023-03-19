@@ -12,6 +12,27 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class UnionTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test union example usage
+     */
+    public function testExampleUsage(): void
+    {
+        // Given
+        $a = [1, 2, 3];
+        $b = [3, 4];
+        $c = [1, 2, 3, 6, 7];
+
+        // When
+        $result = [];
+        foreach (Set::union($a, $b, $c) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $expected = [1, 2, 3, 4, 6, 7];
+        $this->assertEqualsCanonicalizing($expected, $result);
+    }
+
+    /**
      * @dataProvider dataProviderForArraySets
      * @dataProvider dataProviderForArrayMultisets
      * @param array<array> $iterables
