@@ -145,6 +145,7 @@ Quick Reference
 | [`arePermutations`](#Are-Permutations)                  | True if iterables are permutations of each other                         | `Summary::arePermutations(...$iterables)`         |
 | [`arePermutationsCoercive`](#Are-Permutations-Coercive) | True if iterables are permutations of each other with type coercion      | `Summary::arePermutationsCoercive(...$iterables)` |
 | [`exactlyN`](#Exactly-N)                                | True if exactly n items are true according to predicate                  | `Summary::exactlyN($data, $n, $predicate)`        |
+| [`isEmpty`](#Is-Empty)                                  | True if iterable has no items                                            | `Summary::isEmpty($data)`                         |
 | [`isPartitioned`](#Is-Partitioned)                      | True if partitioned with items true according to predicate before others | `Summary::isPartitioned($data, $predicate)`       |
 | [`isSorted`](#Is-Sorted)                                | True if iterable sorted                                                  | `Summary::isSorted($data)`                        |
 | [`isReversed`](#Is-Reversed)                            | True if iterable reverse sorted                                          | `Summary::isReversed($data)`                      |
@@ -238,6 +239,7 @@ Quick Reference
 | [`arePermutationsWith`](#Are-Permutations-With)                  | Returns true if all iterables permutations of stream                             | `$stream->arePermutationsWith(...$iterables)`          |
 | [`arePermutationsCoerciveWith`](#Are-Permutations-Coercive-With) | Returns true if all iterables permutations of stream with type coercion          | `$stream->arePermutationsCoerciveWith(...$iterables)`  |
 | [`exactlyN`](#Exactly-N-1)                                       | Returns true if exactly n items are true according to predicate                  | `$stream->exactlyN($n, $predicate)`                    |
+| [`isEmpty`](#Is-Empty-1)                                         | Returns true if stream has no items                                              | `$stream::isEmpty()`                                   |
 | [`isPartitioned`](#Is-Partitioned-1)                             | Returns true if partitioned with items true according to predicate before others | `$stream::isPartitioned($predicate)`                   |
 | [`isSorted`](#Is-Sorted-1)                                       | Returns true if stream is sorted in ascending order                              | `$stream->isSorted()`                                  |
 | [`isReversed`](#Is-Reversed-1)                                   | Returns true if stream is sorted in reverse descending order                     | `$stream->isReversed()`                                |
@@ -1561,6 +1563,20 @@ $predicate = fn ($age) => $age >= 21;
 
 $boolean = Summary::exactlyN($ages, $n, $predicate);
 // false
+```
+
+### Is Empty
+Returns true if the iterable is empty having no items.
+
+```Summary::isEmpty(iterable $data): bool```
+
+```php
+use IterTools\Summary;
+
+$data = []
+
+$boolean = Summary::isEmpty($data);
+// true
 ```
 
 ### Is Partitioned
@@ -3048,6 +3064,23 @@ $twoTruthsAndALie = [true, true, false];
 $n                = 2;
 
 $boolean = Stream::of($twoTruthsAndALie)->exactlyN($n);
+// true
+```
+
+##### Is Empty
+Returns true if the stream is empty having no items.
+
+```$stream->isEmpty(): bool```
+
+```php
+use IterTools\Summary;
+
+$numbers    = [0, 1, 2, 3, 4, 5];
+$filterFunc = fn ($x) => $x > 10;
+
+$boolean = Stream::($numbers)
+    ->filter($filterFunc)
+    ->isEmpty();
 // true
 ```
 
