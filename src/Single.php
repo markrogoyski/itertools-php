@@ -528,7 +528,7 @@ class Single
 
     /**
      * Returns a frequency distribution of iterable elements
-     * showing how often each different value in the data occurs.
+     * showing how often each different value in the collection occurs.
      *
      * @template T
      *
@@ -559,7 +559,7 @@ class Single
          * @var T $value
          * @var int $usageCount
          */
-        foreach (Multi::zip($values, $usages) as [$value, $usageCount]) {
+        foreach (Multi::zipEqual($values, $usages) as [$value, $usageCount]) {
             yield $value => ($usageCount / $totalCount);
         }
     }

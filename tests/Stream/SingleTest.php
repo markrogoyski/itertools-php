@@ -730,6 +730,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2],
             ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toAssociativeArray(),
+                [],
+            ],
+            [
+                ['a', 'c', 'b', 'c'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toAssociativeArray(),
+                ['a' => 0.25, 'c' => 0.5, 'b' => 0.25],
+            ],
+            [
+                [1, '1'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toArray(),
+                [0.5, 0.5],
+            ],
+            [
+                [1, '1'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies(false)
+                    ->toAssociativeArray(),
+                ['1' => 1],
+            ],
         ];
     }
 
@@ -1365,6 +1393,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2],
             ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toAssociativeArray(),
+                [],
+            ],
+            [
+                $gen(['a', 'c', 'b', 'c']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toAssociativeArray(),
+                ['a' => 0.25, 'c' => 0.5, 'b' => 0.25],
+            ],
+            [
+                $gen([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toArray(),
+                [0.5, 0.5],
+            ],
+            [
+                $gen([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies(false)
+                    ->toAssociativeArray(),
+                ['1' => 1],
+            ],
         ];
     }
 
@@ -1992,6 +2048,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->toArray(),
                 [1, 2],
             ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toAssociativeArray(),
+                [],
+            ],
+            [
+                $iter(['a', 'c', 'b', 'c']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toAssociativeArray(),
+                ['a' => 0.25, 'c' => 0.5, 'b' => 0.25],
+            ],
+            [
+                $iter([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toArray(),
+                [0.5, 0.5],
+            ],
+            [
+                $iter([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies(false)
+                    ->toAssociativeArray(),
+                ['1' => 1],
+            ],
         ];
     }
 
@@ -2618,6 +2702,34 @@ class SingleTest extends \PHPUnit\Framework\TestCase
                     ->skip(10, 2)
                     ->toArray(),
                 [1, 2],
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toAssociativeArray(),
+                [],
+            ],
+            [
+                $trav(['a', 'c', 'b', 'c']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toAssociativeArray(),
+                ['a' => 0.25, 'c' => 0.5, 'b' => 0.25],
+            ],
+            [
+                $trav([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toArray(),
+                [0.5, 0.5],
+            ],
+            [
+                $trav([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies(false)
+                    ->toAssociativeArray(),
+                ['1' => 1],
             ],
         ];
     }

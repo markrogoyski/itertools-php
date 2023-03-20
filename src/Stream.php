@@ -498,6 +498,20 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns a frequency distribution of stream elements
+     * showing how often each different value in the collection occurs.
+     *
+     * @param bool $strict
+     *
+     * @return $this
+     */
+    public function frequencies(bool $strict = true): self
+    {
+        $this->iterable = Single::frequencies($this->iterable, $strict);
+        return $this;
+    }
+
+    /**
      * Sorts the stream.
      *
      * If comparator is null, then elements of the iterable source must be comparable.
