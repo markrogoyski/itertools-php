@@ -3910,3 +3910,11 @@ License
 -------
 
 IterTools PHP is licensed under the MIT License.
+
+Similar Libraries in Other Languages
+------------------------------------
+
+IterTools functionality is not limited to PHP and Python. Other languages have similar libraries.
+Familiar functionality is available when working in other langauges.
+
+* [IterTools TypeScript](https://github.com/Smoren/itertools-ts)
