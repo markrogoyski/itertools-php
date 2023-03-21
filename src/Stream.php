@@ -603,6 +603,28 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Iterate iterable source with another iterable collections simultaneously.
+     *
+     * Make an iterator that aggregates items from multiple iterators.
+     * Similar to Python's zip_longest function
+     *
+     * Iteration continues until the longest iterable is exhausted.
+     * For uneven lengths, the exhausted iterables will produce $filler value for the remaining iterations.
+     *
+     * @param mixed $filler
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return $this
+     *
+     * @see Multi::zipFilled()
+     */
+    public function zipFilledWith($filler, iterable ...$iterables): self
+    {
+        $this->iterable = Multi::zipFilled($filler, $this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
      * Iterate iterable source with another iterable collections of equal lengths simultaneously.
      *
      * Works like Multi::zip() method but throws \LengthException if lengths not equal,

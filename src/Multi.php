@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\Iterators\StrictMultipleIterator;
 
 class Multi
@@ -54,6 +55,30 @@ class Multi
         $zippedIterator->setFlags(\MultipleIterator::MIT_NEED_ANY);
 
         foreach ($zippedIterator as $values) {
+            yield $values;
+        }
+    }
+
+    /**
+     * Iterate multiple iterable collections simultaneously.
+     *
+     * Make an iterator that aggregates items from multiple iterators.
+     * Similar to Python's zip_longest function
+     *
+     * Iteration continues until the longest iterable is exhausted.
+     * For uneven lengths, the exhausted iterables will produce $filler value for the remaining iterations.
+     *
+     * @param mixed $filler
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<array<mixed>>
+     */
+    public static function zipFilled($filler, iterable ...$iterables): \Generator
+    {
+        $iterator = new JustifyMultipleIterator(...$iterables);
+        $iterator->setFiller($filler);
+
+        foreach ($iterator as $values) {
             yield $values;
         }
     }
