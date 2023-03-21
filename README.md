@@ -281,23 +281,23 @@ Quick Reference
 | [`tee`](#Tee-1)                                 | Returns array of multiple identical Streams           | `$stream->tee($count)`                                  |
 
 ##### Side Effect Terminal Operations
-| Terminal Operation              | Description                                    | Code Snippet                                          |
-|---------------------------------|------------------------------------------------|-------------------------------------------------------|
-| [`callForEach`](#Call-For-Each) | Perform action via function on each item       | `$stream->callForEach($function)`                     |
-| [`print`](#Print)               | `print` each item in the stream                | `$stream->print([$separator], [$prefix], [$suffix])`  |
-| [`printLn`](#Print-Line)        | `print` each item on a new line                | `$stream->printLn()`                                  |
-| [`printR`](#Print-R)            | `print_r` each item                            | `$stream->printR()`                                   |
-| [`toCsvFile`](#To-CSV-File)     | Write the contents of the stream to a CSV file | `$stream->toCsvFile($fileHandle, [$headers])`         |
-| [`toFile`](#To-File)            | Write the contents of the stream to a file     | `$stream->toFile($fileHandle)`                        |
-| [`var_dump`](#Var-Dump)         | `var_dump` each item                           | `$stream->varDump()`                                  |
+| Terminal Operation              | Description                                    | Code Snippet                                         |
+|---------------------------------|------------------------------------------------|------------------------------------------------------|
+| [`callForEach`](#Call-For-Each) | Perform action via function on each item       | `$stream->callForEach($function)`                    |
+| [`print`](#Print)               | `print` each item in the stream                | `$stream->print([$separator], [$prefix], [$suffix])` |
+| [`printLn`](#Print-Line)        | `print` each item on a new line                | `$stream->printLn()`                                 |
+| [`toCsvFile`](#To-CSV-File)     | Write the contents of the stream to a CSV file | `$stream->toCsvFile($fileHandle, [$headers])`        |
+| [`toFile`](#To-File)            | Write the contents of the stream to a file     | `$stream->toFile($fileHandle)`                       |
 
 #### Stream Debug Operations
-| Debug Operation                   | Description                                              | Code Snippet                          |
-|-----------------------------------|----------------------------------------------------------|---------------------------------------|
-| [`peek`](#Peek)                   | Peek at each element between stream operations           | `$stream->peek($peekFunc)`            |
-| [`peekStream`](#Peek-Stream)      | Peek at the entire stream between operations             | `$stream->peekStream($peekFunc)`      |
-| [`peekPrint`](#Peek-Print)        | Peek at each element by printing between operations      | `$stream->peekPrint()`                |
-| [`peekPrintR`](#Peek-PrintR)      | Peek at each element by doing print-r between operations | `$stream->peekPrintR()`               |
+| Debug Operation              | Description                                              | Code Snippet                     |
+|------------------------------|----------------------------------------------------------|----------------------------------|
+| [`peek`](#Peek)              | Peek at each element between stream operations           | `$stream->peek($peekFunc)`       |
+| [`peekStream`](#Peek-Stream) | Peek at the entire stream between operations             | `$stream->peekStream($peekFunc)` |
+| [`peekPrint`](#Peek-Print)   | Peek at each element by printing between operations      | `$stream->peekPrint()`           |
+| [`peekPrintR`](#Peek-PrintR) | Peek at each element by doing print-r between operations | `$stream->peekPrintR()`          |
+| [`printR`](#Print-R)         | `print_r` each item                                      | `$stream->printR()`              |
+| [`varDump`](#Var-Dump)       | `var_dump` each item                                     | `$stream->varDump()`             |
 
 Setup
 -----
@@ -2884,7 +2884,7 @@ $result = Stream::of($input)
 #### Skip
 Skip some elements of the stream.
 
-```$stream->slice(int $start = 0, int $count = null, int $step = 1)```
+```$stream->skip(int $count, int $offset = 0): Stream```
 
 ```php
 use IterTools\Stream;
@@ -3718,20 +3718,6 @@ Stream::of($words)->printLn();
 // v1.0
 ```
 
-##### Print R
-`print_r` each item in the stream.
-
-```$stream->printR(): void```
-
-```php
-use IterTools\Stream;
-
-$items = [$string, $array, $object];
-
-Stream::of($words)->printR();
-// print_r output
-```
-
 ##### To CSV File
 Write the contents of the stream to a CSV file.
 
@@ -3778,26 +3764,11 @@ Stream::of($data)
 // </ul>
 ```
 
-##### Var Dump
-`var_dump` each item in the stream.
-
-```$stream->varDump(): void```
-
-```php
-use IterTools\Stream;
-
-$items = [$string, $array, $object];
-
-Stream::of($words)->varDump();
-// var_dump output
-```
-
-### Stream Terminal Operations
-
+### Stream Debug Operations
 #### Peek
 Peek at each element between other Stream operations to do some action without modifying the stream.
 
-```$stream->peek(callable $callback): void```
+```$stream->peek(callable $callback): Stream```
 
 ```php
 use IterTools\Stream;
@@ -3813,7 +3784,7 @@ Stream::of(['some', 'items'])
 #### Peek Stream
 Peek at the entire stream between other Stream operations to do some action without modifying the stream.
 
-```$stream->peekStream(callable $callback): void```
+```$stream->peekStream(callable $callback): Stream```
 
 ```php
 use IterTools\Stream;
@@ -3829,7 +3800,7 @@ Stream::of(['some', 'items'])
 #### Peek Print
 Peek at each element between other Stream operations to print each item without modifying the stream.
 
-```$stream->peek(callable $callback): void```
+```$stream->peekPrint(string $separator = '', string $prefix = '', string $suffix = ''): void```
 
 ```php
 use IterTools\Stream;
@@ -3852,6 +3823,34 @@ Stream::of(['some', 'items'])
   ->map('strtoupper')
   ->peekPrintR()
   ->foreach($someComplexCallable);
+```
+
+##### Print R
+`print_r` each item in the stream.
+
+```$stream->printR(): void```
+
+```php
+use IterTools\Stream;
+
+$items = [$string, $array, $object];
+
+Stream::of($words)->printR();
+// print_r output
+```
+
+##### Var Dump
+`var_dump` each item in the stream.
+
+```$stream->varDump(): void```
+
+```php
+use IterTools\Stream;
+
+$items = [$string, $array, $object];
+
+Stream::of($words)->varDump();
+// var_dump output
 ```
 
 ## Composition
