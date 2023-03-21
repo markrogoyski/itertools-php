@@ -3915,6 +3915,7 @@ Similar Libraries in Other Languages
 ------------------------------------
 
 IterTools functionality is not limited to PHP and Python. Other languages have similar libraries.
-Familiar functionality is available when working in other langauges.
+Familiar functionality is available when working in other languages.
 
 * [IterTools TypeScript](https://github.com/Smoren/itertools-ts)
+* [IterTools Python](https://docs.python.org/3/library/itertools.html): The original!
