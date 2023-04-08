@@ -6,6 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\Iterators\StrictMultipleIterator;
+use IterTools\Util\NoValueMonad;
 
 class Multi
 {
@@ -75,8 +76,7 @@ class Multi
      */
     public static function zipFilled($filler, iterable ...$iterables): \Generator
     {
-        $iterator = new JustifyMultipleIterator(...$iterables);
-        $iterator->setFiller($filler);
+        $iterator = new JustifyMultipleIterator($filler, ...$iterables);
 
         foreach ($iterator as $values) {
             yield $values;

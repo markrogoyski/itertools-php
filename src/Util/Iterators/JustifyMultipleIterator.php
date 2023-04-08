@@ -26,24 +26,16 @@ class JustifyMultipleIterator implements \Iterator
     protected $filler;
 
     /**
+     * @param mixed $filler
      * @param iterable<mixed> ...$iterables
      */
-    public function __construct(iterable ...$iterables)
+    public function __construct($filler, iterable ...$iterables)
     {
-        $this->filler = NoValueMonad::getInstance();
+        $this->filler = $filler;
 
         foreach ($iterables as $iterable) {
             $this->iterators[] = Transform::toIterator($iterable);
         }
-    }
-
-    /**
-     * @param mixed $filler
-     * @return void
-     */
-    public function setFiller($filler): void
-    {
-        $this->filler = $filler;
     }
 
     /**
