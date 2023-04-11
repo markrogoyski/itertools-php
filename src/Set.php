@@ -216,7 +216,7 @@ class Set
     ): \Generator {
         $usageMap = new UsageMap($strict);
 
-        $multipleIterator = new JustifyMultipleIterator(...$iterables);
+        $multipleIterator = new JustifyMultipleIterator(NoValueMonad::getInstance(), ...$iterables);
 
         foreach ($multipleIterator as $index => $values) {
             foreach ($values as $owner => $value) {
@@ -249,7 +249,7 @@ class Set
         $usageMap = new UsageMap($strict);
         $valuesMap = [];
 
-        $multipleIterator = new JustifyMultipleIterator(...$iterables);
+        $multipleIterator = new JustifyMultipleIterator(NoValueMonad::getInstance(), ...$iterables);
 
         foreach ($multipleIterator as $values) {
             foreach ($values as $owner => $value) {

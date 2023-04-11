@@ -121,6 +121,23 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->zipFilledWith(
+                        'filler',
+                        [11, 22, 33],
+                        [111, 222, 333, 444]
+                    )
+                    ->toArray(),
+                [
+                    [1, 11, 111],
+                    [2, 22, 222],
+                    [3, 33, 333],
+                    [4, 'filler', 444],
+                    [5, 'filler', 'filler'],
+                ],
+            ],
+            [
                 [1, 2, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
                 ->chainWith([4, 5, 6])
@@ -247,6 +264,23 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                     [3, 33, 333],
                     [4, null, 444],
                     [5, null, null],
+                ],
+            ],
+            [
+                $gen([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->zipFilledWith(
+                        'filler',
+                        $gen([11, 22, 33]),
+                        $gen([111, 222, 333, 444]),
+                    )
+                    ->toArray(),
+                [
+                    [1, 11, 111],
+                    [2, 22, 222],
+                    [3, 33, 333],
+                    [4, 'filler', 444],
+                    [5, 'filler', 'filler'],
                 ],
             ],
             [
@@ -379,6 +413,23 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
             [
+                $iter([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->zipFilledWith(
+                        'filler',
+                        $iter([11, 22, 33]),
+                        $iter([111, 222, 333, 444]),
+                    )
+                    ->toArray(),
+                [
+                    [1, 11, 111],
+                    [2, 22, 222],
+                    [3, 33, 333],
+                    [4, 'filler', 444],
+                    [5, 'filler', 'filler'],
+                ],
+            ],
+            [
                 $iter([1, 2, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->chainWith($iter([4, 5, 6]))
@@ -505,6 +556,23 @@ class MultiTest extends \PHPUnit\Framework\TestCase
                     [3, 33, 333],
                     [4, null, 444],
                     [5, null, null],
+                ],
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->zipFilledWith(
+                        'filler',
+                        $trav([11, 22, 33]),
+                        $trav([111, 222, 333, 444]),
+                    )
+                    ->toArray(),
+                [
+                    [1, 11, 111],
+                    [2, 22, 222],
+                    [3, 33, 333],
+                    [4, 'filler', 444],
+                    [5, 'filler', 'filler'],
                 ],
             ],
             [

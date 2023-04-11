@@ -20,12 +20,19 @@ class JustifyMultipleIterator implements \Iterator
      * @var int
      */
     protected int $index = 0;
+    /**
+     * @var mixed
+     */
+    protected $filler;
 
     /**
+     * @param mixed $filler
      * @param iterable<mixed> ...$iterables
      */
-    public function __construct(iterable ...$iterables)
+    public function __construct($filler, iterable ...$iterables)
     {
+        $this->filler = $filler;
+
         foreach ($iterables as $iterable) {
             $this->iterators[] = Transform::toIterator($iterable);
         }
@@ -39,8 +46,8 @@ class JustifyMultipleIterator implements \Iterator
     public function current(): array
     {
         return Stream::of($this->iterators)
-            ->map(static function (\Iterator $iterator) {
-                return $iterator->valid() ? $iterator->current() : NoValueMonad::getInstance();
+            ->map(function (\Iterator $iterator) {
+                return $iterator->valid() ? $iterator->current() : $this->filler;
             })
             ->toArray();
     }
