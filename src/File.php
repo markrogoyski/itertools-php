@@ -50,8 +50,10 @@ class File
     ): \Generator {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
-        // @phpstan-ignore-next-line (expects int<0, max>, null given.)
-        while (($row = \fgetcsv($fileResource, null, $separator, $enclosure, $escape)) !== false) {
+        /** @var int<0, max> $length */
+        $length = null;
+
+        while (($row = \fgetcsv($fileResource, $length, $separator, $enclosure, $escape)) !== false) {
             /** @var array<string|null> $row */
             yield $row;
         }
