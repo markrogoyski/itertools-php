@@ -61,7 +61,7 @@ class Multi
     }
 
     /**
-     * Iterate multiple iterable collections simultaneously.
+     * Iterate multiple iterable collections simultaneously, using a default filler value if lengths are not equal
      *
      * Make an iterator that aggregates items from multiple iterators.
      * Similar to Python's zip_longest function

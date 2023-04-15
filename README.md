@@ -47,12 +47,13 @@ Quick Reference
 ### Loop Iteration Tools
 
 #### Multi Iteration
-| Iterator                    | Description                                                                             | Code Snippet                        |
-|-----------------------------|-----------------------------------------------------------------------------------------|-------------------------------------|
-| [`chain`](#Chain)           | Chain multiple iterables together                                                       | `Multi::chain($list1, $list2)`      |
-| [`zip`](#Zip)               | Iterate multiple collections simultaneously until the shortest iterator completes       | `Multi::zip($list1, $list2)`        |
-| [`zipEqual`](#ZipEqual)     | Iterate multiple collections of equal length simultaneously, error if lengths not equal | `Multi::zipEqual($list1, $list2)`   |
-| [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously until the longest iterator completes        | `Multi::zipLongest($list1, $list2)` |
+| Iterator                    | Description                                                                             | Code Snippet                                  |
+|-----------------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------|
+| [`chain`](#Chain)           | Chain multiple iterables together                                                       | `Multi::chain($list1, $list2)`                |
+| [`zip`](#Zip)               | Iterate multiple collections simultaneously until the shortest iterator completes       | `Multi::zip($list1, $list2)`                  |
+| [`zipEqual`](#ZipEqual)     | Iterate multiple collections of equal length simultaneously, error if lengths not equal | `Multi::zipEqual($list1, $list2)`             |
+| [`zipFilled`](#ZipFilled)   | Iterate multiple collections, using a filler value if lengths not equal                 | `Multi::zipFilled($default, $list1, $list2)`  |
+| [`zipLongest`](#ZipLongest) | Iterate multiple collections simultaneously until the longest iterator completes        | `Multi::zipLongest($list1, $list2)`           |
 
 #### Single Iteration
 | Iterator                                       | Description                                  | Code Snippet                                                |
@@ -232,9 +233,10 @@ Quick Reference
 | [`takeWhile`](#Take-While-1)                                              | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                                                  |
 | [`unionWith`](#Union-With)                                                | Union of stream with iterables                                                            | `$stream->unionWith(...$iterables)`                                               |
 | [`unionCoerciveWith`](#Union-Coercive-With)                               | Union of stream with iterables with type coercion                                         | `$stream->unionCoerciveWith(...$iterables)`                                       |
-| [`zipWith`](#Zip-With)                                                    | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipWith(...$iterables)`                                                 |
-| [`zipLongestWith`](#Zip-Longest-With)                                     | Iterate iterable source with another iterable collections simultaneously                  | `$stream->zipLongestWith(...$iterables)`                                          |
-| [`zipEqualWith`](#Zip-Equal-With)                                         | Iterate iterable source with another iterable collections of equal lengths simultaneously | `$stream->zipEqualWith(...$iterables)`                                            |
+| [`zipWith`](#Zip-With)                                                    | Iterate iterable source with another iterable collection simultaneously                   | `$stream->zipWith(...$iterables)`                                                 |
+| [`zipEqualWith`](#Zip-Equal-With)                                         | Iterate iterable source with another iterable collection of equal lengths simultaneously  | `$stream->zipEqualWith(...$iterables)`                                            |
+| [`zipFilledWith`](#Zip-Willed-With)                                       | Iterate iterable source with another iterable collection using default filler             | `$stream->zipFilledWith($default, ...$iterables)`                                 |
+| [`zipLongestWith`](#Zip-Longest-With)                                     | Iterate iterable source with another iterable collection simultaneously                   | `$stream->zipLongestWith(...$iterables)`                                          |
 
 #### Stream Terminal Operations
 ##### Summary Terminal Operations
@@ -388,24 +390,6 @@ foreach (Multi::zip($names, $countries, $signatureMoves) as [$name, $country, $s
 ```
 Note: For uneven lengths, iteration stops when the shortest iterable is exhausted.
 
-### ZipLongest
-Iterate multiple iterable collections simultaneously.
-
-```Multi::zipLongest(iterable ...$iterables)```
-
-For uneven lengths, the exhausted iterables will produce `null` for the remaining iterations.
-
-```php
-use IterTools\Multi;
-
-$letters = ['A', 'B', 'C'];
-$numbers = [1, 2];
-
-foreach (Multi::zipLongest($letters, $numbers) as [$letter, $number]) {
-    // ['A', 1], ['B', 2], ['C', null]
-}
-```
-
 ### ZipEqual
 Iterate multiple iterable collections with equal lengths simultaneously.
 
@@ -421,6 +405,41 @@ $numbers = [1, 2, 3];
 
 foreach (Multi::zipEqual($letters, $numbers) as [$letter, $number]) {
     // ['A', 1], ['B', 2], ['C', 3]
+}
+```
+
+### ZipFilled
+Iterate multiple iterable collections simultaneously, using a default filler value if lengths are not equal.
+
+```Multi::zipFilled(mixed $filler, iterable ...$iterables)```
+
+```php
+use IterTools\Multi;
+
+$default = '?';
+$letters = ['A', 'B'];
+$numbers = [1, 2, 3];
+
+foreach (Multi::zipFilled($default, $letters, $numbers) as [$letter, $number]) {
+    // ['A', 1], ['B', 2], ['?', 3]
+}
+```
+
+### ZipLongest
+Iterate multiple iterable collections simultaneously.
+
+```Multi::zipLongest(iterable ...$iterables)```
+
+For uneven lengths, the exhausted iterables will produce `null` for the remaining iterations.
+
+```php
+use IterTools\Multi;
+
+$letters = ['A', 'B', 'C'];
+$numbers = [1, 2];
+
+foreach (Multi::zipLongest($letters, $numbers) as [$letter, $number]) {
+    // ['A', 1], ['B', 2], ['C', null]
 }
 ```
 
@@ -3049,6 +3068,49 @@ $stream = Stream::of($input)
 // [1, 4, 7], [2, 5, 8], [3, 6, 9]
 ```
 
+#### Zip Filled With
+Return a stream consisting of multiple iterable collections, using a default filler value if lengths no equal.
+
+```$stream->zipEqualWith(mixed $default, iterable ...$iterables): Stream```
+
+Works like `Stream::zipWith()` method but throws \LengthException if lengths not equal,
+i.e., at least one iterator ends before the others.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$stream = Stream::of($input)
+    ->zipFilledWith('?', ['A', 'B']);
+
+foreach ($stream as $zipped) {
+    // [1, A], [2, B], [3, ?]
+}
+```
+
+#### Zip Filled With
+Return a stream consisting of multiple iterable collections of equal lengths streamed simultaneously.
+
+```$stream->zipEqualWith(iterable ...$iterables): Stream```
+
+Works like `Stream::zipWith()` method but throws \LengthException if lengths not equal,
+i.e., at least one iterator ends before the others.
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$stream = Stream::of($input)
+    ->zipEqualWith([4, 5, 6])
+    ->zipEqualWith([7, 8, 9]);
+
+foreach ($stream as $zipped) {
+    // [1, 4, 7], [2, 5, 8], [3, 6, 9]
+}
+```
+
 #### Zip Longest With
 Return a stream consisting of multiple iterable collections streamed simultaneously.
 
@@ -3068,28 +3130,6 @@ $stream = Stream::of($input)
 
 foreach ($stream as $zipped) {
     // [1, 4, 7], [2, 5, 8], [3, 6, 9], [4, null, 10], [null, null, 5]
-}
-```
-
-#### Zip Equal With
-Return a stream consisting of multiple iterable collectionso f equal lengths streamed simultaneously.
-
-```$stream->zipEqualWith(iterable ...$iterables): Stream```
-
-Works like `Stream::zipWith()` method but throws \LengthException if lengths not equal,
-i.e., at least one iterator ends before the others.
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3];
-
-$stream = Stream::of($input)
-    ->zipEqualWith([4, 5, 6])
-    ->zipEqualWith([7, 8, 9]);
-
-foreach ($stream as $zipped) {
-    // [1, 4, 7], [2, 5, 8], [3, 6, 9]
 }
 ```
 
