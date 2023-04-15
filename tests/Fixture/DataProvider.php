@@ -60,8 +60,9 @@ trait DataProvider
         return [
             [Multi::chain([1, 2, 3], [4, 5, 6])],
             [Multi::zip([1, 2, 3], [4, 5, 6])],
-            [Multi::zipLongest([1, 2, 3], [4, 5, 6])],
             [Multi::zipEqual([1, 2, 3], [4, 5, 6])],
+            [Multi::zipFilled([1, 2, 3], ['filler', 5, 6])],
+            [Multi::zipLongest([1, 2, 3], [4, 5, 6])],
         ];
     }
 
@@ -235,6 +236,7 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->unionCoerciveWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->zipWith([6, 7, 8, 9, 10])],
             [Stream::of([1, 2, 3, 4, 5])->zipEqualWith([6, 7, 8, 9, 10])],
+            [Stream::of([1, 2, 3, 4, 5])->zipFilledWith('filler', [6, 7, 8, 9, 10])],
             [Stream::of([1, 2, 3, 4, 5])->zipLongestWith([6, 7, 8, 9, 10])],
         ];
     }
