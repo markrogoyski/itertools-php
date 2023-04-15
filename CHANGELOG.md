@@ -3,8 +3,13 @@
 ## v1.6.0 - TBD
 
 ### New Features
+* Multi
+  * `zipFilled`
 * Reduce
   * `toNth`
+* Stream
+  * `toNth`
+  * `zipFilledWith`
 
 ## v1.5.0 - 2023-03-19
 
