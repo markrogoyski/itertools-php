@@ -44,12 +44,13 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 ### Инструменты для итерирования в циклах
 
 #### Итерирование нескольких коллекций
-| Метод                       | Описание                                                                                    | Пример кода                         |
-|-----------------------------|---------------------------------------------------------------------------------------------|-------------------------------------|
-| [`chain`](#Chain)           | Последовательно итерирует коллекции                                                         | `Multi::chain($list1, $list2)`      |
-| [`zip`](#Zip)               | Параллельно итерирует коллекции, пока не закончится самый короткий итератор                 | `Multi::zip($list1, $list2)`        |
-| [`zipEqual`](#ZipEqual)     | Параллельно итерирует коллекции одного размера, в случае разных размеров бросает исключение | `Multi::zipEqual($list1, $list2)`   |
-| [`zipLongest`](#ZipLongest) | Параллельно итерирует коллекции, пока не закончится самый длинный итератор                  | `Multi::zipLongest($list1, $list2)` |
+| Метод                       | Описание                                                                                    | Пример кода                                  |
+|-----------------------------|---------------------------------------------------------------------------------------------|----------------------------------------------|
+| [`chain`](#Chain)           | Последовательно итерирует коллекции                                                         | `Multi::chain($list1, $list2)`               |
+| [`zip`](#Zip)               | Параллельно итерирует коллекции, пока не закончится самый короткий итератор                 | `Multi::zip($list1, $list2)`                 |
+| [`zipEqual`](#ZipEqual)     | Параллельно итерирует коллекции одного размера, в случае разных размеров бросает исключение | `Multi::zipEqual($list1, $list2)`            |
+| [`zipFilled`](#ZipFilled)   | Параллельно итерирует коллекции с подстановкой филлера для закончившихся итераторов         | `Multi::zipFilled($default, $list1, $list2)` |
+| [`zipLongest`](#ZipLongest) | Параллельно итерирует коллекции, пока не закончится самый длинный итератор                  | `Multi::zipLongest($list1, $list2)`          |
 
 #### Итерирование одной коллекции
 | Метод                                          | Описание                                                                     | Пример кода                                                 |
@@ -164,6 +165,7 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`toMax`](#To-Max)                     | Максимальный элемент коллекции                                                      | `Reduce::toMax($numbers, [$compareBy])`                       |
 | [`toMin`](#To-Min)                     | Минимальный элемент коллекции                                                       | `Reduce::toMin($numbers, [$compareBy])`                       |
 | [`toMinMax`](#To-Min-Max)              | Минимальный и максимальный элемент коллекции                                        | `Reduce::toMinMax($numbers, [$compareBy])`                    |
+| [`toNth`](#To-Nth)                     | N-й элемент коллекции                                                               | `Reduce::toNth($data, $position)`                             |
 | [`toProduct`](#To-Product)             | Произведение элементов коллекции                                                    | `Reduce::toProduct($numbers)`                                 |
 | [`toRandomValue`](#To-Random-Value)    | Случайный элемент из коллекции                                                      | `Reduce::toRandomValue($data)`                                |
 | [`toRange`](#To-Range)                 | Разница между максимальным и минимальным элементами коллекции                       | `Reduce::toRange($numbers)`                                   |
@@ -229,8 +231,9 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`unionWith`](#Union-With)                                                | Возвращает объединение хранимой коллекции с другими коллекциями                                              | `$stream->unionWith(...$iterables)`                                               |
 | [`unionCoerciveWith`](#Union-Coercive-With)                               | Возвращает объединение хранимой коллекции с другими коллекциями (в режиме приведения типов)                  | `$stream->unionCoerciveWith(...$iterables)`                                       |
 | [`zipWith`](#Zip-With)                                                    | Параллельно итерирует коллекцию вместе с другими, пока не закончится самый короткий итератор                 | `$stream->zipWith(...$iterables)`                                                 |
-| [`zipLongestWith`](#Zip-Longest-With)                                     | Параллельно итерирует коллекцию вместе с другими, пока не закончится самый длинный итератор                  | `$stream->zipLongestWith(...$iterables)`                                          |
 | [`zipEqualWith`](#Zip-Equal-With)                                         | Параллельно итерирует коллекцию вместе с другими одного размера, в случае разных размеров бросает исключение | `$stream->zipEqualWith(...$iterables)`                                            |
+| [`zipFilledWith`](#Zip-Filled-With)                                       | Параллельно итерирует коллекцию вместе с другими, подставляя для закончившихся заданный филлер               | `$stream->zipFilledWith($default, ...$iterables)`                                 |
+| [`zipLongestWith`](#Zip-Longest-With)                                     | Параллельно итерирует коллекцию вместе с другими, пока не закончится самый длинный итератор                  | `$stream->zipLongestWith(...$iterables)`                                          |
 
 #### Завершающие операции
 ##### Саммари о коллекции
@@ -261,6 +264,7 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`toMax`](#To-Max-1)                     | Максимальное значение из элементов коллекции                        | `$stream->toMax([$compareBy])`                          |
 | [`toMin`](#To-Min-1)                     | Минимальное значение из элементов коллекции                         | `$stream->toMin([$compareBy])`                          |
 | [`toMinMax`](#To-Min-Max-1)              | Минимальное и максимальное значения из элементов коллекции          | `$stream->toMinMax([$compareBy])`                       |
+| [`toNth`](#To-Nth-1)                     | N-й элемент коллекции                                               | `$stream->toNth($position)`                             |
 | [`toProduct`](#To-Product-1)             | Произведение элементов коллекции                                    | `$stream->toProduct()`                                  |
 | [`toString`](#To-String-1)               | Преобразование коллекции в строку                                   | `$stream->toString([$separator], [$prefix], [$suffix])` |
 | [`toSum`](#To-Sum-1)                     | Сумма элементов коллекции                                           | `$stream->toSum()`                                      |
@@ -382,6 +386,24 @@ foreach (Multi::zip($names, $countries, $signatureMoves) as [$name, $country, $s
 }
 ```
 Примечание: для коллекций разных длин итерирование прекратиться, когда закончится самая короткая коллекция.
+
+### ZipFilled
+Параллельно итерирует коллекции, пока не закончится самый длинный итератор.
+Для законичвшихся коллекций в качестве значения подставляет заданный филлер.
+
+```Multi::zipFilled(mixed $filler, iterable ...$iterables)```
+
+```php
+use IterTools\Multi;
+
+$default = '?';
+$letters = ['A', 'B'];
+$numbers = [1, 2, 3];
+
+foreach (Multi::zipFilled($default, $letters, $numbers) as [$letter, $number]) {
+    // ['A', 1], ['B', 2], ['?', 3]
+}
+```
 
 ### ZipLongest
 Параллельно итерирует коллекции, пока не закончится самый длинный итератор.
@@ -1941,6 +1963,20 @@ $bestAndWorstSubject = Reduce::toMinMax($reportCard, $compareBy);
 // ]
 ```
 
+### To Nth
+Возвращает n-й элемент коллекции.
+
+```Reduce::toNth(iterable $data, int $position): mixed```
+
+```php
+use IterTools\Reduce;
+
+$lotrMovies = ['The Fellowship of the Ring', 'The Two Towers', 'The Return of the King'];
+
+$rotk = Reduce::toNth($lotrMovies, 2);
+// 20
+```
+
 ### To Product
 Возвращает произведение элементов коллекции.
 
@@ -2984,6 +3020,26 @@ $stream = Stream::of($input)
 // [1, 4, 7], [2, 5, 8], [3, 6, 9]
 ```
 
+#### Zip Filled With
+Параллельно итерирует элементы из потока вместе с элементами переданных коллекций, пока не закончится самый длинный итератор.
+
+Для закончившихся итераторов подставляет заданный филлер в кортеж значений итерации.
+
+```$stream->zipFilledWith(mixed $default, iterable ...$iterables): Stream```
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$stream = Stream::of($input)
+    ->zipFilledWith('?', ['A', 'B']);
+
+foreach ($stream as $zipped) {
+    // [1, A], [2, B], [3, ?]
+}
+```
+
 #### Zip Longest With
 Параллельно итерирует элементы из потока вместе с элементами переданных коллекций, пока не закончится самый длинный итератор.
 
@@ -3413,6 +3469,23 @@ $numbers = [1, 2, 3, -1, -2, -3];
 [$min, $max] = Stream::of($numbers)
     ->toMinMax();
 // [-3, 3]
+```
+
+##### To Nth
+Возвращает n-й элемент потока.
+
+```$stream->toNth(int $position): mixed```
+
+Для пустой коллекции возвращает `null`.
+
+```php
+use IterTools\Stream;
+
+$lotrMovies = ['The Fellowship of the Ring', 'The Two Towers', 'The Return of the King'];
+
+$result = Stream::of($lotrMovies)
+    ->toNth(2);
+// The Return of the King
 ```
 
 ##### To Product
