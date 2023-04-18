@@ -668,6 +668,28 @@ class Stream implements \IteratorAggregate
     }
 
     /**
+     * Filter out elements from the iterable source only returning unique elements.
+     *
+     * Using $compareBy function for getting comparable value.
+     *
+     * Supports only strict-type comparisons:
+     *  - scalars: compares strictly by type
+     *  - objects: always treats different instances as not equal to each other
+     *  - arrays: compares serialized
+     *
+     * @param callable $compareBy
+     *
+     * @return $this
+     *
+     * @see Single::distinctBy()
+     */
+    public function distinctBy(callable $compareBy): self
+    {
+        $this->iterable = Set::distinctBy($this->iterable, $compareBy);
+        return $this;
+    }
+
+    /**
      * Cycle through the elements of iterable source sequentially forever
      *
      * @return $this
