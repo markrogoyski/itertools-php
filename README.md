@@ -235,7 +235,7 @@ Quick Reference
 | [`unionCoerciveWith`](#Union-Coercive-With)                               | Union of stream with iterables with type coercion                                         | `$stream->unionCoerciveWith(...$iterables)`                                       |
 | [`zipWith`](#Zip-With)                                                    | Iterate iterable source with another iterable collection simultaneously                   | `$stream->zipWith(...$iterables)`                                                 |
 | [`zipEqualWith`](#Zip-Equal-With)                                         | Iterate iterable source with another iterable collection of equal lengths simultaneously  | `$stream->zipEqualWith(...$iterables)`                                            |
-| [`zipFilledWith`](#Zip-Willed-With)                                       | Iterate iterable source with another iterable collection using default filler             | `$stream->zipFilledWith($default, ...$iterables)`                                 |
+| [`zipFilledWith`](#Zip-Filled-With)                                       | Iterate iterable source with another iterable collection using default filler             | `$stream->zipFilledWith($default, ...$iterables)`                                 |
 | [`zipLongestWith`](#Zip-Longest-With)                                     | Iterate iterable source with another iterable collection simultaneously                   | `$stream->zipLongestWith(...$iterables)`                                          |
 
 #### Stream Terminal Operations
@@ -3071,10 +3071,7 @@ $stream = Stream::of($input)
 #### Zip Filled With
 Return a stream consisting of multiple iterable collections, using a default filler value if lengths no equal.
 
-```$stream->zipEqualWith(mixed $default, iterable ...$iterables): Stream```
-
-Works like `Stream::zipWith()` method but throws \LengthException if lengths not equal,
-i.e., at least one iterator ends before the others.
+```$stream->zipFilledWith(mixed $default, iterable ...$iterables): Stream```
 
 ```php
 use IterTools\Stream;
@@ -3089,7 +3086,7 @@ foreach ($stream as $zipped) {
 }
 ```
 
-#### Zip Filled With
+#### Zip Equal With
 Return a stream consisting of multiple iterable collections of equal lengths streamed simultaneously.
 
 ```$stream->zipEqualWith(iterable ...$iterables): Stream```
