@@ -135,6 +135,10 @@ END_OF_EXPECTED;
                 ["123\n", "45\n6", "\n789"],
                 "123\n\n45\n6\n\n789",
             ],
+            [
+                [1, 2.2, 'words', \NAN, \INF, true, false, null, 'the end'],
+                "1\n2.2\nwords\nNAN\nINF\n1\n\n\nthe end",
+            ]
         ];
     }
 

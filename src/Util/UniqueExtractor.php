@@ -54,6 +54,7 @@ class UniqueExtractor
                 return \gettype($var) . '_' . $var;
             case !$var:
                 return 'boolean_0';
+            // @phpstan-ignore-next-line
             case \strval($var) === '1':
                 return 'boolean_1';
             case \is_numeric($var):

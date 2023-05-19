@@ -1078,12 +1078,15 @@ class Stream implements \IteratorAggregate
         }
 
         foreach ($this->iterable as $line) {
+
             if ($firstIteration) {
                 $firstIteration = false;
             } else {
+                // @phpstan-ignore-next-line
                 $line = $newlineSeparator . \strval($line);
             }
 
+            // @phpstan-ignore-next-line
             \fputs($fileResource, \strval($line));
         }
 
