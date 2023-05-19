@@ -1078,7 +1078,6 @@ class Stream implements \IteratorAggregate
         }
 
         foreach ($this->iterable as $line) {
-
             if ($firstIteration) {
                 $firstIteration = false;
             } else {
