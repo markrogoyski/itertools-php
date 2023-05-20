@@ -151,7 +151,7 @@ class Single
     public static function filterFalse(iterable $data, callable $predicate = null): \Generator
     {
         if ($predicate === null) {
-            $predicate = fn($datum) => \boolval($datum);
+            $predicate = fn($datum): bool => \boolval($datum);
         }
 
         foreach ($data as $key => $datum) {
@@ -174,7 +174,7 @@ class Single
     public static function filterTrue(iterable $data, callable $predicate = null): \Generator
     {
         if ($predicate === null) {
-            $predicate = fn($datum) => \boolval($datum);
+            $predicate = fn($datum): bool => \boolval($datum);
         }
 
         foreach ($data as $key => $datum) {

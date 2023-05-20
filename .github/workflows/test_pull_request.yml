@@ -3,8 +3,8 @@ name: Test and Static Analysis (Pull Request)
 on: pull_request
 
 jobs:
-  test-and-static-analysis:
-    name: Test and Static Analysis
+  test-lint-and-static-analysis:
+    name: Test, Lint and Static Analysis
     runs-on: ubuntu-latest
     strategy:
       matrix:
