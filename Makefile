@@ -1,4 +1,4 @@
-.PHONY : lint tests style phpstan phpmd report coverage
+.PHONY : lint tests style phpstan psalm phpmd report coverage
 
 all : lint tests style phpstan
 
@@ -13,6 +13,9 @@ style :
 
 phpstan :
 	vendor/bin/phpstan analyze -c tests/phpstan.neon
+
+psalm :
+	vendor/bin/psalm --config=tests/psalm.xml
 
 phpmd :
 	vendor/bin/phpmd src/ ansi cleancode,codesize,design,unusedcode,naming
