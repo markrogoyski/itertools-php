@@ -33,8 +33,8 @@ class Transform
      * @template TValue
      *
      * @param iterable<TKey, TValue> $iterable
-     * @param callable(mixed $value, mixed $key): mixed|null $keyFunc
-     * @param callable(mixed $value, mixed $key): mixed|null $valueFunc
+     * @param callable(mixed, mixed): mixed|null $keyFunc
+     * @param callable(mixed, mixed): mixed|null $valueFunc
      *
      * @return array<TKey|numeric|string, TValue|mixed>
      */

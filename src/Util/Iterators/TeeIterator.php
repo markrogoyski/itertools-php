@@ -17,11 +17,11 @@ class TeeIterator extends \NoRewindIterator
     /**
      * @var array<RelatedIterator<TKey, TValue>>
      */
-    private array $related;
+    private array $related = [];
     /**
      * @var array<int>
      */
-    private array $positions;
+    private array $positions = [];
     /**
      * @var array<int, TKey>
      */
