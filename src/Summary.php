@@ -205,7 +205,7 @@ class Summary
         }
 
         if ($predicate === null) {
-            $predicate = fn($datum) => boolval($datum);
+            $predicate = fn($datum): bool => boolval($datum);
         }
 
         $count = 0;
@@ -320,7 +320,7 @@ class Summary
      */
     public static function isPartitioned(iterable $data, callable $predicate = null): bool
     {
-        $predicate ??= fn ($item) => \boolval($item);
+        $predicate ??= fn ($item): bool => \boolval($item);
 
         $allTrueSoFar = true;
 
