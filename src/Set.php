@@ -218,7 +218,7 @@ class Set
 
         $multipleIterator = new JustifyMultipleIterator(NoValueMonad::getInstance(), ...$iterables);
 
-        foreach ($multipleIterator as $index => $values) {
+        foreach ($multipleIterator as $values) {
             foreach ($values as $owner => $value) {
                 if ($value instanceof NoValueMonad) {
                     continue;

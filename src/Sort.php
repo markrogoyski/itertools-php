@@ -12,7 +12,7 @@ class Sort
      * If comparator is null, the elements of given iterable must be comparable.
      *
      * @param iterable<mixed> $data
-     * @param callable|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
+     * @param callable(mixed, mixed):int|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
      * @return \Generator
      */
@@ -37,7 +37,7 @@ class Sort
      * If comparator is null, the elements of given iterable must be comparable.
      *
      * @param iterable<mixed> $data
-     * @param callable|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
+     * @param callable(mixed, mixed):int|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
      * @return \Generator
      */

@@ -33,7 +33,7 @@ class Stream implements \IteratorAggregate
      *
      * @param iterable<mixed> $iterable
      *
-     * @return Stream<mixed>
+     * @return Stream
      */
     public static function of(iterable $iterable): self
     {
@@ -45,7 +45,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int $repetitions
      *
-     * @return Stream<mixed>
+     * @return Stream
      *
      * @see Random::coinFlip()
      */
@@ -57,7 +57,7 @@ class Stream implements \IteratorAggregate
     /**
      * Creates iterable instance with fluent interface from empty iterable source.
      *
-     * @return Stream<mixed>
+     * @return Stream
      */
     public static function ofEmpty(): self
     {
@@ -70,7 +70,7 @@ class Stream implements \IteratorAggregate
      * @param array<mixed> $items
      * @param int     $repetitions
      *
-     * @return Stream<mixed>
+     * @return Stream
      *
      * @see Random::choice()
      */
@@ -86,7 +86,7 @@ class Stream implements \IteratorAggregate
      * @param int $max
      * @param int $repetitions
      *
-     * @return Stream<mixed>
+     * @return Stream
      *
      * @see Random::number()
      */
@@ -100,7 +100,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int $repetitions
      *
-     * @return Stream<mixed>
+     * @return Stream
      *
      * @see Random::percentage()
      */
@@ -114,7 +114,7 @@ class Stream implements \IteratorAggregate
      * @param int|float|mixed $end Sequence ends upon reaching this value
      * @param int|float       $step (optional) Step increase between values. Defaults to 1.
      *
-     * @return Stream<int|float>
+     * @return Stream
      */
     public static function ofRange($start, $end, $step = 1): self
     {
@@ -133,7 +133,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int $repetitions
      *
-     * @return Stream<mixed>
+     * @return Stream
      *
      * @see Random::rockPaperScissors()
      */
@@ -147,7 +147,7 @@ class Stream implements \IteratorAggregate
      *
      * @param resource $file File handle stream opened for reading
      *
-     * @return Stream<mixed>
+     * @return Stream
      *
      * @see File::readLines()
      */
@@ -186,7 +186,7 @@ class Stream implements \IteratorAggregate
      *
      * @param iterable<bool> $selectors
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::compress()
      */
@@ -205,7 +205,7 @@ class Stream implements \IteratorAggregate
      *
      * @param array<int|string> $keys
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::compressAssociative()
      */
@@ -222,7 +222,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable(mixed $value, mixed $key): scalar $indexer
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::reindex()
      */
@@ -239,7 +239,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable $predicate
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::dropWhile()
      */
@@ -256,7 +256,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable $predicate
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::takeWhile()
      */
@@ -271,7 +271,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable $predicate
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::filter()
      */
@@ -288,7 +288,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable|null $predicate
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::filterTrue()
      */
@@ -305,7 +305,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable|null $predicate
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::filterFalse()
      */
@@ -320,7 +320,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable $predicate
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::filterKeys()
      */
@@ -340,7 +340,7 @@ class Stream implements \IteratorAggregate
      * @param callable $groupKeyFunction
      * @param callable|null $itemKeyFunction
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::groupBy()
      */
@@ -355,7 +355,7 @@ class Stream implements \IteratorAggregate
      *
      * Returns empty generator if given collection contains less than 2 elements.
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::pairwise()
      */
@@ -372,7 +372,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int $chunkSize
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::chunkwise()
      */
@@ -393,7 +393,7 @@ class Stream implements \IteratorAggregate
      * @param int $overlapSize
      * @param bool $includeIncompleteTail
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::chunkwiseOverlap()
      */
@@ -408,7 +408,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int $limit
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::limit
      */
@@ -423,7 +423,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable $func
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::map
      */
@@ -439,7 +439,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable $func
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::flatMap()
      */
@@ -454,7 +454,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int $dimensions
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::flatten()
      */
@@ -471,7 +471,7 @@ class Stream implements \IteratorAggregate
      * @param int<0, max>|null $count
      * @param positive-int $step
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::slice()
      */
@@ -487,7 +487,7 @@ class Stream implements \IteratorAggregate
      * @param int<0, max> $count
      * @param int<0, max> $offset
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::skip()
      */
@@ -504,7 +504,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::sort()
      */
@@ -521,7 +521,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::asort()
      */
@@ -534,7 +534,7 @@ class Stream implements \IteratorAggregate
     /**
      * Reverse the iterable source.
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::reverse()
      */
@@ -551,7 +551,7 @@ class Stream implements \IteratorAggregate
      *
      * @param iterable<mixed> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Multi::chain()
      */
@@ -571,7 +571,7 @@ class Stream implements \IteratorAggregate
      *
      * @param iterable<mixed> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Multi::zip()
      */
@@ -592,7 +592,7 @@ class Stream implements \IteratorAggregate
      *
      * @param iterable<mixed> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Multi::zipLongest()
      */
@@ -614,7 +614,7 @@ class Stream implements \IteratorAggregate
      * @param mixed $filler
      * @param iterable<mixed> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Multi::zipFilled()
      */
@@ -632,7 +632,7 @@ class Stream implements \IteratorAggregate
      *
      * @param iterable<mixed> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Multi::zipEqual()
      */
@@ -657,7 +657,7 @@ class Stream implements \IteratorAggregate
      *
      * @param bool $strict
      *
-     * @return $this
+     * @return Stream
      *
      * @see Single::distinct()
      */
@@ -670,7 +670,7 @@ class Stream implements \IteratorAggregate
     /**
      * Cycle through the elements of iterable source sequentially forever
      *
-     * @return $this
+     * @return Stream
      *
      * @see Infinite::cycle()
      */
@@ -685,7 +685,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int|float|null $initialValue
      *
-     * @return $this
+     * @return Stream
      *
      * @see Math::runningAverage()
      */
@@ -702,7 +702,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int|float|null $initialValue
      *
-     * @return $this
+     * @return Stream
      *
      * @see Math::runningDifference()
      */
@@ -719,7 +719,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int|float|null $initialValue
      *
-     * @return $this
+     * @return Stream
      *
      * @see Math::runningMax()
      */
@@ -736,7 +736,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int|float|null $initialValue
      *
-     * @return $this
+     * @return Stream
      *
      * @see Math::runningMin()
      */
@@ -753,7 +753,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int|float|null $initialValue
      *
-     * @return $this
+     * @return Stream
      *
      * @see Math::runningProduct()
      */
@@ -770,7 +770,7 @@ class Stream implements \IteratorAggregate
      *
      * @param int|float|null $initialValue
      *
-     * @return $this
+     * @return Stream
      *
      * @see Math::runningTotal()
      */
@@ -791,7 +791,7 @@ class Stream implements \IteratorAggregate
      *
      * @param array<iterable<mixed>> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Set::intersection()
      */
@@ -810,7 +810,7 @@ class Stream implements \IteratorAggregate
      *
      * @param array<iterable<mixed>> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Set::intersectionCoercive()
      */
@@ -829,7 +829,7 @@ class Stream implements \IteratorAggregate
      *
      * @param iterable<mixed> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Set::symmetricDifference()
      */
@@ -848,7 +848,7 @@ class Stream implements \IteratorAggregate
      *
      * @param iterable<mixed> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Set::symmetricDifferenceCoercive()
      */
@@ -868,7 +868,7 @@ class Stream implements \IteratorAggregate
      * @param positive-int $minIntersectionCount
      * @param array<iterable<mixed>> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Set::partialIntersection()
      */
@@ -888,7 +888,7 @@ class Stream implements \IteratorAggregate
      * @param positive-int $minIntersectionCount
      * @param array<iterable<mixed>> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Set::partialIntersectionCoercive()
      */
@@ -907,7 +907,7 @@ class Stream implements \IteratorAggregate
      *
      * @param array<iterable<mixed>> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Set::union()
      */
@@ -926,7 +926,7 @@ class Stream implements \IteratorAggregate
      *
      * @param array<iterable<mixed>> ...$iterables
      *
-     * @return $this
+     * @return Stream
      *
      * @see Set::unionCoercive()
      */
@@ -945,7 +945,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable $callback
      *
-     * @return $this
+     * @return Stream
      */
     public function peek(callable $callback): self
     {
@@ -965,7 +965,7 @@ class Stream implements \IteratorAggregate
      *
      * @param callable $callback
      *
-     * @return $this
+     * @return Stream
      */
     public function peekStream(callable $callback): self
     {
@@ -984,7 +984,7 @@ class Stream implements \IteratorAggregate
      * @param string $prefix
      * @param string $suffix
      *
-     * @return $this
+     * @return Stream
      */
     public function peekPrint(string $separator = '', string $prefix = '', string $suffix = ''): self
     {
@@ -997,7 +997,7 @@ class Stream implements \IteratorAggregate
      *
      * Useful for debugging purposes.
      *
-     * @return $this
+     * @return Stream
      */
     public function peekPrintR(): self
     {
