@@ -7,8 +7,8 @@ on:
       - main
 
 jobs:
-  test-and-static-analysis:
-    name: Test and Static Analysis
+  test-lint-and-static-analysis:
+    name: Test, Lint and Static Analysis
     runs-on: ubuntu-latest
     strategy:
       matrix:
