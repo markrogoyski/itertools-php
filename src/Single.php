@@ -541,6 +541,42 @@ class Single
     {
         $usages = [];
         $values = [];
+
+        foreach ($data as $datum) {
+            $hash = UniqueExtractor::getString($datum, $strict);
+
+            if (!array_key_exists($hash, $usages)) {
+                $usages[$hash] = 0;
+                $values[$hash] = $datum;
+            }
+
+            $usages[$hash]++;
+        }
+
+        /**
+         * @var T $value
+         * @var int $usageCount
+         */
+        foreach (Multi::zipEqual($values, $usages) as [$value, $usageCount]) {
+            yield $value => $usageCount;
+        }
+    }
+
+    /**
+     * Returns a relative frequency distribution of iterable elements
+     * showing how often each different value in the collection occurs.
+     *
+     * @template T
+     *
+     * @param iterable<T> $data
+     * @param bool $strict
+     *
+     * @return \Generator<T, int>
+     */
+    public static function relativeFrequencies(iterable $data, bool $strict = true): \Generator
+    {
+        $usages = [];
+        $values = [];
         $totalCount = 0;
 
         foreach ($data as $datum) {
