@@ -507,7 +507,7 @@ class Stream implements \IteratorAggregate
      */
     public function frequencies(bool $strict = true): self
     {
-        $this->iterable = Single::frequencies($this->iterable, $strict);
+        $this->iterable = Math::frequencies($this->iterable, $strict);
         return $this;
     }
 
@@ -521,7 +521,7 @@ class Stream implements \IteratorAggregate
      */
     public function relativeFrequencies(bool $strict = true): self
     {
-        $this->iterable = Single::relativeFrequencies($this->iterable, $strict);
+        $this->iterable = Math::relativeFrequencies($this->iterable, $strict);
         return $this;
     }
 
