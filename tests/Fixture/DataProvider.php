@@ -120,6 +120,8 @@ trait DataProvider
     public function dataProviderForMathLoopTools(): array
     {
         return [
+            [Math::frequencies([1, 2, 3, 4, 5])],
+            [Math::relativeFrequencies([1, 2, 3, 4, 5])],
             [Math::runningAverage([1, 2, 3, 4, 5])],
             [Math::runningDifference([1, 2, 3, 4, 5])],
             [Math::runningMax([1, 2, 3, 4, 5])],

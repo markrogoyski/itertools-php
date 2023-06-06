@@ -14,6 +14,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProviderForArray
      * @dataProvider dataProviderForArrayStrict
+     * @dataProvider dataProviderForArrayNonScalarValues
      * @param array $data
      * @param array $expectedValues
      * @param array $expectedFrequencies
@@ -133,14 +134,28 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 1],
             ],
             [
+                [1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a'],
+                [1, 'a', 'b'],
+                [5, 3, 2],
+            ],
+        ];
+    }
+
+    public function dataProviderForArrayNonScalarValues(): array
+    {
+        $obj1 = new \stdClass();
+        $obj2 = new \stdClass();
+
+        return [
+            [
                 [[1, 2, 3], [1], [1, 2, 3], [2]],
                 [[1, 2, 3], [1], [2]],
                 [2, 1, 1],
             ],
             [
-                [1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a'],
-                [1, 'a', 'b'],
-                [5, 3, 2],
+                [$obj1, $obj1, $obj2, $obj2, $obj2],
+                [$obj1, $obj2],
+                [2, 3],
             ],
         ];
     }
@@ -731,5 +746,25 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 [5, 2, 3],
             ],
         ];
+    }
+
+    /**
+     * @test         frequencies iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param array $data
+     * @param array $expectedValues
+     * @param array $expectedFrequencies
+     */
+    public function testIteratorToArray(array $data, array $expectedValues, array $expectedFrequencies): void
+    {
+        // Given
+        $iterator = Math::frequencies($data);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertEquals($expectedValues, \array_keys($result));
+        $this->assertEquals($expectedFrequencies, \array_values($result));
     }
 }

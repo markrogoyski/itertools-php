@@ -11,11 +11,12 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
 class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
 {
-    private const DELTA = 0.0001;
+    private const Δ = 0.0001;
 
     /**
      * @dataProvider dataProviderForArray
      * @dataProvider dataProviderForArrayStrict
+     * @dataProvider dataProviderForArrayNonScalarValues
      * @param array $data
      * @param array $expectedValues
      * @param array $expectedrelativeFrequencies
@@ -36,10 +37,10 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expectedValues, $values);
-        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::DELTA);
+        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::Δ);
 
         if (\count($values) > 0) {
-            $this->assertEqualsWithDelta(1, $sum, self::DELTA);
+            $this->assertEqualsWithDelta(1, $sum, self::Δ);
         }
     }
 
@@ -66,10 +67,10 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expectedValues, $values);
-        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::DELTA);
+        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::Δ);
 
         if (\count($values) > 0) {
-            $this->assertEqualsWithDelta(1, $sum, self::DELTA);
+            $this->assertEqualsWithDelta(1, $sum, self::Δ);
         }
     }
 
@@ -147,14 +148,28 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
                 [0.25, 0.5, 0.25],
             ],
             [
+                [1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a'],
+                [1, 'a', 'b'],
+                [0.5, 0.3, 0.2],
+            ],
+        ];
+    }
+
+    public function dataProviderForArrayNonScalarValues(): array
+    {
+        $obj1 = new \stdClass();
+        $obj2 = new \stdClass();
+
+        return [
+            [
                 [[1, 2, 3], [1], [1, 2, 3], [2]],
                 [[1, 2, 3], [1], [2]],
                 [0.5, 0.25, 0.25],
             ],
             [
-                [1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a'],
-                [1, 'a', 'b'],
-                [0.5, 0.3, 0.2],
+                [$obj1, $obj1, $obj2, $obj2, $obj2],
+                [$obj1, $obj2],
+                [0.4, 0.6],
             ],
         ];
     }
@@ -224,10 +239,10 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expectedValues, $values);
-        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::DELTA);
+        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::Δ);
 
         if (\count($values) > 0) {
-            $this->assertEqualsWithDelta(1, $sum, self::DELTA);
+            $this->assertEqualsWithDelta(1, $sum, self::Δ);
         }
     }
 
@@ -254,10 +269,10 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expectedValues, $values);
-        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::DELTA);
+        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::Δ);
 
         if (\count($values) > 0) {
-            $this->assertEqualsWithDelta(1, $sum, self::DELTA);
+            $this->assertEqualsWithDelta(1, $sum, self::Δ);
         }
     }
 
@@ -418,10 +433,10 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expectedValues, $values);
-        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::DELTA);
+        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::Δ);
 
         if (\count($values) > 0) {
-            $this->assertEqualsWithDelta(1, $sum, self::DELTA);
+            $this->assertEqualsWithDelta(1, $sum, self::Δ);
         }
     }
 
@@ -448,10 +463,10 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expectedValues, $values);
-        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::DELTA);
+        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::Δ);
 
         if (\count($values) > 0) {
-            $this->assertEqualsWithDelta(1, $sum, self::DELTA);
+            $this->assertEqualsWithDelta(1, $sum, self::Δ);
         }
     }
 
@@ -612,10 +627,10 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expectedValues, $values);
-        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::DELTA);
+        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::Δ);
 
         if (\count($values) > 0) {
-            $this->assertEqualsWithDelta(1, $sum, self::DELTA);
+            $this->assertEqualsWithDelta(1, $sum, self::Δ);
         }
     }
 
@@ -642,10 +657,10 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expectedValues, $values);
-        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::DELTA);
+        $this->assertEqualsWithDelta($expectedrelativeFrequencies, $relativeFrequencies, self::Δ);
 
         if (\count($values) > 0) {
-            $this->assertEqualsWithDelta(1, $sum, self::DELTA);
+            $this->assertEqualsWithDelta(1, $sum, self::Δ);
         }
     }
 
@@ -781,5 +796,25 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
                 [0.5, 0.2, 0.3],
             ],
         ];
+    }
+
+    /**
+     * @test         frequencies iterator_to_array
+     * @dataProvider dataProviderForArray
+     * @param array $data
+     * @param array $expectedValues
+     * @param array $expectedFrequencies
+     */
+    public function testIteratorToArray(array $data, array $expectedValues, array $expectedFrequencies): void
+    {
+        // Given
+        $iterator = Math::relativeFrequencies($data);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertEqualsWithDelta($expectedValues, \array_keys($result), self::Δ);
+        $this->assertEqualsWithDelta($expectedFrequencies, \array_values($result), self::Δ);
     }
 }
