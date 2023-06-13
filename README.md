@@ -98,14 +98,16 @@ Quick Reference
 | [`rockPaperScissors`](#RockPaperScissors) | Random rock-paper-scissors hands  | `Random::rockPaperScissors($repetitions)`  |
 
 #### Math Iteration
-| Iterator                                   | Description                     | Code Snippet                                       |
-|--------------------------------------------|---------------------------------|----------------------------------------------------|
-| [`runningAverage`](#Running-Average)       | Running average accumulation    | `Math::runningAverage($numbers, $initialValue)`    |
-| [`runningDifference`](#Running-Difference) | Running difference accumulation | `Math::runningDifference($numbers, $initialValue)` |
-| [`runningMax`](#Running-Max)               | Running maximum accumulation    | `Math::runningMax($numbers, $initialValue)`        |
-| [`runningMin`](#Running-Min)               | Running minimum accumulation    | `Math::runningMin($numbers, $initialValue)`        |
-| [`runningProduct`](#Running-Product)       | Running product accumulation    | `Math::runningProduct($numbers, $initialValue)`    |
-| [`runningTotal`](#Running-Total)           | Running total accumulation      | `Math::runningTotal($numbers, $initialValue)`      |
+| Iterator                                        | Description                             | Code Snippet                                       |
+|-------------------------------------------------|-----------------------------------------|----------------------------------------------------|
+| [`frequencies`](#Frequencies)                   | Frequency distribution of data          | `Math::frequencies($data, [$strict])`              |
+| [`relativeFrequencies`](#Relative-Frequencies)  | Relative frequency distribution of data | `Math::relativeFrequencies($data, [$strict])`      |
+| [`runningAverage`](#Running-Average)            | Running average accumulation            | `Math::runningAverage($numbers, $initialValue)`    |
+| [`runningDifference`](#Running-Difference)      | Running difference accumulation         | `Math::runningDifference($numbers, $initialValue)` |
+| [`runningMax`](#Running-Max)                    | Running maximum accumulation            | `Math::runningMax($numbers, $initialValue)`        |
+| [`runningMin`](#Running-Min)                    | Running minimum accumulation            | `Math::runningMin($numbers, $initialValue)`        |
+| [`runningProduct`](#Running-Product)            | Running product accumulation            | `Math::runningProduct($numbers, $initialValue)`    |
+| [`runningTotal`](#Running-Total)                | Running total accumulation              | `Math::runningTotal($numbers, $initialValue)`      |
 
 #### Set and multiset Iteration
 | Iterator                                                        | Description                                               | Code Snippet                                                 |
@@ -1076,6 +1078,42 @@ foreach (Random::rockPaperScissors($repetitions) as $rpsHand) {
 ```
 
 ## Math Iteration
+### Frequencies
+Returns a frequency distribution of the data.
+
+```Math::frequencies(iterable $data, bool $strict = true): \Generator```
+
+Defaults to [strict type](#Strict-and-Coercive-Types) comparisons. Set strict to false for type coercion comparisons.
+
+```php
+use IterTools\Math;
+
+$grades = ['A', 'A', 'B', 'B', 'B', 'C'];
+
+foreach (Math::frequencies($grades) as $grade => $frequency) {
+    print("$grade: $frequency" . \PHP_EOL);
+}
+// A: 2, B: 3, C: 1
+```
+
+### Relative Frequencies
+Returns a relative frequency distribution of the data.
+
+```Math::relativeFrequencies(iterable $data, bool $strict = true): \Generator```
+
+Defaults to [strict type](#Strict-and-Coercive-Types) comparisons. Set strict to false for type coercion comparisons.
+
+```php
+use IterTools\Math;
+
+$grades = ['A', 'A', 'B', 'B', 'B', 'C'];
+
+foreach (Math::relativeFrequencies($grades) as $grade => $frequency) {
+    print("$grade: $frequency" . \PHP_EOL);
+}
+// A: 0.33, B: 0.5, C: 0.166
+```
+
 ### Running Average
 Accumulate the running average over a list of numbers.
 
