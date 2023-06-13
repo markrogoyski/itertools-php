@@ -12,6 +12,27 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class FrequenciesTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test frequencies example usage
+     */
+    public function testFrequenciesExampleUsage(): void
+    {
+        // Given
+        $grades = ['A', 'A', 'B', 'B', 'B', 'C'];
+
+        // And
+        $frequencies = [];
+
+        // When
+        foreach (Math::frequencies($grades) as $grade => $frequency) {
+            $frequencies[$grade] = $frequency;
+        }
+
+        // Then
+        self::assertEqualsCanonicalizing(['A' => 2, 'B' => 3, 'C' => 1], $frequencies);
+    }
+
+    /**
+     * @test
      * @dataProvider dataProviderForArray
      * @dataProvider dataProviderForArrayStrict
      * @dataProvider dataProviderForArrayNonScalarValues
@@ -37,6 +58,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test
      * @dataProvider dataProviderForArray
      * @dataProvider dataProviderForArrayCoercive
      * @param array $data
@@ -203,6 +225,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test
      * @dataProvider dataProviderForGenerators
      * @dataProvider dataProviderForGeneratorsStrict
      * @param \Generator $data
@@ -227,6 +250,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test
      * @dataProvider dataProviderForGenerators
      * @dataProvider dataProviderForGeneratorsCoercive
      * @param \Generator $data
@@ -385,6 +409,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test
      * @dataProvider dataProviderForIterators
      * @dataProvider dataProviderForIteratorsStrict
      * @param \Iterator $data
@@ -409,6 +434,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test
      * @dataProvider dataProviderForIterators
      * @dataProvider dataProviderForIteratorsCoercive
      * @param \Iterator $data
@@ -567,6 +593,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test
      * @dataProvider dataProviderForTraversables
      * @dataProvider dataProviderForTraversablesStrict
      * @param \Traversable $data
@@ -591,6 +618,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test
      * @dataProvider dataProviderForTraversables
      * @dataProvider dataProviderForTraversablesCoercive
      * @param \Traversable $data

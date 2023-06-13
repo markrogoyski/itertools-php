@@ -14,6 +14,26 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
     private const Δ = 0.0001;
 
     /**
+     * @test relativeFrequencies example usage
+     */
+    public function testRelativeFrequenciesExampleUsage(): void
+    {
+        // Given
+        $grades = ['A', 'A', 'B', 'B', 'B', 'C'];
+
+        // And
+        $frequencies = [];
+
+        // When
+        foreach (Math::relativeFrequencies($grades) as $grade => $frequency) {
+            $frequencies[$grade] = $frequency;
+        }
+
+        // Then
+        self::assertEqualsWithDelta(['A' => 2 / 6, 'B' => 3 / 6, 'C' => 1 / 6], $frequencies, self::Δ);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @dataProvider dataProviderForArrayStrict
      * @dataProvider dataProviderForArrayNonScalarValues
