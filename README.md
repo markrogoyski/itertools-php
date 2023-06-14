@@ -210,6 +210,7 @@ Quick Reference
 | [`filterKeys`](#Filter-Keys-1)                                            | Filter for keys where predicate function is true                                          | `$stream->filterKeys($predicate)`                                                 |
 | [`flatMap`](#Flat-Map-1)                                                  | Map function onto elements and flatten result                                             | `$stream->flatMap($function)`                                                     |
 | [`flatten`](#Flatten-1)                                                   | Flatten multidimensional stream                                                           | `$stream->flatten($dimensions)`                                                   |
+| [`frequencies`](#Frequencies-1)                                           | Frequency distribution                                                                    | `$stream->frequencies([$strict])`                                                 |
 | [`groupBy`](#Group-By-1)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction, [$itemKeyFunc])`                             |
 | [`infiniteCycle`](#Infinite-Cycle)                                        | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                                                        |
 | [`intersectionWith`](#Intersection-With)                                  | Intersect iterable source and given iterables                                             | `$stream->intersectionWith(...$iterables)`                                        |
@@ -220,6 +221,7 @@ Quick Reference
 | [`partialIntersectionWith`](#Partial-Intersection-With)                   | Partially intersect iterable source and given iterables                                   | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`         |
 | [`partialIntersection CoerciveWith`](#Partial-Intersection-Coercive-With) | Partially intersect iterable source and given iterables with type coercion                | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
 | [`reindex`](#Reindex-1)                                                   | Reindex keys of key-value stream                                                          | `$stream->reindex($reindexer)`                                                    |
+| [`relativeFrequencies`](#Relative-Frequencies-1)                          | Relative frequency distribution                                                           | `$stream->relativeFrequencies([$strict])`                                         |
 | [`reverse`](#Reverse-1)                                                   | Reverse elements of the stream                                                            | `$stream->reverse()`                                                              |
 | [`runningAverage`](#Running-Average-1)                                    | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`                                          |
 | [`runningDifference`](#Running-Difference-1)                              | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`                                       |
@@ -2613,6 +2615,21 @@ $result = Stream::of($data)
 // [1, 2, 3, 4, 5]
 ```
 
+#### Frequencies
+Frequency distribution of the stream elements.
+
+```$stream->frequencies(bool $strict = true): Stream```
+
+```php
+$grades = ['A', 'A', 'B', 'B', 'B', 'C'];
+
+$result = Stream::of($grades)
+    ->frequencies()
+    ->toAssociativeArray();
+
+// ['A' => 2, 'B' => 3, 'C' => 1]
+```
+
 #### Group By
 Return a stream grouping by a common data element.
 
@@ -2822,6 +2839,21 @@ $reindexResult = Stream::of($data)
 //         'year' => 1983,
 //     ],
 // ]
+```
+
+#### Relative Frequencies
+Relative frequency distribution of the stream elements.
+
+```$stream->relativeFrequencies(bool $strict = true): Stream```
+
+```php
+$grades = ['A', 'A', 'B', 'B', 'B', 'C'];
+
+$result = Stream::of($grades)
+    ->relativeFrequencies()
+    ->toAssociativeArray();
+
+// A => 0.33, B => 0.5, C => 0.166
 ```
 
 #### Reverse
