@@ -1,5 +1,16 @@
 # IterTools PHP Change Log
 
+## v.1.7.0 - 2023-06-14
+
+### New Features
+* Math
+  * `frequencies`
+  * `relativeFrequencies`
+
+### Improvements
+* Internal improvements for static analysis
+
+
 ## v1.6.0 - 2023-04-16
 
 ### New Features
