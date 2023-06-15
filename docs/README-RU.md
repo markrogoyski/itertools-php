@@ -1,4 +1,4 @@
-![MathPHP Logo](https://github.com/markrogoyski/itertools-php/blob/main/docs/image/IterToolsLogo.png?raw=true)
+![IterToolsLogo Logo](https://github.com/markrogoyski/itertools-php/blob/main/docs/image/IterToolsLogo.png?raw=true)
 
 ### IterTools PHP — инструментарий для работы с итерируемыми сущностями
 
@@ -95,14 +95,16 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`rockPaperScissors`](#RockPaperScissors) | Случайный выбор "камень-ножницы-бумага"  | `Random::rockPaperScissors($repetitions)`  |
 
 #### Математическое итерирование
-| Метод                                      | Описание                            | Пример кода                                        |
-|--------------------------------------------|-------------------------------------|----------------------------------------------------|
-| [`runningAverage`](#Running-Average)       | Накопление среднего арифметического | `Math::runningAverage($numbers, $initialValue)`    |
-| [`runningDifference`](#Running-Difference) | Накопление разности                 | `Math::runningDifference($numbers, $initialValue)` |
-| [`runningMax`](#Running-Max)               | Поиск максимального значения        | `Math::runningMax($numbers, $initialValue)`        |
-| [`runningMin`](#Running-Min)               | Поиск минимального значения         | `Math::runningMin($numbers, $initialValue)`        |
-| [`runningProduct`](#Running-Product)       | Накопление произведения             | `Math::runningProduct($numbers, $initialValue)`    |
-| [`runningTotal`](#Running-Total)           | Накопление суммы                    | `Math::runningTotal($numbers, $initialValue)`      |
+| Метод                                          | Описание                            | Пример кода                                        |
+|------------------------------------------------|-------------------------------------|----------------------------------------------------|
+| [`frequencies`](#Frequencies)                  | Абсолютное распределение частот     | `Math::frequencies($data, [$strict])`              |
+| [`relativeFrequencies`](#Relative-Frequencies) | Относительное распределение частот  | `Math::relativeFrequencies($data, [$strict])`      |
+| [`runningAverage`](#Running-Average)           | Накопление среднего арифметического | `Math::runningAverage($numbers, $initialValue)`    |
+| [`runningDifference`](#Running-Difference)     | Накопление разности                 | `Math::runningDifference($numbers, $initialValue)` |
+| [`runningMax`](#Running-Max)                   | Поиск максимального значения        | `Math::runningMax($numbers, $initialValue)`        |
+| [`runningMin`](#Running-Min)                   | Поиск минимального значения         | `Math::runningMin($numbers, $initialValue)`        |
+| [`runningProduct`](#Running-Product)           | Накопление произведения             | `Math::runningProduct($numbers, $initialValue)`    |
+| [`runningTotal`](#Running-Total)               | Накопление суммы                    | `Math::runningTotal($numbers, $initialValue)`      |
 
 #### Итерирование множеств и мультимножеств
 | Метод                                                           | Описание                                                              | Пример кода                                                  |
@@ -205,6 +207,7 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`filterKeys`](#Filter-Keys-1)                                            | Возвращает только те элементы, для ключей которых предикат возвращает истину                                 | `$stream->filterKeys($predicate)`                                                 |
 | [`flatMap`](#Flat-Map-1)                                                  | Отображение коллекции с уплощением результата на 1 уровень вложенности                                       | `$stream->flatMap($function)`                                                     |
 | [`flatten`](#Flatten-1)                                                   | Многоуровневое уплощение коллекции                                                                           | `$stream->flatten($dimensions)`                                                   |
+| [`frequencies`](#Frequencies-1)                                           | Абсолютная частота вхождений                                                                                 | `$stream->frequencies([$strict])`                                                 |
 | [`groupBy`](#Group-By-1)                                                  | Группирует элементы из коллекции по заданному правилу                                                        | `$stream->groupBy($groupKeyFunction)`                                             |
 | [`infiniteCycle`](#Infinite-Cycle)                                        | Бесконечно зацикливает перебор коллекции                                                                     | `$stream->infiniteCycle()`                                                        |
 | [`intersectionWith`](#Intersection-With)                                  | Возвращает пересечение хранимой коллекции с другими коллекциями                                              | `$stream->intersectionWith(...$iterables)`                                        |
@@ -215,6 +218,7 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`partialIntersectionWith`](#Partial-Intersection-With)                   | Возвращает частичное пересечение хранимой коллекции с другими коллекциями                                    | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`         |
 | [`partialIntersection CoerciveWith`](#Partial-Intersection-Coercive-With) | Возвращает частичное пересечение хранимой коллекции с другими коллекциями (в режиме приведения типов)        | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
 | [`reindex`](#Reindex-1)                                                   | Переиндексирует key-value коллекцию                                                                          | `$stream->reindex($reindexer)`                                                    |
+| [`relativeFrequencies`](#Relative-Frequencies-1)                          | Относительная частота вхождений                                                                              | `$stream->relativeFrequencies([$strict])`                                         |
 | [`reverse`](#Reverse-1)                                                   | Итерирует коллекцию в обратном порядке                                                                       | `$stream->reverse()`                                                              |
 | [`runningAverage`](#Running-Average-1)                                    | Накопление среднего арифметического элементов коллекции                                                      | `$stream->runningAverage($initialValue)`                                          |
 | [`runningDifference`](#Running-Difference-1)                              | Накопление разности элементов коллекции                                                                      | `$stream->runningDifference($initialValue)`                                       |
@@ -1060,6 +1064,44 @@ foreach (Random::rockPaperScissors($repetitions) as $rpsHand) {
 ```
 
 ## Математическое итерирование
+### Frequencies
+Возвращает генератор, при обходе которого ключами оказываются элементы поданной на вход последовательности,
+а значениями — количества вхождений соответствующих элементов.
+
+```Math::frequencies(iterable $data, bool $strict = true): \Generator```
+
+По умолчанию выполняет сравнение в [режиме строгой типизации](#Режимы-типизации). Передайте значение `false` аргумента `$strict`, чтобы работать в режиме приведения типов.
+
+```php
+use IterTools\Math;
+
+$grades = ['A', 'A', 'B', 'B', 'B', 'C'];
+
+foreach (Math::frequencies($grades) as $grade => $frequency) {
+    print("$grade: $frequency" . \PHP_EOL);
+}
+// A: 2, B: 3, C: 1
+```
+
+### Relative Frequencies
+Возвращает генератор, при обходе которого ключами оказываются элементы поданной на вход последовательности,
+а значениями — относительные частоты вхождений соответствующих элементов.
+
+```Math::relativeFrequencies(iterable $data, bool $strict = true): \Generator```
+
+По умолчанию выполняет сравнение в [режиме строгой типизации](#Режимы-типизации). Передайте значение `false` аргумента `$strict`, чтобы работать в режиме приведения типов.
+
+```php
+use IterTools\Math;
+
+$grades = ['A', 'A', 'B', 'B', 'B', 'C'];
+
+foreach (Math::relativeFrequencies($grades) as $grade => $frequency) {
+    print("$grade: $frequency" . \PHP_EOL);
+}
+// A: 0.33, B: 0.5, C: 0.166
+```
+
 ### Running Average
 Накопление среднего арифметического элементов коллекции в процессе итерирования.
 
@@ -2529,6 +2571,23 @@ $result = Stream::of($data)
 // [1, 2, 3, 4, 5]
 ```
 
+#### Frequencies
+Абсолютная частота распредения элементов потока.
+
+```$stream->frequencies(bool $strict = true): Stream```
+
+```php
+use IterTools\Stream;
+
+$grades = ['A', 'A', 'B', 'B', 'B', 'C'];
+
+$result = Stream::of($grades)
+    ->frequencies()
+    ->toAssociativeArray();
+
+// ['A' => 2, 'B' => 3, 'C' => 1]
+```
+
 #### Group By
 Группирует элементы из потока по заданному правилу.
 
@@ -2696,7 +2755,7 @@ $stream = Stream::of($languages)
 ```$stream->reindex(callable $indexer): Stream```
 
 ```php
-use IterTools\Single;
+use IterTools\Stream;
 $data = [
     [
         'title'   => 'Star Wars: Episode IV – A New Hope',
@@ -2735,6 +2794,23 @@ $reindexResult = Stream::of($data)
 //         'year' => 1983,
 //     ],
 // ]
+```
+
+#### Relative Frequencies
+Относительная частота распредения элементов потока.
+
+```$stream->relativeFrequencies(bool $strict = true): Stream```
+
+```php
+use IterTools\Stream;
+
+$grades = ['A', 'A', 'B', 'B', 'B', 'C'];
+
+$result = Stream::of($grades)
+    ->relativeFrequencies()
+    ->toAssociativeArray();
+
+// A => 0.33, B => 0.5, C => 0.166
 ```
 
 #### Reverse

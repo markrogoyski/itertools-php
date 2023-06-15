@@ -1,4 +1,4 @@
-![MathPHP Logo](https://github.com/markrogoyski/itertools-php/blob/main/docs/image/IterToolsLogo.png?raw=true)
+![IterToolsLogo Logo](https://github.com/markrogoyski/itertools-php/blob/main/docs/image/IterToolsLogo.png?raw=true)
 
 ### IterTools - PHP Iteration Tools to Power Up Your Loops
 
@@ -2621,6 +2621,8 @@ Frequency distribution of the stream elements.
 ```$stream->frequencies(bool $strict = true): Stream```
 
 ```php
+use IterTools\Stream;
+
 $grades = ['A', 'A', 'B', 'B', 'B', 'C'];
 
 $result = Stream::of($grades)
@@ -2798,7 +2800,7 @@ Return a new stream of key-value elements reindexed by the key indexer function.
 ```$stream->reindex(callable $indexer): Stream```
 
 ```php
-use IterTools\Single;
+use IterTools\Stream;
 
 $data = [
     [
@@ -2847,6 +2849,8 @@ Relative frequency distribution of the stream elements.
 ```$stream->relativeFrequencies(bool $strict = true): Stream```
 
 ```php
+use IterTools\Stream;
+
 $grades = ['A', 'A', 'B', 'B', 'B', 'C'];
 
 $result = Stream::of($grades)
