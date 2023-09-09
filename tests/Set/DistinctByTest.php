@@ -12,6 +12,36 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class DistinctByTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test distinctBy example usage
+     */
+    public function testExampleUsage(): void
+    {
+        // Given
+        $streetFighterConsoleReleases = [
+            ['id' => '112233', 'name' => 'Street Fighter 3 3rd Strike', 'console' => 'Dreamcast'],
+            ['id' => '223344', 'name' => 'Street Fighter 3 3rd Strike', 'console' => 'PS4'],
+            ['id' => '334455', 'name' => 'Street Fighter 3 3rd Strike', 'console' => 'PS5'],
+            ['id' => '445566', 'name' => 'Street Fighter VI', 'console' => 'PS4'],
+            ['id' => '556677', 'name' => 'Street Fighter VI', 'console' => 'PS5'],
+            ['id' => '667788', 'name' => 'Street Fighter VI', 'console' => 'PC'],
+        ];
+
+        // And
+        $compareBy = fn ($sfTitle) => $sfTitle['name'];
+
+        // When
+        $uniqueTitles = [];
+        foreach (Set::distinctBy($streetFighterConsoleReleases, $compareBy) as $sfTitle) {
+            $uniqueTitles[] = $sfTitle;
+        }
+
+        // Then
+        $this->assertCount(2, $uniqueTitles);
+        $this->assertContains('Street Fighter 3 3rd Strike', [$uniqueTitles[0]['name'], $uniqueTitles[1]['name']]);
+        $this->assertContains('Street Fighter VI', [$uniqueTitles[0]['name'], $uniqueTitles[1]['name']]);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param        array $data
      * @param        callable $compareBy

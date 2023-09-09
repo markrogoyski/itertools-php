@@ -113,6 +113,7 @@ Quick Reference
 | Iterator                                                        | Description                                               | Code Snippet                                                 |
 |-----------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------|
 | [`distinct`](#Distinct)                                         | Iterate only distinct items                               | `Set::distinct($data)`                                       |
+| [`distinctBy`](#Distinct-By)                                    | Iterate only distinct items using custom comparator       | `Set::distinct($data, $compareBy)`                           |
 | [`intersection`](#Intersection)                                 | Intersection of iterables                                 | `Set::intersection(...$iterables)`                           |
 | [`intersectionCoercive`](#Intersection-Coercive)                | Intersection with type coercion                           | `Set::intersectionCoercive(...$iterables)`                   |
 | [`partialIntersection`](#Partial-Intersection)                  | Partial intersection of iterables                         | `Set::partialIntersection($minCount, ...$iterables)`         |
@@ -203,6 +204,7 @@ Quick Reference
 | [`chunkwise`](#Chunkwise-1)                                               | Iterate by chunks                                                                         | `$stream->chunkwise($chunkSize)`                                                  |
 | [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                                | Iterate by overlapped chunks                                                              | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                 |
 | [`distinct`](#Distinct-1)                                                 | Filter out elements: iterate only unique items                                            | `$stream->distinct([$strict])`                                                    |
+| [`distinctBy`](#Distinct-By-1)                                            | Filter out elements: iterate only unique items using custom comparator                    | `$stream->distinct($compareBy)`                                                   |
 | [`dropWhile`](#Drop-While-1)                                              | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`                                                  |
 | [`filter`](#Filter-1)                                                     | Filter for only elements where the predicate function is true                             | `$stream->filterTrue($predicate)`                                                 |
 | [`filterTrue`](#Filter-True-1)                                            | Filter for only truthy elements                                                           | `$stream->filterTrue()`                                                           |
@@ -1250,7 +1252,7 @@ foreach (Math::runningTotal($prices, $initialValue) as $runningTotal) {
 // 5, 6, 8, 11, 15, 20
 ```
 
-## Set and multiset
+## Set and Multiset
 ### Distinct
 Filter out elements from the iterable only returning distinct elements.
 
@@ -1274,6 +1276,34 @@ foreach (Set::distinct($mixedTypes, false) as $datum) {
     print($datum);
 }
 // 1, 2, 3
+```
+
+### Distinct By
+Filter out elements from the iterable only returning distinct elements according to a custom comparator function.
+
+```Set::distinctBy(iterable $data, callable $compareBy)```
+
+Defaults to [strict type](#Strict-and-Coercive-Types) comparisons. Set strict to false for type coercion comparisons.
+
+```php
+use IterTools\Set;
+
+$streetFighterConsoleReleases = [
+    ['id' => '112233', 'name' => 'Street Fighter 3 3rd Strike', 'console' => 'Dreamcast'],
+    ['id' => '223344', 'name' => 'Street Fighter 3 3rd Strike', 'console' => 'PS4'],
+    ['id' => '334455', 'name' => 'Street Fighter 3 3rd Strike', 'console' => 'PS5'],
+    ['id' => '445566', 'name' => 'Street Fighter VI', 'console' => 'PS4'],
+    ['id' => '556677', 'name' => 'Street Fighter VI', 'console' => 'PS5'],
+    ['id' => '667788', 'name' => 'Street Fighter VI', 'console' => 'PC'],
+];
+$compareBy = fn ($sfTitle) => $sfTitle['name'];
+
+$uniqueTitles = [];
+foreach (Set::distinctBy($streetFighterConsoleReleases, $compareBy) as $sfTitle) {
+    $uniqueTitles[] = $sfTitle;
+}
+
+// Contains one SF3 3rd Strike entry and one SFVI entry.
 ```
 
 ### Intersection
@@ -2483,6 +2513,28 @@ $stream = Stream::of($input)
     ->distinct(false)
     ->toArray();
 // 1, 2, 3
+```
+
+#### Distinct By
+Return a stream filtering out elements from the stream only returning distinct elements according to a custom comparator function.
+
+```$stream->distinctBy(callable $compareBy): Stream```
+
+```php
+use IterTools\Stream;
+
+$streetFighterConsoleReleases = [
+    ['id' => '112233', 'name' => 'Street Fighter 3 3rd Strike', 'console' => 'Dreamcast'],
+    ['id' => '223344', 'name' => 'Street Fighter 3 3rd Strike', 'console' => 'PS4'],
+    ['id' => '334455', 'name' => 'Street Fighter 3 3rd Strike', 'console' => 'PS5'],
+    ['id' => '445566', 'name' => 'Street Fighter VI', 'console' => 'PS4'],
+    ['id' => '556677', 'name' => 'Street Fighter VI', 'console' => 'PS5'],
+    ['id' => '667799', 'name' => 'Street Fighter VI', 'console' => 'PC'],
+];
+$stream = Stream::of($streetFighterConsoleReleases)
+    ->distinctBy(fn ($sfTitle) => $sfTitle['name'])
+    ->toArray();
+// Contains one SF3 3rd Strike entry and one SFVI entry
 ```
 
 #### Drop While
