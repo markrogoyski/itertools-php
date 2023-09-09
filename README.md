@@ -1283,8 +1283,6 @@ Filter out elements from the iterable only returning distinct elements according
 
 ```Set::distinctBy(iterable $data, callable $compareBy)```
 
-Defaults to [strict type](#Strict-and-Coercive-Types) comparisons. Set strict to false for type coercion comparisons.
-
 ```php
 use IterTools\Set;
 
