@@ -1,5 +1,13 @@
 # IterTools PHP Change Log
 
+## v1.8.0 - 2023-09-09
+
+### New Features
+* Set
+  * `distinctBy`
+* Stream
+  * `distinctBy`
+
 ## v.1.7.0 - 2023-06-14
 
 ### New Features
@@ -9,7 +17,6 @@
 
 ### Improvements
 * Internal improvements for static analysis
-
 
 ## v1.6.0 - 2023-04-16
 
