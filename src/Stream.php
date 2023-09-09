@@ -700,11 +700,6 @@ class Stream implements \IteratorAggregate
      *
      * Using $compareBy function for getting comparable value.
      *
-     * Supports only strict-type comparisons:
-     *  - scalars: compares strictly by type
-     *  - objects: always treats different instances as not equal to each other
-     *  - arrays: compares serialized
-     *
      * @param callable $compareBy
      *
      * @return $this

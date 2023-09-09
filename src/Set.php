@@ -47,11 +47,6 @@ class Set
     /**
      * Iterate only the distinct elements using $compareBy function for getting comparable value.
      *
-     * Supports only strict-type comparisons:
-     *  - scalars: compares strictly by type
-     *  - objects: always treats different instances as not equal to each other
-     *  - arrays: compares serialized
-     *
      * @template T
      *
      * @param iterable<T> $data
