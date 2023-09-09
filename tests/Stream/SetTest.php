@@ -53,6 +53,23 @@ class SetTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
+                    ['name' => 'John', 'id' => 1],
+                    ['name' => 'Mary', 'id' => 2],
+                    ['name' => 'Mary', 'id' => 3],
+                    ['name' => 'John', 'id' => 4],
+                    ['name' => 'Jane', 'id' => 5],
+                ],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinctBy(fn ($item) => $item['name'])
+                    ->toArray(),
+                [
+                    ['name' => 'John', 'id' => 1],
+                    ['name' => 'Mary', 'id' => 2],
+                    ['name' => 'Jane', 'id' => 5],
+                ],
+            ],
+            [
+                [
                     [1, 2, 3, 4, 5],
                     [2, 3, 4, 5, 6, 7],
                     [3, 4, 5, 6, 7, 8, 9],
@@ -481,6 +498,23 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->distinct()
                     ->toArray(),
                 [1, 2, 3, '1', '2', '3'],
+            ],
+            [
+                $gen([
+                    ['name' => 'John', 'id' => 1],
+                    ['name' => 'Mary', 'id' => 2],
+                    ['name' => 'Mary', 'id' => 3],
+                    ['name' => 'John', 'id' => 4],
+                    ['name' => 'Jane', 'id' => 5],
+                ]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinctBy(fn ($item) => $item['name'])
+                    ->toArray(),
+                [
+                    ['name' => 'John', 'id' => 1],
+                    ['name' => 'Mary', 'id' => 2],
+                    ['name' => 'Jane', 'id' => 5],
+                ],
             ],
             [
                 [
@@ -916,6 +950,23 @@ class SetTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3, '1', '2', '3'],
             ],
             [
+                $iter([
+                    ['name' => 'John', 'id' => 1],
+                    ['name' => 'Mary', 'id' => 2],
+                    ['name' => 'Mary', 'id' => 3],
+                    ['name' => 'John', 'id' => 4],
+                    ['name' => 'Jane', 'id' => 5],
+                ]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinctBy(fn ($item) => $item['name'])
+                    ->toArray(),
+                [
+                    ['name' => 'John', 'id' => 1],
+                    ['name' => 'Mary', 'id' => 2],
+                    ['name' => 'Jane', 'id' => 5],
+                ],
+            ],
+            [
                 [
                     $iter([1, 2, 3, 4, 5]),
                     $iter([2, 3, 4, 5, 6, 7]),
@@ -1347,6 +1398,23 @@ class SetTest extends \PHPUnit\Framework\TestCase
                     ->distinct()
                     ->toArray(),
                 [1, 2, 3, '1', '2', '3'],
+            ],
+            [
+                $trav([
+                    ['name' => 'John', 'id' => 1],
+                    ['name' => 'Mary', 'id' => 2],
+                    ['name' => 'Mary', 'id' => 3],
+                    ['name' => 'John', 'id' => 4],
+                    ['name' => 'Jane', 'id' => 5],
+                ]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->distinctBy(fn ($item) => $item['name'])
+                    ->toArray(),
+                [
+                    ['name' => 'John', 'id' => 1],
+                    ['name' => 'Mary', 'id' => 2],
+                    ['name' => 'Jane', 'id' => 5],
+                ],
             ],
             [
                 [
