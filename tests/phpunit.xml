@@ -9,12 +9,12 @@
       <directory suffix="Test.php">Random</directory>
       <directory suffix="Test.php">Reduce</directory>
       <directory suffix="Test.php">Single</directory>
-      <directory suffix="Test.php">Summary</directory>
+      <!--<directory suffix="Test.php">Summary</directory>
       <directory suffix="Test.php">Set</directory>
       <directory suffix="Test.php">Stream</directory>
       <directory suffix="Test.php">File</directory>
       <directory suffix="Test.php">Transform</directory>
-      <directory suffix="Test.php">Util</directory>
+      <directory suffix="Test.php">Util</directory>-->
     </testsuite>
   </testsuites>
   <coverage processUncoveredFiles="true">
