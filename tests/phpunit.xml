@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="bootstrap.php" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="bootstrap.php" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" processIsolation="true">
   <testsuites>
     <testsuite name="All">
-        <!--<directory suffix="Test.php">Composition</directory>
-         <directory suffix="Test.php">Infinite</directory>
-         <directory suffix="Test.php">Math</directory>-->
-      <directory suffix="Test.php">Multi/ZipFilled</directory>
-        <!--<directory suffix="Test.php">Random</directory>
+        <directory suffix="Test.php">Composition</directory>
+        <directory suffix="Test.php">Infinite</directory>
+        <directory suffix="Test.php">Math</directory>
+        <directory suffix="Test.php">Multi/Zip</directory>
+        <directory suffix="Test.php">Random</directory>
         <directory suffix="Test.php">Reduce</directory>
         <directory suffix="Test.php">Single</directory>
         <directory suffix="Test.php">Summary</directory>
@@ -14,7 +14,7 @@
         <directory suffix="Test.php">Stream</directory>
         <directory suffix="Test.php">File</directory>
         <directory suffix="Test.php">Transform</directory>
-        <directory suffix="Test.php">Util</directory>-->
+        <directory suffix="Test.php">Util</directory>
     </testsuite>
   </testsuites>
   <coverage processUncoveredFiles="true">
