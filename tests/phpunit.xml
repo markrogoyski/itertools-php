@@ -2,10 +2,10 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="bootstrap.php" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
   <testsuites>
     <testsuite name="All">
-      <!--<directory suffix="Test.php">Composition</directory>
+     <directory suffix="Test.php">Composition</directory>
       <directory suffix="Test.php">Infinite</directory>
-      <directory suffix="Test.php">Math</directory>-->
-      <directory suffix="Test.php">Multi</directory>
+      <!--<directory suffix="Test.php">Math</directory>
+     <directory suffix="Test.php">Multi</directory>-->
       <directory suffix="Test.php">Random</directory>
       <directory suffix="Test.php">Reduce</directory>
       <directory suffix="Test.php">Single</directory>
