@@ -198,7 +198,7 @@ class Summary
      *
      * @return bool
      */
-    public static function exactlyN(iterable $data, int $n, callable $predicate = null): bool
+    public static function exactlyN(iterable $data, int $n, ?callable $predicate = null): bool
     {
         if ($n < 0) {
             return false;
@@ -318,7 +318,7 @@ class Summary
      *
      * @return bool
      */
-    public static function isPartitioned(iterable $data, callable $predicate = null): bool
+    public static function isPartitioned(iterable $data, ?callable $predicate = null): bool
     {
         $predicate ??= fn ($item): bool => \boolval($item);
 

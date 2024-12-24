@@ -292,7 +292,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Single::filterTrue()
      */
-    public function filterTrue(callable $predicate = null): self
+    public function filterTrue(?callable $predicate = null): self
     {
         $this->iterable = Single::filterTrue($this->iterable, $predicate);
         return $this;
@@ -309,7 +309,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Single::filterFalse()
      */
-    public function filterFalse(callable $predicate = null): self
+    public function filterFalse(?callable $predicate = null): self
     {
         $this->iterable = Single::filterFalse($this->iterable, $predicate);
         return $this;
@@ -344,7 +344,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Single::groupBy()
      */
-    public function groupBy(callable $groupKeyFunction, callable $itemKeyFunction = null): self
+    public function groupBy(callable $groupKeyFunction, ?callable $itemKeyFunction = null): self
     {
         $this->iterable = Single::groupBy($this->iterable, $groupKeyFunction, $itemKeyFunction);
         return $this;
@@ -475,7 +475,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Single::slice()
      */
-    public function slice(int $start = 0, int $count = null, int $step = 1): self
+    public function slice(int $start = 0, ?int $count = null, int $step = 1): self
     {
         $this->iterable = Single::slice($this->iterable, $start, $count, $step);
         return $this;
@@ -536,7 +536,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Single::sort()
      */
-    public function sort(callable $comparator = null): self
+    public function sort(?callable $comparator = null): self
     {
         $this->iterable = Sort::sort($this->iterable, $comparator);
         return $this;
@@ -553,7 +553,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Single::asort()
      */
-    public function asort(callable $comparator = null): self
+    public function asort(?callable $comparator = null): self
     {
         $this->iterable = Sort::asort($this->iterable, $comparator);
         return $this;
@@ -1074,7 +1074,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Transform::toAssociativeArray()
      */
-    public function toAssociativeArray(callable $keyFunc = null, callable $valueFunc = null): array
+    public function toAssociativeArray(?callable $keyFunc = null, ?callable $valueFunc = null): array
     {
         return Transform::toAssociativeArray($this->iterable, $keyFunc, $valueFunc);
     }
@@ -1112,7 +1112,7 @@ class Stream implements \IteratorAggregate
      *
      * @return void
      */
-    public function toFile($fileResource, string $newlineSeparator = \PHP_EOL, string $header = null, string $footer = null): void
+    public function toFile($fileResource, string $newlineSeparator = \PHP_EOL, ?string $header = null, ?string $footer = null): void
     {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
@@ -1154,7 +1154,7 @@ class Stream implements \IteratorAggregate
      */
     public function toCsvFile(
         $fileResource,
-        array $header = null,
+        ?array $header = null,
         string $separator = ',',
         string $enclosure = '"',
         string $escape = '\\'
@@ -1215,7 +1215,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Summary::exactlyN()
      */
-    public function exactlyN(int $n, callable $predicate = null): bool
+    public function exactlyN(int $n, ?callable $predicate = null): bool
     {
         return Summary::exactlyN($this->iterable, $n, $predicate);
     }
@@ -1236,7 +1236,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Summary::isPartitioned()
      */
-    public function isPartitioned(callable $predicate = null): bool
+    public function isPartitioned(?callable $predicate = null): bool
     {
         return Summary::isPartitioned($this->iterable, $predicate);
     }
@@ -1436,7 +1436,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toMax()
      */
-    public function toMax(callable $compareBy = null)
+    public function toMax(?callable $compareBy = null)
     {
         return Reduce::toMax($this->iterable, $compareBy);
     }
@@ -1456,7 +1456,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toMin()
      */
-    public function toMin(callable $compareBy = null)
+    public function toMin(?callable $compareBy = null)
     {
         return Reduce::toMin($this->iterable, $compareBy);
     }
@@ -1476,7 +1476,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toMinMax()
      */
-    public function toMinMax(callable $compareBy = null): array
+    public function toMinMax(?callable $compareBy = null): array
     {
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;
