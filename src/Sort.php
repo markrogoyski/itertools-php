@@ -16,7 +16,7 @@ class Sort
      *
      * @return \Generator
      */
-    public static function asort(iterable $data, callable $comparator = null): \Generator
+    public static function asort(iterable $data, ?callable $comparator = null): \Generator
     {
         $array = \iterator_to_array(Transform::toIterator($data), true);
 
@@ -41,7 +41,7 @@ class Sort
      *
      * @return \Generator
      */
-    public static function sort(iterable $data, callable $comparator = null): \Generator
+    public static function sort(iterable $data, ?callable $comparator = null): \Generator
     {
         $array = \iterator_to_array(Transform::toIterator($data));
 

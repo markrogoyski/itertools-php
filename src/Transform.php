@@ -40,8 +40,8 @@ class Transform
      */
     public static function toAssociativeArray(
         iterable $iterable,
-        callable $keyFunc = null,
-        callable $valueFunc = null
+        ?callable $keyFunc = null,
+        ?callable $valueFunc = null
     ): array {
         if ($keyFunc === null) {
             $keyFunc = fn ($item, $key) => $key;

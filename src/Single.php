@@ -150,7 +150,7 @@ class Single
      *
      * @return \Generator<mixed>
      */
-    public static function filterFalse(iterable $data, callable $predicate = null): \Generator
+    public static function filterFalse(iterable $data, ?callable $predicate = null): \Generator
     {
         if ($predicate === null) {
             $predicate = fn($datum): bool => \boolval($datum);
@@ -173,7 +173,7 @@ class Single
      *
      * @return \Generator<mixed>
      */
-    public static function filterTrue(iterable $data, callable $predicate = null): \Generator
+    public static function filterTrue(iterable $data, ?callable $predicate = null): \Generator
     {
         if ($predicate === null) {
             $predicate = fn($datum): bool => \boolval($datum);
@@ -244,7 +244,7 @@ class Single
     public static function groupBy(
         iterable $data,
         callable $groupKeyFunction,
-        callable $itemKeyFunction = null
+        ?callable $itemKeyFunction = null
     ): \Generator {
         $itemKeyFunction ??= fn ($x) => null;
         $groups = [];
@@ -473,7 +473,7 @@ class Single
      *
      * @return \Generator<T>
      */
-    public static function slice(iterable $data, int $start = 0, int $count = null, int $step = 1): \Generator
+    public static function slice(iterable $data, int $start = 0, ?int $count = null, int $step = 1): \Generator
     {
         if ($start < 0) {
             throw new \InvalidArgumentException("Parameter 'start' cannot be negative");
