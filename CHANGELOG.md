@@ -1,5 +1,10 @@
 # IterTools PHP Change Log
 
+## v1.9.0 - 2024-02-023
+
+### Improvements
+* Improvements for PHP 8.4 compatibility
+
 ## v1.8.0 - 2023-09-09
 
 ### New Features
