@@ -335,7 +335,8 @@ $ php composer.phar require markrogoyski/itertools-php:1.*
 ```
 
 #### Минимальные требования
-* PHP 8.1
+* **PHP 8.1+**
+    * (Для PHP 7.4–8.0 используйте [v1.9](https://github.com/markrogoyski/itertools-php/releases/tag/v1.9.0))
 
 Использование
 -----
