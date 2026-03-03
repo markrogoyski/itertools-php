@@ -119,7 +119,7 @@ class Single
                 }
                 continue;
             }
-            yield $datum;
+            yield $key => $datum;
         }
     }
 

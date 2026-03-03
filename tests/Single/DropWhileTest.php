@@ -420,4 +420,20 @@ class DropWhileTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEquals($expected, \array_values($result));
     }
+
+    /**
+     * @test dropWhile preserves keys for all yielded items, not just the first
+     */
+    public function testDropWhilePreservesKeys(): void
+    {
+        // Given
+        $data = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5];
+
+        // When - drop while value < 3, should yield c=>3, d=>4, e=>5
+        $result = \iterator_to_array(Single::dropWhile($data, fn ($x) => $x < 3));
+
+        // Then - all keys must be preserved, not just the first one
+        $expected = ['c' => 3, 'd' => 4, 'e' => 5];
+        $this->assertSame($expected, $result);
+    }
 }
