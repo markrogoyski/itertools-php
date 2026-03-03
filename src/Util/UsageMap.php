@@ -21,16 +21,10 @@ class UsageMap
      */
     private array $deletedMap = [];
     /**
-     * @var bool
-     */
-    private bool $strict;
-
-    /**
      * @param bool $strict
      */
-    public function __construct(bool $strict)
+    public function __construct(private readonly bool $strict)
     {
-        $this->strict = $strict;
     }
 
     /**
@@ -41,7 +35,7 @@ class UsageMap
      *
      * @return string unique hash string
      */
-    public function addUsage($value, string $owner): string
+    public function addUsage(mixed $value, string $owner): string
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
 
@@ -65,7 +59,7 @@ class UsageMap
      *
      * @return string unique hash string
      */
-    public function deleteUsage($value): string
+    public function deleteUsage(mixed $value): string
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
 
@@ -85,7 +79,7 @@ class UsageMap
      *
      * @return int
      */
-    public function getOwnersCount($value): int
+    public function getOwnersCount(mixed $value): int
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
         $deletesCount = $this->deletedMap[$hash] ?? 0;
@@ -103,7 +97,7 @@ class UsageMap
      *
      * @return int
      */
-    public function getUsagesCount($value, int $maxOwnersCount = 1): int
+    public function getUsagesCount(mixed $value, int $maxOwnersCount = 1): int
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
         $deletesCount = $this->deletedMap[$hash] ?? 0;
@@ -133,7 +127,7 @@ class UsageMap
      *
      * @return bool
      */
-    public function hasSameOwnerCount($value, int $ownersCount): bool
+    public function hasSameOwnerCount(mixed $value, int $ownersCount): bool
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
         $map = $this->addedMap[$hash] ?? [];

@@ -340,7 +340,7 @@ $ php composer.phar require markrogoyski/itertools-php:1.*
 ```
 
 #### Minimum Requirements
- * PHP 7.4
+ * PHP 8.1
 
 Usage
 -----

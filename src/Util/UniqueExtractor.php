@@ -35,34 +35,22 @@ class UniqueExtractor
      *
      * @return string
      */
-    public static function getString($var, bool $strict): string
+    public static function getString(mixed $var, bool $strict): string
     {
-        switch (true) {
-            case \is_array($var):
-                return 'array_' . \serialize($var);
-            case \is_resource($var):
-                return 'resource_' . \get_resource_type($var) . '_' . (string) $var;
-            case $var instanceof \Generator:
-                return 'generator_' . \spl_object_id($var);
-            case $var instanceof \Closure:
-                return 'closure_' . \spl_object_id($var);
-            case \is_object($var):
-                return 'object_' . ($strict ? \spl_object_id($var) : \serialize($var));
-            case \is_float($var) && \is_nan($var):
-                return 'double_NAN';
-            case \gettype($var) === 'boolean':
-                return 'boolean_' . \intval($var);
-            case $strict:
-                return \gettype($var) . '_' . $var;
-            case !$var:
-                return 'boolean_0';
+        return match (true) {
+            \is_array($var) => 'array_' . \serialize($var),
+            \is_resource($var) => 'resource_' . \get_resource_type($var) . '_' . (string) $var,
+            $var instanceof \Generator => 'generator_' . \spl_object_id($var),
+            $var instanceof \Closure => 'closure_' . \spl_object_id($var),
+            \is_object($var) => 'object_' . ($strict ? \spl_object_id($var) : \serialize($var)),
+            \is_float($var) && \is_nan($var) => 'double_NAN',
+            \gettype($var) === 'boolean' => 'boolean_' . \intval($var),
+            $strict => \gettype($var) . '_' . $var,
+            !$var => 'boolean_0',
             // @phpstan-ignore-next-line
-            case \strval($var) === '1':
-                return 'boolean_1';
-            case \is_numeric($var):
-                return 'numeric_' . \floatval($var);
-            default:
-                return 'scalar_' . $var;
-        }
+            \strval($var) === '1' => 'boolean_1',
+            \is_numeric($var) => 'numeric_' . \floatval($var),
+            default => 'scalar_' . $var,
+        };
     }
 }

@@ -20,7 +20,7 @@ class Reduce
      *
      * @return T
      */
-    public static function toValue(iterable $data, callable $reducer, $initialValue = null)
+    public static function toValue(iterable $data, callable $reducer, mixed $initialValue = null): mixed
     {
         $carry = $initialValue;
 
@@ -44,7 +44,7 @@ class Reduce
      *
      * @return mixed|null
      */
-    public static function toMin(iterable $data, ?callable $compareBy = null)
+    public static function toMin(iterable $data, ?callable $compareBy = null): mixed
     {
         if ($compareBy !== null) {
             return static::toValue(
@@ -71,7 +71,7 @@ class Reduce
      *
      * @return mixed|null
      */
-    public static function toMax(iterable $data, ?callable $compareBy = null)
+    public static function toMax(iterable $data, ?callable $compareBy = null): mixed
     {
         if ($compareBy !== null) {
             return static::toValue(
@@ -147,7 +147,7 @@ class Reduce
      *
      * @return int|float
      */
-    public static function toSum(iterable $data)
+    public static function toSum(iterable $data): int|float
     {
         return static::toValue($data, fn ($carry, $datum) => $carry + $datum, 0);
     }
@@ -161,7 +161,7 @@ class Reduce
      *
      * @return int|float|null
      */
-    public static function toProduct(iterable $data)
+    public static function toProduct(iterable $data): int|float|null
     {
         return static::toValue($data, fn ($carry, $datum) => ($carry ?? 1) * $datum);
     }
@@ -175,7 +175,7 @@ class Reduce
      *
      * @return int|float|null
      */
-    public static function toAverage(iterable $data)
+    public static function toAverage(iterable $data): int|float|null
     {
         [$count, $sum] = static::toValue($data, static function ($carry, $datum): array {
             [$count, $sum] = $carry;
@@ -217,7 +217,7 @@ class Reduce
      *
      * @return int|float
      */
-    public static function toRange(iterable $numbers)
+    public static function toRange(iterable $numbers): int|float
     {
         [$min, $max] = static::toMinMax($numbers);
 
@@ -232,7 +232,7 @@ class Reduce
      *
      * @throws \LengthException if collection is empty
      */
-    public static function toFirst(iterable $data)
+    public static function toFirst(iterable $data): mixed
     {
         foreach ($data as $datum) {
             return $datum;
@@ -249,7 +249,7 @@ class Reduce
      *
      * @throws \LengthException if collection is empty
      */
-    public static function toLast(iterable $data)
+    public static function toLast(iterable $data): mixed
     {
         /** @var mixed|NoValueMonad $result */
         $result = static::toValue($data, fn ($carry, $datum) => $datum, NoValueMonad::getInstance());
@@ -283,7 +283,7 @@ class Reduce
      *
      * @throws \LengthException if given iterable is empty
      */
-    public static function toRandomValue(iterable $data)
+    public static function toRandomValue(iterable $data): mixed
     {
         if (\is_countable($data)) {
             if (\count($data) === 0) {
@@ -323,7 +323,7 @@ class Reduce
      *
      * @throws \LengthException if given iterable does not contain item with target position.
      */
-    public static function toNth(iterable $data, int $position)
+    public static function toNth(iterable $data, int $position): mixed
     {
         if (\is_countable($data) && \count($data) <= $position) {
             throw new \LengthException("Given iterable does not contain item with position {$position}");

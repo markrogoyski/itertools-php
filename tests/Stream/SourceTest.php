@@ -573,22 +573,22 @@ class SourceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         ofRange invalid arguments
-     * @dataProvider dataProviderForRangeInvalidArguments
+     * @test         ofRange invalid type arguments
+     * @dataProvider dataProviderForRangeInvalidTypeArguments
      * @param mixed $start
      * @param mixed $end
-     * @param float $step
+     * @param mixed $step
      */
-    public function testOfRangeInvalidArguments($start, $end, $step): void
+    public function testOfRangeInvalidTypeArguments($start, $end, $step): void
     {
         // Then
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
 
         // When
         $stream = Stream::ofRange($start, $end, $step);
     }
 
-    public function dataProviderForRangeInvalidArguments(): array
+    public function dataProviderForRangeInvalidTypeArguments(): array
     {
         return [
             [
@@ -606,6 +606,28 @@ class SourceTest extends \PHPUnit\Framework\TestCase
                 4,
                 [2],
             ],
+        ];
+    }
+
+    /**
+     * @test         ofRange invalid arguments
+     * @dataProvider dataProviderForRangeInvalidArguments
+     * @param int|float|string $start
+     * @param int|float|string $end
+     * @param int|float $step
+     */
+    public function testOfRangeInvalidArguments(int|float|string $start, int|float|string $end, int|float $step): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        $stream = Stream::ofRange($start, $end, $step);
+    }
+
+    public function dataProviderForRangeInvalidArguments(): array
+    {
+        return [
             [
                 'a',
                 4,

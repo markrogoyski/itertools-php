@@ -15,14 +15,6 @@ namespace IterTools\Util\Iterators;
 class RelatedIterator implements \Iterator
 {
     /**
-     * @var TeeIterator<TKey, TValue>
-     */
-    protected TeeIterator $parentIterator;
-    /**
-     * @var int
-     */
-    private int $id;
-    /**
      * @var bool
      */
     private bool $isRewinded = false;
@@ -31,10 +23,10 @@ class RelatedIterator implements \Iterator
      * @param TeeIterator<TKey, TValue> $parentIterator
      * @param int $id
      */
-    public function __construct(TeeIterator $parentIterator, int $id)
-    {
-        $this->parentIterator = $parentIterator;
-        $this->id = $id;
+    public function __construct(
+        private readonly TeeIterator $parentIterator,
+        private readonly int $id,
+    ) {
     }
 
     /**
@@ -58,8 +50,7 @@ class RelatedIterator implements \Iterator
      *
      * @return TValue
      */
-    #[\ReturnTypeWillChange]
-    public function current()
+    public function current(): mixed
     {
         return $this->parentIterator->current($this);
     }
@@ -69,8 +60,7 @@ class RelatedIterator implements \Iterator
      *
      * @return TKey
      */
-    #[\ReturnTypeWillChange]
-    public function key()
+    public function key(): mixed
     {
         return $this->parentIterator->key($this);
     }

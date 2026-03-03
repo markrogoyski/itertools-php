@@ -29,7 +29,7 @@ class JustifyMultipleIterator implements \Iterator
      * @param mixed $filler
      * @param iterable<mixed> ...$iterables
      */
-    public function __construct($filler, iterable ...$iterables)
+    public function __construct(mixed $filler, iterable ...$iterables)
     {
         $this->filler = $filler;
 

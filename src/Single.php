@@ -31,7 +31,7 @@ class Single
      *
      * @return \Generator<mixed>
      */
-    public static function repeat($item, int $repetitions): \Generator
+    public static function repeat(mixed $item, int $repetitions): \Generator
     {
         if ($repetitions < 0) {
             throw new \RangeException("Number of repetitions cannot be negative: {$repetitions}");

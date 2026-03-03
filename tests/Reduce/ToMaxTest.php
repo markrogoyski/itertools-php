@@ -1724,7 +1724,7 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav(['ab', 'ba', 'b']),
-                fn ($item) => -ord($item),
+                fn ($item) => -ord($item[0]),
                 'ab',
             ],
             [

@@ -97,8 +97,7 @@ class TeeIterator extends \NoRewindIterator
      *
      * @param RelatedIterator<TKey, TValue>|null $related
      */
-    #[\ReturnTypeWillChange]
-    public function current(?RelatedIterator $related = null)
+    public function current(?RelatedIterator $related = null): mixed
     {
         if ($related === null) {
             throw new \LogicException();
@@ -114,8 +113,7 @@ class TeeIterator extends \NoRewindIterator
      *
      * @return TKey
      */
-    #[\ReturnTypeWillChange]
-    public function key(?RelatedIterator $related = null)
+    public function key(?RelatedIterator $related = null): mixed
     {
         if ($related === null) {
             throw new \LogicException();

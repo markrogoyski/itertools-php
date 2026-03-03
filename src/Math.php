@@ -90,7 +90,7 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningTotal(iterable $numbers, $initialValue = null): \Generator
+    public static function runningTotal(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         if ($initialValue !== null) {
             yield $initialValue;
@@ -111,7 +111,7 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningProduct(iterable $numbers, $initialValue = null): \Generator
+    public static function runningProduct(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         if ($initialValue !== null) {
             yield $initialValue;
@@ -132,7 +132,7 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningDifference(iterable $numbers, $initialValue = null): \Generator
+    public static function runningDifference(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         if ($initialValue !== null) {
             yield $initialValue;
@@ -153,7 +153,7 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningMax(iterable $numbers, $initialValue = null): \Generator
+    public static function runningMax(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         if ($initialValue !== null) {
             yield $initialValue;
@@ -174,7 +174,7 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningMin(iterable $numbers, $initialValue = null): \Generator
+    public static function runningMin(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         if ($initialValue !== null) {
             yield $initialValue;
@@ -195,7 +195,7 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningAverage(iterable $numbers, $initialValue = null): \Generator
+    public static function runningAverage(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         $n = 0;
         foreach (Math::runningTotal($numbers, $initialValue) as $runningTotal) {

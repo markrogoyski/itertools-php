@@ -74,7 +74,7 @@ class Multi
      *
      * @return \Generator<array<mixed>>
      */
-    public static function zipFilled($filler, iterable ...$iterables): \Generator
+    public static function zipFilled(mixed $filler, iterable ...$iterables): \Generator
     {
         $iterator = new JustifyMultipleIterator($filler, ...$iterables);
 

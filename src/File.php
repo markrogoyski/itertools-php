@@ -19,7 +19,7 @@ class File
      *
      * @see fgets()
      */
-    public static function readLines($fileResource): \Generator
+    public static function readLines(mixed $fileResource): \Generator
     {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
@@ -43,7 +43,7 @@ class File
      * @see fgetcsv()
      */
     public static function readCsv(
-        $fileResource,
+        mixed $fileResource,
         string $separator = ',',
         string $enclosure = '"',
         string $escape = '\\'

@@ -43,7 +43,7 @@ class Infinite
      *
      * @return \Generator<mixed>
      */
-    public static function repeat($item): \Generator
+    public static function repeat(mixed $item): \Generator
     {
         // @phpstan-ignore-next-line
         while (true) {

@@ -69,19 +69,13 @@ class Transform
      */
     public static function toIterator(iterable $iterable): \Iterator
     {
-        switch (true) {
-            case $iterable instanceof \Iterator:
-                return $iterable;
-
-            case $iterable instanceof \Traversable:
-                // @phpstan-ignore-next-line
-                return new \IteratorIterator($iterable);
-
-            case \is_array($iterable):
-                return new \ArrayIterator($iterable);
-        }
-
-        throw new \LogicException(\gettype($iterable) . ' type is not an expected iterable type (Iterator|Traversable|array)');
+        // @phpstan-ignore return.type
+        return match (true) {
+            $iterable instanceof \Iterator => $iterable,
+            $iterable instanceof \Traversable => new \IteratorIterator($iterable),
+            \is_array($iterable) => new \ArrayIterator($iterable),
+            default => throw new \LogicException(\gettype($iterable) . ' type is not an expected iterable type (Iterator|Traversable|array)'),
+        };
     }
 
     /**
