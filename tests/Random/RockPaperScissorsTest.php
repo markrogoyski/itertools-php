@@ -40,7 +40,7 @@ class RockPaperScissorsTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForRockPaperScissors(): array
+    public static function dataProviderForRockPaperScissors(): array
     {
         return [
             [0],

@@ -82,7 +82,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedFrequencies, $frequencies);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -163,7 +163,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayNonScalarValues(): array
+    public static function dataProviderForArrayNonScalarValues(): array
     {
         $obj1 = new \stdClass();
         $obj2 = new \stdClass();
@@ -182,7 +182,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayStrict(): array
+    public static function dataProviderForArrayStrict(): array
     {
         return [
             [
@@ -203,7 +203,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayCoercive(): array
+    public static function dataProviderForArrayCoercive(): array
     {
         return [
             [
@@ -274,7 +274,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedFrequencies, $frequencies);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = fn ($data) => GeneratorFixture::getGenerator($data);
 
@@ -362,7 +362,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGeneratorsStrict(): array
+    public static function dataProviderForGeneratorsStrict(): array
     {
         $gen = fn ($data) => GeneratorFixture::getGenerator($data);
 
@@ -385,7 +385,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGeneratorsCoercive(): array
+    public static function dataProviderForGeneratorsCoercive(): array
     {
         $gen = fn ($data) => GeneratorFixture::getGenerator($data);
 
@@ -458,7 +458,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedFrequencies, $frequencies);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = fn ($data) => new ArrayIteratorFixture($data);
 
@@ -546,7 +546,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIteratorsStrict(): array
+    public static function dataProviderForIteratorsStrict(): array
     {
         $iter = fn ($data) => new ArrayIteratorFixture($data);
 
@@ -569,7 +569,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIteratorsCoercive(): array
+    public static function dataProviderForIteratorsCoercive(): array
     {
         $iter = fn ($data) => new ArrayIteratorFixture($data);
 
@@ -642,7 +642,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedFrequencies, $frequencies);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
@@ -730,7 +730,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversablesStrict(): array
+    public static function dataProviderForTraversablesStrict(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
@@ -753,7 +753,7 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversablesCoercive(): array
+    public static function dataProviderForTraversablesCoercive(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 

@@ -31,7 +31,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipFilledTwoArraysSameSize(): array
+    public static function dataProviderForZipFilledTwoArraysSameSize(): array
     {
         return [
             [
@@ -90,7 +90,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipFilledTwoArraysDifferentSize(): array
+    public static function dataProviderForZipFilledTwoArraysDifferentSize(): array
     {
         return [
             [
@@ -189,7 +189,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipFilledThreeArraysSameSize(): array
+    public static function dataProviderForZipFilledThreeArraysSameSize(): array
     {
         return [
             [
@@ -254,7 +254,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipFilledThreeArraysDifferentSize(): array
+    public static function dataProviderForZipFilledThreeArraysDifferentSize(): array
     {
         return [
             [

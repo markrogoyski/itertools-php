@@ -36,7 +36,7 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForNumber(): array
+    public static function dataProviderForNumber(): array
     {
         return [
             [0, 0, 0],

@@ -26,7 +26,7 @@ class ToStringTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForNoGlueNoPrefixNoSuffix(): array
+    public static function dataProviderForNoGlueNoPrefixNoSuffix(): array
     {
         return [
             [
@@ -112,7 +112,7 @@ class ToStringTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForWithGlueNoPrefixNoSuffix(): array
+    public static function dataProviderForWithGlueNoPrefixNoSuffix(): array
     {
         return [
             [
@@ -281,7 +281,7 @@ class ToStringTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForWithGlueWithPrefixWithSuffix(): array
+    public static function dataProviderForWithGlueWithPrefixWithSuffix(): array
     {
         return [
             [

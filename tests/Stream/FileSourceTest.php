@@ -35,7 +35,7 @@ class FileSourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $stream->toArray());
     }
 
-    public function dataProviderForOfCsvFileByDefault(): array
+    public static function dataProviderForOfCsvFileByDefault(): array
     {
         return [
             [
@@ -183,7 +183,7 @@ class FileSourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $stream->toArray());
     }
 
-    public function dataProviderForOfCsvFileWithConfig(): array
+    public static function dataProviderForOfCsvFileWithConfig(): array
     {
         return [
             [
@@ -339,7 +339,7 @@ class FileSourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $stream->toArray());
     }
 
-    public function dataProviderForOfFileLines(): array
+    public static function dataProviderForOfFileLines(): array
     {
         return [
             [

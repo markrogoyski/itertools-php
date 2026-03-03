@@ -27,7 +27,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -283,7 +283,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForPartialIntersectionArray(): array
+    public static function dataProviderForPartialIntersectionArray(): array
     {
         return [
             [
@@ -473,7 +473,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -731,7 +731,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForPartialIntersectionGenerators(): array
+    public static function dataProviderForPartialIntersectionGenerators(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -923,7 +923,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -1181,7 +1181,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForPartialIntersectionIterators(): array
+    public static function dataProviderForPartialIntersectionIterators(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -1373,7 +1373,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -1631,7 +1631,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForPartialIntersectionTraversables(): array
+    public static function dataProviderForPartialIntersectionTraversables(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 

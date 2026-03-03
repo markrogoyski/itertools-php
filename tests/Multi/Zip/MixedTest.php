@@ -34,7 +34,7 @@ class MixedTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipThreeIterablesSameSize(): array
+    public static function dataProviderForZipThreeIterablesSameSize(): array
     {
         return [
             [
@@ -95,7 +95,7 @@ class MixedTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipThreeIterablesDifferentSize(): array
+    public static function dataProviderForZipThreeIterablesDifferentSize(): array
     {
         return [
             [

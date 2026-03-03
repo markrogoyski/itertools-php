@@ -27,7 +27,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForArrayByDefaultTrue(): array
+    public static function dataProviderForArrayByDefaultTrue(): array
     {
         return [
             [
@@ -93,7 +93,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayWithDefaultPredicateTrue(): array
+    public static function dataProviderForArrayWithDefaultPredicateTrue(): array
     {
         return [
             [
@@ -159,7 +159,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayWithSpecificPredicateTrue(): array
+    public static function dataProviderForArrayWithSpecificPredicateTrue(): array
     {
         return [
             [
@@ -237,7 +237,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForArrayByDefaultFalse(): array
+    public static function dataProviderForArrayByDefaultFalse(): array
     {
         return [
             [
@@ -291,7 +291,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayWithDefaultPredicateFalse(): array
+    public static function dataProviderForArrayWithDefaultPredicateFalse(): array
     {
         return [
             [
@@ -345,7 +345,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayWithSpecificPredicateFalse(): array
+    public static function dataProviderForArrayWithSpecificPredicateFalse(): array
     {
         return [
             [
@@ -407,7 +407,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForGeneratorsByDefaultTrue(): array
+    public static function dataProviderForGeneratorsByDefaultTrue(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -475,7 +475,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGeneratorsWithDefaultPredicateTrue(): array
+    public static function dataProviderForGeneratorsWithDefaultPredicateTrue(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -543,7 +543,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGeneratorsWithSpecificPredicateTrue(): array
+    public static function dataProviderForGeneratorsWithSpecificPredicateTrue(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -623,7 +623,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForGeneratorsByDefaultFalse(): array
+    public static function dataProviderForGeneratorsByDefaultFalse(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -679,7 +679,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGeneratorsWithDefaultPredicateFalse(): array
+    public static function dataProviderForGeneratorsWithDefaultPredicateFalse(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -735,7 +735,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGeneratorsWithSpecificPredicateFalse(): array
+    public static function dataProviderForGeneratorsWithSpecificPredicateFalse(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -799,7 +799,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForIteratorsByDefaultTrue(): array
+    public static function dataProviderForIteratorsByDefaultTrue(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -867,7 +867,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIteratorsWithDefaultPredicateTrue(): array
+    public static function dataProviderForIteratorsWithDefaultPredicateTrue(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -935,7 +935,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIteratorsWithSpecificPredicateTrue(): array
+    public static function dataProviderForIteratorsWithSpecificPredicateTrue(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -1015,7 +1015,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForIteratorsByDefaultFalse(): array
+    public static function dataProviderForIteratorsByDefaultFalse(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -1071,7 +1071,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIteratorsWithDefaultPredicateFalse(): array
+    public static function dataProviderForIteratorsWithDefaultPredicateFalse(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -1127,7 +1127,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIteratorsWithSpecificPredicateFalse(): array
+    public static function dataProviderForIteratorsWithSpecificPredicateFalse(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -1191,7 +1191,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForTraversablesByDefaultTrue(): array
+    public static function dataProviderForTraversablesByDefaultTrue(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -1259,7 +1259,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversablesWithDefaultPredicateTrue(): array
+    public static function dataProviderForTraversablesWithDefaultPredicateTrue(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -1327,7 +1327,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversablesWithSpecificPredicateTrue(): array
+    public static function dataProviderForTraversablesWithSpecificPredicateTrue(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -1407,7 +1407,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForTraversablesByDefaultFalse(): array
+    public static function dataProviderForTraversablesByDefaultFalse(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -1463,7 +1463,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversablesWithDefaultPredicateFalse(): array
+    public static function dataProviderForTraversablesWithDefaultPredicateFalse(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -1519,7 +1519,7 @@ class IsPartitionedTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversablesWithSpecificPredicateFalse(): array
+    public static function dataProviderForTraversablesWithSpecificPredicateFalse(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 

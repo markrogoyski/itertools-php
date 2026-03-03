@@ -33,7 +33,7 @@ class TraversableTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipStrictTwoTraversableSameSize(): array
+    public static function dataProviderForZipStrictTwoTraversableSameSize(): array
     {
         $trav = static function (array $input) {
             return new Fixture\IteratorAggregateFixture($input);
@@ -104,7 +104,7 @@ class TraversableTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipStrictTwoTraversableDifferentSize(): array
+    public static function dataProviderForZipStrictTwoTraversableDifferentSize(): array
     {
         $trav = static function (array $input) {
             return new Fixture\IteratorAggregateFixture($input);

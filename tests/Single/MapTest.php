@@ -34,7 +34,7 @@ class MapTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -80,7 +80,7 @@ class MapTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGenerator(): array
+    public static function dataProviderForGenerator(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -128,7 +128,7 @@ class MapTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIterator(): array
+    public static function dataProviderForIterator(): array
     {
         $iter = fn (array $data) => new Fixture\ArrayIteratorFixture($data);
 
@@ -176,7 +176,7 @@ class MapTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversable(): array
+    public static function dataProviderForTraversable(): array
     {
         $iter = fn (array $data) => new Fixture\IteratorAggregateFixture($data);
 

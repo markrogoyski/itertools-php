@@ -37,7 +37,7 @@ class PeekPrintRTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($output);
     }
 
-    public function dataProviderForEmptyArray(): array
+    public static function dataProviderForEmptyArray(): array
     {
         return [
             [
@@ -114,7 +114,7 @@ class PeekPrintRTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($output);
     }
 
-    public function dataProviderForNonEmptyArray(): array
+    public static function dataProviderForNonEmptyArray(): array
     {
         return [
             [
@@ -192,7 +192,7 @@ class PeekPrintRTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($output);
     }
 
-    public function dataProviderForEmptyGenerators(): array
+    public static function dataProviderForEmptyGenerators(): array
     {
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -271,7 +271,7 @@ class PeekPrintRTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($output);
     }
 
-    public function dataProviderForNonEmptyGenerators(): array
+    public static function dataProviderForNonEmptyGenerators(): array
     {
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -351,7 +351,7 @@ class PeekPrintRTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($output);
     }
 
-    public function dataProviderForEmptyIterators(): array
+    public static function dataProviderForEmptyIterators(): array
     {
         $iter = fn ($data) => new \ArrayIterator($data);
 
@@ -430,7 +430,7 @@ class PeekPrintRTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($output);
     }
 
-    public function dataProviderForNonEmptyIterators(): array
+    public static function dataProviderForNonEmptyIterators(): array
     {
         $iter = fn ($data) => new \ArrayIterator($data);
 
@@ -510,7 +510,7 @@ class PeekPrintRTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($output);
     }
 
-    public function dataProviderForEmptyTraversables(): array
+    public static function dataProviderForEmptyTraversables(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
@@ -589,7 +589,7 @@ class PeekPrintRTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($output);
     }
 
-    public function dataProviderForNonEmptyTraversables(): array
+    public static function dataProviderForNonEmptyTraversables(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 

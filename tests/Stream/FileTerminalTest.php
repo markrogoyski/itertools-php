@@ -108,7 +108,7 @@ END_OF_EXPECTED;
         $this->assertEquals($expected, $fileContents);
     }
 
-    public function dataProviderForToFileWithDefaultConfig(): array
+    public static function dataProviderForToFileWithDefaultConfig(): array
     {
         return [
             [
@@ -164,7 +164,7 @@ END_OF_EXPECTED;
         $this->assertEquals($expected, $fileContents);
     }
 
-    public function dataProviderForToFileWithCustomConfig(): array
+    public static function dataProviderForToFileWithCustomConfig(): array
     {
         return [
             [
@@ -371,7 +371,7 @@ END_OF_EXPECTED;
         $this->assertEquals($expected, $fileContents);
     }
 
-    public function dataProviderForToCsvFileWithDefaultConfig(): array
+    public static function dataProviderForToCsvFileWithDefaultConfig(): array
     {
         return [
             [
@@ -462,7 +462,7 @@ END_OF_EXPECTED;
         $this->assertEquals($expected, $fileContents);
     }
 
-    public function dataProviderForToCsvFileWithCustomConfig(): array
+    public static function dataProviderForToCsvFileWithCustomConfig(): array
     {
         return [
             [

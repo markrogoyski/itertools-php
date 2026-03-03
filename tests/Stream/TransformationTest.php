@@ -25,7 +25,7 @@ class TransformationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForToArray(): array
+    public static function dataProviderForToArray(): array
     {
         return [
             [
@@ -67,7 +67,7 @@ class TransformationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForToAssociativeArray(): array
+    public static function dataProviderForToAssociativeArray(): array
     {
         return [
             [
@@ -201,7 +201,7 @@ class TransformationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForTee(): array
+    public static function dataProviderForTee(): array
     {
         return [
             [

@@ -30,7 +30,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -738,7 +738,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForGenerator(): array
+    public static function dataProviderForGenerator(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -1372,7 +1372,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForIterator(): array
+    public static function dataProviderForIterator(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -2006,7 +2006,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForTraversable(): array
+    public static function dataProviderForTraversable(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -2639,7 +2639,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
         $this->assertContains($result, $expected);
     }
 
-    public function dataProviderForToRandomValue(): array
+    public static function dataProviderForToRandomValue(): array
     {
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
         $iter = fn ($data) => new \ArrayIterator($data);

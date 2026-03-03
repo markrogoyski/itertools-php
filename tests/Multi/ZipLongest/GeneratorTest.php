@@ -33,7 +33,7 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestTwoGeneratorsSameSize(): array
+    public static function dataProviderForZipLongestTwoGeneratorsSameSize(): array
     {
         return [
             [

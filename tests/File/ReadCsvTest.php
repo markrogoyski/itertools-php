@@ -78,7 +78,7 @@ CSV_END;
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForByDefault(): array
+    public static function dataProviderForByDefault(): array
     {
         return [
             [
@@ -229,7 +229,7 @@ CSV_END;
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForWithConfig(): array
+    public static function dataProviderForWithConfig(): array
     {
         return [
             [

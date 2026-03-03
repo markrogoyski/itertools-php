@@ -98,7 +98,7 @@ class AnyMatchTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForAnyMatchWhenTrueArray(): array
+    public static function dataProviderForAnyMatchWhenTrueArray(): array
     {
         return [
             [
@@ -209,7 +209,7 @@ class AnyMatchTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForAnyMatchWhenFalseArray(): array
+    public static function dataProviderForAnyMatchWhenFalseArray(): array
     {
         return [
             [

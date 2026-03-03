@@ -39,7 +39,7 @@ class CoinFlipTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForCoinFlip(): array
+    public static function dataProviderForCoinFlip(): array
     {
         return [
             [0],

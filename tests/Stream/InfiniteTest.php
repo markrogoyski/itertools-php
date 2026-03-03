@@ -38,7 +38,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -104,7 +104,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForGenerator(): array
+    public static function dataProviderForGenerator(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -172,7 +172,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForIterator(): array
+    public static function dataProviderForIterator(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -240,7 +240,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForTraversable(): array
+    public static function dataProviderForTraversable(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 

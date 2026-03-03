@@ -39,7 +39,7 @@ class IsEmptyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForArrayFalse(): array
+    public static function dataProviderForArrayFalse(): array
     {
         return [
             [[0]],
@@ -67,7 +67,7 @@ class IsEmptyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForGeneratorsFalse(): array
+    public static function dataProviderForGeneratorsFalse(): array
     {
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -97,7 +97,7 @@ class IsEmptyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForIteratorsFalse(): array
+    public static function dataProviderForIteratorsFalse(): array
     {
         $iter = fn ($data) => new \ArrayIterator($data);
 
@@ -127,7 +127,7 @@ class IsEmptyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForTraversablesFalse(): array
+    public static function dataProviderForTraversablesFalse(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 

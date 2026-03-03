@@ -135,7 +135,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -294,7 +294,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = static function ($data) {
             foreach ($data as $key => $datum) {
@@ -460,7 +460,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = fn ($data) => new \ArrayIterator($data);
 
@@ -540,7 +540,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForNestedIterators(): array
+    public static function dataProviderForNestedIterators(): array
     {
         $nested = fn ($data) => new \IteratorIterator(new \IteratorIterator(new \ArrayIterator($data)));
 
@@ -701,7 +701,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 

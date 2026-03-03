@@ -26,7 +26,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForArrayTrue(): array
+    public static function dataProviderForArrayTrue(): array
     {
         return [
             [
@@ -263,7 +263,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForArrayFalse(): array
+    public static function dataProviderForArrayFalse(): array
     {
         return [
             [
@@ -444,7 +444,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForGeneratorTrue(): array
+    public static function dataProviderForGeneratorTrue(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -667,7 +667,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForGeneratorFalse(): array
+    public static function dataProviderForGeneratorFalse(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -840,7 +840,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForIteratorTrue(): array
+    public static function dataProviderForIteratorTrue(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -1063,7 +1063,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForIteratorFalse(): array
+    public static function dataProviderForIteratorFalse(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -1236,7 +1236,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForTraversableTrue(): array
+    public static function dataProviderForTraversableTrue(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -1459,7 +1459,7 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForTraversableFalse(): array
+    public static function dataProviderForTraversableFalse(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 

@@ -28,7 +28,7 @@ class ToAverageTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -125,7 +125,7 @@ class ToAverageTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -226,7 +226,7 @@ class ToAverageTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = static function (array $data) {
             return new ArrayIteratorFixture($data);
@@ -327,7 +327,7 @@ class ToAverageTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = static function (array $data) {
             return new IteratorAggregateFixture($data);

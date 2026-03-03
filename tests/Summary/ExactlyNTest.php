@@ -92,7 +92,7 @@ class ExactlyNTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForNonZero(): array
+    public static function dataProviderForNonZero(): array
     {
         return [
             [1],
@@ -172,7 +172,7 @@ class ExactlyNTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForExactlyN(): array
+    public static function dataProviderForExactlyN(): array
     {
         return [
             [
@@ -298,7 +298,7 @@ class ExactlyNTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForExactlyNNotN(): array
+    public static function dataProviderForExactlyNNotN(): array
     {
         return [
             [
@@ -436,7 +436,7 @@ class ExactlyNTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForExactlyNWithPredicate(): array
+    public static function dataProviderForExactlyNWithPredicate(): array
     {
         return [
             [
@@ -609,7 +609,7 @@ class ExactlyNTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForExactlyNWithPredicateWhenNDoesNotMatch(): array
+    public static function dataProviderForExactlyNWithPredicateWhenNDoesNotMatch(): array
     {
         return [
             [

@@ -98,7 +98,7 @@ class NoneMatchTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForNoneMatchWhenTrueArray(): array
+    public static function dataProviderForNoneMatchWhenTrueArray(): array
     {
         return [
             [
@@ -205,7 +205,7 @@ class NoneMatchTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForNoneMatchWhenFalseArray(): array
+    public static function dataProviderForNoneMatchWhenFalseArray(): array
     {
         return [
             [

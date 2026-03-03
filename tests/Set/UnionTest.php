@@ -52,7 +52,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForArraySets(): array
+    public static function dataProviderForArraySets(): array
     {
         return [
             [
@@ -105,7 +105,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayMultisets(): array
+    public static function dataProviderForArrayMultisets(): array
     {
         return [
             [
@@ -170,7 +170,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForGeneratorsSets(): array
+    public static function dataProviderForGeneratorsSets(): array
     {
         $gen = fn ($data) => GeneratorFixture::getGenerator($data);
 
@@ -225,7 +225,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGeneratorsMultisets(): array
+    public static function dataProviderForGeneratorsMultisets(): array
     {
         $gen = fn ($data) => GeneratorFixture::getGenerator($data);
 
@@ -292,7 +292,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForIteratorsSets(): array
+    public static function dataProviderForIteratorsSets(): array
     {
         $iter = fn ($data) => new ArrayIteratorFixture($data);
 
@@ -347,7 +347,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIteratorsMultisets(): array
+    public static function dataProviderForIteratorsMultisets(): array
     {
         $iter = fn ($data) => new ArrayIteratorFixture($data);
 
@@ -414,7 +414,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForTraversablesSets(): array
+    public static function dataProviderForTraversablesSets(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
@@ -469,7 +469,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversablesMultisets(): array
+    public static function dataProviderForTraversablesMultisets(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
@@ -536,7 +536,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForMixedSets(): array
+    public static function dataProviderForMixedSets(): array
     {
         $gen = fn ($data) => GeneratorFixture::getGenerator($data);
         $iter = fn ($data) => new ArrayIteratorFixture($data);
@@ -567,7 +567,7 @@ class UnionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForMixedMultisets(): array
+    public static function dataProviderForMixedMultisets(): array
     {
         $gen = fn ($data) => GeneratorFixture::getGenerator($data);
         $iter = fn ($data) => new ArrayIteratorFixture($data);

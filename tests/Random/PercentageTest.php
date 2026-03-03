@@ -34,7 +34,7 @@ class PercentageTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForPercentage(): array
+    public static function dataProviderForPercentage(): array
     {
         return [
             [0],

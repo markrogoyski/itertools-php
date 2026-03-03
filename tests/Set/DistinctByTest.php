@@ -61,7 +61,7 @@ class DistinctByTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -221,7 +221,7 @@ class DistinctByTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = fn ($data) => GeneratorFixture::getGenerator($data);
 
@@ -383,7 +383,7 @@ class DistinctByTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = fn ($data) => new ArrayIteratorFixture($data);
 
@@ -545,7 +545,7 @@ class DistinctByTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $iter = fn ($data) => new IteratorAggregateFixture($data);
 

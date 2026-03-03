@@ -34,7 +34,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForChoiceInt(): array
+    public static function dataProviderForChoiceInt(): array
     {
         return [
             [[-5, -1, 0, 1, 7, 4, 10, 8847], 0],
@@ -72,7 +72,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForChoiceFloat(): array
+    public static function dataProviderForChoiceFloat(): array
     {
         return [
             [[-5.0, -1.2, 0.0, 1.2, 7.65, 4.339, 10.10, 8847.00001, 0.00005], 0],
@@ -110,7 +110,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForChoiceString(): array
+    public static function dataProviderForChoiceString(): array
     {
         return [
             [['php', 'go', 'python', 'java', 'c++', 'lisp', 'ruby', 'perl'], 0],

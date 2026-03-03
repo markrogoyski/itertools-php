@@ -25,7 +25,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForNonIterables(): array
+    public static function dataProviderForNonIterables(): array
     {
         return [
             'int'    => [5],

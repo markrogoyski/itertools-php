@@ -57,7 +57,7 @@ class SliceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -469,7 +469,7 @@ class SliceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = fn ($data) => GeneratorFixture::getGenerator($data);
 
@@ -883,7 +883,7 @@ class SliceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = fn ($data) => new ArrayIteratorFixture($data);
 
@@ -1297,7 +1297,7 @@ class SliceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
@@ -1729,7 +1729,7 @@ class SliceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForInvalidArgumentStart(): array
+    public static function dataProviderForInvalidArgumentStart(): array
     {
         return [
             [[-1]],
@@ -1767,7 +1767,7 @@ class SliceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForInvalidArgumentCount(): array
+    public static function dataProviderForInvalidArgumentCount(): array
     {
         return [
             [[0, -1]],
@@ -1799,7 +1799,7 @@ class SliceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForInvalidArgumentStep(): array
+    public static function dataProviderForInvalidArgumentStep(): array
     {
         return [
             [[0, null, 0]],

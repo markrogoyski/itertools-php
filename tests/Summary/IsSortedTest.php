@@ -25,7 +25,7 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForArrayTrue(): array
+    public static function dataProviderForArrayTrue(): array
     {
         return [
             [
@@ -90,7 +90,7 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForArrayFalse(): array
+    public static function dataProviderForArrayFalse(): array
     {
         return [
             [
@@ -134,7 +134,7 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForGeneratorsTrue(): array
+    public static function dataProviderForGeneratorsTrue(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -203,7 +203,7 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForGeneratorsFalse(): array
+    public static function dataProviderForGeneratorsFalse(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -251,7 +251,7 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForIteratorsTrue(): array
+    public static function dataProviderForIteratorsTrue(): array
     {
         $iter = static function (array $data) {
             return new ArrayIteratorFixture($data);
@@ -320,7 +320,7 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForIteratorsFalse(): array
+    public static function dataProviderForIteratorsFalse(): array
     {
         $iter = static function (array $data) {
             return new ArrayIteratorFixture($data);
@@ -368,7 +368,7 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForTraversablesTrue(): array
+    public static function dataProviderForTraversablesTrue(): array
     {
         $trav = static function (array $data) {
             return new IteratorAggregateFixture($data);
@@ -437,7 +437,7 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForTraversablesFalse(): array
+    public static function dataProviderForTraversablesFalse(): array
     {
         $trav = static function (array $data) {
             return new IteratorAggregateFixture($data);

@@ -70,7 +70,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedCount, $count);
     }
 
-    public function dataProviderForSourceCounts(): array
+    public static function dataProviderForSourceCounts(): array
     {
         return [
             [
@@ -140,7 +140,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $array);
     }
 
-    public function dataProviderForSourceArray(): array
+    public static function dataProviderForSourceArray(): array
     {
         return [
             [
@@ -215,7 +215,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForStreamOfRandomChoice(): array
+    public static function dataProviderForStreamOfRandomChoice(): array
     {
         return [
             [[-5, -1, 0, 1, 7, 4, 10, 8847], 0],
@@ -267,7 +267,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForStreamOfCoinFlips(): array
+    public static function dataProviderForStreamOfCoinFlips(): array
     {
         return [
             [0],
@@ -302,7 +302,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForStreamOfRandomNumbers(): array
+    public static function dataProviderForStreamOfRandomNumbers(): array
     {
         return [
             [0, 0, 0],
@@ -340,7 +340,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForStreamOfRandomPercentage(): array
+    public static function dataProviderForStreamOfRandomPercentage(): array
     {
         return [
             [0],
@@ -381,7 +381,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForStreamOfRockPaperScissors(): array
+    public static function dataProviderForStreamOfRockPaperScissors(): array
     {
         return [
             [0],
@@ -412,7 +412,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForRangeIntsDefaultStep(): array
+    public static function dataProviderForRangeIntsDefaultStep(): array
     {
         return [
             [
@@ -452,7 +452,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta($expected, $result, 0.001);
     }
 
-    public function dataProviderForRangeFloatsDefaultStep(): array
+    public static function dataProviderForRangeFloatsDefaultStep(): array
     {
         return [
             [
@@ -498,7 +498,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForRangeIntsCustomStep(): array
+    public static function dataProviderForRangeIntsCustomStep(): array
     {
         return [
             [
@@ -542,7 +542,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta($expected, $result, 0.001);
     }
 
-    public function dataProviderForRangeFloatsCustomStep(): array
+    public static function dataProviderForRangeFloatsCustomStep(): array
     {
         return [
             [
@@ -588,7 +588,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $stream = Stream::ofRange($start, $end, $step);
     }
 
-    public function dataProviderForRangeInvalidTypeArguments(): array
+    public static function dataProviderForRangeInvalidTypeArguments(): array
     {
         return [
             [
@@ -625,7 +625,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $stream = Stream::ofRange($start, $end, $step);
     }
 
-    public function dataProviderForRangeInvalidArguments(): array
+    public static function dataProviderForRangeInvalidArguments(): array
     {
         return [
             [

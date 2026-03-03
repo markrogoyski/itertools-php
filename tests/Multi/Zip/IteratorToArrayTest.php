@@ -31,7 +31,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipTwoArraysSameSize(): array
+    public static function dataProviderForZipTwoArraysSameSize(): array
     {
         return [
             [
@@ -84,7 +84,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipTwoArraysDifferentSize(): array
+    public static function dataProviderForZipTwoArraysDifferentSize(): array
     {
         return [
             [
@@ -173,7 +173,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipThreeArraysSameSize(): array
+    public static function dataProviderForZipThreeArraysSameSize(): array
     {
         return [
             [
@@ -232,7 +232,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipThreeArraysDifferentSize(): array
+    public static function dataProviderForZipThreeArraysDifferentSize(): array
     {
         return [
             [
@@ -284,7 +284,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipTwoGeneratorsSameSize(): array
+    public static function dataProviderForZipTwoGeneratorsSameSize(): array
     {
         return [
             [
@@ -337,7 +337,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipTwoIteratorsSameSize(): array
+    public static function dataProviderForZipTwoIteratorsSameSize(): array
     {
         return [
             [
@@ -390,7 +390,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipTwoTraversableSameSize(): array
+    public static function dataProviderForZipTwoTraversableSameSize(): array
     {
         return [
             [
