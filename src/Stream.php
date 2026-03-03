@@ -1123,15 +1123,16 @@ class Stream implements \IteratorAggregate
         }
 
         foreach ($this->iterable as $line) {
+            // @phpstan-ignore-next-line
+            $line = \is_float($line) && \is_nan($line) ? 'NAN' : \strval($line);
+
             if ($firstIteration) {
                 $firstIteration = false;
             } else {
-                // @phpstan-ignore-next-line
-                $line = $newlineSeparator . \strval($line);
+                $line = $newlineSeparator . $line;
             }
 
-            // @phpstan-ignore-next-line
-            \fputs($fileResource, \strval($line));
+            \fputs($fileResource, $line);
         }
 
         if ($footer !== null) {

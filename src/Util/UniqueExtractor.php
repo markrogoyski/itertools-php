@@ -48,6 +48,8 @@ class UniqueExtractor
                 return 'closure_' . \spl_object_id($var);
             case \is_object($var):
                 return 'object_' . ($strict ? \spl_object_id($var) : \serialize($var));
+            case \is_float($var) && \is_nan($var):
+                return 'double_NAN';
             case \gettype($var) === 'boolean':
                 return 'boolean_' . \intval($var);
             case $strict:

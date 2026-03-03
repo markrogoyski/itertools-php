@@ -184,7 +184,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 \NAN,
-                'numeric_'
+                'double_'
             ],
             [
                 null,
