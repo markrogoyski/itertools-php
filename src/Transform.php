@@ -52,7 +52,9 @@ class Transform
 
         $result = [];
         foreach ($iterable as $key => $item) {
-            $result[$keyFunc($item, $key)] = $valueFunc($item, $key);
+            /** @var int|string $computedKey */
+            $computedKey = $keyFunc($item, $key);
+            $result[$computedKey] = $valueFunc($item, $key);
         }
         return $result;
     }
@@ -73,6 +75,7 @@ class Transform
         return match (true) {
             $iterable instanceof \Iterator => $iterable,
             $iterable instanceof \Traversable => new \IteratorIterator($iterable),
+            /** @phpstan-ignore function.alreadyNarrowedType */
             \is_array($iterable) => new \ArrayIterator($iterable),
             default => throw new \LogicException(\gettype($iterable) . ' type is not an expected iterable type (Iterator|Traversable|array)'),
         };

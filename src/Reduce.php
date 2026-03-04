@@ -116,7 +116,8 @@ class Reduce
 
         return static::toValue(
             $numbers,
-            fn ($carry, $datum) => [
+            /** @param array{numeric|null, numeric|null} $carry */
+            fn (array $carry, $datum) => [
                 \min($carry[0] ?? $datum, $datum),
                 \max($carry[1] ?? $datum, $datum)
             ],
@@ -137,7 +138,7 @@ class Reduce
             return \count($data);
         }
 
-        return static::toValue($data, fn ($carry) => $carry + 1, 0);
+        return static::toValue($data, fn (int $carry) => $carry + 1, 0);
     }
 
     /**
@@ -149,6 +150,7 @@ class Reduce
      */
     public static function toSum(iterable $data): int|float
     {
+        /** @phpstan-ignore binaryOp.invalid */
         return static::toValue($data, fn ($carry, $datum) => $carry + $datum, 0);
     }
 
@@ -163,6 +165,7 @@ class Reduce
      */
     public static function toProduct(iterable $data): int|float|null
     {
+        /** @phpstan-ignore binaryOp.invalid */
         return static::toValue($data, fn ($carry, $datum) => ($carry ?? 1) * $datum);
     }
 
@@ -177,10 +180,16 @@ class Reduce
      */
     public static function toAverage(iterable $data): int|float|null
     {
-        [$count, $sum] = static::toValue($data, static function ($carry, $datum): array {
+        /** @var array{int, int|float} $result */
+        $result = static::toValue($data, /**
+         * @param array{int, int|float} $carry
+         * @param int|float $datum
+         */ static function (array $carry, mixed $datum): array {
             [$count, $sum] = $carry;
+            /** @phpstan-ignore binaryOp.invalid, binaryOp.invalid */
             return [$count + 1, $sum + $datum];
         }, [0, 0]);
+        [$count, $sum] = $result;
 
         return $count ? ($sum / $count) : null;
     }

@@ -45,12 +45,14 @@ class UniqueExtractor
             \is_object($var) => 'object_' . ($strict ? \spl_object_id($var) : \serialize($var)),
             \is_float($var) && \is_nan($var) => 'double_NAN',
             \gettype($var) === 'boolean' => 'boolean_' . \intval($var),
-            $strict => \gettype($var) . '_' . $var,
+            /** @phpstan-ignore cast.string */
+            $strict => \gettype($var) . '_' . (string) $var,
             !$var => 'boolean_0',
             // @phpstan-ignore-next-line
             \strval($var) === '1' => 'boolean_1',
             \is_numeric($var) => 'numeric_' . \floatval($var),
-            default => 'scalar_' . $var,
+            /** @phpstan-ignore cast.string */
+            default => 'scalar_' . (string) $var,
         };
     }
 }

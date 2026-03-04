@@ -26,7 +26,7 @@ class Infinite
      *
      * @param iterable<mixed> $iterable Finite array or traversable object
      *
-     * @return \InfiniteIterator<mixed>
+     * @return \InfiniteIterator<mixed, mixed, \Iterator<mixed, mixed>>
      */
     public static function cycle(iterable $iterable): \InfiniteIterator
     {

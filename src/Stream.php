@@ -122,7 +122,7 @@ class Stream implements \IteratorAggregate
      */
     public static function ofRange(int|float|string $start, int|float|string $end, int|float $step = 1): self
     {
-        if (!\is_numeric($start) || !\is_numeric($end) || !\is_numeric($step)) {
+        if (!\is_numeric($start) || !\is_numeric($end)) {
             throw new \InvalidArgumentException(
                 'Stream::ofRange values must be numeric, got: ' .
                 \print_r(['start' => $start, 'end' => $end, 'step' => $step], true)
@@ -1665,7 +1665,8 @@ class Stream implements \IteratorAggregate
     public function printLn(): void
     {
         foreach ($this->iterable as $item) {
-            print($item . \PHP_EOL);
+            /** @phpstan-ignore cast.string */
+            print((string) $item . \PHP_EOL);
         }
     }
 

@@ -50,11 +50,8 @@ class File
     ): \Generator {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
-        /** @var int<0, max> $length */
-        $length = null;
-
-        while (($row = \fgetcsv($fileResource, $length, $separator, $enclosure, $escape)) !== false) {
-            /** @var array<string|null> $row */
+        while (($row = \fgetcsv($fileResource, null, $separator, $enclosure, $escape)) !== false) {
+            /** @var array<int, string|null> $row */
             yield $row;
         }
     }

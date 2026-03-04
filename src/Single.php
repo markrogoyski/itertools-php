@@ -257,9 +257,11 @@ class Single
                 : [$group];
 
             foreach (Set::distinct($itemGroups) as $itemGroup) {
+                /** @var int|string $itemGroup */
                 if ($itemKey === null) {
                     $groups[$itemGroup][] = $item;
                 } else {
+                    /** @var int|string $itemKey */
                     $groups[$itemGroup][$itemKey] = $item;
                 }
             }
@@ -494,7 +496,7 @@ class Single
                 continue;
             }
 
-            if ($yielded++ === $count && $count !== null) {
+            if ($count !== null && $yielded++ === $count) {
                 break;
             }
 

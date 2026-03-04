@@ -103,15 +103,16 @@ class UsageMap
         $deletesCount = $this->deletedMap[$hash] ?? 0;
 
         $ownersMap = Stream::of($this->addedMap[$hash] ?? [])
-            ->map(fn ($value) => $value - $deletesCount)
-            ->filterTrue(fn ($value) => $value > 0)
+            ->map(fn (int $value) => $value - $deletesCount)
+            ->filterTrue(fn (int $value) => $value > 0)
             ->toArray();
 
         while (count($ownersMap) > $maxOwnersCount) {
+            /** @var int $minValue */
             $minValue = Reduce::toMin($ownersMap);
             $ownersMap = Stream::of($ownersMap)
-                ->map(fn ($value) => $value - $minValue)
-                ->filterTrue(fn ($value) => $value > 0)
+                ->map(fn (int $value) => $value - $minValue)
+                ->filterTrue(fn (int $value) => $value > 0)
                 ->toArray();
         }
 

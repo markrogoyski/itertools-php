@@ -11,6 +11,8 @@ use IterTools\Util\Iterators\RelatedIterator;
  *
  * @template TKey
  * @template TValue
+ *
+ * @extends \NoRewindIterator<TKey, TValue, \Iterator<TKey, TValue>>
  */
 class TeeIterator extends \NoRewindIterator
 {
@@ -74,6 +76,7 @@ class TeeIterator extends \NoRewindIterator
             return;
         }
 
+        /** @phpstan-ignore argument.type, argument.type */
         [$relPos, $minPos, $maxPos] = [$this->getPosition($related), \min($this->positions), \max($this->positions)];
 
         if ($relPos === $maxPos) {
@@ -86,6 +89,7 @@ class TeeIterator extends \NoRewindIterator
 
         $this->incrementPosition($related);
 
+        /** @phpstan-ignore argument.type */
         if ($minPos < \min($this->positions)) {
             unset($this->cacheKeys[$minPos]);
             unset($this->cacheValues[$minPos]);
@@ -133,6 +137,7 @@ class TeeIterator extends \NoRewindIterator
             throw new \LogicException();
         }
 
+        /** @phpstan-ignore argument.type */
         [$relPos, $maxPos] = [$this->getPosition($related), \max($this->positions)];
 
         return $relPos !== $maxPos || parent::valid();
