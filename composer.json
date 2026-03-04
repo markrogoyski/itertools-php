@@ -5,7 +5,7 @@
   "keywords": ["iteration", "iterator", "generator", "loop", "looping", "traversable", "stream", "functional", "zip", "infinite", "random", "accumulate", "itertools"],
   "homepage": "https://github.com/markrogoyski/itertools-php/",
   "require": {
-    "php": ">=8.1.0"
+    "php": ">=8.2.0"
   },
   "autoload": {
     "psr-4": { "IterTools\\": "src/" }

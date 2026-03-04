@@ -53,6 +53,34 @@ class RockPaperScissorsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test rockPaperScissors with seeded engine produces deterministic results
+     */
+    public function testRockPaperScissorsWithSeededEngine(): void
+    {
+        // Given
+        $engine = new \Random\Engine\Mt19937(42);
+
+        // When
+        $result = iterator_to_array(Random::rockPaperScissors(5, $engine));
+
+        // Then
+        $this->assertEquals(['rock', 'scissors', 'paper', 'paper', 'rock'], $result);
+    }
+
+    /**
+     * @test rockPaperScissors with seeded engine is reproducible
+     */
+    public function testRockPaperScissorsWithSeededEngineIsReproducible(): void
+    {
+        // Given
+        $result1 = iterator_to_array(Random::rockPaperScissors(10, new \Random\Engine\Mt19937(55)));
+        $result2 = iterator_to_array(Random::rockPaperScissors(10, new \Random\Engine\Mt19937(55)));
+
+        // Then
+        $this->assertEquals($result1, $result2);
+    }
+
+    /**
      * @test rockPaperScissors exception when repetitions is negative
      */
     public function testRockPaperScissorsRepetitionsException(): void

@@ -394,6 +394,84 @@ class SourceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test stream of coin flips with seeded engine
+     */
+    public function testStreamOfCoinFlipsWithSeededEngine(): void
+    {
+        // Given
+        $stream = Stream::ofCoinFlips(5, new \Random\Engine\Mt19937(42));
+
+        // When
+        $actual = $stream->toArray();
+
+        // Then
+        $this->assertEquals([0, 1, 0, 0, 0], $actual);
+    }
+
+    /**
+     * @test stream of random choice with seeded engine
+     */
+    public function testStreamOfRandomChoiceWithSeededEngine(): void
+    {
+        // Given
+        $stream = Stream::ofRandomChoice(['a', 'b', 'c', 'd'], 5, new \Random\Engine\Mt19937(42));
+
+        // When
+        $actual = $stream->toArray();
+
+        // Then
+        $this->assertEquals(['c', 'd', 'a', 'c', 'c'], $actual);
+    }
+
+    /**
+     * @test stream of random numbers with seeded engine
+     */
+    public function testStreamOfRandomNumbersWithSeededEngine(): void
+    {
+        // Given
+        $stream = Stream::ofRandomNumbers(1, 100, 5, new \Random\Engine\Mt19937(42));
+
+        // When
+        $actual = $stream->toArray();
+
+        // Then
+        $this->assertEquals([43, 68, 77, 15, 27], $actual);
+    }
+
+    /**
+     * @test stream of random percentage with seeded engine
+     */
+    public function testStreamOfRandomPercentageWithSeededEngine(): void
+    {
+        // Given
+        $stream = Stream::ofRandomPercentage(3, new \Random\Engine\Mt19937(42));
+
+        // When
+        $actual = $stream->toArray();
+
+        // Then
+        $this->assertCount(3, $actual);
+        $this->assertEqualsWithDelta(0.59308596857569, $actual[0], 1e-10);
+        $this->assertEqualsWithDelta(0.36686957578674, $actual[1], 1e-10);
+        $this->assertEqualsWithDelta(0.55938199522532, $actual[2], 1e-10);
+    }
+
+    /**
+     * @test stream of rock-paper-scissors with seeded engine
+     */
+    public function testStreamOfRockPaperScissorsWithSeededEngine(): void
+    {
+        // Given
+        $stream = Stream::ofRockPaperScissors(5, new \Random\Engine\Mt19937(42));
+
+        // When
+        $actual = $stream->toArray();
+
+        // Then
+        $this->assertEquals(['rock', 'scissors', 'paper', 'paper', 'rock'], $actual);
+    }
+
+    /**
      * @test         ofRange ints default step
      * @dataProvider dataProviderForRangeIntsDefaultStep
      * @param int $start

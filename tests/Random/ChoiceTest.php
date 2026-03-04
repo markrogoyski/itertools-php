@@ -149,6 +149,36 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test choice with seeded engine produces deterministic results
+     */
+    public function testChoiceWithSeededEngine(): void
+    {
+        // Given
+        $items  = ['a', 'b', 'c', 'd'];
+        $engine = new \Random\Engine\Mt19937(42);
+
+        // When
+        $result = iterator_to_array(Random::choice($items, 5, $engine));
+
+        // Then
+        $this->assertEquals(['c', 'd', 'a', 'c', 'c'], $result);
+    }
+
+    /**
+     * @test choice with seeded engine is reproducible
+     */
+    public function testChoiceWithSeededEngineIsReproducible(): void
+    {
+        // Given
+        $items   = [10, 20, 30, 40, 50];
+        $result1 = iterator_to_array(Random::choice($items, 10, new \Random\Engine\Mt19937(88)));
+        $result2 = iterator_to_array(Random::choice($items, 10, new \Random\Engine\Mt19937(88)));
+
+        // Then
+        $this->assertEquals($result1, $result2);
+    }
+
+    /**
      * @test choice exception when items is empty
      */
     public function testChoiceItemsEmptyException(): void

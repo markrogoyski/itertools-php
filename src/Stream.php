@@ -44,14 +44,15 @@ class Stream implements \IteratorAggregate
      * Creates iterable instance with fluent interface of random coin flips.
      *
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return Stream
      *
      * @see Random::coinFlip()
      */
-    public static function ofCoinFlips(int $repetitions): self
+    public static function ofCoinFlips(int $repetitions, ?\Random\Engine $engine = null): self
     {
-        return new self(Random::coinFlip($repetitions));
+        return new self(Random::coinFlip($repetitions, $engine));
     }
 
     /**
@@ -69,14 +70,15 @@ class Stream implements \IteratorAggregate
      *
      * @param array<mixed> $items
      * @param int     $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return Stream
      *
      * @see Random::choice()
      */
-    public static function ofRandomChoice(array $items, int $repetitions): self
+    public static function ofRandomChoice(array $items, int $repetitions, ?\Random\Engine $engine = null): self
     {
-        return new self(Random::choice($items, $repetitions));
+        return new self(Random::choice($items, $repetitions, $engine));
     }
 
     /**
@@ -85,28 +87,30 @@ class Stream implements \IteratorAggregate
      * @param int $min
      * @param int $max
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return Stream
      *
      * @see Random::number()
      */
-    public static function ofRandomNumbers(int $min, int $max, int $repetitions): self
+    public static function ofRandomNumbers(int $min, int $max, int $repetitions, ?\Random\Engine $engine = null): self
     {
-        return new self(Random::number($min, $max, $repetitions));
+        return new self(Random::number($min, $max, $repetitions, $engine));
     }
 
     /**
      * Creates iterable instance with fluent interface of random percentages between 0 and 1.
      *
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return Stream
      *
      * @see Random::percentage()
      */
-    public static function ofRandomPercentage(int $repetitions): self
+    public static function ofRandomPercentage(int $repetitions, ?\Random\Engine $engine = null): self
     {
-        return new self(Random::percentage($repetitions));
+        return new self(Random::percentage($repetitions, $engine));
     }
 
     /**
@@ -132,14 +136,15 @@ class Stream implements \IteratorAggregate
      * Creates iterable instance with fluent interface of rock-paper-scissors hands.
      *
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return Stream
      *
      * @see Random::rockPaperScissors()
      */
-    public static function ofRockPaperScissors(int $repetitions): self
+    public static function ofRockPaperScissors(int $repetitions, ?\Random\Engine $engine = null): self
     {
-        return new self(Random::rockPaperScissors($repetitions));
+        return new self(Random::rockPaperScissors($repetitions, $engine));
     }
 
     /**

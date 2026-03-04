@@ -11,10 +11,11 @@ class Random
      *
      * @param mixed[] $items
      * @param int     $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return \Generator<mixed>
      */
-    public static function choice(array $items, int $repetitions): \Generator
+    public static function choice(array $items, int $repetitions, ?\Random\Engine $engine = null): \Generator
     {
         if (count($items) === 0) {
             throw new \RangeException('Array of items for choice cannot be empty');
@@ -22,7 +23,7 @@ class Random
 
         $start = 0;
         $end   = \count($items) - 1;
-        foreach (self::number($start, $end, $repetitions) as $i) {
+        foreach (self::number($start, $end, $repetitions, $engine) as $i) {
             yield $items[$i];
         }
     }
@@ -31,16 +32,18 @@ class Random
      * Generate random coin flips
      *
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return \Generator<int>
      */
-    public static function coinFlip(int $repetitions): \Generator
+    public static function coinFlip(int $repetitions, ?\Random\Engine $engine = null): \Generator
     {
         if ($repetitions < 0) {
             throw new \RangeException("Number of repetitions cannot be negative: {$repetitions}");
         }
+        $randomizer = new \Random\Randomizer($engine);
         for ($i = $repetitions; $i > 0; $i--) {
-            yield \random_int(0, 1);
+            yield $randomizer->getInt(0, 1);
         }
     }
 
@@ -50,10 +53,11 @@ class Random
      * @param int $min
      * @param int $max
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return \Generator<int>
      */
-    public static function number(int $min, int $max, int $repetitions): \Generator
+    public static function number(int $min, int $max, int $repetitions, ?\Random\Engine $engine = null): \Generator
     {
         if ($repetitions < 0) {
             throw new \RangeException("Number of repetitions cannot be negative: {$repetitions}");
@@ -61,8 +65,9 @@ class Random
         if ($max < $min) {
             throw new \RangeException("Max $max cannot be less than min $min");
         }
+        $randomizer = new \Random\Randomizer($engine);
         for ($i = $repetitions; $i > 0; $i--) {
-            yield \random_int($min, $max);
+            yield $randomizer->getInt($min, $max);
         }
     }
 
@@ -70,16 +75,18 @@ class Random
      * Generate a random percentage between 0 and 1
      *
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return \Generator<float>
      */
-    public static function percentage(int $repetitions): \Generator
+    public static function percentage(int $repetitions, ?\Random\Engine $engine = null): \Generator
     {
         if ($repetitions < 0) {
             throw new \RangeException("Number of repetitions cannot be negative: {$repetitions}");
         }
+        $randomizer = new \Random\Randomizer($engine);
         for ($i = $repetitions; $i > 0; $i--) {
-            yield \random_int(0, \PHP_INT_MAX) / \PHP_INT_MAX;
+            yield $randomizer->getInt(0, \PHP_INT_MAX) / \PHP_INT_MAX;
         }
     }
 
@@ -92,16 +99,18 @@ class Random
      * Generate random rock-paper-scissors hands
      *
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return \Generator<string>
      */
-    public static function rockPaperScissors(int $repetitions): \Generator
+    public static function rockPaperScissors(int $repetitions, ?\Random\Engine $engine = null): \Generator
     {
         if ($repetitions < 0) {
             throw new \RangeException("Number of repetitions cannot be negative: {$repetitions}");
         }
+        $randomizer = new \Random\Randomizer($engine);
         for ($i = $repetitions; $i > 0; $i--) {
-            yield self::RPS_HANDS[\random_int(0, 2)];
+            yield self::RPS_HANDS[$randomizer->getInt(0, 2)];
         }
     }
 }

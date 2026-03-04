@@ -72,6 +72,34 @@ class CoinFlipTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test coinFlip with seeded engine produces deterministic results
+     */
+    public function testCoinFlipWithSeededEngine(): void
+    {
+        // Given
+        $engine = new \Random\Engine\Mt19937(42);
+
+        // When
+        $result = iterator_to_array(Random::coinFlip(5, $engine));
+
+        // Then
+        $this->assertEquals([0, 1, 0, 0, 0], $result);
+    }
+
+    /**
+     * @test coinFlip with seeded engine is reproducible
+     */
+    public function testCoinFlipWithSeededEngineIsReproducible(): void
+    {
+        // Given
+        $result1 = iterator_to_array(Random::coinFlip(10, new \Random\Engine\Mt19937(123)));
+        $result2 = iterator_to_array(Random::coinFlip(10, new \Random\Engine\Mt19937(123)));
+
+        // Then
+        $this->assertEquals($result1, $result2);
+    }
+
+    /**
      * @test         coinFlip iterator_to_array
      * @dataProvider dataProviderForCoinFlip
      * @param        int $repetitions
