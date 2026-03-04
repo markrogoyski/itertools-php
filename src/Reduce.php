@@ -180,15 +180,19 @@ class Reduce
      */
     public static function toAverage(iterable $data): int|float|null
     {
-        /** @var array{int, int|float} $result */
-        $result = static::toValue($data, /**
+        /**
          * @param array{int, int|float} $carry
          * @param int|float $datum
-         */ static function (array $carry, mixed $datum): array {
+         * @return array{int, int|float}
+         */
+        $accumulator = static function (array $carry, mixed $datum): array {
             [$count, $sum] = $carry;
             /** @phpstan-ignore binaryOp.invalid, binaryOp.invalid */
             return [$count + 1, $sum + $datum];
-        }, [0, 0]);
+        };
+
+        /** @var array{int, int|float} $result */
+        $result = static::toValue($data, $accumulator, [0, 0]);
         [$count, $sum] = $result;
 
         return $count ? ($sum / $count) : null;
