@@ -5,7 +5,7 @@ namespace IterTools\Util;
 /**
  * @internal
  */
-class NoValueMonad
+final class NoValueMonad
 {
     private static ?self $instance = null;
 

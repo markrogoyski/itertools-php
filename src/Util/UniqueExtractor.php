@@ -12,7 +12,7 @@ namespace IterTools\Util;
  * Contributed to IterTools by @author Smoren <ofigate@gmail.com>
  * @see https://github.com/Smoren/type-tools-php
  */
-class UniqueExtractor
+final class UniqueExtractor
 {
     /**
      * @internal
@@ -48,7 +48,7 @@ class UniqueExtractor
             /** @phpstan-ignore cast.string */
             $strict => \gettype($var) . '_' . (string) $var,
             !$var => 'boolean_0',
-            // @phpstan-ignore-next-line
+            /** @phpstan-ignore argument.type */
             \strval($var) === '1' => 'boolean_1',
             \is_numeric($var) => 'numeric_' . \floatval($var),
             /** @phpstan-ignore cast.string */

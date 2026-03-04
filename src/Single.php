@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\UniqueExtractor;
 
-class Single
+final class Single
 {
     /**
      * Iterate the individual characters of a string

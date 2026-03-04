@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-class Random
+final class Random
 {
     /**
      * Generate random selections from an array of values

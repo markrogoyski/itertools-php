@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-class Sort
+final class Sort
 {
     /**
      * Sorts the given iterable, maintaining index key associations.

@@ -10,7 +10,7 @@ use IterTools\Util\UsageMap;
 /**
  * Tools to get summarized answers about iterables.
  */
-class Summary
+final class Summary
 {
     /**
      * Returns true if all elements match the predicate function.

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-class Infinite
+final class Infinite
 {
     /**
      * Count sequentially forever
@@ -45,7 +45,7 @@ class Infinite
      */
     public static function repeat(mixed $item): \Generator
     {
-        // @phpstan-ignore-next-line
+        /** @phpstan-ignore while.alwaysTrue */
         while (true) {
             yield $item;
         }

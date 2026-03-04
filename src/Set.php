@@ -9,7 +9,7 @@ use IterTools\Util\NoValueMonad;
 use IterTools\Util\UniqueExtractor;
 use IterTools\Util\UsageMap;
 
-class Set
+final class Set
 {
     /**
      * Iterate only the distinct elements.

@@ -7,7 +7,7 @@ namespace IterTools\Util;
 /**
  * @internal
  */
-class ResourcePolicy
+final class ResourcePolicy
 {
     /**
      * @param resource $resource

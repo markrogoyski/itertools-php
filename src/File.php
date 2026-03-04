@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\ResourcePolicy;
 
-class File
+final class File
 {
     /**
      * Iterate the lines of a file, read in from a file handle stream resource.

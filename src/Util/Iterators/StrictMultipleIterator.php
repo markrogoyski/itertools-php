@@ -9,7 +9,7 @@ namespace IterTools\Util\Iterators;
  *
  * {@inheritDoc}
  */
-class StrictMultipleIterator extends \MultipleIterator
+final class StrictMultipleIterator extends \MultipleIterator
 {
     /**
      * Throws \LengthException if at least one iterator ends before the others.
@@ -36,7 +36,7 @@ class StrictMultipleIterator extends \MultipleIterator
             // We are backing up current flags and replacing them with MIT_NEED_ANY to do an extra check
             $this->setFlags(\MultipleIterator::MIT_NEED_ANY);
 
-            /** So do we have non-ended iterators? @phpstan-ignore-next-line */
+            /** So do we have non-ended iterators? @phpstan-ignore identical.alwaysFalse */
             if (parent::valid() === true) {
                 // This is situation (2)
                 throw new \LengthException('Iterables of unequal sizes');

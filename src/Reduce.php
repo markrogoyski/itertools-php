@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\NoValueMonad;
 
-class Reduce
+final class Reduce
 {
     /**
      * Reduces given collection like array_reduce() function.
@@ -98,6 +98,7 @@ class Reduce
      * @param callable|null     $compareBy
      *
      * @return array{numeric, numeric}|array{null, null}
+     * @phpstan-ignore return.unusedType
      */
     public static function toMinMax(iterable $numbers, ?callable $compareBy = null): array
     {
@@ -147,6 +148,7 @@ class Reduce
      * @param iterable<numeric> $data
      *
      * @return int|float
+     * @phpstan-ignore return.unusedType
      */
     public static function toSum(iterable $data): int|float
     {
@@ -162,6 +164,7 @@ class Reduce
      * @param iterable<numeric> $data
      *
      * @return int|float|null
+     * @phpstan-ignore return.unusedType, return.unusedType
      */
     public static function toProduct(iterable $data): int|float|null
     {

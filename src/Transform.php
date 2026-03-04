@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\Iterators\TeeIterator;
 
-class Transform
+final class Transform
 {
     /**
      * Converts iterable source to array without saving keys.
@@ -71,7 +71,7 @@ class Transform
      */
     public static function toIterator(iterable $iterable): \Iterator
     {
-        // @phpstan-ignore return.type
+        /** @phpstan-ignore return.type */
         return match (true) {
             $iterable instanceof \Iterator => $iterable,
             $iterable instanceof \Traversable => new \IteratorIterator($iterable),

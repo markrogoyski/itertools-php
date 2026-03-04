@@ -10,7 +10,7 @@ use IterTools\Stream;
 /**
  * @internal
  */
-class UsageMap
+final class UsageMap
 {
     /**
      * @var array<string, array<string, int>>

@@ -11,7 +11,7 @@ use IterTools\Util\ResourcePolicy;
  *
  * @implements \IteratorAggregate<mixed>
  */
-class Stream implements \IteratorAggregate
+final class Stream implements \IteratorAggregate
 {
     /**
      * @var iterable<mixed> iterable source
@@ -1128,7 +1128,7 @@ class Stream implements \IteratorAggregate
         }
 
         foreach ($this->iterable as $line) {
-            // @phpstan-ignore-next-line
+            /** @phpstan-ignore argument.type */
             $line = \is_float($line) && \is_nan($line) ? 'NAN' : \strval($line);
 
             if ($firstIteration) {

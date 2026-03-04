@@ -10,7 +10,7 @@ use IterTools\Util\NoValueMonad;
  * @internal
  * @implements \Iterator<array<mixed>>
  */
-class JustifyMultipleIterator implements \Iterator
+final class JustifyMultipleIterator implements \Iterator
 {
     /**
      * @var array<\Iterator<mixed>>

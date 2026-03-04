@@ -14,7 +14,7 @@ use IterTools\Util\Iterators\RelatedIterator;
  *
  * @extends \NoRewindIterator<TKey, TValue, \Iterator<TKey, TValue>>
  */
-class TeeIterator extends \NoRewindIterator
+final class TeeIterator extends \NoRewindIterator
 {
     /**
      * @var array<RelatedIterator<TKey, TValue>>

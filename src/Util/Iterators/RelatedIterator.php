@@ -12,7 +12,7 @@ namespace IterTools\Util\Iterators;
  *
  * @implements \Iterator<TKey, TValue>
  */
-class RelatedIterator implements \Iterator
+final class RelatedIterator implements \Iterator
 {
     /**
      * @var bool

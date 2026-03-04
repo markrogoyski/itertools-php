@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\UniqueExtractor;
 
-class Math
+final class Math
 {
     /**
      * Returns a frequency distribution of iterable elements

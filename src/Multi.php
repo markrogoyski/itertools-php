@@ -8,7 +8,7 @@ use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\Iterators\StrictMultipleIterator;
 use IterTools\Util\NoValueMonad;
 
-class Multi
+final class Multi
 {
     /**
      * Iterate multiple iterable collections simultaneously.
