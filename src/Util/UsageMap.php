@@ -58,6 +58,8 @@ final class UsageMap
      * @param mixed $value
      *
      * @return string unique hash string
+     *
+     * @psalm-suppress PossiblyUnusedReturnValue
      */
     public function deleteUsage(mixed $value): string
     {
@@ -85,7 +87,7 @@ final class UsageMap
         $deletesCount = $this->deletedMap[$hash] ?? 0;
 
         return Stream::of($this->addedMap[$hash] ?? [])
-            ->filterTrue(fn ($count) => $count > $deletesCount)
+            ->filterTrue(fn (int $count): bool => $count > $deletesCount)
             ->toCount();
     }
 

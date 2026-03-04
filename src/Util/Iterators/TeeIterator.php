@@ -76,8 +76,8 @@ final class TeeIterator extends \NoRewindIterator
             return;
         }
 
-        /** @phpstan-ignore argument.type, argument.type */
-        [$relPos, $minPos, $maxPos] = [$this->getPosition($related), \min($this->positions), \max($this->positions)];
+        /** @psalm-suppress ArgumentTypeCoercion */
+        [$relPos, $minPos, $maxPos] = [$this->getPosition($related), \min($this->positions), \max($this->positions)]; // @phpstan-ignore argument.type, argument.type
 
         if ($relPos === $maxPos) {
             parent::next();
@@ -89,8 +89,8 @@ final class TeeIterator extends \NoRewindIterator
 
         $this->incrementPosition($related);
 
-        /** @phpstan-ignore argument.type */
-        if ($minPos < \min($this->positions)) {
+        /** @psalm-suppress ArgumentTypeCoercion */
+        if ($minPos < \min($this->positions)) { // @phpstan-ignore argument.type
             unset($this->cacheKeys[$minPos]);
             unset($this->cacheValues[$minPos]);
         }
@@ -137,8 +137,8 @@ final class TeeIterator extends \NoRewindIterator
             throw new \LogicException();
         }
 
-        /** @phpstan-ignore argument.type */
-        [$relPos, $maxPos] = [$this->getPosition($related), \max($this->positions)];
+        /** @psalm-suppress ArgumentTypeCoercion */
+        [$relPos, $maxPos] = [$this->getPosition($related), \max($this->positions)]; // @phpstan-ignore argument.type
 
         return $relPos !== $maxPos || parent::valid();
     }

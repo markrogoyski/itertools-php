@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<ruleset name="IterToolsPHP">
+ <description>The coding standard for IterTools PHP.</description>
+
+ <config name="php_version" value="80200"/>
+
+ <rule ref="PSR12">
+  <!-- Welcome to the future where we have HD wide-screen monitors -->
+  <exclude name="Generic.Files.LineLength.TooLong"/>
+
+  <!-- Unit tests use fractions and it is nice to write them like 3/2 -->
+  <exclude name="PSR12.Operators.OperatorSpacing.NoSpaceBefore"/>
+  <exclude name="PSR12.Operators.OperatorSpacing.NoSpaceAfter"/>
+ </rule>
+
+</ruleset>

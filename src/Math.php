@@ -98,6 +98,7 @@ final class Math
 
         $total = $initialValue ?? 0;
         foreach ($numbers as $number) {
+            /** @psalm-suppress InvalidOperand */
             $total += $number;
             yield $total;
         }
@@ -119,6 +120,7 @@ final class Math
 
         $product = $initialValue ?? 1;
         foreach ($numbers as $number) {
+            /** @psalm-suppress InvalidOperand */
             $product *= $number;
             yield $product;
         }
@@ -140,6 +142,7 @@ final class Math
 
         $difference = $initialValue ?? 0;
         foreach ($numbers as $number) {
+            /** @psalm-suppress InvalidOperand */
             $difference -= $number;
             yield $difference;
         }
@@ -200,6 +203,7 @@ final class Math
         $n = 0;
         foreach (Math::runningTotal($numbers, $initialValue) as $runningTotal) {
             $n++;
+            /** @psalm-suppress InvalidOperand */
             yield $runningTotal / $n;
         }
     }

@@ -75,6 +75,7 @@ final class Single
     public static function compressAssociative(iterable $data, array $keys): \Generator
     {
         $keyMap = \array_flip($keys);
+        /** @var mixed $datum */
         foreach ($data as $key => $datum) {
             if (\array_key_exists($key, $keyMap)) {
                 yield $key => $datum;
@@ -153,11 +154,11 @@ final class Single
     public static function filterFalse(iterable $data, ?callable $predicate = null): \Generator
     {
         if ($predicate === null) {
-            $predicate = fn($datum): bool => \boolval($datum);
+            $predicate = fn(mixed $datum): bool => \boolval($datum);
         }
 
         foreach ($data as $key => $datum) {
-            if (!$predicate($datum)) {
+            if (!(bool) $predicate($datum)) {
                 yield $key => $datum;
             }
         }
@@ -176,11 +177,11 @@ final class Single
     public static function filterTrue(iterable $data, ?callable $predicate = null): \Generator
     {
         if ($predicate === null) {
-            $predicate = fn($datum): bool => \boolval($datum);
+            $predicate = fn(mixed $datum): bool => \boolval($datum);
         }
 
         foreach ($data as $key => $datum) {
-            if ($predicate($datum)) {
+            if ((bool) $predicate($datum)) {
                 yield $key => $datum;
             }
         }
@@ -246,7 +247,7 @@ final class Single
         callable $groupKeyFunction,
         ?callable $itemKeyFunction = null
     ): \Generator {
-        $itemKeyFunction ??= fn ($x) => null;
+        $itemKeyFunction ??= fn (mixed $_x): mixed => null;
         $groups = [];
 
         foreach ($data as $item) {
@@ -469,9 +470,9 @@ final class Single
      * @template T
      *
      * @param iterable<T> $data
-     * @param int<0, max> $start
-     * @param int<0, max>|null $count
-     * @param positive-int $step
+     * @param int $start
+     * @param int|null $count
+     * @param int $step
      *
      * @return \Generator<T>
      */
@@ -496,9 +497,10 @@ final class Single
                 continue;
             }
 
-            if ($count !== null && $yielded++ === $count) {
+            if ($count !== null && $yielded === $count) {
                 break;
             }
+            $yielded++;
 
             yield $datum;
         }
@@ -508,8 +510,8 @@ final class Single
      * Skip n elements in the iterable after optional offset offset.
      *
      * @param iterable<mixed> $data
-     * @param int<0, max> $count
-     * @param int<0, max> $offset
+     * @param int $count
+     * @param int $offset
      *
      * @return \Generator
      */

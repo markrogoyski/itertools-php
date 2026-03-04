@@ -36,7 +36,7 @@ final class Transform
      * @param callable(mixed, mixed): mixed|null $keyFunc
      * @param callable(mixed, mixed): mixed|null $valueFunc
      *
-     * @return array<TKey|numeric|string, TValue|mixed>
+     * @return array<TKey|int|string, TValue|mixed>
      */
     public static function toAssociativeArray(
         iterable $iterable,
@@ -44,10 +44,10 @@ final class Transform
         ?callable $valueFunc = null
     ): array {
         if ($keyFunc === null) {
-            $keyFunc = fn ($item, $key) => $key;
+            $keyFunc = fn (mixed $item, mixed $key): mixed => $key;
         }
         if ($valueFunc === null) {
-            $valueFunc = fn ($item, $key) => $item;
+            $valueFunc = fn (mixed $item, mixed $_key): mixed => $item;
         }
 
         $result = [];
@@ -71,12 +71,11 @@ final class Transform
      */
     public static function toIterator(iterable $iterable): \Iterator
     {
-        /** @phpstan-ignore return.type */
-        return match (true) {
+        /** @psalm-suppress DocblockTypeContradiction, MixedArgumentTypeCoercion */
+        return match (true) { // @phpstan-ignore return.type
             $iterable instanceof \Iterator => $iterable,
             $iterable instanceof \Traversable => new \IteratorIterator($iterable),
-            /** @phpstan-ignore function.alreadyNarrowedType */
-            \is_array($iterable) => new \ArrayIterator($iterable),
+            \is_array($iterable) => new \ArrayIterator($iterable), // @phpstan-ignore function.alreadyNarrowedType
             default => throw new \LogicException(\gettype($iterable) . ' type is not an expected iterable type (Iterator|Traversable|array)'),
         };
     }

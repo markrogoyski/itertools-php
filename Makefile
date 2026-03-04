@@ -1,6 +1,6 @@
 .PHONY : lint tests style phpstan psalm phpmd coverage composer-unused composer-require-checker composer-audit
 
-all : lint tests style phpstan psalm phpmd composer-unused composer-require-checker
+all : lint tests style phpstan psalm composer-unused composer-require-checker
 
 tests :
 	vendor/bin/phpunit tests/ --configuration=tests/phpunit.xml

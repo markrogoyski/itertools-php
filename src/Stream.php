@@ -535,7 +535,7 @@ final class Stream implements \IteratorAggregate
      *
      * If comparator is null, then elements of the iterable source must be comparable.
      *
-     * @param callable|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
+     * @param (callable(mixed, mixed):int)|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
      * @return Stream
      *
@@ -552,7 +552,7 @@ final class Stream implements \IteratorAggregate
      *
      * If comparator is null, then elements of the iterable source must be comparable.
      *
-     * @param callable|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
+     * @param (callable(mixed, mixed):int)|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
      * @return Stream
      *
@@ -1072,8 +1072,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Converts iterable source to an associative array.
      *
-     * @param callable|null $keyFunc fn ($value, $key) => Custom Logic
-     * @param callable|null $valueFunc fn ($value, $key) => Custom logic
+     * @param (callable(mixed, mixed):mixed)|null $keyFunc fn ($value, $key) => Custom Logic
+     * @param (callable(mixed, mixed):mixed)|null $valueFunc fn ($value, $key) => Custom logic
      *
      * @return array<mixed>
      *
@@ -1128,8 +1128,8 @@ final class Stream implements \IteratorAggregate
         }
 
         foreach ($this->iterable as $line) {
-            /** @phpstan-ignore argument.type */
-            $line = \is_float($line) && \is_nan($line) ? 'NAN' : \strval($line);
+            /** @psalm-suppress MixedArgument */
+            $line = \is_float($line) && \is_nan($line) ? 'NAN' : \strval($line); // @phpstan-ignore argument.type
 
             if ($firstIteration) {
                 $firstIteration = false;
@@ -1690,6 +1690,7 @@ final class Stream implements \IteratorAggregate
     public function varDump(): void
     {
         foreach ($this->iterable as $item) {
+            /** @psalm-suppress ForbiddenCode */
             \var_dump($item);
         }
     }

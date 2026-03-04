@@ -98,6 +98,7 @@ final class Multi
     {
         $zippedIterator = new StrictMultipleIterator(\MultipleIterator::MIT_NEED_ALL);
         foreach ($iterables as $iterable) {
+            /** @psalm-suppress MixedArgumentTypeCoercion */
             $zippedIterator->attachIterator(Transform::toIterator($iterable));
         }
         $zippedIterator->setFlags(\MultipleIterator::MIT_NEED_ALL);
@@ -120,6 +121,7 @@ final class Multi
     {
         foreach ($iterables as $iterable) {
             foreach ($iterable as $item) {
+                /** @var mixed $item */
                 yield $item;
             }
         }

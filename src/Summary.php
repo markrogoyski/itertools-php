@@ -205,12 +205,12 @@ final class Summary
         }
 
         if ($predicate === null) {
-            $predicate = fn($datum): bool => boolval($datum);
+            $predicate = fn(mixed $datum): bool => boolval($datum);
         }
 
         $count = 0;
         foreach ($data as $datum) {
-            if ($predicate($datum)) {
+            if ((bool) $predicate($datum)) {
                 $count++;
                 if ($count > $n) {
                     return false;
@@ -320,12 +320,12 @@ final class Summary
      */
     public static function isPartitioned(iterable $data, ?callable $predicate = null): bool
     {
-        $predicate ??= fn ($item): bool => \boolval($item);
+        $predicate ??= fn (mixed $item): bool => \boolval($item);
 
         $allTrueSoFar = true;
 
         foreach ($data as $datum) {
-            $currentItemTrue = $predicate($datum);
+            $currentItemTrue = (bool) $predicate($datum);
 
             if ($allTrueSoFar && !$currentItemTrue) {
                 $allTrueSoFar = false;

@@ -46,7 +46,7 @@ final class JustifyMultipleIterator implements \Iterator
     public function current(): array
     {
         return Stream::of($this->iterators)
-            ->map(function (\Iterator $iterator) {
+            ->map(function (\Iterator $iterator): mixed {
                 return $iterator->valid() ? $iterator->current() : $this->filler;
             })
             ->toArray();

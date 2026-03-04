@@ -34,6 +34,8 @@ final class UniqueExtractor
      * @param bool $strict
      *
      * @return string
+     *
+     * @psalm-suppress MixedArgument, InvalidOperand
      */
     public static function getString(mixed $var, bool $strict): string
     {

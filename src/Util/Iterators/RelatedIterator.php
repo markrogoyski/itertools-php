@@ -52,6 +52,7 @@ final class RelatedIterator implements \Iterator
      */
     public function current(): mixed
     {
+        /** @var TValue */
         return $this->parentIterator->current($this);
     }
 

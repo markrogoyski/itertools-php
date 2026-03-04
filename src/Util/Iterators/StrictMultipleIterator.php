@@ -8,6 +8,8 @@ namespace IterTools\Util\Iterators;
  * but throws \LengthException if at least one iterator ends before the others while iteration process.
  *
  * {@inheritDoc}
+ *
+ * @psalm-suppress MissingTemplateParam
  */
 final class StrictMultipleIterator extends \MultipleIterator
 {

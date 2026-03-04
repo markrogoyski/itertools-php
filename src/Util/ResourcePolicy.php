@@ -10,7 +10,7 @@ namespace IterTools\Util;
 final class ResourcePolicy
 {
     /**
-     * @param resource $resource
+     * @param mixed $resource
      * @return void
      */
     public static function assertIsSatisfied(mixed $resource): void

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="1"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config ../vendor/vimeo/psalm/config.xsd"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="true"
+>
+
+    <projectFiles>
+        <directory name="../src/" />
+        <ignoreFiles>
+            <directory name="../vendor" />
+        </ignoreFiles>
+    </projectFiles>
+    <issueHandlers>
+        <!-- MissingOverrideAttribute requires PHP 8.3+, but we support 8.2+ -->
+        <MissingOverrideAttribute errorLevel="suppress" />
+        <!-- Public API methods/classes intended for library consumers -->
+        <PossiblyUnusedMethod errorLevel="suppress" />
+        <PossiblyUnusedProperty errorLevel="suppress" />
+        <UnusedClass errorLevel="suppress" />
+        <!-- Library intentionally works with mixed types via iterable<mixed> -->
+        <MixedAssignment errorLevel="suppress" />
+        <MixedReturnStatement errorLevel="suppress" />
+    </issueHandlers>
+</psalm>
