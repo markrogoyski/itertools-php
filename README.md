@@ -307,6 +307,29 @@ Quick Reference
 | [`printR`](docs/stream.md#print-r)         | `print_r` each item                                      | `$stream->printR()`              |
 | [`varDump`](docs/stream.md#var-dump)       | `var_dump` each item                                     | `$stream->varDump()`             |
 
+Documentation
+-------------
+
+Full documentation with detailed descriptions, signatures, and code examples for each function.
+
+#### Loop Iteration
+- [Multi Iteration](docs/multi-iteration.md) — Chain, Zip, ZipEqual, ZipFilled, ZipLongest
+- [Single Iteration](docs/single-iteration.md) — Chunkwise, Compress, Filter, Map, Flatten, GroupBy, and more
+- [Infinite Iteration](docs/infinite-iteration.md) — Count, Cycle, Repeat
+- [Random Iteration](docs/random-iteration.md) — Choice, CoinFlip, Number, Percentage, RockPaperScissors
+- [Math Iteration](docs/math-iteration.md) — Frequencies, Running Average/Difference/Max/Min/Product/Total
+- [Set and Multiset Iteration](docs/set-iteration.md) — Distinct, Intersection, Union, Symmetric Difference
+- [Sort Iteration](docs/sort-iteration.md) — ASort, Sort
+- [File Iteration](docs/file-iteration.md) — ReadCsv, ReadLines
+- [Transform Iteration](docs/transform-iteration.md) — Tee, ToArray, ToAssociativeArray, ToIterator
+
+#### Summarize and Reduce
+- [Summary](docs/summary.md) — AllMatch, AnyMatch, IsEmpty, IsSorted, and more
+- [Reduce](docs/reduce.md) — ToAverage, ToSum, ToMin, ToMax, ToString, and more
+
+#### Stream
+- [Stream](docs/stream.md) — Sources, operations, terminal operations, and debug tools
+
 Setup
 -----
 
