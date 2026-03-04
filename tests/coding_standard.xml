@@ -2,7 +2,7 @@
 <ruleset name="IterToolsPHP">
  <description>The coding standard for IterTools PHP.</description>
 
- <config name="php_version" value="80100"/>
+ <config name="php_version" value="80200"/>
 
  <rule ref="PSR12">
   <!-- Welcome to the future where we have HD wide-screen monitors -->
