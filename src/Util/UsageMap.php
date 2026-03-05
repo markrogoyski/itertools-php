@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace IterTools\Util;
 
-use IterTools\Reduce;
-use IterTools\Stream;
-
 /**
  * @internal
  */
@@ -86,9 +83,14 @@ final class UsageMap
         $hash = UniqueExtractor::getString($value, $this->strict);
         $deletesCount = $this->deletedMap[$hash] ?? 0;
 
-        return Stream::of($this->addedMap[$hash] ?? [])
-            ->filterTrue(fn (int $count): bool => $count > $deletesCount)
-            ->toCount();
+        $count = 0;
+        foreach ($this->addedMap[$hash] ?? [] as $usageCount) {
+            if ($usageCount > $deletesCount) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
     /**
@@ -104,22 +106,28 @@ final class UsageMap
         $hash = UniqueExtractor::getString($value, $this->strict);
         $deletesCount = $this->deletedMap[$hash] ?? 0;
 
-        $ownersMap = Stream::of($this->addedMap[$hash] ?? [])
-            ->map(fn (int $value) => $value - $deletesCount)
-            ->filterTrue(fn (int $value) => $value > 0)
-            ->toArray();
-
-        while (count($ownersMap) > $maxOwnersCount) {
-            /** @var int $minValue */
-            $minValue = Reduce::toMin($ownersMap);
-            $ownersMap = Stream::of($ownersMap)
-                ->map(fn (int $value) => $value - $minValue)
-                ->filterTrue(fn (int $value) => $value > 0)
-                ->toArray();
+        $ownersMap = [];
+        foreach ($this->addedMap[$hash] ?? [] as $owner => $count) {
+            $adjusted = $count - $deletesCount;
+            if ($adjusted > 0) {
+                $ownersMap[$owner] = $adjusted;
+            }
         }
 
-        /** @var array<string, int> $ownersMap */
-        return (int)Reduce::toSum($ownersMap);
+        while (count($ownersMap) > $maxOwnersCount) {
+            /** @var non-empty-array<string, int<1, max>> $ownersMap */
+            $minValue = min($ownersMap);
+            $filtered = [];
+            foreach ($ownersMap as $owner => $count) {
+                $adjusted = $count - $minValue;
+                if ($adjusted > 0) {
+                    $filtered[$owner] = $adjusted;
+                }
+            }
+            $ownersMap = $filtered;
+        }
+
+        return array_sum($ownersMap);
     }
 
     /**
@@ -139,10 +147,6 @@ final class UsageMap
             return false;
         }
 
-        $differentUsageCounts = Stream::of($map)
-            ->distinct()
-            ->toCount();
-
-        return $differentUsageCounts <= 1;
+        return \count(\array_unique($map)) <= 1;
     }
 }
