@@ -112,14 +112,10 @@ final class Single
     {
         $drop = true;
         foreach ($data as $key => $datum) {
-            if ($drop === true) {
-                if (!$predicate($datum)) {
-                    $drop = false;
-                    yield $key => $datum;
-                    continue;
-                }
+            if ($drop === true && $predicate($datum)) {
                 continue;
             }
+            $drop = false;
             yield $key => $datum;
         }
     }
