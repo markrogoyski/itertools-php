@@ -299,15 +299,13 @@ final class Single
      * @param iterable<T> $data
      *
      * @return \Generator<array{T, T}>
+     *
+     * @psalm-suppress MoreSpecificReturnType
      */
     public static function pairwise(iterable $data): \Generator
     {
-        $chunked = static::chunkwiseOverlap($data, 2, 1, false);
-
-        foreach ($chunked as $chunk) {
-            /** @var array{T, T} $chunk */
-            yield $chunk;
-        }
+        /** @psalm-suppress LessSpecificReturnStatement @phpstan-ignore generator.valueType */
+        yield from static::chunkwiseOverlap($data, 2, 1, false);
     }
 
     /**

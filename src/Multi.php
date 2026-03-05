@@ -6,7 +6,6 @@ namespace IterTools;
 
 use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\Iterators\StrictMultipleIterator;
-use IterTools\Util\NoValueMonad;
 
 final class Multi
 {
@@ -101,8 +100,6 @@ final class Multi
             /** @psalm-suppress MixedArgumentTypeCoercion */
             $zippedIterator->attachIterator(Transform::toIterator($iterable));
         }
-        $zippedIterator->setFlags(\MultipleIterator::MIT_NEED_ALL);
-
         foreach ($zippedIterator as $values) {
             yield $values;
         }
