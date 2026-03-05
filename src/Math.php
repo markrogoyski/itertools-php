@@ -57,28 +57,16 @@ final class Math
      */
     public static function relativeFrequencies(iterable $data, bool $strict = true): \Generator
     {
-        $usages = [];
-        $values = [];
+        $frequencies = [];
         $totalCount = 0;
 
-        foreach ($data as $datum) {
-            $hash = UniqueExtractor::getString($datum, $strict);
-
-            if (!\array_key_exists($hash, $usages)) {
-                $usages[$hash] = 0;
-                $values[$hash] = $datum;
-            }
-
-            $usages[$hash]++;
-            $totalCount++;
+        foreach (self::frequencies($data, $strict) as $value => $count) {
+            $frequencies[] = [$value, $count];
+            $totalCount += $count;
         }
 
-        /**
-         * @var T $value
-         * @var int $usageCount
-         */
-        foreach (Multi::zipEqual($values, $usages) as [$value, $usageCount]) {
-            yield $value => ($usageCount / $totalCount);
+        foreach ($frequencies as [$value, $count]) {
+            yield $value => ($count / $totalCount);
         }
     }
 
