@@ -204,9 +204,7 @@ final class Summary
             return false;
         }
 
-        if ($predicate === null) {
-            $predicate = fn(mixed $datum): bool => boolval($datum);
-        }
+        $predicate ??= fn(mixed $datum): bool => boolval($datum);
 
         $count = 0;
         foreach ($data as $datum) {

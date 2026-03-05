@@ -43,12 +43,8 @@ final class Transform
         ?callable $keyFunc = null,
         ?callable $valueFunc = null
     ): array {
-        if ($keyFunc === null) {
-            $keyFunc = fn (mixed $item, mixed $key): mixed => $key;
-        }
-        if ($valueFunc === null) {
-            $valueFunc = fn (mixed $item, mixed $_key): mixed => $item;
-        }
+        $keyFunc ??= fn (mixed $item, mixed $key): mixed => $key;
+        $valueFunc ??= fn (mixed $item, mixed $_key): mixed => $item;
 
         $result = [];
         foreach ($iterable as $key => $item) {

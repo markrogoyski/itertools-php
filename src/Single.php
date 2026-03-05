@@ -149,9 +149,7 @@ final class Single
      */
     public static function filterFalse(iterable $data, ?callable $predicate = null): \Generator
     {
-        if ($predicate === null) {
-            $predicate = fn(mixed $datum): bool => \boolval($datum);
-        }
+        $predicate ??= fn(mixed $datum): bool => \boolval($datum);
 
         foreach ($data as $key => $datum) {
             if (!(bool) $predicate($datum)) {
@@ -172,9 +170,7 @@ final class Single
      */
     public static function filterTrue(iterable $data, ?callable $predicate = null): \Generator
     {
-        if ($predicate === null) {
-            $predicate = fn(mixed $datum): bool => \boolval($datum);
-        }
+        $predicate ??= fn(mixed $datum): bool => \boolval($datum);
 
         foreach ($data as $key => $datum) {
             if ((bool) $predicate($datum)) {
