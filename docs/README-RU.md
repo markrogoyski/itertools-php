@@ -114,6 +114,8 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`intersectionCoercive`](#Intersection-Coercive)                | Пересечение нескольких коллекций в режиме приведения типов            | `Set::intersectionCoercive(...$iterables)`                   |
 | [`partialIntersection`](#Partial-Intersection)                  | Частичное пересечение нескольких коллекций                            | `Set::partialIntersection($minCount, ...$iterables)`         |
 | [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Частичное пересечение нескольких коллекций в режиме приведения типов  | `Set::partialIntersectionCoercive($minCount, ...$iterables)` |
+| [`difference`](#Difference)                                     | Разность коллекций                                                   | `Set::difference($a, ...$iterables)`                         |
+| [`differenceCoercive`](#Difference-Coercive)                    | Разность коллекций в режиме приведения типов                         | `Set::differenceCoercive($a, ...$iterables)`                 |
 | [`symmetricDifference`](#Symmetric-Difference)                  | Симметрическая разница нескольких коллекций                           | `Set::symmetricDifference(...$iterables)`                    |
 | [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Симметрическая разница нескольких коллекций в режиме приведения типов | `Set::symmetricDifferenceCoercive(...$iterables)`            |
 | [`union`](#Union)                                               | Объединение нескольких коллекций                                      | `Set::union(...$iterables)`                                  |
@@ -229,6 +231,8 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`skip`](#Skip-1)                                                         | Пропускает n элементов коллекции                                                                             | `$stream->skip($count, [$offset])`                                                |
 | [`slice`](#Slice-1)                                                       | Возвращает подвыборку коллекции                                                                              | `$stream->slice([start], [$count], [step])`                                       |
 | [`sort`](#Sort-1)                                                         | Сортирует хранимую коллекцию                                                                                 | `$stream->sort([$comparator])`                                                    |
+| [`differenceWith`](#Difference-With)                                       | Возвращает разность хранимой коллекции с другими коллекциями                                                 | `$stream->differenceWith(...$iterables)`                                          |
+| [`differenceCoerciveWith`](#Difference-Coercive-With)                     | Возвращает разность хранимой коллекции с другими коллекциями (в режиме приведения типов)                     | `$stream->differenceCoerciveWith(...$iterables)`                                  |
 | [`symmetricDifferenceWith`](#Symmetric-Difference-With)                   | Возвращает симметрическую разность хранимой коллекции с другими коллекциями                                  | `$this->symmetricDifferenceWith(...$iterables)`                                   |
 | [`symmetricDifference CoerciveWith`](#Symmetric-Difference-Coercive-With) | Возвращает симметрическую разность хранимой коллекции с другими коллекциями (в режиме приведения типов)      | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                          |
 | [`takeWhile`](#Take-While-1)                                              | Отдает элементы из коллекции, пока предикат возвращает истину                                                | `$stream->takeWhile($predicate)`                                                  |
@@ -1341,6 +1345,45 @@ foreach (Set::partialIntersectionCoercive(2, $set1, $set2, $set3) as $partiallyC
     print($partiallyCommonNumber);
 }
 // 1, 2, 3
+```
+
+### Difference
+Итерирует разность коллекций. Возвращает элементы из первой коллекции, не входящие ни в одну из остальных.
+
+```Set::difference(iterable $a, iterable ...$iterables)```
+
+Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила получения разности [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = [2, 3, 5, 8];
+$c = [1, 6, 9];
+
+foreach (Set::difference($a, $b, $c) as $item) {
+    print($item);
+}
+// 4, 7
+```
+
+### Difference Coercive
+Итерирует разность коллекций в режиме [приведения типов](#Режимы-типизации).
+
+```Set::differenceCoercive(iterable $a, iterable ...$iterables)```
+
+Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила получения разности [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+
+foreach (Set::differenceCoercive($a, $b) as $item) {
+    print($item);
+}
+// 4, 7
 ```
 
 ### Symmetric difference
@@ -2977,6 +3020,45 @@ $result = Stream::of($input)
     ->sort()
     ->toArray();
 // 1, 2, 3, 4, 5, 6, 7, 8, 9
+```
+
+#### Difference With
+Возвращает поток, содержащий разность исходного потока с заданным набором коллекций. Элементы из исходного потока, не входящие ни в одну из заданных коллекций.
+
+```$stream->differenceWith(iterable ...$iterables): Stream```
+
+Если хотя бы в одной коллекции или в потоке встречаются повторяющиеся элементы, работают правила получения разности для [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Stream;
+
+$a = [1, 2, 3, 4, 7];
+$b = [2, 3, 5, 8];
+$c = [1, 6, 9];
+
+$stream = Stream::of($a)
+    ->differenceWith($b, $c)
+    ->toArray();
+// 4, 7
+```
+
+#### Difference Coercive With
+Возвращает поток, содержащий разность исходного потока с заданным набором коллекций, полученную в режиме [приведения типов](#Режимы-типизации).
+
+```$stream->differenceCoerciveWith(iterable ...$iterables): Stream```
+
+Если хотя бы в одной коллекции или в потоке встречаются повторяющиеся элементы, работают правила получения разности для [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Stream;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+
+$stream = Stream::of($a)
+    ->differenceCoerciveWith($b)
+    ->toArray();
+// 4, 7
 ```
 
 #### Symmetric difference With

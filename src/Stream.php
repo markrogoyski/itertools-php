@@ -909,6 +909,48 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Iterates the difference of iterable source and given iterables in strict type mode.
+     *
+     * Returns elements from the source not present in any given iterables.
+     *
+     *  - scalars: compares strictly by type;
+     *  - objects: always treats different instances as not equal to each other;
+     *  - arrays: compares serialized.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return Stream
+     *
+     * @see Set::difference()
+     */
+    public function differenceWith(iterable ...$iterables): self
+    {
+        $this->iterable = Set::difference($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Iterates the difference of iterable source and given iterables in non-strict type mode.
+     *
+     * Returns elements from the source not present in any given iterables.
+     *
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return Stream
+     *
+     * @see Set::differenceCoercive()
+     */
+    public function differenceCoerciveWith(iterable ...$iterables): self
+    {
+        $this->iterable = Set::differenceCoercive($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
      * Iterates partial intersection of iterable source and given iterables in strict type mode.
      *
      *  - scalars: compares strictly by type;

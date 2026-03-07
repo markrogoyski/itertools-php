@@ -135,6 +135,45 @@ foreach (Set::partialIntersectionCoercive(2, $set1, $set2, $set3) as $partiallyC
 // 1, 2, 3
 ```
 
+### Difference
+Iterates the difference of iterables. Returns elements from the first iterable not present in any of the other iterables.
+
+```Set::difference(iterable $a, iterable ...$iterables)```
+
+If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = [2, 3, 5, 8];
+$c = [1, 6, 9];
+
+foreach (Set::difference($a, $b, $c) as $item) {
+    print($item);
+}
+// 4, 7
+```
+
+### Difference Coercive
+Iterates the difference of iterables using [type coercion](../README.md#strict-and-coercive-types).
+
+```Set::differenceCoercive(iterable $a, iterable ...$iterables)```
+
+If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+
+foreach (Set::differenceCoercive($a, $b) as $item) {
+    print($item);
+}
+// 4, 7
+```
+
 ### Symmetric difference
 Iterates the symmetric difference of iterables.
 

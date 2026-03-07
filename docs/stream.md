@@ -895,6 +895,45 @@ $result = Stream::of($input)
 // 1, 2, 3, 4, 5, 6, 7, 8, 9
 ```
 
+#### Difference With
+Return a stream of the difference of the stream and the given iterables. Elements from the source not present in any given iterables.
+
+```$stream->differenceWith(iterable ...$iterables): Stream```
+
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
+
+```php
+use IterTools\Stream;
+
+$a = [1, 2, 3, 4, 7];
+$b = [2, 3, 5, 8];
+$c = [1, 6, 9];
+
+$stream = Stream::of($a)
+    ->differenceWith($b, $c)
+    ->toArray();
+// 4, 7
+```
+
+#### Difference Coercive With
+Return a stream of the difference of the stream and the given iterables using [type coercion](../README.md#strict-and-coercive-types).
+
+```$stream->differenceCoerciveWith(iterable ...$iterables): Stream```
+
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
+
+```php
+use IterTools\Stream;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+
+$stream = Stream::of($a)
+    ->differenceCoerciveWith($b)
+    ->toArray();
+// 4, 7
+```
+
 #### Symmetric difference With
 Return a stream of the symmetric difference of the stream and the given iterables.
 

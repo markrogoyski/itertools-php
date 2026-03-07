@@ -187,6 +187,48 @@ final class Set
     }
 
     /**
+     * Iterates the difference of iterables in strict type mode.
+     *
+     * Returns elements from the first iterable not present in any other iterables.
+     * If input iterables produce duplicate items, then multiset difference rules apply.
+     *
+     * Strict-type comparisons:
+     *  - scalars: compares strictly by type
+     *  - objects: always treats different instances as not equal to each other
+     *  - arrays: compares serialized
+     *
+     * @param iterable<mixed> $a
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    public static function difference(iterable $a, iterable ...$iterables): \Generator
+    {
+        yield from self::differenceInternal(true, $a, ...$iterables);
+    }
+
+    /**
+     * Iterates the difference of iterables using type coercion.
+     *
+     * Returns elements from the first iterable not present in any other iterables.
+     * If input iterables produce duplicate items, then multiset difference rules apply.
+     *
+     * Coercive (non-strict) type comparisons:
+     *  - scalars: compares non-strictly by value
+     *  - objects: compares serialized
+     *  - arrays: compares serialized
+     *
+     * @param iterable<mixed> $a
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    public static function differenceCoercive(iterable $a, iterable ...$iterables): \Generator
+    {
+        yield from self::differenceInternal(false, $a, ...$iterables);
+    }
+
+    /**
      * Iterates the symmetric difference of iterables in strict type mode.
      *
      * If input iterables produce duplicate items, then multiset difference rules apply.
@@ -285,7 +327,7 @@ final class Set
 
                 $valuesMap[UniqueExtractor::getString($value, $strict)] = $value;
 
-                if ($usageMap->getOwnersCount($value) === count($iterables)) {
+                if ($usageMap->getOwnersCount($value) === \count($iterables)) {
                     $usageMap->deleteUsage($value);
                 }
             }
@@ -294,6 +336,40 @@ final class Set
         foreach ($valuesMap as $value) {
             foreach (Single::repeat($value, $usageMap->getUsagesCount($value)) as $item) {
                 yield $item;
+            }
+        }
+    }
+
+    /**
+     * Iterates the difference of iterables.
+     *
+     * @param bool $strict
+     * @param iterable<mixed> $a
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    protected static function differenceInternal(
+        bool $strict,
+        iterable $a,
+        iterable ...$iterables
+    ): \Generator {
+        $subtractCounts = [];
+
+        foreach ($iterables as $iterable) {
+            foreach ($iterable as $value) {
+                $hash = UniqueExtractor::getString($value, $strict);
+                $subtractCounts[$hash] = ($subtractCounts[$hash] ?? 0) + 1;
+            }
+        }
+
+        foreach ($a as $value) {
+            $hash = UniqueExtractor::getString($value, $strict);
+
+            if (isset($subtractCounts[$hash]) && $subtractCounts[$hash] > 0) {
+                $subtractCounts[$hash]--;
+            } else {
+                yield $value;
             }
         }
     }

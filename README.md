@@ -118,6 +118,8 @@ Quick Reference
 | [`intersectionCoercive`](docs/set-iteration.md#intersection-coercive)                | Intersection with type coercion                           | `Set::intersectionCoercive(...$iterables)`                   |
 | [`partialIntersection`](docs/set-iteration.md#partial-intersection)                  | Partial intersection of iterables                         | `Set::partialIntersection($minCount, ...$iterables)`         |
 | [`partialIntersectionCoercive`](docs/set-iteration.md#partial-intersection-coercive) | Partial intersection with type coercion                   | `Set::partialIntersectionCoercive($minCount, ...$iterables)` |
+| [`difference`](docs/set-iteration.md#difference)                                     | Difference of iterables                                   | `Set::difference($a, ...$iterables)`                         |
+| [`differenceCoercive`](docs/set-iteration.md#difference-coercive)                    | Difference with type coercion                             | `Set::differenceCoercive($a, ...$iterables)`                 |
 | [`symmetricDifference`](docs/set-iteration.md#symmetric-difference)                  | Symmetric difference of iterables                         | `Set::symmetricDifference(...$iterables)`                    |
 | [`symmetricDifferenceCoercive`](docs/set-iteration.md#symmetric-difference-coercive) | Symmetric difference with type coercion                   | `Set::symmetricDifferenceCoercive(...$iterables)`            |
 | [`union`](docs/set-iteration.md#union)                                               | Union of iterables                                        | `Set::union(...$iterables)`                                  |
@@ -234,8 +236,10 @@ Quick Reference
 | [`skip`](docs/stream.md#skip)                                                         | Skip some elements of the stream                                                          | `$stream->skip($count, [$offset])`                                                |
 | [`slice`](docs/stream.md#slice)                                                       | Extract a slice of the stream                                                             | `$stream->slice([$start], [$count], [$step])`                                     |
 | [`sort`](docs/stream.md#sort)                                                         | Sorts the stream                                                                          | `$stream->sort([$comparator])`                                                    |
-| [`symmetricDifferenceWith`](docs/stream.md#symmetric-difference-with)                   | Symmetric difference of iterable source and given iterables                               | `$this->symmetricDifferenceWith(...$iterables)`                                   |
-| [`symmetricDifferenceCoerciveWith`](docs/stream.md#symmetric-difference-coercive-with) | Symmetric difference of iterable source and given iterables with type coercion            | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                          |
+| [`differenceWith`](docs/stream.md#difference-with)                                       | Difference of iterable source and given iterables                                         | `$stream->differenceWith(...$iterables)`                                          |
+| [`differenceCoerciveWith`](docs/stream.md#difference-coercive-with)                     | Difference of iterable source and given iterables with type coercion                      | `$stream->differenceCoerciveWith(...$iterables)`                                  |
+| [`symmetricDifferenceWith`](docs/stream.md#symmetric-difference-with)                   | Symmetric difference of iterable source and given iterables                               | `$stream->symmetricDifferenceWith(...$iterables)`                                 |
+| [`symmetricDifferenceCoerciveWith`](docs/stream.md#symmetric-difference-coercive-with) | Symmetric difference of iterable source and given iterables with type coercion            | `$stream->symmetricDifferenceCoerciveWith(...$iterables)`                         |
 | [`takeWhile`](docs/stream.md#take-while)                                              | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                                                  |
 | [`unionWith`](docs/stream.md#union-with)                                                | Union of stream with iterables                                                            | `$stream->unionWith(...$iterables)`                                               |
 | [`unionCoerciveWith`](docs/stream.md#union-coercive-with)                               | Union of stream with iterables with type coercion                                         | `$stream->unionCoerciveWith(...$iterables)`                                       |
@@ -318,7 +322,7 @@ Full documentation with detailed descriptions, signatures, and code examples for
 - [Infinite Iteration](docs/infinite-iteration.md) — Count, Cycle, Repeat
 - [Random Iteration](docs/random-iteration.md) — Choice, CoinFlip, Number, Percentage, RockPaperScissors
 - [Math Iteration](docs/math-iteration.md) — Frequencies, Running Average/Difference/Max/Min/Product/Total
-- [Set and Multiset Iteration](docs/set-iteration.md) — Distinct, Intersection, Union, Symmetric Difference
+- [Set and Multiset Iteration](docs/set-iteration.md) — Distinct, Intersection, Difference, Symmetric Difference, Union
 - [Sort Iteration](docs/sort-iteration.md) — ASort, Sort
 - [File Iteration](docs/file-iteration.md) — ReadCsv, ReadLines
 - [Transform Iteration](docs/transform-iteration.md) — Tee, ToArray, ToAssociativeArray, ToIterator
