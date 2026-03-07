@@ -34,7 +34,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForChoiceInt(): array
+    public static function dataProviderForChoiceInt(): array
     {
         return [
             [[-5, -1, 0, 1, 7, 4, 10, 8847], 0],
@@ -72,7 +72,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForChoiceFloat(): array
+    public static function dataProviderForChoiceFloat(): array
     {
         return [
             [[-5.0, -1.2, 0.0, 1.2, 7.65, 4.339, 10.10, 8847.00001, 0.00005], 0],
@@ -110,7 +110,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForChoiceString(): array
+    public static function dataProviderForChoiceString(): array
     {
         return [
             [['php', 'go', 'python', 'java', 'c++', 'lisp', 'ruby', 'perl'], 0],
@@ -146,6 +146,36 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         foreach ($result as $choice) {
             $this->assertTrue(\in_array($choice, $items, true));
         }
+    }
+
+    /**
+     * @test choice with seeded engine produces deterministic results
+     */
+    public function testChoiceWithSeededEngine(): void
+    {
+        // Given
+        $items  = ['a', 'b', 'c', 'd'];
+        $engine = new \Random\Engine\Mt19937(42);
+
+        // When
+        $result = \iterator_to_array(Random::choice($items, 5, $engine));
+
+        // Then
+        $this->assertEquals(['c', 'd', 'a', 'c', 'c'], $result);
+    }
+
+    /**
+     * @test choice with seeded engine is reproducible
+     */
+    public function testChoiceWithSeededEngineIsReproducible(): void
+    {
+        // Given
+        $items   = [10, 20, 30, 40, 50];
+        $result1 = \iterator_to_array(Random::choice($items, 10, new \Random\Engine\Mt19937(88)));
+        $result2 = \iterator_to_array(Random::choice($items, 10, new \Random\Engine\Mt19937(88)));
+
+        // Then
+        $this->assertEquals($result1, $result2);
     }
 
     /**
@@ -206,7 +236,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         $iterator = Random::choice($items, $repetitions);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertCount($repetitions, $result);

@@ -21,7 +21,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zipLongest($array1, $array2);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -30,7 +30,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestTwoArraysSameSize(): array
+    public static function dataProviderForZipLongestTwoArraysSameSize(): array
     {
         return [
             [
@@ -74,7 +74,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zipLongest($array1, $array2);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -83,7 +83,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestTwoArraysDifferentSize(): array
+    public static function dataProviderForZipLongestTwoArraysDifferentSize(): array
     {
         return [
             [
@@ -143,7 +143,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zipLongest($array1, $array2, $array3);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -163,7 +163,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zipLongest(...[$array1, $array2, $array3]);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -172,7 +172,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestThreeArraysSameSize(): array
+    public static function dataProviderForZipLongestThreeArraysSameSize(): array
     {
         return [
             [
@@ -222,7 +222,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zipLongest($array1, $array2, $array3);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -231,7 +231,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestThreeArraysDifferentSize(): array
+    public static function dataProviderForZipLongestThreeArraysDifferentSize(): array
     {
         return [
             [
@@ -272,7 +272,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
 
         // When
         $iterator = Multi::zipLongest($array1, $array2);
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => [null, 4], 4 => [null, 5]];
@@ -290,7 +290,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
 
         // When
         $iterator = Multi::zipLongest($array1, $array2);
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => [null, 4], 4 => [null, 5]];

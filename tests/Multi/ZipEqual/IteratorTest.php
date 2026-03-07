@@ -33,7 +33,7 @@ class IteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipStrictTwoIteratorsSameSize(): array
+    public static function dataProviderForZipStrictTwoIteratorsSameSize(): array
     {
         $iter = static function (array $input) {
             return new Fixture\ArrayIteratorFixture($input);
@@ -101,7 +101,7 @@ class IteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipStrictTwoIteratorsDifferentSize(): array
+    public static function dataProviderForZipStrictTwoIteratorsDifferentSize(): array
     {
         $iter = static function (array $input) {
             return new Fixture\ArrayIteratorFixture($input);

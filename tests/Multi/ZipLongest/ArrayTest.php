@@ -32,7 +32,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestTwoArraysSameSize(): array
+    public static function dataProviderForZipLongestTwoArraysSameSize(): array
     {
         return [
             [
@@ -86,7 +86,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestTwoArraysDifferentSize(): array
+    public static function dataProviderForZipLongestTwoArraysDifferentSize(): array
     {
         return [
             [
@@ -179,7 +179,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestThreeArraysSameSize(): array
+    public static function dataProviderForZipLongestThreeArraysSameSize(): array
     {
         return [
             [
@@ -240,7 +240,7 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestThreeArraysDifferentSize(): array
+    public static function dataProviderForZipLongestThreeArraysDifferentSize(): array
     {
         return [
             [

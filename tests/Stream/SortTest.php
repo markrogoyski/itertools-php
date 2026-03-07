@@ -27,7 +27,7 @@ class SortTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -133,7 +133,7 @@ class SortTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForGenerator(): array
+    public static function dataProviderForGenerator(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -241,7 +241,7 @@ class SortTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForIterator(): array
+    public static function dataProviderForIterator(): array
     {
         $iter = fn (array $data) => new \ArrayIterator($data);
 
@@ -349,7 +349,7 @@ class SortTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForTraversable(): array
+    public static function dataProviderForTraversable(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 

@@ -63,7 +63,7 @@ class SkipTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -327,7 +327,7 @@ class SkipTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -593,7 +593,7 @@ class SkipTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = fn ($data) => new \ArrayIterator($data);
 
@@ -859,7 +859,7 @@ class SkipTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
@@ -1120,7 +1120,7 @@ class SkipTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForInvalidParams(): array
+    public static function dataProviderForInvalidParams(): array
     {
         return [
             [[-1]],

@@ -37,7 +37,7 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForArrayTrue(): array
+    public static function dataProviderForArrayTrue(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -127,7 +127,7 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForArrayFalse(): array
+    public static function dataProviderForArrayFalse(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -173,7 +173,7 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForGeneratorsTrue(): array
+    public static function dataProviderForGeneratorsTrue(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -263,7 +263,7 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForGeneratorsFalse(): array
+    public static function dataProviderForGeneratorsFalse(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -309,7 +309,7 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForIteratorsTrue(): array
+    public static function dataProviderForIteratorsTrue(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -399,7 +399,7 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForIteratorsFalse(): array
+    public static function dataProviderForIteratorsFalse(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -445,7 +445,7 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForTraversablesTrue(): array
+    public static function dataProviderForTraversablesTrue(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -535,7 +535,7 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForTraversablesFalse(): array
+    public static function dataProviderForTraversablesFalse(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);

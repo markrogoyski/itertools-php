@@ -118,7 +118,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -334,7 +334,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -552,7 +552,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = fn (array $data) => new \ArrayIterator($data);
 
@@ -770,7 +770,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 

@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\ResourcePolicy;
 
-class File
+final class File
 {
     /**
      * Iterate the lines of a file, read in from a file handle stream resource.
@@ -19,7 +19,7 @@ class File
      *
      * @see fgets()
      */
-    public static function readLines($fileResource): \Generator
+    public static function readLines(mixed $fileResource): \Generator
     {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
@@ -43,18 +43,15 @@ class File
      * @see fgetcsv()
      */
     public static function readCsv(
-        $fileResource,
+        mixed $fileResource,
         string $separator = ',',
         string $enclosure = '"',
         string $escape = '\\'
     ): \Generator {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
-        /** @var int<0, max> $length */
-        $length = null;
-
-        while (($row = \fgetcsv($fileResource, $length, $separator, $enclosure, $escape)) !== false) {
-            /** @var array<string|null> $row */
+        while (($row = \fgetcsv($fileResource, null, $separator, $enclosure, $escape)) !== false) {
+            /** @var array<int, string|null> $row */
             yield $row;
         }
     }

@@ -37,7 +37,7 @@ class PeekPrintTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -156,7 +156,7 @@ class PeekPrintTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -277,7 +277,7 @@ class PeekPrintTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = fn ($data) => new \ArrayIterator($data);
 
@@ -398,7 +398,7 @@ class PeekPrintTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 

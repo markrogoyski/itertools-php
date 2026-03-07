@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\UniqueExtractor;
 
-class Math
+final class Math
 {
     /**
      * Returns a frequency distribution of iterable elements
@@ -57,28 +57,16 @@ class Math
      */
     public static function relativeFrequencies(iterable $data, bool $strict = true): \Generator
     {
-        $usages = [];
-        $values = [];
+        $frequencies = [];
         $totalCount = 0;
 
-        foreach ($data as $datum) {
-            $hash = UniqueExtractor::getString($datum, $strict);
-
-            if (!\array_key_exists($hash, $usages)) {
-                $usages[$hash] = 0;
-                $values[$hash] = $datum;
-            }
-
-            $usages[$hash]++;
-            $totalCount++;
+        foreach (self::frequencies($data, $strict) as $value => $count) {
+            $frequencies[] = [$value, $count];
+            $totalCount += $count;
         }
 
-        /**
-         * @var T $value
-         * @var int $usageCount
-         */
-        foreach (Multi::zipEqual($values, $usages) as [$value, $usageCount]) {
-            yield $value => ($usageCount / $totalCount);
+        foreach ($frequencies as [$value, $count]) {
+            yield $value => ($count / $totalCount);
         }
     }
 
@@ -90,7 +78,7 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningTotal(iterable $numbers, $initialValue = null): \Generator
+    public static function runningTotal(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         if ($initialValue !== null) {
             yield $initialValue;
@@ -98,6 +86,7 @@ class Math
 
         $total = $initialValue ?? 0;
         foreach ($numbers as $number) {
+            /** @psalm-suppress InvalidOperand */
             $total += $number;
             yield $total;
         }
@@ -111,7 +100,7 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningProduct(iterable $numbers, $initialValue = null): \Generator
+    public static function runningProduct(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         if ($initialValue !== null) {
             yield $initialValue;
@@ -119,6 +108,7 @@ class Math
 
         $product = $initialValue ?? 1;
         foreach ($numbers as $number) {
+            /** @psalm-suppress InvalidOperand */
             $product *= $number;
             yield $product;
         }
@@ -132,7 +122,7 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningDifference(iterable $numbers, $initialValue = null): \Generator
+    public static function runningDifference(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         if ($initialValue !== null) {
             yield $initialValue;
@@ -140,6 +130,7 @@ class Math
 
         $difference = $initialValue ?? 0;
         foreach ($numbers as $number) {
+            /** @psalm-suppress InvalidOperand */
             $difference -= $number;
             yield $difference;
         }
@@ -153,7 +144,7 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningMax(iterable $numbers, $initialValue = null): \Generator
+    public static function runningMax(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         if ($initialValue !== null) {
             yield $initialValue;
@@ -174,7 +165,7 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningMin(iterable $numbers, $initialValue = null): \Generator
+    public static function runningMin(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         if ($initialValue !== null) {
             yield $initialValue;
@@ -195,11 +186,12 @@ class Math
      *
      * @return \Generator<int|float>
      */
-    public static function runningAverage(iterable $numbers, $initialValue = null): \Generator
+    public static function runningAverage(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
         $n = 0;
         foreach (Math::runningTotal($numbers, $initialValue) as $runningTotal) {
             $n++;
+            /** @psalm-suppress InvalidOperand */
             yield $runningTotal / $n;
         }
     }

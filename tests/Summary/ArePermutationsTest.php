@@ -44,7 +44,7 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForArrayTrue(): array
+    public static function dataProviderForArrayTrue(): array
     {
         return [
             [],
@@ -177,7 +177,7 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForArrayFalse(): array
+    public static function dataProviderForArrayFalse(): array
     {
         return [
             [[1], []],
@@ -228,7 +228,7 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForGeneratorsTrue(): array
+    public static function dataProviderForGeneratorsTrue(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -363,7 +363,7 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForGeneratorsFalse(): array
+    public static function dataProviderForGeneratorsFalse(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -414,7 +414,7 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForIteratorsTrue(): array
+    public static function dataProviderForIteratorsTrue(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -549,7 +549,7 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForIteratorsFalse(): array
+    public static function dataProviderForIteratorsFalse(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -600,7 +600,7 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    public function dataProviderForTraversablesTrue(): array
+    public static function dataProviderForTraversablesTrue(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -735,7 +735,7 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForTraversablesFalse(): array
+    public static function dataProviderForTraversablesFalse(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 

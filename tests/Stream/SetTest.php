@@ -27,7 +27,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -217,6 +217,77 @@ class SetTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
+                    [1, 2, 3, 4, 5, 6],
+                    [3, 4, 5, 6, 7, 8],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                [
+                    [1, 2, '3', 4, 5, 6],
+                    [3, 4, 5, 6, 7, 8],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, '3'],
+            ],
+            [
+                [
+                    [1, 2, '3', 4, 5, 6],
+                    [3, 4, 5, 6, 7, 8],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 5],
+                    [2, 4],
+                    [1, 3],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [5],
+            ],
+            [
+                [
+                    [1, 1, 2, 2, 3],
+                    [1, 2],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 7],
+                    ['1', 2, 3, 5, 8],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 4, 7],
+            ],
+            [
+                [
+                    [1, 2, 3, 4, 7],
+                    ['1', 2, 3, 5, 8],
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 7],
+            ],
+            [
+                [
                     [],
                     [2, 3, 4, 5, 6],
                     [3, 4, 5, 6, 7],
@@ -283,7 +354,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForPartialIntersectionArray(): array
+    public static function dataProviderForPartialIntersectionArray(): array
     {
         return [
             [
@@ -473,7 +544,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -665,6 +736,77 @@ class SetTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
+                    $gen([1, 2, 3, 4, 5, 6]),
+                    $gen([3, 4, 5, 6, 7, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                [
+                    $gen([1, 2, '3', 4, 5, 6]),
+                    $gen([3, 4, 5, 6, 7, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, '3'],
+            ],
+            [
+                [
+                    $gen([1, 2, '3', 4, 5, 6]),
+                    $gen([3, 4, 5, 6, 7, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 7]),
+                    $gen(['1', 2, 3, 5, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 4, 7],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 7]),
+                    $gen(['1', 2, 3, 5, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 7],
+            ],
+            [
+                [
+                    $gen([1, 2, 3, 4, 5]),
+                    $gen([2, 4]),
+                    $gen([1, 3]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [5],
+            ],
+            [
+                [
+                    $gen([1, 1, 2, 2, 3]),
+                    $gen([1, 2]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3],
+            ],
+            [
+                [
                     $gen([]),
                     [2, 3, 4, 5, 6],
                     [3, 4, 5, 6, 7],
@@ -731,7 +873,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForPartialIntersectionGenerators(): array
+    public static function dataProviderForPartialIntersectionGenerators(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -923,7 +1065,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -1115,6 +1257,77 @@ class SetTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
+                    $iter([1, 2, 3, 4, 5, 6]),
+                    $iter([3, 4, 5, 6, 7, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                [
+                    $iter([1, 2, '3', 4, 5, 6]),
+                    $iter([3, 4, 5, 6, 7, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, '3'],
+            ],
+            [
+                [
+                    $iter([1, 2, '3', 4, 5, 6]),
+                    $iter([3, 4, 5, 6, 7, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 7]),
+                    $iter(['1', 2, 3, 5, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 4, 7],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 7]),
+                    $iter(['1', 2, 3, 5, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 7],
+            ],
+            [
+                [
+                    $iter([1, 2, 3, 4, 5]),
+                    $iter([2, 4]),
+                    $iter([1, 3]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [5],
+            ],
+            [
+                [
+                    $iter([1, 1, 2, 2, 3]),
+                    $iter([1, 2]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3],
+            ],
+            [
+                [
                     $iter([]),
                     [2, 3, 4, 5, 6],
                     [3, 4, 5, 6, 7],
@@ -1181,7 +1394,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForPartialIntersectionIterators(): array
+    public static function dataProviderForPartialIntersectionIterators(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -1373,7 +1586,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -1565,6 +1778,77 @@ class SetTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
+                    $trav([1, 2, 3, 4, 5, 6]),
+                    $trav([3, 4, 5, 6, 7, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                [
+                    $trav([1, 2, '3', 4, 5, 6]),
+                    $trav([3, 4, 5, 6, 7, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, '3'],
+            ],
+            [
+                [
+                    $trav([1, 2, '3', 4, 5, 6]),
+                    $trav([3, 4, 5, 6, 7, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [1, 2],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 7]),
+                    $trav(['1', 2, 3, 5, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 4, 7],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 7]),
+                    $trav(['1', 2, 3, 5, 8]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceCoerciveWith(...$iterables)
+                    ->toArray(),
+                [4, 7],
+            ],
+            [
+                [
+                    $trav([1, 2, 3, 4, 5]),
+                    $trav([2, 4]),
+                    $trav([1, 3]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [5],
+            ],
+            [
+                [
+                    $trav([1, 1, 2, 2, 3]),
+                    $trav([1, 2]),
+                ],
+                fn (array $iterables) => Stream::of(array_shift($iterables))
+                    ->differenceWith(...$iterables)
+                    ->toArray(),
+                [1, 2, 3],
+            ],
+            [
+                [
                     $trav([]),
                     [2, 3, 4, 5, 6],
                     [3, 4, 5, 6, 7],
@@ -1631,7 +1915,7 @@ class SetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForPartialIntersectionTraversables(): array
+    public static function dataProviderForPartialIntersectionTraversables(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 

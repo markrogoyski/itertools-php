@@ -1,0 +1,20 @@
+{
+  "name": "markrogoyski/itertools-php",
+  "type": "library",
+  "description": "Minimal composer config for CI unit tests on PHP 8.2+",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.2.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5",
+    "php-parallel-lint/php-parallel-lint": "^1.4",
+    "mikey179/vfsstream": "^1.6"
+  },
+  "autoload": {
+    "psr-4": { "IterTools\\": "src/" }
+  },
+  "autoload-dev": {
+    "psr-4": { "IterTools\\Tests\\": "tests/" }
+  }
+}

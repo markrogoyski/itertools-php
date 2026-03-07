@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace IterTools\Util;
 
-use IterTools\Reduce;
-use IterTools\Stream;
-
 /**
  * @internal
  */
-class UsageMap
+final class UsageMap
 {
     /**
      * @var array<string, array<string, int>>
@@ -21,16 +18,10 @@ class UsageMap
      */
     private array $deletedMap = [];
     /**
-     * @var bool
-     */
-    private bool $strict;
-
-    /**
      * @param bool $strict
      */
-    public function __construct(bool $strict)
+    public function __construct(private readonly bool $strict)
     {
-        $this->strict = $strict;
     }
 
     /**
@@ -41,7 +32,7 @@ class UsageMap
      *
      * @return string unique hash string
      */
-    public function addUsage($value, string $owner): string
+    public function addUsage(mixed $value, string $owner): string
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
 
@@ -64,8 +55,10 @@ class UsageMap
      * @param mixed $value
      *
      * @return string unique hash string
+     *
+     * @psalm-suppress PossiblyUnusedReturnValue
      */
-    public function deleteUsage($value): string
+    public function deleteUsage(mixed $value): string
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
 
@@ -85,14 +78,19 @@ class UsageMap
      *
      * @return int
      */
-    public function getOwnersCount($value): int
+    public function getOwnersCount(mixed $value): int
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
         $deletesCount = $this->deletedMap[$hash] ?? 0;
 
-        return Stream::of($this->addedMap[$hash] ?? [])
-            ->filterTrue(fn ($count) => $count > $deletesCount)
-            ->toCount();
+        $count = 0;
+        foreach ($this->addedMap[$hash] ?? [] as $usageCount) {
+            if ($usageCount > $deletesCount) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
     /**
@@ -103,26 +101,33 @@ class UsageMap
      *
      * @return int
      */
-    public function getUsagesCount($value, int $maxOwnersCount = 1): int
+    public function getUsagesCount(mixed $value, int $maxOwnersCount = 1): int
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
         $deletesCount = $this->deletedMap[$hash] ?? 0;
 
-        $ownersMap = Stream::of($this->addedMap[$hash] ?? [])
-            ->map(fn ($value) => $value - $deletesCount)
-            ->filterTrue(fn ($value) => $value > 0)
-            ->toArray();
-
-        while (count($ownersMap) > $maxOwnersCount) {
-            $minValue = Reduce::toMin($ownersMap);
-            $ownersMap = Stream::of($ownersMap)
-                ->map(fn ($value) => $value - $minValue)
-                ->filterTrue(fn ($value) => $value > 0)
-                ->toArray();
+        $ownersMap = [];
+        foreach ($this->addedMap[$hash] ?? [] as $owner => $count) {
+            $adjusted = $count - $deletesCount;
+            if ($adjusted > 0) {
+                $ownersMap[$owner] = $adjusted;
+            }
         }
 
-        /** @var array<string, int> $ownersMap */
-        return (int)Reduce::toSum($ownersMap);
+        while (\count($ownersMap) > $maxOwnersCount) {
+            /** @var non-empty-array<string, int<1, max>> $ownersMap */
+            $minValue = \min($ownersMap);
+            $filtered = [];
+            foreach ($ownersMap as $owner => $count) {
+                $adjusted = $count - $minValue;
+                if ($adjusted > 0) {
+                    $filtered[$owner] = $adjusted;
+                }
+            }
+            $ownersMap = $filtered;
+        }
+
+        return \array_sum($ownersMap);
     }
 
     /**
@@ -133,7 +138,7 @@ class UsageMap
      *
      * @return bool
      */
-    public function hasSameOwnerCount($value, int $ownersCount): bool
+    public function hasSameOwnerCount(mixed $value, int $ownersCount): bool
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
         $map = $this->addedMap[$hash] ?? [];
@@ -142,10 +147,6 @@ class UsageMap
             return false;
         }
 
-        $differentUsageCounts = Stream::of($map)
-            ->distinct()
-            ->toCount();
-
-        return $differentUsageCounts <= 1;
+        return \count(\array_unique($map)) <= 1;
     }
 }

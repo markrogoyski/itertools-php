@@ -30,7 +30,7 @@ class LimitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -98,7 +98,7 @@ class LimitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForGenerator(): array
+    public static function dataProviderForGenerator(): array
     {
         return [
             [
@@ -160,7 +160,7 @@ class LimitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForIterator(): array
+    public static function dataProviderForIterator(): array
     {
         return [
             [
@@ -227,7 +227,7 @@ class LimitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForTraversable(): array
+    public static function dataProviderForTraversable(): array
     {
         return [
             [

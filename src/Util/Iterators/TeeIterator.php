@@ -11,8 +11,10 @@ use IterTools\Util\Iterators\RelatedIterator;
  *
  * @template TKey
  * @template TValue
+ *
+ * @extends \NoRewindIterator<TKey, TValue, \Iterator<TKey, TValue>>
  */
-class TeeIterator extends \NoRewindIterator
+final class TeeIterator extends \NoRewindIterator
 {
     /**
      * @var array<RelatedIterator<TKey, TValue>>
@@ -74,7 +76,8 @@ class TeeIterator extends \NoRewindIterator
             return;
         }
 
-        [$relPos, $minPos, $maxPos] = [$this->getPosition($related), \min($this->positions), \max($this->positions)];
+        /** @psalm-suppress ArgumentTypeCoercion */
+        [$relPos, $minPos, $maxPos] = [$this->getPosition($related), \min($this->positions), \max($this->positions)]; // @phpstan-ignore argument.type, argument.type
 
         if ($relPos === $maxPos) {
             parent::next();
@@ -86,7 +89,8 @@ class TeeIterator extends \NoRewindIterator
 
         $this->incrementPosition($related);
 
-        if ($minPos < \min($this->positions)) {
+        /** @psalm-suppress ArgumentTypeCoercion */
+        if ($minPos < \min($this->positions)) { // @phpstan-ignore argument.type
             unset($this->cacheKeys[$minPos]);
             unset($this->cacheValues[$minPos]);
         }
@@ -97,8 +101,7 @@ class TeeIterator extends \NoRewindIterator
      *
      * @param RelatedIterator<TKey, TValue>|null $related
      */
-    #[\ReturnTypeWillChange]
-    public function current(?RelatedIterator $related = null)
+    public function current(?RelatedIterator $related = null): mixed
     {
         if ($related === null) {
             throw new \LogicException();
@@ -114,8 +117,7 @@ class TeeIterator extends \NoRewindIterator
      *
      * @return TKey
      */
-    #[\ReturnTypeWillChange]
-    public function key(?RelatedIterator $related = null)
+    public function key(?RelatedIterator $related = null): mixed
     {
         if ($related === null) {
             throw new \LogicException();
@@ -135,7 +137,8 @@ class TeeIterator extends \NoRewindIterator
             throw new \LogicException();
         }
 
-        [$relPos, $maxPos] = [$this->getPosition($related), \max($this->positions)];
+        /** @psalm-suppress ArgumentTypeCoercion */
+        [$relPos, $maxPos] = [$this->getPosition($related), \max($this->positions)]; // @phpstan-ignore argument.type
 
         return $relPos !== $maxPos || parent::valid();
     }

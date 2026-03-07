@@ -30,7 +30,7 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForInteger(): array
+    public static function dataProviderForInteger(): array
     {
         return [
             [0, [0, 0, 0, 0, 0]],
@@ -60,7 +60,7 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForFloat(): array
+    public static function dataProviderForFloat(): array
     {
         return [
             [0.0, [0.0, 0.0, 0.0, 0.0, 0.0]],
@@ -131,7 +131,7 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForBoolean(): array
+    public static function dataProviderForBoolean(): array
     {
         return [
             [true, [true, true, true, true, true]],
@@ -159,7 +159,7 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForString(): array
+    public static function dataProviderForString(): array
     {
         return [
             ['', ['', '', '', '', '']],
@@ -259,7 +259,7 @@ class RepeatTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForRepetitions(): array
+    public static function dataProviderForRepetitions(): array
     {
         return [
             [0, 0, []],

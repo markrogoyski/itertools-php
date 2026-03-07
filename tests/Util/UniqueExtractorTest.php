@@ -23,7 +23,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->startsWith($string, $expectedPrefix), "got: $string");
     }
 
-    public function dataProviderForStrict(): array
+    public static function dataProviderForStrict(): array
     {
         return [
             [
@@ -115,7 +115,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->startsWith($string, $expectedPrefix), "got: $string");
     }
 
-    public function dataProviderForNotStrict(): array
+    public static function dataProviderForNotStrict(): array
     {
         return [
             [
@@ -184,7 +184,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 \NAN,
-                'numeric_'
+                'double_'
             ],
             [
                 null,
@@ -219,7 +219,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($startsWith);
     }
 
-    public function dataProviderForStartsWithTrue(): array
+    public static function dataProviderForStartsWithTrue(): array
     {
         return [
             [
@@ -276,7 +276,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($startsWith);
     }
 
-    public function dataProviderForStartsWithFalse(): array
+    public static function dataProviderForStartsWithFalse(): array
     {
         return [
             [

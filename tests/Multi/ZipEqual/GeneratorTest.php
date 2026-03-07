@@ -36,7 +36,7 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipStrictTwoGeneratorsSameSize(): array
+    public static function dataProviderForZipStrictTwoGeneratorsSameSize(): array
     {
         $gen = static function (array $input) {
             return Fixture\GeneratorFixture::getGenerator($input);
@@ -107,7 +107,7 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipStrictTwoArraysDifferentSize(): array
+    public static function dataProviderForZipStrictTwoArraysDifferentSize(): array
     {
         $gen = static function (array $input) {
             return Fixture\GeneratorFixture::getGenerator($input);
@@ -190,7 +190,7 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipStrictThreeArraysDifferentSize(): array
+    public static function dataProviderForZipStrictThreeArraysDifferentSize(): array
     {
         $gen = static function (array $input) {
             return Fixture\GeneratorFixture::getGenerator($input);

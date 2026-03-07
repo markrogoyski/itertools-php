@@ -38,6 +38,42 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 * `Generator`
 * `Traversable`
 
+Установка
+-----
+
+Добавьте библиотеку в зависимости в файле `composer.json` вашего проекта:
+
+```json
+{
+  "require": {
+      "markrogoyski/itertools-php": "2.*"
+  }
+}
+```
+
+Используйте [composer](http://getcomposer.org), чтобы установить библиотеку:
+
+```bash
+$ composer install
+```
+
+Composer установит IterTools в папку vendor вашего проекта. После этого вы можете использовать функционал библиотеки
+в файлах своего проекта, используя Composer Autoloader.
+
+```php
+require_once __DIR__ . '/vendor/autoload.php';
+```
+
+Альтернативный вариант установки. Выполните данную команду в терминале, находясь в корневой директории вашего проекта:
+
+```
+$ composer require markrogoyski/itertools-php:2.*
+```
+
+#### Минимальные требования
+* **PHP 8.2+**
+    * (Для PHP 7.4–8.1 используйте [v1.9](https://github.com/markrogoyski/itertools-php/releases/tag/v1.9.0))
+
 Краткий справочник
 -----------
 
@@ -114,6 +150,8 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`intersectionCoercive`](#Intersection-Coercive)                | Пересечение нескольких коллекций в режиме приведения типов            | `Set::intersectionCoercive(...$iterables)`                   |
 | [`partialIntersection`](#Partial-Intersection)                  | Частичное пересечение нескольких коллекций                            | `Set::partialIntersection($minCount, ...$iterables)`         |
 | [`partialIntersectionCoercive`](#Partial-Intersection-Coercive) | Частичное пересечение нескольких коллекций в режиме приведения типов  | `Set::partialIntersectionCoercive($minCount, ...$iterables)` |
+| [`difference`](#Difference)                                     | Разность коллекций                                                   | `Set::difference($a, ...$iterables)`                         |
+| [`differenceCoercive`](#Difference-Coercive)                    | Разность коллекций в режиме приведения типов                         | `Set::differenceCoercive($a, ...$iterables)`                 |
 | [`symmetricDifference`](#Symmetric-Difference)                  | Симметрическая разница нескольких коллекций                           | `Set::symmetricDifference(...$iterables)`                    |
 | [`symmetricDifferenceCoercive`](#Symmetric-Difference-Coercive) | Симметрическая разница нескольких коллекций в режиме приведения типов | `Set::symmetricDifferenceCoercive(...$iterables)`            |
 | [`union`](#Union)                                               | Объединение нескольких коллекций                                      | `Set::union(...$iterables)`                                  |
@@ -229,6 +267,8 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`skip`](#Skip-1)                                                         | Пропускает n элементов коллекции                                                                             | `$stream->skip($count, [$offset])`                                                |
 | [`slice`](#Slice-1)                                                       | Возвращает подвыборку коллекции                                                                              | `$stream->slice([start], [$count], [step])`                                       |
 | [`sort`](#Sort-1)                                                         | Сортирует хранимую коллекцию                                                                                 | `$stream->sort([$comparator])`                                                    |
+| [`differenceWith`](#Difference-With)                                       | Возвращает разность хранимой коллекции с другими коллекциями                                                 | `$stream->differenceWith(...$iterables)`                                          |
+| [`differenceCoerciveWith`](#Difference-Coercive-With)                     | Возвращает разность хранимой коллекции с другими коллекциями (в режиме приведения типов)                     | `$stream->differenceCoerciveWith(...$iterables)`                                  |
 | [`symmetricDifferenceWith`](#Symmetric-Difference-With)                   | Возвращает симметрическую разность хранимой коллекции с другими коллекциями                                  | `$this->symmetricDifferenceWith(...$iterables)`                                   |
 | [`symmetricDifference CoerciveWith`](#Symmetric-Difference-Coercive-With) | Возвращает симметрическую разность хранимой коллекции с другими коллекциями (в режиме приведения типов)      | `$this->symmetricDifferenceCoerciveWith( ...$iterables)`                          |
 | [`takeWhile`](#Take-While-1)                                              | Отдает элементы из коллекции, пока предикат возвращает истину                                                | `$stream->takeWhile($predicate)`                                                  |
@@ -301,41 +341,6 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`peekPrintR`](#Peek-PrintR) | Вызов `print_r` для каждого элемента коллекции между операциями   | `$stream->peekPrintR()`          |
 | [`printR`](#Print-R)         | `print_r` каждого элемента потока                                 | `$stream->printR()`              |
 | [`varDump`](#Var-Dump)       | `var_dump` каждого элемента потока                                | `$stream->varDump()`             |
-
-Установка
------
-
-Добавьте библиотеку в зависимости в файле `composer.json` вашего проекта:
-
-```json
-{
-  "require": {
-      "markrogoyski/itertools-php": "1.*"
-  }
-}
-```
-
-Используйте [composer](http://getcomposer.org), чтобы установить библиотеку:
-
-```bash
-$ php composer.phar install
-```
-
-Composer установит IterTools в папку vendor вашего проекта. После этого вы можете использовать функционал библиотеки
-в файлах своего проекта, используя Composer Autoloader.
-
-```php
-require_once __DIR__ . '/vendor/autoload.php';
-```
-
-Альтернативный вариант установки. Выполните данную команду в терминале, находясь в корневой директории вашего проекта:
-
-```
-$ php composer.phar require markrogoyski/itertools-php:1.*
-```
-
-#### Минимальные требования
-* PHP 7.4
 
 Использование
 -----
@@ -1340,6 +1345,45 @@ foreach (Set::partialIntersectionCoercive(2, $set1, $set2, $set3) as $partiallyC
     print($partiallyCommonNumber);
 }
 // 1, 2, 3
+```
+
+### Difference
+Итерирует разность коллекций. Возвращает элементы из первой коллекции, не входящие ни в одну из остальных.
+
+```Set::difference(iterable $a, iterable ...$iterables)```
+
+Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила получения разности [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = [2, 3, 5, 8];
+$c = [1, 6, 9];
+
+foreach (Set::difference($a, $b, $c) as $item) {
+    print($item);
+}
+// 4, 7
+```
+
+### Difference Coercive
+Итерирует разность коллекций в режиме [приведения типов](#Режимы-типизации).
+
+```Set::differenceCoercive(iterable $a, iterable ...$iterables)```
+
+Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила получения разности [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Set;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+
+foreach (Set::differenceCoercive($a, $b) as $item) {
+    print($item);
+}
+// 4, 7
 ```
 
 ### Symmetric difference
@@ -2976,6 +3020,45 @@ $result = Stream::of($input)
     ->sort()
     ->toArray();
 // 1, 2, 3, 4, 5, 6, 7, 8, 9
+```
+
+#### Difference With
+Возвращает поток, содержащий разность исходного потока с заданным набором коллекций. Элементы из исходного потока, не входящие ни в одну из заданных коллекций.
+
+```$stream->differenceWith(iterable ...$iterables): Stream```
+
+Если хотя бы в одной коллекции или в потоке встречаются повторяющиеся элементы, работают правила получения разности для [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Stream;
+
+$a = [1, 2, 3, 4, 7];
+$b = [2, 3, 5, 8];
+$c = [1, 6, 9];
+
+$stream = Stream::of($a)
+    ->differenceWith($b, $c)
+    ->toArray();
+// 4, 7
+```
+
+#### Difference Coercive With
+Возвращает поток, содержащий разность исходного потока с заданным набором коллекций, полученную в режиме [приведения типов](#Режимы-типизации).
+
+```$stream->differenceCoerciveWith(iterable ...$iterables): Stream```
+
+Если хотя бы в одной коллекции или в потоке встречаются повторяющиеся элементы, работают правила получения разности для [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+
+```php
+use IterTools\Stream;
+
+$a = [1, 2, 3, 4, 7];
+$b = ['1', 2, 3, 5, 8];
+
+$stream = Stream::of($a)
+    ->differenceCoerciveWith($b)
+    ->toArray();
+// 4, 7
 ```
 
 #### Symmetric difference With

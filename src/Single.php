@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\UniqueExtractor;
 
-class Single
+final class Single
 {
     /**
      * Iterate the individual characters of a string
@@ -17,8 +17,7 @@ class Single
      */
     public static function string(string $string): \Generator
     {
-        $characters = \mb_str_split($string);
-        foreach ($characters as $character) {
+        foreach (\mb_str_split($string) as $character) {
             yield $character;
         }
     }
@@ -31,7 +30,7 @@ class Single
      *
      * @return \Generator<mixed>
      */
-    public static function repeat($item, int $repetitions): \Generator
+    public static function repeat(mixed $item, int $repetitions): \Generator
     {
         if ($repetitions < 0) {
             throw new \RangeException("Number of repetitions cannot be negative: {$repetitions}");
@@ -75,6 +74,7 @@ class Single
     public static function compressAssociative(iterable $data, array $keys): \Generator
     {
         $keyMap = \array_flip($keys);
+        /** @var mixed $datum */
         foreach ($data as $key => $datum) {
             if (\array_key_exists($key, $keyMap)) {
                 yield $key => $datum;
@@ -111,14 +111,10 @@ class Single
     {
         $drop = true;
         foreach ($data as $key => $datum) {
-            if ($drop === true) {
-                if (!$predicate($datum)) {
-                    $drop = false;
-                    yield $key => $datum;
-                    continue;
-                }
+            if ($drop === true && $predicate($datum)) {
                 continue;
             }
+            $drop = false;
             yield $key => $datum;
         }
     }
@@ -152,12 +148,10 @@ class Single
      */
     public static function filterFalse(iterable $data, ?callable $predicate = null): \Generator
     {
-        if ($predicate === null) {
-            $predicate = fn($datum): bool => \boolval($datum);
-        }
+        $predicate ??= fn(mixed $datum): bool => \boolval($datum);
 
         foreach ($data as $key => $datum) {
-            if (!$predicate($datum)) {
+            if (!(bool) $predicate($datum)) {
                 yield $key => $datum;
             }
         }
@@ -175,12 +169,10 @@ class Single
      */
     public static function filterTrue(iterable $data, ?callable $predicate = null): \Generator
     {
-        if ($predicate === null) {
-            $predicate = fn($datum): bool => \boolval($datum);
-        }
+        $predicate ??= fn(mixed $datum): bool => \boolval($datum);
 
         foreach ($data as $key => $datum) {
-            if ($predicate($datum)) {
+            if ((bool) $predicate($datum)) {
                 yield $key => $datum;
             }
         }
@@ -246,7 +238,7 @@ class Single
         callable $groupKeyFunction,
         ?callable $itemKeyFunction = null
     ): \Generator {
-        $itemKeyFunction ??= fn ($x) => null;
+        $itemKeyFunction ??= fn (mixed $_x): mixed => null;
         $groups = [];
 
         foreach ($data as $item) {
@@ -257,9 +249,11 @@ class Single
                 : [$group];
 
             foreach (Set::distinct($itemGroups) as $itemGroup) {
+                /** @var int|string $itemGroup */
                 if ($itemKey === null) {
                     $groups[$itemGroup][] = $item;
                 } else {
+                    /** @var int|string $itemKey */
                     $groups[$itemGroup][$itemKey] = $item;
                 }
             }
@@ -300,15 +294,13 @@ class Single
      * @param iterable<T> $data
      *
      * @return \Generator<array{T, T}>
+     *
+     * @psalm-suppress MoreSpecificReturnType
      */
     public static function pairwise(iterable $data): \Generator
     {
-        $chunked = static::chunkwiseOverlap($data, 2, 1, false);
-
-        foreach ($chunked as $chunk) {
-            /** @var array{T, T} $chunk */
-            yield $chunk;
-        }
+        /** @psalm-suppress LessSpecificReturnStatement @phpstan-ignore generator.valueType */
+        yield from static::chunkwiseOverlap($data, 2, 1, false);
     }
 
     /**
@@ -467,9 +459,9 @@ class Single
      * @template T
      *
      * @param iterable<T> $data
-     * @param int<0, max> $start
-     * @param int<0, max>|null $count
-     * @param positive-int $step
+     * @param int $start
+     * @param int|null $count
+     * @param int $step
      *
      * @return \Generator<T>
      */
@@ -494,9 +486,10 @@ class Single
                 continue;
             }
 
-            if ($yielded++ === $count && $count !== null) {
+            if ($count !== null && $yielded === $count) {
                 break;
             }
+            $yielded++;
 
             yield $datum;
         }
@@ -506,8 +499,8 @@ class Single
      * Skip n elements in the iterable after optional offset offset.
      *
      * @param iterable<mixed> $data
-     * @param int<0, max> $count
-     * @param int<0, max> $offset
+     * @param int $count
+     * @param int $offset
      *
      * @return \Generator
      */

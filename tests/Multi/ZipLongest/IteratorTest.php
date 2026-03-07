@@ -33,7 +33,7 @@ class IteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestTwoIteratorsSameSize(): array
+    public static function dataProviderForZipLongestTwoIteratorsSameSize(): array
     {
         return [
             [
@@ -87,7 +87,7 @@ class IteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestTwoIteratorsDifferentSize(): array
+    public static function dataProviderForZipLongestTwoIteratorsDifferentSize(): array
     {
         return [
             [

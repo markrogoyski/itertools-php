@@ -11,7 +11,7 @@ class FileFixture
      */
     public static function createFromLines(array $lines, string $dirPath)
     {
-        return self::createFromString(implode(\PHP_EOL, $lines), $dirPath);
+        return self::createFromString(\implode(\PHP_EOL, $lines), $dirPath);
     }
 
     /**

@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\NoValueMonad;
 
-class Reduce
+final class Reduce
 {
     /**
      * Reduces given collection like array_reduce() function.
@@ -20,14 +20,17 @@ class Reduce
      *
      * @return T
      */
-    public static function toValue(iterable $data, callable $reducer, $initialValue = null)
+    public static function toValue(iterable $data, callable $reducer, mixed $initialValue = null): mixed
     {
+        /** @var mixed $carry */
         $carry = $initialValue;
 
         foreach ($data as $datum) {
+            /** @var mixed $datum */
             $carry = $reducer($carry, $datum);
         }
 
+        /** @var T */
         return $carry;
     }
 
@@ -44,18 +47,18 @@ class Reduce
      *
      * @return mixed|null
      */
-    public static function toMin(iterable $data, ?callable $compareBy = null)
+    public static function toMin(iterable $data, ?callable $compareBy = null): mixed
     {
         if ($compareBy !== null) {
             return static::toValue(
                 $data,
-                fn ($carry, $datum) => $compareBy($datum) < $compareBy($carry ?? $datum)
+                fn (mixed $carry, mixed $datum): mixed => $compareBy($datum) < $compareBy($carry ?? $datum)
                     ? $datum
                     : $carry ?? $datum
             );
         }
 
-        return static::toValue($data, fn ($carry, $datum) => \min($carry ?? $datum, $datum));
+        return static::toValue($data, fn (mixed $carry, mixed $datum): mixed => \min($carry ?? $datum, $datum));
     }
 
     /**
@@ -71,18 +74,18 @@ class Reduce
      *
      * @return mixed|null
      */
-    public static function toMax(iterable $data, ?callable $compareBy = null)
+    public static function toMax(iterable $data, ?callable $compareBy = null): mixed
     {
         if ($compareBy !== null) {
             return static::toValue(
                 $data,
-                fn ($carry, $datum) => $compareBy($datum) > $compareBy($carry ?? $datum)
+                fn (mixed $carry, mixed $datum): mixed => $compareBy($datum) > $compareBy($carry ?? $datum)
                     ? $datum
                     : $carry ?? $datum
             );
         }
 
-        return static::toValue($data, fn ($carry, $datum) => \max($carry ?? $datum, $datum));
+        return static::toValue($data, fn (mixed $carry, mixed $datum): mixed => \max($carry ?? $datum, $datum));
     }
 
     /**
@@ -98,11 +101,12 @@ class Reduce
      * @param callable|null     $compareBy
      *
      * @return array{numeric, numeric}|array{null, null}
+     * @phpstan-ignore return.unusedType
      */
     public static function toMinMax(iterable $numbers, ?callable $compareBy = null): array
     {
         if ($compareBy !== null) {
-            return static::toValue($numbers, static function (array $carry, $datum) use ($compareBy) {
+            return static::toValue($numbers, static function (array $carry, mixed $datum) use ($compareBy): array {
                 return [
                     $compareBy($datum) <= $compareBy($carry[0] ?? $datum)
                         ? $datum
@@ -116,7 +120,8 @@ class Reduce
 
         return static::toValue(
             $numbers,
-            fn ($carry, $datum) => [
+            /** @param array{numeric|null, numeric|null} $carry */
+            fn (array $carry, mixed $datum): array => [
                 \min($carry[0] ?? $datum, $datum),
                 \max($carry[1] ?? $datum, $datum)
             ],
@@ -137,7 +142,7 @@ class Reduce
             return \count($data);
         }
 
-        return static::toValue($data, fn ($carry) => $carry + 1, 0);
+        return static::toValue($data, fn (int $carry): int => $carry + 1, 0);
     }
 
     /**
@@ -146,10 +151,12 @@ class Reduce
      * @param iterable<numeric> $data
      *
      * @return int|float
+     * @phpstan-ignore return.unusedType
      */
-    public static function toSum(iterable $data)
+    public static function toSum(iterable $data): int|float
     {
-        return static::toValue($data, fn ($carry, $datum) => $carry + $datum, 0);
+        /** @psalm-suppress MixedOperand */
+        return static::toValue($data, fn (int|float $carry, mixed $datum): int|float => $carry + $datum, 0); // @phpstan-ignore binaryOp.invalid
     }
 
     /**
@@ -160,10 +167,12 @@ class Reduce
      * @param iterable<numeric> $data
      *
      * @return int|float|null
+     * @phpstan-ignore return.unusedType, return.unusedType
      */
-    public static function toProduct(iterable $data)
+    public static function toProduct(iterable $data): int|float|null
     {
-        return static::toValue($data, fn ($carry, $datum) => ($carry ?? 1) * $datum);
+        /** @psalm-suppress MixedOperand */
+        return static::toValue($data, fn (int|float|null $carry, mixed $datum): int|float => ($carry ?? 1) * $datum); // @phpstan-ignore binaryOp.invalid
     }
 
     /**
@@ -175,13 +184,27 @@ class Reduce
      *
      * @return int|float|null
      */
-    public static function toAverage(iterable $data)
+    public static function toAverage(iterable $data): int|float|null
     {
-        [$count, $sum] = static::toValue($data, static function ($carry, $datum): array {
+        /**
+         * @param array{int, int|float} $carry
+         * @param int|float $datum
+         * @return array{int, int|float}
+         */
+        /** @psalm-suppress MixedOperand */
+        $accumulator = static function (array $carry, mixed $datum): array {
+            /** @var int $count */
+            /** @var int|float $sum */
             [$count, $sum] = $carry;
+            /** @phpstan-ignore binaryOp.invalid */
             return [$count + 1, $sum + $datum];
-        }, [0, 0]);
+        };
 
+        /** @var array{int, int|float} $result */
+        $result = static::toValue($data, $accumulator, [0, 0]);
+        [$count, $sum] = $result;
+
+        /** @psalm-suppress InvalidOperand */
         return $count ? ($sum / $count) : null;
     }
 
@@ -199,8 +222,10 @@ class Reduce
      */
     public static function toString(iterable $data, string $separator = '', string $prefix = '', string $suffix = ''): string
     {
+        /** @var list<string|int|float> $items */
         $items = [];
         foreach ($data as $datum) {
+            /** @var string|int|float $datum */
             $items[] = $datum;
         }
 
@@ -217,10 +242,11 @@ class Reduce
      *
      * @return int|float
      */
-    public static function toRange(iterable $numbers)
+    public static function toRange(iterable $numbers): int|float
     {
         [$min, $max] = static::toMinMax($numbers);
 
+        /** @psalm-suppress InvalidOperand */
         return ($max ?? 0) - ($min ?? 0);
     }
 
@@ -232,9 +258,10 @@ class Reduce
      *
      * @throws \LengthException if collection is empty
      */
-    public static function toFirst(iterable $data)
+    public static function toFirst(iterable $data): mixed
     {
         foreach ($data as $datum) {
+            /** @var mixed $datum */
             return $datum;
         }
 
@@ -249,10 +276,10 @@ class Reduce
      *
      * @throws \LengthException if collection is empty
      */
-    public static function toLast(iterable $data)
+    public static function toLast(iterable $data): mixed
     {
         /** @var mixed|NoValueMonad $result */
-        $result = static::toValue($data, fn ($carry, $datum) => $datum, NoValueMonad::getInstance());
+        $result = static::toValue($data, fn (mixed $carry, mixed $datum): mixed => $datum, NoValueMonad::getInstance());
 
         if ($result instanceof NoValueMonad) {
             throw new \LengthException('collection is empty');
@@ -283,7 +310,7 @@ class Reduce
      *
      * @throws \LengthException if given iterable is empty
      */
-    public static function toRandomValue(iterable $data)
+    public static function toRandomValue(iterable $data): mixed
     {
         if (\is_countable($data)) {
             if (\count($data) === 0) {
@@ -294,6 +321,7 @@ class Reduce
 
             $index = 0;
             foreach ($data as $datum) {
+                /** @var mixed $datum */
                 if ($targetIndex === $index) {
                     return $datum;
                 }
@@ -323,7 +351,7 @@ class Reduce
      *
      * @throws \LengthException if given iterable does not contain item with target position.
      */
-    public static function toNth(iterable $data, int $position)
+    public static function toNth(iterable $data, int $position): mixed
     {
         if (\is_countable($data) && \count($data) <= $position) {
             throw new \LengthException("Given iterable does not contain item with position {$position}");

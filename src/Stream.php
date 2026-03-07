@@ -11,7 +11,7 @@ use IterTools\Util\ResourcePolicy;
  *
  * @implements \IteratorAggregate<mixed>
  */
-class Stream implements \IteratorAggregate
+final class Stream implements \IteratorAggregate
 {
     /**
      * @var iterable<mixed> iterable source
@@ -44,14 +44,15 @@ class Stream implements \IteratorAggregate
      * Creates iterable instance with fluent interface of random coin flips.
      *
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return Stream
      *
      * @see Random::coinFlip()
      */
-    public static function ofCoinFlips(int $repetitions): self
+    public static function ofCoinFlips(int $repetitions, ?\Random\Engine $engine = null): self
     {
-        return new self(Random::coinFlip($repetitions));
+        return new self(Random::coinFlip($repetitions, $engine));
     }
 
     /**
@@ -69,14 +70,15 @@ class Stream implements \IteratorAggregate
      *
      * @param array<mixed> $items
      * @param int     $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return Stream
      *
      * @see Random::choice()
      */
-    public static function ofRandomChoice(array $items, int $repetitions): self
+    public static function ofRandomChoice(array $items, int $repetitions, ?\Random\Engine $engine = null): self
     {
-        return new self(Random::choice($items, $repetitions));
+        return new self(Random::choice($items, $repetitions, $engine));
     }
 
     /**
@@ -85,40 +87,42 @@ class Stream implements \IteratorAggregate
      * @param int $min
      * @param int $max
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return Stream
      *
      * @see Random::number()
      */
-    public static function ofRandomNumbers(int $min, int $max, int $repetitions): self
+    public static function ofRandomNumbers(int $min, int $max, int $repetitions, ?\Random\Engine $engine = null): self
     {
-        return new self(Random::number($min, $max, $repetitions));
+        return new self(Random::number($min, $max, $repetitions, $engine));
     }
 
     /**
      * Creates iterable instance with fluent interface of random percentages between 0 and 1.
      *
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return Stream
      *
      * @see Random::percentage()
      */
-    public static function ofRandomPercentage(int $repetitions): self
+    public static function ofRandomPercentage(int $repetitions, ?\Random\Engine $engine = null): self
     {
-        return new self(Random::percentage($repetitions));
+        return new self(Random::percentage($repetitions, $engine));
     }
 
     /**
-     * @param int|float|mixed $start First value of sequence
-     * @param int|float|mixed $end Sequence ends upon reaching this value
-     * @param int|float       $step (optional) Step increase between values. Defaults to 1.
+     * @param int|float|string $start First value of sequence
+     * @param int|float|string $end Sequence ends upon reaching this value
+     * @param int|float        $step (optional) Step increase between values. Defaults to 1.
      *
      * @return Stream
      */
-    public static function ofRange($start, $end, $step = 1): self
+    public static function ofRange(int|float|string $start, int|float|string $end, int|float $step = 1): self
     {
-        if (!\is_numeric($start) || !\is_numeric($end) || !\is_numeric($step)) {
+        if (!\is_numeric($start) || !\is_numeric($end)) {
             throw new \InvalidArgumentException(
                 'Stream::ofRange values must be numeric, got: ' .
                 \print_r(['start' => $start, 'end' => $end, 'step' => $step], true)
@@ -132,14 +136,15 @@ class Stream implements \IteratorAggregate
      * Creates iterable instance with fluent interface of rock-paper-scissors hands.
      *
      * @param int $repetitions
+     * @param \Random\Engine|null $engine
      *
      * @return Stream
      *
      * @see Random::rockPaperScissors()
      */
-    public static function ofRockPaperScissors(int $repetitions): self
+    public static function ofRockPaperScissors(int $repetitions, ?\Random\Engine $engine = null): self
     {
-        return new self(Random::rockPaperScissors($repetitions));
+        return new self(Random::rockPaperScissors($repetitions, $engine));
     }
 
     /**
@@ -151,7 +156,7 @@ class Stream implements \IteratorAggregate
      *
      * @see File::readLines()
      */
-    public static function ofFileLines($file): self
+    public static function ofFileLines(mixed $file): self
     {
         return new self(File::readLines($file));
     }
@@ -169,7 +174,7 @@ class Stream implements \IteratorAggregate
      * @see File::readCsv()
      */
     public static function ofCsvFile(
-        $file,
+        mixed $file,
         string $separator = ',',
         string $enclosure = '"',
         string $escape = '\\'
@@ -530,7 +535,7 @@ class Stream implements \IteratorAggregate
      *
      * If comparator is null, then elements of the iterable source must be comparable.
      *
-     * @param callable|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
+     * @param (callable(mixed, mixed):int)|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
      * @return Stream
      *
@@ -547,7 +552,7 @@ class Stream implements \IteratorAggregate
      *
      * If comparator is null, then elements of the iterable source must be comparable.
      *
-     * @param callable|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
+     * @param (callable(mixed, mixed):int)|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
      * @return Stream
      *
@@ -646,7 +651,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Multi::zipFilled()
      */
-    public function zipFilledWith($filler, iterable ...$iterables): self
+    public function zipFilledWith(mixed $filler, iterable ...$iterables): self
     {
         $this->iterable = Multi::zipFilled($filler, $this->iterable, ...$iterables);
         return $this;
@@ -734,7 +739,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Math::runningAverage()
      */
-    public function runningAverage($initialValue = null): self
+    public function runningAverage(int|float|null $initialValue = null): self
     {
         /** @var iterable<int|float> $iterable */
         $iterable = $this->iterable;
@@ -751,7 +756,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Math::runningDifference()
      */
-    public function runningDifference($initialValue = null): self
+    public function runningDifference(int|float|null $initialValue = null): self
     {
         /** @var iterable<int|float> $iterable */
         $iterable = $this->iterable;
@@ -768,7 +773,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Math::runningMax()
      */
-    public function runningMax($initialValue = null): self
+    public function runningMax(int|float|null $initialValue = null): self
     {
         /** @var iterable<int|float> $iterable */
         $iterable = $this->iterable;
@@ -785,7 +790,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Math::runningMin()
      */
-    public function runningMin($initialValue = null): self
+    public function runningMin(int|float|null $initialValue = null): self
     {
         /** @var iterable<int|float> $iterable */
         $iterable = $this->iterable;
@@ -802,7 +807,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Math::runningProduct()
      */
-    public function runningProduct($initialValue = null): self
+    public function runningProduct(int|float|null $initialValue = null): self
     {
         /** @var iterable<int|float> $iterable */
         $iterable = $this->iterable;
@@ -819,7 +824,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Math::runningTotal()
      */
-    public function runningTotal($initialValue = null): self
+    public function runningTotal(int|float|null $initialValue = null): self
     {
         /** @var iterable<int|float> $iterable */
         $iterable = $this->iterable;
@@ -900,6 +905,48 @@ class Stream implements \IteratorAggregate
     public function symmetricDifferenceCoerciveWith(iterable ...$iterables): self
     {
         $this->iterable = Set::symmetricDifferenceCoercive($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Iterates the difference of iterable source and given iterables in strict type mode.
+     *
+     * Returns elements from the source not present in any given iterables.
+     *
+     *  - scalars: compares strictly by type;
+     *  - objects: always treats different instances as not equal to each other;
+     *  - arrays: compares serialized.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return Stream
+     *
+     * @see Set::difference()
+     */
+    public function differenceWith(iterable ...$iterables): self
+    {
+        $this->iterable = Set::difference($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Iterates the difference of iterable source and given iterables in non-strict type mode.
+     *
+     * Returns elements from the source not present in any given iterables.
+     *
+     *  - scalars: compares non-strictly by value;
+     *  - objects: compares serialized;
+     *  - arrays: compares serialized.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return Stream
+     *
+     * @see Set::differenceCoercive()
+     */
+    public function differenceCoerciveWith(iterable ...$iterables): self
+    {
+        $this->iterable = Set::differenceCoercive($this->iterable, ...$iterables);
         return $this;
     }
 
@@ -1067,8 +1114,8 @@ class Stream implements \IteratorAggregate
     /**
      * Converts iterable source to an associative array.
      *
-     * @param callable|null $keyFunc fn ($value, $key) => Custom Logic
-     * @param callable|null $valueFunc fn ($value, $key) => Custom logic
+     * @param (callable(mixed, mixed):mixed)|null $keyFunc fn ($value, $key) => Custom Logic
+     * @param (callable(mixed, mixed):mixed)|null $valueFunc fn ($value, $key) => Custom logic
      *
      * @return array<mixed>
      *
@@ -1097,7 +1144,7 @@ class Stream implements \IteratorAggregate
      */
     public function tee(int $count): array
     {
-        return array_map(fn ($it) => new self($it), Transform::tee($this->iterable, $count));
+        return \array_map(fn ($it) => new self($it), Transform::tee($this->iterable, $count));
     }
 
     /**
@@ -1112,7 +1159,7 @@ class Stream implements \IteratorAggregate
      *
      * @return void
      */
-    public function toFile($fileResource, string $newlineSeparator = \PHP_EOL, ?string $header = null, ?string $footer = null): void
+    public function toFile(mixed $fileResource, string $newlineSeparator = \PHP_EOL, ?string $header = null, ?string $footer = null): void
     {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
@@ -1123,15 +1170,16 @@ class Stream implements \IteratorAggregate
         }
 
         foreach ($this->iterable as $line) {
+            /** @psalm-suppress MixedArgument */
+            $line = \is_float($line) && \is_nan($line) ? 'NAN' : \strval($line); // @phpstan-ignore argument.type
+
             if ($firstIteration) {
                 $firstIteration = false;
             } else {
-                // @phpstan-ignore-next-line
-                $line = $newlineSeparator . \strval($line);
+                $line = $newlineSeparator . $line;
             }
 
-            // @phpstan-ignore-next-line
-            \fputs($fileResource, \strval($line));
+            \fputs($fileResource, $line);
         }
 
         if ($footer !== null) {
@@ -1153,7 +1201,7 @@ class Stream implements \IteratorAggregate
      * @return void
      */
     public function toCsvFile(
-        $fileResource,
+        mixed $fileResource,
         ?array $header = null,
         string $separator = ',',
         string $enclosure = '"',
@@ -1402,7 +1450,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toAverage()
      */
-    public function toAverage()
+    public function toAverage(): int|float|null
     {
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;
@@ -1436,7 +1484,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toMax()
      */
-    public function toMax(?callable $compareBy = null)
+    public function toMax(?callable $compareBy = null): mixed
     {
         return Reduce::toMax($this->iterable, $compareBy);
     }
@@ -1456,7 +1504,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toMin()
      */
-    public function toMin(?callable $compareBy = null)
+    public function toMin(?callable $compareBy = null): mixed
     {
         return Reduce::toMin($this->iterable, $compareBy);
     }
@@ -1492,7 +1540,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toProduct()
      */
-    public function toProduct()
+    public function toProduct(): int|float|null
     {
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;
@@ -1525,7 +1573,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toSum()
      */
-    public function toSum()
+    public function toSum(): int|float
     {
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;
@@ -1541,7 +1589,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toRange()
      */
-    public function toRange()
+    public function toRange(): int|float
     {
         /** @var iterable<numeric> $iterable */
         $iterable = $this->iterable;
@@ -1557,7 +1605,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toFirst()
      */
-    public function toFirst()
+    public function toFirst(): mixed
     {
         return Reduce::toFirst($this->iterable);
     }
@@ -1571,7 +1619,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toLast()
      */
-    public function toLast()
+    public function toLast(): mixed
     {
         return Reduce::toLast($this->iterable);
     }
@@ -1599,7 +1647,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toRandomValue()
      */
-    public function toRandomValue()
+    public function toRandomValue(): mixed
     {
         return Reduce::toRandomValue($this->iterable);
     }
@@ -1616,7 +1664,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toValue()
      */
-    public function toValue(callable $reducer, $initialValue = null)
+    public function toValue(callable $reducer, mixed $initialValue = null): mixed
     {
         return Reduce::toValue($this->iterable, $reducer, $initialValue);
     }
@@ -1629,7 +1677,7 @@ class Stream implements \IteratorAggregate
      *
      * @see Reduce::toNth()
      */
-    public function toNth(int $position)
+    public function toNth(int $position): mixed
     {
         return Reduce::toNth($this->iterable, $position);
     }
@@ -1659,7 +1707,8 @@ class Stream implements \IteratorAggregate
     public function printLn(): void
     {
         foreach ($this->iterable as $item) {
-            print($item . \PHP_EOL);
+            /** @phpstan-ignore cast.string */
+            print((string) $item . \PHP_EOL);
         }
     }
 
@@ -1683,6 +1732,7 @@ class Stream implements \IteratorAggregate
     public function varDump(): void
     {
         foreach ($this->iterable as $item) {
+            /** @psalm-suppress ForbiddenCode */
             \var_dump($item);
         }
     }

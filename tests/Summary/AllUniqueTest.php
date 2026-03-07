@@ -78,7 +78,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
-    public function dataProviderForArrayStrictTrue(): array
+    public static function dataProviderForArrayStrictTrue(): array
     {
         return [
             [[]],
@@ -94,7 +94,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayStrictFalse(): array
+    public static function dataProviderForArrayStrictFalse(): array
     {
         return [
             [[1, 1]],
@@ -113,7 +113,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayCoerciveTrue(): array
+    public static function dataProviderForArrayCoerciveTrue(): array
     {
         return [
             [[]],
@@ -128,7 +128,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayCoerciveFalse(): array
+    public static function dataProviderForArrayCoerciveFalse(): array
     {
         return [
             [[1, 1.0, '1.0', '1', true]],
@@ -140,7 +140,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGeneratorsStrictTrue(): array
+    public static function dataProviderForGeneratorsStrictTrue(): array
     {
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -158,7 +158,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGeneratorsStrictFalse(): array
+    public static function dataProviderForGeneratorsStrictFalse(): array
     {
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -179,7 +179,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGeneratorsCoerciveTrue(): array
+    public static function dataProviderForGeneratorsCoerciveTrue(): array
     {
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -196,7 +196,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGeneratorsCoerciveFalse(): array
+    public static function dataProviderForGeneratorsCoerciveFalse(): array
     {
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -210,7 +210,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIteratorsStrictTrue(): array
+    public static function dataProviderForIteratorsStrictTrue(): array
     {
         $iter = fn ($data) => new \ArrayIterator($data);
 
@@ -228,7 +228,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIteratorsStrictFalse(): array
+    public static function dataProviderForIteratorsStrictFalse(): array
     {
         $iter = fn ($data) => new \ArrayIterator($data);
 
@@ -249,7 +249,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIteratorsCoerciveTrue(): array
+    public static function dataProviderForIteratorsCoerciveTrue(): array
     {
         $iter = fn ($data) => new \ArrayIterator($data);
 
@@ -266,7 +266,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForIteratorsCoerciveFalse(): array
+    public static function dataProviderForIteratorsCoerciveFalse(): array
     {
         $iter = fn ($data) => new \ArrayIterator($data);
 
@@ -280,7 +280,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversablesStrictTrue(): array
+    public static function dataProviderForTraversablesStrictTrue(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
@@ -298,7 +298,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversablesStrictFalse(): array
+    public static function dataProviderForTraversablesStrictFalse(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
@@ -319,7 +319,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversablesCoerciveTrue(): array
+    public static function dataProviderForTraversablesCoerciveTrue(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
@@ -336,7 +336,7 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForTraversablesCoerciveFalse(): array
+    public static function dataProviderForTraversablesCoerciveFalse(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 

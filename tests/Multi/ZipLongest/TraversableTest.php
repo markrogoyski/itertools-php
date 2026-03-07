@@ -33,7 +33,7 @@ class TraversableTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestTwoTraversableSameSize(): array
+    public static function dataProviderForZipLongestTwoTraversableSameSize(): array
     {
         return [
             [
@@ -87,7 +87,7 @@ class TraversableTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipLongestTwoTraversableDifferentSize(): array
+    public static function dataProviderForZipLongestTwoTraversableDifferentSize(): array
     {
         return [
             [

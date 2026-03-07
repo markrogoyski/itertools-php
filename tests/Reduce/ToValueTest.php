@@ -32,7 +32,7 @@ class ToValueTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForArrayWithSumReducer(): array
+    public static function dataProviderForArrayWithSumReducer(): array
     {
         return [
             [
@@ -99,7 +99,7 @@ class ToValueTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForArrayWithConcatReducer(): array
+    public static function dataProviderForArrayWithConcatReducer(): array
     {
         return [
             [
@@ -176,7 +176,7 @@ class ToValueTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForGeneratorsWithSumReducer(): array
+    public static function dataProviderForGeneratorsWithSumReducer(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -247,7 +247,7 @@ class ToValueTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForGeneratorsWithConcatReducer(): array
+    public static function dataProviderForGeneratorsWithConcatReducer(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -328,7 +328,7 @@ class ToValueTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForIteratorsWithSumReducer(): array
+    public static function dataProviderForIteratorsWithSumReducer(): array
     {
         $iter = static function (array $data) {
             return new ArrayIteratorFixture($data);
@@ -399,7 +399,7 @@ class ToValueTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForIteratorsWithConcatReducer(): array
+    public static function dataProviderForIteratorsWithConcatReducer(): array
     {
         $iter = static function (array $data) {
             return new ArrayIteratorFixture($data);
@@ -480,7 +480,7 @@ class ToValueTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForTraversablesWithSumReducer(): array
+    public static function dataProviderForTraversablesWithSumReducer(): array
     {
         $trav = static function (array $data) {
             return new IteratorAggregateFixture($data);
@@ -551,7 +551,7 @@ class ToValueTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function dataProviderForTraversablesWithConcatReducer(): array
+    public static function dataProviderForTraversablesWithConcatReducer(): array
     {
         $trav = static function (array $data) {
             return new IteratorAggregateFixture($data);

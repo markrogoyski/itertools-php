@@ -32,7 +32,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForArraySets(): array
+    public static function dataProviderForArraySets(): array
     {
         return [
             [
@@ -213,7 +213,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayMultisets(): array
+    public static function dataProviderForArrayMultisets(): array
     {
         return [
             [
@@ -379,7 +379,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -566,7 +566,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = static function (array $data) {
             return new ArrayIteratorFixture($data);
@@ -753,7 +753,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = static function (array $data) {
             return new IteratorAggregateFixture($data);
@@ -940,7 +940,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForMixed(): array
+    public static function dataProviderForMixed(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -1093,13 +1093,13 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         foreach (Set::partialIntersection($m, $a, $b, $c, $d) as $value) {
             $result[] = $value;
         }
-        sort($result);
+        \sort($result);
 
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForDemo(): array
+    public static function dataProviderForDemo(): array
     {
         $a = [1, 2, 3, 4, 5];
         $b = [1, 2, 10, 11];
@@ -1128,13 +1128,13 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         $partIntersect = Set::partialIntersection($minIntersectionCount, ...$sets);
 
         // When
-        $actual = iterator_to_array($partIntersect);
+        $actual = \iterator_to_array($partIntersect);
 
         // Then
         $this->assertEquals($expected, $actual);
     }
 
-    public function dataProviderForIteratorToArray(): array
+    public static function dataProviderForIteratorToArray(): array
     {
         return [
             [

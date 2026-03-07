@@ -36,7 +36,7 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForNumber(): array
+    public static function dataProviderForNumber(): array
     {
         return [
             [0, 0, 0],
@@ -100,6 +100,34 @@ class NumberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test number with seeded engine produces deterministic results
+     */
+    public function testNumberWithSeededEngine(): void
+    {
+        // Given
+        $engine = new \Random\Engine\Mt19937(42);
+
+        // When
+        $result = \iterator_to_array(Random::number(1, 100, 5, $engine));
+
+        // Then
+        $this->assertEquals([43, 68, 77, 15, 27], $result);
+    }
+
+    /**
+     * @test number with seeded engine is reproducible
+     */
+    public function testNumberWithSeededEngineIsReproducible(): void
+    {
+        // Given
+        $result1 = \iterator_to_array(Random::number(0, 1000, 10, new \Random\Engine\Mt19937(99)));
+        $result2 = \iterator_to_array(Random::number(0, 1000, 10, new \Random\Engine\Mt19937(99)));
+
+        // Then
+        $this->assertEquals($result1, $result2);
+    }
+
+    /**
      * @test         number iterator_to_array
      * @dataProvider dataProviderForNumber
      * @param        int $min
@@ -112,7 +140,7 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         $iterator = Random::number($min, $max, $repetitions);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertCount($repetitions, $result);

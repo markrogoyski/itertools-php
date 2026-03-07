@@ -34,7 +34,7 @@ class FlattenTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -220,9 +220,9 @@ class FlattenTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForGenerator(): \Generator
+    public static function dataProviderForGenerator(): \Generator
     {
-        foreach ($this->dataProviderForArray() as [$iterable, $dimensions, $expected]) {
+        foreach (self::dataProviderForArray() as [$iterable, $dimensions, $expected]) {
             yield [
                 GeneratorFixture::getGenerator($iterable),
                 $dimensions,
@@ -231,9 +231,9 @@ class FlattenTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForIterator(): \Generator
+    public static function dataProviderForIterator(): \Generator
     {
-        foreach ($this->dataProviderForArray() as [$iterable, $dimensions, $expected]) {
+        foreach (self::dataProviderForArray() as [$iterable, $dimensions, $expected]) {
             yield [
                 new ArrayIteratorFixture($iterable),
                 $dimensions,
@@ -242,9 +242,9 @@ class FlattenTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function dataProviderForTraversable(): \Generator
+    public static function dataProviderForTraversable(): \Generator
     {
-        foreach ($this->dataProviderForArray() as [$iterable, $dimensions, $expected]) {
+        foreach (self::dataProviderForArray() as [$iterable, $dimensions, $expected]) {
             yield [
                 new IteratorAggregateFixture($iterable),
                 $dimensions,

@@ -70,7 +70,7 @@ CSV_END;
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForCommon(): array
+    public static function dataProviderForCommon(): array
     {
         return [
             [

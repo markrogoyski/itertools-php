@@ -29,7 +29,7 @@ class RunningMinTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -100,7 +100,7 @@ class RunningMinTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForArrayWithInitialValue(): array
+    public static function dataProviderForArrayWithInitialValue(): array
     {
         return [
             [
@@ -176,7 +176,7 @@ class RunningMinTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         return [
             [
@@ -234,7 +234,7 @@ class RunningMinTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         return [
             [
@@ -292,7 +292,7 @@ class RunningMinTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         return [
             [
@@ -342,7 +342,7 @@ class RunningMinTest extends \PHPUnit\Framework\TestCase
         $iterator = Math::runningMin($numbers);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);

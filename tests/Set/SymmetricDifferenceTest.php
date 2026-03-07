@@ -31,7 +31,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForArraySets(): array
+    public static function dataProviderForArraySets(): array
     {
         return [
             [
@@ -131,7 +131,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForArrayMultisets(): array
+    public static function dataProviderForArrayMultisets(): array
     {
         return [
             [
@@ -214,7 +214,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);
@@ -353,7 +353,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = static function (array $data) {
             return new ArrayIteratorFixture($data);
@@ -492,7 +492,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = static function (array $data) {
             return new IteratorAggregateFixture($data);
@@ -631,7 +631,7 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
-    public function dataProviderForMixed(): array
+    public static function dataProviderForMixed(): array
     {
         $gen = static function (array $data) {
             return GeneratorFixture::getGenerator($data);

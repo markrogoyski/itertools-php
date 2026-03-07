@@ -27,7 +27,7 @@ class StringTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForAsciiStrings(): array
+    public static function dataProviderForAsciiStrings(): array
     {
         return [
             ['', []],
@@ -58,7 +58,7 @@ class StringTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataProviderForMultiByteStrings(): array
+    public static function dataProviderForMultiByteStrings(): array
     {
         return [
             ['　', ['　']],

@@ -31,7 +31,7 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         $stream->print();
     }
 
-    public function dataProviderForPrintArray(): array
+    public static function dataProviderForPrintArray(): array
     {
         return [
             [
@@ -57,7 +57,7 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForPrintGenerator(): array
+    public static function dataProviderForPrintGenerator(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -85,7 +85,7 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForPrintIterator(): array
+    public static function dataProviderForPrintIterator(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -113,7 +113,7 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForPrintTraversable(): array
+    public static function dataProviderForPrintTraversable(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -157,7 +157,7 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         $stream->print($separator, $prefix, $suffix);
     }
 
-    public function dataProviderForPrintGluePrefixSuffix(): array
+    public static function dataProviderForPrintGluePrefixSuffix(): array
     {
         return [
             [
@@ -287,7 +287,7 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         $stream->printLn();
     }
 
-    public function dataProviderForPrintLnArray(): array
+    public static function dataProviderForPrintLnArray(): array
     {
         return [
             [
@@ -313,7 +313,7 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForPrintLnGenerator(): array
+    public static function dataProviderForPrintLnGenerator(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
 
@@ -342,7 +342,7 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForPrintLnIterator(): array
+    public static function dataProviderForPrintLnIterator(): array
     {
         $iter = fn (array $data) => new ArrayIteratorFixture($data);
 
@@ -370,7 +370,7 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function dataProviderForPrintLnTraversable(): array
+    public static function dataProviderForPrintLnTraversable(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 

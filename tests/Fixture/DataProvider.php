@@ -15,7 +15,7 @@ use IterTools\Transform;
 
 trait DataProvider
 {
-    public function dataProviderForEmptyIterable(): array
+    public static function dataProviderForEmptyIterable(): array
     {
         return [
             [[]],
@@ -27,35 +27,35 @@ trait DataProvider
 
     // LOOP TOOLS
 
-    public function dataProviderForIterableLoopTools(): \Generator
+    public static function dataProviderForIterableLoopTools(): \Generator
     {
-        foreach ($this->dataProviderForMultiLoopTools() as $loopTool) {
+        foreach (self::dataProviderForMultiLoopTools() as $loopTool) {
             yield $loopTool;
         }
-        foreach ($this->dataProviderForSingleLoopTools() as $loopTool) {
+        foreach (self::dataProviderForSingleLoopTools() as $loopTool) {
             yield $loopTool;
         }
-        foreach ($this->dataProviderForInfiniteLoopTools() as $loopTool) {
+        foreach (self::dataProviderForInfiniteLoopTools() as $loopTool) {
             yield $loopTool;
         }
-        foreach ($this->dataProviderForRandomLoopTools() as $loopTool) {
+        foreach (self::dataProviderForRandomLoopTools() as $loopTool) {
             yield $loopTool;
         }
-        foreach ($this->dataProviderForMathLoopTools() as $loopTool) {
+        foreach (self::dataProviderForMathLoopTools() as $loopTool) {
             yield $loopTool;
         }
-        foreach ($this->dataProviderForSetLoopTools() as $loopTool) {
+        foreach (self::dataProviderForSetLoopTools() as $loopTool) {
             yield $loopTool;
         }
-        foreach ($this->dataProviderForSortLoopTools() as $loopTool) {
+        foreach (self::dataProviderForSortLoopTools() as $loopTool) {
             yield $loopTool;
         }
-        foreach ($this->dataProviderForTransformLoopTools() as $loopTool) {
+        foreach (self::dataProviderForTransformLoopTools() as $loopTool) {
             yield $loopTool;
         }
     }
 
-    public function dataProviderForMultiLoopTools(): array
+    public static function dataProviderForMultiLoopTools(): array
     {
         return [
             [Multi::chain([1, 2, 3], [4, 5, 6])],
@@ -66,7 +66,7 @@ trait DataProvider
         ];
     }
 
-    public function dataProviderForSingleLoopTools(): array
+    public static function dataProviderForSingleLoopTools(): array
     {
         return [
             [Single::chunkwise([1, 2, 3, 4, 5], 2)],
@@ -96,7 +96,7 @@ trait DataProvider
         ];
     }
 
-    public function dataProviderForInfiniteLoopTools(): array
+    public static function dataProviderForInfiniteLoopTools(): array
     {
         return [
             [Infinite::count(1, 1)],
@@ -106,7 +106,7 @@ trait DataProvider
         ];
     }
 
-    public function dataProviderForRandomLoopTools(): array
+    public static function dataProviderForRandomLoopTools(): array
     {
         return [
             [Random::choice([1, 2, 3], 3)],
@@ -117,7 +117,7 @@ trait DataProvider
         ];
     }
 
-    public function dataProviderForMathLoopTools(): array
+    public static function dataProviderForMathLoopTools(): array
     {
         return [
             [Math::frequencies([1, 2, 3, 4, 5])],
@@ -131,7 +131,7 @@ trait DataProvider
         ];
     }
 
-    public function dataProviderForSetLoopTools(): array
+    public static function dataProviderForSetLoopTools(): array
     {
         return [
             [Set::distinct([1, 2, 3, 4, 5])],
@@ -146,7 +146,7 @@ trait DataProvider
         ];
     }
 
-    public function dataProviderForSortLoopTools(): array
+    public static function dataProviderForSortLoopTools(): array
     {
         return [
             [Sort::sort([5, 4, 1, 3, 2])],
@@ -154,7 +154,7 @@ trait DataProvider
         ];
     }
 
-    public function dataProviderForTransformLoopTools(): array
+    public static function dataProviderForTransformLoopTools(): array
     {
         return [
             [Transform::tee([1, 2, 3, 4, 5], 2)],
@@ -166,17 +166,17 @@ trait DataProvider
 
     // STREAM TOOLS
 
-    public function dataProviderForIterableStreamTools(): \Generator
+    public static function dataProviderForIterableStreamTools(): \Generator
     {
-        foreach ($this->dataProviderForSourceStreamTools() as $loopTool) {
+        foreach (self::dataProviderForSourceStreamTools() as $loopTool) {
             yield $loopTool;
         }
-        foreach ($this->dataProviderForStreamOperations() as $loopTool) {
+        foreach (self::dataProviderForStreamOperations() as $loopTool) {
             yield $loopTool;
         }
     }
 
-    public function dataProviderForSourceStreamTools(): array
+    public static function dataProviderForSourceStreamTools(): array
     {
         return [
             [Stream::of([1, 2, 3, 4, 5])],
@@ -190,7 +190,7 @@ trait DataProvider
         ];
     }
 
-    public function dataProviderForStreamOperations(): array
+    public static function dataProviderForStreamOperations(): array
     {
         return [
             [Stream::of([1, 2, 3, 4, 5])->asort()],

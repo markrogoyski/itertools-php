@@ -71,7 +71,7 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -168,7 +168,7 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = fn (array $data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -266,7 +266,7 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedKeys, $resultKeys);
         $this->assertEquals($expectedValues, $resultValues);
     }
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = fn (array $data) => new \ArrayIterator($data);
 
@@ -365,7 +365,7 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = fn (array $data) => new IteratorAggregateFixture($data);
 
@@ -458,6 +458,6 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expectedKeys, \array_keys($result));
-        $this->assertEquals($expectedValues, array_values($result));
+        $this->assertEquals($expectedValues, \array_values($result));
     }
 }

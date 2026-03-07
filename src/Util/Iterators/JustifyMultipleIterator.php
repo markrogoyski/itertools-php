@@ -2,7 +2,6 @@
 
 namespace IterTools\Util\Iterators;
 
-use IterTools\Stream;
 use IterTools\Transform;
 use IterTools\Util\NoValueMonad;
 
@@ -10,7 +9,7 @@ use IterTools\Util\NoValueMonad;
  * @internal
  * @implements \Iterator<array<mixed>>
  */
-class JustifyMultipleIterator implements \Iterator
+final class JustifyMultipleIterator implements \Iterator
 {
     /**
      * @var array<\Iterator<mixed>>
@@ -29,7 +28,7 @@ class JustifyMultipleIterator implements \Iterator
      * @param mixed $filler
      * @param iterable<mixed> ...$iterables
      */
-    public function __construct($filler, iterable ...$iterables)
+    public function __construct(mixed $filler, iterable ...$iterables)
     {
         $this->filler = $filler;
 
@@ -45,11 +44,10 @@ class JustifyMultipleIterator implements \Iterator
      */
     public function current(): array
     {
-        return Stream::of($this->iterators)
-            ->map(function (\Iterator $iterator) {
-                return $iterator->valid() ? $iterator->current() : $this->filler;
-            })
-            ->toArray();
+        return \array_map(
+            fn(\Iterator $iterator): mixed => $iterator->valid() ? $iterator->current() : $this->filler,
+            $this->iterators,
+        );
     }
 
     /**

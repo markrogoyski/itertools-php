@@ -33,7 +33,7 @@ class IteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipTwoIteratorsSameSize(): array
+    public static function dataProviderForZipTwoIteratorsSameSize(): array
     {
         return [
             [
@@ -87,7 +87,7 @@ class IteratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipTwoIteratorsDifferentSize(): array
+    public static function dataProviderForZipTwoIteratorsDifferentSize(): array
     {
         return [
             [

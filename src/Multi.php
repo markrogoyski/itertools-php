@@ -6,9 +6,8 @@ namespace IterTools;
 
 use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\Iterators\StrictMultipleIterator;
-use IterTools\Util\NoValueMonad;
 
-class Multi
+final class Multi
 {
     /**
      * Iterate multiple iterable collections simultaneously.
@@ -74,7 +73,7 @@ class Multi
      *
      * @return \Generator<array<mixed>>
      */
-    public static function zipFilled($filler, iterable ...$iterables): \Generator
+    public static function zipFilled(mixed $filler, iterable ...$iterables): \Generator
     {
         $iterator = new JustifyMultipleIterator($filler, ...$iterables);
 
@@ -98,10 +97,9 @@ class Multi
     {
         $zippedIterator = new StrictMultipleIterator(\MultipleIterator::MIT_NEED_ALL);
         foreach ($iterables as $iterable) {
+            /** @psalm-suppress MixedArgumentTypeCoercion */
             $zippedIterator->attachIterator(Transform::toIterator($iterable));
         }
-        $zippedIterator->setFlags(\MultipleIterator::MIT_NEED_ALL);
-
         foreach ($zippedIterator as $values) {
             yield $values;
         }
@@ -120,6 +118,7 @@ class Multi
     {
         foreach ($iterables as $iterable) {
             foreach ($iterable as $item) {
+                /** @var mixed $item */
                 yield $item;
             }
         }

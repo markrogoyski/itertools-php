@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\Iterators\TeeIterator;
 
-class Transform
+final class Transform
 {
     /**
      * Converts iterable source to array without saving keys.
@@ -36,23 +36,21 @@ class Transform
      * @param callable(mixed, mixed): mixed|null $keyFunc
      * @param callable(mixed, mixed): mixed|null $valueFunc
      *
-     * @return array<TKey|numeric|string, TValue|mixed>
+     * @return array<TKey|int|string, TValue|mixed>
      */
     public static function toAssociativeArray(
         iterable $iterable,
         ?callable $keyFunc = null,
         ?callable $valueFunc = null
     ): array {
-        if ($keyFunc === null) {
-            $keyFunc = fn ($item, $key) => $key;
-        }
-        if ($valueFunc === null) {
-            $valueFunc = fn ($item, $key) => $item;
-        }
+        $keyFunc ??= fn (mixed $item, mixed $key): mixed => $key;
+        $valueFunc ??= fn (mixed $item, mixed $_key): mixed => $item;
 
         $result = [];
         foreach ($iterable as $key => $item) {
-            $result[$keyFunc($item, $key)] = $valueFunc($item, $key);
+            /** @var int|string $computedKey */
+            $computedKey = $keyFunc($item, $key);
+            $result[$computedKey] = $valueFunc($item, $key);
         }
         return $result;
     }
@@ -69,19 +67,13 @@ class Transform
      */
     public static function toIterator(iterable $iterable): \Iterator
     {
-        switch (true) {
-            case $iterable instanceof \Iterator:
-                return $iterable;
-
-            case $iterable instanceof \Traversable:
-                // @phpstan-ignore-next-line
-                return new \IteratorIterator($iterable);
-
-            case \is_array($iterable):
-                return new \ArrayIterator($iterable);
-        }
-
-        throw new \LogicException(\gettype($iterable) . ' type is not an expected iterable type (Iterator|Traversable|array)');
+        /** @psalm-suppress DocblockTypeContradiction, MixedArgumentTypeCoercion */
+        return match (true) { // @phpstan-ignore return.type
+            $iterable instanceof \Iterator => $iterable,
+            $iterable instanceof \Traversable => new \IteratorIterator($iterable),
+            \is_array($iterable) => new \ArrayIterator($iterable), // @phpstan-ignore function.alreadyNarrowedType
+            default => throw new \LogicException(\gettype($iterable) . ' type is not an expected iterable type (Iterator|Traversable|array)'),
+        };
     }
 
     /**

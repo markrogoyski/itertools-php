@@ -22,7 +22,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zipFilled($filler, $array1, $array2);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -31,7 +31,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipFilledTwoArraysSameSize(): array
+    public static function dataProviderForZipFilledTwoArraysSameSize(): array
     {
         return [
             [
@@ -81,7 +81,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zipFilled($filler, $array1, $array2);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -90,7 +90,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipFilledTwoArraysDifferentSize(): array
+    public static function dataProviderForZipFilledTwoArraysDifferentSize(): array
     {
         return [
             [
@@ -159,7 +159,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zipFilled($filler, $array1, $array2, $array3);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -180,7 +180,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zipFilled($filler, ...[$array1, $array2, $array3]);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -189,7 +189,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipFilledThreeArraysSameSize(): array
+    public static function dataProviderForZipFilledThreeArraysSameSize(): array
     {
         return [
             [
@@ -245,7 +245,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zipFilled($filler, $array1, $array2, $array3);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -254,7 +254,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function dataProviderForZipFilledThreeArraysDifferentSize(): array
+    public static function dataProviderForZipFilledThreeArraysDifferentSize(): array
     {
         return [
             [
@@ -299,7 +299,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
 
         // When
         $iterator = Multi::zipFilled('none', $array1, $array2);
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => ['none', 4], 4 => ['none', 5]];
@@ -317,7 +317,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
 
         // When
         $iterator = Multi::zipFilled(100, $array1, $array2);
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => [100, 4], 4 => [100, 5]];

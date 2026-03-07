@@ -33,7 +33,7 @@ class ReverseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForArray(): array
+    public static function dataProviderForArray(): array
     {
         return [
             [
@@ -82,7 +82,7 @@ class ReverseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForGenerators(): array
+    public static function dataProviderForGenerators(): array
     {
         $gen = fn ($data) => GeneratorFixture::getKeyValueGenerator($data);
 
@@ -133,7 +133,7 @@ class ReverseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForIterators(): array
+    public static function dataProviderForIterators(): array
     {
         $iter = fn ($data) => new \ArrayIterator($data);
 
@@ -184,7 +184,7 @@ class ReverseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForTraversables(): array
+    public static function dataProviderForTraversables(): array
     {
         $trav = fn ($data) => new IteratorAggregateFixture($data);
 
@@ -235,7 +235,7 @@ class ReverseTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues, $resultValues);
     }
 
-    public function dataProviderForComposite(): array
+    public static function dataProviderForComposite(): array
     {
         $composite = fn ($keys, $values) => GeneratorFixture::getCombined($keys, $values);
 
