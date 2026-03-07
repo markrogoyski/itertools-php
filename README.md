@@ -41,6 +41,42 @@ All functions work on `iterable` collections:
 ### README docs translated in other languages:
 * [Русский](docs/README-RU.md)
 
+Setup
+-----
+
+Add the library to your `composer.json` file in your project:
+
+```json
+{
+  "require": {
+      "markrogoyski/itertools-php": "2.*"
+  }
+}
+```
+
+Use [composer](http://getcomposer.org) to install the library:
+
+```bash
+$ composer install
+```
+
+Composer will install IterTools inside your vendor folder. Then you can add the following to your
+.php files to use the library with Autoloading.
+
+```php
+require_once __DIR__ . '/vendor/autoload.php';
+```
+
+Alternatively, use composer on the command line to require and install IterTools:
+
+```
+$ composer require markrogoyski/itertools-php:2.*
+```
+
+#### Minimum Requirements
+ * **PHP 8.2+**
+     * (For PHP 7.4–8.1, use [v1.9](https://github.com/markrogoyski/itertools-php/releases/tag/v1.9.0))
+
 Quick Reference
 -----------
 
@@ -333,42 +369,6 @@ Full documentation with detailed descriptions, signatures, and code examples for
 
 #### Stream
 - [Stream](docs/stream.md) — Sources, operations, terminal operations, and debug tools
-
-Setup
------
-
- Add the library to your `composer.json` file in your project:
-
-```json
-{
-  "require": {
-      "markrogoyski/itertools-php": "1.*"
-  }
-}
-```
-
-Use [composer](http://getcomposer.org) to install the library:
-
-```bash
-$ php composer.phar install
-```
-
-Composer will install IterTools inside your vendor folder. Then you can add the following to your
-.php files to use the library with Autoloading.
-
-```php
-require_once __DIR__ . '/vendor/autoload.php';
-```
-
-Alternatively, use composer on the command line to require and install IterTools:
-
-```
-$ php composer.phar require markrogoyski/itertools-php:1.*
-```
-
-#### Minimum Requirements
- * **PHP 8.2+**
-     * (For PHP 7.4–8.1, use [v1.9](https://github.com/markrogoyski/itertools-php/releases/tag/v1.9.0))
 
 Usage
 -----

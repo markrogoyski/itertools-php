@@ -38,6 +38,42 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 * `Generator`
 * `Traversable`
 
+Установка
+-----
+
+Добавьте библиотеку в зависимости в файле `composer.json` вашего проекта:
+
+```json
+{
+  "require": {
+      "markrogoyski/itertools-php": "2.*"
+  }
+}
+```
+
+Используйте [composer](http://getcomposer.org), чтобы установить библиотеку:
+
+```bash
+$ composer install
+```
+
+Composer установит IterTools в папку vendor вашего проекта. После этого вы можете использовать функционал библиотеки
+в файлах своего проекта, используя Composer Autoloader.
+
+```php
+require_once __DIR__ . '/vendor/autoload.php';
+```
+
+Альтернативный вариант установки. Выполните данную команду в терминале, находясь в корневой директории вашего проекта:
+
+```
+$ composer require markrogoyski/itertools-php:2.*
+```
+
+#### Минимальные требования
+* **PHP 8.2+**
+    * (Для PHP 7.4–8.1 используйте [v1.9](https://github.com/markrogoyski/itertools-php/releases/tag/v1.9.0))
+
 Краткий справочник
 -----------
 
@@ -305,42 +341,6 @@ $result = Stream::of([1, 1, 2, 2, 3, 4, 5])
 | [`peekPrintR`](#Peek-PrintR) | Вызов `print_r` для каждого элемента коллекции между операциями   | `$stream->peekPrintR()`          |
 | [`printR`](#Print-R)         | `print_r` каждого элемента потока                                 | `$stream->printR()`              |
 | [`varDump`](#Var-Dump)       | `var_dump` каждого элемента потока                                | `$stream->varDump()`             |
-
-Установка
------
-
-Добавьте библиотеку в зависимости в файле `composer.json` вашего проекта:
-
-```json
-{
-  "require": {
-      "markrogoyski/itertools-php": "1.*"
-  }
-}
-```
-
-Используйте [composer](http://getcomposer.org), чтобы установить библиотеку:
-
-```bash
-$ php composer.phar install
-```
-
-Composer установит IterTools в папку vendor вашего проекта. После этого вы можете использовать функционал библиотеки
-в файлах своего проекта, используя Composer Autoloader.
-
-```php
-require_once __DIR__ . '/vendor/autoload.php';
-```
-
-Альтернативный вариант установки. Выполните данную команду в терминале, находясь в корневой директории вашего проекта:
-
-```
-$ php composer.phar require markrogoyski/itertools-php:1.*
-```
-
-#### Минимальные требования
-* **PHP 8.2+**
-    * (Для PHP 7.4–8.1 используйте [v1.9](https://github.com/markrogoyski/itertools-php/releases/tag/v1.9.0))
 
 Использование
 -----
