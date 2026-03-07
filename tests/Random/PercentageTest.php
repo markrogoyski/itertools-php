@@ -75,7 +75,7 @@ class PercentageTest extends \PHPUnit\Framework\TestCase
         $engine = new \Random\Engine\Mt19937(42);
 
         // When
-        $result = iterator_to_array(Random::percentage(3, $engine));
+        $result = \iterator_to_array(Random::percentage(3, $engine));
 
         // Then
         $this->assertCount(3, $result);
@@ -90,8 +90,8 @@ class PercentageTest extends \PHPUnit\Framework\TestCase
     public function testPercentageWithSeededEngineIsReproducible(): void
     {
         // Given
-        $result1 = iterator_to_array(Random::percentage(10, new \Random\Engine\Mt19937(77)));
-        $result2 = iterator_to_array(Random::percentage(10, new \Random\Engine\Mt19937(77)));
+        $result1 = \iterator_to_array(Random::percentage(10, new \Random\Engine\Mt19937(77)));
+        $result2 = \iterator_to_array(Random::percentage(10, new \Random\Engine\Mt19937(77)));
 
         // Then
         $this->assertEquals($result1, $result2);
@@ -108,7 +108,7 @@ class PercentageTest extends \PHPUnit\Framework\TestCase
         $iterator = Random::percentage($repetitions);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertCount($repetitions, $result);

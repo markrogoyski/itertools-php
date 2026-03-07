@@ -108,7 +108,7 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         $engine = new \Random\Engine\Mt19937(42);
 
         // When
-        $result = iterator_to_array(Random::number(1, 100, 5, $engine));
+        $result = \iterator_to_array(Random::number(1, 100, 5, $engine));
 
         // Then
         $this->assertEquals([43, 68, 77, 15, 27], $result);
@@ -120,8 +120,8 @@ class NumberTest extends \PHPUnit\Framework\TestCase
     public function testNumberWithSeededEngineIsReproducible(): void
     {
         // Given
-        $result1 = iterator_to_array(Random::number(0, 1000, 10, new \Random\Engine\Mt19937(99)));
-        $result2 = iterator_to_array(Random::number(0, 1000, 10, new \Random\Engine\Mt19937(99)));
+        $result1 = \iterator_to_array(Random::number(0, 1000, 10, new \Random\Engine\Mt19937(99)));
+        $result2 = \iterator_to_array(Random::number(0, 1000, 10, new \Random\Engine\Mt19937(99)));
 
         // Then
         $this->assertEquals($result1, $result2);
@@ -140,7 +140,7 @@ class NumberTest extends \PHPUnit\Framework\TestCase
         $iterator = Random::number($min, $max, $repetitions);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertCount($repetitions, $result);

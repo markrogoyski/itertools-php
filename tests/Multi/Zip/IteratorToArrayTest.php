@@ -22,7 +22,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zip($array1, $array2);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -75,7 +75,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zip($array1, $array2);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -144,7 +144,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zip($array1, $array2, $array3);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -164,7 +164,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zip(...[$array1, $array2, $array3]);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -223,7 +223,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zip($array1, $array2, $array3);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -275,7 +275,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zip($generator1, $generator2);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -328,7 +328,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zip($iter1, $iter2);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);
@@ -381,7 +381,7 @@ class IteratorToArrayTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::zip($iter1, $iter2);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);

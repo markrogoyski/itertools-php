@@ -81,21 +81,21 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->toArray(),
                 [],
             ],
             [
                 [1, -1, 2, -2, 3, -3],
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->toArray(),
                 [1, -1, 2, -2],
             ],
             [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1, 0, 1])
                     ->toArray(),
                 [],
@@ -103,7 +103,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1, 0, 1])
                     ->toArray(),
                 [-1, -2],
@@ -111,7 +111,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->dropWhile(fn ($value) => abs($value) < 3)
+                    ->dropWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1])
                     ->toArray(),
                 [],
@@ -119,7 +119,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 [1, -1, 2, -2, 3, -3],
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->dropWhile(fn ($value) => abs($value) < 3)
+                    ->dropWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1])
                     ->toArray(),
                 [-3],
@@ -549,7 +549,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5],
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterKeys(fn ($key) => in_array($key, ['a', 'c', 'e', 'g']))
+                    ->filterKeys(fn ($key) => \in_array($key, ['a', 'c', 'e', 'g']))
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],
@@ -783,21 +783,21 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->toArray(),
                 [],
             ],
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->toArray(),
                 [1, -1, 2, -2],
             ],
             [
                 $gen([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1, 0, 1])
                     ->toArray(),
                 [],
@@ -805,7 +805,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1, 0, 1])
                     ->toArray(),
                 [-1, -2],
@@ -813,7 +813,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->dropWhile(fn ($value) => abs($value) < 3)
+                    ->dropWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1])
                     ->toArray(),
                 [],
@@ -821,7 +821,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->dropWhile(fn ($value) => abs($value) < 3)
+                    ->dropWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1])
                     ->toArray(),
                 [-3],
@@ -1184,7 +1184,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 GeneratorFixture::getKeyValueGenerator(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterKeys(fn ($key) => in_array($key, ['a', 'c', 'e', 'g']))
+                    ->filterKeys(fn ($key) => \in_array($key, ['a', 'c', 'e', 'g']))
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],
@@ -1418,21 +1418,21 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->toArray(),
                 [],
             ],
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->toArray(),
                 [1, -1, 2, -2],
             ],
             [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1, 0, 1])
                     ->toArray(),
                 [],
@@ -1440,7 +1440,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1, 0, 1])
                     ->toArray(),
                 [-1, -2],
@@ -1448,7 +1448,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->dropWhile(fn ($value) => abs($value) < 3)
+                    ->dropWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1])
                     ->toArray(),
                 [],
@@ -1456,7 +1456,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->dropWhile(fn ($value) => abs($value) < 3)
+                    ->dropWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1])
                     ->toArray(),
                 [-3],
@@ -1811,7 +1811,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 new \ArrayIterator(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterKeys(fn ($key) => in_array($key, ['a', 'c', 'e', 'g']))
+                    ->filterKeys(fn ($key) => \in_array($key, ['a', 'c', 'e', 'g']))
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],
@@ -2045,21 +2045,21 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->toArray(),
                 [],
             ],
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->toArray(),
                 [1, -1, 2, -2],
             ],
             [
                 $trav([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1, 0, 1])
                     ->toArray(),
                 [],
@@ -2067,7 +2067,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->takeWhile(fn ($value) => abs($value) < 3)
+                    ->takeWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1, 0, 1])
                     ->toArray(),
                 [-1, -2],
@@ -2075,7 +2075,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->dropWhile(fn ($value) => abs($value) < 3)
+                    ->dropWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1])
                     ->toArray(),
                 [],
@@ -2083,7 +2083,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->dropWhile(fn ($value) => abs($value) < 3)
+                    ->dropWhile(fn ($value) => \abs($value) < 3)
                     ->compress([0, 1])
                     ->toArray(),
                 [-3],
@@ -2438,7 +2438,7 @@ class SingleTest extends \PHPUnit\Framework\TestCase
             [
                 $trav(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterKeys(fn ($key) => in_array($key, ['a', 'c', 'e', 'g']))
+                    ->filterKeys(fn ($key) => \in_array($key, ['a', 'c', 'e', 'g']))
                     ->toAssociativeArray(fn ($value, $key) => $key, fn ($value) => $value),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],

@@ -125,7 +125,7 @@ class ReindexTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [1, 2.0, [3], 'a' => [4], 'b' => [5], 'c' => [6], 'd' => []],
-                fn ($value, $key): string => is_array($value) ? "{$key}_".($value[0] ?? 'null') : "{$key}_{$value}",
+                fn ($value, $key): string => \is_array($value) ? "{$key}_".($value[0] ?? 'null') : "{$key}_{$value}",
                 ["0_1" => 1, "1_2" => 2.0, "2_3" => [3], "a_4" => [4], "b_5" => [5], "c_6" => [6], "d_null" => []],
             ],
         ];
@@ -194,7 +194,7 @@ class ReindexTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([1, 2.0, [3], 'a' => [4], 'b' => [5], 'c' => [6], 'd' => []]),
-                fn ($value, $key): string => is_array($value) ? "{$key}_".($value[0] ?? 'null') : "{$key}_{$value}",
+                fn ($value, $key): string => \is_array($value) ? "{$key}_".($value[0] ?? 'null') : "{$key}_{$value}",
                 ["0_1" => 1, "1_2" => 2.0, "2_3" => [3], "a_4" => [4], "b_5" => [5], "c_6" => [6], "d_null" => []],
             ],
         ];
@@ -263,7 +263,7 @@ class ReindexTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([1, 2.0, [3], 'a' => [4], 'b' => [5], 'c' => [6], 'd' => []]),
-                fn ($value, $key): string => is_array($value) ? "{$key}_".($value[0] ?? 'null') : "{$key}_{$value}",
+                fn ($value, $key): string => \is_array($value) ? "{$key}_".($value[0] ?? 'null') : "{$key}_{$value}",
                 ["0_1" => 1, "1_2" => 2.0, "2_3" => [3], "a_4" => [4], "b_5" => [5], "c_6" => [6], "d_null" => []],
             ],
         ];
@@ -332,7 +332,7 @@ class ReindexTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([1, 2.0, [3], 'a' => [4], 'b' => [5], 'c' => [6], 'd' => []]),
-                fn ($value, $key): string => is_array($value) ? "{$key}_".($value[0] ?? 'null') : "{$key}_{$value}",
+                fn ($value, $key): string => \is_array($value) ? "{$key}_".($value[0] ?? 'null') : "{$key}_{$value}",
                 ["0_1" => 1, "1_2" => 2.0, "2_3" => [3], "a_4" => [4], "b_5" => [5], "c_6" => [6], "d_null" => []],
             ],
         ];
@@ -379,9 +379,9 @@ class ReindexTest extends \PHPUnit\Framework\TestCase
                 ),
                 static function (array $value, $key): string {
                     switch (true) {
-                        case is_array($key):
+                        case \is_array($key):
                             return "[{$key[0]}]({$value[0]})";
-                        case is_object($key):
+                        case \is_object($key):
                             return "[{$key->a}]({$value[0]})";
                         default:
                             return "[{$key}]({$value[0]})";
@@ -396,9 +396,9 @@ class ReindexTest extends \PHPUnit\Framework\TestCase
                 ),
                 static function ($value, array $key): string {
                     switch (true) {
-                        case is_array($value):
+                        case \is_array($value):
                             return "[{$key[0]}]({$value[0]})";
-                        case is_object($value):
+                        case \is_object($value):
                             return "[{$key[0]}]({$value->a})";
                         default:
                             return "[{$key[0]}]({$value})";
@@ -413,20 +413,20 @@ class ReindexTest extends \PHPUnit\Framework\TestCase
                 ),
                 static function ($value, $key): string {
                     switch (true) {
-                        case is_array($key):
+                        case \is_array($key):
                             $key = "{$key[0]}";
                             break;
-                        case is_object($key):
+                        case \is_object($key):
                             $key = "{$key->a}";
                             break;
                         default:
                             $key = "{$key}";
                     }
                     switch (true) {
-                        case is_array($value):
+                        case \is_array($value):
                             $value = "{$value[0]}";
                             break;
-                        case is_object($value):
+                        case \is_object($value):
                             $value = "{$value->a}";
                             break;
                         default:

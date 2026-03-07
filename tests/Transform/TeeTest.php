@@ -793,7 +793,7 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         $iterators = Transform::tee($data, $relatedCount);
 
         // Then
-        $this->assertEquals($relatedCount, count($iterators));
+        $this->assertEquals($relatedCount, \count($iterators));
 
         // And When
         foreach ($iterators as $iterator) {

@@ -27,7 +27,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         foreach ($stream as $value) {
             $result[] = $value;
 
-            if (count($expected) > 0 && $i === count($expected) - 1) {
+            if (\count($expected) > 0 && $i === \count($expected) - 1) {
                 break;
             }
 
@@ -93,7 +93,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         foreach ($stream as $value) {
             $result[] = $value;
 
-            if (count($expected) > 0 && $i === count($expected) - 1) {
+            if (\count($expected) > 0 && $i === \count($expected) - 1) {
                 break;
             }
 
@@ -161,7 +161,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         foreach ($stream as $value) {
             $result[] = $value;
 
-            if (count($expected) > 0 && $i === count($expected) - 1) {
+            if (\count($expected) > 0 && $i === \count($expected) - 1) {
                 break;
             }
 
@@ -229,7 +229,7 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
         foreach ($stream as $value) {
             $result[] = $value;
 
-            if (count($expected) > 0 && $i === count($expected) - 1) {
+            if (\count($expected) > 0 && $i === \count($expected) - 1) {
                 break;
             }
 

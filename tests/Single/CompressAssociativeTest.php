@@ -458,6 +458,6 @@ class CompressAssociativeTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expectedKeys, \array_keys($result));
-        $this->assertEquals($expectedValues, array_values($result));
+        $this->assertEquals($expectedValues, \array_values($result));
     }
 }

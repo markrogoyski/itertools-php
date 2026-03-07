@@ -208,7 +208,7 @@ class ChainTest extends \PHPUnit\Framework\TestCase
         $iterator = Multi::chain($first, $second);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);

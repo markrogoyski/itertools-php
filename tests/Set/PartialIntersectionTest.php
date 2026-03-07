@@ -1093,7 +1093,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         foreach (Set::partialIntersection($m, $a, $b, $c, $d) as $value) {
             $result[] = $value;
         }
-        sort($result);
+        \sort($result);
 
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);
@@ -1128,7 +1128,7 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         $partIntersect = Set::partialIntersection($minIntersectionCount, ...$sets);
 
         // When
-        $actual = iterator_to_array($partIntersect);
+        $actual = \iterator_to_array($partIntersect);
 
         // Then
         $this->assertEquals($expected, $actual);

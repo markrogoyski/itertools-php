@@ -99,17 +99,17 @@ class FilterKeysTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5],
-                fn (string $key): bool => in_array($key, ['a', 'c', 'e']),
+                fn (string $key): bool => \in_array($key, ['a', 'c', 'e']),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],
             [
                 [1, 2, 3, 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5],
-                fn ($key): bool => in_array((string)$key, ['a', 'c', 'e']),
+                fn ($key): bool => \in_array((string)$key, ['a', 'c', 'e']),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],
             [
                 [1, 2, 3, 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5],
-                fn ($key): bool => in_array((string)$key, [1, 'a', 'c', 'e']),
+                fn ($key): bool => \in_array((string)$key, [1, 'a', 'c', 'e']),
                 [1 => 2, 'a' => 1, 'c' => 3, 'e' => 5],
             ],
         ];
@@ -162,17 +162,17 @@ class FilterKeysTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
-                fn (string $key): bool => in_array($key, ['a', 'c', 'e']),
+                fn (string $key): bool => \in_array($key, ['a', 'c', 'e']),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],
             [
                 $gen([1, 2, 3, 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
-                fn ($key): bool => in_array((string)$key, ['a', 'c', 'e']),
+                fn ($key): bool => \in_array((string)$key, ['a', 'c', 'e']),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],
             [
                 $gen([1, 2, 3, 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
-                fn ($key): bool => in_array((string)$key, [1, 'a', 'c', 'e']),
+                fn ($key): bool => \in_array((string)$key, [1, 'a', 'c', 'e']),
                 [1 => 2, 'a' => 1, 'c' => 3, 'e' => 5],
             ],
         ];
@@ -226,17 +226,17 @@ class FilterKeysTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
-                fn (string $key): bool => in_array($key, ['a', 'c', 'e']),
+                fn (string $key): bool => \in_array($key, ['a', 'c', 'e']),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],
             [
                 $iter([1, 2, 3, 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
-                fn ($key): bool => in_array((string)$key, ['a', 'c', 'e']),
+                fn ($key): bool => \in_array((string)$key, ['a', 'c', 'e']),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],
             [
                 $iter([1, 2, 3, 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
-                fn ($key): bool => in_array((string)$key, [1, 'a', 'c', 'e']),
+                fn ($key): bool => \in_array((string)$key, [1, 'a', 'c', 'e']),
                 [1 => 2, 'a' => 1, 'c' => 3, 'e' => 5],
             ],
         ];
@@ -290,17 +290,17 @@ class FilterKeysTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
-                fn (string $key): bool => in_array($key, ['a', 'c', 'e']),
+                fn (string $key): bool => \in_array($key, ['a', 'c', 'e']),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],
             [
                 $trav([1, 2, 3, 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
-                fn ($key): bool => in_array((string)$key, ['a', 'c', 'e']),
+                fn ($key): bool => \in_array((string)$key, ['a', 'c', 'e']),
                 ['a' => 1, 'c' => 3, 'e' => 5],
             ],
             [
                 $trav([1, 2, 3, 'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]),
-                fn ($key): bool => in_array((string)$key, [1, 'a', 'c', 'e']),
+                fn ($key): bool => \in_array((string)$key, [1, 'a', 'c', 'e']),
                 [1 => 2, 'a' => 1, 'c' => 3, 'e' => 5],
             ],
         ];
@@ -340,7 +340,7 @@ class FilterKeysTest extends \PHPUnit\Framework\TestCase
                     [[1], [2, 3], [4, 5, 6], [7, 8, 9, 10], [11, 12, 13, 14, 15]],
                     [[11], [22], [33], [44], [55]],
                 ),
-                fn (array $key): bool => count($key) < 4,
+                fn (array $key): bool => \count($key) < 4,
                 [[1], [2, 3], [4, 5, 6]],
                 [[11], [22], [33]],
             ],
@@ -358,7 +358,7 @@ class FilterKeysTest extends \PHPUnit\Framework\TestCase
                     [[1], [2, 3], [4, 5, 6], [7, 8, 9, 10], [11, 12, 13, 14, 15]],
                     [[11], [22], [33], [44], [55]],
                 ),
-                fn (array $key): bool => array_sum($key) === 15,
+                fn (array $key): bool => \array_sum($key) === 15,
                 [[4, 5, 6]],
                 [[33]],
             ],

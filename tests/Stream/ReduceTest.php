@@ -430,7 +430,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -440,7 +440,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -450,7 +450,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -460,7 +460,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 675,
             ],
             [
@@ -481,7 +481,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [7, 8, 9]
                     )
                     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item)),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item)),
                 90,
             ],
             [
@@ -1140,7 +1140,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -1150,7 +1150,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -1160,7 +1160,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -1170,7 +1170,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 675,
             ],
             [
@@ -1191,7 +1191,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [7, 8, 9]
                     )
                     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item)),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item)),
                 90,
             ],
             [
@@ -1774,7 +1774,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -1784,7 +1784,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -1794,7 +1794,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -1804,7 +1804,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 675,
             ],
             [
@@ -1825,7 +1825,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [7, 8, 9]
                     )
                     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item)),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item)),
                 90,
             ],
             [
@@ -2408,7 +2408,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -2418,7 +2418,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -2428,7 +2428,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 666,
             ],
             [
@@ -2438,7 +2438,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [10, 20, 30],
                         [100, 200, 300]
                     )
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item), 0),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 675,
             ],
             [
@@ -2459,7 +2459,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [7, 8, 9]
                     )
                     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
-                    ->toValue(fn ($carry, $item) => $carry + array_sum($item)),
+                    ->toValue(fn ($carry, $item) => $carry + \array_sum($item)),
                 90,
             ],
             [

@@ -114,9 +114,9 @@ final class UsageMap
             }
         }
 
-        while (count($ownersMap) > $maxOwnersCount) {
+        while (\count($ownersMap) > $maxOwnersCount) {
             /** @var non-empty-array<string, int<1, max>> $ownersMap */
-            $minValue = min($ownersMap);
+            $minValue = \min($ownersMap);
             $filtered = [];
             foreach ($ownersMap as $owner => $count) {
                 $adjusted = $count - $minValue;
@@ -127,7 +127,7 @@ final class UsageMap
             $ownersMap = $filtered;
         }
 
-        return array_sum($ownersMap);
+        return \array_sum($ownersMap);
     }
 
     /**

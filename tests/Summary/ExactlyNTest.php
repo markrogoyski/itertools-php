@@ -457,17 +457,17 @@ class ExactlyNTest extends \PHPUnit\Framework\TestCase
             [
                 ['a'],
                 1,
-                fn ($x) => is_string($x),
+                fn ($x) => \is_string($x),
             ],
             [
                 [[5]],
                 1,
-                fn ($x) => is_array($x),
+                fn ($x) => \is_array($x),
             ],
             [
                 [new \stdClass()],
                 1,
-                fn ($x) => is_object($x),
+                fn ($x) => \is_object($x),
             ],
             [
                 [1, 2],
@@ -482,17 +482,17 @@ class ExactlyNTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2.2, '3', 'four'],
                 4,
-                fn ($x) => $x < 3 || is_string($x),
+                fn ($x) => $x < 3 || \is_string($x),
             ],
             [
                 [1, 2.2, '3', 'four', 5, ['what'], [2]],
                 4,
-                fn ($x) => $x < 3 || is_string($x),
+                fn ($x) => $x < 3 || \is_string($x),
             ],
             [
                 [1, 2.2, '3', 'four', 5, ['what'], [2], 2.9, -5],
                 6,
-                fn ($x) => $x < 3 || is_string($x),
+                fn ($x) => $x < 3 || \is_string($x),
             ],
             [
                 [0],
@@ -630,17 +630,17 @@ class ExactlyNTest extends \PHPUnit\Framework\TestCase
             [
                 ['a'],
                 0,
-                fn ($x) => is_string($x),
+                fn ($x) => \is_string($x),
             ],
             [
                 [[5]],
                 2,
-                fn ($x) => is_array($x),
+                fn ($x) => \is_array($x),
             ],
             [
                 [new \stdClass()],
                 0,
-                fn ($x) => is_object($x),
+                fn ($x) => \is_object($x),
             ],
             [
                 [1, 2],
@@ -655,17 +655,17 @@ class ExactlyNTest extends \PHPUnit\Framework\TestCase
             [
                 [1, 2.2, '3', 'four'],
                 5,
-                fn ($x) => $x < 3 || is_string($x),
+                fn ($x) => $x < 3 || \is_string($x),
             ],
             [
                 [1, 2.2, '3', 'four', 5, ['what'], [2]],
                 6,
-                fn ($x) => $x < 3 || is_string($x),
+                fn ($x) => $x < 3 || \is_string($x),
             ],
             [
                 [1, 2.2, '3', 'four', 5, ['what'], [2], 2.9, -5],
                 4,
-                fn ($x) => $x < 3 || is_string($x),
+                fn ($x) => $x < 3 || \is_string($x),
             ],
             [
                 [0],

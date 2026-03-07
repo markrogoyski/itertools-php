@@ -1144,7 +1144,7 @@ final class Stream implements \IteratorAggregate
      */
     public function tee(int $count): array
     {
-        return array_map(fn ($it) => new self($it), Transform::tee($this->iterable, $count));
+        return \array_map(fn ($it) => new self($it), Transform::tee($this->iterable, $count));
     }
 
     /**

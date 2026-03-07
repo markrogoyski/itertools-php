@@ -17,7 +17,7 @@ final class Random
      */
     public static function choice(array $items, int $repetitions, ?\Random\Engine $engine = null): \Generator
     {
-        if (count($items) === 0) {
+        if (\count($items) === 0) {
             throw new \RangeException('Array of items for choice cannot be empty');
         }
 

@@ -61,7 +61,7 @@ class RockPaperScissorsTest extends \PHPUnit\Framework\TestCase
         $engine = new \Random\Engine\Mt19937(42);
 
         // When
-        $result = iterator_to_array(Random::rockPaperScissors(5, $engine));
+        $result = \iterator_to_array(Random::rockPaperScissors(5, $engine));
 
         // Then
         $this->assertEquals(['rock', 'scissors', 'paper', 'paper', 'rock'], $result);
@@ -73,8 +73,8 @@ class RockPaperScissorsTest extends \PHPUnit\Framework\TestCase
     public function testRockPaperScissorsWithSeededEngineIsReproducible(): void
     {
         // Given
-        $result1 = iterator_to_array(Random::rockPaperScissors(10, new \Random\Engine\Mt19937(55)));
-        $result2 = iterator_to_array(Random::rockPaperScissors(10, new \Random\Engine\Mt19937(55)));
+        $result1 = \iterator_to_array(Random::rockPaperScissors(10, new \Random\Engine\Mt19937(55)));
+        $result2 = \iterator_to_array(Random::rockPaperScissors(10, new \Random\Engine\Mt19937(55)));
 
         // Then
         $this->assertEquals($result1, $result2);
@@ -111,7 +111,7 @@ class RockPaperScissorsTest extends \PHPUnit\Framework\TestCase
         $iterator = Random::rockPaperScissors($repetitions);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertCount($repetitions, $result);

@@ -320,7 +320,7 @@ class RunningDifferenceTest extends \PHPUnit\Framework\TestCase
         $iterator = Math::runningDifference($numbers);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);

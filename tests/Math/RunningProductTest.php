@@ -333,7 +333,7 @@ class RunningProductTest extends \PHPUnit\Framework\TestCase
         $iterator = Math::runningProduct($numbers);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertEquals($expected, $result);

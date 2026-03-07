@@ -19,7 +19,7 @@ class ToAssociativeArrayTest extends \PHPUnit\Framework\TestCase
 
         // And
         $keyFunc   = fn ($msg) => \md5($msg);
-        $valueFunc = fn ($msg) => strtoupper($msg);
+        $valueFunc = fn ($msg) => \strtoupper($msg);
 
         // When
         $associativeArray = Transform::toAssociativeArray($messages, $keyFunc, $valueFunc);

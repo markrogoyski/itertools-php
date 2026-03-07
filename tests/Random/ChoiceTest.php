@@ -158,7 +158,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         $engine = new \Random\Engine\Mt19937(42);
 
         // When
-        $result = iterator_to_array(Random::choice($items, 5, $engine));
+        $result = \iterator_to_array(Random::choice($items, 5, $engine));
 
         // Then
         $this->assertEquals(['c', 'd', 'a', 'c', 'c'], $result);
@@ -171,8 +171,8 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
     {
         // Given
         $items   = [10, 20, 30, 40, 50];
-        $result1 = iterator_to_array(Random::choice($items, 10, new \Random\Engine\Mt19937(88)));
-        $result2 = iterator_to_array(Random::choice($items, 10, new \Random\Engine\Mt19937(88)));
+        $result1 = \iterator_to_array(Random::choice($items, 10, new \Random\Engine\Mt19937(88)));
+        $result2 = \iterator_to_array(Random::choice($items, 10, new \Random\Engine\Mt19937(88)));
 
         // Then
         $this->assertEquals($result1, $result2);
@@ -236,7 +236,7 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
         $iterator = Random::choice($items, $repetitions);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertCount($repetitions, $result);

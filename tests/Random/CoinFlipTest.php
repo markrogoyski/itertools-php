@@ -80,7 +80,7 @@ class CoinFlipTest extends \PHPUnit\Framework\TestCase
         $engine = new \Random\Engine\Mt19937(42);
 
         // When
-        $result = iterator_to_array(Random::coinFlip(5, $engine));
+        $result = \iterator_to_array(Random::coinFlip(5, $engine));
 
         // Then
         $this->assertEquals([0, 1, 0, 0, 0], $result);
@@ -92,8 +92,8 @@ class CoinFlipTest extends \PHPUnit\Framework\TestCase
     public function testCoinFlipWithSeededEngineIsReproducible(): void
     {
         // Given
-        $result1 = iterator_to_array(Random::coinFlip(10, new \Random\Engine\Mt19937(123)));
-        $result2 = iterator_to_array(Random::coinFlip(10, new \Random\Engine\Mt19937(123)));
+        $result1 = \iterator_to_array(Random::coinFlip(10, new \Random\Engine\Mt19937(123)));
+        $result2 = \iterator_to_array(Random::coinFlip(10, new \Random\Engine\Mt19937(123)));
 
         // Then
         $this->assertEquals($result1, $result2);
@@ -110,7 +110,7 @@ class CoinFlipTest extends \PHPUnit\Framework\TestCase
         $iterator = Random::coinFlip($repetitions);
 
         // When
-        $result = iterator_to_array($iterator);
+        $result = \iterator_to_array($iterator);
 
         // Then
         $this->assertCount($repetitions, $result);
