@@ -3,7 +3,7 @@
 ## v2.0.0
 
 ### Breaking Changes
-* Minimum PHP version updated from 7.4 to 8.1
+* Minimum PHP version updated from 7.4 to 8.2
 * Updated PHPUnit from ^9.0 to ^10.0
 
 ### New Features
@@ -17,9 +17,9 @@
 ### Improvements
 * Added native `mixed` and union type hints throughout the codebase
 * Removed `#[\ReturnTypeWillChange]` attributes (replaced with proper return types)
-* Updated CI to test PHP 8.1, 8.2, 8.3, 8.4
+* Updated CI to test PHP 8.2, 8.3, 8.4
 
-## v1.9.0 - 2024-02-023
+## v1.9.0 - 2024-02-23
 
 ### Improvements
 * Improvements for PHP 8.4 compatibility
