@@ -4,6 +4,7 @@
 
 # Improvements
 * Fix `cycle` crash with generator-returning IteratorAggregate and null handling in min/max reductions
+* Fix `allMatch`/`anyMatch`/`noneMatch` to use boolean coercion instead of strict comparison
 
 ## v2.0.0 - 2026-03-07
 

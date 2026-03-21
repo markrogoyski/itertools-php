@@ -209,6 +209,72 @@ class AnyMatchTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
+    /**
+     * @test         anyMatch with truthy non-boolean predicate returns - true
+     * @dataProvider dataProviderForAnyMatchTruthyNonBooleanTrue
+     * @param        array $data
+     * @param        callable $predicate
+     */
+    public function testAnyMatchWithTruthyNonBooleanPredicateTrue(array $data, callable $predicate): void
+    {
+        // When
+        $result = Summary::anyMatch($data, $predicate);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    public static function dataProviderForAnyMatchTruthyNonBooleanTrue(): array
+    {
+        return [
+            [
+                [0, 0, 1],
+                fn ($x) => $x, // 1 is truthy
+            ],
+            [
+                ['', 'a'],
+                fn ($x) => $x, // 'a' is truthy
+            ],
+            [
+                ['foo'],
+                fn ($x) => \preg_match('/\w+/', $x), // returns 1
+            ],
+        ];
+    }
+
+    /**
+     * @test         anyMatch with falsy non-boolean predicate returns - false
+     * @dataProvider dataProviderForAnyMatchTruthyNonBooleanFalse
+     * @param        array $data
+     * @param        callable $predicate
+     */
+    public function testAnyMatchWithTruthyNonBooleanPredicateFalse(array $data, callable $predicate): void
+    {
+        // When
+        $result = Summary::anyMatch($data, $predicate);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    public static function dataProviderForAnyMatchTruthyNonBooleanFalse(): array
+    {
+        return [
+            [
+                [0, 0, 0],
+                fn ($x) => $x, // all falsy
+            ],
+            [
+                ['', ''],
+                fn ($x) => $x, // all falsy
+            ],
+            [
+                [null, null],
+                fn ($x) => $x, // all falsy
+            ],
+        ];
+    }
+
     public static function dataProviderForAnyMatchWhenFalseArray(): array
     {
         return [

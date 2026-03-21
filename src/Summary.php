@@ -25,7 +25,7 @@ final class Summary
     public static function allMatch(iterable $data, callable $predicate): bool
     {
         foreach ($data as $datum) {
-            if ($predicate($datum) === false) {
+            if (!(bool) $predicate($datum)) {
                 return false;
             }
         }
@@ -46,7 +46,7 @@ final class Summary
     public static function anyMatch(iterable $data, callable $predicate): bool
     {
         foreach ($data as $datum) {
-            if ($predicate($datum) === true) {
+            if ((bool) $predicate($datum)) {
                 return true;
             }
         }
@@ -66,7 +66,7 @@ final class Summary
     public static function noneMatch(iterable $data, callable $predicate): bool
     {
         foreach ($data as $datum) {
-            if ($predicate($datum) === true) {
+            if ((bool) $predicate($datum)) {
                 return false;
             }
         }

@@ -205,6 +205,72 @@ class AllMatchTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
+    /**
+     * @test         allMatch with truthy non-boolean predicate returns - true
+     * @dataProvider dataProviderForAllMatchTruthyNonBooleanTrue
+     * @param        array $data
+     * @param        callable $predicate
+     */
+    public function testAllMatchWithTruthyNonBooleanPredicateTrue(array $data, callable $predicate): void
+    {
+        // When
+        $result = Summary::allMatch($data, $predicate);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    public static function dataProviderForAllMatchTruthyNonBooleanTrue(): array
+    {
+        return [
+            [
+                [1, 2, 3],
+                fn ($x) => $x, // all truthy integers
+            ],
+            [
+                ['foo', 'bar'],
+                fn ($x) => \preg_match('/\w+/', $x), // returns 1
+            ],
+            [
+                ['a', 'b'],
+                fn ($x) => $x, // all truthy strings
+            ],
+        ];
+    }
+
+    /**
+     * @test         allMatch with falsy non-boolean predicate returns - false
+     * @dataProvider dataProviderForAllMatchTruthyNonBooleanFalse
+     * @param        array $data
+     * @param        callable $predicate
+     */
+    public function testAllMatchWithTruthyNonBooleanPredicateFalse(array $data, callable $predicate): void
+    {
+        // When
+        $result = Summary::allMatch($data, $predicate);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    public static function dataProviderForAllMatchTruthyNonBooleanFalse(): array
+    {
+        return [
+            [
+                [1, 0, 2],
+                fn ($x) => $x, // 0 is falsy
+            ],
+            [
+                ['a', '', 'b'],
+                fn ($x) => $x, // '' is falsy
+            ],
+            [
+                [1, null, 3],
+                fn ($x) => $x, // null is falsy
+            ],
+        ];
+    }
+
     public static function dataProviderForAllMatchWhenFalseArray(): array
     {
         return [

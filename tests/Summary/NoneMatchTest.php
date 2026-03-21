@@ -205,6 +205,72 @@ class NoneMatchTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
+    /**
+     * @test         noneMatch with truthy non-boolean predicate returns - true
+     * @dataProvider dataProviderForNoneMatchTruthyNonBooleanTrue
+     * @param        array $data
+     * @param        callable $predicate
+     */
+    public function testNoneMatchWithTruthyNonBooleanPredicateTrue(array $data, callable $predicate): void
+    {
+        // When
+        $result = Summary::noneMatch($data, $predicate);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    public static function dataProviderForNoneMatchTruthyNonBooleanTrue(): array
+    {
+        return [
+            [
+                [0, 0, 0],
+                fn ($x) => $x, // all falsy
+            ],
+            [
+                ['', ''],
+                fn ($x) => $x, // all falsy
+            ],
+            [
+                [null, null],
+                fn ($x) => $x, // all falsy
+            ],
+        ];
+    }
+
+    /**
+     * @test         noneMatch with truthy non-boolean predicate returns - false
+     * @dataProvider dataProviderForNoneMatchTruthyNonBooleanFalse
+     * @param        array $data
+     * @param        callable $predicate
+     */
+    public function testNoneMatchWithTruthyNonBooleanPredicateFalse(array $data, callable $predicate): void
+    {
+        // When
+        $result = Summary::noneMatch($data, $predicate);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    public static function dataProviderForNoneMatchTruthyNonBooleanFalse(): array
+    {
+        return [
+            [
+                [0, 0, 1],
+                fn ($x) => $x, // 1 is truthy
+            ],
+            [
+                ['', 'a'],
+                fn ($x) => $x, // 'a' is truthy
+            ],
+            [
+                ['foo'],
+                fn ($x) => \preg_match('/\w+/', $x), // returns 1
+            ],
+        ];
+    }
+
     public static function dataProviderForNoneMatchWhenFalseArray(): array
     {
         return [
