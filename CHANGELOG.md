@@ -1,5 +1,10 @@
 # IterTools PHP Change Log
 
+## v2.1.0 - TBD
+
+# Improvements
+* Fix `cycle` crash with generator-returning IteratorAggregate and null handling in min/max reductions
+
 ## v2.0.0 - 2026-03-07
 
 ### Breaking Changes

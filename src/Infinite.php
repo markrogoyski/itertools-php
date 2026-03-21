@@ -30,9 +30,15 @@ final class Infinite
      */
     public static function cycle(iterable $iterable): \InfiniteIterator
     {
-        if ($iterable instanceof \Generator) {
-            $iterable = \iterator_to_array($iterable);
+        if ($iterable instanceof \IteratorAggregate) {
+            $inner = $iterable->getIterator();
+            if ($inner instanceof \Generator) {
+                $iterable = \iterator_to_array($inner, false);
+            }
+        } elseif ($iterable instanceof \Generator) {
+            $iterable = \iterator_to_array($iterable, false);
         }
+
         return new \InfiniteIterator(Transform::toIterator($iterable));
     }
 

@@ -514,6 +514,16 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
                 fn ($item) => -$item[1],
                 [2, 0, 3],
             ],
+            [
+                [-1, null, -2],
+                null,
+                -1,
+            ],
+            [
+                [-1, null, -2],
+                fn ($item) => $item,
+                -1,
+            ],
         ];
     }
 

@@ -50,15 +50,24 @@ final class Reduce
     public static function toMin(iterable $data, ?callable $compareBy = null): mixed
     {
         if ($compareBy !== null) {
-            return static::toValue(
+            /** @var mixed|NoValueMonad $result */
+            $result = static::toValue(
                 $data,
-                fn (mixed $carry, mixed $datum): mixed => $compareBy($datum) < $compareBy($carry ?? $datum)
+                fn (mixed $carry, mixed $datum): mixed => ($carry instanceof NoValueMonad || $compareBy($datum) < $compareBy($carry))
                     ? $datum
-                    : $carry ?? $datum
+                    : $carry,
+                NoValueMonad::getInstance()
+            );
+        } else {
+            /** @var mixed|NoValueMonad $result */
+            $result = static::toValue(
+                $data,
+                fn (mixed $carry, mixed $datum): mixed => ($carry instanceof NoValueMonad) ? $datum : \min($carry, $datum),
+                NoValueMonad::getInstance()
             );
         }
 
-        return static::toValue($data, fn (mixed $carry, mixed $datum): mixed => \min($carry ?? $datum, $datum));
+        return ($result instanceof NoValueMonad) ? null : $result;
     }
 
     /**
@@ -77,15 +86,24 @@ final class Reduce
     public static function toMax(iterable $data, ?callable $compareBy = null): mixed
     {
         if ($compareBy !== null) {
-            return static::toValue(
+            /** @var mixed|NoValueMonad $result */
+            $result = static::toValue(
                 $data,
-                fn (mixed $carry, mixed $datum): mixed => $compareBy($datum) > $compareBy($carry ?? $datum)
+                fn (mixed $carry, mixed $datum): mixed => ($carry instanceof NoValueMonad || $compareBy($datum) > $compareBy($carry))
                     ? $datum
-                    : $carry ?? $datum
+                    : $carry,
+                NoValueMonad::getInstance()
+            );
+        } else {
+            /** @var mixed|NoValueMonad $result */
+            $result = static::toValue(
+                $data,
+                fn (mixed $carry, mixed $datum): mixed => ($carry instanceof NoValueMonad) ? $datum : \max($carry, $datum),
+                NoValueMonad::getInstance()
             );
         }
 
-        return static::toValue($data, fn (mixed $carry, mixed $datum): mixed => \max($carry ?? $datum, $datum));
+        return ($result instanceof NoValueMonad) ? null : $result;
     }
 
     /**
@@ -101,32 +119,38 @@ final class Reduce
      * @param callable|null     $compareBy
      *
      * @return array{numeric, numeric}|array{null, null}
-     * @phpstan-ignore return.unusedType
      */
     public static function toMinMax(iterable $numbers, ?callable $compareBy = null): array
     {
         if ($compareBy !== null) {
-            return static::toValue($numbers, static function (array $carry, mixed $datum) use ($compareBy): array {
+            /** @var array{mixed|NoValueMonad, mixed|NoValueMonad} $result */
+            $result = static::toValue($numbers, static function (array $carry, mixed $datum) use ($compareBy): array {
                 return [
-                    $compareBy($datum) <= $compareBy($carry[0] ?? $datum)
+                    ($carry[0] instanceof NoValueMonad || $compareBy($datum) <= $compareBy($carry[0]))
                         ? $datum
-                        : $carry[0] ?? $datum,
-                    $compareBy($datum) >= $compareBy($carry[1] ?? $datum)
+                        : $carry[0],
+                    ($carry[1] instanceof NoValueMonad || $compareBy($datum) >= $compareBy($carry[1]))
                         ? $datum
-                        : $carry[1] ?? $datum,
+                        : $carry[1],
                 ];
-            }, [null, null]);
+            }, [NoValueMonad::getInstance(), NoValueMonad::getInstance()]);
+        } else {
+            /** @var array{mixed|NoValueMonad, mixed|NoValueMonad} $result */
+            $result = static::toValue(
+                $numbers,
+                fn (array $carry, mixed $datum): array => [
+                    ($carry[0] instanceof NoValueMonad) ? $datum : \min($carry[0], $datum),
+                    ($carry[1] instanceof NoValueMonad) ? $datum : \max($carry[1], $datum)
+                ],
+                [NoValueMonad::getInstance(), NoValueMonad::getInstance()]
+            );
         }
 
-        return static::toValue(
-            $numbers,
-            /** @param array{numeric|null, numeric|null} $carry */
-            fn (array $carry, mixed $datum): array => [
-                \min($carry[0] ?? $datum, $datum),
-                \max($carry[1] ?? $datum, $datum)
-            ],
-            [null, null]
-        );
+        /** @var array{numeric, numeric}|array{null, null} */
+        return [
+            ($result[0] instanceof NoValueMonad) ? null : $result[0],
+            ($result[1] instanceof NoValueMonad) ? null : $result[1],
+        ];
     }
 
     /**

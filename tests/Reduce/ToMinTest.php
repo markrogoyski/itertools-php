@@ -503,6 +503,16 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
                 fn ($item) => -$item[1],
                 [1, 2, 3],
             ],
+            [
+                [1, null, 2],
+                null,
+                null,
+            ],
+            [
+                [1, null, 2],
+                fn ($item) => $item,
+                null,
+            ],
         ];
     }
 
