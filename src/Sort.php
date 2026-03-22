@@ -11,10 +11,6 @@ final class Sort
      *
      * If comparator is null, the elements of given iterable must be comparable.
      *
-     * Note: When the iterable yields duplicate keys (e.g. a generator using `yield $value`
-     * without explicit keys), later values silently overwrite earlier ones because keys must
-     * be unique in the resulting array. Use Sort::sort() instead when key preservation is not needed.
-     *
      * @param iterable<mixed> $data
      * @param callable(mixed, mixed):int|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
@@ -22,16 +18,20 @@ final class Sort
      */
     public static function asort(iterable $data, ?callable $comparator = null): \Generator
     {
-        $array = \iterator_to_array(Transform::toIterator($data), true);
-
-        if ($comparator === null) {
-            \asort($array);
-        } else {
-            \uasort($array, $comparator);
+        /** @var list<array{0: mixed, 1: mixed}> $pairs */
+        $pairs = [];
+        foreach (Transform::toIterator($data) as $key => $value) {
+            $pairs[] = [$key, $value];
         }
 
-        foreach ($array as $key => $datum) {
-            yield $key => $datum;
+        if ($comparator === null) {
+            \usort($pairs, static fn (array $a, array $b) => $a[1] <=> $b[1]);
+        } else {
+            \usort($pairs, static fn (array $a, array $b) => $comparator($a[1], $b[1]));
+        }
+
+        foreach ($pairs as [$key, $value]) {
+            yield $key => $value;
         }
     }
 

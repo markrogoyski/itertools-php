@@ -967,4 +967,70 @@ class AsortTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test asort preserves all elements from generator with duplicate keys
+     */
+    public function testAsortGeneratorWithDuplicateKeys(): void
+    {
+        // Given: generator yielding keys 0, 1, 0, 1 (duplicates)
+        $gen = GeneratorFixture::getCombined([0, 1, 0, 1], ['c', 'a', 'b', 'z']);
+
+        // When
+        $keys = [];
+        $values = [];
+        foreach (Sort::asort($gen) as $key => $datum) {
+            $keys[] = $key;
+            $values[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(4, $values);
+        $this->assertEquals(['a', 'b', 'c', 'z'], $values);
+        $this->assertEquals([1, 0, 0, 1], $keys);
+    }
+
+    /**
+     * @test asort with custom comparator preserves all elements from generator with duplicate keys
+     */
+    public function testAsortGeneratorWithDuplicateKeysCustomComparator(): void
+    {
+        // Given: generator yielding keys 0, 1, 0, 1 (duplicates)
+        $gen = GeneratorFixture::getCombined([0, 1, 0, 1], ['c', 'a', 'b', 'z']);
+
+        // When
+        $keys = [];
+        $values = [];
+        foreach (Sort::asort($gen, fn ($lhs, $rhs) => $rhs <=> $lhs) as $key => $datum) {
+            $keys[] = $key;
+            $values[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(4, $values);
+        $this->assertEquals(['z', 'c', 'b', 'a'], $values);
+        $this->assertEquals([1, 0, 0, 1], $keys);
+    }
+
+    /**
+     * @test asort with duplicate keys and equal values preserves insertion order for ties
+     */
+    public function testAsortGeneratorWithDuplicateKeysAndEqualValues(): void
+    {
+        // Given: generator yielding duplicate keys with some equal values
+        $gen = GeneratorFixture::getCombined([0, 1, 0, 1], ['a', 'a', 'b', 'b']);
+
+        // When
+        $keys = [];
+        $values = [];
+        foreach (Sort::asort($gen) as $key => $datum) {
+            $keys[] = $key;
+            $values[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(4, $values);
+        $this->assertEquals(['a', 'a', 'b', 'b'], $values);
+        $this->assertEquals([0, 1, 0, 1], $keys);
+    }
 }

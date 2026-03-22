@@ -6,6 +6,7 @@
 * Fix `cycle` crash with generator-returning IteratorAggregate and null handling in min/max reductions
 * Fix `allMatch`/`anyMatch`/`noneMatch` to use boolean coercion instead of strict comparison
 * Fix `Sort::sort` dropping elements when iterable has duplicate keys
+* Fix `Sort::asort` dropping elements when iterable has duplicate keys
 * Throw InvalidArgumentException for non-serializable objects in coercive comparison mode
 * Throw InvalidArgumentException for non-positive count in `Transform::tee()`
 * Throw InvalidArgumentException for step=0 in `Infinite::count()`
