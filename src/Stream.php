@@ -552,11 +552,15 @@ final class Stream implements \IteratorAggregate
      *
      * If comparator is null, then elements of the iterable source must be comparable.
      *
+     * Note: When the iterable yields duplicate keys (e.g. a generator using `yield $value`
+     * without explicit keys), later values silently overwrite earlier ones because keys must
+     * be unique in the resulting array. Use sort() instead when key preservation is not needed.
+     *
      * @param (callable(mixed, mixed):int)|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
      * @return Stream
      *
-     * @see Single::asort()
+     * @see Sort::asort()
      */
     public function asort(?callable $comparator = null): self
     {

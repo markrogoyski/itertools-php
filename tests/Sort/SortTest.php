@@ -961,4 +961,42 @@ class SortTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test sort preserves all elements from generator with duplicate keys
+     */
+    public function testSortGeneratorWithDuplicateKeys(): void
+    {
+        // Given: generator yielding keys 0, 1, 0, 1 (duplicates)
+        $gen = GeneratorFixture::getCombined([0, 1, 0, 1], ['c', 'a', 'b', 'z']);
+
+        // When
+        $result = [];
+        foreach (Sort::sort($gen) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(4, $result);
+        $this->assertEquals(['a', 'b', 'c', 'z'], $result);
+    }
+
+    /**
+     * @test sort with custom comparator preserves all elements from generator with duplicate keys
+     */
+    public function testSortGeneratorWithDuplicateKeysCustomComparator(): void
+    {
+        // Given: generator yielding keys 0, 1, 0, 1 (duplicates)
+        $gen = GeneratorFixture::getCombined([0, 1, 0, 1], ['c', 'a', 'b', 'z']);
+
+        // When
+        $result = [];
+        foreach (Sort::sort($gen, fn ($lhs, $rhs) => $rhs <=> $lhs) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(4, $result);
+        $this->assertEquals(['z', 'c', 'b', 'a'], $result);
+    }
 }

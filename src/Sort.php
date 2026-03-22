@@ -11,6 +11,10 @@ final class Sort
      *
      * If comparator is null, the elements of given iterable must be comparable.
      *
+     * Note: When the iterable yields duplicate keys (e.g. a generator using `yield $value`
+     * without explicit keys), later values silently overwrite earlier ones because keys must
+     * be unique in the resulting array. Use Sort::sort() instead when key preservation is not needed.
+     *
      * @param iterable<mixed> $data
      * @param callable(mixed, mixed):int|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
@@ -43,7 +47,7 @@ final class Sort
      */
     public static function sort(iterable $data, ?callable $comparator = null): \Generator
     {
-        $array = \iterator_to_array(Transform::toIterator($data));
+        $array = \iterator_to_array(Transform::toIterator($data), false);
 
         if ($comparator === null) {
             \sort($array);
