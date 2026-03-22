@@ -438,6 +438,70 @@ class FilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test filter preserves keys with associative array
+     */
+    public function testFilterPreservesKeysArray(): void
+    {
+        // Given
+        $data = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5];
+
+        // When
+        $result = \iterator_to_array(Single::filter($data, fn ($x) => $x > 2));
+
+        // Then
+        $expected = ['c' => 3, 'd' => 4, 'e' => 5];
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test filter preserves keys with associative generator
+     */
+    public function testFilterPreservesKeysGenerator(): void
+    {
+        // Given
+        $data = Fixture\GeneratorFixture::getKeyValueGenerator(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]);
+
+        // When
+        $result = \iterator_to_array(Single::filter($data, fn ($x) => $x > 2));
+
+        // Then
+        $expected = ['c' => 3, 'd' => 4, 'e' => 5];
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test filter preserves keys with associative iterator
+     */
+    public function testFilterPreservesKeysIterator(): void
+    {
+        // Given
+        $data = new \ArrayIterator(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]);
+
+        // When
+        $result = \iterator_to_array(Single::filter($data, fn ($x) => $x > 2));
+
+        // Then
+        $expected = ['c' => 3, 'd' => 4, 'e' => 5];
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test filter preserves keys with associative traversable
+     */
+    public function testFilterPreservesKeysTraversable(): void
+    {
+        // Given
+        $data = new Fixture\IteratorAggregateFixture(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5]);
+
+        // When
+        $result = \iterator_to_array(Single::filter($data, fn ($x) => $x > 2));
+
+        // Then
+        $expected = ['c' => 3, 'd' => 4, 'e' => 5];
+        $this->assertSame($expected, $result);
+    }
+
+    /**
      * @test         filter iterator_to_array
      * @dataProvider dataProviderForArray
      * @param        array    $iterable

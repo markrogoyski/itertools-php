@@ -478,6 +478,86 @@ class FilterTrueTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test filterTrue preserves keys with associative array
+     */
+    public function testFilterTruePreservesKeysArray(): void
+    {
+        // Given
+        $data = ['a' => 1, 'b' => 0, 'c' => 3, 'd' => 0, 'e' => 5];
+
+        // When
+        $result = \iterator_to_array(Single::filterTrue($data));
+
+        // Then
+        $expected = ['a' => 1, 'c' => 3, 'e' => 5];
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test filterTrue preserves keys with predicate and associative array
+     */
+    public function testFilterTruePreservesKeysWithPredicateArray(): void
+    {
+        // Given
+        $data = ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5];
+
+        // When
+        $result = \iterator_to_array(Single::filterTrue($data, fn ($x) => $x > 2));
+
+        // Then
+        $expected = ['c' => 3, 'd' => 4, 'e' => 5];
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test filterTrue preserves keys with associative generator
+     */
+    public function testFilterTruePreservesKeysGenerator(): void
+    {
+        // Given
+        $data = Fixture\GeneratorFixture::getKeyValueGenerator(['a' => 1, 'b' => 0, 'c' => 3, 'd' => 0, 'e' => 5]);
+
+        // When
+        $result = \iterator_to_array(Single::filterTrue($data));
+
+        // Then
+        $expected = ['a' => 1, 'c' => 3, 'e' => 5];
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test filterTrue preserves keys with associative iterator
+     */
+    public function testFilterTruePreservesKeysIterator(): void
+    {
+        // Given
+        $data = new \ArrayIterator(['a' => 1, 'b' => 0, 'c' => 3, 'd' => 0, 'e' => 5]);
+
+        // When
+        $result = \iterator_to_array(Single::filterTrue($data));
+
+        // Then
+        $expected = ['a' => 1, 'c' => 3, 'e' => 5];
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test filterTrue preserves keys with associative traversable
+     */
+    public function testFilterTruePreservesKeysTraversable(): void
+    {
+        // Given
+        $data = new Fixture\IteratorAggregateFixture(['a' => 1, 'b' => 0, 'c' => 3, 'd' => 0, 'e' => 5]);
+
+        // When
+        $result = \iterator_to_array(Single::filterTrue($data));
+
+        // Then
+        $expected = ['a' => 1, 'c' => 3, 'e' => 5];
+        $this->assertSame($expected, $result);
+    }
+
+    /**
      * @test         filterTrue iterator_to_array
      * @dataProvider dataProviderForArray
      * @param        array    $iterable
