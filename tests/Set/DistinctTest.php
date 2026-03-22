@@ -1244,6 +1244,40 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test distinct treats two NAN values as the same element in strict mode
+     */
+    public function testNanDeduplicatedInStrictMode(): void
+    {
+        // When
+        $result = [];
+        foreach (Set::distinct([\NAN, \NAN, 1], true) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(2, $result);
+        $this->assertNan($result[0]);
+        $this->assertSame(1, $result[1]);
+    }
+
+    /**
+     * @test distinct treats two NAN values as the same element in coercive mode
+     */
+    public function testNanDeduplicatedInCoerciveMode(): void
+    {
+        // When
+        $result = [];
+        foreach (Set::distinct([\NAN, \NAN, 1], false) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(2, $result);
+        $this->assertNan($result[0]);
+        $this->assertSame(1, $result[1]);
+    }
+
+    /**
      * @test distinct works with non-serializable objects in strict mode (uses spl_object_id)
      */
     public function testNonSerializableObjectStrictMode(): void
