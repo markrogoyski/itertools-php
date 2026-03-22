@@ -16,6 +16,10 @@ final class Infinite
      */
     public static function count(int $start = 1, int $step = 1): \Generator
     {
+        if ($step === 0) {
+            throw new \InvalidArgumentException("Step must be non-zero. Got 0. Use Infinite::repeat() to yield the same value infinitely.");
+        }
+
         for ($i = $start; $i < \INF; $i += $step) {
             yield $i;
         }

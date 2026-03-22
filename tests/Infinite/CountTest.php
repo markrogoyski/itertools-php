@@ -103,6 +103,19 @@ class CountTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test count with step zero throws InvalidArgumentException
+     */
+    public function testCountStepZeroThrowsException(): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Step must be non-zero');
+
+        // When
+        Infinite::count(1, 0)->current();
+    }
+
+    /**
      * @test count for a long time
      */
     public function testCountForLongTime(): void
