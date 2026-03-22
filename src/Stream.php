@@ -606,6 +606,9 @@ final class Stream implements \IteratorAggregate
      *
      * For uneven lengths, iterations stops when the shortest iterable is exhausted.
      *
+     * Note: Passing the same iterator instance more than once will not work as expected
+     * because PHP's MultipleIterator silently ignores duplicate attachments.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return Stream
@@ -626,6 +629,9 @@ final class Stream implements \IteratorAggregate
      *
      * Iteration continues until the longest iterable is exhausted.
      * For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
+     *
+     * Note: Passing the same iterator instance more than once will not work as expected
+     * because PHP's MultipleIterator silently ignores duplicate attachments.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -648,6 +654,9 @@ final class Stream implements \IteratorAggregate
      * Iteration continues until the longest iterable is exhausted.
      * For uneven lengths, the exhausted iterables will produce $filler value for the remaining iterations.
      *
+     * Note: Passing the same iterator instance more than once will not work as expected
+     * because PHP's MultipleIterator silently ignores duplicate attachments.
+     *
      * @param mixed $filler
      * @param iterable<mixed> ...$iterables
      *
@@ -666,6 +675,9 @@ final class Stream implements \IteratorAggregate
      *
      * Works like Multi::zip() method but throws \LengthException if lengths not equal,
      * i.e., at least one iterator ends before the others.
+     *
+     * Note: Passing the same iterator instance more than once will not work as expected
+     * because PHP's MultipleIterator silently ignores duplicate attachments.
      *
      * @param iterable<mixed> ...$iterables
      *
