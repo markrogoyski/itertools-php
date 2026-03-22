@@ -278,7 +278,7 @@ final class Stream implements \IteratorAggregate
      *
      * @return Stream
      *
-     * @see Single::filter()
+     * @see Single::filterTrue()
      */
     public function filter(callable $predicate): self
     {
