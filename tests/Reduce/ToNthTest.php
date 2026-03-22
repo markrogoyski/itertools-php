@@ -699,6 +699,39 @@ class ToNthTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test toNth with negative position throws InvalidArgumentException
+     * @dataProvider dataProviderForNegativePosition
+     * @param iterable $data
+     * @param int $position
+     */
+    public function testNegativePositionThrowsException(iterable $data, int $position): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Reduce::toNth($data, $position);
+    }
+
+    public static function dataProviderForNegativePosition(): array
+    {
+        return [
+            [
+                [1, 2, 3],
+                -1,
+            ],
+            [
+                [1, 2, 3],
+                -5,
+            ],
+            [
+                [],
+                -1,
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider dataProviderForError
      * @param iterable $data
      * @param int $position

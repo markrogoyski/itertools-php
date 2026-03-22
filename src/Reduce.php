@@ -377,6 +377,10 @@ final class Reduce
      */
     public static function toNth(iterable $data, int $position): mixed
     {
+        if ($position < 0) {
+            throw new \InvalidArgumentException("Position must be non-negative. Got {$position}.");
+        }
+
         if (\is_countable($data) && \count($data) <= $position) {
             throw new \LengthException("Given iterable does not contain item with position {$position}");
         }
