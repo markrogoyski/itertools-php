@@ -105,6 +105,16 @@ class RunningAverageTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 [],
+                0,
+                [0],
+            ],
+            [
+                [1, 2, 3],
+                0,
+                [0, 1/2, 1, 6/4],
+            ],
+            [
+                [],
                 5,
                 [5],
             ],

@@ -8,7 +8,7 @@
 * Fix `Sort::sort` dropping elements when iterable has duplicate keys
 * Throw InvalidArgumentException for non-serializable objects in coercive comparison mode
 * Throw InvalidArgumentException for non-positive count in `Transform::tee()`
-* Throw InvalidArgumentException for step=0 in `Infinite::count()`.
+* Throw InvalidArgumentException for step=0 in `Infinite::count()`
 
 ## v2.0.0 - 2026-03-07
 
