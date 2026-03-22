@@ -324,4 +324,40 @@ class TransformationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($daysOfWeek, $week2Stream->toArray());
         $this->assertEquals($daysOfWeek, $week3Stream->toArray());
     }
+
+    /**
+     * @test tee throws InvalidArgumentException for zero count
+     */
+    public function testTeeThrowsExceptionForZeroCount(): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Count must be ≥ 1. Got 0');
+
+        // When
+        Stream::of([1, 2, 3])->tee(0);
+    }
+
+    /**
+     * @test         tee throws InvalidArgumentException for negative count
+     * @dataProvider dataProviderForTeeNegativeCount
+     */
+    public function testTeeThrowsExceptionForNegativeCount(int $count): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Count must be ≥ 1. Got {$count}");
+
+        // When
+        Stream::of([1, 2, 3])->tee($count);
+    }
+
+    public static function dataProviderForTeeNegativeCount(): array
+    {
+        return [
+            [-1],
+            [-2],
+            [-10],
+        ];
+    }
 }

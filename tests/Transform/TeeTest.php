@@ -782,6 +782,42 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         tee throws InvalidArgumentException for zero count
+     */
+    public function testTeeThrowsExceptionForZeroCount(): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Count must be ≥ 1. Got 0');
+
+        // When
+        Transform::tee([1, 2, 3], 0);
+    }
+
+    /**
+     * @test         tee throws InvalidArgumentException for negative count
+     * @dataProvider dataProviderForNegativeCount
+     */
+    public function testTeeThrowsExceptionForNegativeCount(int $count): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Count must be ≥ 1. Got {$count}");
+
+        // When
+        Transform::tee([1, 2, 3], $count);
+    }
+
+    public static function dataProviderForNegativeCount(): array
+    {
+        return [
+            [-1],
+            [-2],
+            [-10],
+        ];
+    }
+
+    /**
      * @test         tee iterator_to_array
      * @dataProvider dataProviderForArray
      * @param array  $data

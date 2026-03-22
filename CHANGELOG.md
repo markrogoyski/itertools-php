@@ -7,6 +7,7 @@
 * Fix `allMatch`/`anyMatch`/`noneMatch` to use boolean coercion instead of strict comparison
 * Fix `Sort::sort` dropping elements when iterable has duplicate keys
 * Throw InvalidArgumentException for non-serializable objects in coercive comparison mode
+* Throw InvalidArgumentException for non-positive count in `Transform::tee()`
 
 ## v2.0.0 - 2026-03-07
 

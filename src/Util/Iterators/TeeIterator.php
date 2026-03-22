@@ -35,10 +35,14 @@ final class TeeIterator extends \NoRewindIterator
 
     /**
      * @param \Iterator<TKey, TValue> $iterator
-     * @param positive-int $relatedCount
+     * @param int $relatedCount
      */
     public function __construct(\Iterator $iterator, int $relatedCount)
     {
+        if ($relatedCount < 1) {
+            throw new \InvalidArgumentException("Count must be ≥ 1. Got {$relatedCount}");
+        }
+
         parent::__construct($iterator);
         $iterator->rewind();
 
