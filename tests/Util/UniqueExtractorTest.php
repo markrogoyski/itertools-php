@@ -6,6 +6,7 @@ namespace IterTools\Tests\Util;
 
 use IterTools\Util\UniqueExtractor;
 use IterTools\Tests\Fixture;
+use IterTools\Tests\Fixture\NonSerializableFixture;
 
 class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
 {
@@ -316,5 +317,56 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
                 ' over the lazy dog. The quick brown fox jumps'
             ],
         ];
+    }
+
+    /**
+     * @test non-serializable object in strict mode uses spl_object_id
+     */
+    public function testNonSerializableObjectStrictUsesObjectId(): void
+    {
+        // Given
+        $obj = new NonSerializableFixture(1);
+
+        // When
+        $string = UniqueExtractor::getString($obj, true);
+
+        // Then
+        $this->assertTrue($this->startsWith($string, 'object_'));
+        $this->assertSame('object_' . \spl_object_id($obj), $string);
+    }
+
+    /**
+     * @test non-serializable object in non-strict mode throws InvalidArgumentException
+     */
+    public function testNonSerializableObjectNonStrictThrowsException(): void
+    {
+        // Given
+        $obj = new NonSerializableFixture(1);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('NonSerializableFixture');
+
+        // When
+        UniqueExtractor::getString($obj, false);
+    }
+
+    /**
+     * @test non-serializable object exception wraps original cause
+     */
+    public function testNonSerializableObjectExceptionWrapsOriginalCause(): void
+    {
+        // Given
+        $obj = new NonSerializableFixture(1);
+
+        // When
+        try {
+            UniqueExtractor::getString($obj, false);
+            $this->fail('Expected InvalidArgumentException');
+        } catch (\InvalidArgumentException $e) {
+            // Then
+            $this->assertNotNull($e->getPrevious());
+            $this->assertStringContainsString('cannot be serialized', $e->getPrevious()->getMessage());
+        }
     }
 }

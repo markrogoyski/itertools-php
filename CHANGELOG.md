@@ -6,6 +6,7 @@
 * Fix `cycle` crash with generator-returning IteratorAggregate and null handling in min/max reductions
 * Fix `allMatch`/`anyMatch`/`noneMatch` to use boolean coercion instead of strict comparison
 * Fix `Sort::sort` dropping elements when iterable has duplicate keys
+* Throw InvalidArgumentException for non-serializable objects in coercive comparison mode
 
 ## v2.0.0 - 2026-03-07
 

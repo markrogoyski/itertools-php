@@ -26,7 +26,7 @@ final class UniqueExtractor
      *
      * If $strict is false:
      *  - scalars: result is unique by value;
-     *  - objects: result is unique by serialized value;
+     *  - objects: result is unique by serialized value (throws \InvalidArgumentException if not serializable);
      *  - arrays: result is unique by serialized value.
      *  - resources: result is unique by instance.
      *
@@ -44,7 +44,7 @@ final class UniqueExtractor
             \is_resource($var) => 'resource_' . \get_resource_type($var) . '_' . (string) $var,
             $var instanceof \Generator => 'generator_' . \spl_object_id($var),
             $var instanceof \Closure => 'closure_' . \spl_object_id($var),
-            \is_object($var) => 'object_' . ($strict ? \spl_object_id($var) : \serialize($var)),
+            \is_object($var) => 'object_' . ($strict ? \spl_object_id($var) : self::serializeObject($var)),
             \is_float($var) && \is_nan($var) => 'double_NAN',
             \gettype($var) === 'boolean' => 'boolean_' . \intval($var),
             /** @phpstan-ignore cast.string */
@@ -56,5 +56,25 @@ final class UniqueExtractor
             /** @phpstan-ignore cast.string */
             default => 'scalar_' . (string) $var,
         };
+    }
+
+    /**
+     * @throws \InvalidArgumentException if the object cannot be serialized
+     */
+    private static function serializeObject(object $var): string
+    {
+        try {
+            return \serialize($var);
+        } catch (\Throwable $e) {
+            throw new \InvalidArgumentException(
+                \sprintf(
+                    'Object of class %s cannot be serialized for non-strict comparison. '
+                    . 'Use strict mode or pass a serializable object.',
+                    $var::class,
+                ),
+                0,
+                $e,
+            );
+        }
     }
 }

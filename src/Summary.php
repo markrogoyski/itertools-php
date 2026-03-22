@@ -247,7 +247,7 @@ final class Summary
      *
      * Coercive (non-strict) type comparisons:
      *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
      *  - arrays: compares serialized
      *
      * @param iterable<mixed> ...$iterables

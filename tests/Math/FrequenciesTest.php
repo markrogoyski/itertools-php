@@ -8,6 +8,7 @@ use IterTools\Math;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Tests\Fixture\NonSerializableFixture;
 
 class FrequenciesTest extends \PHPUnit\Framework\TestCase
 {
@@ -794,5 +795,44 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEquals($expectedValues, \array_keys($result));
         $this->assertEquals($expectedFrequencies, \array_values($result));
+    }
+
+    /**
+     * @test frequencies throws InvalidArgumentException for non-serializable objects in non-strict mode
+     */
+    public function testNonSerializableObjectNonStrictThrowsException(): void
+    {
+        // Given
+        $obj = new NonSerializableFixture(1);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        foreach (Math::frequencies([$obj], false) as $_) {
+        }
+    }
+
+    /**
+     * @test frequencies works with non-serializable objects in strict mode
+     */
+    public function testNonSerializableObjectStrictMode(): void
+    {
+        // Given
+        $obj1 = new NonSerializableFixture(1);
+        $obj2 = new NonSerializableFixture(1);
+
+        // When
+        $frequencies = [];
+        foreach (Math::frequencies([$obj1, $obj2, $obj1]) as $value => $frequency) {
+            $frequencies[] = [$value, $frequency];
+        }
+
+        // Then
+        $this->assertCount(2, $frequencies);
+        $this->assertSame($obj1, $frequencies[0][0]);
+        $this->assertEquals(2, $frequencies[0][1]);
+        $this->assertSame($obj2, $frequencies[1][0]);
+        $this->assertEquals(1, $frequencies[1][1]);
     }
 }

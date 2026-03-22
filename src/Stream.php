@@ -701,7 +701,7 @@ final class Stream implements \IteratorAggregate
      *
      * If $strict is false:
      *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
      *  - arrays: compares serialized.
      *
      * @param bool $strict
@@ -871,7 +871,7 @@ final class Stream implements \IteratorAggregate
      * Iterates the intersection of iterable source and given iterables in non-strict type mode.
      *
      *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
      *  - arrays: compares serialized.
      *
      * @param array<iterable<mixed>> ...$iterables
@@ -909,7 +909,7 @@ final class Stream implements \IteratorAggregate
      * Iterates the symmetric difference of iterable source and given iterables in non-strict type mode.
      *
      *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
      *  - arrays: compares serialized.
      *
      * @param iterable<mixed> ...$iterables
@@ -951,7 +951,7 @@ final class Stream implements \IteratorAggregate
      * Returns elements from the source not present in any given iterables.
      *
      *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
      *  - arrays: compares serialized.
      *
      * @param iterable<mixed> ...$iterables
@@ -990,7 +990,7 @@ final class Stream implements \IteratorAggregate
      * Iterates partial intersection of iterable source and given iterables in non-strict type mode.
      *
      *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
      *  - arrays: compares serialized.
      *
      * @param positive-int $minIntersectionCount
@@ -1029,7 +1029,7 @@ final class Stream implements \IteratorAggregate
      * Iterates union of iterable source and given iterables using type coercion.
      *
      *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized;
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
      *  - arrays: compares serialized.
      *
      * @param array<iterable<mixed>> ...$iterables
@@ -1442,7 +1442,7 @@ final class Stream implements \IteratorAggregate
      *
      * Coercive (non-strict) type comparisons:
      *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
      *  - arrays: compares serialized
      *
      * @param iterable<mixed> ...$iterables

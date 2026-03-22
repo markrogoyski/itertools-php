@@ -421,7 +421,7 @@ When there is an option, the default will do strict type comparisons:
 When type coercion (non-strict types) is available and enabled via optional flag:
 
 * scalars: compares by value via type juggling
-* objects: compares serialized
+* objects: compares serialized (throws `\InvalidArgumentException` if the object cannot be serialized)
 * arrays: compares serialized
 
 Standards

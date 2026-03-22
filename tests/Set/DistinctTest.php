@@ -8,6 +8,7 @@ use IterTools\Set;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Tests\Fixture\NonSerializableFixture;
 
 class DistinctTest extends \PHPUnit\Framework\TestCase
 {
@@ -1224,5 +1225,42 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @test distinct throws InvalidArgumentException for non-serializable objects in non-strict mode
+     */
+    public function testNonSerializableObjectNonStrictThrowsException(): void
+    {
+        // Given
+        $obj = new NonSerializableFixture(1);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        foreach (Set::distinct([$obj], false) as $_) {
+        }
+    }
+
+    /**
+     * @test distinct works with non-serializable objects in strict mode (uses spl_object_id)
+     */
+    public function testNonSerializableObjectStrictMode(): void
+    {
+        // Given
+        $obj1 = new NonSerializableFixture(1);
+        $obj2 = new NonSerializableFixture(1);
+
+        // When
+        $result = [];
+        foreach (Set::distinct([$obj1, $obj2, $obj1], true) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(2, $result);
+        $this->assertSame($obj1, $result[0]);
+        $this->assertSame($obj2, $result[1]);
     }
 }

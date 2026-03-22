@@ -21,7 +21,7 @@ final class Set
      *
      * Coercive (non-strict) type comparisons:
      *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
      *  - arrays: compares serialized
      *
      * @template T
@@ -94,7 +94,7 @@ final class Set
      *
      * Coercive (non-strict) type comparisons:
      *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
      *  - arrays: compares serialized
      *
      * @param iterable<mixed> ...$iterables
@@ -135,7 +135,7 @@ final class Set
      *
      * Coercive (non-strict) type comparisons:
      *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
      *  - arrays: compares serialized
      *
      * @param positive-int $minIntersectionCount
@@ -174,7 +174,7 @@ final class Set
      *
      * Coercive (non-strict) type comparisons:
      *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
      *  - arrays: compares serialized
      *
      * @param iterable<mixed> ...$iterables
@@ -215,7 +215,7 @@ final class Set
      *
      * Coercive (non-strict) type comparisons:
      *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
      *  - arrays: compares serialized
      *
      * @param iterable<mixed> $a
@@ -254,7 +254,7 @@ final class Set
      *
      * Coercive (non-strict) type comparisons:
      *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
      *  - arrays: compares serialized
      *
      * @param iterable<mixed> ...$iterables
