@@ -92,6 +92,14 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
                 'string_1.0'
             ],
             [
+                \INF,
+                'double_INF'
+            ],
+            [
+                -\INF,
+                'double_-INF'
+            ],
+            [
                 \NAN,
                 'double_'
             ],
@@ -182,6 +190,14 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             [
                 '1.0',
                 'numeric_1'
+            ],
+            [
+                \INF,
+                'numeric_INF'
+            ],
+            [
+                -\INF,
+                'numeric_-INF'
             ],
             [
                 \NAN,
