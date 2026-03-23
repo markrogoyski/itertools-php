@@ -344,8 +344,8 @@ final class Single
             throw new \InvalidArgumentException("Chunk size must be ≥ 1. Got {$chunkSize}");
         }
 
-        if ($overlapSize >= $chunkSize) {
-            throw new \InvalidArgumentException("Overlap size must be less than chunk size");
+        if ($overlapSize < 0 || $overlapSize >= $chunkSize) {
+            throw new \InvalidArgumentException("Overlap size must be ≥ 0 and less than chunk size. Got {$overlapSize}");
         }
 
         $chunk = [];

@@ -3139,7 +3139,6 @@ class ChunkwiseOverlapTest extends \PHPUnit\Framework\TestCase
     {
         // Then
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Overlap size must be less than chunk size");
 
         // When
         foreach (Single::chunkwiseOverlap($data, $chunkSize, $overlapSize, $excludeIncompleteTail) as $_) {
@@ -3340,6 +3339,42 @@ class ChunkwiseOverlapTest extends \PHPUnit\Framework\TestCase
                 ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey', 'Phoebe'],
                 2,
                 2,
+                false,
+            ],
+            [
+                [],
+                1,
+                -1,
+                true,
+            ],
+            [
+                [],
+                1,
+                -1,
+                false,
+            ],
+            [
+                [1, 2, 3],
+                2,
+                -1,
+                true,
+            ],
+            [
+                [1, 2, 3],
+                2,
+                -1,
+                false,
+            ],
+            [
+                [1, 2, 3],
+                3,
+                -2,
+                true,
+            ],
+            [
+                ['Ross', 'Rachel', 'Chandler', 'Monica', 'Joey', 'Phoebe'],
+                3,
+                -1,
                 false,
             ],
         ];

@@ -11,6 +11,7 @@
 * Throw InvalidArgumentException for non-positive count in `Transform::tee()`
 * Throw InvalidArgumentException for step=0 in `Infinite::count()`
 * Throw InvalidArgumentException for negative position in `Reduce::toNth()`
+* Throw InvalidArgumentException for negative overlap in `Single::chunkwiseOverlap()`
 
 ## v2.0.0 - 2026-03-07
 
