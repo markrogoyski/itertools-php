@@ -53,16 +53,27 @@ final class Reduce
             /** @var mixed|NoValueMonad $result */
             $result = static::toValue(
                 $data,
-                fn (mixed $carry, mixed $datum): mixed => ($carry instanceof NoValueMonad || $compareBy($datum) < $compareBy($carry))
-                    ? $datum
-                    : $carry,
+                static function (mixed $carry, mixed $datum) use ($compareBy): mixed {
+                    $comparableValue = $compareBy($datum);
+                    if (\is_float($comparableValue) && \is_nan($comparableValue)) {
+                        return $carry;
+                    }
+                    return ($carry instanceof NoValueMonad || $comparableValue < $compareBy($carry))
+                        ? $datum
+                        : $carry;
+                },
                 NoValueMonad::getInstance()
             );
         } else {
             /** @var mixed|NoValueMonad $result */
             $result = static::toValue(
                 $data,
-                fn (mixed $carry, mixed $datum): mixed => ($carry instanceof NoValueMonad) ? $datum : \min($carry, $datum),
+                static function (mixed $carry, mixed $datum): mixed {
+                    if (\is_float($datum) && \is_nan($datum)) {
+                        return $carry;
+                    }
+                    return ($carry instanceof NoValueMonad) ? $datum : \min($carry, $datum);
+                },
                 NoValueMonad::getInstance()
             );
         }
@@ -89,16 +100,27 @@ final class Reduce
             /** @var mixed|NoValueMonad $result */
             $result = static::toValue(
                 $data,
-                fn (mixed $carry, mixed $datum): mixed => ($carry instanceof NoValueMonad || $compareBy($datum) > $compareBy($carry))
-                    ? $datum
-                    : $carry,
+                static function (mixed $carry, mixed $datum) use ($compareBy): mixed {
+                    $comparableValue = $compareBy($datum);
+                    if (\is_float($comparableValue) && \is_nan($comparableValue)) {
+                        return $carry;
+                    }
+                    return ($carry instanceof NoValueMonad || $comparableValue > $compareBy($carry))
+                        ? $datum
+                        : $carry;
+                },
                 NoValueMonad::getInstance()
             );
         } else {
             /** @var mixed|NoValueMonad $result */
             $result = static::toValue(
                 $data,
-                fn (mixed $carry, mixed $datum): mixed => ($carry instanceof NoValueMonad) ? $datum : \max($carry, $datum),
+                static function (mixed $carry, mixed $datum): mixed {
+                    if (\is_float($datum) && \is_nan($datum)) {
+                        return $carry;
+                    }
+                    return ($carry instanceof NoValueMonad) ? $datum : \max($carry, $datum);
+                },
                 NoValueMonad::getInstance()
             );
         }
@@ -125,11 +147,15 @@ final class Reduce
         if ($compareBy !== null) {
             /** @var array{mixed|NoValueMonad, mixed|NoValueMonad} $result */
             $result = static::toValue($numbers, static function (array $carry, mixed $datum) use ($compareBy): array {
+                $comparableValue = $compareBy($datum);
+                if (\is_float($comparableValue) && \is_nan($comparableValue)) {
+                    return $carry;
+                }
                 return [
-                    ($carry[0] instanceof NoValueMonad || $compareBy($datum) <= $compareBy($carry[0]))
+                    ($carry[0] instanceof NoValueMonad || $comparableValue <= $compareBy($carry[0]))
                         ? $datum
                         : $carry[0],
-                    ($carry[1] instanceof NoValueMonad || $compareBy($datum) >= $compareBy($carry[1]))
+                    ($carry[1] instanceof NoValueMonad || $comparableValue >= $compareBy($carry[1]))
                         ? $datum
                         : $carry[1],
                 ];
@@ -138,10 +164,15 @@ final class Reduce
             /** @var array{mixed|NoValueMonad, mixed|NoValueMonad} $result */
             $result = static::toValue(
                 $numbers,
-                fn (array $carry, mixed $datum): array => [
-                    ($carry[0] instanceof NoValueMonad) ? $datum : \min($carry[0], $datum),
-                    ($carry[1] instanceof NoValueMonad) ? $datum : \max($carry[1], $datum)
-                ],
+                static function (array $carry, mixed $datum): array {
+                    if (\is_float($datum) && \is_nan($datum)) {
+                        return $carry;
+                    }
+                    return [
+                        ($carry[0] instanceof NoValueMonad) ? $datum : \min($carry[0], $datum),
+                        ($carry[1] instanceof NoValueMonad) ? $datum : \max($carry[1], $datum),
+                    ];
+                },
                 [NoValueMonad::getInstance(), NoValueMonad::getInstance()]
             );
         }

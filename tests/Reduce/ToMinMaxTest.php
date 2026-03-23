@@ -1039,4 +1039,164 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test toMinMax skips NaN values array
+     * @dataProvider dataProviderForNanArray
+     * @param        array $data
+     * @param        callable|null $compareBy
+     * @param        array $expected
+     */
+    public function testNanArray(array $data, ?callable $compareBy, array $expected): void
+    {
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test toMinMax skips NaN values generators
+     * @dataProvider dataProviderForNanGenerators
+     * @param        \Generator $data
+     * @param        callable|null $compareBy
+     * @param        array $expected
+     */
+    public function testNanGenerators(\Generator $data, ?callable $compareBy, array $expected): void
+    {
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test toMinMax skips NaN values iterators
+     * @dataProvider dataProviderForNanIterators
+     * @param        \Iterator $data
+     * @param        callable|null $compareBy
+     * @param        array $expected
+     */
+    public function testNanIterators(\Iterator $data, ?callable $compareBy, array $expected): void
+    {
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test toMinMax skips NaN values traversables
+     * @dataProvider dataProviderForNanTraversables
+     * @param        \Traversable $data
+     * @param        callable|null $compareBy
+     * @param        array $expected
+     */
+    public function testNanTraversables(\Traversable $data, ?callable $compareBy, array $expected): void
+    {
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForNanArray(): array
+    {
+        return [
+            [[NAN], null, [null, null]],
+            [[NAN, NAN, NAN], null, [null, null]],
+            [[3, NAN, 1], null, [1, 3]],
+            [[1, 3, NAN], null, [1, 3]],
+            [[NAN, 1, 3], null, [1, 3]],
+            [[NAN, 3, NAN, 1, NAN], null, [1, 3]],
+            [[1.5, NAN, 2.5, NAN, 0.5], null, [0.5, 2.5]],
+            [[NAN, 5], null, [5, 5]],
+            [[5, NAN], null, [5, 5]],
+            [[['v' => NAN]], fn ($item) => $item['v'], [null, null]],
+            [[['v' => NAN], ['v' => NAN]], fn ($item) => $item['v'], [null, null]],
+            [[['v' => 3], ['v' => NAN], ['v' => 1]], fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [[['v' => NAN], ['v' => 1], ['v' => 3]], fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [[['v' => 1], ['v' => 3], ['v' => NAN]], fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [[['v' => NAN], ['v' => 3], ['v' => NAN], ['v' => 1], ['v' => NAN]], fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+        ];
+    }
+
+    public static function dataProviderForNanGenerators(): array
+    {
+        $gen = static function (array $data) {
+            return GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            [$gen([NAN]), null, [null, null]],
+            [$gen([NAN, NAN, NAN]), null, [null, null]],
+            [$gen([3, NAN, 1]), null, [1, 3]],
+            [$gen([1, 3, NAN]), null, [1, 3]],
+            [$gen([NAN, 1, 3]), null, [1, 3]],
+            [$gen([NAN, 3, NAN, 1, NAN]), null, [1, 3]],
+            [$gen([1.5, NAN, 2.5, NAN, 0.5]), null, [0.5, 2.5]],
+            [$gen([NAN, 5]), null, [5, 5]],
+            [$gen([5, NAN]), null, [5, 5]],
+            [$gen([['v' => NAN]]), fn ($item) => $item['v'], [null, null]],
+            [$gen([['v' => NAN], ['v' => NAN]]), fn ($item) => $item['v'], [null, null]],
+            [$gen([['v' => 3], ['v' => NAN], ['v' => 1]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [$gen([['v' => NAN], ['v' => 1], ['v' => 3]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [$gen([['v' => 1], ['v' => 3], ['v' => NAN]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [$gen([['v' => NAN], ['v' => 3], ['v' => NAN], ['v' => 1], ['v' => NAN]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+        ];
+    }
+
+    public static function dataProviderForNanIterators(): array
+    {
+        $iter = static function (array $data) {
+            return new ArrayIteratorFixture($data);
+        };
+
+        return [
+            [$iter([NAN]), null, [null, null]],
+            [$iter([NAN, NAN, NAN]), null, [null, null]],
+            [$iter([3, NAN, 1]), null, [1, 3]],
+            [$iter([1, 3, NAN]), null, [1, 3]],
+            [$iter([NAN, 1, 3]), null, [1, 3]],
+            [$iter([NAN, 3, NAN, 1, NAN]), null, [1, 3]],
+            [$iter([1.5, NAN, 2.5, NAN, 0.5]), null, [0.5, 2.5]],
+            [$iter([NAN, 5]), null, [5, 5]],
+            [$iter([5, NAN]), null, [5, 5]],
+            [$iter([['v' => NAN]]), fn ($item) => $item['v'], [null, null]],
+            [$iter([['v' => NAN], ['v' => NAN]]), fn ($item) => $item['v'], [null, null]],
+            [$iter([['v' => 3], ['v' => NAN], ['v' => 1]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [$iter([['v' => NAN], ['v' => 1], ['v' => 3]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [$iter([['v' => 1], ['v' => 3], ['v' => NAN]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [$iter([['v' => NAN], ['v' => 3], ['v' => NAN], ['v' => 1], ['v' => NAN]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+        ];
+    }
+
+    public static function dataProviderForNanTraversables(): array
+    {
+        $trav = static function (array $data) {
+            return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            [$trav([NAN]), null, [null, null]],
+            [$trav([NAN, NAN, NAN]), null, [null, null]],
+            [$trav([3, NAN, 1]), null, [1, 3]],
+            [$trav([1, 3, NAN]), null, [1, 3]],
+            [$trav([NAN, 1, 3]), null, [1, 3]],
+            [$trav([NAN, 3, NAN, 1, NAN]), null, [1, 3]],
+            [$trav([1.5, NAN, 2.5, NAN, 0.5]), null, [0.5, 2.5]],
+            [$trav([NAN, 5]), null, [5, 5]],
+            [$trav([5, NAN]), null, [5, 5]],
+            [$trav([['v' => NAN]]), fn ($item) => $item['v'], [null, null]],
+            [$trav([['v' => NAN], ['v' => NAN]]), fn ($item) => $item['v'], [null, null]],
+            [$trav([['v' => 3], ['v' => NAN], ['v' => 1]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [$trav([['v' => NAN], ['v' => 1], ['v' => 3]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [$trav([['v' => 1], ['v' => 3], ['v' => NAN]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+            [$trav([['v' => NAN], ['v' => 3], ['v' => NAN], ['v' => 1], ['v' => NAN]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
+        ];
+    }
 }
