@@ -341,6 +341,10 @@ final class Summary
     /**
      * Returns true if given iterable is empty.
      *
+     * For rewindable iterators, reports whether the underlying collection is empty
+     * regardless of cursor position. For generators (which cannot be rewound),
+     * reports whether there are remaining elements from the current position.
+     *
      * @param iterable<mixed> $data
      *
      * @return bool
@@ -349,7 +353,7 @@ final class Summary
     {
         $iterator = Transform::toIterator($data);
 
-        if ($data instanceof \IteratorAggregate) {
+        if (!($iterator instanceof \Generator)) {
             $iterator->rewind();
         }
 

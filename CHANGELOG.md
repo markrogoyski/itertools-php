@@ -7,11 +7,12 @@
 * Fix `allMatch`/`anyMatch`/`noneMatch` to use boolean coercion instead of strict comparison
 * Fix `Sort::sort` dropping elements when iterable has duplicate keys
 * Fix `Sort::asort` dropping elements when iterable has duplicate keys
+* Fix `Summary::isEmpty` to rewind non-Generator iterators before checking.
 * Throw InvalidArgumentException for non-serializable objects in coercive comparison mode
-* Throw InvalidArgumentException for non-positive count in `Transform::tee()`
-* Throw InvalidArgumentException for step=0 in `Infinite::count()`
-* Throw InvalidArgumentException for negative position in `Reduce::toNth()`
-* Throw InvalidArgumentException for negative overlap in `Single::chunkwiseOverlap()`
+* Throw InvalidArgumentException for non-positive count in `Transform::tee`
+* Throw InvalidArgumentException for step=0 in `Infinite::count`
+* Throw InvalidArgumentException for negative position in `Reduce::toNth`
+* Throw InvalidArgumentException for negative overlap in `Single::chunkwiseOverlap`
 
 ## v2.0.0 - 2026-03-07
 

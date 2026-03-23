@@ -115,6 +115,70 @@ class IsEmptyTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test Reports non-empty for an ArrayIterator that has been advanced past all elements.
+     */
+    public function testAdvancedIteratorFalse(): void
+    {
+        // Given: a non-empty iterator advanced past its only element
+        $iterator = new \ArrayIterator([1]);
+        $iterator->next(); // now past end, valid() === false
+
+        // When
+        $result = Summary::isEmpty($iterator);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test Reports non-empty for a partially consumed multi-element ArrayIterator.
+     */
+    public function testPartiallyConsumedIteratorFalse(): void
+    {
+        // Given: a 3-element iterator advanced by one position
+        $iterator = new \ArrayIterator([1, 2, 3]);
+        $iterator->next();
+
+        // When
+        $result = Summary::isEmpty($iterator);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test A consumed generator reports true (empty) since generators cannot be rewound.
+     */
+    public function testConsumedGeneratorTrue(): void
+    {
+        // Given: a non-empty generator that has been fully consumed
+        $generator = GeneratorFixture::getGenerator([1]);
+        $generator->next(); // advance past the only element
+
+        // When
+        $result = Summary::isEmpty($generator);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test A partially consumed generator reports false (not empty) since elements remain.
+     */
+    public function testPartiallyConsumedGeneratorFalse(): void
+    {
+        // Given: a 3-element generator advanced by one position
+        $generator = GeneratorFixture::getGenerator([1, 2, 3]);
+        $generator->next();
+
+        // When
+        $result = Summary::isEmpty($generator);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
      * @dataProvider dataProviderForTraversablesFalse
      * @param        \Traversable $iterable
      */
