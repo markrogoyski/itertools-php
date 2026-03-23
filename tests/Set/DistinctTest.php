@@ -1278,6 +1278,54 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test distinct coercive treats scientific notation string as same as equivalent integer
+     */
+    public function testScientificNotationCoerciveArray(): void
+    {
+        // When
+        $result = [];
+        foreach (Set::distinct(['1e2', 100, '100', 100.0], false) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(1, $result);
+        $this->assertSame('1e2', $result[0]);
+    }
+
+    /**
+     * @test distinct strict keeps scientific notation and equivalent integer separate
+     */
+    public function testScientificNotationStrictArray(): void
+    {
+        // When
+        $result = [];
+        foreach (Set::distinct(['1e2', 100, '100', 100.0], true) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(4, $result);
+    }
+
+    /**
+     * @test distinct coercive treats hex string as different from its decimal equivalent (PHP 8)
+     */
+    public function testHexStringNotNumericCoerciveArray(): void
+    {
+        // When
+        $result = [];
+        foreach (Set::distinct(['0x1A', 26, '26'], false) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then — "0x1A" is not numeric in PHP 8, so it stays distinct from 26
+        $this->assertCount(2, $result);
+        $this->assertSame('0x1A', $result[0]);
+        $this->assertSame(26, $result[1]);
+    }
+
+    /**
      * @test distinct works with non-serializable objects in strict mode (uses spl_object_id)
      */
     public function testNonSerializableObjectStrictMode(): void

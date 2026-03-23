@@ -211,6 +211,70 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test scientific notation string maps to same value as equivalent integer in coercive mode
+     */
+    public function testScientificNotationCoercive(): void
+    {
+        // When
+        $stringResult = UniqueExtractor::getString('1e2', false);
+        $intResult = UniqueExtractor::getString(100, false);
+
+        // Then
+        $this->assertSame($stringResult, $intResult);
+    }
+
+    /**
+     * @test scientific notation variants all map to same value in coercive mode
+     */
+    public function testScientificNotationVariantsCoercive(): void
+    {
+        // When
+        $results = [
+            UniqueExtractor::getString('1e2', false),
+            UniqueExtractor::getString('1E2', false),
+            UniqueExtractor::getString('100', false),
+            UniqueExtractor::getString(100, false),
+            UniqueExtractor::getString(100.0, false),
+            UniqueExtractor::getString('100.0', false),
+        ];
+
+        // Then
+        $this->assertCount(1, \array_unique($results));
+    }
+
+    /**
+     * @test "0" string is in same falsy group as 0, false, null, '' in coercive mode
+     */
+    public function testZeroStringIsFalsyCoercive(): void
+    {
+        // When
+        $zeroString = UniqueExtractor::getString('0', false);
+        $zeroInt = UniqueExtractor::getString(0, false);
+        $false = UniqueExtractor::getString(false, false);
+        $null = UniqueExtractor::getString(null, false);
+        $empty = UniqueExtractor::getString('', false);
+
+        // Then
+        $this->assertSame($zeroString, $zeroInt);
+        $this->assertSame($zeroString, $false);
+        $this->assertSame($zeroString, $null);
+        $this->assertSame($zeroString, $empty);
+    }
+
+    /**
+     * @test hex string is not treated as numeric in PHP 8 coercive mode
+     */
+    public function testHexStringNotNumericCoercive(): void
+    {
+        // When
+        $hexString = UniqueExtractor::getString('0x1A', false);
+        $decimal = UniqueExtractor::getString(26, false);
+
+        // Then — "0x1A" is not numeric in PHP 8
+        $this->assertNotSame($hexString, $decimal);
+    }
+
+    /**
      * @todo Replace usage with str_starts_with when library updated to PHP 8.0 as a minimum requirement.
      * @param string $haystack
      * @param string $needle
