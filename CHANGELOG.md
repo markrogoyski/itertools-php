@@ -8,6 +8,7 @@
 * Fix `Sort::sort` dropping elements when iterable has duplicate keys
 * Fix `Sort::asort` dropping elements when iterable has duplicate keys
 * Fix `Summary::isEmpty` to rewind non-Generator iterators before checking.
+* Fix NaN handling in `Summary::isSorted` and `isReversed`
 * Skip NaN values in `Reduce::toMin/toMax/toMinMax` to prevent incorrect results
 * Throw InvalidArgumentException for non-serializable objects in coercive comparison mode
 * Throw InvalidArgumentException for non-positive count in `Transform::tee`

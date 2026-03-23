@@ -38,6 +38,9 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
                 [null],
             ],
             [
+                [NAN],
+            ],
+            [
                 [0, 1],
             ],
             [
@@ -117,6 +120,18 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
             [
                 [['a', 'a'], ['b']],
             ],
+            [
+                [1, NAN, 3],
+            ],
+            [
+                [NAN, 1, 2],
+            ],
+            [
+                [1, 2, NAN],
+            ],
+            [
+                [NAN, NAN],
+            ],
         ];
     }
 
@@ -149,6 +164,9 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([null])
+            ],
+            [
+                $gen([NAN])
             ],
             [
                 $gen([0, 1])
@@ -234,6 +252,18 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([['a', 'a'], ['b']])
             ],
+            [
+                $gen([1, NAN, 3])
+            ],
+            [
+                $gen([NAN, 1, 2])
+            ],
+            [
+                $gen([1, 2, NAN])
+            ],
+            [
+                $gen([NAN, NAN])
+            ],
         ];
     }
 
@@ -266,6 +296,9 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([null])
+            ],
+            [
+                $iter([NAN])
             ],
             [
                 $iter([0, 1])
@@ -351,6 +384,18 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([['a', 'a'], ['b']])
             ],
+            [
+                $iter([1, NAN, 3])
+            ],
+            [
+                $iter([NAN, 1, 2])
+            ],
+            [
+                $iter([1, 2, NAN])
+            ],
+            [
+                $iter([NAN, NAN])
+            ],
         ];
     }
 
@@ -383,6 +428,9 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([null])
+            ],
+            [
+                $trav([NAN])
             ],
             [
                 $trav([0, 1])
@@ -467,6 +515,18 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([['a', 'a'], ['b']])
+            ],
+            [
+                $trav([1, NAN, 3])
+            ],
+            [
+                $trav([NAN, 1, 2])
+            ],
+            [
+                $trav([1, 2, NAN])
+            ],
+            [
+                $trav([NAN, NAN])
             ],
         ];
     }

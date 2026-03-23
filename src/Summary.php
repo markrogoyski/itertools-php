@@ -112,6 +112,9 @@ final class Summary
     public static function isSorted(iterable $data): bool
     {
         foreach (Single::pairwise($data) as [$lhs, $rhs]) {
+            if ((\is_float($lhs) && \is_nan($lhs)) || (\is_float($rhs) && \is_nan($rhs))) {
+                return false;
+            }
             if ($rhs < $lhs) {
                 return false;
             }
@@ -134,6 +137,9 @@ final class Summary
     public static function isReversed(iterable $data): bool
     {
         foreach (Single::pairwise($data) as [$lhs, $rhs]) {
+            if ((\is_float($lhs) && \is_nan($lhs)) || (\is_float($rhs) && \is_nan($rhs))) {
+                return false;
+            }
             if ($rhs > $lhs) {
                 return false;
             }

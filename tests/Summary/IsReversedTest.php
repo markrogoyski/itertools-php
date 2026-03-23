@@ -38,6 +38,9 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
                 [null]
             ],
             [
+                [NAN]
+            ],
+            [
                 [null, null]
             ],
             [
@@ -117,6 +120,18 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
             [
                 [['bb'], ['a', 'a']]
             ],
+            [
+                [3, NAN, 1]
+            ],
+            [
+                [NAN, 2, 1]
+            ],
+            [
+                [3, 2, NAN]
+            ],
+            [
+                [NAN, NAN]
+            ],
         ];
     }
 
@@ -149,6 +164,9 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([null])
+            ],
+            [
+                $gen([NAN])
             ],
             [
                 $gen([null, null])
@@ -234,6 +252,18 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([['bb'], ['a', 'a']])
             ],
+            [
+                $gen([3, NAN, 1])
+            ],
+            [
+                $gen([NAN, 2, 1])
+            ],
+            [
+                $gen([3, 2, NAN])
+            ],
+            [
+                $gen([NAN, NAN])
+            ],
         ];
     }
 
@@ -266,6 +296,9 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([null])
+            ],
+            [
+                $iter([NAN])
             ],
             [
                 $iter([null, null])
@@ -351,6 +384,18 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([['bb'], ['a', 'a']])
             ],
+            [
+                $iter([3, NAN, 1])
+            ],
+            [
+                $iter([NAN, 2, 1])
+            ],
+            [
+                $iter([3, 2, NAN])
+            ],
+            [
+                $iter([NAN, NAN])
+            ],
         ];
     }
 
@@ -383,6 +428,9 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([null])
+            ],
+            [
+                $trav([NAN])
             ],
             [
                 $trav([null, null])
@@ -467,6 +515,18 @@ class IsReversedTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([['bb'], ['a', 'a']])
+            ],
+            [
+                $trav([3, NAN, 1])
+            ],
+            [
+                $trav([NAN, 2, 1])
+            ],
+            [
+                $trav([3, 2, NAN])
+            ],
+            [
+                $trav([NAN, NAN])
             ],
         ];
     }
