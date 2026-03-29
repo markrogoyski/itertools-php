@@ -55,7 +55,6 @@ final class Infinite
      */
     public static function repeat(mixed $item): \Generator
     {
-        /** @phpstan-ignore while.alwaysTrue */
         while (true) {
             yield $item;
         }
