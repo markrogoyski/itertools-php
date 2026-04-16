@@ -19,7 +19,7 @@
     "phpmd/phpmd": "^2.15",
     "php-parallel-lint/php-parallel-lint": "^1.4",
     "mikey179/vfsstream": "^1.6",
-    "vimeo/psalm": "^6.14",
+    "vimeo/psalm": "^7.0@beta",
     "maglnet/composer-require-checker": "^4.17",
     "icanhazstring/composer-unused": "^0.9.5"
   },

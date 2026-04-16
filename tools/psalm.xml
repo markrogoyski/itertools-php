@@ -18,6 +18,9 @@
     <issueHandlers>
         <!-- MissingOverrideAttribute requires PHP 8.3+, but we support 8.2+ -->
         <MissingOverrideAttribute errorLevel="suppress" />
+        <!-- Psalm 7 security-analysis annotations: advisory, not bugs -->
+        <MissingPureAnnotation errorLevel="suppress" />
+        <MissingImmutableAnnotation errorLevel="suppress" />
         <!-- Public API methods/classes intended for library consumers -->
         <PossiblyUnusedMethod errorLevel="suppress" />
         <PossiblyUnusedProperty errorLevel="suppress" />
