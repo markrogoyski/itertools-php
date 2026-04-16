@@ -1,5 +1,11 @@
 # IterTools PHP Change Log
 
+## v2.2.0 - TBD
+
+# Improvements
+* Fix NaN handling in `Math::runningMax` and `Math::runningMin` to preserve monotonicity (skip NaN values and carry forward accumulator; yield NaN when no prior value exists)
+
+
 ## v2.1.0 - 2026-03-29
 
 # Improvements

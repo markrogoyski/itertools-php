@@ -80,6 +80,18 @@ class RunningMaxTest extends \PHPUnit\Framework\TestCase
                 [1, 9, 2, 8, 3, 7, 4, 5, 5, 10, 1, 0, -1],
                 [1, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10],
             ],
+            [
+                [1, \NAN, 3],
+                [1, 1, 3],
+            ],
+            [
+                [5, \NAN, 3],
+                [5, 5, 5],
+            ],
+            [
+                [1, 2, \NAN, 3, \NAN, 5],
+                [1, 2, 2, 3, 3, 5],
+            ],
         ];
     }
 
@@ -215,6 +227,18 @@ class RunningMaxTest extends \PHPUnit\Framework\TestCase
                 Fixture\GeneratorFixture::getGenerator([1, 2, 3, -4, -5]),
                 [1, 2, 3, 3, 3],
             ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, \NAN, 3]),
+                [1, 1, 3],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([5, \NAN, 3]),
+                [5, 5, 5],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, 2, \NAN, 3, \NAN, 5]),
+                [1, 2, 2, 3, 3, 5],
+            ],
         ];
     }
 
@@ -272,6 +296,18 @@ class RunningMaxTest extends \PHPUnit\Framework\TestCase
             [
                 new Fixture\ArrayIteratorFixture([1, 2, 3, -4, -5]),
                 [1, 2, 3, 3, 3],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, \NAN, 3]),
+                [1, 1, 3],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([5, \NAN, 3]),
+                [5, 5, 5],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, 2, \NAN, 3, \NAN, 5]),
+                [1, 2, 2, 3, 3, 5],
             ],
         ];
     }
@@ -331,6 +367,18 @@ class RunningMaxTest extends \PHPUnit\Framework\TestCase
                 new Fixture\IteratorAggregateFixture([1, 2, 3, -4, -5]),
                 [1, 2, 3, 3, 3],
             ],
+            [
+                new Fixture\IteratorAggregateFixture([1, \NAN, 3]),
+                [1, 1, 3],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([5, \NAN, 3]),
+                [5, 5, 5],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, 2, \NAN, 3, \NAN, 5]),
+                [1, 2, 2, 3, 3, 5],
+            ],
         ];
     }
 
@@ -350,5 +398,79 @@ class RunningMaxTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @test runningMax leading NaN yields NaN then recovers
+     */
+    public function testLeadingNanArray(): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningMax([\NAN, 1, 2]));
+
+        // Then
+        $this->assertNan($result[0]);
+        $this->assertEquals(1, $result[1]);
+        $this->assertEquals(2, $result[2]);
+    }
+
+    /**
+     * @test runningMax all NaN yields all NaN
+     */
+    public function testAllNanArray(): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningMax([\NAN, \NAN, \NAN]));
+
+        // Then
+        $this->assertCount(3, $result);
+        $this->assertNan($result[0]);
+        $this->assertNan($result[1]);
+        $this->assertNan($result[2]);
+    }
+
+    /**
+     * @test runningMax single NaN yields NaN
+     */
+    public function testSingleNanArray(): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningMax([\NAN]));
+
+        // Then
+        $this->assertCount(1, $result);
+        $this->assertNan($result[0]);
+    }
+
+    /**
+     * @test runningMax NaN initialValue is yielded then ignored for accumulation
+     */
+    public function testNanInitialValueArray(): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningMax([1, 2, 3], \NAN));
+
+        // Then
+        $this->assertCount(4, $result);
+        $this->assertNan($result[0]);
+        $this->assertEquals(1, $result[1]);
+        $this->assertEquals(2, $result[2]);
+        $this->assertEquals(3, $result[3]);
+    }
+
+    /**
+     * @test runningMax NaN initialValue with NaN in stream
+     */
+    public function testNanInitialValueWithNanInStreamArray(): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningMax([\NAN, 1, 2], \NAN));
+
+        // Then
+        $this->assertCount(4, $result);
+        $this->assertNan($result[0]);
+        $this->assertNan($result[1]);
+        $this->assertEquals(1, $result[2]);
+        $this->assertEquals(2, $result[3]);
     }
 }

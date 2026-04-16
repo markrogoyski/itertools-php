@@ -150,9 +150,13 @@ final class Math
             yield $initialValue;
         }
 
-        $max = $initialValue ?? -\INF;
+        $max = ($initialValue !== null && \is_float($initialValue) && \is_nan($initialValue)) ? null : $initialValue;
         foreach ($numbers as $number) {
-            $max = \max($max, $number);
+            if (\is_float($number) && \is_nan($number)) {
+                yield $max ?? \NAN;
+                continue;
+            }
+            $max = $max === null ? $number : \max($max, $number);
             yield $max;
         }
     }
@@ -171,9 +175,13 @@ final class Math
             yield $initialValue;
         }
 
-        $min = $initialValue ?? \INF;
+        $min = ($initialValue !== null && \is_float($initialValue) && \is_nan($initialValue)) ? null : $initialValue;
         foreach ($numbers as $number) {
-            $min = \min($min, $number);
+            if (\is_float($number) && \is_nan($number)) {
+                yield $min ?? \NAN;
+                continue;
+            }
+            $min = $min === null ? $number : \min($min, $number);
             yield $min;
         }
     }
