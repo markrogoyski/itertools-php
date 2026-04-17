@@ -1579,8 +1579,7 @@ final class Stream implements \IteratorAggregate
      */
     public function toString(string $separator = '', string $prefix = '', string $suffix = ''): string
     {
-        $iterable = $this->iterable;
-        return Reduce::toString($iterable, $separator, $prefix, $suffix);
+        return Reduce::toString($this->iterable, $separator, $prefix, $suffix);
     }
 
     /**
