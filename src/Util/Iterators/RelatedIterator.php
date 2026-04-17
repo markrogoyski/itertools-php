@@ -81,10 +81,9 @@ final class RelatedIterator implements \Iterator
      */
     public function rewind(): void
     {
-        if (!$this->isRewinded) {
-            $this->isRewinded = true;
-        } else {
+        if ($this->isRewinded) {
             throw new \LogicException('RelatedIterator cannot be rewinded repeatedly');
         }
+        $this->isRewinded = true;
     }
 }
