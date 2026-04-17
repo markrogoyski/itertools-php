@@ -86,7 +86,7 @@ final class Random
         }
         $randomizer = new \Random\Randomizer($engine);
         for ($i = $repetitions; $i > 0; $i--) {
-            yield $randomizer->getInt(0, \PHP_INT_MAX) / \PHP_INT_MAX;
+            yield (float) $randomizer->getInt(0, \PHP_INT_MAX) / (float) \PHP_INT_MAX;
         }
     }
 

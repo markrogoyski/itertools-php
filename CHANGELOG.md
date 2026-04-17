@@ -4,6 +4,8 @@
 
 # Improvements
 * Fix NaN handling in `Math::runningMax` and `Math::runningMin` to preserve monotonicity (skip NaN values and carry forward accumulator; yield NaN when no prior value exists)
+* Fix `Random::percentage` to always yield float (previously yielded int(0) when underlying RNG returned 0)
+* Upgrade Psalm from v6 to v7 for PHP 8.5 compatibility
 
 
 ## v2.1.0 - 2026-03-29
