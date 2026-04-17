@@ -282,8 +282,7 @@ final class Stream implements \IteratorAggregate
      */
     public function filter(callable $predicate): self
     {
-        $this->iterable = Single::filterTrue($this->iterable, $predicate);
-        return $this;
+        return $this->filterTrue($predicate);
     }
 
     /**
