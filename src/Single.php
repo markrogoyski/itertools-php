@@ -412,8 +412,15 @@ final class Single
      *
      * The mapper function can return scalar or collections as a result.
      *
-     * @param iterable<mixed> $data
-     * @param callable        $mapper
+     * The mapper receives itself as its second argument, enabling recursive flatMap with arrow-function
+     * syntax (which cannot otherwise reference itself). For example, to fully flatten a nested structure:
+     *
+     *     Single::flatMap($data, fn ($item, $self) => \is_iterable($item)
+     *         ? Single::flatMap($item, $self)
+     *         : [$item]);
+     *
+     * @param iterable<mixed>                  $data
+     * @param callable(mixed, callable): mixed $mapper
      *
      * @return \Generator
      */

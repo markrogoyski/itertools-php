@@ -441,7 +441,9 @@ final class Stream implements \IteratorAggregate
      * Returns a new collection formed by applying a given callback function
      * to each element of the stream, and then flattening the result by one level.
      *
-     * @param callable $func
+     * See Single::flatMap() for the recursive-flatMap pattern using the mapper's second argument.
+     *
+     * @param callable(mixed, callable): mixed $func
      *
      * @return Stream
      *
