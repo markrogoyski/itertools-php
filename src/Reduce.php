@@ -395,6 +395,33 @@ final class Reduce
     }
 
     /**
+     * Reduces given iterable to the first element matching the predicate.
+     *
+     * Predicate return value is coerced via (bool) cast, matching Summary::allMatch/anyMatch.
+     *
+     * Short-circuits on first match — does not consume the rest of the iterable.
+     *
+     * If no element matches, returns $default (null by default).
+     *
+     * @param iterable<mixed> $data
+     * @param callable        $predicate
+     * @param mixed           $default value returned when no element matches
+     *
+     * @return mixed
+     */
+    public static function toFirstMatch(iterable $data, callable $predicate, mixed $default = null): mixed
+    {
+        foreach ($data as $datum) {
+            /** @var mixed $datum */
+            if ((bool) $predicate($datum)) {
+                return $datum;
+            }
+        }
+
+        return $default;
+    }
+
+    /**
      * Reduces given iterable to the value at the nth position.
      *
      * @template T

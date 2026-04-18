@@ -719,6 +719,55 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toNth(2),
                 3,
             ],
+            [
+                [2, 4, 6],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                2,
+            ],
+            [
+                [1, 3, 5, 8],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                8,
+            ],
+            [
+                [1, 3, 6, 7, 9],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                6,
+            ],
+            [
+                [4],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                4,
+            ],
+            [
+                [1, 3, 5, 7],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                null,
+            ],
+            [
+                [1, 3, 5, 7],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0, -1),
+                -1,
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (): bool => true, 'fallback'),
+                'fallback',
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn (int $n): int => $n * 10)
+                    ->toFirstMatch(fn (int $n): bool => $n > 20),
+                30,
+            ],
         ];
     }
 
@@ -1352,6 +1401,55 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->toNth(2),
                 3,
+            ],
+            [
+                $gen([2, 4, 6]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                2,
+            ],
+            [
+                $gen([1, 3, 5, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                8,
+            ],
+            [
+                $gen([1, 3, 6, 7, 9]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                6,
+            ],
+            [
+                $gen([4]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                4,
+            ],
+            [
+                $gen([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                null,
+            ],
+            [
+                $gen([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0, -1),
+                -1,
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (): bool => true, 'fallback'),
+                'fallback',
+            ],
+            [
+                $gen([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn (int $n): int => $n * 10)
+                    ->toFirstMatch(fn (int $n): bool => $n > 20),
+                30,
             ],
         ];
     }
@@ -1987,6 +2085,55 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toNth(2),
                 3,
             ],
+            [
+                $iter([2, 4, 6]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                2,
+            ],
+            [
+                $iter([1, 3, 5, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                8,
+            ],
+            [
+                $iter([1, 3, 6, 7, 9]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                6,
+            ],
+            [
+                $iter([4]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                4,
+            ],
+            [
+                $iter([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                null,
+            ],
+            [
+                $iter([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0, -1),
+                -1,
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (): bool => true, 'fallback'),
+                'fallback',
+            ],
+            [
+                $iter([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn (int $n): int => $n * 10)
+                    ->toFirstMatch(fn (int $n): bool => $n > 20),
+                30,
+            ],
         ];
     }
 
@@ -2620,6 +2767,55 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->toNth(2),
                 3,
+            ],
+            [
+                $trav([2, 4, 6]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                2,
+            ],
+            [
+                $trav([1, 3, 5, 8]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                8,
+            ],
+            [
+                $trav([1, 3, 6, 7, 9]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                6,
+            ],
+            [
+                $trav([4]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                4,
+            ],
+            [
+                $trav([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0),
+                null,
+            ],
+            [
+                $trav([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (int $n): bool => $n % 2 === 0, -1),
+                -1,
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatch(fn (): bool => true, 'fallback'),
+                'fallback',
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn (int $n): int => $n * 10)
+                    ->toFirstMatch(fn (int $n): bool => $n > 20),
+                30,
             ],
         ];
     }

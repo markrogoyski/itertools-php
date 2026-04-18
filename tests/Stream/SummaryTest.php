@@ -244,6 +244,62 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->allUnique(),
             ],
+            [
+                [1],
+                fn (iterable $iterable) => Stream::of($iterable)->contains(1),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)->contains(2),
+            ],
+            [
+                ['a', 'b', 'c'],
+                fn (iterable $iterable) => Stream::of($iterable)->contains('c'),
+            ],
+            [
+                [null, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)->contains(null),
+            ],
+            [
+                [1.1, 2.2, 3.3],
+                fn (iterable $iterable) => Stream::of($iterable)->contains(2.2),
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->contains(6),
+            ],
+            [
+                [1],
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('1'),
+            ],
+            [
+                ['1', '2', '3'],
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                [0, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(false),
+            ],
+            [
+                [0, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('0'),
+            ],
+            [
+                [100, 200, 300],
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('1e2'),
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->containsCoercive('6'),
+            ],
         ];
     }
 
@@ -425,6 +481,58 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 [1, '1', true, [1], (object)[1]],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->allUnique(false),
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)->contains(1),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)->contains(4),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)->contains('1'),
+            ],
+            [
+                [0, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)->contains(false),
+            ],
+            [
+                [0, 1, 2],
+                fn (iterable $iterable) => Stream::of($iterable)->contains('0'),
+            ],
+            [
+                [null],
+                fn (iterable $iterable) => Stream::of($iterable)->contains(0),
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->contains(5),
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(4),
+            ],
+            [
+                ['a', 'b', 'c'],
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('d'),
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(99),
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->containsCoercive(5),
             ],
         ];
     }
@@ -649,6 +757,62 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->allUnique(),
             ],
+            [
+                $gen([1]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(1),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(2),
+            ],
+            [
+                $gen(['a', 'b', 'c']),
+                fn (iterable $iterable) => Stream::of($iterable)->contains('c'),
+            ],
+            [
+                $gen([null, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(null),
+            ],
+            [
+                $gen([1.1, 2.2, 3.3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(2.2),
+            ],
+            [
+                $gen([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->contains(6),
+            ],
+            [
+                $gen([1]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('1'),
+            ],
+            [
+                $gen(['1', '2', '3']),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                $gen([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(false),
+            ],
+            [
+                $gen([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('0'),
+            ],
+            [
+                $gen([100, 200, 300]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('1e2'),
+            ],
+            [
+                $gen([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->containsCoercive('6'),
+            ],
         ];
     }
 
@@ -821,6 +985,58 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $gen([1, '1', true, [1], (object)[1]]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->allUnique(false),
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(1),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(4),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains('1'),
+            ],
+            [
+                $gen([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(false),
+            ],
+            [
+                $gen([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains('0'),
+            ],
+            [
+                $gen([null]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(0),
+            ],
+            [
+                $gen([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->contains(5),
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(4),
+            ],
+            [
+                $gen(['a', 'b', 'c']),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('d'),
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(99),
+            ],
+            [
+                $gen([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->containsCoercive(5),
             ],
         ];
     }
@@ -1045,6 +1261,62 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->allUnique(),
             ],
+            [
+                $iter([1]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(1),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(2),
+            ],
+            [
+                $iter(['a', 'b', 'c']),
+                fn (iterable $iterable) => Stream::of($iterable)->contains('c'),
+            ],
+            [
+                $iter([null, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(null),
+            ],
+            [
+                $iter([1.1, 2.2, 3.3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(2.2),
+            ],
+            [
+                $iter([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->contains(6),
+            ],
+            [
+                $iter([1]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('1'),
+            ],
+            [
+                $iter(['1', '2', '3']),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                $iter([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(false),
+            ],
+            [
+                $iter([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('0'),
+            ],
+            [
+                $iter([100, 200, 300]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('1e2'),
+            ],
+            [
+                $iter([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->containsCoercive('6'),
+            ],
         ];
     }
 
@@ -1217,6 +1489,58 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $iter([1, '1', true, [1], (object)[1]]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->allUnique(false),
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(1),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(4),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains('1'),
+            ],
+            [
+                $iter([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(false),
+            ],
+            [
+                $iter([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains('0'),
+            ],
+            [
+                $iter([null]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(0),
+            ],
+            [
+                $iter([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->contains(5),
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(4),
+            ],
+            [
+                $iter(['a', 'b', 'c']),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('d'),
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(99),
+            ],
+            [
+                $iter([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->containsCoercive(5),
             ],
         ];
     }
@@ -1441,6 +1765,62 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->allUnique(),
             ],
+            [
+                $trav([1]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(1),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(2),
+            ],
+            [
+                $trav(['a', 'b', 'c']),
+                fn (iterable $iterable) => Stream::of($iterable)->contains('c'),
+            ],
+            [
+                $trav([null, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(null),
+            ],
+            [
+                $trav([1.1, 2.2, 3.3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(2.2),
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->contains(6),
+            ],
+            [
+                $trav([1]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('1'),
+            ],
+            [
+                $trav(['1', '2', '3']),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                $trav([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(false),
+            ],
+            [
+                $trav([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('0'),
+            ],
+            [
+                $trav([100, 200, 300]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('1e2'),
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->containsCoercive('6'),
+            ],
         ];
     }
 
@@ -1613,6 +1993,58 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 $trav([1, '1', true, [1], (object)[1]]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->allUnique(false),
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(1),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(4),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains('1'),
+            ],
+            [
+                $trav([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(false),
+            ],
+            [
+                $trav([0, 1, 2]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains('0'),
+            ],
+            [
+                $trav([null]),
+                fn (iterable $iterable) => Stream::of($iterable)->contains(0),
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->contains(5),
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(1),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(4),
+            ],
+            [
+                $trav(['a', 'b', 'c']),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive('d'),
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)->containsCoercive(99),
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn ($x) => $x * 2)
+                    ->containsCoercive(5),
             ],
         ];
     }

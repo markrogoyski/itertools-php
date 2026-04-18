@@ -201,6 +201,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`toCount`](#To-Count)                 | Длина коллекции                                                                     | `Reduce::toCount($data)`                                      |
 | [`toFirst`](#To-First)                 | Первый элемент коллекции                                                            | `Reduce::toFirst()`                                           |
 | [`toFirstAndLast`](#To-First-And-Last) | Первый и последни элементы коллекции                                                | `Reduce::toFirstAndLast()`                                    |
+| [`toFirstMatch`](#To-First-Match)      | Первый элемент, удовлетворяющий предикату                                           | `Reduce::toFirstMatch($data, $predicate, [$default])`         |
 | [`toLast`](#To-Last)                   | Последний элемент коллекции                                                         | `Reduce::toLast()`                                            |
 | [`toMax`](#To-Max)                     | Максимальный элемент коллекции                                                      | `Reduce::toMax($numbers, [$compareBy])`                       |
 | [`toMin`](#To-Min)                     | Минимальный элемент коллекции                                                       | `Reduce::toMin($numbers, [$compareBy])`                       |
@@ -304,6 +305,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`toCount`](#To-Count-1)                 | Длина коллекции                                                     | `$stream->toCount()`                                    |
 | [`toFirst`](#To-First-1)                 | Первый элемент коллекции                                            | `$stream->toFirst()`                                    |
 | [`toFirstAndLast`](#To-First-And-Last-1) | Первый и последни элементы коллекции                                | `$stream->toFirstAndLast()`                             |
+| [`toFirstMatch`](#To-First-Match-1)      | Первый элемент, удовлетворяющий предикату                           | `$stream->toFirstMatch($predicate, [$default])`         |
 | [`toLast`](#To-Last-1)                   | Последний элемент коллекции                                         | `$stream->toLast()`                                     |
 | [`toMax`](#To-Max-1)                     | Максимальное значение из элементов коллекции                        | `$stream->toMax([$compareBy])`                          |
 | [`toMin`](#To-Min-1)                     | Минимальное значение из элементов коллекции                         | `$stream->toMin([$compareBy])`                          |
@@ -1896,6 +1898,24 @@ $input = [10, 20, 30];
 
 $result = Reduce::toFirstAndLast($input);
 // [10, 30]
+```
+
+### To First Match
+Возвращает первый элемент коллекции, удовлетворяющий предикату.
+
+```Reduce::toFirstMatch(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Завершает обход на первом совпадении — коллекция не потребляется полностью.
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+
+```php
+use IterTools\Reduce;
+
+$numbers = [1, 3, 5, 6, 7, 8];
+
+$firstEven = Reduce::toFirstMatch($numbers, fn (int $n) => $n % 2 === 0);
+// 6
 ```
 
 ### To Last
@@ -3554,6 +3574,25 @@ $input = [10, 20, 30];
 $result = Stream::of($input)
     ->toFirstAndLast();
 // [10, 30]
+```
+
+##### To First Match
+Возвращает первый элемент из коллекции в потоке, удовлетворяющий предикату.
+
+```$stream->toFirstMatch(callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Завершает обход на первом совпадении.
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 3, 5, 6, 7, 8];
+
+$result = Stream::of($numbers)
+    ->toFirstMatch(fn (int $n) => $n % 2 === 0);
+// 6
 ```
 
 ##### To Last

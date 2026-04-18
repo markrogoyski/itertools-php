@@ -1468,6 +1468,25 @@ $result = Stream::of($input)
 // [10, 30]
 ```
 
+##### To First Match
+Reduces iterable source to the first element matching the predicate.
+
+```$stream->toFirstMatch(callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Short-circuits on the first match.
+- Returns `$default` (null by default) if no element matches.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 3, 5, 6, 7, 8];
+
+$result = Stream::of($numbers)
+    ->toFirstMatch(fn (int $n) => $n % 2 === 0);
+// 6
+```
+
 ##### To Last
 Reduces iterable source to its last element.
 

@@ -209,6 +209,7 @@ Quick Reference
 | [`toCount`](docs/reduce.md#to-count)                 | Reduce to length of iterable               | `Reduce::toCount($data)`                                      |
 | [`toFirst`](docs/reduce.md#to-first)                 | Reduce to its first value                  | `Reduce::toFirst($data)`                                      |
 | [`toFirstAndLast`](docs/reduce.md#to-first-and-last) | Reduce to its first and last values        | `Reduce::toFirstAndLast($data)`                               |
+| [`toFirstMatch`](docs/reduce.md#to-first-match)      | Reduce to first value matching predicate   | `Reduce::toFirstMatch($data, $predicate, [$default])`         |
 | [`toLast`](docs/reduce.md#to-last)                   | Reduce to its last value                   | `Reduce::toLast()`                                            |
 | [`toMax`](docs/reduce.md#to-max)                     | Reduce to its largest element              | `Reduce::toMax($numbers, [$compareBy])`                       |
 | [`toMin`](docs/reduce.md#to-min)                     | Reduce to its smallest element             | `Reduce::toMin($numbers, [$compareBy])`                       |
@@ -315,6 +316,7 @@ Quick Reference
 | [`toCount`](docs/stream.md#to-count)                 | Reduces stream to its length                       | `$stream->toCount()`                                    |
 | [`toFirst`](docs/stream.md#to-first)                 | Reduces stream to its first value                  | `$stream->toFirst()`                                    |
 | [`toFirstAndLast`](docs/stream.md#to-first-and-last) | Reduces stream to its first and last values        | `$stream->toFirstAndLast()`                             |
+| [`toFirstMatch`](docs/stream.md#to-first-match)      | Reduces stream to first value matching predicate   | `$stream->toFirstMatch($predicate, [$default])`         |
 | [`toLast`](docs/stream.md#to-last)                   | Reduces stream to its last value                   | `$stream->toLast()`                                     |
 | [`toMax`](docs/stream.md#to-max)                     | Reduces stream to its max value                    | `$stream->toMax([$compareBy])`                          |
 | [`toMin`](docs/stream.md#to-min)                     | Reduces stream to its min value                    | `$stream->toMin([$compareBy])`                          |

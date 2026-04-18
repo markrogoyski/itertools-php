@@ -1744,6 +1744,25 @@ final class Stream implements \IteratorAggregate
         return Reduce::toNth($this->iterable, $position);
     }
 
+    /**
+     * Reduces iterable source to the first element matching the predicate.
+     *
+     * Predicate return value is coerced via (bool) cast.
+     *
+     * Short-circuits on first match. Returns $default when no element matches.
+     *
+     * @param callable $predicate
+     * @param mixed    $default value returned when no element matches
+     *
+     * @return mixed
+     *
+     * @see Reduce::toFirstMatch()
+     */
+    public function toFirstMatch(callable $predicate, mixed $default = null): mixed
+    {
+        return Reduce::toFirstMatch($this->iterable, $predicate, $default);
+    }
+
     // TERMINAL OPERATIONS WITH SIDE EFFECTS - PRINT
 
     /**

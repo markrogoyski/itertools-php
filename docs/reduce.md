@@ -68,6 +68,27 @@ $firstAndLast = Reduce::toFirstAndLast($weekdays);
 // [Monday, Friday]
 ```
 
+### To First Match
+Reduces iterable to its first element matching the predicate.
+
+```Reduce::toFirstMatch(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Short-circuits on the first match — the iterable is not fully consumed.
+- Returns `$default` (null by default) if no element matches.
+
+```php
+use IterTools\Reduce;
+
+$numbers = [1, 3, 5, 6, 7, 8];
+
+$firstEven = Reduce::toFirstMatch($numbers, fn (int $n) => $n % 2 === 0);
+// 6
+
+$firstNegative = Reduce::toFirstMatch($numbers, fn (int $n) => $n < 0, -1);
+// -1
+```
+
 ### To Last
 Reduces iterable to its last element.
 

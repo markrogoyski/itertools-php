@@ -11,9 +11,12 @@
 * Summary
   * `contains`
   * `containsCoercive`
+* Reduce
+  * `toFirstMatch`
 * Stream
   * `contains`
   * `containsCoercive`
+  * `toFirstMatch`
 
 
 ## v2.1.0 - 2026-03-29
