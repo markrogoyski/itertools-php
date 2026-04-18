@@ -1219,6 +1219,26 @@ $boolean = Stream::of($primes)->contains('7');
 // false (strict comparison)
 ```
 
+##### Contains Coercive
+Returns true if the stream contains the needle using [type coercion](../README.md#strict-and-coercive-types).
+
+```$stream->containsCoercive(mixed $needle): bool```
+
+- Scalars are compared non-strictly by value (`1` matches `'1'`; `0` matches `false`; `'1e2'` matches `100`).
+- Objects are compared by serialized value (throws `\InvalidArgumentException` if needle or any visited datum is not serializable).
+- Arrays are compared by serialized value.
+- `NaN` matches `NaN`.
+- Short-circuits on the first match.
+
+```php
+use IterTools\Stream;
+
+$primes = [2, 3, 5, 7, 11, 13];
+
+$boolean = Stream::of($primes)->containsCoercive('7');
+// true (coercive comparison)
+```
+
 ##### Exactly N
 Returns true if exactly n items are true according to a predicate function.
 

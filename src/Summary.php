@@ -335,6 +335,38 @@ final class Summary
     }
 
     /**
+     * Returns true if the given iterable contains the needle (using type coercion).
+     *
+     * Coercive (non-strict) type comparison:
+     *  - scalars: compares non-strictly by value (1 matches '1', 0 matches false, '1e2' matches 100)
+     *  - objects: compares serialized (throws \InvalidArgumentException if needle or any visited datum is not serializable)
+     *  - arrays: compares serialized
+     *  - NaN: matches NaN (consistent with other coercive operations in this library)
+     *
+     * Short-circuits on first match: a non-serializable datum is only reached if no
+     * earlier datum has matched, so a match before such a datum returns true without throwing.
+     *
+     * @param iterable<mixed> $data
+     * @param mixed           $needle
+     *
+     * @return bool
+     *
+     * @throws \InvalidArgumentException if the needle is not serializable, or if a non-serializable datum is reached before any match
+     */
+    public static function containsCoercive(iterable $data, mixed $needle): bool
+    {
+        $needleHash = UniqueExtractor::getString($needle, false);
+
+        foreach ($data as $datum) {
+            if (UniqueExtractor::getString($datum, false) === $needleHash) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns true if all elements of given collection that satisfy the predicate
      * appear before all elements that don't.
      *

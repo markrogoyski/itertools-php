@@ -1291,6 +1291,30 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns true if the stream contains the needle (using type coercion).
+     *
+     * Coercive (non-strict) type comparison:
+     *  - scalars: compares non-strictly by value (1 matches '1', 0 matches false, '1e2' matches 100)
+     *  - objects: compares serialized (throws \InvalidArgumentException if needle or any visited datum is not serializable)
+     *  - arrays: compares serialized
+     *  - NaN: matches NaN (consistent with other coercive operations in this library)
+     *
+     * Short-circuits on first match.
+     *
+     * @param mixed $needle
+     *
+     * @return bool
+     *
+     * @throws \InvalidArgumentException if the needle is not serializable, or if a non-serializable datum is reached before any match
+     *
+     * @see Summary::containsCoercive()
+     */
+    public function containsCoercive(mixed $needle): bool
+    {
+        return Summary::containsCoercive($this->iterable, $needle);
+    }
+
+    /**
      * Returns true if exactly n items in the stream are true where the predicate function is true.
      *
      * Default predicate if not provided is the boolean value of each data item.

@@ -118,6 +118,29 @@ $boolean = Summary::contains($primes, '7');
 // false (strict comparison)
 ```
 
+### Contains Coercive
+Returns true if the iterable contains the needle using [type coercion](../README.md#strict-and-coercive-types).
+
+```Summary::containsCoercive(iterable $data, mixed $needle): bool```
+
+- Scalars are compared non-strictly by value (`1` matches `'1'`; `0` matches `false`; `'1e2'` matches `100`).
+- Objects are compared by serialized value (throws `\InvalidArgumentException` if needle or any visited datum is not serializable).
+- Arrays are compared by serialized value.
+- `NaN` matches `NaN` (consistent with other coercive operations in this library).
+- Short-circuits on the first match: a non-serializable datum is only reached if no earlier datum matched.
+
+```php
+use IterTools\Summary;
+
+$primes = [2, 3, 5, 7, 11, 13];
+
+$boolean = Summary::containsCoercive($primes, '7');
+// true (coercive comparison)
+
+$boolean = Summary::containsCoercive([100, 200, 300], '1e2');
+// true
+```
+
 ### Exactly N
 Returns true if exactly n items are true according to a predicate function.
 
