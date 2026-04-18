@@ -255,6 +255,25 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Yield [index, value] pairs from the stream.
+     *
+     * The index is sequential starting from $start, independent of the source iterable's keys.
+     *
+     * Negative $start is allowed.
+     *
+     * @param int $start
+     *
+     * @return Stream
+     *
+     * @see Single::enumerate()
+     */
+    public function enumerate(int $start = 0): self
+    {
+        $this->iterable = Single::enumerate($this->iterable, $start);
+        return $this;
+    }
+
+    /**
      * Return elements from the iterable source as long as the predicate is true.
      *
      * If no predicate is provided, the boolean value of the data is used.

@@ -96,6 +96,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`compress`](#Compress)                        | Возвращает элементы из коллекции, выбранные селектором                       | `Single::compress($data, $selectors)`                       |
 | [`compressAssociative`](#Compress-Associative) | Возвращает элементы из коллекции по заданным ключам                          | `Single::compressAssociative($data, $selectorKeys)`         |
 | [`dropWhile`](#Drop-While)                     | Пропускает элементы, пока предикат возвращает истину                         | `Single::dropWhile($data, $predicate)`                      |
+| [`enumerate`](#Enumerate)                      | Итерирует пары `[индекс, значение]`                                          | `Single::enumerate($data, [$start])`                        |
 | [`filter`](#Filter)                            | Возвращает только те элементы, для которых предикат возвращает истину        | `Single::filter($data)`                                     |
 | [`filterTrue`](#Filter-True)                   | Возвращает только истинные элементы из коллекции                             | `Single::filterTrue($data)`                                 |
 | [`filterFalse`](#Filter-False)                 | Возвращает только ложные элементы из коллекции                               | `Single::filterFalse($data, $predicate)`                    |
@@ -240,6 +241,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`chunkwiseOverlap`](#Chunkwise-Overlap-1)                                | Итерирует коллекцию с разбиением по взаимонакладывающимся чанкам                                             | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                 |
 | [`distinct`](#Distinct-1)                                                 | Фильтрует коллекцию, сохраняя только уникальные значения                                                     | `$stream->distinct($strict)`                                                      |
 | [`dropWhile`](#Drop-While-1)                                              | Пропускает элементы из коллекции, пока предикат возвращает ложь                                              | `$stream->dropWhile($predicate)`                                                  |
+| [`enumerate`](#Enumerate-1)                                               | Итерирует пары `[индекс, значение]`                                                                          | `$stream->enumerate([$start])`                                                    |
 | [`filter`](#Filter-1)                                                     | Возвращает из коллекции только те элементы, для которых предикат возвращает истину                           | `$stream->filterTrue($predicate)`                                                 |
 | [`filterTrue`](#Filter-True-1)                                            | Возвращает только истинные элементы из коллекции                                                             | `$stream->filterTrue($predicate)`                                                 |
 | [`filterFalse`](#Filter-False-1)                                          | Возвращает только ложные элементы из коллекции                                                               | `$stream->filterFalse($predicate)`                                                |
@@ -564,6 +566,28 @@ foreach (Single::dropWhile($scores, $predicate) as $score) {
     print($score);
 }
 // 70, 85, 65, 90
+```
+
+### Enumerate
+Итерирует пары `[индекс, значение]`.
+
+```Single::enumerate(iterable $data, int $start = 0)```
+
+* Индекс генерируется последовательно начиная с `$start`, независимо от ключей исходной коллекции.
+* Допускается отрицательное значение `$start`.
+
+```php
+use IterTools\Single;
+
+$seasons = ['spring', 'summer', 'autumn', 'winter'];
+
+foreach (Single::enumerate($seasons) as [$index, $season]) {
+    print("$index: $season" . \PHP_EOL);
+}
+// 0: spring
+// 1: summer
+// 2: autumn
+// 3: winter
 ```
 
 ### Filter
@@ -2520,6 +2544,25 @@ $result = Stream::of($input)
     ->dropWhile(fn ($value) => $value < 3)
     ->toArray();
 // 3, 4, 5
+```
+
+#### Enumerate
+Итерирует пары `[индекс, значение]`.
+
+```$stream->enumerate(int $start = 0): Stream```
+
+* Индекс генерируется последовательно начиная с `$start`, независимо от ключей исходной коллекции.
+* Допускается отрицательное значение `$start`.
+
+```php
+use IterTools\Stream;
+
+$seasons = ['spring', 'summer', 'autumn', 'winter'];
+
+$result = Stream::of($seasons)
+    ->enumerate()
+    ->toArray();
+// [[0, 'spring'], [1, 'summer'], [2, 'autumn'], [3, 'winter']]
 ```
 
 #### Filter

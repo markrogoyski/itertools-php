@@ -369,6 +369,25 @@ $result = Stream::of($input)
 // 3, 4, 5
 ```
 
+#### Enumerate
+Yield `[index, value]` pairs from the stream.
+
+```$stream->enumerate(int $start = 0): Stream```
+
+* The index is sequential starting from `$start`, independent of the source iterable's keys.
+* Negative `$start` is allowed.
+
+```php
+use IterTools\Stream;
+
+$seasons = ['spring', 'summer', 'autumn', 'winter'];
+
+$result = Stream::of($seasons)
+    ->enumerate()
+    ->toArray();
+// [[0, 'spring'], [1, 'summer'], [2, 'autumn'], [3, 'winter']]
+```
+
 #### Filter
 Filter out elements from the stream only keeping elements where there predicate function is true.
 

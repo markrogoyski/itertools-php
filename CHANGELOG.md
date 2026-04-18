@@ -13,9 +13,12 @@
   * `containsCoercive`
 * Reduce
   * `toFirstMatch`
+* Single
+  * `enumerate`
 * Stream
   * `contains`
   * `containsCoercive`
+  * `enumerate`
   * `toFirstMatch`
 
 

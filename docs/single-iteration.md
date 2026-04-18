@@ -121,6 +121,28 @@ foreach (Single::dropWhile($scores, $predicate) as $score) {
 // 70, 85, 65, 90
 ```
 
+### Enumerate
+Yield `[index, value]` pairs from the iterable.
+
+```Single::enumerate(iterable $data, int $start = 0)```
+
+* The index is sequential starting from `$start`, independent of the source iterable's keys.
+* Negative `$start` is allowed.
+
+```php
+use IterTools\Single;
+
+$seasons = ['spring', 'summer', 'autumn', 'winter'];
+
+foreach (Single::enumerate($seasons) as [$index, $season]) {
+    print("$index: $season" . \PHP_EOL);
+}
+// 0: spring
+// 1: summer
+// 2: autumn
+// 3: winter
+```
+
 ### Filter
 Filter out elements from the iterable only returning elements where the predicate function is true.
 

@@ -120,6 +120,27 @@ final class Single
     }
 
     /**
+     * Yield [index, value] pairs from the iterable.
+     *
+     * The index is sequential starting from $start, independent of the source iterable's keys.
+     *
+     * Negative $start is allowed.
+     *
+     * @param iterable<mixed> $data
+     * @param int             $start
+     *
+     * @return \Generator<array{int, mixed}>
+     */
+    public static function enumerate(iterable $data, int $start = 0): \Generator
+    {
+        $index = $start;
+        foreach ($data as $datum) {
+            yield [$index, $datum];
+            $index++;
+        }
+    }
+
+    /**
      * Filter out elements from the iterable only returning elements where there predicate function is true.
      *
      * @param iterable<mixed> $data
