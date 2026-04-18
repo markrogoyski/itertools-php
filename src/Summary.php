@@ -308,6 +308,33 @@ final class Summary
     }
 
     /**
+     * Returns true if the given iterable contains the needle (using strict-type comparison).
+     *
+     * Strict-type comparison:
+     *  - scalars: compares strictly by type (1 does not match '1', 0 does not match false)
+     *  - objects: matches only the same instance
+     *  - arrays: compares strictly by ===
+     *  - NaN: never matches NaN (since NaN !== NaN)
+     *
+     * Short-circuits on first match.
+     *
+     * @param iterable<mixed> $data
+     * @param mixed           $needle
+     *
+     * @return bool
+     */
+    public static function contains(iterable $data, mixed $needle): bool
+    {
+        foreach ($data as $datum) {
+            if ($datum === $needle) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns true if all elements of given collection that satisfy the predicate
      * appear before all elements that don't.
      *

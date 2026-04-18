@@ -1196,6 +1196,29 @@ $boolean = Stream::of([1, 2.0, '3'])
 // true
 ```
 
+##### Contains
+Returns true if the stream contains the needle using [strict-type comparison](../README.md#strict-and-coercive-types).
+
+```$stream->contains(mixed $needle): bool```
+
+- Scalars are compared strictly by type (`1` does not match `'1'`; `0` does not match `false`).
+- Objects match only the same instance.
+- Arrays are compared with `===`.
+- `NaN` never matches `NaN`.
+- Short-circuits on the first match.
+
+```php
+use IterTools\Stream;
+
+$primes = [2, 3, 5, 7, 11, 13];
+
+$boolean = Stream::of($primes)->contains(7);
+// true
+
+$boolean = Stream::of($primes)->contains('7');
+// false (strict comparison)
+```
+
 ##### Exactly N
 Returns true if exactly n items are true according to a predicate function.
 

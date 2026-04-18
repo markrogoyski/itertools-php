@@ -191,6 +191,7 @@ Quick Reference
 | [`anyMatch`](docs/summary.md#any-match)                                | True if any item is true according to predicate                          | `Summary::anyMatch($data, $predicate)`            |
 | [`arePermutations`](docs/summary.md#are-permutations)                  | True if iterables are permutations of each other                         | `Summary::arePermutations(...$iterables)`         |
 | [`arePermutationsCoercive`](docs/summary.md#are-permutations-coercive) | True if iterables are permutations of each other with type coercion      | `Summary::arePermutationsCoercive(...$iterables)` |
+| [`contains`](docs/summary.md#contains)                                 | True if iterable contains the needle                                     | `Summary::contains($data, $needle)`               |
 | [`exactlyN`](docs/summary.md#exactly-n)                                | True if exactly n items are true according to predicate                  | `Summary::exactlyN($data, $n, $predicate)`        |
 | [`isEmpty`](docs/summary.md#is-empty)                                  | True if iterable has no items                                            | `Summary::isEmpty($data)`                         |
 | [`isPartitioned`](docs/summary.md#is-partitioned)                      | True if partitioned with items true according to predicate before others | `Summary::isPartitioned($data, $predicate)`       |
@@ -295,6 +296,7 @@ Quick Reference
 | [`anyMatch`](docs/stream.md#any-match)                                       | Returns true if any item in stream matches predicate                             | `$stream->anyMatch($predicate)`                        |
 | [`arePermutationsWith`](docs/stream.md#are-permutations-with)                  | Returns true if all iterables permutations of stream                             | `$stream->arePermutationsWith(...$iterables)`          |
 | [`arePermutationsCoerciveWith`](docs/stream.md#are-permutations-coercive-with) | Returns true if all iterables permutations of stream with type coercion          | `$stream->arePermutationsCoerciveWith(...$iterables)`  |
+| [`contains`](docs/stream.md#contains)                                        | Returns true if stream contains the needle                                       | `$stream->contains($needle)`                           |
 | [`exactlyN`](docs/stream.md#exactly-n)                                       | Returns true if exactly n items are true according to predicate                  | `$stream->exactlyN($n, $predicate)`                    |
 | [`isEmpty`](docs/stream.md#is-empty)                                         | Returns true if stream has no items                                              | `$stream::isEmpty()`                                   |
 | [`isPartitioned`](docs/stream.md#is-partitioned)                             | Returns true if partitioned with items true according to predicate before others | `$stream::isPartitioned($predicate)`                   |

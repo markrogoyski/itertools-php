@@ -92,6 +92,32 @@ $boolean = Summary::arePermutationsCoercive($set1, $set2, $set3);
 // true
 ```
 
+### Contains
+Returns true if the iterable contains the needle using [strict-type comparison](../README.md#strict-and-coercive-types).
+
+```Summary::contains(iterable $data, mixed $needle): bool```
+
+- Scalars are compared strictly by type (`1` does not match `'1'`; `0` does not match `false`).
+- Objects match only the same instance.
+- Arrays are compared with `===`.
+- `NaN` never matches `NaN` (since `NaN !== NaN`).
+- Short-circuits on the first match.
+
+```php
+use IterTools\Summary;
+
+$primes = [2, 3, 5, 7, 11, 13];
+
+$boolean = Summary::contains($primes, 7);
+// true
+
+$boolean = Summary::contains($primes, 4);
+// false
+
+$boolean = Summary::contains($primes, '7');
+// false (strict comparison)
+```
+
 ### Exactly N
 Returns true if exactly n items are true according to a predicate function.
 

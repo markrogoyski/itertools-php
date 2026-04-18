@@ -1269,6 +1269,28 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns true if the stream contains the needle (using strict-type comparison).
+     *
+     * Strict-type comparison:
+     *  - scalars: compares strictly by type (1 does not match '1', 0 does not match false)
+     *  - objects: matches only the same instance
+     *  - arrays: compares strictly by ===
+     *  - NaN: never matches NaN (since NaN !== NaN)
+     *
+     * Short-circuits on first match.
+     *
+     * @param mixed $needle
+     *
+     * @return bool
+     *
+     * @see Summary::contains()
+     */
+    public function contains(mixed $needle): bool
+    {
+        return Summary::contains($this->iterable, $needle);
+    }
+
+    /**
      * Returns true if exactly n items in the stream are true where the predicate function is true.
      *
      * Default predicate if not provided is the boolean value of each data item.
