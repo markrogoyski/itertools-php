@@ -158,6 +158,7 @@ trait DataProvider
     public static function dataProviderForTransformLoopTools(): array
     {
         return [
+            [Transform::partition([1, 2, 3, 4, 5], fn ($x) => $x % 2 === 0)],
             [Transform::tee([1, 2, 3, 4, 5], 2)],
             [Transform::toArray([1, 2, 3, 4, 5])],
             [Transform::toAssociativeArray([1, 2, 3, 4, 5])],

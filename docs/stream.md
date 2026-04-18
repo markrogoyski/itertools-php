@@ -1739,6 +1739,36 @@ $array = Stream::of(['message 1', 'message 2', 'message 3'])
 // [3b3f2272b3b904d342b2d0df2bf31ed4 => MESSAGE 1, 43638d919cfb8ea31979880f1a2bb146 => MESSAGE 2, ... ]
 ```
 
+##### To Partition
+Partitions the stream into two lists based on a predicate.
+
+Returns a two-element list array: `[truthyValues, falsyValues]`. Both output arrays are reindexed (list arrays); source keys are discarded. Predicate return value is coerced via `(bool)` cast.
+
+```$stream->toPartition(callable $predicate): array```
+
+```php
+use IterTools\Stream;
+
+[$evens, $odds] = Stream::of([1, 2, 3, 4, 5, 6])
+    ->toPartition(fn (int $n): bool => $n % 2 === 0);
+// $evens: [2, 4, 6]
+// $odds:  [1, 3, 5]
+```
+
+Since both halves are returned together, `toPartition` pairs naturally with operations that consume two lists. For example, tournament seeding — partition seeds into top and bottom halves, then pair top vs reversed bottom to build matchups:
+
+```php
+use IterTools\Stream;
+
+[$topHalf, $bottomHalf] = Stream::of([1, 2, 3, 4, 5, 6, 7, 8])
+    ->toPartition(fn (int $seed): bool => $seed <= 4);
+
+$matchups = Stream::of($topHalf)
+    ->zipWith(array_reverse($bottomHalf))
+    ->toArray();
+// [[1, 8], [2, 7], [3, 6], [4, 5]]
+```
+
 ##### Tee
 Return several independent (duplicated) streams.
 

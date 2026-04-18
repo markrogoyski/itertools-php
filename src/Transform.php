@@ -77,6 +77,35 @@ final class Transform
     }
 
     /**
+     * Partitions iterable into two lists based on a predicate.
+     *
+     * Returns a two-element list array: [truthyValues, falsyValues].
+     * Both output arrays are reindexed (list arrays); source keys are discarded.
+     *
+     * Predicate return value is coerced via (bool) cast.
+     *
+     * @template T
+     *
+     * @param iterable<T> $data
+     * @param callable    $predicate
+     *
+     * @return array{0: array<T>, 1: array<T>}
+     */
+    public static function partition(iterable $data, callable $predicate): array
+    {
+        $truthy = [];
+        $falsy  = [];
+        foreach ($data as $datum) {
+            if ((bool) $predicate($datum)) {
+                $truthy[] = $datum;
+            } else {
+                $falsy[] = $datum;
+            }
+        }
+        return [$truthy, $falsy];
+    }
+
+    /**
      * Return several independent (duplicated) iterators from a single iterable.
      *
      * Once tee has been called to duplicate iterators, it is advisable to not use the original input iterator any further.

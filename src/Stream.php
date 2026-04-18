@@ -1163,6 +1163,25 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Partitions the stream into two lists based on a predicate.
+     *
+     * Returns a two-element list array: [truthyValues, falsyValues].
+     * Both output arrays are reindexed (list arrays); source keys are discarded.
+     *
+     * Predicate return value is coerced via (bool) cast.
+     *
+     * @param callable $predicate
+     *
+     * @return array{0: array<mixed>, 1: array<mixed>}
+     *
+     * @see Transform::partition()
+     */
+    public function toPartition(callable $predicate): array
+    {
+        return Transform::partition($this->iterable, $predicate);
+    }
+
+    /**
      * Return several independent streams from current stream.
      *
      * Once a tee() has been created, the original iterable should not be used anywhere else;

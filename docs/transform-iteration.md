@@ -6,6 +6,23 @@ Tools for transforming iterables into other data structures.
 
 ---
 
+### Partition
+Partitions an iterable into two lists based on a predicate.
+
+Returns a two-element list array: `[truthyValues, falsyValues]`. Both output arrays are reindexed (list arrays); source keys are discarded. Predicate return value is coerced via `(bool)` cast.
+
+```Transform::partition(iterable $data, callable $predicate): array```
+
+```php
+use IterTools\Transform;
+
+$numbers = [1, 2, 3, 4, 5, 6];
+
+[$evens, $odds] = Transform::partition($numbers, fn (int $n): bool => $n % 2 === 0);
+// $evens: [2, 4, 6]
+// $odds:  [1, 3, 5]
+```
+
 ### Tee
 Return several independent (duplicated) iterators from a single iterable.
 

@@ -179,6 +179,7 @@ Quick Reference
 #### Transform Iteration
 | Iterator                                       | Description                                  | Code Snippet                                                      |
 |------------------------------------------------|----------------------------------------------|-------------------------------------------------------------------|
+| [`partition`](docs/transform-iteration.md#partition)                      | Partition iterable into truthy and falsy lists | `Transform::partition($data, $predicate)`                       |
 | [`tee`](docs/transform-iteration.md#tee)                                  | Iterate duplicate iterators                  | `Transform::tee($data, $count)`                                   |
 | [`toArray`](docs/transform-iteration.md#to-array)                         | Transform iterable to an array               | `Transform::toArray($data)`                                       |
 | [`toAssociativeArray`](docs/transform-iteration.md#to-associative-array)  | Transform iterable to an associative array   | `Transform::toAssociativeArray($data, [$keyFunc], [$valueFunc])`  |
@@ -336,6 +337,7 @@ Quick Reference
 |-------------------------------------------------|-------------------------------------------------------|---------------------------------------------------------|
 | [`toArray`](docs/stream.md#to-array)                        | Returns array of stream elements                      | `$stream->toArray()`                                    |
 | [`toAssociativeArray`](docs/stream.md#to-associative-array) | Returns key-value map of stream elements              | `$stream->toAssociativeArray($keyFunc, $valueFunc)`     |
+| [`toPartition`](docs/stream.md#to-partition)                | Partition stream into truthy and falsy lists          | `$stream->toPartition($predicate)`                      |
 | [`tee`](docs/stream.md#tee)                                 | Returns array of multiple identical Streams           | `$stream->tee($count)`                                  |
 
 ##### Side Effect Terminal Operations

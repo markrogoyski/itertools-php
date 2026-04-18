@@ -15,11 +15,14 @@
   * `toFirstMatch`
 * Single
   * `enumerate`
+* Transform
+  * `partition`
 * Stream
   * `contains`
   * `containsCoercive`
   * `enumerate`
   * `toFirstMatch`
+  * `toPartition`
 
 
 ## v2.1.0 - 2026-03-29
