@@ -243,6 +243,10 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->zipEqualWith([6, 7, 8, 9, 10])],
             [Stream::of([1, 2, 3, 4, 5])->zipFilledWith('filler', [6, 7, 8, 9, 10])],
             [Stream::of([1, 2, 3, 4, 5])->zipLongestWith([6, 7, 8, 9, 10])],
+            [Stream::of([[1, 2, 3], [4, 5, 6]])->zip()],
+            [Stream::of([[1, 2, 3], [4, 5]])->zipLongest()],
+            [Stream::of([[1, 2, 3], [4, 5]])->zipFilled('x')],
+            [Stream::of([[1, 2, 3], [4, 5, 6]])->zipEqual()],
         ];
     }
 }

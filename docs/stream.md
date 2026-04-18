@@ -1047,6 +1047,180 @@ $stream = Stream::of($input)
 // [1, 2, 3, 4, 5, 6]
 ```
 
+#### Zip
+Treat the stream itself as a sequence of iterables and zip them column-wise (transpose).
+
+```$stream->zip(): Stream```
+
+For uneven lengths, iteration stops when the shortest row is exhausted. Similar to Python's `zip(*rows)` idiom.
+
+```php
+use IterTools\Stream;
+
+$rows = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+
+$stream = Stream::of($rows)
+    ->zip()
+    ->toArray();
+// [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+```
+
+Pairs well with `chunkwise()` — chunk a flat stream into groups, then transpose:
+
+```php
+use IterTools\Stream;
+
+$stream = Stream::of([1, 2, 3, 4, 5, 6])
+    ->chunkwise(3)
+    ->zip()
+    ->toArray();
+// [[1, 4], [2, 5], [3, 6]]
+```
+
+Pairs naturally with `toPartition()` — build tournament matchups by pairing the top half against the reversed bottom half (1 vs 8, 2 vs 7, 3 vs 6, 4 vs 5):
+
+```php
+use IterTools\Stream;
+
+[$topHalf, $bottomHalf] = Stream::of([1, 2, 3, 4, 5, 6, 7, 8])
+    ->toPartition(fn (int $seed): bool => $seed <= 4);
+
+$matchups = Stream::of([$topHalf, array_reverse($bottomHalf)])
+    ->zip()
+    ->toArray();
+// [[1, 8], [2, 7], [3, 6], [4, 5]]
+```
+
+Transpose a row-oriented table into columns — handy when records arrive row-by-row but you need each field as its own series:
+
+```php
+use IterTools\Stream;
+
+$rows = [
+    ['Alice', 30, 'NYC'],
+    ['Bob',   25, 'LA'],
+    ['Carol', 41, 'Austin'],
+];
+
+$columns = Stream::of($rows)
+    ->zip()
+    ->toArray();
+// [['Alice', 'Bob', 'Carol'], [30, 25, 41], ['NYC', 'LA', 'Austin']]
+```
+
+The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. Passing the same iterator instance more than once is not supported and may not behave as expected.
+
+#### Zip Longest
+Treat the stream itself as a sequence of iterables and zip them column-wise (transpose), continuing until the longest row is exhausted.
+
+```$stream->zipLongest(): Stream```
+
+For uneven lengths, the exhausted rows will produce `null` for the remaining iterations. Similar to Python's `zip_longest(*rows)` idiom.
+
+```php
+use IterTools\Stream;
+
+$rows = [[1, 2, 3], [4, 5]];
+
+$stream = Stream::of($rows)
+    ->zipLongest()
+    ->toArray();
+// [[1, 4], [2, 5], [3, null]]
+```
+
+Group month-by-month readings across years with uneven record lengths — short years surface as `null` gaps instead of dropping data:
+
+```php
+use IterTools\Stream;
+
+$rainfallByYear = [
+    [3.2, 4.1, 5.0, 6.2],           // 2022
+    [2.8, 3.9, 4.7],                // 2023 — sensor outage mid-year
+    [3.5, 4.3, 5.2, 6.8, 7.1],      // 2024
+];
+
+$byMonth = Stream::of($rainfallByYear)
+    ->zipLongest()
+    ->toArray();
+// [[3.2, 2.8, 3.5], [4.1, 3.9, 4.3], [5.0, 4.7, 5.2], [6.2, null, 6.8], [null, null, 7.1]]
+```
+
+The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. Passing the same iterator instance more than once is not supported and may not behave as expected.
+
+#### Zip Filled
+Treat the stream itself as a sequence of iterables and zip them column-wise (transpose), continuing until the longest row is exhausted, using a filler value for missing entries.
+
+```$stream->zipFilled(mixed $filler): Stream```
+
+For uneven lengths, the exhausted rows will produce `$filler` for the remaining iterations.
+
+```php
+use IterTools\Stream;
+
+$rows = [[1, 2, 3], [4, 5]];
+
+$stream = Stream::of($rows)
+    ->zipFilled('?')
+    ->toArray();
+// [[1, 4], [2, 5], [3, '?']]
+```
+
+Useful when a caller downstream wants a numeric default instead of `null` — e.g. quarterly sales figures across teams where missing quarters should count as zero for aggregation:
+
+```php
+use IterTools\Stream;
+
+$salesByTeam = [
+    [120, 150, 180, 210],   // Team A — full year
+    [ 95, 110],             // Team B — onboarded H2
+    [140, 160, 175],        // Team C — Q4 pending
+];
+
+$byQuarter = Stream::of($salesByTeam)
+    ->zipFilled(0)
+    ->toArray();
+// [[120, 95, 140], [150, 110, 160], [180, 0, 175], [210, 0, 0]]
+```
+
+The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. Passing the same iterator instance more than once is not supported and may not behave as expected.
+
+#### Zip Equal
+Treat the stream itself as a sequence of iterables of equal lengths and zip them column-wise (transpose).
+
+```$stream->zipEqual(): Stream```
+
+Works like `Stream::zip()` but throws `\LengthException` if row lengths are not equal — i.e., at least one row ends before the others. Use this when equal lengths are a required invariant.
+
+```php
+use IterTools\Stream;
+
+$rows = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+
+$stream = Stream::of($rows)
+    ->zipEqual()
+    ->toArray();
+// [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+```
+
+A natural fit for CSV-style records where every row must have the same number of fields — transposing to columns surfaces a schema violation as a `\LengthException` instead of silently truncating or padding:
+
+```php
+use IterTools\Stream;
+
+$records = [
+    ['id', 'name', 'email'],
+    [1,    'Alice', 'alice@example.com'],
+    [2,    'Bob',   'bob@example.com'],
+];
+
+$byField = Stream::of($records)
+    ->zipEqual()
+    ->toArray();
+// [['id', 1, 2], ['name', 'Alice', 'Bob'], ['email', 'alice@example.com', 'bob@example.com']]
+```
+
+The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. Passing the same iterator instance more than once is not supported and may not behave as expected.
+
 #### Zip With
 Return a stream consisting of multiple iterable collections streamed simultaneously.
 
@@ -1765,6 +1939,20 @@ use IterTools\Stream;
 
 $matchups = Stream::of($topHalf)
     ->zipWith(array_reverse($bottomHalf))
+    ->toArray();
+// [[1, 8], [2, 7], [3, 6], [4, 5]]
+```
+
+Or, treating both halves as rows of a single stream and transposing them with [`zip`](#zip):
+
+```php
+use IterTools\Stream;
+
+[$topHalf, $bottomHalf] = Stream::of([1, 2, 3, 4, 5, 6, 7, 8])
+    ->toPartition(fn (int $seed): bool => $seed <= 4);
+
+$matchups = Stream::of([$topHalf, array_reverse($bottomHalf)])
+    ->zip()
     ->toArray();
 // [[1, 8], [2, 7], [3, 6], [4, 5]]
 ```

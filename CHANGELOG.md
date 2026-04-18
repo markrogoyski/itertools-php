@@ -23,6 +23,10 @@
   * `enumerate`
   * `toFirstMatch`
   * `toPartition`
+  * `zip`
+  * `zipLongest`
+  * `zipFilled`
+  * `zipEqual`
 
 
 ## v2.1.0 - 2026-03-29

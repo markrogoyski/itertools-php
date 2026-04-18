@@ -619,6 +619,160 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Treat the stream itself as a sequence of iterables and zip them column-wise (transpose).
+     *
+     * Similar to Python's zip(*rows) idiom.
+     *
+     * For uneven lengths, iteration stops when the shortest row is exhausted.
+     *
+     * The outer stream must be finite; it is consumed when the zipped stream is iterated,
+     * before the first tuple is yielded. Inner rows are advanced lazily after that.
+     *
+     * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
+     * is thrown at iteration time (not at call time).
+     *
+     * Note: Passing the same iterator instance more than once is not supported and may
+     * not behave as expected.
+     *
+     * @return Stream
+     *
+     * @see Multi::zip()
+     */
+    public function zip(): self
+    {
+        $source         = $this->iterable;
+        $this->iterable = (static function () use ($source): \Generator {
+            $rows = self::toRowIterators($source);
+            yield from Multi::zip(...$rows);
+        })();
+        return $this;
+    }
+
+    /**
+     * Treat the stream itself as a sequence of iterables and zip them column-wise (transpose),
+     * continuing until the longest row is exhausted.
+     *
+     * Similar to Python's zip_longest(*rows) idiom.
+     *
+     * For uneven lengths, the exhausted rows will produce null for the remaining iterations.
+     *
+     * The outer stream must be finite; it is consumed when the zipped stream is iterated,
+     * before the first tuple is yielded. Inner rows are advanced lazily after that.
+     *
+     * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
+     * is thrown at iteration time (not at call time).
+     *
+     * Note: Passing the same iterator instance more than once is not supported and may
+     * not behave as expected.
+     *
+     * @return Stream
+     *
+     * @see Multi::zipLongest()
+     */
+    public function zipLongest(): self
+    {
+        $source         = $this->iterable;
+        $this->iterable = (static function () use ($source): \Generator {
+            $rows = self::toRowIterators($source);
+            yield from Multi::zipLongest(...$rows);
+        })();
+        return $this;
+    }
+
+    /**
+     * Treat the stream itself as a sequence of iterables and zip them column-wise (transpose),
+     * continuing until the longest row is exhausted, using $filler for missing values.
+     *
+     * For uneven lengths, the exhausted rows will produce the $filler value for the remaining
+     * iterations.
+     *
+     * The outer stream must be finite; it is consumed when the zipped stream is iterated,
+     * before the first tuple is yielded. Inner rows are advanced lazily after that.
+     *
+     * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
+     * is thrown at iteration time (not at call time).
+     *
+     * Note: Passing the same iterator instance more than once is not supported and may
+     * not behave as expected.
+     *
+     * @param mixed $filler
+     *
+     * @return Stream
+     *
+     * @see Multi::zipFilled()
+     */
+    public function zipFilled(mixed $filler): self
+    {
+        $source         = $this->iterable;
+        $this->iterable = (static function () use ($source, $filler): \Generator {
+            $rows = self::toRowIterators($source);
+            yield from Multi::zipFilled($filler, ...$rows);
+        })();
+        return $this;
+    }
+
+    /**
+     * Treat the stream itself as a sequence of iterables of equal lengths and zip them
+     * column-wise (transpose).
+     *
+     * Works like Stream::zip() but throws \LengthException if row lengths are not equal,
+     * i.e., at least one row ends before the others.
+     *
+     * The outer stream must be finite; it is consumed when the zipped stream is iterated,
+     * before the first tuple is yielded. Inner rows are advanced lazily after that.
+     *
+     * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
+     * is thrown at iteration time (not at call time).
+     *
+     * Note: Passing the same iterator instance more than once is not supported and may
+     * not behave as expected.
+     *
+     * @return Stream
+     *
+     * @throws \LengthException if during iteration one row ends before the others
+     *
+     * @see Multi::zipEqual()
+     */
+    public function zipEqual(): self
+    {
+        $source         = $this->iterable;
+        $this->iterable = (static function () use ($source): \Generator {
+            $rows = self::toRowIterators($source);
+            yield from Multi::zipEqual(...$rows);
+        })();
+        return $this;
+    }
+
+    /**
+     * Materialize an outer iterable of iterables into an array of Iterator instances.
+     *
+     * Uses an explicit zero-based counter so error messages reference positional row index
+     * independent of source keys (associative or sparse numeric).
+     *
+     * @param iterable<mixed> $rows
+     *
+     * @return array<\Iterator<mixed>>
+     *
+     * @throws \InvalidArgumentException if any element of $rows is not iterable
+     */
+    private static function toRowIterators(iterable $rows): array
+    {
+        $iterators = [];
+        $rowIndex  = 0;
+        foreach ($rows as $row) {
+            if (!\is_iterable($row)) {
+                throw new \InvalidArgumentException(
+                    "Stream::zip* requires every element to be iterable; row {$rowIndex} is "
+                    . \get_debug_type($row)
+                );
+            }
+            $iterators[] = Transform::toIterator($row);
+            $rowIndex++;
+        }
+        return $iterators;
+    }
+
+    /**
      * Iterate iterable source with another iterable collections simultaneously.
      *
      * Make an iterator that aggregates items from multiple iterators.
