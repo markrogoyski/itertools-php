@@ -699,6 +699,34 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Combinations (without replacement) of the stream's elements.
+     *
+     * Output tuples are list arrays (0-indexed, in input order). Source keys are ignored.
+     * Output order follows Python's itertools.combinations (lexicographic by input position):
+     * duplicate values are position-unique.
+     *
+     * The stream is finite and consumed once (materialized internally); generators are
+     * supported but cannot be re-iterated afterwards.
+     *
+     * Special cases:
+     *  - $r = 0 yields one empty tuple
+     *  - $r greater than the stream length yields nothing
+     *
+     * @param int $r length of each combination
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if $r is negative
+     *
+     * @see Combinatorics::combinations()
+     */
+    public function combinations(int $r): self
+    {
+        $this->iterable = Combinatorics::combinations($this->iterable, $r);
+        return $this;
+    }
+
+    /**
      * Treat the stream itself as a sequence of iterables and zip them column-wise (transpose).
      *
      * Similar to Python's zip(*rows) idiom.

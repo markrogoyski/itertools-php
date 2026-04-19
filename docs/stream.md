@@ -288,6 +288,26 @@ $result = Stream::of($data)
 // [[1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 2]]
 ```
 
+#### Combinations
+Combinations (without replacement) of the stream's elements.
+
+```$stream->combinations(int $r): Stream```
+
+Tuples are list arrays (0-indexed, in input order). Output order follows Python's `itertools.combinations` (lexicographic by input position): duplicate values are position-unique. `$r = 0` yields one empty tuple; `$r` greater than the stream length yields nothing.
+
+Throws `\InvalidArgumentException` if `$r` is negative.
+
+```php
+use IterTools\Stream;
+
+$data = [1, 2, 3, 4];
+
+$result = Stream::of($data)
+    ->combinations(2)
+    ->toArray();
+// [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+```
+
 #### Compress
 Compress to a new stream by filtering out data that is not selected.
 

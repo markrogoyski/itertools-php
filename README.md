@@ -170,6 +170,7 @@ Quick Reference
 |---------------------------------------------------------------------|---------------------------------|--------------------------------------------|
 | [`product`](docs/combinatorics-iteration.md#product)                | Cartesian product of iterables  | `Combinatorics::product(...$iterables)`    |
 | [`permutations`](docs/combinatorics-iteration.md#permutations)      | Permutations of an iterable     | `Combinatorics::permutations($data, [$r])` |
+| [`combinations`](docs/combinatorics-iteration.md#combinations)      | Combinations of an iterable     | `Combinatorics::combinations($data, $r)`   |
 
 #### Sort Iteration
 | Iterator                                       | Description                                  | Code Snippet                                              |
@@ -278,6 +279,7 @@ Quick Reference
 | [`partialIntersectionCoerciveWith`](docs/stream.md#partial-intersection-coercive-with) | Partially intersect iterable source and given iterables with type coercion                | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
 | [`productWith`](docs/stream.md#product-with)                                          | Cartesian product of stream with given iterables                                          | `$stream->productWith(...$iterables)`                                             |
 | [`permutations`](docs/stream.md#permutations)                                         | Permutations of the stream's elements                                                     | `$stream->permutations([$r])`                                                     |
+| [`combinations`](docs/stream.md#combinations)                                         | Combinations of the stream's elements                                                     | `$stream->combinations($r)`                                                       |
 | [`reindex`](docs/stream.md#reindex)                                                   | Reindex keys of key-value stream                                                          | `$stream->reindex($reindexer)`                                                    |
 | [`relativeFrequencies`](docs/stream.md#relative-frequencies)                          | Relative frequency distribution                                                           | `$stream->relativeFrequencies([$strict])`                                         |
 | [`reverse`](docs/stream.md#reverse)                                                   | Reverse elements of the stream                                                            | `$stream->reverse()`                                                              |
@@ -385,7 +387,7 @@ Full documentation with detailed descriptions, signatures, and code examples for
 - [Random Iteration](docs/random-iteration.md) — Choice, CoinFlip, Number, Percentage, RockPaperScissors
 - [Math Iteration](docs/math-iteration.md) — Frequencies, Running Average/Difference/Max/Min/Product/Total
 - [Set and Multiset Iteration](docs/set-iteration.md) — Distinct, Intersection, Difference, Symmetric Difference, Union
-- [Combinatorics Iteration](docs/combinatorics-iteration.md) — Product, Permutations
+- [Combinatorics Iteration](docs/combinatorics-iteration.md) — Product, Permutations, Combinations
 - [Sort Iteration](docs/sort-iteration.md) — ASort, Sort
 - [File Iteration](docs/file-iteration.md) — ReadCsv, ReadLines
 - [Transform Iteration](docs/transform-iteration.md) — Tee, ToArray, ToAssociativeArray, ToIterator

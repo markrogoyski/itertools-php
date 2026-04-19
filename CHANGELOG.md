@@ -11,6 +11,7 @@
 * Combinatorics (new class)
   * `product`
   * `permutations`
+  * `combinations`
 * Summary
   * `contains`
   * `containsCoercive`
@@ -23,6 +24,7 @@
   * `partition`
 * Stream
   * `accumulate`
+  * `combinations`
   * `contains`
   * `containsCoercive`
   * `enumerate`
