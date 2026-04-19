@@ -182,6 +182,7 @@ $ composer require markrogoyski/itertools-php:2.*
 #### Преобразование итерируемых сущностей
 | Iterator                                      | Description                                                    | Code Snippet                                                     |
 |-----------------------------------------------|----------------------------------------------------------------|------------------------------------------------------------------|
+| [`partition`](#Partition)                     | Разделяет коллекцию на два списка: истинные и ложные           | `Transform::partition($data, $predicate)`                        |
 | [`tee`](#Tee)                                 | Создает несколько одинаковых независимых итераторов из данного | `Transform::tee($data, $count)`                                  |
 | [`toArray`](#To-Array)                        | Преобразует итерируемую коллекцию в массив                     | `Transform::toArray($data)`                                      |
 | [`toAssociativeArray`](#To-Associative-Array) | Преобразует итерируемую коллекцию в ассоциативный массив       | `Transform::toAssociativeArray($data, [$keyFunc], [$valueFunc])` |
@@ -195,6 +196,8 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`anyMatch`](#Any-Match)                                | Истинно, если предикат возвращает истину хотя бы для одного элемента коллекции                       | `Summary::anyMatch($data, $predicate)`            |
 | [`arePermutations`](#Are-Permutations)                  | Истинно, если коллекции являются перестановками друг друга                                           | `Summary::arePermutations(...$iterables)`         |
 | [`arePermutationsCoercive`](#Are-Permutations-Coercive) | Истинно, если коллекции являются перестановками друг друга (в режиме приведения типов)               | `Summary::arePermutationsCoercive(...$iterables)` |
+| [`contains`](#Contains)                                 | Истинно, если коллекция содержит искомое значение                                                    | `Summary::contains($data, $needle)`               |
+| [`containsCoercive`](#Contains-Coercive)                | Истинно, если коллекция содержит искомое значение (в режиме приведения типов)                        | `Summary::containsCoercive($data, $needle)`       |
 | [`exactlyN`](#Exactly-N)                                | Истинно, если предикат возвращает истину в точности для N элементов                                  | `Summary::exactlyN($data, $n, $predicate)`        |
 | [`isPartitioned`](#Is-Partitioned)                      | Истинно, если истинные элементы находятся в коллекции перед ложными (истинность определяет предикат) | `Summary::isPartitioned($data, $predicate)`       |
 | [`isEmpty`](#Is-Empty)                                  | Истинно, если коллекция пуста                                                                        | `Summary::isEmpty($data)`                         |
@@ -309,6 +312,8 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`anyMatch`](#Any-Match-1)                                       | Истинно, если предикат возвращает истину хотя бы для одного элемента коллекции                       | `$stream->anyMatch($predicate)`                       |
 | [`arePermutationsWith`](#Are-Permutations-With)                  | Истинно, если коллекции являются перестановками друг друга                                           | `$stream->arePermutationsWith(...$iterables)`         |
 | [`arePermutationsCoerciveWith`](#Are-Permutations-Coercive-With) | Истинно, если коллекции являются перестановками друг друга (в режиме приведения типов)               | `$stream->arePermutationsCoerciveWith(...$iterables)` |
+| [`contains`](#Contains-1)                                        | Истинно, если поток содержит искомое значение                                                        | `$stream->contains($needle)`                          |
+| [`containsCoercive`](#Contains-Coercive-1)                       | Истинно, если поток содержит искомое значение (в режиме приведения типов)                            | `$stream->containsCoercive($needle)`                  |
 | [`exactlyN`](#Exactly-N-1)                                       | Истинно, если предикат возвращает истину в точности для N элементов                                  | `$stream->exactlyN($n, $predicate)`                   |
 | [`isEmpty`](#Is-Empty-1)                                         | Истинно, если коллекция пуста                                                                        | `$stream::isEmpty()`                                  |
 | [`isPartitioned`](#Is-Partitioned-1)                             | Истинно, если истинные элементы находятся в коллекции перед ложными (истинность определяет предикат) | `$stream::isPartitioned($predicate)`                  |
@@ -343,6 +348,7 @@ $ composer require markrogoyski/itertools-php:2.*
 |-------------------------------------------------|-------------------------------------------------------------|---------------------------------------------------------|
 | [`toArray`](#To-Array)                          | Возвращает массив из элементов потока                       | `$stream->toArray()`                                    |
 | [`toAssociativeArray`](#To-Associative-Array-1) | Возвращает ассоциативный массив из элементов потока         | `$stream->toAssociativeArray($keyFunc, $valueFunc)`     |
+| [`toPartition`](#To-Partition)                  | Разделяет поток на два списка: истинные и ложные            | `$stream->toPartition($predicate)`                      |
 | [`tee`](#Tee-1)                                 | Создает несколько одинаковых независимых потоков из данного | `$stream->tee($count)`                                  |
 
 ##### Операции с побочными эффектами
@@ -1737,6 +1743,23 @@ foreach (File::readLines($fileHandle) as $line) {
 ```
 
 ## Transform
+### Partition
+Разделяет коллекцию на два списка на основе предиката.
+
+Возвращает массив из двух списков: `[истинные значения, ложные значения]`. Оба выходных массива — списки с переиндексацией (с нулевыми индексами); ключи исходной коллекции отбрасываются. Значение, возвращаемое предикатом, приводится к булевому типу через `(bool)`.
+
+```Transform::partition(iterable $data, callable $predicate): array```
+
+```php
+use IterTools\Transform;
+
+$numbers = [1, 2, 3, 4, 5, 6];
+
+[$evens, $odds] = Transform::partition($numbers, fn (int $n): bool => $n % 2 === 0);
+// $evens: [2, 4, 6]
+// $odds:  [1, 3, 5]
+```
+
 ### Tee
 Создает несколько одинаковых независимых итераторов из данного.
 
@@ -1870,6 +1893,55 @@ $set1 = [1, 2.0, '3'];
 $set2 = [2.0, '1', 3];
 $set3 = [3, 2, 1];
 $boolean = Summary::arePermutationsCoercive($set1, $set2, $set3);
+// true
+```
+
+### Contains
+Возвращает истину, если коллекция содержит искомое значение, при [строгом сравнении типов](#Режимы-типизации).
+
+```Summary::contains(iterable $data, mixed $needle): bool```
+
+- Скаляры сравниваются строго по типу (`1` не равно `'1'`; `0` не равно `false`).
+- Для объектов совпадает только один и тот же экземпляр.
+- Массивы сравниваются через `===`.
+- `NaN` никогда не совпадает с `NaN` (так как `NaN !== NaN`).
+- Обрывает итерацию при первом совпадении.
+
+```php
+use IterTools\Summary;
+
+$primes = [2, 3, 5, 7, 11, 13];
+
+$boolean = Summary::contains($primes, 7);
+// true
+
+$boolean = Summary::contains($primes, 4);
+// false
+
+$boolean = Summary::contains($primes, '7');
+// false (строгое сравнение)
+```
+
+### Contains Coercive
+Возвращает истину, если коллекция содержит искомое значение, в режиме [приведения типов](#Режимы-типизации).
+
+```Summary::containsCoercive(iterable $data, mixed $needle): bool```
+
+- Скаляры сравниваются нестрого по значению (`1` совпадает с `'1'`; `0` совпадает с `false`; `'1e2'` совпадает с `100`).
+- Объекты сравниваются по сериализованному значению (бросает `\InvalidArgumentException`, если искомое значение или элемент коллекции не сериализуется).
+- Массивы сравниваются по сериализованному значению.
+- `NaN` совпадает с `NaN` (согласованно с другими операциями приведения типов в библиотеке).
+- Обрывает итерацию при первом совпадении: несериализуемый элемент встретится только при отсутствии совпадений до него.
+
+```php
+use IterTools\Summary;
+
+$primes = [2, 3, 5, 7, 11, 13];
+
+$boolean = Summary::containsCoercive($primes, '7');
+// true (приведение типов)
+
+$boolean = Summary::containsCoercive([100, 200, 300], '1e2');
 // true
 ```
 
@@ -3842,6 +3914,49 @@ $boolean = Stream::of([1, 2.0, '3'])
 // true
 ```
 
+##### Contains
+Возвращает истину, если поток содержит искомое значение, при [строгом сравнении типов](#Режимы-типизации).
+
+```$stream->contains(mixed $needle): bool```
+
+- Скаляры сравниваются строго по типу (`1` не равно `'1'`; `0` не равно `false`).
+- Для объектов совпадает только один и тот же экземпляр.
+- Массивы сравниваются через `===`.
+- `NaN` никогда не совпадает с `NaN`.
+- Обрывает итерацию при первом совпадении.
+
+```php
+use IterTools\Stream;
+
+$primes = [2, 3, 5, 7, 11, 13];
+
+$boolean = Stream::of($primes)->contains(7);
+// true
+
+$boolean = Stream::of($primes)->contains('7');
+// false (строгое сравнение)
+```
+
+##### Contains Coercive
+Возвращает истину, если поток содержит искомое значение, в режиме [приведения типов](#Режимы-типизации).
+
+```$stream->containsCoercive(mixed $needle): bool```
+
+- Скаляры сравниваются нестрого по значению (`1` совпадает с `'1'`; `0` совпадает с `false`; `'1e2'` совпадает с `100`).
+- Объекты сравниваются по сериализованному значению (бросает `\InvalidArgumentException`, если искомое значение или элемент потока не сериализуется).
+- Массивы сравниваются по сериализованному значению.
+- `NaN` совпадает с `NaN`.
+- Обрывает итерацию при первом совпадении.
+
+```php
+use IterTools\Stream;
+
+$primes = [2, 3, 5, 7, 11, 13];
+
+$boolean = Stream::of($primes)->containsCoercive('7');
+// true (приведение типов)
+```
+
 ##### Exactly N
 Возвращает истину, если в точности для n элементов из потока предикат возвращает истину.
 
@@ -4318,6 +4433,36 @@ $array = Stream::of(['message 1', 'message 2', 'message 3'])
         fn ($s) => $s
     );
 // [3b3f2272b3b904d342b2d0df2bf31ed4 => MESSAGE 1, 43638d919cfb8ea31979880f1a2bb146 => MESSAGE 2, ... ]
+```
+
+##### To Partition
+Разделяет поток на два списка на основе предиката.
+
+Возвращает массив из двух списков: `[истинные значения, ложные значения]`. Оба выходных массива — списки с переиндексацией (с нулевыми индексами); ключи исходной коллекции отбрасываются. Значение, возвращаемое предикатом, приводится к булевому типу через `(bool)`.
+
+```$stream->toPartition(callable $predicate): array```
+
+```php
+use IterTools\Stream;
+
+[$evens, $odds] = Stream::of([1, 2, 3, 4, 5, 6])
+    ->toPartition(fn (int $n): bool => $n % 2 === 0);
+// $evens: [2, 4, 6]
+// $odds:  [1, 3, 5]
+```
+
+Так как обе части возвращаются вместе, `toPartition` естественно сочетается с операциями, потребляющими два списка. Например, при составлении турнирной сетки — разделяем номера посева на верхнюю и нижнюю половины, затем образуем пары верх vs перевёрнутая нижняя половина:
+
+```php
+use IterTools\Stream;
+
+[$topHalf, $bottomHalf] = Stream::of([1, 2, 3, 4, 5, 6, 7, 8])
+    ->toPartition(fn (int $seed): bool => $seed <= 4);
+
+$matchups = Stream::of($topHalf)
+    ->zipWith(array_reverse($bottomHalf))
+    ->toArray();
+// [[1, 8], [2, 7], [3, 6], [4, 5]]
 ```
 
 ##### Tee
