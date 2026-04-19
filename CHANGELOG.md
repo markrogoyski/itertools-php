@@ -12,6 +12,7 @@
   * `product`
   * `permutations`
   * `combinations`
+  * `combinationsWithReplacement`
 * Summary
   * `contains`
   * `containsCoercive`
@@ -25,6 +26,7 @@
 * Stream
   * `accumulate`
   * `combinations`
+  * `combinationsWithReplacement`
   * `contains`
   * `containsCoercive`
   * `enumerate`

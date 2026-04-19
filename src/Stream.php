@@ -727,6 +727,37 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Combinations with replacement of the stream's elements.
+     *
+     * Output tuples are list arrays (0-indexed, in input order). Source keys are ignored.
+     * Output order follows Python's itertools.combinations_with_replacement (lexicographic
+     * by input position): duplicate values are position-unique and may produce duplicate
+     * output tuples.
+     *
+     * The stream is finite and consumed once (materialized internally); generators are
+     * supported but cannot be re-iterated afterwards.
+     *
+     * Unlike combinations(), $r may exceed the stream length — elements repeat.
+     *
+     * Special cases:
+     *  - $r = 0 yields one empty tuple
+     *  - empty stream with $r > 0 yields nothing
+     *
+     * @param int $r length of each combination
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if $r is negative
+     *
+     * @see Combinatorics::combinationsWithReplacement()
+     */
+    public function combinationsWithReplacement(int $r): self
+    {
+        $this->iterable = Combinatorics::combinationsWithReplacement($this->iterable, $r);
+        return $this;
+    }
+
+    /**
      * Treat the stream itself as a sequence of iterables and zip them column-wise (transpose).
      *
      * Similar to Python's zip(*rows) idiom.

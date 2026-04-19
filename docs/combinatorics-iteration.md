@@ -2,7 +2,7 @@
 
 [Back to main README](../README.md)
 
-Tools for combinatoric iteration: cartesian product, permutations, combinations.
+Tools for combinatoric iteration: cartesian product, permutations, combinations, combinations with replacement.
 
 ---
 
@@ -103,4 +103,40 @@ foreach (Combinatorics::combinations($data, 2) as $tuple) {
 // [2, 3]
 // [2, 4]
 // [3, 4]
+```
+
+---
+
+### Combinations With Replacement
+Combinations with replacement of an iterable.
+
+Output tuples are list arrays (0-indexed, in input order); source keys are discarded. Output order follows Python's `itertools.combinations_with_replacement` (lexicographic by input position, not by value), so duplicate input values are treated as position-unique and may produce duplicate output tuples: `combinationsWithReplacement([1, 1], 2)` yields `[[1, 1], [1, 1], [1, 1]]`.
+
+Input iterable must be finite. It is consumed once (materialized internally), so generators are supported but cannot be re-iterated afterwards.
+
+Unlike `combinations()`, `$r` may exceed `count($data)` — elements repeat.
+
+Special cases:
+- `$r = 0` yields one empty tuple: `[[]]`
+- empty input with `$r > 0` yields nothing
+- empty input with `$r = 0` yields one empty tuple: `[[]]`
+
+Throws `\InvalidArgumentException` if `$r` is negative.
+
+```Combinatorics::combinationsWithReplacement(iterable $data, int $r): \Generator```
+
+```php
+use IterTools\Combinatorics;
+
+$data = [1, 2, 3];
+
+foreach (Combinatorics::combinationsWithReplacement($data, 2) as $tuple) {
+    print_r($tuple);
+}
+// [1, 1]
+// [1, 2]
+// [1, 3]
+// [2, 2]
+// [2, 3]
+// [3, 3]
 ```

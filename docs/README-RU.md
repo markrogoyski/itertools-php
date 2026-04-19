@@ -162,9 +162,10 @@ $ composer require markrogoyski/itertools-php:2.*
 #### Комбинаторное итерирование
 | Метод                 | Описание                          | Пример кода                             |
 |-----------------------|-----------------------------------|-----------------------------------------|
-| [`product`](#Product)           | Декартово произведение коллекций  | `Combinatorics::product(...$iterables)`    |
-| [`permutations`](#Permutations) | Перестановки элементов коллекции  | `Combinatorics::permutations($data, [$r])` |
-| [`combinations`](#Combinations) | Сочетания элементов коллекции     | `Combinatorics::combinations($data, $r)`   |
+| [`product`](#Product)                                               | Декартово произведение коллекций             | `Combinatorics::product(...$iterables)`                    |
+| [`permutations`](#Permutations)                                     | Перестановки элементов коллекции             | `Combinatorics::permutations($data, [$r])`                 |
+| [`combinations`](#Combinations)                                     | Сочетания элементов коллекции                | `Combinatorics::combinations($data, $r)`                   |
+| [`combinationsWithReplacement`](#Combinations-With-Replacement)     | Сочетания с повторениями                     | `Combinatorics::combinationsWithReplacement($data, $r)`    |
 
 #### Итерирование с сортировкой
 | Iterator          | Description                              | Code Snippet                        |
@@ -270,6 +271,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`productWith`](#Product-With)                                            | Декартово произведение коллекции с другими коллекциями                                                       | `$stream->productWith(...$iterables)`                                             |
 | [`permutations`](#Permutations-1)                                         | Перестановки элементов коллекции                                                                            | `$stream->permutations([$r])`                                                     |
 | [`combinations`](#Combinations-1)                                         | Сочетания элементов коллекции                                                                               | `$stream->combinations($r)`                                                       |
+| [`combinationsWithReplacement`](#Combinations-With-Replacement-1)         | Сочетания с повторениями элементов потока                                                                   | `$stream->combinationsWithReplacement($r)`                                        |
 | [`reindex`](#Reindex-1)                                                   | Переиндексирует key-value коллекцию                                                                          | `$stream->reindex($reindexer)`                                                    |
 | [`relativeFrequencies`](#Relative-Frequencies-1)                          | Относительная частота вхождений                                                                              | `$stream->relativeFrequencies([$strict])`                                         |
 | [`reverse`](#Reverse-1)                                                   | Итерирует коллекцию в обратном порядке                                                                       | `$stream->reverse()`                                                              |
@@ -1628,6 +1630,40 @@ foreach (Combinatorics::combinations($data, 2) as $tuple) {
 // [3, 4]
 ```
 
+### Combinations With Replacement
+Сочетания с повторениями элементов коллекции.
+
+Выходные кортежи — это list-массивы (с 0-индексацией, в порядке входа); ключи исходной коллекции игнорируются. Порядок выхода соответствует Python's `itertools.combinations_with_replacement` (лексикографический по позиции во входе, не по значению): дублирующиеся значения считаются уникальными по позиции и могут давать дублирующиеся выходные кортежи: `combinationsWithReplacement([1, 1], 2)` даёт `[[1, 1], [1, 1], [1, 1]]`.
+
+Входная коллекция должна быть конечной. Она потребляется один раз (материализуется внутри), поэтому генераторы поддерживаются, но их нельзя перебирать повторно.
+
+В отличие от `combinations()`, `$r` может превышать `count($data)` — элементы повторяются.
+
+Особые случаи:
+- `$r = 0` даёт один пустой кортеж: `[[]]`
+- пустой вход с `$r > 0` даёт пустой результат
+- пустой вход с `$r = 0` даёт один пустой кортеж: `[[]]`
+
+Выбрасывает `\InvalidArgumentException`, если `$r` отрицательное.
+
+```Combinatorics::combinationsWithReplacement(iterable $data, int $r): \Generator```
+
+```php
+use IterTools\Combinatorics;
+
+$data = [1, 2, 3];
+
+foreach (Combinatorics::combinationsWithReplacement($data, 2) as $tuple) {
+    print_r($tuple);
+}
+// [1, 1]
+// [1, 2]
+// [1, 3]
+// [2, 2]
+// [2, 3]
+// [3, 3]
+```
+
 ## Итерирование с сортировкой
 ### ASort
 Сортирует коллекцию с сохранением ключей.
@@ -2640,6 +2676,26 @@ $result = Stream::of($data)
     ->combinations(2)
     ->toArray();
 // [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]
+```
+
+#### Combinations With Replacement
+Сочетания с повторениями элементов коллекции потока.
+
+```$stream->combinationsWithReplacement(int $r): Stream```
+
+Выходные кортежи — массивы-списки (индексы с нуля, в порядке входа). Порядок соответствует `itertools.combinations_with_replacement` из Python (лексикографический по позиции): одинаковые значения различаются по позиции и могут давать дублирующиеся выходные кортежи. В отличие от `combinations()`, `$r` может превышать длину потока — элементы повторяются. `$r = 0` даёт один пустой кортеж.
+
+Выбрасывает `\InvalidArgumentException`, если `$r` отрицательное.
+
+```php
+use IterTools\Stream;
+
+$data = [1, 2, 3];
+
+$result = Stream::of($data)
+    ->combinationsWithReplacement(2)
+    ->toArray();
+// [[1, 1], [1, 2], [1, 3], [2, 2], [2, 3], [3, 3]]
 ```
 
 #### Compress

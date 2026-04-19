@@ -234,4 +234,80 @@ final class Combinatorics
             yield $tuple;
         }
     }
+
+    /**
+     * Combinations with replacement of the input iterable.
+     *
+     * Output tuples are list arrays (0-indexed, in input order). Source keys are ignored.
+     * Output order follows Python's itertools.combinations_with_replacement (lexicographic
+     * by input position, not by value), so duplicate input values are treated as
+     * position-unique and may produce duplicate output tuples:
+     * combinationsWithReplacement([1, 1], 2) yields [[1, 1], [1, 1], [1, 1]].
+     *
+     * Input iterable is finite and consumed once (materialized internally), so passing
+     * a generator is supported (but it cannot be re-iterated afterwards).
+     *
+     * Unlike combinations(), $r may exceed count($data) — elements repeat.
+     *
+     * Special cases:
+     *  - $r = 0 yields one empty tuple: [[]]
+     *  - empty input with $r > 0 yields nothing
+     *  - empty input with $r = 0 yields one empty tuple: [[]]
+     *
+     * @param iterable<mixed> $data
+     * @param int             $r length of each combination
+     *
+     * @return \Generator<list<mixed>>
+     *
+     * @throws \InvalidArgumentException if $r is negative
+     */
+    public static function combinationsWithReplacement(iterable $data, int $r): \Generator
+    {
+        if ($r < 0) {
+            throw new \InvalidArgumentException("r must be non-negative. Got {$r}.");
+        }
+
+        $pool = Transform::toArray($data);
+        $n = \count($pool);
+
+        if ($n === 0 && $r > 0) {
+            return;
+        }
+
+        $indices = \array_fill(0, \max($r, 1), 0);
+
+        $tuple = [];
+        for ($i = 0; $i < $r; $i++) {
+            $tuple[] = $pool[$indices[$i]];
+        }
+        yield $tuple;
+
+        if ($r === 0) {
+            return;
+        }
+
+        while (true) {
+            $pivot = -1;
+            for ($i = $r - 1; $i >= 0; $i--) {
+                if ($indices[$i] !== $n - 1) {
+                    $pivot = $i;
+                    break;
+                }
+            }
+            if ($pivot === -1) {
+                return;
+            }
+
+            $newIndex = $indices[$pivot] + 1;
+            for ($j = $pivot; $j < $r; $j++) {
+                $indices[$j] = $newIndex;
+            }
+
+            $tuple = [];
+            for ($i = 0; $i < $r; $i++) {
+                $tuple[] = $pool[$indices[$i]];
+            }
+            yield $tuple;
+        }
+    }
 }
