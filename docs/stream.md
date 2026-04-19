@@ -178,6 +178,32 @@ $rps = Stream::ofRockPaperScissors(5)
 
 ### Stream Operations
 
+#### Accumulate
+Accumulate the running result of applying a binary operator across the stream.
+
+```$stream->accumulate(callable $op, mixed ...$initial): Stream```
+
+* Without an initial value: the first yielded element is the first datum unchanged, and each subsequent element is `$op(accumulator, nextDatum)`.
+* With an initial value: the first yielded element is the initial value, and each subsequent element is `$op(accumulator, nextDatum)`.
+* Explicit `null` is a legitimate initial value.
+* Throws `\InvalidArgumentException` if more than one initial value is passed.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 2, 3, 4, 5];
+
+$runningSums = Stream::of($numbers)
+    ->accumulate(fn ($a, $b) => $a + $b)
+    ->toArray();
+// [1, 3, 6, 10, 15]
+
+$withInitial = Stream::of($numbers)
+    ->accumulate(fn ($a, $b) => $a + $b, 100)
+    ->toArray();
+// [100, 101, 103, 106, 110, 115]
+```
+
 #### ASort
 Sorts the stream, maintaining keys.
 

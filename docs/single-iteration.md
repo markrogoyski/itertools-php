@@ -6,6 +6,32 @@ Tools for iterating and transforming a single collection.
 
 ---
 
+### Accumulate
+Accumulate the running result of applying a binary operator across an iterable.
+
+```Single::accumulate(iterable $data, callable $op, mixed ...$initial)```
+
+* Without an initial value: the first yielded element is the first datum unchanged, and each subsequent element is `$op(accumulator, nextDatum)`.
+* With an initial value: the first yielded element is the initial value, and each subsequent element is `$op(accumulator, nextDatum)`.
+* Explicit `null` is a legitimate initial value (the variadic sentinel distinguishes "no initial" from "null initial"; this diverges from `Math::running*`, where `null` means "no initial").
+* Throws `\InvalidArgumentException` if more than one initial value is passed.
+
+```php
+use IterTools\Single;
+
+$numbers = [1, 2, 3, 4, 5];
+
+foreach (Single::accumulate($numbers, fn ($a, $b) => $a + $b) as $runningSum) {
+    print($runningSum . ' ');
+}
+// 1 3 6 10 15
+
+foreach (Single::accumulate($numbers, fn ($a, $b) => $a + $b, 100) as $runningSum) {
+    print($runningSum . ' ');
+}
+// 100 101 103 106 110 115
+```
+
 ### Chunkwise
 Return elements in chunks of a certain size.
 

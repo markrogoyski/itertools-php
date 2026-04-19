@@ -9,6 +9,62 @@ use IterTools\Util\UniqueExtractor;
 final class Single
 {
     /**
+     * Accumulate the running result of applying a binary operator across an iterable.
+     *
+     * With no initial value:
+     *   - first yielded element is the first datum unchanged;
+     *   - each subsequent yielded element is $op(accumulator, nextDatum).
+     *
+     * With an initial value:
+     *   - first yielded element is the initial value;
+     *   - each subsequent yielded element is $op(accumulator, nextDatum).
+     *
+     * The initial value is variadic (0 or 1 values) rather than nullable so that explicit
+     * null is a legitimate initial value. This diverges from Math::running*, which treats
+     * null as "no initial" because those helpers operate on numeric data where null is not
+     * a meaningful accumulator.
+     *
+     * @param iterable<mixed>              $data
+     * @param callable(mixed, mixed): mixed $op
+     * @param mixed                        ...$initial (Optional) zero or one initial values.
+     *
+     * @return \Generator<mixed>
+     *
+     * @throws \InvalidArgumentException if more than one initial value is passed.
+     */
+    public static function accumulate(iterable $data, callable $op, mixed ...$initial): \Generator
+    {
+        if (\count($initial) > 1) {
+            throw new \InvalidArgumentException(
+                'accumulate expects at most one initial value, got ' . \count($initial)
+            );
+        }
+
+        $hasInitial = \count($initial) === 1;
+        $acc = null;
+        $started = false;
+
+        if ($hasInitial) {
+            /** @var mixed $acc */
+            $acc = $initial[0];
+            $started = true;
+            yield $acc;
+        }
+
+        foreach ($data as $datum) {
+            if (!$started) {
+                /** @var mixed $acc */
+                $acc = $datum;
+                $started = true;
+            } else {
+                /** @var mixed $acc */
+                $acc = $op($acc, $datum);
+            }
+            yield $acc;
+        }
+    }
+
+    /**
      * Iterate the individual characters of a string
      *
      * @param string $string

@@ -69,6 +69,7 @@ trait DataProvider
     public static function dataProviderForSingleLoopTools(): array
     {
         return [
+            [Single::accumulate([1, 2, 3, 4, 5], fn ($a, $b) => $a + $b)],
             [Single::chunkwise([1, 2, 3, 4, 5], 2)],
             [Single::chunkwiseOverlap([1, 2, 3, 4, 5], 2, 1)],
             [Single::compress([1, 2, 3, 4, 5], [1, 1, 0, 0, 1])],
@@ -195,6 +196,7 @@ trait DataProvider
     public static function dataProviderForStreamOperations(): array
     {
         return [
+            [Stream::of([1, 2, 3, 4, 5])->accumulate(fn ($a, $b) => $a + $b)],
             [Stream::of([1, 2, 3, 4, 5])->asort()],
             [Stream::of([1, 2, 3, 4, 5])->chainWith([6, 7, 8, 9, 10])],
             [Stream::of([1, 2, 3, 4, 5])->compress([1, 1, 0, 0, 1])],

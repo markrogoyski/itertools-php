@@ -96,6 +96,7 @@ Quick Reference
 #### Single Iteration
 | Iterator                                       | Description                                  | Code Snippet                                                |
 |------------------------------------------------|----------------------------------------------|-------------------------------------------------------------|
+| [`accumulate`](docs/single-iteration.md#accumulate)                    | Running result of a binary operator          | `Single::accumulate($data, $op, [$initial])`                |
 | [`chunkwise`](docs/single-iteration.md#chunkwise)                      | Iterate by chunks                            | `Single::chunkwise($data, $chunkSize)`                      |
 | [`chunkwiseOverlap`](docs/single-iteration.md#chunkwise-overlap)       | Iterate by overlapped chunks                 | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
 | [`compress`](docs/single-iteration.md#compress)                        | Filter out elements not selected             | `Single::compress($data, $selectors)`                       |
@@ -242,6 +243,7 @@ Quick Reference
 #### Stream Operations
 | Operation                                                                 | Description                                                                               | Code Snippet                                                                      |
 |---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| [`accumulate`](docs/stream.md#accumulate)                                             | Running result of a binary operator                                                       | `$stream->accumulate($op, [$initial])`                                            |
 | [`asort`](docs/stream.md#asort)                                                       | Sorts the iterable source maintaining keys                                                | `$stream->asort([$comparator])`                                                   |
 | [`chainWith`](docs/stream.md#chain-with)                                                | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                                               |
 | [`compress`](docs/stream.md#compress)                                                 | Compress source by filtering out data not selected                                        | `$stream->compress($selectors)`                                                   |

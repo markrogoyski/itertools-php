@@ -15,9 +15,11 @@
   * `toFirstMatch`
 * Single
   * `enumerate`
+  * `accumulate`
 * Transform
   * `partition`
 * Stream
+  * `accumulate`
   * `contains`
   * `containsCoercive`
   * `enumerate`

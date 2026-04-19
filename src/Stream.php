@@ -185,6 +185,31 @@ final class Stream implements \IteratorAggregate
     // STREAM OPERATIONS
 
     /**
+     * Accumulate the running result of applying a binary operator across the stream.
+     *
+     * With no initial value, the first yielded element is the first datum unchanged and each
+     * subsequent element is $op(accumulator, nextDatum).
+     *
+     * With one initial value, the first yielded element is the initial value and each
+     * subsequent element is $op(accumulator, nextDatum). Explicit null is a legitimate
+     * initial value.
+     *
+     * @param callable(mixed, mixed): mixed $op
+     * @param mixed                         ...$initial (Optional) zero or one initial values.
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if more than one initial value is passed.
+     *
+     * @see Single::accumulate()
+     */
+    public function accumulate(callable $op, mixed ...$initial): self
+    {
+        $this->iterable = Single::accumulate($this->iterable, $op, ...$initial);
+        return $this;
+    }
+
+    /**
      * Compress an iterable source by filtering out data that is not selected.
      *
      * Selectors indicate which data. True value selects item. False value filters out data.
