@@ -268,6 +268,26 @@ $result = Stream::of($numbers)
 // [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']]
 ```
 
+#### Permutations
+Permutations of the stream's elements.
+
+```$stream->permutations(?int $r = null): Stream```
+
+Tuples are list arrays (0-indexed, in input order). Output order follows Python's `itertools.permutations` (lexicographic by input position): duplicate values are position-unique. `$r = 0` yields one empty tuple; `$r` greater than the stream length yields nothing; `$r = null` means full-length permutations.
+
+Throws `\InvalidArgumentException` if `$r` is negative.
+
+```php
+use IterTools\Stream;
+
+$data = [1, 2, 3];
+
+$result = Stream::of($data)
+    ->permutations(2)
+    ->toArray();
+// [[1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 2]]
+```
+
 #### Compress
 Compress to a new stream by filtering out data that is not selected.
 

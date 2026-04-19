@@ -162,7 +162,8 @@ $ composer require markrogoyski/itertools-php:2.*
 #### Комбинаторное итерирование
 | Метод                 | Описание                          | Пример кода                             |
 |-----------------------|-----------------------------------|-----------------------------------------|
-| [`product`](#Product) | Декартово произведение коллекций  | `Combinatorics::product(...$iterables)` |
+| [`product`](#Product)           | Декартово произведение коллекций  | `Combinatorics::product(...$iterables)`    |
+| [`permutations`](#Permutations) | Перестановки элементов коллекции  | `Combinatorics::permutations($data, [$r])` |
 
 #### Итерирование с сортировкой
 | Iterator          | Description                              | Code Snippet                        |
@@ -266,6 +267,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`partialIntersectionWith`](#Partial-Intersection-With)                   | Возвращает частичное пересечение хранимой коллекции с другими коллекциями                                    | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`         |
 | [`partialIntersection CoerciveWith`](#Partial-Intersection-Coercive-With) | Возвращает частичное пересечение хранимой коллекции с другими коллекциями (в режиме приведения типов)        | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
 | [`productWith`](#Product-With)                                            | Декартово произведение коллекции с другими коллекциями                                                       | `$stream->productWith(...$iterables)`                                             |
+| [`permutations`](#Permutations-1)                                         | Перестановки элементов коллекции                                                                            | `$stream->permutations([$r])`                                                     |
 | [`reindex`](#Reindex-1)                                                   | Переиндексирует key-value коллекцию                                                                          | `$stream->reindex($reindexer)`                                                    |
 | [`relativeFrequencies`](#Relative-Frequencies-1)                          | Относительная частота вхождений                                                                              | `$stream->relativeFrequencies([$strict])`                                         |
 | [`reverse`](#Reverse-1)                                                   | Итерирует коллекцию в обратном порядке                                                                       | `$stream->reverse()`                                                              |
@@ -1559,6 +1561,39 @@ foreach (Combinatorics::product($numbers, $letters) as $tuple) {
 // [2, 'b']
 ```
 
+### Permutations
+Перестановки элементов коллекции.
+
+Выходные кортежи — массивы-списки (индексы с нуля, в порядке входной коллекции); исходные ключи отбрасываются. Порядок соответствует `itertools.permutations` из Python (лексикографический по позиции во входе, а не по значению): одинаковые значения различаются по позиции, поэтому `permutations([1, 1])` даёт `[[1, 1], [1, 1]]`.
+
+Входная коллекция должна быть конечной. Она потребляется один раз (материализуется внутри), поэтому генераторы поддерживаются, но повторно итерироваться не могут.
+
+Особые случаи:
+- `$r = 0` даёт один пустой кортеж: `[[]]`
+- если `$r` больше `count($data)`, результат пуст
+- `$r = null` означает перестановки полной длины (эквивалентно `$r = count($data)`)
+- пустой вход с `$r = null` (или `$r = 0`) даёт один пустой кортеж: `[[]]`
+
+Выбрасывает `\InvalidArgumentException`, если `$r` отрицательное.
+
+```Combinatorics::permutations(iterable $data, ?int $r = null): \Generator```
+
+```php
+use IterTools\Combinatorics;
+
+$data = [1, 2, 3];
+
+foreach (Combinatorics::permutations($data) as $tuple) {
+    print_r($tuple);
+}
+// [1, 2, 3]
+// [1, 3, 2]
+// [2, 1, 3]
+// [2, 3, 1]
+// [3, 1, 2]
+// [3, 2, 1]
+```
+
 ## Итерирование с сортировкой
 ### ASort
 Сортирует коллекцию с сохранением ключей.
@@ -2531,6 +2566,26 @@ $result = Stream::of($numbers)
     ->productWith($letters)
     ->toArray();
 // [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']]
+```
+
+#### Permutations
+Перестановки элементов коллекции потока.
+
+```$stream->permutations(?int $r = null): Stream```
+
+Выходные кортежи — массивы-списки (индексы с нуля, в порядке входа). Порядок соответствует `itertools.permutations` из Python (лексикографический по позиции): одинаковые значения различаются по позиции. `$r = 0` даёт один пустой кортеж; если `$r` больше длины потока, результат пуст; `$r = null` означает перестановки полной длины.
+
+Выбрасывает `\InvalidArgumentException`, если `$r` отрицательное.
+
+```php
+use IterTools\Stream;
+
+$data = [1, 2, 3];
+
+$result = Stream::of($data)
+    ->permutations(2)
+    ->toArray();
+// [[1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 2]]
 ```
 
 #### Compress

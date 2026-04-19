@@ -35,3 +35,38 @@ foreach (Combinatorics::product($numbers, $letters) as $tuple) {
 // [2, 'a']
 // [2, 'b']
 ```
+
+---
+
+### Permutations
+Permutations of an iterable.
+
+Output tuples are list arrays (0-indexed, in input order); source keys are discarded. Output order follows Python's `itertools.permutations` (lexicographic by input position, not by value), so duplicate values are treated as position-unique: `permutations([1, 1])` yields `[[1, 1], [1, 1]]`.
+
+Input iterable must be finite. It is consumed once (materialized internally), so generators are supported but cannot be re-iterated afterwards.
+
+Special cases:
+- `$r = 0` yields one empty tuple: `[[]]`
+- `$r` greater than `count($data)` yields nothing
+- `$r = null` means full-length permutations (equivalent to `$r = count($data)`)
+- empty input with `$r = null` (or `$r = 0`) yields one empty tuple: `[[]]`
+
+Throws `\InvalidArgumentException` if `$r` is negative.
+
+```Combinatorics::permutations(iterable $data, ?int $r = null): \Generator```
+
+```php
+use IterTools\Combinatorics;
+
+$data = [1, 2, 3];
+
+foreach (Combinatorics::permutations($data) as $tuple) {
+    print_r($tuple);
+}
+// [1, 2, 3]
+// [1, 3, 2]
+// [2, 1, 3]
+// [2, 3, 1]
+// [3, 1, 2]
+// [3, 2, 1]
+```

@@ -175,6 +175,7 @@ trait DataProvider
     {
         return [
             [Combinatorics::product([1, 2], ['a', 'b'])],
+            [Combinatorics::permutations([1, 2, 3], 2)],
         ];
     }
 
@@ -236,6 +237,7 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->partialIntersectionCoerciveWith(1, [2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->peek(fn ($x) => $x)],
             [Stream::of([1, 2, 3])->productWith(['a', 'b'])],
+            [Stream::of([1, 2, 3])->permutations(2)],
             [Stream::of([1, 2, 3, 4, 5])->reindex(fn ($x) => $x)],
             [Stream::of([1, 2, 3, 4, 5])->reverse()],
             [Stream::of([1, 2, 3, 4, 5])->runningAverage()],

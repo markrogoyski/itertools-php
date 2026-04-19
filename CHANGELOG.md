@@ -10,6 +10,7 @@
 ### New Features
 * Combinatorics (new class)
   * `product`
+  * `permutations`
 * Summary
   * `contains`
   * `containsCoercive`
@@ -25,6 +26,7 @@
   * `contains`
   * `containsCoercive`
   * `enumerate`
+  * `permutations`
   * `productWith`
   * `toFirstMatch`
   * `toPartition`
