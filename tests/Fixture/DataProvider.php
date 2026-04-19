@@ -2,6 +2,7 @@
 
 namespace IterTools\Tests\Fixture;
 
+use IterTools\Combinatorics;
 use IterTools\Infinite;
 use IterTools\Math;
 use IterTools\Multi;
@@ -51,6 +52,9 @@ trait DataProvider
             yield $loopTool;
         }
         foreach (self::dataProviderForTransformLoopTools() as $loopTool) {
+            yield $loopTool;
+        }
+        foreach (self::dataProviderForCombinatoricsLoopTools() as $loopTool) {
             yield $loopTool;
         }
     }
@@ -167,6 +171,13 @@ trait DataProvider
         ];
     }
 
+    public static function dataProviderForCombinatoricsLoopTools(): array
+    {
+        return [
+            [Combinatorics::product([1, 2], ['a', 'b'])],
+        ];
+    }
+
     // STREAM TOOLS
 
     public static function dataProviderForIterableStreamTools(): \Generator
@@ -224,6 +235,7 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->partialIntersectionWith(1, [2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->partialIntersectionCoerciveWith(1, [2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->peek(fn ($x) => $x)],
+            [Stream::of([1, 2, 3])->productWith(['a', 'b'])],
             [Stream::of([1, 2, 3, 4, 5])->reindex(fn ($x) => $x)],
             [Stream::of([1, 2, 3, 4, 5])->reverse()],
             [Stream::of([1, 2, 3, 4, 5])->runningAverage()],

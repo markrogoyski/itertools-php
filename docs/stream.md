@@ -247,6 +247,27 @@ $result = Stream::of($input)
 // 1, 2, 3, 4, 5, 6, 7, 8, 9
 ```
 
+#### Product With
+Cartesian product of the stream with zero or more additional iterables.
+
+```$stream->productWith(iterable ...$iterables): Stream```
+
+Tuples are list arrays (0-indexed, in input order). With zero extra iterables, each stream element is wrapped in a one-element tuple. If any iterable (stream or extra) is empty, the result is empty.
+
+Note: Passing the same non-rewindable iterator instance more than once is not supported.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 2];
+$letters = ['a', 'b'];
+
+$result = Stream::of($numbers)
+    ->productWith($letters)
+    ->toArray();
+// [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']]
+```
+
 #### Compress
 Compress to a new stream by filtering out data that is not selected.
 

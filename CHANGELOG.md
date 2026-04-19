@@ -8,6 +8,8 @@
 * Upgrade Psalm from v6 to v7 for PHP 8.5 compatibility
 
 ### New Features
+* Combinatorics (new class)
+  * `product`
 * Summary
   * `contains`
   * `containsCoercive`
@@ -23,6 +25,7 @@
   * `contains`
   * `containsCoercive`
   * `enumerate`
+  * `productWith`
   * `toFirstMatch`
   * `toPartition`
   * `zip`

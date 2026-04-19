@@ -644,6 +644,32 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Cartesian product of the stream with zero or more additional iterables.
+     *
+     * Stream::of($src)->productWith(...$iterables) is equivalent to
+     * Combinatorics::product($src, ...$iterables).
+     *
+     * Output tuples are list arrays (0-indexed, in input order). Source keys are ignored.
+     * With zero extra iterables, each stream element is wrapped into a one-element tuple.
+     * If any iterable (including the stream itself) is empty, the result is empty.
+     *
+     * Note: Passing the same non-rewindable iterator instance more than once is not
+     * supported — the second occurrence will throw because the iterator has already
+     * been consumed. Pass distinct instances instead.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return Stream
+     *
+     * @see Combinatorics::product()
+     */
+    public function productWith(iterable ...$iterables): self
+    {
+        $this->iterable = Combinatorics::product($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
      * Treat the stream itself as a sequence of iterables and zip them column-wise (transpose).
      *
      * Similar to Python's zip(*rows) idiom.

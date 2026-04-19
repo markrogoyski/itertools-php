@@ -159,6 +159,11 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`union`](#Union)                                               | Объединение нескольких коллекций                                      | `Set::union(...$iterables)`                                  |
 | [`unionCoercive`](#Union-Coercive)                              | Объединение нескольких коллекций в режиме приведения типов            | `Set::unionCoercive(...$iterables)`                          |
 
+#### Комбинаторное итерирование
+| Метод                 | Описание                          | Пример кода                             |
+|-----------------------|-----------------------------------|-----------------------------------------|
+| [`product`](#Product) | Декартово произведение коллекций  | `Combinatorics::product(...$iterables)` |
+
 #### Итерирование с сортировкой
 | Iterator          | Description                              | Code Snippet                        |
 |-------------------|------------------------------------------|-------------------------------------|
@@ -260,6 +265,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`pairwise`](#Pairwise-1)                                                 | Итерирует коллекцию попарно (с наложением)                                                                   | `$stream->pairwise()`                                                             |
 | [`partialIntersectionWith`](#Partial-Intersection-With)                   | Возвращает частичное пересечение хранимой коллекции с другими коллекциями                                    | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`         |
 | [`partialIntersection CoerciveWith`](#Partial-Intersection-Coercive-With) | Возвращает частичное пересечение хранимой коллекции с другими коллекциями (в режиме приведения типов)        | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
+| [`productWith`](#Product-With)                                            | Декартово произведение коллекции с другими коллекциями                                                       | `$stream->productWith(...$iterables)`                                             |
 | [`reindex`](#Reindex-1)                                                   | Переиндексирует key-value коллекцию                                                                          | `$stream->reindex($reindexer)`                                                    |
 | [`relativeFrequencies`](#Relative-Frequencies-1)                          | Относительная частота вхождений                                                                              | `$stream->relativeFrequencies([$strict])`                                         |
 | [`reverse`](#Reverse-1)                                                   | Итерирует коллекцию в обратном порядке                                                                       | `$stream->reverse()`                                                              |
@@ -1524,6 +1530,35 @@ foreach (Set::unionCoercive($a, $b, $c) as $item) {
 //1, 2, 3, 4, 6, 7
 ```
 
+## Комбинаторное итерирование
+### Product
+Декартово произведение коллекций.
+
+Выходные кортежи — массивы-списки (индексы с нуля, в порядке входных коллекций); исходные ключи отбрасываются. Порядок соответствует `itertools.product` из Python (лексикографический, с сохранением порядка входов): самая правая коллекция «пробегает» быстрее всех.
+
+Входные коллекции должны быть конечными. Они потребляются один раз (материализуются внутри), поэтому генераторы поддерживаются, но повторно итерироваться не могут.
+
+Особые случаи:
+- `product()` без аргументов возвращает один пустой кортеж: `[[]]`
+- если любая входная коллекция пуста, результат пуст
+
+```Combinatorics::product(iterable ...$iterables): \Generator```
+
+```php
+use IterTools\Combinatorics;
+
+$numbers = [1, 2];
+$letters = ['a', 'b'];
+
+foreach (Combinatorics::product($numbers, $letters) as $tuple) {
+    print_r($tuple);
+}
+// [1, 'a']
+// [1, 'b']
+// [2, 'a']
+// [2, 'b']
+```
+
 ## Итерирование с сортировкой
 ### ASort
 Сортирует коллекцию с сохранением ключей.
@@ -2477,6 +2512,25 @@ $result = Stream::of($input)
     ->chainWith([7, 8, 9])
     ->toArray();
 // 1, 2, 3, 4, 5, 6, 7, 8, 9
+```
+
+#### Product With
+Декартово произведение коллекции потока с другими коллекциями.
+
+```$stream->productWith(iterable ...$iterables): Stream```
+
+Выходные кортежи — массивы-списки (индексы с нуля, в порядке входов). Без дополнительных коллекций каждый элемент потока оборачивается в одноэлементный кортеж. Если хотя бы одна коллекция (поток или аргумент) пуста, результат пуст.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 2];
+$letters = ['a', 'b'];
+
+$result = Stream::of($numbers)
+    ->productWith($letters)
+    ->toArray();
+// [[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']]
 ```
 
 #### Compress

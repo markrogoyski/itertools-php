@@ -165,6 +165,11 @@ Quick Reference
 | [`union`](docs/set-iteration.md#union)                                               | Union of iterables                                        | `Set::union(...$iterables)`                                  |
 | [`unionCoercive`](docs/set-iteration.md#union-coercive)                              | Union with type coercion                                  | `Set::unionCoercive(...$iterables)`                          |
 
+#### Combinatorics
+| Iterator                                                            | Description                     | Code Snippet                               |
+|---------------------------------------------------------------------|---------------------------------|--------------------------------------------|
+| [`product`](docs/combinatorics-iteration.md#product)                | Cartesian product of iterables  | `Combinatorics::product(...$iterables)`    |
+
 #### Sort Iteration
 | Iterator                                       | Description                                  | Code Snippet                                              |
 |------------------------------------------------|----------------------------------------------|-----------------------------------------------------------|
@@ -270,6 +275,7 @@ Quick Reference
 | [`pairwise`](docs/stream.md#pairwise)                                                 | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                                                             |
 | [`partialIntersectionWith`](docs/stream.md#partial-intersection-with)                   | Partially intersect iterable source and given iterables                                   | `$stream->partialIntersectionWith( $minIntersectionCount, ...$iterables)`         |
 | [`partialIntersectionCoerciveWith`](docs/stream.md#partial-intersection-coercive-with) | Partially intersect iterable source and given iterables with type coercion                | `$stream->partialIntersectionCoerciveWith( $minIntersectionCount, ...$iterables)` |
+| [`productWith`](docs/stream.md#product-with)                                          | Cartesian product of stream with given iterables                                          | `$stream->productWith(...$iterables)`                                             |
 | [`reindex`](docs/stream.md#reindex)                                                   | Reindex keys of key-value stream                                                          | `$stream->reindex($reindexer)`                                                    |
 | [`relativeFrequencies`](docs/stream.md#relative-frequencies)                          | Relative frequency distribution                                                           | `$stream->relativeFrequencies([$strict])`                                         |
 | [`reverse`](docs/stream.md#reverse)                                                   | Reverse elements of the stream                                                            | `$stream->reverse()`                                                              |
@@ -377,6 +383,7 @@ Full documentation with detailed descriptions, signatures, and code examples for
 - [Random Iteration](docs/random-iteration.md) — Choice, CoinFlip, Number, Percentage, RockPaperScissors
 - [Math Iteration](docs/math-iteration.md) — Frequencies, Running Average/Difference/Max/Min/Product/Total
 - [Set and Multiset Iteration](docs/set-iteration.md) — Distinct, Intersection, Difference, Symmetric Difference, Union
+- [Combinatorics Iteration](docs/combinatorics-iteration.md) — Product
 - [Sort Iteration](docs/sort-iteration.md) — ASort, Sort
 - [File Iteration](docs/file-iteration.md) — ReadCsv, ReadLines
 - [Transform Iteration](docs/transform-iteration.md) — Tee, ToArray, ToAssociativeArray, ToIterator
