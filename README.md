@@ -41,7 +41,7 @@ All functions work on `iterable` collections:
 * `Traversable` (interface)
 
 ### README docs translated in other languages:
-* [Русский](docs/README-RU.md)
+* [Русский](docs/ru/README.md)
 
 Setup
 -----
