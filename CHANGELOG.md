@@ -1,5 +1,10 @@
 # IterTools PHP Change Log
 
+## v2.3.0 - TBD
+
+### Improvements
+* Reorganized translated docs
+
 ## v2.2.0 - 2026-04-19
 
 ### New Features
