@@ -2,6 +2,12 @@
 
 ## v2.3.0 - TBD
 
+### New Features
+* Single
+  * `intersperse`
+* Stream
+  * `intersperse`
+
 ### Improvements
 * Reorganized translated docs
 

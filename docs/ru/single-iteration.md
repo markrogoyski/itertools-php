@@ -326,6 +326,42 @@ foreach (Single::groupBy($cartoonCharacters, fn ($x) => $x[1]) as $animal => $ch
 */
 ```
 
+### Intersperse
+Вставляет разделитель между последовательными элементами коллекции.
+
+```Single::intersperse(iterable $data, mixed $separator)```
+
+* Порядок выдачи: элемент, разделитель, элемент, разделитель, …, элемент.
+* Разделитель не выдаётся ни перед первым элементом, ни после последнего.
+* Разделитель выдаётся как есть: массивы не разворачиваются, объекты сохраняют идентичность.
+* Ключи исходной коллекции отбрасываются — на выходе список с последовательными целочисленными ключами.
+
+```php
+use IterTools\Single;
+
+$pipelineStages = ['fetch', 'parse', 'validate', 'persist'];
+
+$flow = '';
+foreach (Single::intersperse($pipelineStages, ' -> ') as $part) {
+    $flow .= $part;
+}
+// 'fetch -> parse -> validate -> persist'
+```
+
+```php
+use IterTools\Single;
+
+$cells = ['name', 'email', 'role'];
+
+$row = '';
+foreach (Single::intersperse($cells, ',') as $part) {
+    $row .= $part;
+}
+// 'name,email,role'
+```
+
+См. также [Stream::intersperse](stream.md#intersperse).
+
 ### Limit
 Ограничивает итерирование коллекции заданным максимальным числом итераций.
 

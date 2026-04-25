@@ -697,6 +697,37 @@ $stream = Stream::of($languages)
 // 'php', 'typescript'
 ```
 
+#### Intersperse
+Return a stream with a separator inserted between consecutive elements.
+
+```$stream->intersperse(mixed $separator): Stream```
+
+* No separator is emitted before the first element or after the last element.
+* The separator is yielded as-is on each pass: arrays are not expanded, objects retain identity.
+* Source keys are discarded — the output is a list with sequential integer keys.
+
+```php
+use IterTools\Stream;
+
+$flow = '';
+foreach (Stream::of(['fetch', 'parse', 'validate', 'persist'])->intersperse(' -> ') as $part) {
+    $flow .= $part;
+}
+// 'fetch -> parse -> validate -> persist'
+```
+
+```php
+use IterTools\Stream;
+
+$row = '';
+foreach (Stream::of(['name', 'email', 'role'])->intersperse(',') as $part) {
+    $row .= $part;
+}
+// 'name,email,role'
+```
+
+See also [Single::intersperse](single-iteration.md#intersperse).
+
 #### Limit
 Return a stream up to a limit.
 

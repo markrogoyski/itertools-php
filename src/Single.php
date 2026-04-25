@@ -516,6 +516,35 @@ final class Single
     }
 
     /**
+     * Insert a separator between consecutive elements of an iterable.
+     *
+     * Yields: element, separator, element, separator, …, element.
+     * The separator is not emitted before the first element or after the last one.
+     * An empty input yields nothing; a single-element input yields just that element.
+     *
+     * The separator is yielded as-is on each pass: arrays are not expanded, objects
+     * retain identity. Source keys are discarded — the output is a list with
+     * sequential integer keys, because inserted separators have no natural source key.
+     *
+     * @param iterable<mixed> $data
+     * @param mixed           $separator
+     *
+     * @return \Generator<mixed>
+     */
+    public static function intersperse(iterable $data, mixed $separator): \Generator
+    {
+        $first = true;
+        foreach ($data as $datum) {
+            if ($first) {
+                $first = false;
+            } else {
+                yield $separator;
+            }
+            yield $datum;
+        }
+    }
+
+    /**
      * Reverse given iterable.
      *
      * @param iterable<mixed> $data

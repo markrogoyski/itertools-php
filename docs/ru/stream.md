@@ -688,6 +688,37 @@ $stream = Stream::of($languages)
 // 'php', 'typescript'
 ```
 
+#### Intersperse
+Возвращает поток, в котором между последовательными элементами вставлен разделитель.
+
+```$stream->intersperse(mixed $separator): Stream```
+
+* Разделитель не выдаётся ни перед первым элементом, ни после последнего.
+* Разделитель выдаётся как есть: массивы не разворачиваются, объекты сохраняют идентичность.
+* Ключи исходной коллекции отбрасываются — на выходе список с последовательными целочисленными ключами.
+
+```php
+use IterTools\Stream;
+
+$flow = '';
+foreach (Stream::of(['fetch', 'parse', 'validate', 'persist'])->intersperse(' -> ') as $part) {
+    $flow .= $part;
+}
+// 'fetch -> parse -> validate -> persist'
+```
+
+```php
+use IterTools\Stream;
+
+$row = '';
+foreach (Stream::of(['name', 'email', 'role'])->intersperse(',') as $part) {
+    $row .= $part;
+}
+// 'name,email,role'
+```
+
+См. также [Single::intersperse](single-iteration.md#intersperse).
+
 #### Limit
 Ограничивает итерирование элементов из потока заданным максимальным числом итераций.
 

@@ -335,6 +335,42 @@ foreach (Single::groupBy($cartoonCharacters, fn ($x) => $x[1]) as $animal => $ch
 */
 ```
 
+### Intersperse
+Insert a separator between consecutive elements of an iterable.
+
+```Single::intersperse(iterable $data, mixed $separator)```
+
+* Yields: element, separator, element, separator, …, element.
+* No separator is emitted before the first element or after the last element.
+* The separator is yielded as-is on each pass: arrays are not expanded, objects retain identity.
+* Source keys are discarded — the output is a list with sequential integer keys.
+
+```php
+use IterTools\Single;
+
+$pipelineStages = ['fetch', 'parse', 'validate', 'persist'];
+
+$flow = '';
+foreach (Single::intersperse($pipelineStages, ' -> ') as $part) {
+    $flow .= $part;
+}
+// 'fetch -> parse -> validate -> persist'
+```
+
+```php
+use IterTools\Single;
+
+$cells = ['name', 'email', 'role'];
+
+$row = '';
+foreach (Single::intersperse($cells, ',') as $part) {
+    $row .= $part;
+}
+// 'name,email,role'
+```
+
+See also [Stream::intersperse](stream.md#intersperse).
+
 ### Limit
 Iterate up to a limit.
 

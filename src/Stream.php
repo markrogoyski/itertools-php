@@ -515,6 +515,21 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Insert a separator between consecutive elements of the stream.
+     *
+     * @param mixed $separator
+     *
+     * @return Stream
+     *
+     * @see Single::intersperse()
+     */
+    public function intersperse(mixed $separator): self
+    {
+        $this->iterable = Single::intersperse($this->iterable, $separator);
+        return $this;
+    }
+
+    /**
      * Extract a slice of the stream.
      *
      * @param int<0, max> $start
