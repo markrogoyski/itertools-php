@@ -127,6 +127,7 @@ Quick Reference
 |------------------------------|----------------------------|----------------------------------|
 | [`count`](docs/infinite-iteration.md#count)            | Count sequentially forever | `Infinite::count($start, $step)` |
 | [`cycle`](docs/infinite-iteration.md#cycle)            | Cycle through a collection | `Infinite::cycle($collection)`   |
+| [`iterate`](docs/infinite-iteration.md#iterate)        | Iterate by repeatedly applying a function | `Infinite::iterate($initial, $function)` |
 | [`repeat`](docs/infinite-iteration.md#repeat-infinite) | Repeat an item forever     | `Infinite::repeat($item)`        |
 
 #### Random Iteration
@@ -387,7 +388,7 @@ Full documentation with detailed descriptions, signatures, and code examples for
 #### Loop Iteration
 - [Multi Iteration](docs/multi-iteration.md) — Chain, Zip, ZipEqual, ZipFilled, ZipLongest
 - [Single Iteration](docs/single-iteration.md) — Chunkwise, Compress, Filter, Map, Flatten, GroupBy, and more
-- [Infinite Iteration](docs/infinite-iteration.md) — Count, Cycle, Repeat
+- [Infinite Iteration](docs/infinite-iteration.md) — Count, Cycle, Iterate, Repeat
 - [Random Iteration](docs/random-iteration.md) — Choice, CoinFlip, Number, Percentage, RockPaperScissors
 - [Math Iteration](docs/math-iteration.md) — Frequencies, Running Average/Difference/Max/Min/Product/Total
 - [Set and Multiset Iteration](docs/set-iteration.md) — Distinct, Intersection, Difference, Symmetric Difference, Union

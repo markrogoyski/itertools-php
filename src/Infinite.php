@@ -59,4 +59,25 @@ final class Infinite
             yield $item;
         }
     }
+
+    /**
+     * Iterate forever by repeatedly applying a function to its previous output
+     *
+     * Yields $initial, then $function($initial), then $function($function($initial)), ...
+     *
+     * @template T
+     *
+     * @param T            $initial  Starting value (yielded first)
+     * @param callable(T):T $function Applied to the previously yielded value to produce the next
+     *
+     * @return \Generator<T>
+     */
+    public static function iterate(mixed $initial, callable $function): \Generator
+    {
+        $current = $initial;
+        while (true) {
+            yield $current;
+            $current = $function($current);
+        }
+    }
 }

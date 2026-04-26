@@ -122,6 +122,7 @@ $ composer require markrogoyski/itertools-php:2.*
 |----------------------------------------------------------|------------------------------------------------------|----------------------------------|
 | [`count`](infinite-iteration.md#count)                  | Бесконечно перебирает последовательность целых чисел | `Infinite::count($start, $step)` |
 | [`cycle`](infinite-iteration.md#cycle)                  | Бесконечно зацикливает перебор коллекции             | `Infinite::cycle($collection)`   |
+| [`iterate`](infinite-iteration.md#iterate)              | Бесконечно применяет функцию к её предыдущему результату | `Infinite::iterate($initial, $function)` |
 | [`repeat`](infinite-iteration.md#repeat)                | Бесконечно повторяет данное значение                 | `Infinite::repeat($item)`        |
 
 #### Итерирование случайных значений

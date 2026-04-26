@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Stream;
 
+use IterTools\Infinite;
 use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
@@ -279,5 +280,40 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 6, 10, 15, 16, 18, 21, 25, 30, 31, 33, 36, 40, 45],
             ],
         ];
+    }
+
+    /**
+     * @test Infinite::iterate composes with Stream via Stream::of(...)->limit(N)
+     */
+    public function testStreamOfIterateLimit(): void
+    {
+        // Given
+        $iterate = Infinite::iterate(1, fn (int $x) => $x * 2);
+
+        // When
+        $result = Stream::of($iterate)
+            ->limit(5)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 4, 8, 16], $result);
+    }
+
+    /**
+     * @test Infinite::iterate composes with Stream filter and limit
+     */
+    public function testStreamOfIterateFilterLimit(): void
+    {
+        // Given: integers starting from 1
+        $iterate = Infinite::iterate(1, fn (int $x) => $x + 1);
+
+        // When: take first 5 even numbers
+        $result = Stream::of($iterate)
+            ->filterTrue(fn (int $x) => $x % 2 === 0)
+            ->limit(5)
+            ->toArray();
+
+        // Then
+        $this->assertSame([2, 4, 6, 8, 10], $result);
     }
 }

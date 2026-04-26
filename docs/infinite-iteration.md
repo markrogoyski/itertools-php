@@ -39,6 +39,39 @@ foreach (Infinite::cycle($hands) as $hand) {
 // rock, paper, scissors, rock, paper, scissors, ...
 ```
 
+### Iterate
+Iterate forever by repeatedly applying a function to its previous output.
+
+Yields `$initial` first, then `$function($initial)`, then `$function($function($initial))`, and so on without end. Always combine with a bounded consumer such as [`Single::limit`](single-iteration.md#limit) when collecting results.
+
+```Infinite::iterate(mixed $initial, callable $function)```
+
+```php
+use IterTools\Infinite;
+use IterTools\Single;
+
+// Powers of 2: 1, 2, 4, 8, 16, 32, 64, 128
+$powersOfTwo = Infinite::iterate(1, fn (int $x) => $x * 2);
+
+foreach (Single::limit($powersOfTwo, 8) as $power) {
+    print("$power ");
+}
+// 1 2 4 8 16 32 64 128
+```
+
+```php
+use IterTools\Infinite;
+use IterTools\Single;
+
+// Collatz sequence starting from 27, take the first 50 terms.
+$collatz = fn (int $n) => $n % 2 === 0 ? \intdiv($n, 2) : 3 * $n + 1;
+
+foreach (Single::limit(Infinite::iterate(27, $collatz), 50) as $term) {
+    print("$term ");
+}
+// 27 82 41 124 62 31 94 47 142 71 214 107 322 161 484 ...
+```
+
 ### Repeat (Infinite)
 Repeat an item forever.
 

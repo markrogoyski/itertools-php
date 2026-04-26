@@ -3,6 +3,8 @@
 ## v2.3.0 - TBD
 
 ### New Features
+* Infinite
+  * `iterate`
 * Single
   * `intersperse`
 * Stream

@@ -109,6 +109,7 @@ trait DataProvider
             [Infinite::count(1, 1)],
             [Infinite::cycle([1, 2, 3])],
             [Infinite::repeat(5)],
+            [Infinite::iterate(1, fn ($x) => $x + 1)],
 
         ];
     }
