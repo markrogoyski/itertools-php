@@ -754,6 +754,40 @@ $result = Stream::of($grades)
 // A, F, F, F, A
 ```
 
+#### Map Spread
+Возвращает поток, где к каждому элементу применяется функция, при этом элемент распаковывается как позиционные аргументы функции.
+
+```$stream->mapSpread(callable $function): Stream```
+
+* Каждый элемент потока сам должен быть итерируемым; его значения передаются в `$function` позиционно через splat-оператор.
+* Внутренние ключи отбрасываются — значения передаются позиционно, даже если внутренний элемент является ассоциативным массивом.
+* Внешние ключи сохраняются (как и в `Stream::map`).
+* Бросает `\InvalidArgumentException`, если какой-либо внутренний элемент не является итерируемым.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([[1, 2], [3, 4], [5, 6]])
+    ->mapSpread(fn ($a, $b) => $a + $b)
+    ->toArray();
+// [3, 7, 11]
+```
+
+```php
+use IterTools\Stream;
+
+$names  = ['Alice', 'Bob', 'Carol'];
+$scores = [92, 87, 95];
+
+$result = Stream::of($names)
+    ->zipWith($scores)
+    ->mapSpread(fn (string $name, int $score) => "{$name}: {$score}")
+    ->toArray();
+// ['Alice: 92', 'Bob: 87', 'Carol: 95']
+```
+
+См. также [Single::mapSpread](single-iteration.md#map-spread).
+
 #### Pairwise
 Итерирует элементы из потока попарно (с наложением).
 

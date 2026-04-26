@@ -482,6 +482,21 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Map a function onto every element of the stream, unpacking each element positionally as arguments.
+     *
+     * @param callable $function
+     *
+     * @return Stream
+     *
+     * @see Single::mapSpread()
+     */
+    public function mapSpread(callable $function): self
+    {
+        $this->iterable = Single::mapSpread($this->iterable, $function);
+        return $this;
+    }
+
+    /**
      * Returns a new collection formed by applying a given callback function
      * to each element of the stream, and then flattening the result by one level.
      *

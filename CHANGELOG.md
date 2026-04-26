@@ -7,8 +7,10 @@
   * `iterate`
 * Single
   * `intersperse`
+  * `mapSpread`
 * Stream
   * `intersperse`
+  * `mapSpread`
 
 ### Improvements
 * Reorganized translated docs

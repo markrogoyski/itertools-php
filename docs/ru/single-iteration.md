@@ -400,6 +400,47 @@ foreach (Single::map($grades, $strictParentsOpinion) as $actualGrade) {
 // A, F, F, F, A
 ```
 
+### Map Spread
+Отображение коллекции, при котором каждый элемент распаковывается как позиционные аргументы функции.
+
+```Single::mapSpread(iterable $data, callable $function)```
+
+* Каждый элемент `$data` сам должен быть итерируемым; его значения передаются в `$function` позиционно через splat-оператор.
+* Внутренние ключи отбрасываются — значения передаются позиционно, даже если внутренний элемент является ассоциативным массивом.
+* Внешние ключи сохраняются (как и в `Single::map`).
+* Бросает `\InvalidArgumentException`, если какой-либо внутренний элемент не является итерируемым.
+
+```php
+use IterTools\Single;
+
+$pairs = [[1, 2], [3, 4], [5, 6]];
+
+foreach (Single::mapSpread($pairs, fn ($a, $b) => $a + $b) as $sum) {
+    print($sum);
+}
+// 3, 7, 11
+```
+
+```php
+use IterTools\Multi;
+use IterTools\Single;
+
+$names  = ['Alice', 'Bob', 'Carol'];
+$scores = [92, 87, 95];
+
+$lines = Single::mapSpread(
+    Multi::zip($names, $scores),
+    fn (string $name, int $score) => "{$name}: {$score}"
+);
+
+foreach ($lines as $line) {
+    print($line);
+}
+// 'Alice: 92', 'Bob: 87', 'Carol: 95'
+```
+
+См. также [Stream::mapSpread](stream.md#map-spread).
+
 ### Pairwise
 Итерирует коллекцию попарно (с наложением).
 

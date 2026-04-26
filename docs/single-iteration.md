@@ -407,6 +407,47 @@ foreach (Single::map($grades, $strictParentsOpinion) as $actualGrade) {
 // A, F, F, F, A
 ```
 
+### Map Spread
+Map a function onto each element, unpacking each element positionally as arguments.
+
+```Single::mapSpread(iterable $data, callable $function)```
+
+* Each element of `$data` must itself be iterable; its values are splatted into `$function` positionally.
+* Inner keys are discarded — values flow positionally even when an inner element is an associative array.
+* Outer keys are preserved (matching `Single::map`).
+* Throws `\InvalidArgumentException` if any inner element is not iterable.
+
+```php
+use IterTools\Single;
+
+$pairs = [[1, 2], [3, 4], [5, 6]];
+
+foreach (Single::mapSpread($pairs, fn ($a, $b) => $a + $b) as $sum) {
+    print($sum);
+}
+// 3, 7, 11
+```
+
+```php
+use IterTools\Multi;
+use IterTools\Single;
+
+$names  = ['Alice', 'Bob', 'Carol'];
+$scores = [92, 87, 95];
+
+$lines = Single::mapSpread(
+    Multi::zip($names, $scores),
+    fn (string $name, int $score) => "{$name}: {$score}"
+);
+
+foreach ($lines as $line) {
+    print($line);
+}
+// 'Alice: 92', 'Bob: 87', 'Carol: 95'
+```
+
+See also [Stream::mapSpread](stream.md#map-spread).
+
 ### Pairwise
 Returns successive overlapping pairs.
 

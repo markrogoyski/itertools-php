@@ -484,6 +484,38 @@ final class Single
     }
 
     /**
+     * Map a function onto every element of the iteration, unpacking each element positionally as arguments.
+     *
+     * Each element of $data must itself be iterable. Its values are passed positionally
+     * to $function via the splat operator. Inner keys are discarded — values flow positionally
+     * regardless of whether each inner element is a list or an associative array. Outer keys
+     * are preserved (matching {@see Single::map()}).
+     *
+     * @param iterable<mixed> $data
+     * @param callable        $function
+     *
+     * @return \Generator
+     *
+     * @throws \InvalidArgumentException if any inner element is not iterable
+     */
+    public static function mapSpread(iterable $data, callable $function): \Generator
+    {
+        foreach ($data as $key => $item) {
+            if (!\is_iterable($item)) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'Single::mapSpread requires each element to be iterable; element at key %s is %s',
+                    \var_export($key, true),
+                    \get_debug_type($item)
+                ));
+            }
+            $args = \is_array($item)
+                ? \array_values($item)
+                : \iterator_to_array($item, false);
+            yield $key => $function(...$args);
+        }
+    }
+
+    /**
      * Returns a new collection formed by applying a given callback mapper function to each element
      * of the given collection, and then flattening the result by one level.
      *
