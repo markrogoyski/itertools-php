@@ -788,6 +788,32 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Powerset of the stream's elements — every subset, ordered by length then by input position.
+     *
+     * Output subsets are list arrays (0-indexed, in input order). Source keys are ignored.
+     * Subsets are yielded in length-ascending order; within each length the order matches
+     * Stream::combinations (lexicographic by input position): duplicate values are
+     * position-unique.
+     *
+     * The stream is finite and consumed once (materialized internally); generators are
+     * supported but cannot be re-iterated afterwards.
+     *
+     * Warning: a stream of n elements yields 2**n subsets — consumption grows exponentially.
+     *
+     * Special cases:
+     *  - empty stream yields one empty subset
+     *
+     * @return Stream
+     *
+     * @see Combinatorics::powerset()
+     */
+    public function powerset(): self
+    {
+        $this->iterable = Combinatorics::powerset($this->iterable);
+        return $this;
+    }
+
+    /**
      * Treat the stream itself as a sequence of iterables and zip them column-wise (transpose).
      *
      * Similar to Python's zip(*rows) idiom.

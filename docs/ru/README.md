@@ -169,6 +169,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`permutations`](combinatorics-iteration.md#permutations)                               | Перестановки элементов коллекции             | `Combinatorics::permutations($data, [$r])`                 |
 | [`combinations`](combinatorics-iteration.md#combinations)                               | Сочетания элементов коллекции                | `Combinatorics::combinations($data, $r)`                   |
 | [`combinationsWithReplacement`](combinatorics-iteration.md#combinations-with-replacement) | Сочетания с повторениями                   | `Combinatorics::combinationsWithReplacement($data, $r)`    |
+| [`powerset`](combinatorics-iteration.md#powerset)                                       | Все подмножества коллекции (булеан)          | `Combinatorics::powerset($data)`                           |
 
 #### Итерирование с сортировкой
 | Итератор                                          | Описание                                 | Пример кода                         |
@@ -280,6 +281,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`permutations`](stream.md#permutations)                                                 | Перестановки элементов коллекции                                                                            | `$stream->permutations([$r])`                                                     |
 | [`combinations`](stream.md#combinations)                                                 | Сочетания элементов коллекции                                                                               | `$stream->combinations($r)`                                                       |
 | [`combinationsWithReplacement`](stream.md#combinations-with-replacement)                 | Сочетания с повторениями элементов потока                                                                   | `$stream->combinationsWithReplacement($r)`                                        |
+| [`powerset`](stream.md#powerset)                                                         | Все подмножества элементов потока (булеан)                                                                  | `$stream->powerset()`                                                             |
 | [`reindex`](stream.md#reindex)                                                           | Переиндексирует key-value коллекцию                                                                          | `$stream->reindex($reindexer)`                                                    |
 | [`relativeFrequencies`](stream.md#relative-frequencies)                                  | Относительная частота вхождений                                                                              | `$stream->relativeFrequencies([$strict])`                                         |
 | [`reverse`](stream.md#reverse)                                                           | Итерирует коллекцию в обратном порядке                                                                       | `$stream->reverse()`                                                              |

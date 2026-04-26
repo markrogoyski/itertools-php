@@ -328,6 +328,40 @@ $result = Stream::of($data)
 // [[1, 1], [1, 2], [1, 3], [2, 2], [2, 3], [3, 3]]
 ```
 
+#### Powerset
+Every subset of the stream's elements, ordered by length then by input position.
+
+```$stream->powerset(): Stream```
+
+Subsets are list arrays (0-indexed, in input order); source keys are discarded. Subsets are yielded in length-ascending order; within each length the order matches `Stream::combinations` (lexicographic by input position): duplicate values are position-unique. Empty stream yields one empty subset.
+
+> **Warning:** a stream of `n` elements yields `2**n` subsets — consumption grows exponentially.
+
+```php
+use IterTools\Stream;
+
+$data = [1, 2, 3];
+
+$result = Stream::of($data)
+    ->powerset()
+    ->toArray();
+// [[], [1], [2], [3], [1, 2], [1, 3], [2, 3], [1, 2, 3]]
+```
+
+```php
+use IterTools\Stream;
+
+// Every combination of feature flags to drive parameterized tests.
+$result = Stream::of(['darkMode', 'beta', 'analytics'])
+    ->powerset()
+    ->toArray();
+// [[], ['darkMode'], ['beta'], ['analytics'],
+//  ['darkMode', 'beta'], ['darkMode', 'analytics'], ['beta', 'analytics'],
+//  ['darkMode', 'beta', 'analytics']]
+```
+
+See also [Combinatorics::powerset](combinatorics-iteration.md#powerset).
+
 #### Compress
 Compress to a new stream by filtering out data that is not selected.
 

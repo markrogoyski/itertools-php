@@ -3,6 +3,8 @@
 ## v2.3.0 - TBD
 
 ### New Features
+* Combinatorics
+  * `powerset`
 * Infinite
   * `iterate`
 * Single
@@ -11,6 +13,7 @@
 * Stream
   * `intersperse`
   * `mapSpread`
+  * `powerset`
 
 ### Improvements
 * Reorganized translated docs

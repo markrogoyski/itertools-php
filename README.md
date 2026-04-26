@@ -175,6 +175,7 @@ Quick Reference
 | [`permutations`](docs/combinatorics-iteration.md#permutations)                                  | Permutations of an iterable     | `Combinatorics::permutations($data, [$r])`                 |
 | [`combinations`](docs/combinatorics-iteration.md#combinations)                                  | Combinations of an iterable     | `Combinatorics::combinations($data, $r)`                   |
 | [`combinationsWithReplacement`](docs/combinatorics-iteration.md#combinations-with-replacement)  | Combinations with replacement   | `Combinatorics::combinationsWithReplacement($data, $r)`    |
+| [`powerset`](docs/combinatorics-iteration.md#powerset)                                          | Every subset of an iterable     | `Combinatorics::powerset($data)`                           |
 
 #### Sort Iteration
 | Iterator                                       | Description                                  | Code Snippet                                              |
@@ -287,6 +288,7 @@ Quick Reference
 | [`permutations`](docs/stream.md#permutations)                                         | Permutations of the stream's elements                                                     | `$stream->permutations([$r])`                                                     |
 | [`combinations`](docs/stream.md#combinations)                                         | Combinations of the stream's elements                                                     | `$stream->combinations($r)`                                                       |
 | [`combinationsWithReplacement`](docs/stream.md#combinations-with-replacement)         | Combinations with replacement of the stream's elements                                    | `$stream->combinationsWithReplacement($r)`                                        |
+| [`powerset`](docs/stream.md#powerset)                                                 | Every subset of the stream's elements                                                     | `$stream->powerset()`                                                             |
 | [`reindex`](docs/stream.md#reindex)                                                   | Reindex keys of key-value stream                                                          | `$stream->reindex($reindexer)`                                                    |
 | [`relativeFrequencies`](docs/stream.md#relative-frequencies)                          | Relative frequency distribution                                                           | `$stream->relativeFrequencies([$strict])`                                         |
 | [`reverse`](docs/stream.md#reverse)                                                   | Reverse elements of the stream                                                            | `$stream->reverse()`                                                              |
@@ -394,7 +396,7 @@ Full documentation with detailed descriptions, signatures, and code examples for
 - [Random Iteration](docs/random-iteration.md) — Choice, CoinFlip, Number, Percentage, RockPaperScissors
 - [Math Iteration](docs/math-iteration.md) — Frequencies, Running Average/Difference/Max/Min/Product/Total
 - [Set and Multiset Iteration](docs/set-iteration.md) — Distinct, Intersection, Difference, Symmetric Difference, Union
-- [Combinatorics Iteration](docs/combinatorics-iteration.md) — Product, Permutations, Combinations, CombinationsWithReplacement
+- [Combinatorics Iteration](docs/combinatorics-iteration.md) — Product, Permutations, Combinations, CombinationsWithReplacement, Powerset
 - [Sort Iteration](docs/sort-iteration.md) — ASort, Sort
 - [File Iteration](docs/file-iteration.md) — ReadCsv, ReadLines
 - [Transform Iteration](docs/transform-iteration.md) — Tee, ToArray, ToAssociativeArray, ToIterator

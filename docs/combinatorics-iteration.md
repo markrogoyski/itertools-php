@@ -2,7 +2,7 @@
 
 [Back to main README](../README.md)
 
-Tools for combinatoric iteration: cartesian product, permutations, combinations, combinations with replacement.
+Tools for combinatoric iteration: cartesian product, permutations, combinations, combinations with replacement, powerset.
 
 ---
 
@@ -140,3 +140,58 @@ foreach (Combinatorics::combinationsWithReplacement($data, 2) as $tuple) {
 // [2, 3]
 // [3, 3]
 ```
+
+---
+
+### Powerset
+Every subset of an iterable, ordered by length then by input position.
+
+Output subsets are list arrays (0-indexed, in input order); source keys are discarded. Subsets are yielded in length-ascending order; within each length the order matches `Combinatorics::combinations` (lexicographic by input position, not by value), so duplicate values are treated as position-unique: `powerset([1, 1])` yields `[[], [1], [1], [1, 1]]`.
+
+Input iterable must be finite. It is consumed once (materialized internally), so generators are supported but cannot be re-iterated afterwards.
+
+> **Warning:** the powerset of `n` elements has `2**n` subsets — consumption grows exponentially. A 20-element input yields over a million subsets; a 30-element input yields over a billion.
+
+Special cases:
+- empty input yields one empty subset: `[[]]`
+
+```Combinatorics::powerset(iterable $data): \Generator```
+
+```php
+use IterTools\Combinatorics;
+
+$data = [1, 2, 3];
+
+foreach (Combinatorics::powerset($data) as $subset) {
+    print_r($subset);
+}
+// []
+// [1]
+// [2]
+// [3]
+// [1, 2]
+// [1, 3]
+// [2, 3]
+// [1, 2, 3]
+```
+
+```php
+use IterTools\Combinatorics;
+
+// Generate every combination of feature flags to drive parameterized tests.
+$flags = ['darkMode', 'beta', 'analytics'];
+
+foreach (Combinatorics::powerset($flags) as $enabled) {
+    print_r($enabled);
+}
+// []
+// ['darkMode']
+// ['beta']
+// ['analytics']
+// ['darkMode', 'beta']
+// ['darkMode', 'analytics']
+// ['beta', 'analytics']
+// ['darkMode', 'beta', 'analytics']
+```
+
+See also [Stream::powerset](stream.md#powerset).

@@ -236,6 +236,37 @@ final class Combinatorics
     }
 
     /**
+     * Powerset of the input iterable — every subset, ordered by length then by input position.
+     *
+     * Output subsets are list arrays (0-indexed, in input order). Source keys are ignored.
+     * Subsets are yielded in length-ascending order; within each length the order matches
+     * Combinatorics::combinations (lexicographic by input position, not by value), so duplicate
+     * values are treated as position-unique:
+     * powerset([1, 1]) yields [[], [1], [1], [1, 1]].
+     *
+     * Input iterable is finite and consumed once (materialized internally), so passing
+     * a generator is supported (but it cannot be re-iterated afterwards).
+     *
+     * Warning: the powerset of n elements has 2**n subsets — consumption grows exponentially.
+     *
+     * Special cases:
+     *  - empty input yields one empty subset: [[]]
+     *
+     * @param iterable<mixed> $data
+     *
+     * @return \Generator<list<mixed>>
+     */
+    public static function powerset(iterable $data): \Generator
+    {
+        $pool = Transform::toArray($data);
+        $n = \count($pool);
+
+        for ($r = 0; $r <= $n; $r++) {
+            yield from self::combinations($pool, $r);
+        }
+    }
+
+    /**
      * Combinations with replacement of the input iterable.
      *
      * Output tuples are list arrays (0-indexed, in input order). Source keys are ignored.
