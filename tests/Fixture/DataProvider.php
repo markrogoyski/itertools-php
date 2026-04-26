@@ -144,6 +144,8 @@ trait DataProvider
     {
         return [
             [Set::distinct([1, 2, 3, 4, 5])],
+            [Set::distinctAdjacent([1, 1, 2, 2, 3, 3, 4, 4, 5, 5])],
+            [Set::distinctAdjacentBy([1, 1, 2, 2, 3, 3, 4, 4, 5, 5], fn ($x) => $x)],
             [Set::intersection([1, 2, 3, 4, 5], [2, 3, 4])],
             [Set::intersectionCoercive([1, 2, 3, 4, 5], [2, 3, 4])],
             [Set::partialIntersection(2, [1, 2, 3, 4, 5], [2, 3, 4])],
@@ -222,6 +224,8 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->chunkwise(2)],
             [Stream::of([1, 2, 3, 4, 5])->chunkwiseOverlap(2, 1)],
             [Stream::of([1, 2, 3, 4, 5])->distinct()],
+            [Stream::of([1, 1, 2, 2, 3, 3, 4, 4, 5, 5])->distinctAdjacent()],
+            [Stream::of([1, 1, 2, 2, 3, 3, 4, 4, 5, 5])->distinctAdjacentBy(fn ($x) => $x)],
             [Stream::of([1, 2, 3, 4, 5])->dropWhile(fn ($x) => $x < 2)],
             [Stream::of([1, 2, 3, 4, 5])->enumerate()],
             [Stream::of([1, 2, 3, 4, 5])->filter(fn ($x) => $x < 2)],

@@ -7,10 +7,15 @@
   * `powerset`
 * Infinite
   * `iterate`
+* Set
+  * `distinctAdjacent`
+  * `distinctAdjacentBy`
 * Single
   * `intersperse`
   * `mapSpread`
 * Stream
+  * `distinctAdjacent`
+  * `distinctAdjacentBy`
   * `intersperse`
   * `mapSpread`
   * `powerset`

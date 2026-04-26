@@ -57,6 +57,86 @@ foreach (Set::distinctBy($streetFighterConsoleReleases, $compareBy) as $sfTitle)
 // Содержит одну запись для SF3 3rd Strike и одну для SFVI.
 ```
 
+### Distinct Adjacent
+Удаляет только подряд идущие дубликаты в коллекции (поведение Unix `uniq`).
+
+```Set::distinctAdjacent(iterable $data)```
+
+* Каждый элемент сравнивается строго (`===`) с предыдущим выданным элементом.
+* Не подряд идущие дубликаты сохраняются.
+* Работает с памятью O(1) — хранится только предыдущий элемент.
+* Исходные ключи отбрасываются; результат — список с последовательными целочисленными ключами.
+
+```php
+use IterTools\Set;
+
+$values = [1, 1, 2, 2, 3, 1, 1];
+
+$result = [];
+foreach (Set::distinctAdjacent($values) as $value) {
+    $result[] = $value;
+}
+// [1, 2, 3, 1] — последняя 1 сохраняется, потому что не идёт подряд с более ранними
+```
+
+```php
+use IterTools\Set;
+
+$logLines = ['error: timeout', 'error: timeout', 'error: timeout', 'info: ok', 'error: timeout'];
+
+$collapsed = [];
+foreach (Set::distinctAdjacent($logLines) as $line) {
+    $collapsed[] = $line;
+}
+// ['error: timeout', 'info: ok', 'error: timeout']
+```
+
+См. также [Stream::distinctAdjacent](stream.md#distinct-adjacent).
+
+### Distinct Adjacent By
+Удаляет только подряд идущие дубликаты в коллекции, сравнивая значения, возвращаемые функцией ключа.
+
+```Set::distinctAdjacentBy(iterable $data, callable $keyFn)```
+
+* Извлечённый ключ каждого элемента сравнивается строго (`===`) с ключом предыдущего элемента.
+* Не подряд идущие дубликаты по ключу сохраняются.
+* Работает с памятью O(1) и вызывает `$keyFn` ровно один раз на элемент.
+* Исходные ключи отбрасываются; результат — список с последовательными целочисленными ключами.
+
+```php
+use IterTools\Set;
+
+$words = ['apple', 'ant', 'banana', 'berry', 'apple'];
+
+$firstLetterRuns = [];
+foreach (Set::distinctAdjacentBy($words, fn ($s) => $s[0]) as $word) {
+    $firstLetterRuns[] = $word;
+}
+// ['apple', 'banana', 'apple'] — первое слово в каждой серии с одинаковой первой буквой
+```
+
+```php
+use IterTools\Set;
+
+$readings = [
+    ['ts' => 60,  'v' => 1],
+    ['ts' => 65,  'v' => 2],
+    ['ts' => 119, 'v' => 3],
+    ['ts' => 120, 'v' => 4],
+    ['ts' => 121, 'v' => 5],
+];
+$minuteKey = fn ($r) => intdiv($r['ts'], 60);
+
+$compressed = [];
+foreach (Set::distinctAdjacentBy($readings, $minuteKey) as $reading) {
+    $compressed[] = $reading;
+}
+// сохраняется только первое показание из каждой серии в той же минуте:
+// [['ts' => 60, 'v' => 1], ['ts' => 120, 'v' => 4]]
+```
+
+См. также [Stream::distinctAdjacentBy](stream.md#distinct-adjacent-by).
+
 ### Intersection
 Итерирует пересечение коллекций.
 

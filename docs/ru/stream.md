@@ -483,6 +483,78 @@ $stream = Stream::of($streetFighterConsoleReleases)
 // Содержит одну запись для SF3 3rd Strike и одну для SFVI
 ```
 
+#### Distinct Adjacent
+Возвращает поток, удаляющий только подряд идущие дубликаты (поведение Unix `uniq`).
+
+```$stream->distinctAdjacent(): Stream```
+
+* Каждый элемент сравнивается строго (`===`) с предыдущим выданным элементом.
+* Не подряд идущие дубликаты сохраняются.
+* Работает с памятью O(1) — хранится только предыдущий элемент.
+* Исходные ключи отбрасываются.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 1, 2, 2, 3, 1, 1])
+    ->distinctAdjacent()
+    ->toArray();
+// [1, 2, 3, 1]
+```
+
+```php
+use IterTools\Stream;
+
+$logLines = ['error: timeout', 'error: timeout', 'info: ok', 'error: timeout', 'error: timeout'];
+
+$collapsed = Stream::of($logLines)
+    ->distinctAdjacent()
+    ->toArray();
+// ['error: timeout', 'info: ok', 'error: timeout']
+```
+
+См. также [Set::distinctAdjacent](set-iteration.md#distinct-adjacent).
+
+#### Distinct Adjacent By
+Возвращает поток, удаляющий только подряд идущие дубликаты по ключу, используя заданную функцию ключа.
+
+```$stream->distinctAdjacentBy(callable $keyFn): Stream```
+
+* Извлечённый ключ каждого элемента сравнивается строго (`===`) с ключом предыдущего элемента.
+* Не подряд идущие дубликаты по ключу сохраняются.
+* Работает с памятью O(1) и вызывает `$keyFn` ровно один раз на элемент.
+* Исходные ключи отбрасываются.
+
+```php
+use IterTools\Stream;
+
+$words = ['apple', 'ant', 'banana', 'berry', 'apple'];
+
+$firstLetterRuns = Stream::of($words)
+    ->distinctAdjacentBy(fn ($s) => $s[0])
+    ->toArray();
+// ['apple', 'banana', 'apple']
+```
+
+```php
+use IterTools\Stream;
+
+$readings = [
+    ['ts' => 60,  'v' => 1],
+    ['ts' => 65,  'v' => 2],
+    ['ts' => 119, 'v' => 3],
+    ['ts' => 120, 'v' => 4],
+    ['ts' => 121, 'v' => 5],
+];
+
+$compressed = Stream::of($readings)
+    ->distinctAdjacentBy(fn ($r) => intdiv($r['ts'], 60))
+    ->toArray();
+// [['ts' => 60, 'v' => 1], ['ts' => 120, 'v' => 4]]
+```
+
+См. также [Set::distinctAdjacentBy](set-iteration.md#distinct-adjacent-by).
+
 #### Drop While
 Пропускает элементы из потока, пока предикат возвращает истину.
 

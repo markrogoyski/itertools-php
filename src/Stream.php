@@ -1103,6 +1103,40 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Remove only consecutive duplicates from the stream (Unix `uniq` behavior).
+     *
+     * Each element is compared strictly (===) to the previous element yielded.
+     * Non-adjacent duplicates are kept. Source keys are discarded.
+     *
+     * @return Stream
+     *
+     * @see Set::distinctAdjacent()
+     */
+    public function distinctAdjacent(): self
+    {
+        $this->iterable = Set::distinctAdjacent($this->iterable);
+        return $this;
+    }
+
+    /**
+     * Remove only consecutive duplicates from the stream, comparing values returned by $keyFn.
+     *
+     * Each element's extracted key is compared strictly (===) to the previous element's key.
+     * Non-adjacent duplicates are kept. Source keys are discarded.
+     *
+     * @param callable $keyFn
+     *
+     * @return Stream
+     *
+     * @see Set::distinctAdjacentBy()
+     */
+    public function distinctAdjacentBy(callable $keyFn): self
+    {
+        $this->iterable = Set::distinctAdjacentBy($this->iterable, $keyFn);
+        return $this;
+    }
+
+    /**
      * Cycle through the elements of iterable source sequentially forever
      *
      * @return Stream

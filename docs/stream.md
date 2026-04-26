@@ -492,6 +492,78 @@ $stream = Stream::of($streetFighterConsoleReleases)
 // Contains one SF3 3rd Strike entry and one SFVI entry
 ```
 
+#### Distinct Adjacent
+Return a stream that removes only consecutive duplicates (Unix `uniq` behavior).
+
+```$stream->distinctAdjacent(): Stream```
+
+* Each element is compared strictly (`===`) to the previous element yielded.
+* Non-adjacent duplicates are kept.
+* Runs in O(1) memory — only the previous element is held.
+* Source keys are discarded.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 1, 2, 2, 3, 1, 1])
+    ->distinctAdjacent()
+    ->toArray();
+// [1, 2, 3, 1]
+```
+
+```php
+use IterTools\Stream;
+
+$logLines = ['error: timeout', 'error: timeout', 'info: ok', 'error: timeout', 'error: timeout'];
+
+$collapsed = Stream::of($logLines)
+    ->distinctAdjacent()
+    ->toArray();
+// ['error: timeout', 'info: ok', 'error: timeout']
+```
+
+See also [Set::distinctAdjacent](set-iteration.md#distinct-adjacent).
+
+#### Distinct Adjacent By
+Return a stream that removes only consecutive duplicates by key, using a custom key function.
+
+```$stream->distinctAdjacentBy(callable $keyFn): Stream```
+
+* Each element's extracted key is compared strictly (`===`) to the previous element's key.
+* Non-adjacent duplicate keys are kept.
+* Runs in O(1) memory and calls `$keyFn` once per element.
+* Source keys are discarded.
+
+```php
+use IterTools\Stream;
+
+$words = ['apple', 'ant', 'banana', 'berry', 'apple'];
+
+$firstLetterRuns = Stream::of($words)
+    ->distinctAdjacentBy(fn ($s) => $s[0])
+    ->toArray();
+// ['apple', 'banana', 'apple']
+```
+
+```php
+use IterTools\Stream;
+
+$readings = [
+    ['ts' => 60,  'v' => 1],
+    ['ts' => 65,  'v' => 2],
+    ['ts' => 119, 'v' => 3],
+    ['ts' => 120, 'v' => 4],
+    ['ts' => 121, 'v' => 5],
+];
+
+$compressed = Stream::of($readings)
+    ->distinctAdjacentBy(fn ($r) => intdiv($r['ts'], 60))
+    ->toArray();
+// [['ts' => 60, 'v' => 1], ['ts' => 120, 'v' => 4]]
+```
+
+See also [Set::distinctAdjacentBy](set-iteration.md#distinct-adjacent-by).
+
 #### Drop While
 Drop elements from the stream while the predicate function is true.
 

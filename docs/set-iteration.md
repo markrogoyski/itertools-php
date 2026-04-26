@@ -57,6 +57,86 @@ foreach (Set::distinctBy($streetFighterConsoleReleases, $compareBy) as $sfTitle)
 // Contains one SF3 3rd Strike entry and one SFVI entry.
 ```
 
+### Distinct Adjacent
+Remove only consecutive duplicates from an iterable (Unix `uniq` behavior).
+
+```Set::distinctAdjacent(iterable $data)```
+
+* Each element is compared strictly (`===`) to the previous element yielded.
+* Non-adjacent duplicates are kept.
+* Runs in O(1) memory — only the previous element is held.
+* Source keys are discarded; the output is a list with sequential integer keys.
+
+```php
+use IterTools\Set;
+
+$values = [1, 1, 2, 2, 3, 1, 1];
+
+$result = [];
+foreach (Set::distinctAdjacent($values) as $value) {
+    $result[] = $value;
+}
+// [1, 2, 3, 1] — the trailing 1 stays because it is not adjacent to the earlier 1s
+```
+
+```php
+use IterTools\Set;
+
+$logLines = ['error: timeout', 'error: timeout', 'error: timeout', 'info: ok', 'error: timeout'];
+
+$collapsed = [];
+foreach (Set::distinctAdjacent($logLines) as $line) {
+    $collapsed[] = $line;
+}
+// ['error: timeout', 'info: ok', 'error: timeout']
+```
+
+See also [Stream::distinctAdjacent](stream.md#distinct-adjacent).
+
+### Distinct Adjacent By
+Remove only consecutive duplicates from an iterable, comparing values returned by a custom key function.
+
+```Set::distinctAdjacentBy(iterable $data, callable $keyFn)```
+
+* Each element's extracted key is compared strictly (`===`) to the previous element's key.
+* Non-adjacent duplicate keys are kept.
+* Runs in O(1) memory and calls `$keyFn` once per element.
+* Source keys are discarded; the output is a list with sequential integer keys.
+
+```php
+use IterTools\Set;
+
+$words = ['apple', 'ant', 'banana', 'berry', 'apple'];
+
+$firstLetterRuns = [];
+foreach (Set::distinctAdjacentBy($words, fn ($s) => $s[0]) as $word) {
+    $firstLetterRuns[] = $word;
+}
+// ['apple', 'banana', 'apple'] — first word of each run of same first letter
+```
+
+```php
+use IterTools\Set;
+
+$readings = [
+    ['ts' => 60,  'v' => 1],
+    ['ts' => 65,  'v' => 2],
+    ['ts' => 119, 'v' => 3],
+    ['ts' => 120, 'v' => 4],
+    ['ts' => 121, 'v' => 5],
+];
+$minuteKey = fn ($r) => intdiv($r['ts'], 60);
+
+$compressed = [];
+foreach (Set::distinctAdjacentBy($readings, $minuteKey) as $reading) {
+    $compressed[] = $reading;
+}
+// keeps only the first reading of each minute-bucket run:
+// [['ts' => 60, 'v' => 1], ['ts' => 120, 'v' => 4]]
+```
+
+See also [Stream::distinctAdjacentBy](stream.md#distinct-adjacent-by).
+
 ### Intersection
 Iterates intersection of iterables.
 

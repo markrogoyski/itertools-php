@@ -69,6 +69,64 @@ final class Set
     }
 
     /**
+     * Remove only consecutive duplicates from the iterable (Unix `uniq` behavior).
+     *
+     * Each element is compared strictly (===) to the previous element yielded.
+     * Non-adjacent duplicates are kept. Runs in O(1) memory.
+     *
+     * Source keys are discarded; output is a sequentially re-indexed list.
+     *
+     * @template T
+     *
+     * @param iterable<T> $data
+     *
+     * @return \Generator<T>
+     */
+    public static function distinctAdjacent(iterable $data): \Generator
+    {
+        $hasPrevious = false;
+        $previous = null;
+
+        foreach ($data as $datum) {
+            if (!$hasPrevious || $datum !== $previous) {
+                yield $datum;
+                $previous = $datum;
+                $hasPrevious = true;
+            }
+        }
+    }
+
+    /**
+     * Remove only consecutive duplicates from the iterable, comparing values returned by $keyFn.
+     *
+     * Each element's extracted key is compared strictly (===) to the previous element's key.
+     * Non-adjacent duplicates are kept. Runs in O(1) memory and calls $keyFn once per element.
+     *
+     * Source keys are discarded; output is a sequentially re-indexed list.
+     *
+     * @template T
+     *
+     * @param iterable<T> $data
+     * @param callable $keyFn
+     *
+     * @return \Generator<T>
+     */
+    public static function distinctAdjacentBy(iterable $data, callable $keyFn): \Generator
+    {
+        $hasPrevious = false;
+        $previousKey = null;
+
+        foreach ($data as $datum) {
+            $currentKey = $keyFn($datum);
+            if (!$hasPrevious || $currentKey !== $previousKey) {
+                yield $datum;
+                $previousKey = $currentKey;
+                $hasPrevious = true;
+            }
+        }
+    }
+
+    /**
      * Iterates the intersection of iterables in strict type mode.
      *
      * If input iterables produce duplicate items, then multiset intersection rules apply.
