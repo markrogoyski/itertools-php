@@ -674,6 +674,27 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Yield one value at a time from the stream and the given iterables in round-robin order.
+     *
+     * On each round, takes one value from each iterable that still has values; once an iterable
+     * is exhausted, it is skipped in subsequent rounds. Iteration ends when every iterable is
+     * exhausted. Unlike zipWith, values are yielded individually rather than as tuples.
+     *
+     * Keys from the source iterables are discarded; the output is sequentially re-indexed.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return Stream
+     *
+     * @see Multi::roundRobin()
+     */
+    public function roundRobinWith(iterable ...$iterables): self
+    {
+        $this->iterable = Multi::roundRobin($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
      * Cartesian product of the stream with zero or more additional iterables.
      *
      * Stream::of($src)->productWith(...$iterables) is equivalent to

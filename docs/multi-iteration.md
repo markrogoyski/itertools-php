@@ -22,6 +22,44 @@ foreach (Multi::chain($prequels, $originals) as $movie) {
 // 'Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith', 'A New Hope', 'Empire Strikes Back', 'Return of the Jedi'
 ```
 
+### RoundRobin
+Yield one value at a time from multiple iterables, rotating across sources.
+
+```Multi::roundRobin(iterable ...$iterables)```
+
+On each round, takes one value from each iterable that still has values; once an iterable is
+exhausted, it is skipped in subsequent rounds. Iteration ends when every iterable is exhausted.
+Unlike `zip`, values are yielded individually rather than as tuples. Source keys are discarded;
+the output is sequentially re-indexed.
+
+```php
+use IterTools\Multi;
+
+$queueA = ['A', 'B', 'C'];
+$queueB = ['D', 'E'];
+$queueC = ['F', 'G', 'H'];
+
+foreach (Multi::roundRobin($queueA, $queueB, $queueC) as $item) {
+    print($item);
+}
+// 'A', 'D', 'F', 'B', 'E', 'G', 'C', 'H'
+```
+
+Round-robin scheduling across worker queues fairly drains tasks from every worker until all are empty:
+```php
+$workerOne   = ['task-1', 'task-4', 'task-7'];
+$workerTwo   = ['task-2', 'task-5'];
+$workerThree = ['task-3', 'task-6', 'task-8', 'task-9'];
+
+$schedule = [];
+foreach (Multi::roundRobin($workerOne, $workerTwo, $workerThree) as $task) {
+    $schedule[] = $task;
+}
+// ['task-1', 'task-2', 'task-3', 'task-4', 'task-5', 'task-6', 'task-7', 'task-8', 'task-9']
+```
+
+See also: [`Stream::roundRobinWith`](stream.md#round-robin-with).
+
 ### Zip
 Iterate multiple iterable collections simultaneously.
 

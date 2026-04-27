@@ -1039,6 +1039,39 @@ $reversed = Stream::of($words)
 // am I as bored as you are
 ```
 
+#### Round Robin With
+Return a stream that yields one value at a time from the stream and the given iterables in round-robin order.
+
+```$stream->roundRobinWith(iterable ...$iterables): Stream```
+
+On each round, takes one value from each iterable that still has values; once an iterable is
+exhausted, it is skipped in subsequent rounds. Iteration ends when every iterable is exhausted.
+Unlike `zipWith`, values are yielded individually rather than as tuples. Source keys are discarded;
+the output is sequentially re-indexed.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of(['A', 'B', 'C'])
+    ->roundRobinWith(['D', 'E'], ['F', 'G', 'H'])
+    ->toArray();
+// ['A', 'D', 'F', 'B', 'E', 'G', 'C', 'H']
+```
+
+Round-robin scheduling fairly drains items from worker queues of unequal size:
+```php
+$workerOne   = ['task-1', 'task-4', 'task-7'];
+$workerTwo   = ['task-2', 'task-5'];
+$workerThree = ['task-3', 'task-6', 'task-8', 'task-9'];
+
+$schedule = Stream::of($workerOne)
+    ->roundRobinWith($workerTwo, $workerThree)
+    ->toArray();
+// ['task-1', 'task-2', 'task-3', 'task-4', 'task-5', 'task-6', 'task-7', 'task-8', 'task-9']
+```
+
+See also [Multi::roundRobin](multi-iteration.md#roundrobin).
+
 #### Running Average
 Return a stream accumulating the running average (mean) over the stream.
 

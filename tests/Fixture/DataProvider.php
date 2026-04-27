@@ -63,6 +63,7 @@ trait DataProvider
     {
         return [
             [Multi::chain([1, 2, 3], [4, 5, 6])],
+            [Multi::roundRobin([1, 2, 3], [4, 5, 6])],
             [Multi::zip([1, 2, 3], [4, 5, 6])],
             [Multi::zipEqual([1, 2, 3], [4, 5, 6])],
             [Multi::zipFilled([1, 2, 3], ['filler', 5, 6])],
@@ -254,6 +255,7 @@ trait DataProvider
             [Stream::of([1, 2, 3])->combinationsWithReplacement(2)],
             [Stream::of([1, 2, 3])->powerset()],
             [Stream::of([1, 2, 3, 4, 5])->reindex(fn ($x) => $x)],
+            [Stream::of([1, 2, 3])->roundRobinWith([4, 5, 6])],
             [Stream::of([1, 2, 3, 4, 5])->reverse()],
             [Stream::of([1, 2, 3, 4, 5])->runningAverage()],
             [Stream::of([1, 2, 3, 4, 5])->runningDifference()],

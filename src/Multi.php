@@ -136,4 +136,43 @@ final class Multi
             }
         }
     }
+
+    /**
+     * Yield one value at a time from multiple iterables in round-robin order.
+     *
+     * On each round, takes one value from each iterable that still has values; once an iterable
+     * is exhausted, it is skipped in subsequent rounds. Iteration ends when every iterable is
+     * exhausted. Unlike zip, values are yielded individually rather than as tuples.
+     *
+     * Keys from the source iterables are discarded; the output is sequentially re-indexed.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    public static function roundRobin(iterable ...$iterables): \Generator
+    {
+        $iterators = [];
+        foreach ($iterables as $iterable) {
+            $iterator = Transform::toIterator($iterable);
+            $iterator->rewind();
+            if ($iterator->valid()) {
+                $iterators[] = $iterator;
+            }
+        }
+
+        while (\count($iterators) > 0) {
+            $stillActive = [];
+            foreach ($iterators as $iterator) {
+                /** @var mixed $value */
+                $value = $iterator->current();
+                yield $value;
+                $iterator->next();
+                if ($iterator->valid()) {
+                    $stillActive[] = $iterator;
+                }
+            }
+            $iterators = $stillActive;
+        }
+    }
 }

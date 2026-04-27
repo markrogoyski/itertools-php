@@ -1026,6 +1026,39 @@ $reversed = Stream::of($words)
 // am I as bored as you are
 ```
 
+#### Round Robin With
+Поочерёдно отдаёт элементы из потока и заданных коллекций, чередуя источники.
+
+```$stream->roundRobinWith(iterable ...$iterables): Stream```
+
+В каждом раунде берётся по одному элементу из каждого источника, в котором ещё есть значения;
+исчерпавшийся источник пропускается на последующих раундах. Итерирование завершается, когда
+исчерпаны все источники. В отличие от `zipWith`, элементы возвращаются по одному, а не в виде кортежей.
+Ключи источников отбрасываются; результат имеет последовательные целочисленные ключи.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of(['A', 'B', 'C'])
+    ->roundRobinWith(['D', 'E'], ['F', 'G', 'H'])
+    ->toArray();
+// ['A', 'D', 'F', 'B', 'E', 'G', 'C', 'H']
+```
+
+Round-robin-планирование позволяет равномерно вычерпывать задачи из очередей разной длины:
+```php
+$workerOne   = ['task-1', 'task-4', 'task-7'];
+$workerTwo   = ['task-2', 'task-5'];
+$workerThree = ['task-3', 'task-6', 'task-8', 'task-9'];
+
+$schedule = Stream::of($workerOne)
+    ->roundRobinWith($workerTwo, $workerThree)
+    ->toArray();
+// ['task-1', 'task-2', 'task-3', 'task-4', 'task-5', 'task-6', 'task-7', 'task-8', 'task-9']
+```
+
+См. также [Multi::roundRobin](multi-iteration.md#roundrobin).
+
 #### Running Average
 Накапливает среднее арифметическое элементов из потока в процессе итерирования.
 

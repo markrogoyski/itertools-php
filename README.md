@@ -88,6 +88,7 @@ Quick Reference
 | Iterator                    | Description                                                                             | Code Snippet                                  |
 |-----------------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------|
 | [`chain`](docs/multi-iteration.md#chain)           | Chain multiple iterables together                                                       | `Multi::chain($list1, $list2)`                |
+| [`roundRobin`](docs/multi-iteration.md#roundrobin) | Yield one value at a time from multiple iterables, rotating across sources              | `Multi::roundRobin($list1, $list2)`           |
 | [`zip`](docs/multi-iteration.md#zip)               | Iterate multiple collections simultaneously until the shortest iterator completes       | `Multi::zip($list1, $list2)`                  |
 | [`zipEqual`](docs/multi-iteration.md#zipequal)     | Iterate multiple collections of equal length simultaneously, error if lengths not equal | `Multi::zipEqual($list1, $list2)`             |
 | [`zipFilled`](docs/multi-iteration.md#zipfilled)   | Iterate multiple collections, using a filler value if lengths not equal                 | `Multi::zipFilled($default, $list1, $list2)`  |
@@ -298,6 +299,7 @@ Quick Reference
 | [`reindex`](docs/stream.md#reindex)                                                   | Reindex keys of key-value stream                                                          | `$stream->reindex($reindexer)`                                                    |
 | [`relativeFrequencies`](docs/stream.md#relative-frequencies)                          | Relative frequency distribution                                                           | `$stream->relativeFrequencies([$strict])`                                         |
 | [`reverse`](docs/stream.md#reverse)                                                   | Reverse elements of the stream                                                            | `$stream->reverse()`                                                              |
+| [`roundRobinWith`](docs/stream.md#round-robin-with)                                   | Yield values from the stream and given iterables in round-robin order                     | `$stream->roundRobinWith(...$iterables)`                                          |
 | [`runningAverage`](docs/stream.md#running-average)                                    | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`                                          |
 | [`runningDifference`](docs/stream.md#running-difference)                              | Accumulate the running difference over iterable source                                    | `$stream->runningDifference($initialValue)`                                       |
 | [`runningMax`](docs/stream.md#running-max)                                            | Accumulate the running max over iterable source                                           | `$stream->runningMax($initialValue)`                                              |
@@ -398,7 +400,7 @@ Documentation
 Full documentation with detailed descriptions, signatures, and code examples for each function.
 
 #### Loop Iteration
-- [Multi Iteration](docs/multi-iteration.md) — Chain, Zip, ZipEqual, ZipFilled, ZipLongest
+- [Multi Iteration](docs/multi-iteration.md) — Chain, RoundRobin, Zip, ZipEqual, ZipFilled, ZipLongest
 - [Single Iteration](docs/single-iteration.md) — Chunkwise, Compress, Filter, Map, Flatten, GroupBy, and more
 - [Infinite Iteration](docs/infinite-iteration.md) — Count, Cycle, Iterate, Repeat
 - [Random Iteration](docs/random-iteration.md) — Choice, CoinFlip, Number, Percentage, RockPaperScissors

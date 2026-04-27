@@ -7,6 +7,8 @@
   * `powerset`
 * Infinite
   * `iterate`
+* Multi
+  * `roundRobin`
 * Reduce
   * `toFirstMatchIndex`
   * `toFirstMatchKey`
@@ -22,6 +24,7 @@
   * `intersperse`
   * `mapSpread`
   * `powerset`
+  * `roundRobinWith`
   * `toFirstMatchIndex`
   * `toFirstMatchKey`
 
