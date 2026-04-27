@@ -89,6 +89,73 @@ $firstNegative = Reduce::toFirstMatch($numbers, fn (int $n) => $n < 0, -1);
 // -1
 ```
 
+### To First Match Index
+Reduces iterable to the zero-based position of the first element matching the predicate.
+
+```Reduce::toFirstMatchIndex(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Short-circuits on the first match — the iterable is not fully consumed.
+- Returns `$default` (null by default) if no element matches.
+- Position is always counted from the start of iteration, regardless of source keys.
+
+```php
+use IterTools\Reduce;
+
+$numbers = [10, 20, 30, 40];
+
+$firstOver25Index = Reduce::toFirstMatchIndex($numbers, fn (int $n) => $n > 25);
+// 2
+```
+
+```php
+use IterTools\Reduce;
+
+// Early-exit search: a generator that would throw on the item after the match
+// is never advanced past the matching position.
+$ids = (function (): \Generator {
+    yield 1;
+    yield 2;
+    yield 3;
+    throw new \RuntimeException('iterator advanced past match');
+})();
+
+$index = Reduce::toFirstMatchIndex($ids, fn (int $n) => $n === 2);
+// 1
+```
+
+### To First Match Key
+Reduces iterable to the source key of the first element matching the predicate.
+
+```Reduce::toFirstMatchKey(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Short-circuits on the first match — the iterable is not fully consumed.
+- Returns `$default` (null by default) if no element matches.
+- Preserves the source key (string for associative input, int for list-shape input).
+
+```php
+use IterTools\Reduce;
+
+$users = ['alice' => 12, 'bob' => 17, 'carol' => 22, 'dan' => 30];
+
+$firstAdultName = Reduce::toFirstMatchKey($users, fn (int $age) => $age >= 18);
+// 'carol'
+```
+
+```php
+use IterTools\Reduce;
+
+$prices = ['usd' => 9.99, 'eur' => 8.49, 'jpy' => 1499.0];
+
+$firstExpensiveCurrency = Reduce::toFirstMatchKey(
+    $prices,
+    fn (float $p) => $p > 1000,
+    'none'
+);
+// 'jpy'
+```
+
 ### To Last
 Reduces iterable to its last element.
 

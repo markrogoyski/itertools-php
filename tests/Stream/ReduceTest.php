@@ -768,6 +768,55 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toFirstMatch(fn (int $n): bool => $n > 20),
                 30,
             ],
+            [
+                [10, 20, 30, 40],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n > 25),
+                2,
+            ],
+            [
+                [1, 3, 5, 7],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n % 2 === 0),
+                null,
+            ],
+            [
+                [1, 3, 5, 7],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n % 2 === 0, -1),
+                -1,
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (): bool => true, 'fallback'),
+                'fallback',
+            ],
+            [
+                [1, 2, 3, 4, 5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn (int $n): int => $n * 10)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n > 20),
+                2,
+            ],
+            [
+                ['a' => 1, 'b' => 2, 'c' => 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (int $n): bool => $n > 1),
+                'b',
+            ],
+            [
+                ['a' => 1, 'b' => 2, 'c' => 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (int $n): bool => $n > 100, 'missing'),
+                'missing',
+            ],
+            [
+                [],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (): bool => true, 'fallback'),
+                'fallback',
+            ],
         ];
     }
 
@@ -1450,6 +1499,55 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->map(fn (int $n): int => $n * 10)
                     ->toFirstMatch(fn (int $n): bool => $n > 20),
                 30,
+            ],
+            [
+                $gen([10, 20, 30, 40]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n > 25),
+                2,
+            ],
+            [
+                $gen([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n % 2 === 0),
+                null,
+            ],
+            [
+                $gen([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n % 2 === 0, -1),
+                -1,
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (): bool => true, 'fallback'),
+                'fallback',
+            ],
+            [
+                $gen([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn (int $n): int => $n * 10)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n > 20),
+                2,
+            ],
+            [
+                GeneratorFixture::getKeyValueGenerator(['a' => 1, 'b' => 2, 'c' => 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (int $n): bool => $n > 1),
+                'b',
+            ],
+            [
+                $gen([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (int $n): bool => $n % 2 === 0),
+                null,
+            ],
+            [
+                $gen([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (): bool => true, 'fallback'),
+                'fallback',
             ],
         ];
     }
@@ -2134,6 +2232,55 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->toFirstMatch(fn (int $n): bool => $n > 20),
                 30,
             ],
+            [
+                $iter([10, 20, 30, 40]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n > 25),
+                2,
+            ],
+            [
+                $iter([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n % 2 === 0),
+                null,
+            ],
+            [
+                $iter([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n % 2 === 0, -1),
+                -1,
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (): bool => true, 'fallback'),
+                'fallback',
+            ],
+            [
+                $iter([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn (int $n): int => $n * 10)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n > 20),
+                2,
+            ],
+            [
+                new \ArrayIterator(['a' => 1, 'b' => 2, 'c' => 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (int $n): bool => $n > 1),
+                'b',
+            ],
+            [
+                $iter([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (int $n): bool => $n % 2 === 0),
+                null,
+            ],
+            [
+                $iter([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (): bool => true, 'fallback'),
+                'fallback',
+            ],
         ];
     }
 
@@ -2816,6 +2963,55 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->map(fn (int $n): int => $n * 10)
                     ->toFirstMatch(fn (int $n): bool => $n > 20),
                 30,
+            ],
+            [
+                $trav([10, 20, 30, 40]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n > 25),
+                2,
+            ],
+            [
+                $trav([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n % 2 === 0),
+                null,
+            ],
+            [
+                $trav([1, 3, 5, 7]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n % 2 === 0, -1),
+                -1,
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchIndex(fn (): bool => true, 'fallback'),
+                'fallback',
+            ],
+            [
+                $trav([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->map(fn (int $n): int => $n * 10)
+                    ->toFirstMatchIndex(fn (int $n): bool => $n > 20),
+                2,
+            ],
+            [
+                new IteratorAggregateFixture(['a' => 1, 'b' => 2, 'c' => 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (int $n): bool => $n > 1),
+                'b',
+            ],
+            [
+                new IteratorAggregateFixture(['a' => 1, 'b' => 2, 'c' => 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (int $n): bool => $n > 100, 'missing'),
+                'missing',
+            ],
+            [
+                $trav([]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->toFirstMatchKey(fn (): bool => true, 'fallback'),
+                'fallback',
             ],
         ];
     }

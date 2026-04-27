@@ -2184,6 +2184,44 @@ final class Stream implements \IteratorAggregate
         return Reduce::toFirstMatch($this->iterable, $predicate, $default);
     }
 
+    /**
+     * Reduces iterable source to the zero-based position of the first element matching the predicate.
+     *
+     * Predicate return value is coerced via (bool) cast.
+     *
+     * Short-circuits on first match. Returns $default when no element matches.
+     *
+     * @param callable $predicate
+     * @param mixed    $default value returned when no element matches
+     *
+     * @return mixed
+     *
+     * @see Reduce::toFirstMatchIndex()
+     */
+    public function toFirstMatchIndex(callable $predicate, mixed $default = null): mixed
+    {
+        return Reduce::toFirstMatchIndex($this->iterable, $predicate, $default);
+    }
+
+    /**
+     * Reduces iterable source to the source key of the first element matching the predicate.
+     *
+     * Predicate return value is coerced via (bool) cast.
+     *
+     * Short-circuits on first match. Returns $default when no element matches.
+     *
+     * @param callable $predicate
+     * @param mixed    $default value returned when no element matches
+     *
+     * @return mixed
+     *
+     * @see Reduce::toFirstMatchKey()
+     */
+    public function toFirstMatchKey(callable $predicate, mixed $default = null): mixed
+    {
+        return Reduce::toFirstMatchKey($this->iterable, $predicate, $default);
+    }
+
     // TERMINAL OPERATIONS WITH SIDE EFFECTS - PRINT
 
     /**

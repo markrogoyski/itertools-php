@@ -7,6 +7,9 @@
   * `powerset`
 * Infinite
   * `iterate`
+* Reduce
+  * `toFirstMatchIndex`
+  * `toFirstMatchKey`
 * Set
   * `distinctAdjacent`
   * `distinctAdjacentBy`
@@ -19,6 +22,8 @@
   * `intersperse`
   * `mapSpread`
   * `powerset`
+  * `toFirstMatchIndex`
+  * `toFirstMatchKey`
 
 ### Improvements
 * Reorganized translated docs

@@ -221,6 +221,8 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`toFirst`](reduce.md#to-first)                             | Первый элемент коллекции                                                            | `Reduce::toFirst()`                                           |
 | [`toFirstAndLast`](reduce.md#to-first-and-last)             | Первый и последний элементы коллекции                                               | `Reduce::toFirstAndLast()`                                    |
 | [`toFirstMatch`](reduce.md#to-first-match)                  | Первый элемент, удовлетворяющий предикату                                           | `Reduce::toFirstMatch($data, $predicate, [$default])`         |
+| [`toFirstMatchIndex`](reduce.md#to-first-match-index)       | Индекс первого элемента, удовлетворяющего предикату                                 | `Reduce::toFirstMatchIndex($data, $predicate, [$default])`    |
+| [`toFirstMatchKey`](reduce.md#to-first-match-key)           | Ключ первого элемента, удовлетворяющего предикату                                   | `Reduce::toFirstMatchKey($data, $predicate, [$default])`      |
 | [`toLast`](reduce.md#to-last)                               | Последний элемент коллекции                                                         | `Reduce::toLast()`                                            |
 | [`toMax`](reduce.md#to-max)                                 | Максимальный элемент коллекции                                                      | `Reduce::toMax($numbers, [$compareBy])`                       |
 | [`toMin`](reduce.md#to-min)                                 | Минимальный элемент коллекции                                                       | `Reduce::toMin($numbers, [$compareBy])`                       |
@@ -342,6 +344,8 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`toFirst`](stream.md#to-first)                         | Первый элемент коллекции                                            | `$stream->toFirst()`                                    |
 | [`toFirstAndLast`](stream.md#to-first-and-last)         | Первый и последний элементы коллекции                               | `$stream->toFirstAndLast()`                             |
 | [`toFirstMatch`](stream.md#to-first-match)              | Первый элемент, удовлетворяющий предикату                           | `$stream->toFirstMatch($predicate, [$default])`         |
+| [`toFirstMatchIndex`](stream.md#to-first-match-index)   | Индекс первого элемента, удовлетворяющего предикату                 | `$stream->toFirstMatchIndex($predicate, [$default])`    |
+| [`toFirstMatchKey`](stream.md#to-first-match-key)       | Ключ первого элемента, удовлетворяющего предикату                   | `$stream->toFirstMatchKey($predicate, [$default])`      |
 | [`toLast`](stream.md#to-last)                           | Последний элемент коллекции                                         | `$stream->toLast()`                                     |
 | [`toMax`](stream.md#to-max)                             | Максимальное значение из элементов коллекции                        | `$stream->toMax([$compareBy])`                          |
 | [`toMin`](stream.md#to-min)                             | Минимальное значение из элементов коллекции                         | `$stream->toMin([$compareBy])`                          |

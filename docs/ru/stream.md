@@ -1947,6 +1947,44 @@ $result = Stream::of($numbers)
 // 6
 ```
 
+##### To First Match Index
+Возвращает индекс (отсчёт от нуля) первого элемента в потоке, удовлетворяющего предикату.
+
+```$stream->toFirstMatchIndex(callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Завершает обход на первом совпадении.
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+
+```php
+use IterTools\Stream;
+
+$numbers = [10, 20, 30, 40];
+
+$result = Stream::of($numbers)
+    ->toFirstMatchIndex(fn (int $n) => $n > 25);
+// 2
+```
+
+##### To First Match Key
+Возвращает ключ исходной коллекции для первого элемента в потоке, удовлетворяющего предикату.
+
+```$stream->toFirstMatchKey(callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Завершает обход на первом совпадении.
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+
+```php
+use IterTools\Stream;
+
+$users = ['alice' => 12, 'bob' => 17, 'carol' => 22, 'dan' => 30];
+
+$result = Stream::of($users)
+    ->toFirstMatchKey(fn (int $age) => $age >= 18);
+// 'carol'
+```
+
 ##### To Last
 Возвращает последний элемент из коллекции в потоке.
 

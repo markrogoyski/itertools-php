@@ -1958,6 +1958,44 @@ $result = Stream::of($numbers)
 // 6
 ```
 
+##### To First Match Index
+Reduces iterable source to the zero-based position of the first element matching the predicate.
+
+```$stream->toFirstMatchIndex(callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Short-circuits on the first match.
+- Returns `$default` (null by default) if no element matches.
+
+```php
+use IterTools\Stream;
+
+$numbers = [10, 20, 30, 40];
+
+$result = Stream::of($numbers)
+    ->toFirstMatchIndex(fn (int $n) => $n > 25);
+// 2
+```
+
+##### To First Match Key
+Reduces iterable source to the source key of the first element matching the predicate.
+
+```$stream->toFirstMatchKey(callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Short-circuits on the first match.
+- Returns `$default` (null by default) if no element matches.
+
+```php
+use IterTools\Stream;
+
+$users = ['alice' => 12, 'bob' => 17, 'carol' => 22, 'dan' => 30];
+
+$result = Stream::of($users)
+    ->toFirstMatchKey(fn (int $age) => $age >= 18);
+// 'carol'
+```
+
 ##### To Last
 Reduces iterable source to its last element.
 

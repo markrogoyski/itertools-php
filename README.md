@@ -220,24 +220,26 @@ Quick Reference
 | [`sameCount`](docs/summary.md#same-count)                              | True if iterables have the same lengths                                  | `Summary::sameCount(...$iterables)`               |
 
 #### Reduce
-| Reducer                                | Description                                | Code Snippet                                                  |
-|----------------------------------------|--------------------------------------------|---------------------------------------------------------------|
-| [`toAverage`](docs/reduce.md#to-average)             | Mean average of elements                   | `Reduce::toAverage($numbers)`                                 |
-| [`toCount`](docs/reduce.md#to-count)                 | Reduce to length of iterable               | `Reduce::toCount($data)`                                      |
-| [`toFirst`](docs/reduce.md#to-first)                 | Reduce to its first value                  | `Reduce::toFirst($data)`                                      |
-| [`toFirstAndLast`](docs/reduce.md#to-first-and-last) | Reduce to its first and last values        | `Reduce::toFirstAndLast($data)`                               |
-| [`toFirstMatch`](docs/reduce.md#to-first-match)      | Reduce to first value matching predicate   | `Reduce::toFirstMatch($data, $predicate, [$default])`         |
-| [`toLast`](docs/reduce.md#to-last)                   | Reduce to its last value                   | `Reduce::toLast()`                                            |
-| [`toMax`](docs/reduce.md#to-max)                     | Reduce to its largest element              | `Reduce::toMax($numbers, [$compareBy])`                       |
-| [`toMin`](docs/reduce.md#to-min)                     | Reduce to its smallest element             | `Reduce::toMin($numbers, [$compareBy])`                       |
-| [`toMinMax`](docs/reduce.md#to-min-max)              | Reduce to array of upper and lower bounds  | `Reduce::toMinMax($numbers, [$compareBy])`                    |
-| [`toNth`](docs/reduce.md#to-nth)                     | Reduce to value at nth position            | `Reduce::toNth($data, $position)`                             |
-| [`toProduct`](docs/reduce.md#to-product)             | Reduce to the product of its elements      | `Reduce::toProduct($numbers)`                                 |
-| [`toRandomValue`](docs/reduce.md#to-random-value)    | Reduce to random value from iterable       | `Reduce::toRandomValue($data)`                                |
-| [`toRange`](docs/reduce.md#to-range)                 | Reduce to difference of max and min values | `Reduce::toRange($numbers)`                                   |
-| [`toString`](docs/reduce.md#to-string)               | Reduce to joined string                    | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
-| [`toSum`](docs/reduce.md#to-sum)                     | Reduce to the sum of its elements          | `Reduce::toSum($numbers)`                                     |
-| [`toValue`](docs/reduce.md#to-value)                 | Reduce to value using callable reducer     | `Reduce::toValue($data, $reducer, $initialValue)`             |
+| Reducer                                                    | Description                                  | Code Snippet                                                  |
+|------------------------------------------------------------|----------------------------------------------|---------------------------------------------------------------|
+| [`toAverage`](docs/reduce.md#to-average)                   | Mean average of elements                     | `Reduce::toAverage($numbers)`                                 |
+| [`toCount`](docs/reduce.md#to-count)                       | Reduce to length of iterable                 | `Reduce::toCount($data)`                                      |
+| [`toFirst`](docs/reduce.md#to-first)                       | Reduce to its first value                    | `Reduce::toFirst($data)`                                      |
+| [`toFirstAndLast`](docs/reduce.md#to-first-and-last)       | Reduce to its first and last values          | `Reduce::toFirstAndLast($data)`                               |
+| [`toFirstMatch`](docs/reduce.md#to-first-match)            | Reduce to first value matching predicate     | `Reduce::toFirstMatch($data, $predicate, [$default])`         |
+| [`toFirstMatchIndex`](docs/reduce.md#to-first-match-index) | Reduce to position of first matching element | `Reduce::toFirstMatchIndex($data, $predicate, [$default])`    |
+| [`toFirstMatchKey`](docs/reduce.md#to-first-match-key)     | Reduce to key of first matching element      | `Reduce::toFirstMatchKey($data, $predicate, [$default])`      |
+| [`toLast`](docs/reduce.md#to-last)                         | Reduce to its last value                     | `Reduce::toLast()`                                            |
+| [`toMax`](docs/reduce.md#to-max)                           | Reduce to its largest element                | `Reduce::toMax($numbers, [$compareBy])`                       |
+| [`toMin`](docs/reduce.md#to-min)                           | Reduce to its smallest element               | `Reduce::toMin($numbers, [$compareBy])`                       |
+| [`toMinMax`](docs/reduce.md#to-min-max)                    | Reduce to array of upper and lower bounds    | `Reduce::toMinMax($numbers, [$compareBy])`                    |
+| [`toNth`](docs/reduce.md#to-nth)                           | Reduce to value at nth position              | `Reduce::toNth($data, $position)`                             |
+| [`toProduct`](docs/reduce.md#to-product)                   | Reduce to the product of its elements        | `Reduce::toProduct($numbers)`                                 |
+| [`toRandomValue`](docs/reduce.md#to-random-value)          | Reduce to random value from iterable         | `Reduce::toRandomValue($data)`                                |
+| [`toRange`](docs/reduce.md#to-range)                       | Reduce to difference of max and min values   | `Reduce::toRange($numbers)`                                   |
+| [`toString`](docs/reduce.md#to-string)                     | Reduce to joined string                      | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
+| [`toSum`](docs/reduce.md#to-sum)                           | Reduce to the sum of its elements            | `Reduce::toSum($numbers)`                                     |
+| [`toValue`](docs/reduce.md#to-value)                       | Reduce to value using callable reducer       | `Reduce::toValue($data, $reducer, $initialValue)`             |
 
 ### Stream Iteration Tools
 #### Stream Sources
@@ -342,24 +344,26 @@ Quick Reference
 | [`sameCountWith`](docs/stream.md#same-count-with)                              | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`                |
 
 ##### Reduction Terminal Operations
-| Terminal Operation                       | Description                                        | Code Snippet                                            |
-|------------------------------------------|----------------------------------------------------|---------------------------------------------------------|
-| [`toAverage`](docs/stream.md#to-average)             | Reduces stream to the mean average of its items    | `$stream->toAverage()`                                  |
-| [`toCount`](docs/stream.md#to-count)                 | Reduces stream to its length                       | `$stream->toCount()`                                    |
-| [`toFirst`](docs/stream.md#to-first)                 | Reduces stream to its first value                  | `$stream->toFirst()`                                    |
-| [`toFirstAndLast`](docs/stream.md#to-first-and-last) | Reduces stream to its first and last values        | `$stream->toFirstAndLast()`                             |
-| [`toFirstMatch`](docs/stream.md#to-first-match)      | Reduces stream to first value matching predicate   | `$stream->toFirstMatch($predicate, [$default])`         |
-| [`toLast`](docs/stream.md#to-last)                   | Reduces stream to its last value                   | `$stream->toLast()`                                     |
-| [`toMax`](docs/stream.md#to-max)                     | Reduces stream to its max value                    | `$stream->toMax([$compareBy])`                          |
-| [`toMin`](docs/stream.md#to-min)                     | Reduces stream to its min value                    | `$stream->toMin([$compareBy])`                          |
-| [`toMinMax`](docs/stream.md#to-min-max)              | Reduces stream to array of upper and lower bounds  | `$stream->toMinMax([$compareBy])`                       |
-| [`toNth`](docs/stream.md#to-nth)                     | Reduces stream to value at nth position            | `$stream->toNth($position)`                             |
-| [`toProduct`](docs/stream.md#to-product)             | Reduces stream to the product of its items         | `$stream->toProduct()`                                  |
-| [`toString`](docs/stream.md#to-string)               | Reduces stream to joined string                    | `$stream->toString([$separator], [$prefix], [$suffix])` |
-| [`toSum`](docs/stream.md#to-sum)                     | Reduces stream to the sum of its items             | `$stream->toSum()`                                      |
-| [`toRandomValue`](docs/stream.md#to-random-value)    | Reduces stream to random value within it           | `$stream->toRandomValue()`                              |
-| [`toRange`](docs/stream.md#to-range)                 | Reduces stream to difference of max and min values | `$stream->toRange()`                                    |
-| [`toValue`](docs/stream.md#to-value)                 | Reduces stream like array_reduce() function        | `$stream->toValue($reducer, $initialValue)`             |
+| Terminal Operation                                         | Description                                          | Code Snippet                                            |
+|------------------------------------------------------------|------------------------------------------------------|---------------------------------------------------------|
+| [`toAverage`](docs/stream.md#to-average)                   | Reduces stream to the mean average of its items      | `$stream->toAverage()`                                  |
+| [`toCount`](docs/stream.md#to-count)                       | Reduces stream to its length                         | `$stream->toCount()`                                    |
+| [`toFirst`](docs/stream.md#to-first)                       | Reduces stream to its first value                    | `$stream->toFirst()`                                    |
+| [`toFirstAndLast`](docs/stream.md#to-first-and-last)       | Reduces stream to its first and last values          | `$stream->toFirstAndLast()`                             |
+| [`toFirstMatch`](docs/stream.md#to-first-match)            | Reduces stream to first value matching predicate     | `$stream->toFirstMatch($predicate, [$default])`         |
+| [`toFirstMatchIndex`](docs/stream.md#to-first-match-index) | Reduces stream to position of first matching element | `$stream->toFirstMatchIndex($predicate, [$default])`    |
+| [`toFirstMatchKey`](docs/stream.md#to-first-match-key)     | Reduces stream to key of first matching element      | `$stream->toFirstMatchKey($predicate, [$default])`      |
+| [`toLast`](docs/stream.md#to-last)                         | Reduces stream to its last value                     | `$stream->toLast()`                                     |
+| [`toMax`](docs/stream.md#to-max)                           | Reduces stream to its max value                      | `$stream->toMax([$compareBy])`                          |
+| [`toMin`](docs/stream.md#to-min)                           | Reduces stream to its min value                      | `$stream->toMin([$compareBy])`                          |
+| [`toMinMax`](docs/stream.md#to-min-max)                    | Reduces stream to array of upper and lower bounds    | `$stream->toMinMax([$compareBy])`                       |
+| [`toNth`](docs/stream.md#to-nth)                           | Reduces stream to value at nth position              | `$stream->toNth($position)`                             |
+| [`toProduct`](docs/stream.md#to-product)                   | Reduces stream to the product of its items           | `$stream->toProduct()`                                  |
+| [`toString`](docs/stream.md#to-string)                     | Reduces stream to joined string                      | `$stream->toString([$separator], [$prefix], [$suffix])` |
+| [`toSum`](docs/stream.md#to-sum)                           | Reduces stream to the sum of its items               | `$stream->toSum()`                                      |
+| [`toRandomValue`](docs/stream.md#to-random-value)          | Reduces stream to random value within it             | `$stream->toRandomValue()`                              |
+| [`toRange`](docs/stream.md#to-range)                       | Reduces stream to difference of max and min values   | `$stream->toRange()`                                    |
+| [`toValue`](docs/stream.md#to-value)                       | Reduces stream like array_reduce() function          | `$stream->toValue($reducer, $initialValue)`             |
 
 ##### Transformation Terminal Operations
 | Terminal Operation                              | Description                                           | Code Snippet                                            |

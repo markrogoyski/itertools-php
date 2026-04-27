@@ -86,6 +86,73 @@ $firstEven = Reduce::toFirstMatch($numbers, fn (int $n) => $n % 2 === 0);
 // 6
 ```
 
+### To First Match Index
+Возвращает индекс (отсчёт от нуля) первого элемента, удовлетворяющего предикату.
+
+```Reduce::toFirstMatchIndex(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Завершает обход на первом совпадении — коллекция не потребляется полностью.
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+- Позиция всегда отсчитывается от начала обхода, независимо от исходных ключей.
+
+```php
+use IterTools\Reduce;
+
+$numbers = [10, 20, 30, 40];
+
+$firstOver25Index = Reduce::toFirstMatchIndex($numbers, fn (int $n) => $n > 25);
+// 2
+```
+
+```php
+use IterTools\Reduce;
+
+// Ленивый поиск с ранним выходом: генератор, который бросил бы исключение
+// после совпадения, никогда не продвигается дальше совпадающей позиции.
+$ids = (function (): \Generator {
+    yield 1;
+    yield 2;
+    yield 3;
+    throw new \RuntimeException('iterator advanced past match');
+})();
+
+$index = Reduce::toFirstMatchIndex($ids, fn (int $n) => $n === 2);
+// 1
+```
+
+### To First Match Key
+Возвращает ключ исходной коллекции для первого элемента, удовлетворяющего предикату.
+
+```Reduce::toFirstMatchKey(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Завершает обход на первом совпадении — коллекция не потребляется полностью.
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+- Сохраняет исходный ключ (строковый для ассоциативных коллекций, целочисленный для списков).
+
+```php
+use IterTools\Reduce;
+
+$users = ['alice' => 12, 'bob' => 17, 'carol' => 22, 'dan' => 30];
+
+$firstAdultName = Reduce::toFirstMatchKey($users, fn (int $age) => $age >= 18);
+// 'carol'
+```
+
+```php
+use IterTools\Reduce;
+
+$prices = ['usd' => 9.99, 'eur' => 8.49, 'jpy' => 1499.0];
+
+$firstExpensiveCurrency = Reduce::toFirstMatchKey(
+    $prices,
+    fn (float $p) => $p > 1000,
+    'none'
+);
+// 'jpy'
+```
+
 ### To Last
 Возвращает последний элемент коллекции.
 
