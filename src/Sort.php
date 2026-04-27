@@ -59,4 +59,61 @@ final class Sort
             yield $datum;
         }
     }
+
+    /**
+     * Sorts the given iterable using a key-extraction function (Schwartzian transform).
+     *
+     * The key function is called exactly once per element. Source keys are discarded
+     * (matching Sort::sort).
+     *
+     * Stable: elements with equal extracted keys preserve their original relative order.
+     *
+     * @param iterable<mixed>           $data
+     * @param callable(mixed):mixed     $keyFn function used to extract the comparison key from each element.
+     *
+     * @return \Generator
+     */
+    public static function sortBy(iterable $data, callable $keyFn): \Generator
+    {
+        /** @var list<array{0: mixed, 1: mixed}> $decorated */
+        $decorated = [];
+        foreach (Transform::toIterator($data) as $value) {
+            $decorated[] = [$keyFn($value), $value];
+        }
+
+        \usort($decorated, static fn (array $a, array $b) => $a[0] <=> $b[0]);
+
+        foreach ($decorated as [, $value]) {
+            yield $value;
+        }
+    }
+
+    /**
+     * Sorts the given iterable using a key-extraction function (Schwartzian transform),
+     * preserving key associations.
+     *
+     * The key function is called exactly once per element. Source keys are preserved
+     * (matching Sort::asort).
+     *
+     * Stable: elements with equal extracted keys preserve their original relative order.
+     *
+     * @param iterable<mixed>           $data
+     * @param callable(mixed):mixed     $keyFn function used to extract the comparison key from each element.
+     *
+     * @return \Generator
+     */
+    public static function asortBy(iterable $data, callable $keyFn): \Generator
+    {
+        /** @var list<array{0: mixed, 1: mixed, 2: mixed}> $decorated */
+        $decorated = [];
+        foreach (Transform::toIterator($data) as $key => $value) {
+            $decorated[] = [$keyFn($value), $key, $value];
+        }
+
+        \usort($decorated, static fn (array $a, array $b) => $a[0] <=> $b[0]);
+
+        foreach ($decorated as [, $key, $value]) {
+            yield $key => $value;
+        }
+    }
 }

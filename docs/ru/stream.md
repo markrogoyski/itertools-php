@@ -1210,6 +1210,87 @@ $result = Stream::of($input)
 // 1, 2, 3, 4, 5, 6, 7, 8, 9
 ```
 
+#### Sort By
+Сортирует хранимую в потоке коллекцию по ключу, извлечённому из каждого элемента
+(преобразование Шварца).
+
+```$stream->sortBy(callable $keyFn)```
+
+Функция извлечения ключа вызывается ровно один раз для каждого элемента.
+Исходные ключи отбрасываются. Сортировка устойчивая: элементы с равными
+ключами сохраняют исходный относительный порядок.
+
+См. также [`Sort::sortBy()`](sort-iteration.md#sortby).
+
+```php
+use IterTools\Stream;
+
+$words = ['banana', 'fig', 'cherry', 'apple'];
+
+$result = Stream::of($words)
+    ->sortBy(fn (string $s) => \strlen($s))
+    ->toArray();
+// ['fig', 'apple', 'banana', 'cherry']
+```
+
+```php
+use IterTools\Stream;
+
+$people = [
+    (object)['name' => 'Alice', 'age' => 30],
+    (object)['name' => 'Bob',   'age' => 20],
+    (object)['name' => 'Carol', 'age' => 40],
+];
+
+$names = Stream::of($people)
+    ->sortBy(fn ($p) => $p->age)
+    ->map(fn ($p) => $p->name)
+    ->toArray();
+// ['Bob', 'Alice', 'Carol']
+```
+
+#### Asort By
+Сортирует хранимую в потоке коллекцию по ключу, извлечённому из каждого элемента
+(преобразование Шварца), с сохранением ключей.
+
+```$stream->asortBy(callable $keyFn)```
+
+Функция извлечения ключа вызывается ровно один раз для каждого элемента.
+Исходные ключи сохраняются. Сортировка устойчивая: элементы с равными
+ключами сохраняют исходный относительный порядок.
+
+См. также [`Sort::asortBy()`](sort-iteration.md#asortby).
+
+```php
+use IterTools\Stream;
+
+$scores = [
+    'Alice' => 87,
+    'Bob'   => 92,
+    'Carol' => 75,
+];
+
+$result = Stream::of($scores)
+    ->asortBy(fn (int $score) => $score)
+    ->toAssociativeArray();
+// ['Carol' => 75, 'Alice' => 87, 'Bob' => 92]
+```
+
+```php
+use IterTools\Stream;
+
+$people = [
+    'alice' => (object)['age' => 30],
+    'bob'   => (object)['age' => 20],
+    'carol' => (object)['age' => 40],
+];
+
+$result = Stream::of($people)
+    ->asortBy(fn ($p) => $p->age)
+    ->toAssociativeArray();
+// ['bob' => (object)['age' => 20], 'alice' => (object)['age' => 30], 'carol' => (object)['age' => 40]]
+```
+
 #### Difference With
 Возвращает поток, содержащий разность исходного потока с заданным набором коллекций. Элементы из исходного потока, не входящие ни в одну из заданных коллекций.
 

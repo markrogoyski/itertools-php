@@ -177,8 +177,10 @@ $ composer require markrogoyski/itertools-php:2.*
 #### Итерирование с сортировкой
 | Итератор                                          | Описание                                 | Пример кода                         |
 |---------------------------------------------------|------------------------------------------|-------------------------------------|
-| [`asort`](sort-iteration.md#asort)               | Сортирует коллекцию с сохранением ключей | `Sort::asort($data, [$comparator])` |
-| [`sort`](sort-iteration.md#sort)                 | Сортирует коллекцию                      | `Sort::sort($data, [$comparator])`  |
+| [`asort`](sort-iteration.md#asort)               | Сортирует коллекцию с сохранением ключей           | `Sort::asort($data, [$comparator])` |
+| [`asortBy`](sort-iteration.md#asortby)           | Сортирует коллекцию по извлечённому ключу с сохранением ключей | `Sort::asortBy($data, $keyFn)`    |
+| [`sort`](sort-iteration.md#sort)                 | Сортирует коллекцию                                | `Sort::sort($data, [$comparator])`  |
+| [`sortBy`](sort-iteration.md#sortby)             | Сортирует коллекцию по извлечённому ключу          | `Sort::sortBy($data, $keyFn)`       |
 
 #### Итерирование файлов
 | Итератор                                             | Описание                                      | Пример кода                    |
@@ -256,6 +258,7 @@ $ composer require markrogoyski/itertools-php:2.*
 |-------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
 | [`accumulate`](stream.md#accumulate)                                                     | Накапливает результат применения бинарного оператора                                                         | `$stream->accumulate($op, [$initial])`                                            |
 | [`asort`](stream.md#asort)                                                               | Сортирует коллекцию с сохранением ключей                                                                     | `$stream->asort([$comparator])`                                                   |
+| [`asortBy`](stream.md#asort-by)                                                          | Сортирует коллекцию по извлечённому ключу с сохранением ключей                                               | `$stream->asortBy($keyFn)`                                                        |
 | [`chainWith`](stream.md#chain-with)                                                      | Добавляет в конец итератора другие коллекции для последовательного итерирования                              | `$stream->chainWith(...$iterables)`                                               |
 | [`compress`](stream.md#compress)                                                         | Отфильтровывает из коллекции элементы, которые не выбраны                                                    | `$stream->compress($selectors)`                                                   |
 | [`compressAssociative`](stream.md#compress-associative)                                  | Оставляет элементы с выбранными ключами                                                                      | `$stream->compressAssociative($selectorKeys)`                                     |
@@ -302,6 +305,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`skip`](stream.md#skip)                                                                 | Пропускает n элементов коллекции                                                                             | `$stream->skip($count, [$offset])`                                                |
 | [`slice`](stream.md#slice)                                                               | Возвращает подвыборку коллекции                                                                              | `$stream->slice([start], [$count], [step])`                                       |
 | [`sort`](stream.md#sort)                                                                 | Сортирует хранимую коллекцию                                                                                 | `$stream->sort([$comparator])`                                                    |
+| [`sortBy`](stream.md#sort-by)                                                            | Сортирует хранимую коллекцию по извлечённому ключу                                                           | `$stream->sortBy($keyFn)`                                                         |
 | [`differenceWith`](stream.md#difference-with)                                            | Возвращает разность хранимой коллекции с другими коллекциями                                                 | `$stream->differenceWith(...$iterables)`                                          |
 | [`differenceCoerciveWith`](stream.md#difference-coercive-with)                           | Возвращает разность хранимой коллекции с другими коллекциями (в режиме приведения типов)                     | `$stream->differenceCoerciveWith(...$iterables)`                                  |
 | [`symmetricDifferenceWith`](stream.md#symmetric-difference-with)                         | Возвращает симметрическую разность хранимой коллекции с другими коллекциями                                  | `$this->symmetricDifferenceWith(...$iterables)`                                   |

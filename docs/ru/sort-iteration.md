@@ -49,3 +49,91 @@ foreach (Sort::sort($data) as $datum) {
 }
 // 1, 2, 3, 4, 5, 6, 7, 8, 9
 ```
+
+### SortBy
+Сортирует коллекцию по ключу, извлечённому из каждого элемента (преобразование Шварца).
+
+```Sort::sortBy(iterable $data, callable $keyFn)```
+
+Функция извлечения ключа вызывается ровно один раз для каждого элемента.
+Исходные ключи отбрасываются (как у `Sort::sort`). Сортировка устойчивая:
+элементы с равными ключами сохраняют исходный относительный порядок.
+
+Аналог в Stream: [`Stream::sortBy()`](stream.md#sort-by).
+
+```php
+use IterTools\Sort;
+
+$people = [
+    (object)['name' => 'Alice', 'age' => 30],
+    (object)['name' => 'Bob',   'age' => 20],
+    (object)['name' => 'Carol', 'age' => 40],
+];
+
+foreach (Sort::sortBy($people, fn ($p) => $p->age) as $person) {
+    print("{$person->name}: {$person->age}" . \PHP_EOL);
+}
+// Bob: 20
+// Alice: 30
+// Carol: 40
+```
+
+```php
+use IterTools\Sort;
+
+$words = ['banana', 'fig', 'cherry', 'apple'];
+
+foreach (Sort::sortBy($words, fn (string $s) => \strlen($s)) as $word) {
+    print($word . \PHP_EOL);
+}
+// fig
+// apple
+// banana
+// cherry
+```
+
+### AsortBy
+Сортирует коллекцию по ключу, извлечённому из каждого элемента (преобразование Шварца),
+с сохранением ключей.
+
+```Sort::asortBy(iterable $data, callable $keyFn)```
+
+Функция извлечения ключа вызывается ровно один раз для каждого элемента.
+Исходные ключи сохраняются (как у `Sort::asort`). Сортировка устойчивая:
+элементы с равными ключами сохраняют исходный относительный порядок.
+
+Аналог в Stream: [`Stream::asortBy()`](stream.md#asort-by).
+
+```php
+use IterTools\Sort;
+
+$scores = [
+    'Alice' => 87,
+    'Bob'   => 92,
+    'Carol' => 75,
+];
+
+foreach (Sort::asortBy($scores, fn (int $score) => $score) as $name => $score) {
+    print("$name: $score" . \PHP_EOL);
+}
+// Carol: 75
+// Alice: 87
+// Bob: 92
+```
+
+```php
+use IterTools\Sort;
+
+$people = [
+    'alice' => (object)['age' => 30],
+    'bob'   => (object)['age' => 20],
+    'carol' => (object)['age' => 40],
+];
+
+foreach (Sort::asortBy($people, fn ($p) => $p->age) as $key => $person) {
+    print("$key => age {$person->age}" . \PHP_EOL);
+}
+// bob => age 20
+// alice => age 30
+// carol => age 40
+```

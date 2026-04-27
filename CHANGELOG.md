@@ -18,13 +18,18 @@
 * Single
   * `intersperse`
   * `mapSpread`
+* Sort
+  * `sortBy`
+  * `asortBy`
 * Stream
+  * `asortBy`
   * `distinctAdjacent`
   * `distinctAdjacentBy`
   * `intersperse`
   * `mapSpread`
   * `powerset`
   * `roundRobinWith`
+  * `sortBy`
   * `toFirstMatchIndex`
   * `toFirstMatchKey`
 

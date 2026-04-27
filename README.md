@@ -184,7 +184,9 @@ Quick Reference
 | Iterator                                       | Description                                  | Code Snippet                                              |
 |------------------------------------------------|----------------------------------------------|-----------------------------------------------------------|
 | [`asort`](docs/sort-iteration.md#asort)                              | Iterate a sorted collection maintaining keys | `Sort::asort($data, [$comparator])`                       |
+| [`asortBy`](docs/sort-iteration.md#asortby)                          | Iterate sorted by extracted key, keys kept   | `Sort::asortBy($data, $keyFn)`                            |
 | [`sort`](docs/sort-iteration.md#sort)                                | Iterate a sorted collection                  | `Sort::sort($data, [$comparator])`                        |
+| [`sortBy`](docs/sort-iteration.md#sortby)                            | Iterate sorted by extracted key              | `Sort::sortBy($data, $keyFn)`                             |
 
 #### File Iteration
 | Iterator                                                        | Description                                               | Code Snippet                                                 |
@@ -262,6 +264,7 @@ Quick Reference
 |---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
 | [`accumulate`](docs/stream.md#accumulate)                                             | Running result of a binary operator                                                       | `$stream->accumulate($op, [$initial])`                                            |
 | [`asort`](docs/stream.md#asort)                                                       | Sorts the iterable source maintaining keys                                                | `$stream->asort([$comparator])`                                                   |
+| [`asortBy`](docs/stream.md#asort-by)                                                  | Sorts the stream by extracted key, maintaining keys                                       | `$stream->asortBy($keyFn)`                                                        |
 | [`chainWith`](docs/stream.md#chain-with)                                                | Chain iterable source withs given iterables together into a single iteration              | `$stream->chainWith(...$iterables)`                                               |
 | [`compress`](docs/stream.md#compress)                                                 | Compress source by filtering out data not selected                                        | `$stream->compress($selectors)`                                                   |
 | [`compressAssociative`](docs/stream.md#compress-associative)                          | Compress source by filtering out keys not selected                                        | `$stream->compressAssociative($selectorKeys)`                                     |
@@ -309,6 +312,7 @@ Quick Reference
 | [`skip`](docs/stream.md#skip)                                                         | Skip some elements of the stream                                                          | `$stream->skip($count, [$offset])`                                                |
 | [`slice`](docs/stream.md#slice)                                                       | Extract a slice of the stream                                                             | `$stream->slice([$start], [$count], [$step])`                                     |
 | [`sort`](docs/stream.md#sort)                                                         | Sorts the stream                                                                          | `$stream->sort([$comparator])`                                                    |
+| [`sortBy`](docs/stream.md#sort-by)                                                    | Sorts the stream by extracted key                                                         | `$stream->sortBy($keyFn)`                                                         |
 | [`differenceWith`](docs/stream.md#difference-with)                                       | Difference of iterable source and given iterables                                         | `$stream->differenceWith(...$iterables)`                                          |
 | [`differenceCoerciveWith`](docs/stream.md#difference-coercive-with)                     | Difference of iterable source and given iterables with type coercion                      | `$stream->differenceCoerciveWith(...$iterables)`                                  |
 | [`symmetricDifferenceWith`](docs/stream.md#symmetric-difference-with)                   | Symmetric difference of iterable source and given iterables                               | `$stream->symmetricDifferenceWith(...$iterables)`                                 |
@@ -407,7 +411,7 @@ Full documentation with detailed descriptions, signatures, and code examples for
 - [Math Iteration](docs/math-iteration.md) — Frequencies, Running Average/Difference/Max/Min/Product/Total
 - [Set and Multiset Iteration](docs/set-iteration.md) — Distinct, Intersection, Difference, Symmetric Difference, Union
 - [Combinatorics Iteration](docs/combinatorics-iteration.md) — Product, Permutations, Combinations, CombinationsWithReplacement, Powerset
-- [Sort Iteration](docs/sort-iteration.md) — ASort, Sort
+- [Sort Iteration](docs/sort-iteration.md) — ASort, AsortBy, Sort, SortBy
 - [File Iteration](docs/file-iteration.md) — ReadCsv, ReadLines
 - [Transform Iteration](docs/transform-iteration.md) — Tee, ToArray, ToAssociativeArray, ToIterator
 

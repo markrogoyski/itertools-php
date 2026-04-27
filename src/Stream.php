@@ -644,6 +644,40 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Sorts the stream using a key-extraction function (Schwartzian transform).
+     *
+     * The key function is called exactly once per element. Source keys are discarded.
+     *
+     * @param callable(mixed):mixed $keyFn function used to extract the comparison key from each element.
+     *
+     * @return Stream
+     *
+     * @see Sort::sortBy()
+     */
+    public function sortBy(callable $keyFn): self
+    {
+        $this->iterable = Sort::sortBy($this->iterable, $keyFn);
+        return $this;
+    }
+
+    /**
+     * Sorts the stream using a key-extraction function (Schwartzian transform), preserving key associations.
+     *
+     * The key function is called exactly once per element. Source keys are preserved.
+     *
+     * @param callable(mixed):mixed $keyFn function used to extract the comparison key from each element.
+     *
+     * @return Stream
+     *
+     * @see Sort::asortBy()
+     */
+    public function asortBy(callable $keyFn): self
+    {
+        $this->iterable = Sort::asortBy($this->iterable, $keyFn);
+        return $this;
+    }
+
+    /**
      * Reverse the iterable source.
      *
      * @return Stream

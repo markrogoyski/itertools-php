@@ -1225,6 +1225,85 @@ $result = Stream::of($input)
 // 1, 2, 3, 4, 5, 6, 7, 8, 9
 ```
 
+#### Sort By
+Sorts the stream using a key-extraction function (Schwartzian transform).
+
+```$stream->sortBy(callable $keyFn)```
+
+The key function is called exactly once per element. Source keys are discarded.
+The sort is stable: elements with equal extracted keys preserve their original
+relative order.
+
+See also [`Sort::sortBy()`](sort-iteration.md#sortby).
+
+```php
+use IterTools\Stream;
+
+$words = ['banana', 'fig', 'cherry', 'apple'];
+
+$result = Stream::of($words)
+    ->sortBy(fn (string $s) => \strlen($s))
+    ->toArray();
+// ['fig', 'apple', 'banana', 'cherry']
+```
+
+```php
+use IterTools\Stream;
+
+$people = [
+    (object)['name' => 'Alice', 'age' => 30],
+    (object)['name' => 'Bob',   'age' => 20],
+    (object)['name' => 'Carol', 'age' => 40],
+];
+
+$names = Stream::of($people)
+    ->sortBy(fn ($p) => $p->age)
+    ->map(fn ($p) => $p->name)
+    ->toArray();
+// ['Bob', 'Alice', 'Carol']
+```
+
+#### Asort By
+Sorts the stream using a key-extraction function (Schwartzian transform), maintaining keys.
+
+```$stream->asortBy(callable $keyFn)```
+
+The key function is called exactly once per element. Source keys are preserved.
+The sort is stable: elements with equal extracted keys preserve their original
+relative order.
+
+See also [`Sort::asortBy()`](sort-iteration.md#asortby).
+
+```php
+use IterTools\Stream;
+
+$scores = [
+    'Alice' => 87,
+    'Bob'   => 92,
+    'Carol' => 75,
+];
+
+$result = Stream::of($scores)
+    ->asortBy(fn (int $score) => $score)
+    ->toAssociativeArray();
+// ['Carol' => 75, 'Alice' => 87, 'Bob' => 92]
+```
+
+```php
+use IterTools\Stream;
+
+$people = [
+    'alice' => (object)['age' => 30],
+    'bob'   => (object)['age' => 20],
+    'carol' => (object)['age' => 40],
+];
+
+$result = Stream::of($people)
+    ->asortBy(fn ($p) => $p->age)
+    ->toAssociativeArray();
+// ['bob' => (object)['age' => 20], 'alice' => (object)['age' => 30], 'carol' => (object)['age' => 40]]
+```
+
 #### Difference With
 Return a stream of the difference of the stream and the given iterables. Elements from the source not present in any given iterables.
 
