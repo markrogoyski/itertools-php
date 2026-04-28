@@ -1291,6 +1291,86 @@ $result = Stream::of($people)
 // ['bob' => (object)['age' => 20], 'alice' => (object)['age' => 30], 'carol' => (object)['age' => 40]]
 ```
 
+#### Largest
+Сводит поток к n наибольшим элементам (порядок убывания).
+
+```$stream->largest(int $n, callable $keyFn = null)```
+
+Использует ограниченную кучу размера `n` — полная сортировка потока не выполняется.
+Устойчивая при равных ключах; пропускает NaN-ключи; бросает
+`\InvalidArgumentException` для отрицательного `$n`.
+
+См. также [`Sort::largest()`](sort-iteration.md#largest).
+
+```php
+use IterTools\Stream;
+
+$data = [3, 1, 4, 1, 5, 9, 2, 6];
+
+$result = Stream::of($data)
+    ->largest(3)
+    ->toArray();
+// [9, 6, 5]
+```
+
+```php
+use IterTools\Stream;
+
+$leaderboard = [
+    (object)['name' => 'Alice', 'score' => 87],
+    (object)['name' => 'Bob',   'score' => 92],
+    (object)['name' => 'Carol', 'score' => 75],
+    (object)['name' => 'Dave',  'score' => 95],
+    (object)['name' => 'Eve',   'score' => 90],
+];
+
+$result = Stream::of($leaderboard)
+    ->largest(3, fn ($p) => $p->score)
+    ->map(fn ($p) => $p->name)
+    ->toArray();
+// ['Dave', 'Bob', 'Eve']
+```
+
+#### Smallest
+Сводит поток к n наименьшим элементам (порядок возрастания).
+
+```$stream->smallest(int $n, callable $keyFn = null)```
+
+Использует ограниченную кучу размера `n` — полная сортировка потока не выполняется.
+Устойчивая при равных ключах; пропускает NaN-ключи; бросает
+`\InvalidArgumentException` для отрицательного `$n`.
+
+См. также [`Sort::smallest()`](sort-iteration.md#smallest).
+
+```php
+use IterTools\Stream;
+
+$data = [3, 1, 4, 1, 5, 9, 2, 6];
+
+$result = Stream::of($data)
+    ->smallest(3)
+    ->toArray();
+// [1, 1, 2]
+```
+
+```php
+use IterTools\Stream;
+
+$requests = [
+    (object)['id' => 'r1', 'durationMs' => 120],
+    (object)['id' => 'r2', 'durationMs' => 50],
+    (object)['id' => 'r3', 'durationMs' => 200],
+    (object)['id' => 'r4', 'durationMs' => 80],
+    (object)['id' => 'r5', 'durationMs' => 65],
+];
+
+$result = Stream::of($requests)
+    ->smallest(3, fn ($r) => $r->durationMs)
+    ->map(fn ($r) => $r->id)
+    ->toArray();
+// ['r2', 'r5', 'r4']
+```
+
 #### Difference With
 Возвращает поток, содержащий разность исходного потока с заданным набором коллекций. Элементы из исходного потока, не входящие ни в одну из заданных коллекций.
 

@@ -137,3 +137,105 @@ foreach (Sort::asortBy($people, fn ($p) => $p->age) as $key => $person) {
 // alice => age 30
 // carol => age 40
 ```
+
+### Largest
+Возвращает n наибольших элементов коллекции в порядке убывания.
+
+```Sort::largest(iterable $data, int $n, callable $keyFn = null)```
+
+Использует ограниченную кучу размера `n` — полная сортировка входа не выполняется,
+что эффективно для больших входов, когда нужны только несколько крайних значений
+(`O(N log n)`).
+
+- `$n` должно быть неотрицательным; иначе бросается `\InvalidArgumentException`.
+- `$n = 0` возвращает пустой генератор без обхода входа.
+- `$n` больше размера входа — возвращает весь вход, отсортированный по убыванию.
+- Устойчивая: элементы с равными извлечёнными ключами сохраняются в исходном
+  порядке, когда количество совпадений превышает доступные слоты, и эмитятся
+  в порядке вставки среди равных.
+- Политика NaN: элементы, чей ключ сравнения равен NaN, пропускаются.
+
+Аналог в Stream: [`Stream::largest()`](stream.md#largest).
+
+```php
+use IterTools\Sort;
+
+$data = [3, 1, 4, 1, 5, 9, 2, 6];
+
+foreach (Sort::largest($data, 3) as $datum) {
+    print($datum . \PHP_EOL);
+}
+// 9
+// 6
+// 5
+```
+
+```php
+use IterTools\Sort;
+
+$leaderboard = [
+    (object)['name' => 'Alice', 'score' => 87],
+    (object)['name' => 'Bob',   'score' => 92],
+    (object)['name' => 'Carol', 'score' => 75],
+    (object)['name' => 'Dave',  'score' => 95],
+    (object)['name' => 'Eve',   'score' => 90],
+];
+
+foreach (Sort::largest($leaderboard, 3, fn ($p) => $p->score) as $player) {
+    print("{$player->name}: {$player->score}" . \PHP_EOL);
+}
+// Dave: 95
+// Bob: 92
+// Eve: 90
+```
+
+### Smallest
+Возвращает n наименьших элементов коллекции в порядке возрастания.
+
+```Sort::smallest(iterable $data, int $n, callable $keyFn = null)```
+
+Использует ограниченную кучу размера `n` — полная сортировка входа не выполняется,
+что эффективно для больших входов, когда нужны только несколько крайних значений
+(`O(N log n)`).
+
+- `$n` должно быть неотрицательным; иначе бросается `\InvalidArgumentException`.
+- `$n = 0` возвращает пустой генератор без обхода входа.
+- `$n` больше размера входа — возвращает весь вход, отсортированный по возрастанию.
+- Устойчивая: элементы с равными извлечёнными ключами сохраняются в исходном
+  порядке, когда количество совпадений превышает доступные слоты, и эмитятся
+  в порядке вставки среди равных.
+- Политика NaN: элементы, чей ключ сравнения равен NaN, пропускаются.
+
+Аналог в Stream: [`Stream::smallest()`](stream.md#smallest).
+
+```php
+use IterTools\Sort;
+
+$data = [3, 1, 4, 1, 5, 9, 2, 6];
+
+foreach (Sort::smallest($data, 3) as $datum) {
+    print($datum . \PHP_EOL);
+}
+// 1
+// 1
+// 2
+```
+
+```php
+use IterTools\Sort;
+
+$requests = [
+    (object)['id' => 'r1', 'durationMs' => 120],
+    (object)['id' => 'r2', 'durationMs' => 50],
+    (object)['id' => 'r3', 'durationMs' => 200],
+    (object)['id' => 'r4', 'durationMs' => 80],
+    (object)['id' => 'r5', 'durationMs' => 65],
+];
+
+foreach (Sort::smallest($requests, 3, fn ($r) => $r->durationMs) as $request) {
+    print("{$request->id}: {$request->durationMs}ms" . \PHP_EOL);
+}
+// r2: 50ms
+// r5: 65ms
+// r4: 80ms
+```

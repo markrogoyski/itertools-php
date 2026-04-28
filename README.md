@@ -185,6 +185,8 @@ Quick Reference
 |------------------------------------------------|----------------------------------------------|-----------------------------------------------------------|
 | [`asort`](docs/sort-iteration.md#asort)                              | Iterate a sorted collection maintaining keys | `Sort::asort($data, [$comparator])`                       |
 | [`asortBy`](docs/sort-iteration.md#asortby)                          | Iterate sorted by extracted key, keys kept   | `Sort::asortBy($data, $keyFn)`                            |
+| [`largest`](docs/sort-iteration.md#largest)                          | Iterate the n largest elements (descending)  | `Sort::largest($data, $n, [$keyFn])`                      |
+| [`smallest`](docs/sort-iteration.md#smallest)                        | Iterate the n smallest elements (ascending)  | `Sort::smallest($data, $n, [$keyFn])`                     |
 | [`sort`](docs/sort-iteration.md#sort)                                | Iterate a sorted collection                  | `Sort::sort($data, [$comparator])`                        |
 | [`sortBy`](docs/sort-iteration.md#sortby)                            | Iterate sorted by extracted key              | `Sort::sortBy($data, $keyFn)`                             |
 
@@ -288,6 +290,7 @@ Quick Reference
 | [`intersectionWith`](docs/stream.md#intersection-with)                                  | Intersect iterable source and given iterables                                             | `$stream->intersectionWith(...$iterables)`                                        |
 | [`intersectionCoerciveWith`](docs/stream.md#intersection-coercive-with)                | Intersect iterable source and given iterables with type coercion                          | `$stream->intersectionCoerciveWith(...$iterables)`                                |
 | [`intersperse`](docs/stream.md#intersperse)                                           | Insert a separator between elements of the stream                                         | `$stream->intersperse($separator)`                                                |
+| [`largest`](docs/stream.md#largest)                                                   | Reduce the stream to the n largest elements (descending)                                  | `$stream->largest($n, [$keyFn])`                                                  |
 | [`limit`](docs/stream.md#limit)                                                       | Limit the stream's iteration                                                              | `$stream->limit($limit)`                                                          |
 | [`map`](docs/stream.md#map)                                                           | Map function onto elements                                                                | `$stream->map($function)`                                                         |
 | [`mapSpread`](docs/stream.md#map-spread)                                              | Map function onto elements, splatting items as positional args                            | `$stream->mapSpread($function)`                                                   |
@@ -311,6 +314,7 @@ Quick Reference
 | [`runningTotal`](docs/stream.md#running-total)                                        | Accumulate the running total over iterable source                                         | `$stream->runningTotal($initialValue)`                                            |
 | [`skip`](docs/stream.md#skip)                                                         | Skip some elements of the stream                                                          | `$stream->skip($count, [$offset])`                                                |
 | [`slice`](docs/stream.md#slice)                                                       | Extract a slice of the stream                                                             | `$stream->slice([$start], [$count], [$step])`                                     |
+| [`smallest`](docs/stream.md#smallest)                                                 | Reduce the stream to the n smallest elements (ascending)                                  | `$stream->smallest($n, [$keyFn])`                                                 |
 | [`sort`](docs/stream.md#sort)                                                         | Sorts the stream                                                                          | `$stream->sort([$comparator])`                                                    |
 | [`sortBy`](docs/stream.md#sort-by)                                                    | Sorts the stream by extracted key                                                         | `$stream->sortBy($keyFn)`                                                         |
 | [`differenceWith`](docs/stream.md#difference-with)                                       | Difference of iterable source and given iterables                                         | `$stream->differenceWith(...$iterables)`                                          |
@@ -411,7 +415,7 @@ Full documentation with detailed descriptions, signatures, and code examples for
 - [Math Iteration](docs/math-iteration.md) — Frequencies, Running Average/Difference/Max/Min/Product/Total
 - [Set and Multiset Iteration](docs/set-iteration.md) — Distinct, Intersection, Difference, Symmetric Difference, Union
 - [Combinatorics Iteration](docs/combinatorics-iteration.md) — Product, Permutations, Combinations, CombinationsWithReplacement, Powerset
-- [Sort Iteration](docs/sort-iteration.md) — ASort, AsortBy, Sort, SortBy
+- [Sort Iteration](docs/sort-iteration.md) — ASort, AsortBy, Largest, Smallest, Sort, SortBy
 - [File Iteration](docs/file-iteration.md) — ReadCsv, ReadLines
 - [Transform Iteration](docs/transform-iteration.md) — Tee, ToArray, ToAssociativeArray, ToIterator
 

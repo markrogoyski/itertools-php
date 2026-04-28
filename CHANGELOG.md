@@ -21,14 +21,18 @@
 * Sort
   * `sortBy`
   * `asortBy`
+  * `largest`
+  * `smallest`
 * Stream
   * `asortBy`
   * `distinctAdjacent`
   * `distinctAdjacentBy`
   * `intersperse`
+  * `largest`
   * `mapSpread`
   * `powerset`
   * `roundRobinWith`
+  * `smallest`
   * `sortBy`
   * `toFirstMatchIndex`
   * `toFirstMatchKey`

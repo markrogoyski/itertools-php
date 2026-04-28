@@ -1304,6 +1304,84 @@ $result = Stream::of($people)
 // ['bob' => (object)['age' => 20], 'alice' => (object)['age' => 30], 'carol' => (object)['age' => 40]]
 ```
 
+#### Largest
+Reduces the stream to the n largest elements (descending order).
+
+```$stream->largest(int $n, callable $keyFn = null)```
+
+Uses a bounded heap of size `n` internally — the full stream is never sorted.
+Stable under ties; skips NaN keys; throws `\InvalidArgumentException` for negative `$n`.
+
+See also [`Sort::largest()`](sort-iteration.md#largest).
+
+```php
+use IterTools\Stream;
+
+$data = [3, 1, 4, 1, 5, 9, 2, 6];
+
+$result = Stream::of($data)
+    ->largest(3)
+    ->toArray();
+// [9, 6, 5]
+```
+
+```php
+use IterTools\Stream;
+
+$leaderboard = [
+    (object)['name' => 'Alice', 'score' => 87],
+    (object)['name' => 'Bob',   'score' => 92],
+    (object)['name' => 'Carol', 'score' => 75],
+    (object)['name' => 'Dave',  'score' => 95],
+    (object)['name' => 'Eve',   'score' => 90],
+];
+
+$result = Stream::of($leaderboard)
+    ->largest(3, fn ($p) => $p->score)
+    ->map(fn ($p) => $p->name)
+    ->toArray();
+// ['Dave', 'Bob', 'Eve']
+```
+
+#### Smallest
+Reduces the stream to the n smallest elements (ascending order).
+
+```$stream->smallest(int $n, callable $keyFn = null)```
+
+Uses a bounded heap of size `n` internally — the full stream is never sorted.
+Stable under ties; skips NaN keys; throws `\InvalidArgumentException` for negative `$n`.
+
+See also [`Sort::smallest()`](sort-iteration.md#smallest).
+
+```php
+use IterTools\Stream;
+
+$data = [3, 1, 4, 1, 5, 9, 2, 6];
+
+$result = Stream::of($data)
+    ->smallest(3)
+    ->toArray();
+// [1, 1, 2]
+```
+
+```php
+use IterTools\Stream;
+
+$requests = [
+    (object)['id' => 'r1', 'durationMs' => 120],
+    (object)['id' => 'r2', 'durationMs' => 50],
+    (object)['id' => 'r3', 'durationMs' => 200],
+    (object)['id' => 'r4', 'durationMs' => 80],
+    (object)['id' => 'r5', 'durationMs' => 65],
+];
+
+$result = Stream::of($requests)
+    ->smallest(3, fn ($r) => $r->durationMs)
+    ->map(fn ($r) => $r->id)
+    ->toArray();
+// ['r2', 'r5', 'r4']
+```
+
 #### Difference With
 Return a stream of the difference of the stream and the given iterables. Elements from the source not present in any given iterables.
 

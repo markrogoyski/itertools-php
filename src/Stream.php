@@ -678,6 +678,46 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Reduces the stream to the n largest elements (descending order).
+     *
+     * Uses a bounded heap of size n internally — the full stream is never sorted.
+     *
+     * @param int                        $n     number of largest elements to keep (must be non-negative).
+     * @param callable(mixed):mixed|null $keyFn (optional) function used to extract the comparison key from each element.
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if $n is negative.
+     *
+     * @see Sort::largest()
+     */
+    public function largest(int $n, ?callable $keyFn = null): self
+    {
+        $this->iterable = Sort::largest($this->iterable, $n, $keyFn);
+        return $this;
+    }
+
+    /**
+     * Reduces the stream to the n smallest elements (ascending order).
+     *
+     * Uses a bounded heap of size n internally — the full stream is never sorted.
+     *
+     * @param int                        $n     number of smallest elements to keep (must be non-negative).
+     * @param callable(mixed):mixed|null $keyFn (optional) function used to extract the comparison key from each element.
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if $n is negative.
+     *
+     * @see Sort::smallest()
+     */
+    public function smallest(int $n, ?callable $keyFn = null): self
+    {
+        $this->iterable = Sort::smallest($this->iterable, $n, $keyFn);
+        return $this;
+    }
+
+    /**
      * Reverse the iterable source.
      *
      * @return Stream
