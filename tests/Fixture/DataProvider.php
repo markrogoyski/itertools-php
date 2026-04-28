@@ -68,6 +68,7 @@ trait DataProvider
             [Multi::zipEqual([1, 2, 3], [4, 5, 6])],
             [Multi::zipFilled([1, 2, 3], ['filler', 5, 6])],
             [Multi::zipLongest([1, 2, 3], [4, 5, 6])],
+            [Multi::unzip([[1, 'a'], [2, 'b'], [3, 'c']])],
         ];
     }
 
@@ -288,6 +289,7 @@ trait DataProvider
             [Stream::of([[1, 2, 3], [4, 5]])->zipLongest()],
             [Stream::of([[1, 2, 3], [4, 5]])->zipFilled('x')],
             [Stream::of([[1, 2, 3], [4, 5, 6]])->zipEqual()],
+            [Stream::of([[1, 'a'], [2, 'b'], [3, 'c']])->unzip()],
         ];
     }
 }

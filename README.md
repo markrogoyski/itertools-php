@@ -93,6 +93,7 @@ Quick Reference
 | [`zipEqual`](docs/multi-iteration.md#zipequal)     | Iterate multiple collections of equal length simultaneously, error if lengths not equal | `Multi::zipEqual($list1, $list2)`             |
 | [`zipFilled`](docs/multi-iteration.md#zipfilled)   | Iterate multiple collections, using a filler value if lengths not equal                 | `Multi::zipFilled($default, $list1, $list2)`  |
 | [`zipLongest`](docs/multi-iteration.md#ziplongest) | Iterate multiple collections simultaneously until the longest iterator completes        | `Multi::zipLongest($list1, $list2)`           |
+| [`unzip`](docs/multi-iteration.md#unzip)           | Transpose a sequence of rows into columns (inverse of zip)                              | `Multi::unzip($rows)`                         |
 
 #### Single Iteration
 | Iterator                                       | Description                                  | Code Snippet                                                |
@@ -324,6 +325,7 @@ Quick Reference
 | [`takeWhile`](docs/stream.md#take-while)                                              | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                                                  |
 | [`unionWith`](docs/stream.md#union-with)                                                | Union of stream with iterables                                                            | `$stream->unionWith(...$iterables)`                                               |
 | [`unionCoerciveWith`](docs/stream.md#union-coercive-with)                               | Union of stream with iterables with type coercion                                         | `$stream->unionCoerciveWith(...$iterables)`                                       |
+| [`unzip`](docs/stream.md#unzip)                                                         | Transpose rows of the stream into columns (inverse of zip)                                | `$stream->unzip()`                                                                |
 | [`zip`](docs/stream.md#zip)                                                             | Zip rows of the stream column-wise (transpose), stopping at shortest                      | `$stream->zip()`                                                                  |
 | [`zipLongest`](docs/stream.md#zip-longest)                                              | Zip rows of the stream column-wise, continuing until longest (missing → null)             | `$stream->zipLongest()`                                                           |
 | [`zipFilled`](docs/stream.md#zip-filled)                                                | Zip rows of the stream column-wise, continuing until longest with filler                  | `$stream->zipFilled($filler)`                                                     |
@@ -408,7 +410,7 @@ Documentation
 Full documentation with detailed descriptions, signatures, and code examples for each function.
 
 #### Loop Iteration
-- [Multi Iteration](docs/multi-iteration.md) — Chain, RoundRobin, Zip, ZipEqual, ZipFilled, ZipLongest
+- [Multi Iteration](docs/multi-iteration.md) — Chain, RoundRobin, Unzip, Zip, ZipEqual, ZipFilled, ZipLongest
 - [Single Iteration](docs/single-iteration.md) — Chunkwise, Compress, Filter, Map, Flatten, GroupBy, and more
 - [Infinite Iteration](docs/infinite-iteration.md) — Count, Cycle, Iterate, Repeat
 - [Random Iteration](docs/random-iteration.md) — Choice, CoinFlip, Number, Percentage, RockPaperScissors

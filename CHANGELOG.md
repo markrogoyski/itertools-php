@@ -9,6 +9,7 @@
   * `iterate`
 * Multi
   * `roundRobin`
+  * `unzip`
 * Reduce
   * `toFirstMatchIndex`
   * `toFirstMatchKey`
@@ -36,6 +37,7 @@
   * `sortBy`
   * `toFirstMatchIndex`
   * `toFirstMatchKey`
+  * `unzip`
 
 ### Improvements
 * Reorganized translated docs

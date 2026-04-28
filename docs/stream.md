@@ -1515,6 +1515,42 @@ $stream = Stream::of($input)
 // [1, 2, 3, 4, 5, 6]
 ```
 
+#### Unzip
+Treat the stream itself as a sequence of rows and transpose into columns — the inverse of `zip`.
+
+```$stream->unzip(): Stream```
+
+Yields one column array per index up to the width of the shortest row. The outer stream and every row are fully consumed when the unzipped stream is iterated, before the first column can be yielded — column 0 cannot be emitted until every row's first cell is known.
+
+```php
+use IterTools\Stream;
+
+$pairs = [[1, 'a'], [2, 'b'], [3, 'c']];
+
+$columns = Stream::of($pairs)
+    ->unzip()
+    ->toArray();
+// [[1, 2, 3], ['a', 'b', 'c']]
+```
+
+Splitting `(timestamp, value)` event tuples into two parallel series:
+
+```php
+use IterTools\Stream;
+
+$events = [
+    [1700000000, 12.5],
+    [1700000060, 13.1],
+    [1700000120, 12.9],
+];
+
+[$timestamps, $values] = Stream::of($events)
+    ->unzip()
+    ->toArray();
+// $timestamps === [1700000000, 1700000060, 1700000120]
+// $values     === [12.5, 13.1, 12.9]
+```
+
 #### Zip
 Treat the stream itself as a sequence of iterables and zip them column-wise (transpose).
 

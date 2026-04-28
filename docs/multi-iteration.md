@@ -141,3 +141,52 @@ foreach (Multi::zipLongest($letters, $numbers) as [$letter, $number]) {
     // ['A', 1], ['B', 2], ['C', null]
 }
 ```
+
+### Unzip
+Transpose a sequence of rows into columns — the inverse of `zip`.
+
+```Multi::unzip(iterable $rows)```
+
+Yields one array per column. The column count is the width of the shortest row, so trailing
+cells of longer rows are discarded — mirroring `Multi::zip`'s shortest-wins semantics. For any
+uniform-positive-width input, the round-trip identity `Multi::zip(...Multi::unzip($rows))`
+holds. The identity does not extend to zero-width input (e.g. `[[], []]` yields no columns,
+losing the row count) nor to output produced by `zipFilled` / `zipLongest` (truncation drops
+the padded trailing cells).
+
+Although the return type is `\Generator`, this method is not lazy in any meaningful sense: the
+entire input is buffered before the first column can be yielded, since column 0 cannot be
+emitted until every row's first cell has been seen. Memory is O(N · W) for N rows of width W.
+
+Throws `\InvalidArgumentException` if any row is not iterable, naming the zero-based row index.
+
+Both row keys and inner-cell keys are discarded; output columns are sequentially indexed lists.
+
+```php
+use IterTools\Multi;
+
+$pairs = [[1, 'a'], [2, 'b'], [3, 'c']];
+
+foreach (Multi::unzip($pairs) as $column) {
+    print_r($column);
+}
+// [1, 2, 3]
+// ['a', 'b', 'c']
+```
+
+Splitting `(timestamp, value)` event tuples into two parallel series — useful when downstream
+code expects timestamps and values as separate arrays:
+```php
+$events = [
+    [1700000000, 12.5],
+    [1700000060, 13.1],
+    [1700000120, 12.9],
+    [1700000180, 13.4],
+];
+
+[$timestamps, $values] = \iterator_to_array(Multi::unzip($events), false);
+// $timestamps === [1700000000, 1700000060, 1700000120, 1700000180]
+// $values     === [12.5, 13.1, 12.9, 13.4]
+```
+
+See also: [`Stream::unzip`](stream.md#unzip).

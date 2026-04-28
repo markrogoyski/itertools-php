@@ -926,6 +926,8 @@ final class Stream implements \IteratorAggregate
      *
      * @return Stream
      *
+     * @throws \InvalidArgumentException if any element of the stream is not iterable
+     *
      * @see Multi::zip()
      */
     public function zip(): self
@@ -956,6 +958,8 @@ final class Stream implements \IteratorAggregate
      * not behave as expected.
      *
      * @return Stream
+     *
+     * @throws \InvalidArgumentException if any element of the stream is not iterable
      *
      * @see Multi::zipLongest()
      */
@@ -989,6 +993,8 @@ final class Stream implements \IteratorAggregate
      *
      * @return Stream
      *
+     * @throws \InvalidArgumentException if any element of the stream is not iterable
+     *
      * @see Multi::zipFilled()
      */
     public function zipFilled(mixed $filler): self
@@ -1019,6 +1025,7 @@ final class Stream implements \IteratorAggregate
      *
      * @return Stream
      *
+     * @throws \InvalidArgumentException if any element of the stream is not iterable
      * @throws \LengthException if during iteration one row ends before the others
      *
      * @see Multi::zipEqual()
@@ -1029,6 +1036,34 @@ final class Stream implements \IteratorAggregate
         $this->iterable = (static function () use ($source): \Generator {
             $rows = self::toRowIterators($source);
             yield from Multi::zipEqual(...$rows);
+        })();
+        return $this;
+    }
+
+    /**
+     * Treat the stream itself as a sequence of rows and transpose into columns.
+     *
+     * The inverse of zip: yields one column array per index up to the width of the shortest row.
+     *
+     * The outer stream and every row are fully consumed when the unzipped stream is iterated,
+     * before the first column can be yielded — column 0 cannot be emitted until every row's
+     * first cell is known.
+     *
+     * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
+     * is thrown at iteration time (not at call time).
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if any element of the stream is not iterable
+     *
+     * @see Multi::unzip()
+     */
+    public function unzip(): self
+    {
+        $source         = $this->iterable;
+        $this->iterable = (static function () use ($source): \Generator {
+            $rows = self::toRowIterators($source);
+            yield from Multi::unzip($rows);
         })();
         return $this;
     }
@@ -1052,7 +1087,7 @@ final class Stream implements \IteratorAggregate
         foreach ($rows as $row) {
             if (!\is_iterable($row)) {
                 throw new \InvalidArgumentException(
-                    "Stream::zip* requires every element to be iterable; row {$rowIndex} is "
+                    "Stream::zip*/unzip requires every element to be iterable; row {$rowIndex} is "
                     . \get_debug_type($row)
                 );
             }
