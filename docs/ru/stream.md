@@ -23,7 +23,7 @@
       ->distinct()                      // [1, 2, 3, 4, 5]
       ->map(fn ($x) => $x**2)           // [1, 4, 9, 16, 25]
       ->filterTrue(fn ($x) => $x < 10); // [1, 4, 9]
-   
+
    foreach ($result as $item) {
        // 1, 4, 9
    }
