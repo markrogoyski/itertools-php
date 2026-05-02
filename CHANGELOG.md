@@ -1,6 +1,6 @@
 # IterTools PHP Change Log
 
-## v2.3.0 - TBD
+## v2.3.0 - 2026-05-02
 
 ### New Features
 * Combinatorics
