@@ -236,6 +236,11 @@ Quick Reference
 | [`toFirstMatchIndex`](docs/reduce.md#to-first-match-index) | Reduce to position of first matching element | `Reduce::toFirstMatchIndex($data, $predicate, [$default])`    |
 | [`toFirstMatchKey`](docs/reduce.md#to-first-match-key)     | Reduce to key of first matching element      | `Reduce::toFirstMatchKey($data, $predicate, [$default])`      |
 | [`toLast`](docs/reduce.md#to-last)                         | Reduce to its last value                     | `Reduce::toLast()`                                            |
+| [`toLastMatch`](docs/reduce.md#to-last-match)              | Reduce to last value matching predicate      | `Reduce::toLastMatch($data, $predicate, [$default])`          |
+| [`toLastMatchIndex`](docs/reduce.md#to-last-match-index)   | Reduce to position of last matching element  | `Reduce::toLastMatchIndex($data, $predicate, [$default])`     |
+| [`toLastMatchKey`](docs/reduce.md#to-last-match-key)       | Reduce to key of last matching element       | `Reduce::toLastMatchKey($data, $predicate, [$default])`       |
+| [`toOnly`](docs/reduce.md#to-only)                         | Reduce to its sole element                   | `Reduce::toOnly($data)`                                       |
+| [`consume`](docs/reduce.md#consume)                        | Drain iterable, discarding values            | `Reduce::consume($data)`                                      |
 | [`toMax`](docs/reduce.md#to-max)                           | Reduce to its largest element                | `Reduce::toMax($numbers, [$compareBy])`                       |
 | [`toMin`](docs/reduce.md#to-min)                           | Reduce to its smallest element               | `Reduce::toMin($numbers, [$compareBy])`                       |
 | [`toMinMax`](docs/reduce.md#to-min-max)                    | Reduce to array of upper and lower bounds    | `Reduce::toMinMax($numbers, [$compareBy])`                    |
@@ -366,6 +371,10 @@ Quick Reference
 | [`toFirstMatchIndex`](docs/stream.md#to-first-match-index) | Reduces stream to position of first matching element | `$stream->toFirstMatchIndex($predicate, [$default])`    |
 | [`toFirstMatchKey`](docs/stream.md#to-first-match-key)     | Reduces stream to key of first matching element      | `$stream->toFirstMatchKey($predicate, [$default])`      |
 | [`toLast`](docs/stream.md#to-last)                         | Reduces stream to its last value                     | `$stream->toLast()`                                     |
+| [`toLastMatch`](docs/stream.md#to-last-match)              | Reduces stream to last value matching predicate      | `$stream->toLastMatch($predicate, [$default])`          |
+| [`toLastMatchIndex`](docs/stream.md#to-last-match-index)   | Reduces stream to position of last matching element  | `$stream->toLastMatchIndex($predicate, [$default])`     |
+| [`toLastMatchKey`](docs/stream.md#to-last-match-key)       | Reduces stream to key of last matching element       | `$stream->toLastMatchKey($predicate, [$default])`       |
+| [`toOnly`](docs/stream.md#to-only)                         | Reduces stream to its sole element                   | `$stream->toOnly()`                                     |
 | [`toMax`](docs/stream.md#to-max)                           | Reduces stream to its max value                      | `$stream->toMax([$compareBy])`                          |
 | [`toMin`](docs/stream.md#to-min)                           | Reduces stream to its min value                      | `$stream->toMin([$compareBy])`                          |
 | [`toMinMax`](docs/stream.md#to-min-max)                    | Reduces stream to array of upper and lower bounds    | `$stream->toMinMax([$compareBy])`                       |
@@ -389,6 +398,7 @@ Quick Reference
 | Terminal Operation              | Description                                    | Code Snippet                                         |
 |---------------------------------|------------------------------------------------|------------------------------------------------------|
 | [`callForEach`](docs/stream.md#call-for-each) | Perform action via function on each item       | `$stream->callForEach($function)`                    |
+| [`consume`](docs/stream.md#consume)           | Drain stream, discarding values                | `$stream->consume()`                                 |
 | [`print`](docs/stream.md#print)               | `print` each item in the stream                | `$stream->print([$separator], [$prefix], [$suffix])` |
 | [`printLn`](docs/stream.md#print-line)        | `print` each item on a new line                | `$stream->printLn()`                                 |
 | [`toCsvFile`](docs/stream.md#to-csv-file)     | Write the contents of the stream to a CSV file | `$stream->toCsvFile($fileHandle, [$headers])`        |

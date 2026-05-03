@@ -1,5 +1,21 @@
 # IterTools PHP Change Log
 
+## v2.4.0
+
+### New Features
+* Reduce
+  * `consume`
+  * `toLastMatch`
+  * `toLastMatchIndex`
+  * `toLastMatchKey`
+  * `toOnly`
+* Stream
+  * `consume`
+  * `toLastMatch`
+  * `toLastMatchIndex`
+  * `toLastMatchKey`
+  * `toOnly`
+
 ## v2.3.0 - 2026-05-02
 
 ### New Features

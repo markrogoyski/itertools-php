@@ -172,6 +172,65 @@ $lastPhase = Reduce::toLast($gnomesThreePhasePlan);
 // Profit
 ```
 
+### To Last Match
+Reduces iterable to the last element matching the predicate.
+
+```Reduce::toLastMatch(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Consumes the entire iterable (no short-circuit possible).
+- Returns `$default` (null by default) if no element matches.
+
+```php
+use IterTools\Reduce;
+
+$numbers = [1, 3, 5, 6, 7, 8, 9];
+
+$lastEven = Reduce::toLastMatch($numbers, fn (int $n) => $n % 2 === 0);
+// 8
+
+$lastNegative = Reduce::toLastMatch($numbers, fn (int $n) => $n < 0, 'none');
+// 'none'
+```
+
+### To Last Match Index
+Reduces iterable to the zero-based position of the last element matching the predicate.
+
+```Reduce::toLastMatchIndex(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Consumes the entire iterable.
+- Returns `$default` (null by default) if no element matches.
+- For associative input, returns the zero-based position rather than the source key.
+
+```php
+use IterTools\Reduce;
+
+$numbers = [10, 20, 30, 40, 5];
+
+$lastOver25Index = Reduce::toLastMatchIndex($numbers, fn (int $n) => $n > 25);
+// 3
+```
+
+### To Last Match Key
+Reduces iterable to the source key of the last element matching the predicate.
+
+```Reduce::toLastMatchKey(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Consumes the entire iterable.
+- Returns `$default` (null by default) if no element matches.
+- Preserves the source key (string for associative input, int for list-shape input).
+
+```php
+use IterTools\Reduce;
+
+$users = ['alice' => 12, 'bob' => 17, 'carol' => 22, 'dan' => 30];
+
+$lastAdultName = Reduce::toLastMatchKey($users, fn (int $age) => $age >= 18);
+// 'dan'
+```
+
 ### To Max
 Reduces to the max value.
 
@@ -325,6 +384,31 @@ $rotk = Reduce::toNth($lotrMovies, 2);
 // 20
 ```
 
+### To Only
+Reduces iterable to its sole element.
+
+```Reduce::toOnly(iterable $data): mixed```
+
+- Throws `\LengthException` if the iterable is empty or contains more than one element.
+- For associative single-element input, returns the value (not the key).
+- Compose with `Stream::filter()->toOnly()` to assert that exactly one item matches a predicate.
+
+```php
+use IterTools\Reduce;
+
+$config = ['admin' => 'jane'];
+
+$onlyAdmin = Reduce::toOnly($config);
+// 'jane'
+```
+
+```php
+use IterTools\Reduce;
+
+Reduce::toOnly([]);        // throws \LengthException
+Reduce::toOnly([1, 2, 3]); // throws \LengthException
+```
+
 ### To Product
 Reduces to the product of its elements.
 
@@ -422,4 +506,28 @@ $sum   = fn ($carry, $item) => $carry + $item;
 
 $result = Reduce::toValue($input, $sum, 0);
 // 15
+```
+
+### Consume
+Drains the given iterable, discarding values.
+
+```Reduce::consume(iterable $data): void```
+
+- Useful for forcing evaluation of a lazy pipeline whose only purpose is its side effects.
+- Returns nothing.
+
+```php
+use IterTools\Reduce;
+use IterTools\Single;
+
+$log = [];
+
+$pipeline = Single::map([1, 2, 3], function (int $n) use (&$log): int {
+    $log[] = $n;
+    return $n * 2;
+});
+// $log === []  (Single::map is lazy — nothing has run yet)
+
+Reduce::consume($pipeline);
+// $log === [1, 2, 3]
 ```

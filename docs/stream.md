@@ -2239,6 +2239,63 @@ $result = Stream::of($input)
 // 30
 ```
 
+##### To Last Match
+Reduces iterable source to the last element matching the predicate.
+
+```$stream->toLastMatch(callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Consumes the entire iterable.
+- Returns `$default` (null by default) if no element matches.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 3, 5, 6, 7, 8, 9];
+
+$result = Stream::of($numbers)
+    ->toLastMatch(fn (int $n) => $n % 2 === 0);
+// 8
+```
+
+##### To Last Match Index
+Reduces iterable source to the zero-based position of the last element matching the predicate.
+
+```$stream->toLastMatchIndex(callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Consumes the entire iterable.
+- Returns `$default` (null by default) if no element matches.
+
+```php
+use IterTools\Stream;
+
+$numbers = [10, 20, 30, 40, 5];
+
+$result = Stream::of($numbers)
+    ->toLastMatchIndex(fn (int $n) => $n > 25);
+// 3
+```
+
+##### To Last Match Key
+Reduces iterable source to the source key of the last element matching the predicate.
+
+```$stream->toLastMatchKey(callable $predicate, mixed $default = null): mixed```
+
+- Predicate return value is coerced via `(bool)` cast.
+- Consumes the entire iterable.
+- Returns `$default` (null by default) if no element matches.
+
+```php
+use IterTools\Stream;
+
+$users = ['alice' => 12, 'bob' => 17, 'carol' => 22, 'dan' => 30];
+
+$result = Stream::of($users)
+    ->toLastMatchKey(fn (int $age) => $age >= 18);
+// 'dan'
+```
+
 ##### To Max
 Reduces iterable source to its max value.
 
@@ -2311,6 +2368,23 @@ $lotrMovies = ['The Fellowship of the Ring', 'The Two Towers', 'The Return of th
 $result = Stream::of($lotrMovies)
     ->toNth(2);
 // The Return of the King
+```
+
+##### To Only
+Reduces iterable source to its sole element.
+
+```$stream->toOnly(): mixed```
+
+- Throws `\LengthException` if the stream is empty or contains more than one element.
+- Compose with `filter()` to assert that exactly one item matches a predicate.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3, 4, 5])
+    ->filter(fn (int $n) => $n === 3)
+    ->toOnly();
+// 3
 ```
 
 ##### To Product
@@ -2537,6 +2611,29 @@ Stream::of($languages)
 // PHP's mascot: elephant
 // Python's mascot: snake
 // ...
+```
+
+##### Consume
+Drains the stream, discarding values.
+
+Useful for forcing evaluation of a lazy pipeline whose only purpose is its side effects (for example, a side-effectful `map()`).
+
+```$stream->consume(): void```
+
+```php
+use IterTools\Stream;
+
+$log = [];
+
+$pipeline = Stream::of([1, 2, 3])
+    ->map(function (int $n) use (&$log): int {
+        $log[] = $n;
+        return $n * 2;
+    });
+// $log === []  (map is lazy — nothing has run yet)
+
+$pipeline->consume();
+// $log === [1, 2, 3]
 ```
 
 ##### Print

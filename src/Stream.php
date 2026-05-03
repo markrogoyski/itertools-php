@@ -2352,6 +2352,92 @@ final class Stream implements \IteratorAggregate
         return Reduce::toFirstMatchKey($this->iterable, $predicate, $default);
     }
 
+    /**
+     * Reduces iterable source to the last element matching the predicate.
+     *
+     * Predicate return value is coerced via (bool) cast.
+     *
+     * Consumes the entire iterable. Returns $default when no element matches.
+     *
+     * @param callable $predicate
+     * @param mixed    $default value returned when no element matches
+     *
+     * @return mixed
+     *
+     * @see Reduce::toLastMatch()
+     */
+    public function toLastMatch(callable $predicate, mixed $default = null): mixed
+    {
+        return Reduce::toLastMatch($this->iterable, $predicate, $default);
+    }
+
+    /**
+     * Reduces iterable source to the zero-based position of the last element matching the predicate.
+     *
+     * Predicate return value is coerced via (bool) cast.
+     *
+     * Consumes the entire iterable. Returns $default when no element matches.
+     *
+     * @param callable $predicate
+     * @param mixed    $default value returned when no element matches
+     *
+     * @return mixed
+     *
+     * @see Reduce::toLastMatchIndex()
+     */
+    public function toLastMatchIndex(callable $predicate, mixed $default = null): mixed
+    {
+        return Reduce::toLastMatchIndex($this->iterable, $predicate, $default);
+    }
+
+    /**
+     * Reduces iterable source to the source key of the last element matching the predicate.
+     *
+     * Predicate return value is coerced via (bool) cast.
+     *
+     * Consumes the entire iterable. Returns $default when no element matches.
+     *
+     * @param callable $predicate
+     * @param mixed    $default value returned when no element matches
+     *
+     * @return mixed
+     *
+     * @see Reduce::toLastMatchKey()
+     */
+    public function toLastMatchKey(callable $predicate, mixed $default = null): mixed
+    {
+        return Reduce::toLastMatchKey($this->iterable, $predicate, $default);
+    }
+
+    /**
+     * Reduces iterable source to its sole element.
+     *
+     * @return mixed
+     *
+     * @throws \LengthException if iterable is empty or contains more than one element
+     *
+     * @see Reduce::toOnly()
+     */
+    public function toOnly(): mixed
+    {
+        return Reduce::toOnly($this->iterable);
+    }
+
+    /**
+     * Drains the stream, discarding values.
+     *
+     * Useful for forcing evaluation of a lazy pipeline whose only purpose is its side effects
+     * (e.g. a side-effectful map() or a Generator source that writes to a log).
+     *
+     * @return void
+     *
+     * @see Reduce::consume()
+     */
+    public function consume(): void
+    {
+        Reduce::consume($this->iterable);
+    }
+
     // TERMINAL OPERATIONS WITH SIDE EFFECTS - PRINT
 
     /**

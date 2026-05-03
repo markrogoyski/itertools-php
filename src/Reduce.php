@@ -478,6 +478,146 @@ final class Reduce
     }
 
     /**
+     * Reduces given iterable to the last element matching the predicate.
+     *
+     * Predicate return value is coerced via (bool) cast, matching Summary::allMatch/anyMatch.
+     *
+     * Consumes the entire iterable (cannot short-circuit).
+     *
+     * If no element matches, returns $default (null by default).
+     *
+     * @param iterable<mixed> $data
+     * @param callable        $predicate
+     * @param mixed           $default value returned when no element matches
+     *
+     * @return mixed
+     */
+    public static function toLastMatch(iterable $data, callable $predicate, mixed $default = null): mixed
+    {
+        /** @var mixed $result */
+        $result = $default;
+        foreach ($data as $datum) {
+            /** @var mixed $datum */
+            if ((bool) $predicate($datum)) {
+                $result = $datum;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Reduces given iterable to the zero-based position of the last element matching the predicate.
+     *
+     * Predicate return value is coerced via (bool) cast, matching Summary::allMatch/anyMatch.
+     *
+     * Consumes the entire iterable (cannot short-circuit).
+     *
+     * If no element matches, returns $default (null by default).
+     *
+     * @param iterable<mixed> $data
+     * @param callable        $predicate
+     * @param mixed           $default value returned when no element matches
+     *
+     * @return mixed
+     */
+    public static function toLastMatchIndex(iterable $data, callable $predicate, mixed $default = null): mixed
+    {
+        /** @var mixed $result */
+        $result = $default;
+        $index  = 0;
+        foreach ($data as $datum) {
+            /** @var mixed $datum */
+            if ((bool) $predicate($datum)) {
+                $result = $index;
+            }
+            ++$index;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Reduces given iterable to the source key of the last element matching the predicate.
+     *
+     * Predicate return value is coerced via (bool) cast, matching Summary::allMatch/anyMatch.
+     *
+     * Consumes the entire iterable (cannot short-circuit).
+     *
+     * If no element matches, returns $default (null by default).
+     *
+     * @param iterable<mixed> $data
+     * @param callable        $predicate
+     * @param mixed           $default value returned when no element matches
+     *
+     * @return mixed
+     */
+    public static function toLastMatchKey(iterable $data, callable $predicate, mixed $default = null): mixed
+    {
+        /** @var mixed $result */
+        $result = $default;
+        foreach ($data as $key => $datum) {
+            /** @var mixed $datum */
+            if ((bool) $predicate($datum)) {
+                /** @var mixed $result */
+                $result = $key;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Reduces given iterable to its sole element.
+     *
+     * Throws \LengthException if the iterable contains zero or two-or-more elements.
+     *
+     * Compose with Stream::filter()->toOnly() if you need a predicate variant.
+     *
+     * @param iterable<mixed> $data
+     *
+     * @return mixed
+     *
+     * @throws \LengthException if iterable is empty or contains more than one element
+     */
+    public static function toOnly(iterable $data): mixed
+    {
+        $result = NoValueMonad::getInstance();
+        $found  = false;
+        foreach ($data as $datum) {
+            if ($found) {
+                throw new \LengthException('iterable must contain exactly one element; found 2 or more');
+            }
+            /** @var mixed $result */
+            $result = $datum;
+            $found  = true;
+        }
+
+        if (!$found) {
+            throw new \LengthException('iterable must contain exactly one element; found 0');
+        }
+
+        return $result;
+    }
+
+    /**
+     * Drains the given iterable, discarding values.
+     *
+     * Useful for forcing evaluation of a lazy pipeline whose only purpose is its side effects
+     * (e.g. a side-effectful Single::map() or a Generator that writes to a log).
+     *
+     * @param iterable<mixed> $data
+     *
+     * @return void
+     */
+    public static function consume(iterable $data): void
+    {
+        foreach ($data as $_) {
+            // intentionally empty
+        }
+    }
+
+    /**
      * Reduces given iterable to the value at the nth position.
      *
      * @template T
