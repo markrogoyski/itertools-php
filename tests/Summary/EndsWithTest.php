@@ -238,4 +238,26 @@ class EndsWithTest extends \PHPUnit\Framework\TestCase
             [[1.0], [1]],
         ];
     }
+
+    /**
+     * @test endsWith - empty suffix does not consume source generator.
+     */
+    public function testEmptySuffixDoesNotConsumeSource(): void
+    {
+        // Given
+        $consumed = 0;
+        $source = (function () use (&$consumed) {
+            while (true) {
+                $consumed++;
+                yield 1;
+            }
+        })();
+
+        // When
+        $result = Summary::endsWith($source, []);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame(0, $consumed);
+    }
 }

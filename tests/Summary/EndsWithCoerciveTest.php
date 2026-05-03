@@ -297,4 +297,26 @@ class EndsWithCoerciveTest extends \PHPUnit\Framework\TestCase
         // When
         Summary::endsWithCoercive($data, $suffix);
     }
+
+    /**
+     * @test endsWithCoercive - empty suffix does not consume source generator.
+     */
+    public function testEmptySuffixDoesNotConsumeSource(): void
+    {
+        // Given
+        $consumed = 0;
+        $source = (function () use (&$consumed) {
+            while (true) {
+                $consumed++;
+                yield 1;
+            }
+        })();
+
+        // When
+        $result = Summary::endsWithCoercive($source, []);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame(0, $consumed);
+    }
 }
