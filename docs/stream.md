@@ -1806,6 +1806,165 @@ foreach ($stream as $zipped) {
 }
 ```
 
+#### Append
+Append values to the end of the stream.
+
+```$stream->append(mixed ...$values): Stream```
+
+* For appending an entire iterable, use `chainWith`.
+* Output keys are reindexed sequentially across the entire stream.
+* Empty variadic leaves the stream unchanged.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2])->append(3, 4)->toArray();
+// [1, 2, 3, 4]
+```
+
+#### Prepend
+Prepend values to the front of the stream.
+
+```$stream->prepend(mixed ...$values): Stream```
+
+* For prepending an entire iterable, use `chainWith`.
+* Output keys are reindexed sequentially across the entire stream.
+* Empty variadic leaves the stream unchanged.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([3, 4])->prepend(1, 2)->toArray();
+// [1, 2, 3, 4]
+```
+
+#### Split When
+Split the stream into groups, starting a new group every time `$predicate` matches.
+
+```$stream->splitWhen(callable $predicate): Stream```
+
+The matching element starts the next group. Source keys are discarded; outer is sequential, inner groups are list arrays.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 0, 3, 0, 4])
+    ->splitWhen(fn ($x) => $x === 0)
+    ->toArray();
+// [[1, 2], [0, 3], [0, 4]]
+```
+
+#### Group Adjacent By
+Group adjacent elements that share a key returned by `$keyFn`.
+
+```$stream->groupAdjacentBy(callable $keyFn): Stream```
+
+Yields `[groupKey, list<value>]` pairs sequentially. Repeated keys appearing in non-adjacent runs produce separate groups.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 1, 2, 2, 1])
+    ->groupAdjacentBy(fn ($x) => $x)
+    ->toArray();
+// [[1, [1, 1]], [2, [2, 2]], [1, [1]]]
+```
+
+#### Pad Left
+Pad the stream on the left so its length is at least `$length`.
+
+```$stream->padLeft(int $length, mixed $fill): Stream```
+
+* If the stream is already `$length` or longer, all elements pass through unchanged.
+* Source keys are discarded; output keys are sequential 0-indexed.
+* Throws `\InvalidArgumentException` if `$length` is negative.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3])->padLeft(5, 0)->toArray();
+// [0, 0, 1, 2, 3]
+```
+
+#### Pad Right
+Pad the stream on the right so its length is at least `$length`.
+
+```$stream->padRight(int $length, mixed $fill): Stream```
+
+* If the stream is already `$length` or longer, all elements pass through unchanged.
+* Source keys are discarded; output keys are sequential 0-indexed.
+* Throws `\InvalidArgumentException` if `$length` is negative.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3])->padRight(5, 0)->toArray();
+// [1, 2, 3, 0, 0]
+```
+
+#### Duplicates
+Yield each duplicated value once, at the moment its second occurrence is observed.
+
+```$stream->duplicates(bool $strict = true): Stream```
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 1, 1, 2, 3])->duplicates()->toArray();
+// [1, 2]
+```
+
+#### Duplicates By
+Yield each value whose extracted key duplicates a previously seen key, once at the moment of the second occurrence.
+
+```$stream->duplicatesBy(callable $keyFn): Stream```
+
+```php
+use IterTools\Stream;
+
+$users = [
+    ['id' => 1, 'name' => 'Alice'],
+    ['id' => 2, 'name' => 'Bob'],
+    ['id' => 1, 'name' => 'Alicia'],
+];
+
+$result = Stream::of($users)
+    ->duplicatesBy(fn ($u) => $u['id'])
+    ->toArray();
+// [['id' => 1, 'name' => 'Alicia']]
+```
+
+#### Shuffle
+Randomize the order of the stream.
+
+```$stream->shuffle(?\Random\Engine $engine = null): Stream```
+
+* Materializes the stream.
+* Source keys are discarded; output keys are sequential 0-indexed.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3, 4, 5])->shuffle()->toArray();
+// e.g.: [3, 1, 5, 4, 2]
+```
+
+#### Sample
+Sample `$size` elements from the stream without replacement.
+
+```$stream->sample(int $size, ?\Random\Engine $engine = null): Stream```
+
+* Materializes the stream. Output keys are sequential 0-indexed.
+* Throws `\InvalidArgumentException` if `$size` is negative.
+* Throws `\LengthException` if `$size` exceeds the stream length.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3, 4, 5])->sample(3)->toArray();
+// e.g.: [4, 1, 5]
+```
+
 ### Stream Terminal Operations
 
 #### Stream Summary Terminal Operations

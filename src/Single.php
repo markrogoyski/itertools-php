@@ -663,4 +663,158 @@ final class Single
             ++$skipped;
         }
     }
+
+    /**
+     * Split an iterable into groups, starting a new group every time $predicate matches.
+     *
+     * The matching element starts the next group (i.e. it is the first element of that group).
+     * No leading empty group is yielded if the predicate matches the first element.
+     * Empty input yields nothing. Source keys are discarded; outer is sequential, inner groups
+     * are list arrays.
+     *
+     * Example: [1,2,0,3,0,4] with predicate fn($x) => $x === 0 yields [[1,2],[0,3],[0,4]].
+     *
+     * @param iterable<mixed> $data
+     * @param callable        $predicate
+     *
+     * @return \Generator<int, list<mixed>>
+     */
+    public static function splitWhen(iterable $data, callable $predicate): \Generator
+    {
+        /** @var list<mixed> $current */
+        $current = [];
+        $started = false;
+
+        foreach ($data as $datum) {
+            if ((bool) $predicate($datum)) {
+                if ($started) {
+                    yield $current;
+                }
+                $current = [$datum];
+                $started = true;
+            } else {
+                $current[] = $datum;
+                $started = true;
+            }
+        }
+
+        if ($started) {
+            yield $current;
+        }
+    }
+
+    /**
+     * Group adjacent elements that share a key returned by $keyFn.
+     *
+     * Yields [groupKey, list<value>] pairs sequentially (not associatively). Repeated keys
+     * appearing in non-adjacent runs produce separate groups. Source keys are discarded;
+     * outer is sequential, inner groups are list arrays.
+     *
+     * Example: [1,1,2,2,1,3] keyed by identity yields [[1,[1,1]],[2,[2,2]],[1,[1]],[3,[3]]].
+     *
+     * @param iterable<mixed>      $data
+     * @param callable(mixed):mixed $keyFn
+     *
+     * @return \Generator<int, array{0: mixed, 1: list<mixed>}>
+     */
+    public static function groupAdjacentBy(iterable $data, callable $keyFn): \Generator
+    {
+        $hasPrevious = false;
+        $previousKey = null;
+        /** @var list<mixed> $current */
+        $current = [];
+
+        foreach ($data as $datum) {
+            /** @var mixed $key */
+            $key = $keyFn($datum);
+            if (!$hasPrevious) {
+                $previousKey = $key;
+                $current = [$datum];
+                $hasPrevious = true;
+                continue;
+            }
+
+            if ($key === $previousKey) {
+                $current[] = $datum;
+            } else {
+                yield [$previousKey, $current];
+                $previousKey = $key;
+                $current = [$datum];
+            }
+        }
+
+        if ($hasPrevious) {
+            yield [$previousKey, $current];
+        }
+    }
+
+    /**
+     * Pad an iterable on the left so its yielded length is at least $length.
+     *
+     * If the source is already $length or longer, all elements pass through unchanged.
+     * Source keys are discarded; output keys are sequential 0-indexed.
+     *
+     * @param iterable<mixed> $data
+     * @param int             $length minimum final length (must be non-negative)
+     * @param mixed           $fill   value used to pad
+     *
+     * @return \Generator<int, mixed>
+     *
+     * @throws \InvalidArgumentException if $length is negative.
+     */
+    public static function padLeft(iterable $data, int $length, mixed $fill): \Generator
+    {
+        if ($length < 0) {
+            throw new \InvalidArgumentException("Length cannot be negative: {$length}");
+        }
+
+        /** @var list<mixed> $buffer */
+        $buffer = [];
+        $count = 0;
+
+        foreach ($data as $datum) {
+            $buffer[] = $datum;
+            ++$count;
+        }
+
+        $padding = $length - $count;
+        for ($i = 0; $i < $padding; ++$i) {
+            yield $fill;
+        }
+
+        foreach ($buffer as $datum) {
+            yield $datum;
+        }
+    }
+
+    /**
+     * Pad an iterable on the right so its yielded length is at least $length.
+     *
+     * If the source is already $length or longer, all elements pass through unchanged.
+     * Source keys are discarded; output keys are sequential 0-indexed.
+     *
+     * @param iterable<mixed> $data
+     * @param int             $length minimum final length (must be non-negative)
+     * @param mixed           $fill   value used to pad
+     *
+     * @return \Generator<int, mixed>
+     *
+     * @throws \InvalidArgumentException if $length is negative.
+     */
+    public static function padRight(iterable $data, int $length, mixed $fill): \Generator
+    {
+        if ($length < 0) {
+            throw new \InvalidArgumentException("Length cannot be negative: {$length}");
+        }
+
+        $count = 0;
+        foreach ($data as $datum) {
+            yield $datum;
+            ++$count;
+        }
+
+        for ($i = $count; $i < $length; ++$i) {
+            yield $fill;
+        }
+    }
 }

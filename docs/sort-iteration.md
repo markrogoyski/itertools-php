@@ -237,3 +237,23 @@ foreach (Sort::smallest($requests, 3, fn ($r) => $r->durationMs) as $request) {
 // r5: 65ms
 // r4: 80ms
 ```
+
+### Shuffle
+Yields the elements of the given iterable in a random order.
+
+```Sort::shuffle(iterable $data, ?\Random\Engine $engine = null)```
+
+* Materializes the input.
+* Source keys are discarded; output keys are sequential 0-indexed.
+* Use the optional `$engine` for deterministic seeding (e.g., `new \Random\Engine\Mt19937(42)`).
+
+```php
+use IterTools\Sort;
+
+$deck = ['A♠', 'K♠', 'Q♠', 'J♠'];
+
+foreach (Sort::shuffle($deck) as $card) {
+    print($card . ' ');
+}
+// e.g.: J♠ A♠ Q♠ K♠
+```

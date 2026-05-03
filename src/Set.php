@@ -69,6 +69,75 @@ final class Set
     }
 
     /**
+     * Yield each duplicated value once, at the moment its second occurrence is observed.
+     *
+     * Example: [1, 2, 1, 1, 2, 3] yields [1, 2].
+     *
+     * Source keys are discarded; output keys are sequential 0-indexed. $strict mirrors
+     * Set::distinct comparison semantics:
+     *
+     *  - strict: scalars by ===; objects by instance; arrays by serialization;
+     *  - coercive: scalars by ==; objects/arrays by serialization (objects must be serializable).
+     *
+     * @template T
+     *
+     * @param iterable<T> $data
+     * @param bool        $strict
+     *
+     * @return \Generator<T>
+     */
+    public static function duplicates(iterable $data, bool $strict = true): \Generator
+    {
+        $seen = [];
+        $emitted = [];
+
+        foreach ($data as $datum) {
+            $hash = UniqueExtractor::getString($datum, $strict);
+            if (!isset($seen[$hash])) {
+                $seen[$hash] = true;
+                continue;
+            }
+            if (!isset($emitted[$hash])) {
+                $emitted[$hash] = true;
+                yield $datum;
+            }
+        }
+    }
+
+    /**
+     * Yield each value whose extracted key duplicates a previously seen key, once at the
+     * moment of the second occurrence.
+     *
+     * The first value whose key collides is the one yielded; subsequent collisions for
+     * that key are not yielded again. Source keys are discarded; output keys are
+     * sequential 0-indexed. Comparison of extracted keys is strict.
+     *
+     * @template T
+     *
+     * @param iterable<T> $data
+     * @param callable    $keyFn
+     *
+     * @return \Generator<T>
+     */
+    public static function duplicatesBy(iterable $data, callable $keyFn): \Generator
+    {
+        $seen = [];
+        $emitted = [];
+
+        foreach ($data as $datum) {
+            $hash = UniqueExtractor::getString($keyFn($datum), true);
+            if (!isset($seen[$hash])) {
+                $seen[$hash] = true;
+                continue;
+            }
+            if (!isset($emitted[$hash])) {
+                $emitted[$hash] = true;
+                yield $datum;
+            }
+        }
+    }
+
+    /**
      * Remove only consecutive duplicates from the iterable (Unix `uniq` behavior).
      *
      * Each element is compared strictly (===) to the previous element yielded.

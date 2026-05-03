@@ -718,6 +718,45 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Randomize the order of the stream.
+     *
+     * Materializes the stream. Source keys are discarded; output keys are sequential 0-indexed.
+     *
+     * @param \Random\Engine|null $engine optional Random engine (defaults to PHP default).
+     *
+     * @return Stream
+     *
+     * @see Sort::shuffle()
+     */
+    public function shuffle(?\Random\Engine $engine = null): self
+    {
+        $this->iterable = Sort::shuffle($this->iterable, $engine);
+        return $this;
+    }
+
+    /**
+     * Sample $size elements from the stream without replacement.
+     *
+     * Every input position is used at most once; duplicate values are allowed. Materializes
+     * the stream. Output keys are sequential 0-indexed.
+     *
+     * @param int                 $size   number of elements to draw (0 ≤ $size ≤ stream length).
+     * @param \Random\Engine|null $engine optional Random engine.
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if $size is negative.
+     * @throws \LengthException          if $size exceeds the stream length.
+     *
+     * @see Random::sample()
+     */
+    public function sample(int $size, ?\Random\Engine $engine = null): self
+    {
+        $this->iterable = Random::sample($this->iterable, $size, $engine);
+        return $this;
+    }
+
+    /**
      * Reverse the iterable source.
      *
      * @return Stream
@@ -727,6 +766,83 @@ final class Stream implements \IteratorAggregate
     public function reverse(): self
     {
         $this->iterable = Single::reverse($this->iterable);
+        return $this;
+    }
+
+    /**
+     * Split the stream into groups, starting a new group every time $predicate matches.
+     *
+     * Source keys are discarded; outer is sequential, inner groups are list arrays.
+     *
+     * @param callable(mixed):bool $predicate
+     *
+     * @return Stream
+     *
+     * @see Single::splitWhen()
+     */
+    public function splitWhen(callable $predicate): self
+    {
+        $this->iterable = Single::splitWhen($this->iterable, $predicate);
+        return $this;
+    }
+
+    /**
+     * Group adjacent elements that share a key returned by $keyFn.
+     *
+     * Yields [groupKey, list<value>] pairs sequentially. Repeated keys appearing in
+     * non-adjacent runs produce separate groups.
+     *
+     * @param callable(mixed):mixed $keyFn
+     *
+     * @return Stream
+     *
+     * @see Single::groupAdjacentBy()
+     */
+    public function groupAdjacentBy(callable $keyFn): self
+    {
+        $this->iterable = Single::groupAdjacentBy($this->iterable, $keyFn);
+        return $this;
+    }
+
+    /**
+     * Pad the stream on the left so its yielded length is at least $length.
+     *
+     * If the stream is already $length or longer, all elements pass through unchanged.
+     * Source keys are discarded; output keys are sequential 0-indexed.
+     *
+     * @param int   $length minimum final length (must be non-negative)
+     * @param mixed $fill   value used to pad
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if $length is negative.
+     *
+     * @see Single::padLeft()
+     */
+    public function padLeft(int $length, mixed $fill): self
+    {
+        $this->iterable = Single::padLeft($this->iterable, $length, $fill);
+        return $this;
+    }
+
+    /**
+     * Pad the stream on the right so its yielded length is at least $length.
+     *
+     * If the stream is already $length or longer, all elements pass through unchanged.
+     * Source keys are discarded; output keys are sequential 0-indexed.
+     *
+     * @param int   $length minimum final length (must be non-negative)
+     * @param mixed $fill   value used to pad
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if $length is negative.
+     *
+     * @see Single::padRight()
+     */
+    public function padRight(int $length, mixed $fill): self
+    {
+        $this->iterable = Single::padRight($this->iterable, $length, $fill);
         return $this;
     }
 
@@ -744,6 +860,38 @@ final class Stream implements \IteratorAggregate
     public function chainWith(iterable ...$iterables): self
     {
         $this->iterable = Multi::chain($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Prepend variadic values to the front of the stream.
+     *
+     * For inserting an entire iterable, use chainWith. Output keys are reindexed
+     * sequentially across the entire stream. Empty variadic leaves the stream unchanged.
+     *
+     * @param mixed ...$values
+     *
+     * @return Stream
+     */
+    public function prepend(mixed ...$values): self
+    {
+        $this->iterable = Multi::chain($values, $this->iterable);
+        return $this;
+    }
+
+    /**
+     * Append variadic values to the end of the stream.
+     *
+     * For appending an entire iterable, use chainWith. Output keys are reindexed
+     * sequentially across the entire stream. Empty variadic leaves the stream unchanged.
+     *
+     * @param mixed ...$values
+     *
+     * @return Stream
+     */
+    public function append(mixed ...$values): self
+    {
+        $this->iterable = Multi::chain($this->iterable, $values);
         return $this;
     }
 
@@ -1263,6 +1411,41 @@ final class Stream implements \IteratorAggregate
     public function distinctAdjacentBy(callable $keyFn): self
     {
         $this->iterable = Set::distinctAdjacentBy($this->iterable, $keyFn);
+        return $this;
+    }
+
+    /**
+     * Yield each duplicated value once, at the moment its second occurrence is observed.
+     *
+     * Source keys are discarded; output keys are sequential 0-indexed.
+     *
+     * @param bool $strict
+     *
+     * @return Stream
+     *
+     * @see Set::duplicates()
+     */
+    public function duplicates(bool $strict = true): self
+    {
+        $this->iterable = Set::duplicates($this->iterable, $strict);
+        return $this;
+    }
+
+    /**
+     * Yield each value whose extracted key duplicates a previously seen key, once at the
+     * moment of the second occurrence.
+     *
+     * Source keys are discarded; output keys are sequential 0-indexed.
+     *
+     * @param callable $keyFn
+     *
+     * @return Stream
+     *
+     * @see Set::duplicatesBy()
+     */
+    public function duplicatesBy(callable $keyFn): self
+    {
+        $this->iterable = Set::duplicatesBy($this->iterable, $keyFn);
         return $this;
     }
 

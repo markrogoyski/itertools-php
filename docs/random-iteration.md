@@ -88,3 +88,24 @@ foreach (Random::rockPaperScissors($repetitions) as $rpsHand) {
 }
 // 'paper', 'rock', 'rock', 'scissors', ... [random]
 ```
+
+### Sample
+Sample `$size` elements from the population without replacement.
+
+```Random::sample(iterable $data, int $size, ?\Random\Engine $engine = null)```
+
+* Every input position is used at most once; duplicate values in the population are valid.
+* Materializes the input. Output keys are sequential 0-indexed.
+* Throws `\InvalidArgumentException` if `$size` is negative.
+* Throws `\LengthException` if `$size` exceeds the population size.
+
+```php
+use IterTools\Random;
+
+$population = ['a', 'b', 'c', 'd', 'e'];
+
+foreach (Random::sample($population, 3) as $item) {
+    print($item);
+}
+// e.g.: c, a, e [random, no repeats]
+```

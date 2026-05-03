@@ -80,4 +80,20 @@ final class Infinite
             $current = $function($current);
         }
     }
+
+    /**
+     * Yield values produced by a zero-arg supplier forever.
+     *
+     * @template T
+     *
+     * @param callable():T $supplier
+     *
+     * @return \Generator<T>
+     */
+    public static function generate(callable $supplier): \Generator
+    {
+        while (true) {
+            yield $supplier();
+        }
+    }
 }

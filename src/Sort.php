@@ -256,4 +256,27 @@ final class Sort
             yield $item[2];
         }
     }
+
+    /**
+     * Yields the elements of the given iterable in a random order.
+     *
+     * Materializes the input. Source keys are discarded; output keys are sequential 0-indexed.
+     *
+     * @param iterable<mixed>     $data
+     * @param \Random\Engine|null $engine optional Random engine (defaults to PHP default).
+     *
+     * @return \Generator
+     */
+    public static function shuffle(iterable $data, ?\Random\Engine $engine = null): \Generator
+    {
+        $array = \iterator_to_array(Transform::toIterator($data), false);
+
+        $randomizer = new \Random\Randomizer($engine);
+        /** @var array<int, mixed> $shuffled */
+        $shuffled = $randomizer->shuffleArray($array);
+
+        foreach ($shuffled as $value) {
+            yield $value;
+        }
+    }
 }

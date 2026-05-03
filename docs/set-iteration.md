@@ -333,3 +333,47 @@ foreach (Set::unionCoercive($a, $b, $c) as $item) {
 }
 //1, 2, 3, 4, 6, 7
 ```
+
+### Duplicates
+Yield each duplicated value once, at the moment its second occurrence is observed.
+
+```Set::duplicates(iterable $data, bool $strict = true)```
+
+* `$strict` mirrors the comparison semantics of `Set::distinct`.
+* Source keys are discarded; output keys are sequential 0-indexed.
+
+```php
+use IterTools\Set;
+
+$data = [1, 2, 1, 1, 2, 3];
+
+foreach (Set::duplicates($data) as $value) {
+    print($value);
+}
+// 1, 2
+```
+
+### Duplicates By
+Yield each value whose extracted key duplicates a previously seen key, once at the moment of the second occurrence.
+
+```Set::duplicatesBy(iterable $data, callable $keyFn)```
+
+* The first value whose key collides is the one yielded; subsequent collisions for that key are not yielded again.
+* Comparison of extracted keys is strict.
+* Source keys are discarded; output keys are sequential 0-indexed.
+
+```php
+use IterTools\Set;
+
+$users = [
+    ['id' => 1, 'name' => 'Alice'],
+    ['id' => 2, 'name' => 'Bob'],
+    ['id' => 1, 'name' => 'Alicia'],
+    ['id' => 3, 'name' => 'Carol'],
+];
+
+foreach (Set::duplicatesBy($users, fn ($u) => $u['id']) as $duplicate) {
+    print($duplicate['name']);
+}
+// Alicia
+```

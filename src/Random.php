@@ -113,4 +113,48 @@ final class Random
             yield self::RPS_HANDS[$randomizer->getInt(0, 2)];
         }
     }
+
+    /**
+     * Sample $size elements from the population without replacement.
+     *
+     * Every input position is used at most once; duplicate values in the population are
+     * valid because positions, not values, are unique.
+     *
+     * Materializes the input. Output keys are sequential 0-indexed.
+     *
+     * @param iterable<mixed>     $data
+     * @param int                 $size   number of elements to draw (0 ≤ $size ≤ count of population).
+     * @param \Random\Engine|null $engine optional Random engine.
+     *
+     * @return \Generator<mixed>
+     *
+     * @throws \InvalidArgumentException if $size is negative.
+     * @throws \LengthException          if $size exceeds the population size.
+     */
+    public static function sample(iterable $data, int $size, ?\Random\Engine $engine = null): \Generator
+    {
+        if ($size < 0) {
+            throw new \InvalidArgumentException("Sample size cannot be negative: {$size}");
+        }
+
+        $array = \iterator_to_array(Transform::toIterator($data), false);
+        $count = \count($array);
+
+        if ($size > $count) {
+            throw new \LengthException(
+                "Sample size {$size} cannot exceed population size {$count}"
+            );
+        }
+
+        if ($size === 0) {
+            return;
+        }
+
+        $randomizer = new \Random\Randomizer($engine);
+        $shuffled = $randomizer->shuffleArray($array);
+
+        for ($i = 0; $i < $size; ++$i) {
+            yield $shuffled[$i];
+        }
+    }
 }

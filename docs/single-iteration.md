@@ -627,3 +627,89 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
 }
 // 0, 0
 ```
+
+### Group Adjacent By
+Group adjacent elements that share a key returned by `$keyFn`.
+
+```Single::groupAdjacentBy(iterable $data, callable $keyFn)```
+
+* Yields `[groupKey, list<value>]` pairs sequentially (not associatively).
+* Repeated keys appearing in non-adjacent runs produce **separate** groups (unlike `groupBy`).
+* Source keys are discarded; outer is sequential, inner groups are list arrays.
+
+```php
+use IterTools\Single;
+
+$readings = [1, 1, 2, 2, 1, 3];
+
+foreach (Single::groupAdjacentBy($readings, fn ($x) => $x) as [$key, $run]) {
+    print($key . ': ' . \implode(',', $run) . PHP_EOL);
+}
+// 1: 1,1
+// 2: 2,2
+// 1: 1
+// 3: 3
+```
+
+### Pad Left
+Pad an iterable on the left so its yielded length is at least `$length`.
+
+```Single::padLeft(iterable $data, int $length, mixed $fill)```
+
+* If the source is already `$length` or longer, all elements pass through unchanged (no truncation).
+* Source keys are discarded; output keys are sequential 0-indexed.
+* Throws `\InvalidArgumentException` if `$length` is negative.
+
+```php
+use IterTools\Single;
+
+$values = [1, 2, 3];
+
+foreach (Single::padLeft($values, 5, 0) as $value) {
+    print($value);
+}
+// 0, 0, 1, 2, 3
+```
+
+### Pad Right
+Pad an iterable on the right so its yielded length is at least `$length`.
+
+```Single::padRight(iterable $data, int $length, mixed $fill)```
+
+* If the source is already `$length` or longer, all elements pass through unchanged (no truncation).
+* Source keys are discarded; output keys are sequential 0-indexed.
+* Throws `\InvalidArgumentException` if `$length` is negative.
+
+```php
+use IterTools\Single;
+
+$values = [1, 2, 3];
+
+foreach (Single::padRight($values, 5, 0) as $value) {
+    print($value);
+}
+// 1, 2, 3, 0, 0
+```
+
+### Split When
+Split an iterable into groups, starting a new group every time `$predicate` matches.
+
+```Single::splitWhen(iterable $data, callable $predicate)```
+
+* The matching element starts the next group (it is the first element of that group).
+* No leading empty group is yielded if the predicate matches the first element.
+* Empty input yields nothing.
+* Source keys are discarded; outer is sequential, inner groups are list arrays.
+
+```php
+use IterTools\Single;
+
+$values = [1, 2, 0, 3, 0, 4];
+
+foreach (Single::splitWhen($values, fn ($x) => $x === 0) as $group) {
+    print(\implode(',', $group) . PHP_EOL);
+}
+// 1,2
+// 0,3
+// 0,4
+```

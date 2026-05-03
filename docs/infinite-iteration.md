@@ -87,3 +87,26 @@ foreach (Infinite::repeat($dialogue) as $repeated) {
 }
 // 'Are we there yet?', 'Are we there yet?', 'Are we there yet?', ...
 ```
+
+### Generate
+Yield values produced by a zero-arg supplier forever.
+
+```Infinite::generate(callable $supplier)```
+
+* Each iteration calls the supplier and yields its return value.
+* Captured state in the supplier persists across calls.
+
+```php
+use IterTools\Infinite;
+use IterTools\Single;
+
+$counter = 0;
+$next    = function () use (&$counter) {
+    return ++$counter;
+};
+
+foreach (Single::limit(Infinite::generate($next), 5) as $n) {
+    print($n);
+}
+// 1, 2, 3, 4, 5
+```
