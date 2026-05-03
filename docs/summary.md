@@ -57,6 +57,52 @@ $boolean = Summary::anyMatch($answers, $isUltimateAnswer);
 // true
 ```
 
+### At Least N
+Returns true if at least n items match the predicate function.
+
+- Predicate is optional.
+- Default predicate is the boolean value of each item.
+- Short-circuits as soon as the count reaches n.
+- `n <= 0` always returns true.
+
+```Summary::atLeastN(iterable $data, int $n, callable $predicate = null): bool```
+
+```php
+use IterTools\Summary;
+
+$grades         = [45, 50, 61, 72, 85];
+$isPassingGrade = fn ($grade) => $grade >= 70;
+
+$boolean = Summary::atLeastN($grades, 2, $isPassingGrade);
+// true
+
+$boolean = Summary::atLeastN($grades, 3, $isPassingGrade);
+// false
+```
+
+### At Most N
+Returns true if at most n items match the predicate function.
+
+- Predicate is optional.
+- Default predicate is the boolean value of each item.
+- Short-circuits as soon as the count exceeds n.
+- `n < 0` always returns false.
+
+```Summary::atMostN(iterable $data, int $n, callable $predicate = null): bool```
+
+```php
+use IterTools\Summary;
+
+$attempts  = [false, false, true, false];
+$isFailure = fn ($attempt) => $attempt === false;
+
+$boolean = Summary::atMostN($attempts, 3, $isFailure);
+// true
+
+$boolean = Summary::atMostN($attempts, 2, $isFailure);
+// false
+```
+
 ### Are Permutations
 Returns true if all iterables are permutations of each other.
 
@@ -139,6 +185,56 @@ $boolean = Summary::containsCoercive($primes, '7');
 
 $boolean = Summary::containsCoercive([100, 200, 300], '1e2');
 // true
+```
+
+### Ends With
+Returns true if the iterable ends with the given suffix (using strict-type comparison).
+
+- Compares values pairwise; keys are ignored.
+- Empty suffix returns true without consuming the source.
+- Both source and suffix must be finite.
+
+```Summary::endsWith(iterable $data, iterable $suffix): bool```
+
+```php
+use IterTools\Summary;
+
+$path = ['var', 'log', 'nginx', 'access.log'];
+
+$boolean = Summary::endsWith($path, ['access.log']);
+// true
+
+$boolean = Summary::endsWith($path, ['nginx', 'access.log']);
+// true
+
+$boolean = Summary::endsWith($path, ['error.log']);
+// false
+```
+
+### Ends With Coercive
+Returns true if the iterable ends with the given suffix (using type coercion).
+
+- Compares values pairwise; keys are ignored.
+- Empty suffix returns true without consuming the source.
+- Both source and suffix must be finite.
+- Coercive (non-strict) value comparison:
+  - scalars: compares non-strictly by value (1 matches '1', 0 matches false)
+  - objects: compares serialized (throws `\InvalidArgumentException` if not serializable)
+  - arrays: compares serialized
+  - `NaN` matches `NaN`
+
+```Summary::endsWithCoercive(iterable $data, iterable $suffix): bool```
+
+```php
+use IterTools\Summary;
+
+$digits = [1, 2, 3];
+
+$boolean = Summary::endsWithCoercive($digits, ['2', '3']);
+// true (coercive comparison)
+
+$boolean = Summary::endsWith($digits, ['2', '3']);
+// false (strict comparison)
 ```
 
 ### Exactly N
@@ -301,4 +397,52 @@ $matrixMovies = ['The Matrix', 'The Matrix Reloaded', 'The Matrix Revolutions', 
 
 $result = Summary::sameCount($batmanMovies, $matrixMovies);
 // false
+```
+
+### Starts With
+Returns true if the iterable starts with the given prefix (using strict-type comparison).
+
+- Compares values pairwise; keys are ignored.
+- Empty prefix returns true without consuming the source.
+
+```Summary::startsWith(iterable $data, iterable $prefix): bool```
+
+```php
+use IterTools\Summary;
+
+$path = ['var', 'log', 'nginx', 'access.log'];
+
+$boolean = Summary::startsWith($path, ['var']);
+// true
+
+$boolean = Summary::startsWith($path, ['var', 'log']);
+// true
+
+$boolean = Summary::startsWith($path, ['etc']);
+// false
+```
+
+### Starts With Coercive
+Returns true if the iterable starts with the given prefix (using type coercion).
+
+- Compares values pairwise; keys are ignored.
+- Empty prefix returns true without consuming the source.
+- Coercive (non-strict) value comparison:
+  - scalars: compares non-strictly by value (1 matches '1', 0 matches false)
+  - objects: compares serialized (throws `\InvalidArgumentException` if not serializable)
+  - arrays: compares serialized
+  - `NaN` matches `NaN`
+
+```Summary::startsWithCoercive(iterable $data, iterable $prefix): bool```
+
+```php
+use IterTools\Summary;
+
+$digits = [1, 2, 3];
+
+$boolean = Summary::startsWithCoercive($digits, ['1', '2']);
+// true (coercive comparison)
+
+$boolean = Summary::startsWith($digits, ['1', '2']);
+// false (strict comparison)
 ```

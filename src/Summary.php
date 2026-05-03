@@ -226,6 +226,81 @@ final class Summary
     }
 
     /**
+     * Returns true if at least n items in the iterable are true where the predicate function is true.
+     *
+     * Default predicate if not provided is the boolean value of each data item.
+     *
+     * Short-circuits as soon as the count reaches $n.
+     *
+     * Edge cases:
+     *  - $n <= 0 → always true (no work done).
+     *
+     * @param iterable<mixed> $data
+     * @param int             $n
+     * @param callable|null   $predicate
+     *
+     * @return bool
+     */
+    public static function atLeastN(iterable $data, int $n, ?callable $predicate = null): bool
+    {
+        if ($n <= 0) {
+            return true;
+        }
+
+        $predicate ??= fn (mixed $datum): bool => \boolval($datum);
+
+        $count = 0;
+        foreach ($data as $datum) {
+            if ((bool) $predicate($datum)) {
+                $count++;
+                if ($count >= $n) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true if at most n items in the iterable are true where the predicate function is true.
+     *
+     * Default predicate if not provided is the boolean value of each data item.
+     *
+     * Short-circuits as soon as the count exceeds $n.
+     *
+     * Edge cases:
+     *  - $n < 0 → always false (mirrors exactlyN(-1) === false).
+     *  - $n === 0 → true iff zero matches.
+     *
+     * @param iterable<mixed> $data
+     * @param int             $n
+     * @param callable|null   $predicate
+     *
+     * @return bool
+     */
+    public static function atMostN(iterable $data, int $n, ?callable $predicate = null): bool
+    {
+        if ($n < 0) {
+            return false;
+        }
+
+        $predicate ??= fn (mixed $datum): bool => \boolval($datum);
+
+        $count = 0;
+        foreach ($data as $datum) {
+            if ((bool) $predicate($datum)) {
+                $count++;
+                if ($count > $n) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Returns true if given collections are permutations of each other (using strict-type comparisons).
      *
      * Returns true if no collections given or for single collection.
@@ -305,6 +380,198 @@ final class Summary
         }
 
         return true;
+    }
+
+    /**
+     * Returns true if the iterable starts with the given prefix (using strict-type comparison).
+     *
+     * Compares values pairwise; keys are ignored.
+     *
+     * Empty prefix → true without consuming the source.
+     *
+     * Strict-type comparison uses ===.
+     *
+     * @param iterable<mixed> $data
+     * @param iterable<mixed> $prefix must be finite
+     *
+     * @return bool
+     */
+    public static function startsWith(iterable $data, iterable $prefix): bool
+    {
+        return self::startsWithInternal($data, $prefix, true);
+    }
+
+    /**
+     * Returns true if the iterable starts with the given prefix (using type coercion).
+     *
+     * Compares values pairwise; keys are ignored.
+     *
+     * Empty prefix → true without consuming the source.
+     *
+     * Coercive (non-strict) value comparison:
+     *  - scalars: compares non-strictly by value (1 matches '1', 0 matches false)
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
+     *  - arrays: compares serialized
+     *  - NaN: matches NaN (consistent with other coercive operations in this library)
+     *
+     * @param iterable<mixed> $data
+     * @param iterable<mixed> $prefix must be finite
+     *
+     * @return bool
+     *
+     * @throws \InvalidArgumentException if a non-serializable object is reached during comparison
+     */
+    public static function startsWithCoercive(iterable $data, iterable $prefix): bool
+    {
+        return self::startsWithInternal($data, $prefix, false);
+    }
+
+    /**
+     * Returns true if the iterable ends with the given suffix (using strict-type comparison).
+     *
+     * Compares values pairwise; keys are ignored.
+     *
+     * Empty suffix → true without consuming the source.
+     *
+     * Both source and suffix must be finite. Buffers up to count($suffix) elements via a sliding window.
+     *
+     * Strict-type comparison uses ===.
+     *
+     * @param iterable<mixed> $data   must be finite
+     * @param iterable<mixed> $suffix must be finite
+     *
+     * @return bool
+     */
+    public static function endsWith(iterable $data, iterable $suffix): bool
+    {
+        return self::endsWithInternal($data, $suffix, true);
+    }
+
+    /**
+     * Returns true if the iterable ends with the given suffix (using type coercion).
+     *
+     * Compares values pairwise; keys are ignored.
+     *
+     * Empty suffix → true without consuming the source.
+     *
+     * Both source and suffix must be finite. Buffers up to count($suffix) elements via a sliding window.
+     *
+     * Coercive (non-strict) value comparison:
+     *  - scalars: compares non-strictly by value (1 matches '1', 0 matches false)
+     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
+     *  - arrays: compares serialized
+     *  - NaN: matches NaN (consistent with other coercive operations in this library)
+     *
+     * @param iterable<mixed> $data   must be finite
+     * @param iterable<mixed> $suffix must be finite
+     *
+     * @return bool
+     *
+     * @throws \InvalidArgumentException if a non-serializable object is reached during comparison
+     */
+    public static function endsWithCoercive(iterable $data, iterable $suffix): bool
+    {
+        return self::endsWithInternal($data, $suffix, false);
+    }
+
+    /**
+     * Internal helper for startsWith() and startsWithCoercive().
+     *
+     * @param iterable<mixed> $data
+     * @param iterable<mixed> $prefix
+     * @param bool            $strict
+     *
+     * @return bool
+     */
+    private static function startsWithInternal(iterable $data, iterable $prefix, bool $strict): bool
+    {
+        $dataIt = null;
+        foreach ($prefix as $expected) {
+            if ($dataIt === null) {
+                $dataIt = Transform::toIterator($data);
+                if (!($dataIt instanceof \Generator)) {
+                    $dataIt->rewind();
+                }
+            }
+            if (!$dataIt->valid()) {
+                return false;
+            }
+            $actual = $dataIt->current();
+            if (!self::valuesEqual($actual, $expected, $strict)) {
+                return false;
+            }
+            $dataIt->next();
+        }
+
+        return true;
+    }
+
+    /**
+     * Internal helper for endsWith() and endsWithCoercive().
+     *
+     * @param iterable<mixed> $data
+     * @param iterable<mixed> $suffix
+     * @param bool            $strict
+     *
+     * @return bool
+     */
+    private static function endsWithInternal(iterable $data, iterable $suffix, bool $strict): bool
+    {
+        $suffixArr = [];
+        foreach ($suffix as $value) {
+            $suffixArr[] = $value;
+        }
+        $suffixLen = \count($suffixArr);
+
+        if ($suffixLen === 0) {
+            return true;
+        }
+
+        $window = [];
+        foreach ($data as $value) {
+            $window[] = $value;
+            if (\count($window) > $suffixLen) {
+                \array_shift($window);
+            }
+        }
+
+        if (\count($window) !== $suffixLen) {
+            return false;
+        }
+
+        for ($i = 0; $i < $suffixLen; $i++) {
+            if (!self::valuesEqual($window[$i], $suffixArr[$i], $strict)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Pairwise equality used by startsWith and endsWith (strict and coercive variants).
+     *
+     * Strict mode uses ===.
+     *
+     * Coercive mode follows the library-wide contract (mirrors containsCoercive,
+     * arePermutationsCoercive, etc.):
+     *  - scalars: compared non-strictly by value (1 matches '1', 0 matches false)
+     *  - objects: compared by serialized value (throws \InvalidArgumentException if not serializable)
+     *  - arrays: compared by serialized value
+     *  - NaN matches NaN
+     *
+     * @param mixed $a
+     * @param mixed $b
+     * @param bool  $strict
+     *
+     * @return bool
+     */
+    private static function valuesEqual(mixed $a, mixed $b, bool $strict): bool
+    {
+        if ($strict) {
+            return $a === $b;
+        }
+        return UniqueExtractor::getString($a, false) === UniqueExtractor::getString($b, false);
     }
 
     /**

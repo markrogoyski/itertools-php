@@ -1877,6 +1877,46 @@ $boolean = Stream::of(['i', 't', 'e', 'r'])
 // true
 ```
 
+##### At Least N
+Returns true if at least n items in the stream match the predicate function.
+
+- Predicate is optional.
+- Default predicate is the boolean value of each item.
+- Short-circuits as soon as the count reaches n.
+- `n <= 0` always returns true.
+
+```$stream->atLeastN(int $n, callable $predicate = null): bool```
+
+```php
+use IterTools\Stream;
+
+$grades         = [45, 50, 61, 72, 85];
+$isPassingGrade = fn ($grade) => $grade >= 70;
+
+$boolean = Stream::of($grades)->atLeastN(2, $isPassingGrade);
+// true
+```
+
+##### At Most N
+Returns true if at most n items in the stream match the predicate function.
+
+- Predicate is optional.
+- Default predicate is the boolean value of each item.
+- Short-circuits as soon as the count exceeds n.
+- `n < 0` always returns false.
+
+```$stream->atMostN(int $n, callable $predicate = null): bool```
+
+```php
+use IterTools\Stream;
+
+$attempts  = [false, false, true, false];
+$isFailure = fn ($attempt) => $attempt === false;
+
+$boolean = Stream::of($attempts)->atMostN(3, $isFailure);
+// true
+```
+
 ##### Are Permutations Coercive With
 Returns true if all iterables are permutations with stream with [type coercion](../README.md#strict-and-coercive-types).
 
@@ -1933,6 +1973,47 @@ use IterTools\Stream;
 $primes = [2, 3, 5, 7, 11, 13];
 
 $boolean = Stream::of($primes)->containsCoercive('7');
+// true (coercive comparison)
+```
+
+##### Ends With
+Returns true if the stream ends with the given suffix using [strict-type comparison](../README.md#strict-and-coercive-types).
+
+- Compares values pairwise; keys are ignored.
+- Empty suffix returns true without consuming the stream.
+- The stream must be finite.
+
+```$stream->endsWith(iterable $suffix): bool```
+
+```php
+use IterTools\Stream;
+
+$path = ['var', 'log', 'nginx', 'access.log'];
+
+$boolean = Stream::of($path)->endsWith(['nginx', 'access.log']);
+// true
+
+$boolean = Stream::of($path)->endsWith(['error.log']);
+// false
+```
+
+##### Ends With Coercive
+Returns true if the stream ends with the given suffix using [type coercion](../README.md#strict-and-coercive-types).
+
+- Compares values pairwise; keys are ignored.
+- Empty suffix returns true without consuming the stream.
+- The stream must be finite.
+- Scalars are compared non-strictly by value, objects and arrays by serialized value, and `NaN` matches `NaN`.
+- Throws `\InvalidArgumentException` if a non-serializable object is reached during comparison.
+
+```$stream->endsWithCoercive(iterable $suffix): bool```
+
+```php
+use IterTools\Stream;
+
+$digits = [1, 2, 3];
+
+$boolean = Stream::of($digits)->endsWithCoercive(['2', '3']);
 // true (coercive comparison)
 ```
 
@@ -2095,6 +2176,45 @@ $result = Stream::of($input)
 $result = Stream::of($input)
     ->sameCountWith([1, 2, 3]);
 // false
+```
+
+##### Starts With
+Returns true if the stream starts with the given prefix using [strict-type comparison](../README.md#strict-and-coercive-types).
+
+- Compares values pairwise; keys are ignored.
+- Empty prefix returns true without consuming the stream.
+
+```$stream->startsWith(iterable $prefix): bool```
+
+```php
+use IterTools\Stream;
+
+$path = ['var', 'log', 'nginx', 'access.log'];
+
+$boolean = Stream::of($path)->startsWith(['var', 'log']);
+// true
+
+$boolean = Stream::of($path)->startsWith(['etc']);
+// false
+```
+
+##### Starts With Coercive
+Returns true if the stream starts with the given prefix using [type coercion](../README.md#strict-and-coercive-types).
+
+- Compares values pairwise; keys are ignored.
+- Empty prefix returns true without consuming the stream.
+- Scalars are compared non-strictly by value, objects and arrays by serialized value, and `NaN` matches `NaN`.
+- Throws `\InvalidArgumentException` if a non-serializable object is reached during comparison.
+
+```$stream->startsWithCoercive(iterable $prefix): bool```
+
+```php
+use IterTools\Stream;
+
+$digits = [1, 2, 3];
+
+$boolean = Stream::of($digits)->startsWithCoercive(['1', '2']);
+// true (coercive comparison)
 ```
 
 #### Stream Reduction Terminal Operations

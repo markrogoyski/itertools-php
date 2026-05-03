@@ -214,8 +214,12 @@ Quick Reference
 | [`anyMatch`](docs/summary.md#any-match)                                | True if any item is true according to predicate                          | `Summary::anyMatch($data, $predicate)`            |
 | [`arePermutations`](docs/summary.md#are-permutations)                  | True if iterables are permutations of each other                         | `Summary::arePermutations(...$iterables)`         |
 | [`arePermutationsCoercive`](docs/summary.md#are-permutations-coercive) | True if iterables are permutations of each other with type coercion      | `Summary::arePermutationsCoercive(...$iterables)` |
+| [`atLeastN`](docs/summary.md#at-least-n)                               | True if at least n items are true according to predicate                 | `Summary::atLeastN($data, $n, [$predicate])`      |
+| [`atMostN`](docs/summary.md#at-most-n)                                 | True if at most n items are true according to predicate                  | `Summary::atMostN($data, $n, [$predicate])`       |
 | [`contains`](docs/summary.md#contains)                                 | True if iterable contains the needle                                     | `Summary::contains($data, $needle)`               |
 | [`containsCoercive`](docs/summary.md#contains-coercive)                | True if iterable contains the needle with type coercion                  | `Summary::containsCoercive($data, $needle)`       |
+| [`endsWith`](docs/summary.md#ends-with)                                | True if iterable ends with the given suffix                              | `Summary::endsWith($data, $suffix)`               |
+| [`endsWithCoercive`](docs/summary.md#ends-with-coercive)               | True if iterable ends with the given suffix with type coercion           | `Summary::endsWithCoercive($data, $suffix)`       |
 | [`exactlyN`](docs/summary.md#exactly-n)                                | True if exactly n items are true according to predicate                  | `Summary::exactlyN($data, $n, $predicate)`        |
 | [`isEmpty`](docs/summary.md#is-empty)                                  | True if iterable has no items                                            | `Summary::isEmpty($data)`                         |
 | [`isPartitioned`](docs/summary.md#is-partitioned)                      | True if partitioned with items true according to predicate before others | `Summary::isPartitioned($data, $predicate)`       |
@@ -224,6 +228,8 @@ Quick Reference
 | [`noneMatch`](docs/summary.md#none-match)                              | True if none of items true according to predicate                        | `Summary::noneMatch($data, $predicate)`           |
 | [`same`](docs/summary.md#same)                                         | True if iterables are the same                                           | `Summary::same(...$iterables)`                    |
 | [`sameCount`](docs/summary.md#same-count)                              | True if iterables have the same lengths                                  | `Summary::sameCount(...$iterables)`               |
+| [`startsWith`](docs/summary.md#starts-with)                            | True if iterable starts with the given prefix                            | `Summary::startsWith($data, $prefix)`             |
+| [`startsWithCoercive`](docs/summary.md#starts-with-coercive)           | True if iterable starts with the given prefix with type coercion         | `Summary::startsWithCoercive($data, $prefix)`     |
 
 #### Reduce
 | Reducer                                                    | Description                                  | Code Snippet                                                  |
@@ -349,8 +355,12 @@ Quick Reference
 | [`anyMatch`](docs/stream.md#any-match)                                       | Returns true if any item in stream matches predicate                             | `$stream->anyMatch($predicate)`                        |
 | [`arePermutationsWith`](docs/stream.md#are-permutations-with)                  | Returns true if all iterables permutations of stream                             | `$stream->arePermutationsWith(...$iterables)`          |
 | [`arePermutationsCoerciveWith`](docs/stream.md#are-permutations-coercive-with) | Returns true if all iterables permutations of stream with type coercion          | `$stream->arePermutationsCoerciveWith(...$iterables)`  |
+| [`atLeastN`](docs/stream.md#at-least-n)                                      | Returns true if at least n items are true according to predicate                 | `$stream->atLeastN($n, [$predicate])`                  |
+| [`atMostN`](docs/stream.md#at-most-n)                                        | Returns true if at most n items are true according to predicate                  | `$stream->atMostN($n, [$predicate])`                   |
 | [`contains`](docs/stream.md#contains)                                        | Returns true if stream contains the needle                                       | `$stream->contains($needle)`                           |
 | [`containsCoercive`](docs/stream.md#contains-coercive)                       | Returns true if stream contains the needle with type coercion                    | `$stream->containsCoercive($needle)`                   |
+| [`endsWith`](docs/stream.md#ends-with)                                       | Returns true if stream ends with the given suffix                                | `$stream->endsWith($suffix)`                           |
+| [`endsWithCoercive`](docs/stream.md#ends-with-coercive)                      | Returns true if stream ends with the given suffix with type coercion             | `$stream->endsWithCoercive($suffix)`                   |
 | [`exactlyN`](docs/stream.md#exactly-n)                                       | Returns true if exactly n items are true according to predicate                  | `$stream->exactlyN($n, $predicate)`                    |
 | [`isEmpty`](docs/stream.md#is-empty)                                         | Returns true if stream has no items                                              | `$stream::isEmpty()`                                   |
 | [`isPartitioned`](docs/stream.md#is-partitioned)                             | Returns true if partitioned with items true according to predicate before others | `$stream::isPartitioned($predicate)`                   |
@@ -359,6 +369,8 @@ Quick Reference
 | [`noneMatch`](docs/stream.md#none-match)                                     | Returns true if none of the items in stream match predicate                      | `$stream->noneMatch($predicate)`                       |
 | [`sameWith`](docs/stream.md#same-with)                                         | Returns true if stream and all given collections are the same                    | `$stream->sameWith(...$iterables)`                     |
 | [`sameCountWith`](docs/stream.md#same-count-with)                              | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`                |
+| [`startsWith`](docs/stream.md#starts-with)                                   | Returns true if stream starts with the given prefix                              | `$stream->startsWith($prefix)`                         |
+| [`startsWithCoercive`](docs/stream.md#starts-with-coercive)                  | Returns true if stream starts with the given prefix with type coercion           | `$stream->startsWithCoercive($prefix)`                 |
 
 ##### Reduction Terminal Operations
 | Terminal Operation                                         | Description                                          | Code Snippet                                            |

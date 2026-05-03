@@ -1883,6 +1883,116 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns true if at least n items in the stream are true where the predicate function is true.
+     *
+     * Default predicate if not provided is the boolean value of each data item.
+     *
+     * Short-circuits as soon as the count reaches $n.
+     *
+     * @param int           $n
+     * @param callable|null $predicate
+     *
+     * @return bool
+     *
+     * @see Summary::atLeastN()
+     */
+    public function atLeastN(int $n, ?callable $predicate = null): bool
+    {
+        return Summary::atLeastN($this->iterable, $n, $predicate);
+    }
+
+    /**
+     * Returns true if at most n items in the stream are true where the predicate function is true.
+     *
+     * Default predicate if not provided is the boolean value of each data item.
+     *
+     * Short-circuits as soon as the count exceeds $n.
+     *
+     * @param int           $n
+     * @param callable|null $predicate
+     *
+     * @return bool
+     *
+     * @see Summary::atMostN()
+     */
+    public function atMostN(int $n, ?callable $predicate = null): bool
+    {
+        return Summary::atMostN($this->iterable, $n, $predicate);
+    }
+
+    /**
+     * Returns true if the stream starts with the given prefix (using strict-type comparison).
+     *
+     * Compares values pairwise; keys are ignored.
+     *
+     * Empty prefix → true without consuming the stream.
+     *
+     * @param iterable<mixed> $prefix
+     *
+     * @return bool
+     *
+     * @see Summary::startsWith()
+     */
+    public function startsWith(iterable $prefix): bool
+    {
+        return Summary::startsWith($this->iterable, $prefix);
+    }
+
+    /**
+     * Returns true if the stream starts with the given prefix (using type coercion).
+     *
+     * Compares values pairwise; keys are ignored.
+     *
+     * Empty prefix → true without consuming the stream.
+     *
+     * @param iterable<mixed> $prefix
+     *
+     * @return bool
+     *
+     * @see Summary::startsWithCoercive()
+     */
+    public function startsWithCoercive(iterable $prefix): bool
+    {
+        return Summary::startsWithCoercive($this->iterable, $prefix);
+    }
+
+    /**
+     * Returns true if the stream ends with the given suffix (using strict-type comparison).
+     *
+     * Compares values pairwise; keys are ignored.
+     *
+     * Empty suffix → true without consuming the stream. The stream must be finite.
+     *
+     * @param iterable<mixed> $suffix
+     *
+     * @return bool
+     *
+     * @see Summary::endsWith()
+     */
+    public function endsWith(iterable $suffix): bool
+    {
+        return Summary::endsWith($this->iterable, $suffix);
+    }
+
+    /**
+     * Returns true if the stream ends with the given suffix (using type coercion).
+     *
+     * Compares values pairwise; keys are ignored.
+     *
+     * Empty suffix → true without consuming the stream. The stream must be finite.
+     *
+     * @param iterable<mixed> $suffix
+     *
+     * @return bool
+     *
+     * @see Summary::endsWithCoercive()
+     */
+    public function endsWithCoercive(iterable $suffix): bool
+    {
+        return Summary::endsWithCoercive($this->iterable, $suffix);
+    }
+
+    /**
      * Returns true if all elements in stream that satisfy the predicate
      * appear before all elements that don't.
      *
