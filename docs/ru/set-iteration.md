@@ -335,3 +335,47 @@ foreach (Set::unionCoercive($a, $b, $c) as $item) {
 }
 //1, 2, 3, 4, 6, 7
 ```
+
+### Duplicates
+Отдаёт каждое дублирующееся значение по одному разу — в момент его второго появления.
+
+```Set::duplicates(iterable $data, bool $strict = true)```
+
+* Параметр `$strict` соответствует семантике сравнения в `Set::distinct`.
+* Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+
+```php
+use IterTools\Set;
+
+$data = [1, 2, 1, 1, 2, 3];
+
+foreach (Set::duplicates($data) as $value) {
+    print($value);
+}
+// 1, 2
+```
+
+### Duplicates By
+Отдаёт каждое значение, чей извлечённый ключ совпадает с уже встречавшимся, по одному разу — в момент второго появления такого ключа.
+
+```Set::duplicatesBy(iterable $data, callable $keyFn)```
+
+* Отдаётся первое значение, чей ключ совпал; последующие совпадения по тому же ключу не отдаются.
+* Сравнение извлечённых ключей строгое.
+* Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+
+```php
+use IterTools\Set;
+
+$users = [
+    ['id' => 1, 'name' => 'Alice'],
+    ['id' => 2, 'name' => 'Bob'],
+    ['id' => 1, 'name' => 'Alicia'],
+    ['id' => 3, 'name' => 'Carol'],
+];
+
+foreach (Set::duplicatesBy($users, fn ($u) => $u['id']) as $duplicate) {
+    print($duplicate['name']);
+}
+// Alicia
+```

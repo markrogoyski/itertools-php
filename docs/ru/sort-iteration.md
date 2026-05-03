@@ -239,3 +239,23 @@ foreach (Sort::smallest($requests, 3, fn ($r) => $r->durationMs) as $request) {
 // r5: 65ms
 // r4: 80ms
 ```
+
+### Shuffle
+Отдаёт элементы коллекции в случайном порядке.
+
+```Sort::shuffle(iterable $data, ?\Random\Engine $engine = null)```
+
+* Материализует входные данные.
+* Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+* Опциональный параметр `$engine` позволяет задать детерминированный seed (например, `new \Random\Engine\Mt19937(42)`).
+
+```php
+use IterTools\Sort;
+
+$deck = ['A♠', 'K♠', 'Q♠', 'J♠'];
+
+foreach (Sort::shuffle($deck) as $card) {
+    print($card . ' ');
+}
+// например: J♠ A♠ Q♠ K♠
+```

@@ -57,6 +57,52 @@ $boolean = Summary::anyMatch($answers, $isUltimateAnswer);
 // true
 ```
 
+### At Least N
+Возвращает истину, если предикат возвращает истину как минимум для N элементов коллекции.
+
+- Предикат является необязательным аргументом.
+- По умолчанию предикат выполняет приведение значения элемента коллекции к типу `bool`.
+- Прерывает итерацию сразу после того, как количество совпадений достигнет N.
+- При `n <= 0` всегда возвращает истину.
+
+```Summary::atLeastN(iterable $data, int $n, callable $predicate = null): bool```
+
+```php
+use IterTools\Summary;
+
+$grades         = [45, 50, 61, 72, 85];
+$isPassingGrade = fn ($grade) => $grade >= 70;
+
+$boolean = Summary::atLeastN($grades, 2, $isPassingGrade);
+// true
+
+$boolean = Summary::atLeastN($grades, 3, $isPassingGrade);
+// false
+```
+
+### At Most N
+Возвращает истину, если предикат возвращает истину не более чем для N элементов коллекции.
+
+- Предикат является необязательным аргументом.
+- По умолчанию предикат выполняет приведение значения элемента коллекции к типу `bool`.
+- Прерывает итерацию сразу после того, как количество совпадений превысит N.
+- При `n < 0` всегда возвращает ложь.
+
+```Summary::atMostN(iterable $data, int $n, callable $predicate = null): bool```
+
+```php
+use IterTools\Summary;
+
+$attempts  = [false, false, true, false];
+$isFailure = fn ($attempt) => $attempt === false;
+
+$boolean = Summary::atMostN($attempts, 3, $isFailure);
+// true
+
+$boolean = Summary::atMostN($attempts, 2, $isFailure);
+// false
+```
+
 ### Are Permutations
 Возвращает истину, если коллекции являются перестановками друг друга.
 
@@ -136,6 +182,56 @@ $boolean = Summary::containsCoercive($primes, '7');
 
 $boolean = Summary::containsCoercive([100, 200, 300], '1e2');
 // true
+```
+
+### Ends With
+Возвращает истину, если коллекция заканчивается заданным суффиксом (при [строгом сравнении типов](README.md#режимы-типизации)).
+
+- Сравнение значений идёт попарно; ключи игнорируются.
+- Пустой суффикс возвращает истину без потребления исходной коллекции.
+- И исходная коллекция, и суффикс должны быть конечными.
+
+```Summary::endsWith(iterable $data, iterable $suffix): bool```
+
+```php
+use IterTools\Summary;
+
+$path = ['var', 'log', 'nginx', 'access.log'];
+
+$boolean = Summary::endsWith($path, ['access.log']);
+// true
+
+$boolean = Summary::endsWith($path, ['nginx', 'access.log']);
+// true
+
+$boolean = Summary::endsWith($path, ['error.log']);
+// false
+```
+
+### Ends With Coercive
+Возвращает истину, если коллекция заканчивается заданным суффиксом (в режиме [приведения типов](README.md#режимы-типизации)).
+
+- Сравнение значений идёт попарно; ключи игнорируются.
+- Пустой суффикс возвращает истину без потребления исходной коллекции.
+- И исходная коллекция, и суффикс должны быть конечными.
+- Нестрогое сравнение значений:
+  - скаляры: сравниваются нестрого по значению (`1` совпадает с `'1'`, `0` совпадает с `false`)
+  - объекты: сравниваются по сериализованному значению (бросает `\InvalidArgumentException`, если значение не сериализуется)
+  - массивы: сравниваются по сериализованному значению
+  - `NaN` совпадает с `NaN`
+
+```Summary::endsWithCoercive(iterable $data, iterable $suffix): bool```
+
+```php
+use IterTools\Summary;
+
+$digits = [1, 2, 3];
+
+$boolean = Summary::endsWithCoercive($digits, ['2', '3']);
+// true (приведение типов)
+
+$boolean = Summary::endsWith($digits, ['2', '3']);
+// false (строгое сравнение)
 ```
 
 ### Exactly N
@@ -296,4 +392,52 @@ $matrixMovies = ['The Matrix', 'The Matrix Reloaded', 'The Matrix Revolutions', 
 
 $result = Summary::sameCount($batmanMovies, $matrixMovies);
 // false
+```
+
+### Starts With
+Возвращает истину, если коллекция начинается с заданного префикса (при [строгом сравнении типов](README.md#режимы-типизации)).
+
+- Сравнение значений идёт попарно; ключи игнорируются.
+- Пустой префикс возвращает истину без потребления исходной коллекции.
+
+```Summary::startsWith(iterable $data, iterable $prefix): bool```
+
+```php
+use IterTools\Summary;
+
+$path = ['var', 'log', 'nginx', 'access.log'];
+
+$boolean = Summary::startsWith($path, ['var']);
+// true
+
+$boolean = Summary::startsWith($path, ['var', 'log']);
+// true
+
+$boolean = Summary::startsWith($path, ['etc']);
+// false
+```
+
+### Starts With Coercive
+Возвращает истину, если коллекция начинается с заданного префикса (в режиме [приведения типов](README.md#режимы-типизации)).
+
+- Сравнение значений идёт попарно; ключи игнорируются.
+- Пустой префикс возвращает истину без потребления исходной коллекции.
+- Нестрогое сравнение значений:
+  - скаляры: сравниваются нестрого по значению (`1` совпадает с `'1'`, `0` совпадает с `false`)
+  - объекты: сравниваются по сериализованному значению (бросает `\InvalidArgumentException`, если значение не сериализуется)
+  - массивы: сравниваются по сериализованному значению
+  - `NaN` совпадает с `NaN`
+
+```Summary::startsWithCoercive(iterable $data, iterable $prefix): bool```
+
+```php
+use IterTools\Summary;
+
+$digits = [1, 2, 3];
+
+$boolean = Summary::startsWithCoercive($digits, ['1', '2']);
+// true (приведение типов)
+
+$boolean = Summary::startsWith($digits, ['1', '2']);
+// false (строгое сравнение)
 ```

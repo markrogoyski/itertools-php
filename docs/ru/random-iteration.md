@@ -88,3 +88,24 @@ foreach (Random::rockPaperScissors($repetitions) as $rpsHand) {
 }
 // 'paper', 'rock', 'rock', 'scissors', ... [random]
 ```
+
+### Sample
+Возвращает выборку из `$size` элементов из коллекции без повторений.
+
+```Random::sample(iterable $data, int $size, ?\Random\Engine $engine = null)```
+
+* Каждая позиция исходной коллекции используется не более одного раза; одинаковые значения в источнике допустимы.
+* Материализует входные данные. Ключи результата — последовательные, начиная с 0.
+* Бросает `\InvalidArgumentException`, если `$size` отрицателен.
+* Бросает `\LengthException`, если `$size` превышает размер исходной коллекции.
+
+```php
+use IterTools\Random;
+
+$population = ['a', 'b', 'c', 'd', 'e'];
+
+foreach (Random::sample($population, 3) as $item) {
+    print($item);
+}
+// например: c, a, e [случайно, без повторов]
+```

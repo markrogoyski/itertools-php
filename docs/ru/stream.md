@@ -1804,6 +1804,165 @@ foreach ($result as $item) {
 }
 ```
 
+#### Append
+Добавляет значения в конец потока.
+
+```$stream->append(mixed ...$values): Stream```
+
+* Для добавления целой коллекции используйте `chainWith`.
+* Ключи результата переиндексируются последовательно по всему потоку.
+* Пустой набор аргументов оставляет поток без изменений.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2])->append(3, 4)->toArray();
+// [1, 2, 3, 4]
+```
+
+#### Prepend
+Добавляет значения в начало потока.
+
+```$stream->prepend(mixed ...$values): Stream```
+
+* Для добавления целой коллекции используйте `chainWith`.
+* Ключи результата переиндексируются последовательно по всему потоку.
+* Пустой набор аргументов оставляет поток без изменений.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([3, 4])->prepend(1, 2)->toArray();
+// [1, 2, 3, 4]
+```
+
+#### Split When
+Разбивает поток на группы, начиная новую группу при каждом совпадении предиката.
+
+```$stream->splitWhen(callable $predicate): Stream```
+
+Совпавший элемент начинает следующую группу. Ключи исходной коллекции отбрасываются; внешний массив — последовательный, внутренние группы — list-массивы.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 0, 3, 0, 4])
+    ->splitWhen(fn ($x) => $x === 0)
+    ->toArray();
+// [[1, 2], [0, 3], [0, 4]]
+```
+
+#### Group Adjacent By
+Группирует подряд идущие элементы, имеющие одинаковый ключ, возвращаемый функцией `$keyFn`.
+
+```$stream->groupAdjacentBy(callable $keyFn): Stream```
+
+Отдаёт пары `[ключ_группы, list<значение>]` последовательно. Повторяющиеся ключи, встречающиеся в разных подряд идущих сериях, дают отдельные группы.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 1, 2, 2, 1])
+    ->groupAdjacentBy(fn ($x) => $x)
+    ->toArray();
+// [[1, [1, 1]], [2, [2, 2]], [1, [1]]]
+```
+
+#### Pad Left
+Дополняет поток слева до длины не менее `$length`.
+
+```$stream->padLeft(int $length, mixed $fill): Stream```
+
+* Если поток уже имеет длину `$length` или больше, все элементы проходят без изменений.
+* Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+* Бросает `\InvalidArgumentException`, если `$length` отрицателен.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3])->padLeft(5, 0)->toArray();
+// [0, 0, 1, 2, 3]
+```
+
+#### Pad Right
+Дополняет поток справа до длины не менее `$length`.
+
+```$stream->padRight(int $length, mixed $fill): Stream```
+
+* Если поток уже имеет длину `$length` или больше, все элементы проходят без изменений.
+* Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+* Бросает `\InvalidArgumentException`, если `$length` отрицателен.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3])->padRight(5, 0)->toArray();
+// [1, 2, 3, 0, 0]
+```
+
+#### Duplicates
+Отдаёт каждое дублирующееся значение по одному разу — в момент его второго появления.
+
+```$stream->duplicates(bool $strict = true): Stream```
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 1, 1, 2, 3])->duplicates()->toArray();
+// [1, 2]
+```
+
+#### Duplicates By
+Отдаёт каждое значение, чей извлечённый ключ совпадает с уже встречавшимся, по одному разу — в момент второго появления такого ключа.
+
+```$stream->duplicatesBy(callable $keyFn): Stream```
+
+```php
+use IterTools\Stream;
+
+$users = [
+    ['id' => 1, 'name' => 'Alice'],
+    ['id' => 2, 'name' => 'Bob'],
+    ['id' => 1, 'name' => 'Alicia'],
+];
+
+$result = Stream::of($users)
+    ->duplicatesBy(fn ($u) => $u['id'])
+    ->toArray();
+// [['id' => 1, 'name' => 'Alicia']]
+```
+
+#### Shuffle
+Рандомизирует порядок элементов потока.
+
+```$stream->shuffle(?\Random\Engine $engine = null): Stream```
+
+* Материализует поток.
+* Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3, 4, 5])->shuffle()->toArray();
+// например: [3, 1, 5, 4, 2]
+```
+
+#### Sample
+Возвращает выборку из `$size` элементов потока без повторений.
+
+```$stream->sample(int $size, ?\Random\Engine $engine = null): Stream```
+
+* Материализует поток. Ключи результата — последовательные, начиная с 0.
+* Бросает `\InvalidArgumentException`, если `$size` отрицателен.
+* Бросает `\LengthException`, если `$size` превышает длину потока.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3, 4, 5])->sample(3)->toArray();
+// например: [4, 1, 5]
+```
+
 ### Завершающие операции
 
 #### Саммари о потоке
@@ -1853,6 +2012,46 @@ $isUltimateAnswer = fn ($a) => a == 42;
 
 $boolean = Stream::of($answers)
     ->anyMatch($answers, $isUltimateAnswer);
+// true
+```
+
+##### At Least N
+Возвращает истину, если предикат возвращает истину как минимум для n элементов из потока.
+
+- Предикат является необязательным аргументом.
+- По умолчанию предикат приводит элементы коллекции к `bool`.
+- Прерывает итерацию сразу после того, как количество совпадений достигнет n.
+- При `n <= 0` всегда возвращает истину.
+
+```$stream->atLeastN(int $n, callable $predicate = null): bool```
+
+```php
+use IterTools\Stream;
+
+$grades         = [45, 50, 61, 72, 85];
+$isPassingGrade = fn ($grade) => $grade >= 70;
+
+$boolean = Stream::of($grades)->atLeastN(2, $isPassingGrade);
+// true
+```
+
+##### At Most N
+Возвращает истину, если предикат возвращает истину не более чем для n элементов из потока.
+
+- Предикат является необязательным аргументом.
+- По умолчанию предикат приводит элементы коллекции к `bool`.
+- Прерывает итерацию сразу после того, как количество совпадений превысит n.
+- При `n < 0` всегда возвращает ложь.
+
+```$stream->atMostN(int $n, callable $predicate = null): bool```
+
+```php
+use IterTools\Stream;
+
+$attempts  = [false, false, true, false];
+$isFailure = fn ($attempt) => $attempt === false;
+
+$boolean = Stream::of($attempts)->atMostN(3, $isFailure);
 // true
 ```
 
@@ -1927,6 +2126,47 @@ use IterTools\Stream;
 $primes = [2, 3, 5, 7, 11, 13];
 
 $boolean = Stream::of($primes)->containsCoercive('7');
+// true (приведение типов)
+```
+
+##### Ends With
+Возвращает истину, если поток заканчивается заданным суффиксом, при [строгом сравнении типов](README.md#режимы-типизации).
+
+- Сравнение значений идёт попарно; ключи игнорируются.
+- Пустой суффикс возвращает истину без потребления потока.
+- Поток должен быть конечным.
+
+```$stream->endsWith(iterable $suffix): bool```
+
+```php
+use IterTools\Stream;
+
+$path = ['var', 'log', 'nginx', 'access.log'];
+
+$boolean = Stream::of($path)->endsWith(['nginx', 'access.log']);
+// true
+
+$boolean = Stream::of($path)->endsWith(['error.log']);
+// false
+```
+
+##### Ends With Coercive
+Возвращает истину, если поток заканчивается заданным суффиксом, в режиме [приведения типов](README.md#режимы-типизации).
+
+- Сравнение значений идёт попарно; ключи игнорируются.
+- Пустой суффикс возвращает истину без потребления потока.
+- Поток должен быть конечным.
+- Скаляры сравниваются нестрого по значению, объекты и массивы — по сериализованному значению, `NaN` совпадает с `NaN`.
+- Бросает `\InvalidArgumentException`, если в процессе сравнения встретится несериализуемый объект.
+
+```$stream->endsWithCoercive(iterable $suffix): bool```
+
+```php
+use IterTools\Stream;
+
+$digits = [1, 2, 3];
+
+$boolean = Stream::of($digits)->endsWithCoercive(['2', '3']);
 // true (приведение типов)
 ```
 
@@ -2088,6 +2328,45 @@ $result = Stream::of($input)
 $result = Stream::of($input)
     ->sameCountWith([1, 2, 3]);
 // false
+```
+
+##### Starts With
+Возвращает истину, если поток начинается с заданного префикса, при [строгом сравнении типов](README.md#режимы-типизации).
+
+- Сравнение значений идёт попарно; ключи игнорируются.
+- Пустой префикс возвращает истину без потребления потока.
+
+```$stream->startsWith(iterable $prefix): bool```
+
+```php
+use IterTools\Stream;
+
+$path = ['var', 'log', 'nginx', 'access.log'];
+
+$boolean = Stream::of($path)->startsWith(['var', 'log']);
+// true
+
+$boolean = Stream::of($path)->startsWith(['etc']);
+// false
+```
+
+##### Starts With Coercive
+Возвращает истину, если поток начинается с заданного префикса, в режиме [приведения типов](README.md#режимы-типизации).
+
+- Сравнение значений идёт попарно; ключи игнорируются.
+- Пустой префикс возвращает истину без потребления потока.
+- Скаляры сравниваются нестрого по значению, объекты и массивы — по сериализованному значению, `NaN` совпадает с `NaN`.
+- Бросает `\InvalidArgumentException`, если в процессе сравнения встретится несериализуемый объект.
+
+```$stream->startsWithCoercive(iterable $prefix): bool```
+
+```php
+use IterTools\Stream;
+
+$digits = [1, 2, 3];
+
+$boolean = Stream::of($digits)->startsWithCoercive(['1', '2']);
+// true (приведение типов)
 ```
 
 #### Редуцирование

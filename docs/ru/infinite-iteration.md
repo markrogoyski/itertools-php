@@ -87,3 +87,26 @@ foreach (Infinite::repeat($dialogue) as $repeated) {
 }
 // 'Are we there yet?', 'Are we there yet?', 'Are we there yet?', ...
 ```
+
+### Generate
+Бесконечно отдаёт значения, возвращаемые поставщиком (функцией без аргументов).
+
+```Infinite::generate(callable $supplier)```
+
+* На каждой итерации вызывает поставщик и отдаёт его возвращаемое значение.
+* Состояние, захваченное замыканием поставщика, сохраняется между вызовами.
+
+```php
+use IterTools\Infinite;
+use IterTools\Single;
+
+$counter = 0;
+$next    = function () use (&$counter) {
+    return ++$counter;
+};
+
+foreach (Single::limit(Infinite::generate($next), 5) as $n) {
+    print($n);
+}
+// 1, 2, 3, 4, 5
+```

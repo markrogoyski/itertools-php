@@ -613,3 +613,89 @@ foreach (Single::takeWhile($prices, $isFree) as $freePrice) {
 }
 // 0, 0
 ```
+
+### Group Adjacent By
+Группирует подряд идущие элементы, имеющие одинаковый ключ, возвращаемый функцией `$keyFn`.
+
+```Single::groupAdjacentBy(iterable $data, callable $keyFn)```
+
+* Отдаёт пары `[ключ_группы, list<значение>]` последовательно (а не ассоциативно).
+* Повторяющиеся ключи, встречающиеся в разных подряд идущих сериях, дают **отдельные** группы (в отличие от `groupBy`).
+* Ключи исходной коллекции отбрасываются; внешний массив — последовательный, внутренние группы — list-массивы.
+
+```php
+use IterTools\Single;
+
+$readings = [1, 1, 2, 2, 1, 3];
+
+foreach (Single::groupAdjacentBy($readings, fn ($x) => $x) as [$key, $run]) {
+    print($key . ': ' . \implode(',', $run) . PHP_EOL);
+}
+// 1: 1,1
+// 2: 2,2
+// 1: 1
+// 3: 3
+```
+
+### Pad Left
+Дополняет коллекцию слева до длины не менее `$length`.
+
+```Single::padLeft(iterable $data, int $length, mixed $fill)```
+
+* Если коллекция уже имеет длину `$length` или больше, все элементы проходят без изменений (без обрезки).
+* Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+* Бросает `\InvalidArgumentException`, если `$length` отрицателен.
+
+```php
+use IterTools\Single;
+
+$values = [1, 2, 3];
+
+foreach (Single::padLeft($values, 5, 0) as $value) {
+    print($value);
+}
+// 0, 0, 1, 2, 3
+```
+
+### Pad Right
+Дополняет коллекцию справа до длины не менее `$length`.
+
+```Single::padRight(iterable $data, int $length, mixed $fill)```
+
+* Если коллекция уже имеет длину `$length` или больше, все элементы проходят без изменений (без обрезки).
+* Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+* Бросает `\InvalidArgumentException`, если `$length` отрицателен.
+
+```php
+use IterTools\Single;
+
+$values = [1, 2, 3];
+
+foreach (Single::padRight($values, 5, 0) as $value) {
+    print($value);
+}
+// 1, 2, 3, 0, 0
+```
+
+### Split When
+Разбивает коллекцию на группы, начиная новую группу при каждом совпадении предиката.
+
+```Single::splitWhen(iterable $data, callable $predicate)```
+
+* Совпавший элемент начинает следующую группу (становится её первым элементом).
+* Если предикат совпадает с самым первым элементом, ведущая пустая группа не отдаётся.
+* Пустая входная коллекция не отдаёт ничего.
+* Ключи исходной коллекции отбрасываются; внешний массив — последовательный, внутренние группы — list-массивы.
+
+```php
+use IterTools\Single;
+
+$values = [1, 2, 0, 3, 0, 4];
+
+foreach (Single::splitWhen($values, fn ($x) => $x === 0) as $group) {
+    print(\implode(',', $group) . PHP_EOL);
+}
+// 1,2
+// 0,3
+// 0,4
+```
