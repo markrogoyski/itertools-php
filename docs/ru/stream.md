@@ -2232,6 +2232,63 @@ $result = Stream::of($input)
 // 30
 ```
 
+##### To Last Match
+Возвращает последний элемент потока, удовлетворяющий предикату.
+
+```$stream->toLastMatch(callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Полностью потребляет коллекцию.
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 3, 5, 6, 7, 8, 9];
+
+$result = Stream::of($numbers)
+    ->toLastMatch(fn (int $n) => $n % 2 === 0);
+// 8
+```
+
+##### To Last Match Index
+Возвращает индекс (отсчёт от нуля) последнего элемента потока, удовлетворяющего предикату.
+
+```$stream->toLastMatchIndex(callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Полностью потребляет коллекцию.
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+
+```php
+use IterTools\Stream;
+
+$numbers = [10, 20, 30, 40, 5];
+
+$result = Stream::of($numbers)
+    ->toLastMatchIndex(fn (int $n) => $n > 25);
+// 3
+```
+
+##### To Last Match Key
+Возвращает ключ исходной коллекции для последнего элемента потока, удовлетворяющего предикату.
+
+```$stream->toLastMatchKey(callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Полностью потребляет коллекцию.
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+
+```php
+use IterTools\Stream;
+
+$users = ['alice' => 12, 'bob' => 17, 'carol' => 22, 'dan' => 30];
+
+$result = Stream::of($users)
+    ->toLastMatchKey(fn (int $age) => $age >= 18);
+// 'dan'
+```
+
 ##### To Max
 Возвращает максимальный элемент коллекции из потока.
 
@@ -2304,6 +2361,23 @@ $lotrMovies = ['The Fellowship of the Ring', 'The Two Towers', 'The Return of th
 $result = Stream::of($lotrMovies)
     ->toNth(2);
 // The Return of the King
+```
+
+##### To Only
+Возвращает единственный элемент потока.
+
+```$stream->toOnly(): mixed```
+
+- Бросает `\LengthException`, если поток пуст или содержит более одного элемента.
+- Удобно использовать в композиции с `filter()`, чтобы убедиться, что предикату удовлетворяет ровно один элемент.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3, 4, 5])
+    ->filter(fn (int $n) => $n === 3)
+    ->toOnly();
+// 3
 ```
 
 ##### To Product
@@ -2510,6 +2584,29 @@ Stream::of($languages)
 // PHP's mascot: elephant
 // Python's mascot: snake
 // ...
+```
+
+##### Consume
+Полностью обходит поток, отбрасывая значения.
+
+Полезно для принудительного выполнения «ленивого» конвейера, нужного только ради побочных эффектов (например, `map()` с побочным эффектом).
+
+```$stream->consume(): void```
+
+```php
+use IterTools\Stream;
+
+$log = [];
+
+$pipeline = Stream::of([1, 2, 3])
+    ->map(function (int $n) use (&$log): int {
+        $log[] = $n;
+        return $n * 2;
+    });
+// $log === []  (map ленивая — пока ничего не выполнилось)
+
+$pipeline->consume();
+// $log === [1, 2, 3]
 ```
 
 ##### Print

@@ -169,6 +169,65 @@ $result = Reduce::toLast($input);
 // 30
 ```
 
+### To Last Match
+Возвращает последний элемент коллекции, удовлетворяющий предикату.
+
+```Reduce::toLastMatch(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Полностью потребляет коллекцию (без раннего выхода).
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+
+```php
+use IterTools\Reduce;
+
+$numbers = [1, 3, 5, 6, 7, 8, 9];
+
+$lastEven = Reduce::toLastMatch($numbers, fn (int $n) => $n % 2 === 0);
+// 8
+
+$lastNegative = Reduce::toLastMatch($numbers, fn (int $n) => $n < 0, 'none');
+// 'none'
+```
+
+### To Last Match Index
+Возвращает индекс (отсчёт от нуля) последнего элемента, удовлетворяющего предикату.
+
+```Reduce::toLastMatchIndex(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Полностью потребляет коллекцию.
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+- Для ассоциативных коллекций возвращает позицию (а не исходный ключ).
+
+```php
+use IterTools\Reduce;
+
+$numbers = [10, 20, 30, 40, 5];
+
+$lastOver25Index = Reduce::toLastMatchIndex($numbers, fn (int $n) => $n > 25);
+// 3
+```
+
+### To Last Match Key
+Возвращает ключ исходной коллекции для последнего элемента, удовлетворяющего предикату.
+
+```Reduce::toLastMatchKey(iterable $data, callable $predicate, mixed $default = null): mixed```
+
+- Результат предиката приводится к `bool` через `(bool)`.
+- Полностью потребляет коллекцию.
+- Возвращает `$default` (по умолчанию `null`), если совпадений нет.
+- Сохраняет исходный ключ (строковый для ассоциативных коллекций, целочисленный для списков).
+
+```php
+use IterTools\Reduce;
+
+$users = ['alice' => 12, 'bob' => 17, 'carol' => 22, 'dan' => 30];
+
+$lastAdultName = Reduce::toLastMatchKey($users, fn (int $age) => $age >= 18);
+// 'dan'
+```
+
 ### To Max
 Возвращает максимальный элемент коллекции.
 
@@ -318,6 +377,31 @@ $rotk = Reduce::toNth($lotrMovies, 2);
 // 20
 ```
 
+### To Only
+Возвращает единственный элемент коллекции.
+
+```Reduce::toOnly(iterable $data): mixed```
+
+- Бросает `\LengthException`, если коллекция пуста или содержит более одного элемента.
+- Для ассоциативной коллекции с одним элементом возвращает значение (не ключ).
+- Для проверки «совпадает ровно один элемент» используйте композицию `Stream::filter()->toOnly()`.
+
+```php
+use IterTools\Reduce;
+
+$config = ['admin' => 'jane'];
+
+$onlyAdmin = Reduce::toOnly($config);
+// 'jane'
+```
+
+```php
+use IterTools\Reduce;
+
+Reduce::toOnly([]);        // бросает \LengthException
+Reduce::toOnly([1, 2, 3]); // бросает \LengthException
+```
+
 ### To Product
 Возвращает произведение элементов коллекции.
 
@@ -415,4 +499,28 @@ $sum   = fn ($carry, $item) => $carry + $item;
 
 $result = Reduce::toValue($input, $sum, 0);
 // 15
+```
+
+### Consume
+Полностью обходит коллекцию, отбрасывая значения.
+
+```Reduce::consume(iterable $data): void```
+
+- Полезно для принудительного выполнения «ленивого» конвейера, нужного только ради побочных эффектов.
+- Ничего не возвращает.
+
+```php
+use IterTools\Reduce;
+use IterTools\Single;
+
+$log = [];
+
+$pipeline = Single::map([1, 2, 3], function (int $n) use (&$log): int {
+    $log[] = $n;
+    return $n * 2;
+});
+// $log === []  (Single::map ленивая — пока ничего не выполнилось)
+
+Reduce::consume($pipeline);
+// $log === [1, 2, 3]
 ```

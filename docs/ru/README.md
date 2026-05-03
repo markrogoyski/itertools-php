@@ -230,6 +230,11 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`toFirstMatchIndex`](reduce.md#to-first-match-index)       | Индекс первого элемента, удовлетворяющего предикату                                 | `Reduce::toFirstMatchIndex($data, $predicate, [$default])`    |
 | [`toFirstMatchKey`](reduce.md#to-first-match-key)           | Ключ первого элемента, удовлетворяющего предикату                                   | `Reduce::toFirstMatchKey($data, $predicate, [$default])`      |
 | [`toLast`](reduce.md#to-last)                               | Последний элемент коллекции                                                         | `Reduce::toLast()`                                            |
+| [`toLastMatch`](reduce.md#to-last-match)                    | Последний элемент, удовлетворяющий предикату                                        | `Reduce::toLastMatch($data, $predicate, [$default])`          |
+| [`toLastMatchIndex`](reduce.md#to-last-match-index)         | Индекс последнего элемента, удовлетворяющего предикату                              | `Reduce::toLastMatchIndex($data, $predicate, [$default])`     |
+| [`toLastMatchKey`](reduce.md#to-last-match-key)             | Ключ последнего элемента, удовлетворяющего предикату                                | `Reduce::toLastMatchKey($data, $predicate, [$default])`       |
+| [`toOnly`](reduce.md#to-only)                               | Единственный элемент коллекции                                                      | `Reduce::toOnly($data)`                                       |
+| [`consume`](reduce.md#consume)                              | Полный обход коллекции с отбрасыванием значений                                     | `Reduce::consume($data)`                                      |
 | [`toMax`](reduce.md#to-max)                                 | Максимальный элемент коллекции                                                      | `Reduce::toMax($numbers, [$compareBy])`                       |
 | [`toMin`](reduce.md#to-min)                                 | Минимальный элемент коллекции                                                       | `Reduce::toMin($numbers, [$compareBy])`                       |
 | [`toMinMax`](reduce.md#to-min-max)                          | Минимальный и максимальный элемент коллекции                                        | `Reduce::toMinMax($numbers, [$compareBy])`                    |
@@ -359,6 +364,10 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`toFirstMatchIndex`](stream.md#to-first-match-index)   | Индекс первого элемента, удовлетворяющего предикату                 | `$stream->toFirstMatchIndex($predicate, [$default])`    |
 | [`toFirstMatchKey`](stream.md#to-first-match-key)       | Ключ первого элемента, удовлетворяющего предикату                   | `$stream->toFirstMatchKey($predicate, [$default])`      |
 | [`toLast`](stream.md#to-last)                           | Последний элемент коллекции                                         | `$stream->toLast()`                                     |
+| [`toLastMatch`](stream.md#to-last-match)                | Последний элемент, удовлетворяющий предикату                        | `$stream->toLastMatch($predicate, [$default])`          |
+| [`toLastMatchIndex`](stream.md#to-last-match-index)     | Индекс последнего элемента, удовлетворяющего предикату              | `$stream->toLastMatchIndex($predicate, [$default])`     |
+| [`toLastMatchKey`](stream.md#to-last-match-key)         | Ключ последнего элемента, удовлетворяющего предикату                | `$stream->toLastMatchKey($predicate, [$default])`       |
+| [`toOnly`](stream.md#to-only)                           | Единственный элемент коллекции                                      | `$stream->toOnly()`                                     |
 | [`toMax`](stream.md#to-max)                             | Максимальное значение из элементов коллекции                        | `$stream->toMax([$compareBy])`                          |
 | [`toMin`](stream.md#to-min)                             | Минимальное значение из элементов коллекции                         | `$stream->toMin([$compareBy])`                          |
 | [`toMinMax`](stream.md#to-min-max)                      | Минимальное и максимальное значения из элементов коллекции          | `$stream->toMinMax([$compareBy])`                       |
@@ -382,6 +391,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | Завершающая операция                                   | Описание                                              | Пример кода                                          |
 |--------------------------------------------------------|-------------------------------------------------------|------------------------------------------------------|
 | [`callForEach`](stream.md#call-for-each)               | Вызывает callback-функцию для каждого элемента потока | `$stream->callForEach($function)`                    |
+| [`consume`](stream.md#consume)                         | Полный обход потока с отбрасыванием значений          | `$stream->consume()`                                 |
 | [`print`](stream.md#print)                             | `print` каждого элемента потока                       | `$stream->print([$separator], [$prefix], [$suffix])` |
 | [`printLn`](stream.md#print-line)                      | `print` каждого элемента потока с новой строки        | `$stream->printLn()`                                 |
 | [`toCsvFile`](stream.md#to-csv-file)                   | Записывает содержимое потока в CSV файл               | `$stream->toCsvFile($fileHandle, [$headers])`        |
