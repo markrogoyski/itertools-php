@@ -135,6 +135,31 @@ class ContainsCoerciveTest extends \PHPUnit\Framework\TestCase
             [[100, 200, 300], '1e2'],
             [['1e2', 200, 300], 100],
 
+            // 1-boundary: numeric string forms loose-equal to 1
+            [[1], '1.0'],
+            [[1], '1e0'],
+            [[1], '01'],
+            [[1], '+1'],
+            [['1.0'], 1],
+            [['1e0'], 1],
+            [['01'], 1],
+            [[true], '1.0'],
+            [[true], '1e0'],
+
+            // 0-boundary: numeric string forms loose-equal to 0
+            [[0], '0.0'],
+            [[0], '0e0'],
+            [[0], '00'],
+            [['0.0'], 0],
+            [['0e0'], 0],
+            [[false], '0.0'],
+            [[0], -0.0],
+            [[0], '-0'],
+            [[0], '-0.0'],
+            [[-0.0], 0],
+            [['-0'], 0],
+            [['-0.0'], 0.0],
+
             // null/false/0/'0' all hash to falsy-equivalent under coercive
             [[null], false],
             [[null], 0],

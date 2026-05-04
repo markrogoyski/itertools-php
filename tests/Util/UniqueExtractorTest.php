@@ -149,15 +149,15 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 true,
-                'boolean_1'
+                'numeric_1'
             ],
             [
                 false,
-                'boolean_0'
+                'numeric_0'
             ],
             [
                 1,
-                'boolean_1'
+                'numeric_1'
             ],
             [
                 54,
@@ -165,7 +165,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 0,
-                'boolean_0'
+                'numeric_0'
             ],
             [
                 -4,
@@ -173,7 +173,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 1.0,
-                'boolean_1'
+                'numeric_1'
             ],
             [
                 1.1,
@@ -185,7 +185,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 '1',
-                'boolean_1'
+                'numeric_1'
             ],
             [
                 '1.0',
@@ -205,7 +205,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 null,
-                'boolean_0'
+                'numeric_0'
             ],
         ];
     }

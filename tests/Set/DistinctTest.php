@@ -173,7 +173,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
             [
                 [true, 1, '1', 1.0, '1.0'],
                 false,
-                [true, 1.0],
+                [true],
             ],
             [
                 [true, 1, '1', 1.1, '1.1'],
@@ -473,7 +473,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([true, 1, '1', 1.0, '1.0']),
                 false,
-                [true, 1.0],
+                [true],
             ],
             [
                 $gen([true, 1, '1', 1.1, '1.1']),
@@ -773,7 +773,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([true, 1, '1', 1.0, '1.0']),
                 false,
-                [true, 1.0],
+                [true],
             ],
             [
                 $iter([true, 1, '1', 1.1, '1.1']),
@@ -1073,7 +1073,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([true, 1, '1', 1.0, '1.0']),
                 false,
-                [true, 1.0],
+                [true],
             ],
             [
                 $trav([true, 1, '1', 1.1, '1.1']),
@@ -1291,6 +1291,38 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertCount(1, $result);
         $this->assertSame('1e2', $result[0]);
+    }
+
+    /**
+     * @test distinct coercive collapses numeric forms loose-equal to 1
+     */
+    public function testOneBoundaryCoerciveArray(): void
+    {
+        // When
+        $result = [];
+        foreach (Set::distinct([1, '1.0', '1e0', '01', true], false) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(1, $result);
+        $this->assertSame(1, $result[0]);
+    }
+
+    /**
+     * @test distinct coercive collapses numeric forms loose-equal to 0
+     */
+    public function testZeroBoundaryCoerciveArray(): void
+    {
+        // When
+        $result = [];
+        foreach (Set::distinct([0, '0.0', '0e0', false], false) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(1, $result);
+        $this->assertSame(0, $result[0]);
     }
 
     /**

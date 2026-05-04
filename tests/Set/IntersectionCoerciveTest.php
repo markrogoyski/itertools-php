@@ -186,6 +186,29 @@ class IntersectionCoerciveTest extends \PHPUnit\Framework\TestCase
                 ],
                 ['php', 'typescript'],
             ],
+            // 1-boundary
+            [
+                [
+                    [1, 2, 3],
+                    ['01', '02', '03'],
+                ],
+                [1, 2, 3],
+            ],
+            [
+                [
+                    [1, 2, 3],
+                    ['1.0', '2.0', '3.0'],
+                ],
+                [1, 2, 3],
+            ],
+            // 0-boundary
+            [
+                [
+                    [0, 1],
+                    ['0.0', '1.0'],
+                ],
+                [0, 1],
+            ],
         ];
     }
 
@@ -367,6 +390,29 @@ class IntersectionCoerciveTest extends \PHPUnit\Framework\TestCase
                     $gen(['php', 'java', 'c#', 'typescript']),
                 ],
                 ['php', 'typescript'],
+            ],
+            // 1-boundary
+            [
+                [
+                    $gen([1, 2, 3]),
+                    $gen(['01', '02', '03']),
+                ],
+                [1, 2, 3],
+            ],
+            [
+                [
+                    $gen([1, 2, 3]),
+                    $gen(['1.0', '2.0', '3.0']),
+                ],
+                [1, 2, 3],
+            ],
+            // 0-boundary
+            [
+                [
+                    $gen([0, 1]),
+                    $gen(['0.0', '1.0']),
+                ],
+                [0, 1],
             ],
         ];
     }
@@ -550,6 +596,29 @@ class IntersectionCoerciveTest extends \PHPUnit\Framework\TestCase
                 ],
                 ['php', 'typescript'],
             ],
+            // 1-boundary
+            [
+                [
+                    $iter([1, 2, 3]),
+                    $iter(['01', '02', '03']),
+                ],
+                [1, 2, 3],
+            ],
+            [
+                [
+                    $iter([1, 2, 3]),
+                    $iter(['1.0', '2.0', '3.0']),
+                ],
+                [1, 2, 3],
+            ],
+            // 0-boundary
+            [
+                [
+                    $iter([0, 1]),
+                    $iter(['0.0', '1.0']),
+                ],
+                [0, 1],
+            ],
         ];
     }
 
@@ -731,6 +800,29 @@ class IntersectionCoerciveTest extends \PHPUnit\Framework\TestCase
                     $trav(['php', 'java', 'c#', 'typescript']),
                 ],
                 ['php', 'typescript'],
+            ],
+            // 1-boundary
+            [
+                [
+                    $trav([1, 2, 3]),
+                    $trav(['01', '02', '03']),
+                ],
+                [1, 2, 3],
+            ],
+            [
+                [
+                    $trav([1, 2, 3]),
+                    $trav(['1.0', '2.0', '3.0']),
+                ],
+                [1, 2, 3],
+            ],
+            // 0-boundary
+            [
+                [
+                    $trav([0, 1]),
+                    $trav(['0.0', '1.0']),
+                ],
+                [0, 1],
             ],
         ];
     }

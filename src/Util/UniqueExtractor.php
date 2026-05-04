@@ -46,16 +46,20 @@ final class UniqueExtractor
             $var instanceof \Closure => 'closure_' . \spl_object_id($var),
             \is_object($var) => 'object_' . ($strict ? \spl_object_id($var) : self::serializeObject($var)),
             \is_float($var) && \is_nan($var) => 'double_NAN',
-            \gettype($var) === 'boolean' => 'boolean_' . \intval($var),
+            $strict && \is_bool($var) => 'boolean_' . \intval($var),
             /** @phpstan-ignore cast.string */
             $strict => \gettype($var) . '_' . (string) $var,
-            !$var => 'boolean_0',
-            /** @phpstan-ignore argument.type */
-            \strval($var) === '1' => 'boolean_1',
-            \is_numeric($var) => 'numeric_' . \floatval($var),
+            \is_bool($var) => 'numeric_' . self::normalizeNumeric(\floatval($var)),
+            \is_numeric($var) => 'numeric_' . self::normalizeNumeric(\floatval($var)),
+            $var === null || $var === '' => 'numeric_0',
             /** @phpstan-ignore cast.string */
             default => 'scalar_' . (string) $var,
         };
+    }
+
+    private static function normalizeNumeric(float $value): string
+    {
+        return $value === 0.0 ? '0' : (string) $value;
     }
 
     /**
