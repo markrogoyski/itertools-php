@@ -1,20 +1,60 @@
 # IterTools PHP Change Log
 
-## v2.4.0
+## v2.4.0 - 2026-05-06
 
 ### New Features
+* Infinite
+  * `generate`
+* Random
+  * `sample`
 * Reduce
   * `consume`
   * `toLastMatch`
   * `toLastMatchIndex`
   * `toLastMatchKey`
   * `toOnly`
+* Set
+  * `duplicates`
+  * `duplicatesBy`
+* Single
+  * `groupAdjacentBy`
+  * `padLeft`
+  * `padRight`
+  * `splitWhen`
+* Sort
+  * `shuffle`
+* Summary
+  * `atLeastN`
+  * `atMostN`
+  * `endsWith`
+  * `endsWithCoercive`
+  * `startsWith`
+  * `startsWithCoercive`
 * Stream
+  * `append`
+  * `atLeastN`
+  * `atMostN`
   * `consume`
+  * `duplicates`
+  * `duplicatesBy`
+  * `endsWith`
+  * `endsWithCoercive`
+  * `groupAdjacentBy`
+  * `padLeft`
+  * `padRight`
+  * `prepend`
+  * `sample`
+  * `shuffle`
+  * `splitWhen`
+  * `startsWith`
+  * `startsWithCoercive`
   * `toLastMatch`
   * `toLastMatchIndex`
   * `toLastMatchKey`
   * `toOnly`
+
+### Bug Fixes
+* Coercive comparisons now collapse all numeric forms loose-equal to 0 or 1 (e.g. `1` vs `'1.0'`, `'01'`, `'1e0'`; `0` vs `'0.0'`, `-0.0`, `'-0'`) consistently with PHP's `==` semantics. Affects every coercive API in `Summary`, `Set`, `Math`, and `Stream`.
 
 ## v2.3.0 - 2026-05-02
 
