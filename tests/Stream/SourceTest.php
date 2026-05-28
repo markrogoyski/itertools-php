@@ -700,7 +700,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         // When
-        $stream = Stream::ofRange($start, $end, $step);
+        Stream::ofRange($start, $end, $step)->toArray();
     }
 
     public static function dataProviderForRangeInvalidArguments(): array
@@ -711,6 +711,346 @@ class SourceTest extends \PHPUnit\Framework\TestCase
                 4,
                 2,
             ],
+            // Conflicting direction
+            [
+                1,
+                5,
+                -1,
+            ],
+            // Step strictly greater than span
+            [
+                1,
+                5,
+                10,
+            ],
+            // Zero step
+            [
+                1,
+                5,
+                0,
+            ],
         ];
+    }
+
+    /**
+     * @test         ofRange non-finite operands throw
+     * @dataProvider dataProviderForRangeNonFiniteArguments
+     * @param        int|float $start
+     * @param        int|float $end
+     * @param        int|float $step
+     */
+    public function testOfRangeNonFiniteArguments(int|float $start, int|float $end, int|float $step): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Stream::ofRange($start, $end, $step)->toArray();
+    }
+
+    public static function dataProviderForRangeNonFiniteArguments(): array
+    {
+        return [
+            'INF start'  => [\INF, 5, 1],
+            '-INF start' => [-\INF, 5, 1],
+            'NAN start'  => [\NAN, 5, 1],
+            'INF end'    => [1, \INF, 1],
+            '-INF end'   => [1, -\INF, 1],
+            'NAN end'    => [1, \NAN, 1],
+            'INF step'   => [1, 5, \INF],
+            'NAN step'   => [1, 5, \NAN],
+        ];
+    }
+
+    /**
+     * @test ofRange with exponent-string operands that overflow to INF rejects cleanly (no hang)
+     */
+    public function testOfRangeOverflowExponentStringRejects(): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Stream::ofRange('1e309', '1e310')->toArray();
+    }
+
+    /**
+     * @test ofRange numeric-string inputs coerce to ints
+     */
+    public function testOfRangeNumericStringIntCoercion(): void
+    {
+        // Given/When
+        $result = Stream::ofRange('1', '5')->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3, 4, 5], $result);
+    }
+
+    /**
+     * @test ofRange numeric-string float inputs coerce to floats
+     */
+    public function testOfRangeNumericStringFloatCoercion(): void
+    {
+        // Given/When
+        $result = Stream::ofRange('1.0', '5.0')->toArray();
+
+        // Then
+        $this->assertSame([1.0, 2.0, 3.0, 4.0, 5.0], $result);
+    }
+
+    /**
+     * @test ofRange leading-zero numeric strings coerce to ints
+     */
+    public function testOfRangeLeadingZeroStringsCoerce(): void
+    {
+        // Given/When
+        $result = Stream::ofRange('01', '05')->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3, 4, 5], $result);
+    }
+
+    /**
+     * @test ofRange mixed int and float strings yields float-stepped range
+     */
+    public function testOfRangeMixedStringIntFloatCoercion(): void
+    {
+        // Given/When
+        $result = Stream::ofRange('1', '5.5', 1.5)->toArray();
+
+        // Then
+        $this->assertEqualsWithDelta([1.0, 2.5, 4.0, 5.5], $result, 0.0001);
+    }
+
+    /**
+     * @test ofRange exponent notation coerces to floats
+     */
+    public function testOfRangeExponentNotationCoerces(): void
+    {
+        // Given/When
+        $result = Stream::ofRange('1e3', '1e5', 1000)->toArray();
+
+        // Then
+        $this->assertSame([1000.0, 2000.0, 3000.0, 4000.0, 5000.0, 6000.0, 7000.0, 8000.0, 9000.0, 10000.0,
+            11000.0, 12000.0, 13000.0, 14000.0, 15000.0, 16000.0, 17000.0, 18000.0, 19000.0, 20000.0,
+            21000.0, 22000.0, 23000.0, 24000.0, 25000.0, 26000.0, 27000.0, 28000.0, 29000.0, 30000.0,
+            31000.0, 32000.0, 33000.0, 34000.0, 35000.0, 36000.0, 37000.0, 38000.0, 39000.0, 40000.0,
+            41000.0, 42000.0, 43000.0, 44000.0, 45000.0, 46000.0, 47000.0, 48000.0, 49000.0, 50000.0,
+            51000.0, 52000.0, 53000.0, 54000.0, 55000.0, 56000.0, 57000.0, 58000.0, 59000.0, 60000.0,
+            61000.0, 62000.0, 63000.0, 64000.0, 65000.0, 66000.0, 67000.0, 68000.0, 69000.0, 70000.0,
+            71000.0, 72000.0, 73000.0, 74000.0, 75000.0, 76000.0, 77000.0, 78000.0, 79000.0, 80000.0,
+            81000.0, 82000.0, 83000.0, 84000.0, 85000.0, 86000.0, 87000.0, 88000.0, 89000.0, 90000.0,
+            91000.0, 92000.0, 93000.0, 94000.0, 95000.0, 96000.0, 97000.0, 98000.0, 99000.0, 100000.0], $result);
+    }
+
+    /**
+     * @test ofRange real int and float inputs pass through
+     */
+    public function testOfRangeRealNumericInputsPassThrough(): void
+    {
+        // Given/When
+        $resultInt   = Stream::ofRange(1, 5)->toArray();
+        $resultFloat = Stream::ofRange(1.0, 5.0)->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3, 4, 5], $resultInt);
+        $this->assertSame([1.0, 2.0, 3.0, 4.0, 5.0], $resultFloat);
+    }
+
+    /**
+     * @test ofRange ascending descending negative-step matrix (backward-compat)
+     */
+    public function testOfRangeBackwardCompatMatrix(): void
+    {
+        $this->assertSame([1, 2, 3, 4, 5], Stream::ofRange(1, 5, 1)->toArray());
+        $this->assertSame([5, 4, 3, 2, 1], Stream::ofRange(5, 1, 1)->toArray());
+        $this->assertSame([5, 4, 3, 2, 1], Stream::ofRange(5, 1, -1)->toArray());
+        $this->assertSame([1], Stream::ofRange(1, 1, 1)->toArray());
+    }
+
+    /**
+     * @test ofRange integer-valued float step on int operands keeps int output (matches native range)
+     */
+    public function testOfRangeIntegerValuedFloatStepKeepsIntOutput(): void
+    {
+        // Native PHP: range(1, 5, 1.0) → ints. Stream::ofRange must match.
+        $this->assertSame([1, 2, 3, 4, 5], Stream::ofRange(1, 5, 1.0)->toArray());
+        // Numeric-string endpoints with int-valued float step also keep int output.
+        $this->assertSame([1, 2, 3, 4, 5], Stream::ofRange('1', '5', 1.0)->toArray());
+    }
+
+    /**
+     * @test ofRange float range does not yield past $end despite IEEE 754 rounding
+     */
+    public function testOfRangeFloatDoesNotOvershoot(): void
+    {
+        // Native \range(0.3, 0.9, 0.2) returns [0.3, 0.5, 0.7].
+        $result = Stream::ofRange(0.3, 0.9, 0.2)->toArray();
+
+        foreach ($result as $v) {
+            $this->assertLessThanOrEqual(0.9, $v);
+        }
+    }
+
+    /**
+     * @test ofRange integer span from PHP_INT_MIN to 0 iterates lazily
+     */
+    public function testOfRangeIntegerSpanFromPhpIntMinToZeroIteratesLazily(): void
+    {
+        // Span overflows int subtraction; the implementation must iterate lazily
+        // so callers can take a finite prefix via downstream limit().
+        $first5 = Stream::ofRange(\PHP_INT_MIN, 0, 1)->limit(5)->toArray();
+
+        $this->assertSame(
+            [\PHP_INT_MIN, \PHP_INT_MIN + 1, \PHP_INT_MIN + 2, \PHP_INT_MIN + 3, \PHP_INT_MIN + 4],
+            $first5
+        );
+    }
+
+    /**
+     * @test ofRange laziness — large end works with downstream limit
+     */
+    public function testOfRangeIsLazyWithDownstreamLimit(): void
+    {
+        // Given
+        $stream = Stream::ofRange(1, \PHP_INT_MAX);
+
+        // When
+        $first5 = $stream->limit(5)->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3, 4, 5], $first5);
+    }
+
+    /**
+     * @test ofRange leading-whitespace numeric strings coerce to int (matches `+ 0` semantics)
+     */
+    public function testOfRangeLeadingWhitespaceIntCoercion(): void
+    {
+        // Given
+        // is_numeric() accepts leading whitespace (e.g. " 1"), and PHP arithmetic
+        // coercion (`" 1" + 0`) yields int. The lexical int-bound check must trim
+        // whitespace before parsing, otherwise leading whitespace inflates the
+        // digit-string length past the int-range limit (19 chars) and the result
+        // is incorrectly promoted to float for near-PHP_INT_MAX values.
+
+        // When — short value (does not trip the length check, included for coverage)
+        $shortResult = Stream::ofRange(' 1', ' 5')->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3, 4, 5], $shortResult);
+
+        // When — value at PHP_INT_MAX with leading whitespace; without trimming,
+        // the leading space pushes the digit-string length to 20 and promotes to float
+        $maxString = ' ' . \PHP_INT_MAX;
+        $result = Stream::ofRange($maxString, $maxString)->toArray();
+
+        // Then — single-element range yields the int value, not a float
+        $this->assertCount(1, $result);
+        $this->assertIsInt($result[0]);
+        $this->assertSame(\PHP_INT_MAX, $result[0]);
+
+        // When — trailing whitespace at PHP_INT_MAX; is_numeric and PHP arithmetic
+        // coercion both tolerate trailing whitespace, so we must trim both ends
+        $trailingMaxString = \PHP_INT_MAX . ' ';
+        $trailingResult = Stream::ofRange($trailingMaxString, $trailingMaxString)->toArray();
+
+        // Then
+        $this->assertCount(1, $trailingResult);
+        $this->assertIsInt($trailingResult[0]);
+        $this->assertSame(\PHP_INT_MAX, $trailingResult[0]);
+    }
+
+    /**
+     * @test ofRange numeric string exceeding PHP_INT_MAX promotes to float (matches `+ 0` semantics, not clamped to int)
+     */
+    public function testOfRangeIntOverflowNumericStringPromotesToFloat(): void
+    {
+        // Given
+        $overflow = '9223372036854775808'; // PHP_INT_MAX + 1, exceeds int range
+
+        // When
+        $stream = Stream::ofRange($overflow, $overflow);
+        $result = $stream->toArray();
+
+        // Then
+        $this->assertCount(1, $result);
+        $this->assertIsFloat($result[0]);
+        $this->assertEqualsWithDelta((float)$overflow, $result[0], 0.0);
+    }
+
+    /**
+     * @test ofRange with PHP_INT_MIN step is rejected before iteration
+     */
+    public function testOfRangePhpIntMinStepRejects(): void
+    {
+        // Given
+        // PHP_INT_MIN can be passed as $step. The Single::range guard must fire
+        // through the Stream delegation path too.
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Stream::ofRange(\PHP_INT_MAX, 0, \PHP_INT_MIN)->limit(1)->toArray();
+    }
+
+    /**
+     * @test ofRange negative numeric string at PHP_INT_MIN coerces to int (`+ 0` semantics)
+     */
+    public function testOfRangePhpIntMinNumericStringCoercesToInt(): void
+    {
+        // Given
+        $minString = (string)\PHP_INT_MIN;
+
+        // When
+        $result = Stream::ofRange($minString, $minString)->toArray();
+
+        // Then
+        $this->assertCount(1, $result);
+        $this->assertIsInt($result[0]);
+        $this->assertSame(\PHP_INT_MIN, $result[0]);
+    }
+
+    /**
+     * @test ofRange numeric string one below PHP_INT_MIN promotes to float
+     */
+    public function testOfRangeBelowPhpIntMinNumericStringPromotesToFloat(): void
+    {
+        // Given
+        // PHP_INT_MIN = -9223372036854775808; one beyond is -9223372036854775809
+        $belowMin = '-9223372036854775809';
+
+        // When
+        $result = Stream::ofRange($belowMin, $belowMin)->toArray();
+
+        // Then
+        $this->assertCount(1, $result);
+        $this->assertIsFloat($result[0]);
+    }
+
+    /**
+     * @test ofRange signed numeric strings (positive sign) coerce correctly
+     */
+    public function testOfRangePositiveSignedNumericStringCoercesToInt(): void
+    {
+        // Given/When
+        $result = Stream::ofRange('+1', '+5')->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3, 4, 5], $result);
+    }
+
+    /**
+     * @test ofRange alpha strings still rejected with the existing "must be numeric" error
+     */
+    public function testOfRangeAlphaStringStillRejected(): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/numeric/');
+
+        // When
+        Stream::ofRange('a', 'e', 1)->toArray();
     }
 }

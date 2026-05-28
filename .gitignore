@@ -5,3 +5,5 @@ composer.phar
 .phpunit.result.cache
 tests/.phpunit.cache/
 CLAUDE.md
+.antigravitycli/
+

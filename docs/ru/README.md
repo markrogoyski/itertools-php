@@ -115,6 +115,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`padLeft`](single-iteration.md#pad-left)                                       | Дополняет коллекцию слева до указанной минимальной длины                     | `Single::padLeft($data, $length, $fill)`                    |
 | [`padRight`](single-iteration.md#pad-right)                                     | Дополняет коллекцию справа до указанной минимальной длины                    | `Single::padRight($data, $length, $fill)`                   |
 | [`pairwise`](single-iteration.md#pairwise)                                      | Итерирует коллекцию попарно (с наложением)                                   | `Single::pairwise($data)`                                   |
+| [`range`](single-iteration.md#range)                                            | Лениво генерирует конечную арифметическую прогрессию чисел                   | `Single::range($start, $end, [$step])`                      |
 | [`reindex`](single-iteration.md#reindex)                                        | Переиндексирует key-value коллекцию                                          | `Single::reindex($data, $reindexer)`                        |
 | [`repeat`](single-iteration.md#repeat)                                          | Повторяет данное значение заданное число раз                                 | `Single::repeat($item, $repetitions)`                       |
 | [`reverse`](single-iteration.md#reverse)                                        | Итерирует коллекцию в обратном порядке                                       | `Single::reverse($data)`                                    |
@@ -273,7 +274,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`ofRandomChoice`](stream.md#of-random-choice)                       | Создает поток для цепочечных вызовов из бесконечных случайных выборов элемента из списка             | `Stream::ofRandomChoice($items, $repetitions)`      |
 | [`ofRandomNumbers`](stream.md#of-random-numbers)                     | Создает поток для цепочечных вызовов из бесконечного набора случайных целых чисел                    | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
 | [`ofRandomPercentage`](stream.md#of-random-percentage)               | Создает поток для цепочечных вызовов из бесконечного набора случайных вещественных чисел между 0 и 1 | `Stream::ofRandomPercentage($repetitions)`          |
-| [`ofRange`](stream.md#of-range)                                      | Создает поток для цепочечных вызовов из арифметической прогрессии                                    | `Stream::ofRange($start, $end, $step)`              |
+| [`ofRange`](stream.md#of-range)                                      | Создает ленивый поток конечной арифметической прогрессии чисел                                       | `Stream::ofRange($start, $end, $step)`              |
 | [`ofRockPaperScissors`](stream.md#of-rock-paper-scissors)            | Создает поток для цепочечных вызовов из бесконечных случайных выборов "камень-ножницы-бумага"        | `Stream::ofRockPaperScissors($repetitions)`         |
 
 #### Цепочечные операции

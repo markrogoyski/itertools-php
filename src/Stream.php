@@ -129,7 +129,25 @@ final class Stream implements \IteratorAggregate
             );
         }
 
-        return new self(\range($start, $end, $step));
+        $coerce = static function (int|float|string $v): int|float {
+            if (\is_int($v) || \is_float($v)) {
+                return $v;
+            }
+            // PHP arithmetic coercion: int for int-shape strings that fit
+            // PHP_INT_MAX, float otherwise (decimals, exponents, overflow).
+            // Caller gates with is_numeric; assert re-narrows for static analysis.
+            \assert(\is_numeric($v));
+            /** @psalm-suppress InvalidOperand intentional int|float coercion */
+            $n = $v + 0;
+            if (\is_float($n) && !\is_finite($n)) {
+                throw new \InvalidArgumentException(
+                    "Stream::ofRange: numeric string '{$v}' overflows to non-finite value"
+                );
+            }
+            return $n;
+        };
+
+        return new self(Single::range($coerce($start), $coerce($end), $step));
     }
 
     /**

@@ -1,5 +1,17 @@
 # IterTools PHP Change Log
 
+## [Unreleased]
+
+### New Features
+* Single
+  * `range` — lazy finite arithmetic progression
+
+### Changes
+* `Stream::ofRange` is now lazy — it no longer materializes the full sequence via `\range()` and delegates to `Single::range`. Composing it with downstream limiters (e.g. `Stream::ofRange(1, PHP_INT_MAX)->limit(5)`) is now safe.
+* `Stream::ofRange` numeric-string inputs are uniformly coerced to `int`/`float` before iteration. Previously, two matching numeric-string inputs without leading zeros would preserve string-typed output (e.g. `ofRange("1", "5")` yielded `["1", ..., "5"]`); now it yields `[1, ..., 5]`. Alpha string inputs continue to throw `\InvalidArgumentException` with the existing "must be numeric" message.
+* `Stream::ofRange` validation errors (zero step, conflicting direction, step magnitude greater than span, non-finite operands) now surface as `\InvalidArgumentException` at first iteration (e.g. on `->toArray()`), rather than at construction time via PHP's `\ValueError`.
+* `Stream::ofRange` is stricter than native `\range()` in two cases that previously succeeded via delegation: a step magnitude that exceeds the span (e.g. `ofRange(1, 5, 10)`, previously `[1]`) and a negative step that disagrees with the inferred direction (e.g. `ofRange(1, 5, -1)`, previously `[1, 2, 3, 4, 5]`) now both throw `\InvalidArgumentException`. Use the absolute step magnitude or omit the step argument.
+
 ## v2.4.0 - 2026-05-06
 
 ### New Features

@@ -466,6 +466,36 @@ foreach (Single::pairwise($friends) as [$leftFriend, $rightFriend]) {
 // Ross and Rachel, Rachel and Chandler, Chandler and Monica, ...
 ```
 
+### Range
+Yield a finite arithmetic progression of numbers, lazily.
+
+```Single::range(int|float $start, int|float $end, int|float $step = 1)```
+
+* Direction is inferred from `$start` vs `$end` — not from the sign of `$step`. The step magnitude (`abs($step)`) is used internally.
+* A negative `$step` is accepted only when the direction is descending (or when `$start == $end`).
+* Matches PHP's native `\range()` numeric semantics for `int|float` inputs; string inputs are out of scope (use `Stream::ofRange` for a string-accepting entry point).
+* Throws `\InvalidArgumentException` when any operand is non-finite (`INF`/`-INF`/`NAN`), when `$step == 0`, when the step sign conflicts with the operand direction, or when `abs($step) > abs($end - $start)` (strictly greater than).
+* Lazy: safely usable with large bounds when composed with downstream limiters.
+
+```php
+use IterTools\Single;
+
+foreach (Single::range(1, 5) as $n) {
+    print($n);
+}
+// 1, 2, 3, 4, 5
+
+foreach (Single::range(5, 1) as $n) {
+    print($n);
+}
+// 5, 4, 3, 2, 1
+
+foreach (Single::range(0.0, 1.0, 0.25) as $n) {
+    print($n);
+}
+// 0.0, 0.25, 0.5, 0.75, 1.0
+```
+
 ### Repeat
 Repeat an item.
 

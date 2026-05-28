@@ -459,6 +459,36 @@ foreach (Single::pairwise($friends) as [$leftFriend, $rightFriend]) {
 // Ross and Rachel, Rachel and Chandler, Chandler and Monica, ...
 ```
 
+### Range
+Лениво генерирует конечную арифметическую прогрессию чисел.
+
+```Single::range(int|float $start, int|float $end, int|float $step = 1)```
+
+* Направление выводится из соотношения `$start` и `$end`, а не из знака `$step`. Внутри используется модуль шага (`abs($step)`).
+* Отрицательный `$step` допустим только если направление убывающее (или `$start == $end`).
+* Соответствует числовой семантике встроенной функции `\range()` для входов `int|float`; строки не поддерживаются (для строк используйте `Stream::ofRange`).
+* Выбрасывает `\InvalidArgumentException`, если какой-либо операнд не является конечным (`INF`/`-INF`/`NAN`), если `$step == 0`, если знак шага конфликтует с направлением операндов или если `abs($step) > abs($end - $start)` (строго больше).
+* Ленивая реализация: безопасно работает с большими границами при использовании с downstream-ограничителями.
+
+```php
+use IterTools\Single;
+
+foreach (Single::range(1, 5) as $n) {
+    print($n);
+}
+// 1, 2, 3, 4, 5
+
+foreach (Single::range(5, 1) as $n) {
+    print($n);
+}
+// 5, 4, 3, 2, 1
+
+foreach (Single::range(0.0, 1.0, 0.25) as $n) {
+    print($n);
+}
+// 0.0, 0.25, 0.5, 0.75, 1.0
+```
+
 ### Repeat
 Повторяет данное значение заданное число раз.
 

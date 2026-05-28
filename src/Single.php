@@ -817,4 +817,162 @@ final class Single
             yield $fill;
         }
     }
+
+    /**
+     * Yield a finite arithmetic progression of numbers, lazily.
+     *
+     * Direction is inferred from `$start` vs `$end`; the step's magnitude (`abs($step)`)
+     * is used internally. A negative step is accepted only when the inferred direction
+     * is descending, or when `$start == $end` (single-element range, step sign ignored).
+     *
+     * Output type follows native `\range()`: a float `$start` or `$end` always promotes;
+     * an integer-valued float step on int operands preserves int output.
+     *
+     * @param int|float $start
+     * @param int|float $end
+     * @param int|float $step (optional) Step magnitude. Defaults to 1.
+     *
+     * @return \Generator<int, int|float>
+     *
+     * @throws \InvalidArgumentException when any operand is non-finite, when `$step` is zero,
+     *         when the step direction conflicts with the start→end direction, or when the
+     *         step magnitude exceeds the span between `$start` and `$end` and `$start != $end`.
+     */
+    public static function range(int|float $start, int|float $end, int|float $step = 1): \Generator
+    {
+        if (\is_float($start) && !\is_finite($start)) {
+            throw new \InvalidArgumentException('Single::range: start must be finite, got: ' . \var_export($start, true));
+        }
+        if (\is_float($end) && !\is_finite($end)) {
+            throw new \InvalidArgumentException('Single::range: end must be finite, got: ' . \var_export($end, true));
+        }
+        if (\is_float($step) && !\is_finite($step)) {
+            throw new \InvalidArgumentException('Single::range: step must be finite, got: ' . \var_export($step, true));
+        }
+        if ($step == 0) {
+            throw new \InvalidArgumentException('Single::range: step must not be zero');
+        }
+        // \abs(PHP_INT_MIN) overflows int and returns a float; downstream int
+        // arithmetic (\intdiv) would then TypeError. Native PHP \range() also
+        // rejects this. Block it explicitly.
+        if ($step === \PHP_INT_MIN) {
+            throw new \InvalidArgumentException(
+                'Single::range: step magnitude exceeds PHP_INT_MAX (PHP_INT_MIN is not a valid step)'
+            );
+        }
+
+        // Route oversized integer-valued float steps to the float path to avoid PHP 8.5
+        // non-representable int-cast warnings and downstream \intdiv() TypeErrors.
+        $useFloat = \is_float($start)
+            || \is_float($end)
+            || (\is_float($step) && (
+                \fmod($step, 1.0) !== 0.0
+                || \abs($step) >= (float)\PHP_INT_MAX
+            ));
+
+        if ($start == $end) {
+            yield $useFloat ? (float)$start : $start;
+            return;
+        }
+
+        $ascending = $end > $start;
+
+        if ($ascending && $step < 0) {
+            throw new \InvalidArgumentException(
+                "Single::range: step direction ({$step}) conflicts with start ({$start}) → end ({$end})"
+            );
+        }
+
+        if ($useFloat) {
+            $startF = (float)$start;
+            $endF = (float)$end;
+            $magnitudeF = \abs((float)$step);
+            $spanF = \abs($endF - $startF);
+
+            if ($magnitudeF > $spanF) {
+                throw new \InvalidArgumentException(
+                    "Single::range: step magnitude ({$magnitudeF}) must not exceed span ({$spanF})"
+                );
+            }
+
+            // Compute element count up front and derive each value from $start to avoid
+            // (a) accumulator non-termination when the step is smaller than float
+            // spacing at the operand magnitude (e.g. range(1e16, 1e16 + 10, 1.0)),
+            // and (b) drift from accumulated rounding error over long ranges.
+            $stepsQuotient = $spanF / $magnitudeF;
+            // Reject quotients that aren't representable as int. INF / NAN fail
+            // is_finite(); finite-but-too-large floats (e.g. 1.0e20) exceed PHP_INT_MAX
+            // and casting them to int produces a wrong bound plus a PHP 8.5 deprecation.
+            // Use `>=` not `>`: (float)PHP_INT_MAX rounds to 2^63 (one past PHP_INT_MAX),
+            // so a quotient *equal* to that float is already in the unrepresentable region.
+            if (!\is_finite($stepsQuotient) || $stepsQuotient >= (float)\PHP_INT_MAX) {
+                throw new \InvalidArgumentException(
+                    'Single::range: span / step exceeds representable iteration count '
+                    . "(span={$spanF}, step={$magnitudeF})"
+                );
+            }
+            // Add +1 to cover the case where $stepsQuotient is mathematically an
+            // integer but evaluates to N - epsilon in IEEE 754 (e.g. (0.5-0.4)/0.05
+            // → 1.999... not 2.0), which would otherwise truncate the final element.
+            // The clamp below guards against an actual overshoot.
+            $stepsF = (int)\floor($stepsQuotient) + 1;
+            $signF = $ascending ? 1.0 : -1.0;
+
+            for ($i = 0; $i <= $stepsF; ++$i) {
+                $valF = $startF + $signF * ((float)$i * $magnitudeF);
+                // Quotient can be off-by-one when very close to an integer, causing
+                // the reconstructed value to overshoot $end (e.g. 0.3 + 3*0.2 ==
+                // 0.9000000000000001). Clamp.
+                if ($ascending ? $valF > $endF : $valF < $endF) {
+                    break;
+                }
+                yield $valF;
+            }
+        } else {
+            $startI = (int)$start;
+            $endI = (int)$end;
+            $magnitudeI = \abs((int)$step);
+
+            // Step magnitude vs span, computed without subtracting $endI - $startI
+            // (which may overflow int when operands sit on opposite sides of zero).
+            // Ascending: reject when $magnitudeI > $endI - $startI, i.e. when
+            // $endI < $startI + $magnitudeI. If $startI + $magnitudeI overflows
+            // (only possible when $startI > PHP_INT_MAX - $magnitudeI), the true
+            // sum exceeds PHP_INT_MAX ≥ $endI, so the rejection still holds.
+            // Descending: symmetric on $endI + $magnitudeI vs $startI.
+            $stepExceedsSpan = $ascending
+                ? ($startI > \PHP_INT_MAX - $magnitudeI || $endI < $startI + $magnitudeI)
+                : ($endI > \PHP_INT_MAX - $magnitudeI || $startI < $endI + $magnitudeI);
+            if ($stepExceedsSpan) {
+                throw new \InvalidArgumentException(
+                    "Single::range: step magnitude ({$magnitudeI}) must not exceed span between {$startI} and {$endI}"
+                );
+            }
+
+            // Lazy iteration with overflow-safe step advances. Handles arbitrary
+            // spans — including those that overflow int subtraction — by never
+            // precomputing the count. Naive `$v += $magnitudeI` at int boundaries
+            // would promote $v to float and never terminate, so each advance is
+            // gated on whether it would cross PHP_INT_MAX / PHP_INT_MIN.
+            $val = $startI;
+            yield $val;
+            if ($ascending) {
+                while ($val <= \PHP_INT_MAX - $magnitudeI) {
+                    $val += $magnitudeI;
+                    if ($val > $endI) {
+                        break;
+                    }
+                    yield $val;
+                }
+            } else {
+                while ($val >= \PHP_INT_MIN + $magnitudeI) {
+                    $val -= $magnitudeI;
+                    if ($val < $endI) {
+                        break;
+                    }
+                    yield $val;
+                }
+            }
+        }
+    }
 }

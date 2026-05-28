@@ -120,6 +120,7 @@ Quick Reference
 | [`padLeft`](docs/single-iteration.md#pad-left)                         | Pad iterable on the left to a minimum length | `Single::padLeft($data, $length, $fill)`                    |
 | [`padRight`](docs/single-iteration.md#pad-right)                       | Pad iterable on the right to a minimum length | `Single::padRight($data, $length, $fill)`                  |
 | [`pairwise`](docs/single-iteration.md#pairwise)                        | Iterate successive overlapping pairs         | `Single::pairwise($data)`                                   |
+| [`range`](docs/single-iteration.md#range)                              | Lazily yield a finite arithmetic progression | `Single::range($start, $end, [$step])`                      |
 | [`reindex`](docs/single-iteration.md#reindex)                          | Reindex keys of key-value iterable           | `Single::reindex($data, $reindexer)`                        |
 | [`repeat`](docs/single-iteration.md#repeat)                            | Repeat an item a number of times             | `Single::repeat($item, $repetitions)`                       |
 | [`reverse`](docs/single-iteration.md#reverse)                          | Iterate elements in reverse order            | `Single::reverse($data)`                                    |
@@ -279,7 +280,7 @@ Quick Reference
 | [`ofRandomChoice`](docs/stream.md#of-random-choice)            | Create a stream of random selections                            | `Stream::ofRandomChoice($items, $repetitions)`      |
 | [`ofRandomNumbers`](docs/stream.md#of-random-numbers)          | Create a stream of random numbers (integers)                    | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
 | [`ofRandomPercentage`](docs/stream.md#of-random-percentage)    | Create a stream of random percentages between 0 and 1           | `Stream::ofRandomPercentage($repetitions)`          |
-| [`ofRange`](docs/stream.md#of-range)                           | Create a stream of a range of numbers                           | `Stream::ofRange($start, $end, $step)`              |
+| [`ofRange`](docs/stream.md#of-range)                           | Create a lazy stream of an arithmetic progression of numbers    | `Stream::ofRange($start, $end, $step)`              |
 | [`ofRockPaperScissors`](docs/stream.md#of-rock-paper-scissors) | Create a stream of rock-paper-scissors hands                    | `Stream::ofRockPaperScissors($repetitions)`         |
 
 #### Stream Operations

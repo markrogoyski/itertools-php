@@ -151,9 +151,14 @@ $stream = Stream::ofRandomPercentage(3)
 ```
 
 #### Of Range
-Creates stream of a range of numbers.
+Creates a lazy stream of a finite arithmetic progression of numbers.
 
-```Stream::ofRange(int|float $start, int|float $end, int|float $step = 1): Stream```
+```Stream::ofRange(int|float|string $start, int|float|string $end, int|float $step = 1): Stream```
+
+* Numeric strings (e.g. `"1"`, `"1.5"`, `"1e3"`, `"01"`) are accepted and coerced to `int`/`float` before iteration. Non-numeric strings (e.g. `"a"`) throw `\InvalidArgumentException`.
+* Direction is inferred from `$start` vs `$end`. A negative `$step` is accepted only when the direction is descending.
+* Throws `\InvalidArgumentException` when any operand is non-finite (including numeric strings such as `"1e309"` that overflow to `INF`), when `$step == 0`, when the step sign conflicts with the operand direction, or when `abs($step) > abs($end - $start)`.
+* Lazy — safe to use with large bounds combined with downstream operations such as `limit`.
 
 ```php
 use IterTools\Stream;
@@ -161,7 +166,18 @@ use IterTools\Stream;
 $numbers = Stream::ofRange(0, 5)
     ->toArray();
 // 0, 1, 2, 3, 4, 5
+
+$descending = Stream::ofRange(5, 1)
+    ->toArray();
+// 5, 4, 3, 2, 1
+
+$firstFive = Stream::ofRange(1, PHP_INT_MAX)
+    ->limit(5)
+    ->toArray();
+// 1, 2, 3, 4, 5
 ```
+
+> Note: prior to v2.5.0, `Stream::ofRange` materialized the full sequence eagerly via `\range()` and, when given two numeric-string inputs without leading zeros, preserved string-typed output (e.g. `ofRange("1", "5")` yielded `["1", ..., "5"]`). The lazy rewrite normalizes all numeric-string inputs to `int`/`float` uniformly.
 
 #### Of Rock Paper Scissors
 Creates stream of rock-paper-scissors hands.
