@@ -206,7 +206,10 @@ $ composer require markrogoyski/itertools-php:2.*
 | Итератор                                             | Описание                                      | Пример кода                    |
 |------------------------------------------------------|-----------------------------------------------|--------------------------------|
 | [`readCsv`](file-iteration.md#read-csv)             | Итерирует коллекции ячеек CSV-файла построчно | `File::readCsv($fileHandle)`   |
+| [`readCsvAssoc`](file-iteration.md#read-csv-assoc) | Итерирует CSV-файл как массивы с ключами из заголовков | `File::readCsvAssoc($fileHandle)` |
 | [`readLines`](file-iteration.md#read-lines)         | Итерирует содержимое файла построчно          | `File::readLines($fileHandle)` |
+| [`writeCsv`](file-iteration.md#write-csv)           | Записывает коллекцию строк в файл в формате CSV | `File::writeCsv($fileHandle, $rows, $header)` |
+| [`writeLines`](file-iteration.md#write-lines)       | Записывает коллекцию строк в файл             | `File::writeLines($fileHandle, $lines)` |
 
 #### Преобразование итерируемых сущностей
 | Итератор                                                                    | Описание                                                       | Пример кода                                                      |
@@ -279,6 +282,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`of`](stream.md#of)                                                 | Создает поток для цепочечных вызовов из данной коллекции                                             | `Stream::of($iterable)`                             |
 | [`ofCoinFlips`](stream.md#of-coin-flips)                             | Создает поток для цепочечных вызовов из бесконечных случайных бросков монеты                         | `Stream::ofCoinFlips($repetitions)`                 |
 | [`ofCsvFile`](stream.md#of-csv-file)                                 | Создает поток для цепочечных вызовов из строк CSV-файла                                              | `Stream::ofCsvFile($fileHandle)`                    |
+| [`ofCsvFileAssoc`](stream.md#of-csv-file-assoc)                      | Создает поток из строк CSV-файла с ключами из заголовков                                             | `Stream::ofCsvFileAssoc($fileHandle)`               |
 | [`ofFileLines`](stream.md#of-file-lines)                             | Создает поток для цепочечных вызовов из строк файла                                                  | `Stream::ofFileLines($fileHandle)`                  |
 | [`ofEmpty`](stream.md#of-empty)                                      | Создает поток для цепочечных вызовов из пустой коллекции                                             | `Stream::ofEmpty()`                                 |
 | [`ofRandomChoice`](stream.md#of-random-choice)                       | Создает поток для цепочечных вызовов из бесконечных случайных выборов элемента из списка             | `Stream::ofRandomChoice($items, $repetitions)`      |

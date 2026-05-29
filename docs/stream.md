@@ -76,6 +76,23 @@ $result = Stream::of($fileHandle)
     ->toArray();
 ```
 
+#### Of CSV File Assoc
+Creates a stream of rows of a CSV file as associative arrays keyed by header.
+
+```Stream::ofCsvFileAssoc(resource $fileHandle, ?array $headers = null, string $separator = ',', string $enclosure = '"', string $escape = '\\'): Stream```
+
+If `$headers` is `null`, the first row of the file is consumed and used as the header list. Otherwise, the supplied `$headers` are used and every row is treated as data.
+
+```php
+use IterTools\Stream;
+
+$fileHandle = \fopen('path/to/file.csv', 'r');
+
+$result = Stream::ofCsvFileAssoc($fileHandle)
+    ->toArray();
+// [['header1' => 'value1', ...], ...]
+```
+
 #### Of Empty
 Creates stream of nothing.
 

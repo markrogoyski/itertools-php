@@ -200,6 +200,32 @@ final class Stream implements \IteratorAggregate
         return new self(File::readCsv($file, $separator, $enclosure, $escape));
     }
 
+    /**
+     * Create a stream sourced from a CSV file, with each row keyed by header as an associative array.
+     *
+     * If $headers is null, the first row of the file is consumed and used as the header list.
+     * Otherwise, the supplied $headers are used and every row of the file is treated as data.
+     *
+     * @param resource           $fileResource File handle stream opened for reading
+     * @param array<string>|null $headers      (optional) explicit header list; null infers from the first row
+     * @param string             $separator
+     * @param string             $enclosure
+     * @param string             $escape
+     *
+     * @return Stream
+     *
+     * @see File::readCsvAssoc()
+     */
+    public static function ofCsvFileAssoc(
+        mixed $fileResource,
+        ?array $headers = null,
+        string $separator = ',',
+        string $enclosure = '"',
+        string $escape = '\\'
+    ): self {
+        return new self(File::readCsvAssoc($fileResource, $headers, $separator, $enclosure, $escape));
+    }
+
     // STREAM OPERATIONS
 
     /**

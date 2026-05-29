@@ -211,8 +211,11 @@ Quick Reference
 #### File Iteration
 | Iterator                                                        | Description                                               | Code Snippet                                                 |
 |-----------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------|
-| [`readCsv`](docs/file-iteration.md#read-csv)                                          | Intersection a CSV file line by line                      | `File::readCsv($fileHandle)`                                 |
+| [`readCsv`](docs/file-iteration.md#read-csv)                                          | Iterate a CSV file line by line                           | `File::readCsv($fileHandle)`                                 |
+| [`readCsvAssoc`](docs/file-iteration.md#read-csv-assoc)                                | Iterate a CSV file as arrays keyed by header              | `File::readCsvAssoc($fileHandle)`                            |
 | [`readLines`](docs/file-iteration.md#read-lines)                                      | Iterate a file line by line                               | `File::readLines($fileHandle)`                               |
+| [`writeCsv`](docs/file-iteration.md#write-csv)                                        | Write an iterable of rows to a file as CSV                | `File::writeCsv($fileHandle, $rows, $header)`                |
+| [`writeLines`](docs/file-iteration.md#write-lines)                                    | Write an iterable of lines to a file                      | `File::writeLines($fileHandle, $lines)`                      |
 
 #### Transform Iteration
 | Iterator                                       | Description                                  | Code Snippet                                                      |
@@ -285,6 +288,7 @@ Quick Reference
 | [`of`](docs/stream.md#of)                                      | Create a stream from an iterable                                | `Stream::of($iterable)`                             |
 | [`ofCoinFlips`](docs/stream.md#of-coin-flips)                  | Create a stream of random coin flips                            | `Stream::ofCoinFlips($repetitions)`                 |
 | [`ofCsvFile`](docs/stream.md#of-csv-file)                      | Create a stream from a CSV file                                 | `Stream::ofCsvFile($fileHandle)`                    |
+| [`ofCsvFileAssoc`](docs/stream.md#of-csv-file-assoc)           | Create a stream from a CSV file keyed by header                 | `Stream::ofCsvFileAssoc($fileHandle)`               |
 | [`ofEmpty`](docs/stream.md#of-empty)                           | Create an empty stream                                          | `Stream::ofEmpty()`                                 |
 | [`ofFileLines`](docs/stream.md#of-file-lines)                  | Create a stream from lines of a file                            | `Stream::ofFileLines($fileHandle)`                  |
 | [`ofRandomChoice`](docs/stream.md#of-random-choice)            | Create a stream of random selections                            | `Stream::ofRandomChoice($items, $repetitions)`      |
@@ -480,7 +484,7 @@ Full documentation with detailed descriptions, signatures, and code examples for
 - [Set and Multiset Iteration](docs/set-iteration.md) — Distinct, Intersection, Difference, Symmetric Difference, Union
 - [Combinatorics Iteration](docs/combinatorics-iteration.md) — Product, Permutations, Combinations, CombinationsWithReplacement, Powerset
 - [Sort Iteration](docs/sort-iteration.md) — ASort, AsortBy, Largest, Smallest, Sort, SortBy
-- [File Iteration](docs/file-iteration.md) — ReadCsv, ReadLines
+- [File Iteration](docs/file-iteration.md) — ReadCsv, ReadCsvAssoc, ReadLines, WriteLines, WriteCsv
 - [Transform Iteration](docs/transform-iteration.md) — Tee, ToArray, ToAssociativeArray, ToIterator
 
 #### Summarize and Reduce

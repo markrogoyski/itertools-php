@@ -414,4 +414,92 @@ class FileSourceTest extends \PHPUnit\Framework\TestCase
 
         Stream::ofCsvFile($file)->toArray();
     }
+
+    /**
+     * @test ofCsvFileAssoc infers headers from the first row
+     */
+    public function testOfCsvFileAssocInfersHeaders(): void
+    {
+        // Given
+        $file = FileFixture::createFromLines(['a,b,c', '1,2,3', '4,5,6'], $this->root->url());
+
+        // When
+        $stream = Stream::ofCsvFileAssoc($file);
+
+        // Then
+        $expected = [
+            ['a' => '1', 'b' => '2', 'c' => '3'],
+            ['a' => '4', 'b' => '5', 'c' => '6'],
+        ];
+        $this->assertEquals($expected, $stream->toArray());
+    }
+
+    /**
+     * @test ofCsvFileAssoc uses explicit headers and treats every row as data
+     */
+    public function testOfCsvFileAssocExplicitHeaders(): void
+    {
+        // Given
+        $file = FileFixture::createFromLines(['1,2,3', '4,5,6'], $this->root->url());
+
+        // When
+        $stream = Stream::ofCsvFileAssoc($file, ['a', 'b', 'c']);
+
+        // Then
+        $expected = [
+            ['a' => '1', 'b' => '2', 'c' => '3'],
+            ['a' => '4', 'b' => '5', 'c' => '6'],
+        ];
+        $this->assertEquals($expected, $stream->toArray());
+    }
+
+    /**
+     * @test ofCsvFileAssoc chains downstream operations
+     */
+    public function testOfCsvFileAssocChains(): void
+    {
+        // Given
+        $file = FileFixture::createFromLines(['n', '1', '2', '3', '4'], $this->root->url());
+
+        // When
+        $result = Stream::ofCsvFileAssoc($file)
+            ->map(fn (array $row): int => (int)$row['n'])
+            ->filter(fn (int $n): bool => $n % 2 === 0)
+            ->toArray();
+
+        // Then
+        $this->assertEquals([2, 4], $result);
+    }
+
+    /**
+     * @test ofCsvFileAssoc honors a custom separator
+     */
+    public function testOfCsvFileAssocCustomSeparator(): void
+    {
+        // Given
+        $file = FileFixture::createFromLines(['a;b;c', '1;2;3'], $this->root->url());
+
+        // When
+        $stream = Stream::ofCsvFileAssoc($file, null, ';');
+
+        // Then
+        $this->assertEquals([['a' => '1', 'b' => '2', 'c' => '3']], $stream->toArray());
+    }
+
+    /**
+     * @return void
+     */
+    public function testOfCsvFileAssocError(): void
+    {
+        // Given
+        $file = FileFixture::createFromLines([], $this->root->url());
+
+        // When
+        \fclose($file);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        Stream::ofCsvFileAssoc($file)->toArray();
+    }
 }

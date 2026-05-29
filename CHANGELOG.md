@@ -18,6 +18,10 @@
   * `isReversedBy` — true if values projected by a key function are non-increasing
 * Reduce
   * `toCountBy` — reduce to an array of counts keyed by a key function; key function must return `int|string`
+* File
+  * `writeLines` — write an iterable of lines to a file resource; separator inserted between lines, no trailing separator
+  * `writeCsv` — write an iterable of rows to a file resource as CSV, with optional header row
+  * `readCsvAssoc` — iterate CSV rows as associative arrays keyed by header (inferred from the first row or supplied explicitly); validates headers and row-length consistency
 * Stream
   * `mapWithKeys` — fluent key-aware map
   * `filterWithKeys` — fluent key-aware filter
@@ -29,6 +33,7 @@
   * `isSortedBy` — terminal; true if values projected by a key function are non-decreasing
   * `isReversedBy` — terminal; true if values projected by a key function are non-increasing
   * `toCountBy` — terminal; reduce to an array of counts keyed by a key function
+  * `ofCsvFileAssoc` — source; stream a CSV file as associative arrays keyed by header
 
 ### Changes
 * `Stream::ofRange` is now lazy — it no longer materializes the full sequence via `\range()` and delegates to `Single::range`. Composing it with downstream limiters (e.g. `Stream::ofRange(1, PHP_INT_MAX)->limit(5)`) is now safe.

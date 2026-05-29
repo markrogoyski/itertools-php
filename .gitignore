@@ -6,4 +6,5 @@ composer.phar
 tests/.phpunit.cache/
 CLAUDE.md
 .antigravitycli/
+NEW_FEATURES_PLAN.md
 

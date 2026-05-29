@@ -74,6 +74,21 @@ $result = Stream::of($fileHandle)
     ->toArray();
 ```
 
+#### Of CSV File Assoc
+Создает поток из строк CSV-файла как ассоциативных массивов с ключами из заголовков.
+
+```Stream::ofCsvFileAssoc(resource $fileHandle, ?array $headers = null, string $separator = ',', string $enclosure = '"', string $escape = '\\'): Stream```
+
+Если `$headers` равен `null`, первая строка файла потребляется и используется как список заголовков. Иначе используются переданные `$headers`, а каждая строка считается данными.
+
+```php
+use IterTools\Stream;
+$fileHandle = \fopen('path/to/file.csv', 'r');
+$result = Stream::ofCsvFileAssoc($fileHandle)
+    ->toArray();
+// [['header1' => 'value1', ...], ...]
+```
+
 #### Of Empty
 Создает поток из пустой коллекции.
 
