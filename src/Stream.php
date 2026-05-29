@@ -397,6 +397,24 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Filter the stream, keeping only elements for which the key-aware predicate is true.
+     *
+     * The predicate receives both the value and the key: $predicate($value, $key). The return
+     * value is coerced via a (bool) cast. Keys are preserved on the kept elements.
+     *
+     * @param callable(mixed, mixed): mixed $predicate fn($value, $key): bool
+     *
+     * @return Stream
+     *
+     * @see Single::filterWithKeys()
+     */
+    public function filterWithKeys(callable $predicate): self
+    {
+        $this->iterable = Single::filterWithKeys($this->iterable, $predicate);
+        return $this;
+    }
+
+    /**
      * Group iterable source by a common data element.
      *
      * The groupKeyFunction determines the key (or multiple keys) to group elements by.
@@ -500,6 +518,24 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Map a function onto every element of the stream, passing both value and key to the callback.
+     *
+     * The callback receives both the value and the key: $func($value, $key). The transformed
+     * value is yielded with its original key preserved.
+     *
+     * @param callable(mixed, mixed): mixed $func fn($value, $key): mixed
+     *
+     * @return Stream
+     *
+     * @see Single::mapWithKeys()
+     */
+    public function mapWithKeys(callable $func): self
+    {
+        $this->iterable = Single::mapWithKeys($this->iterable, $func);
+        return $this;
+    }
+
+    /**
      * Map a function onto every element of the stream, unpacking each element positionally as arguments.
      *
      * @param callable $function
@@ -529,6 +565,26 @@ final class Stream implements \IteratorAggregate
     public function flatMap(callable $func): self
     {
         $this->iterable = Single::flatMap($this->iterable, $func);
+        return $this;
+    }
+
+    /**
+     * Map a key-aware callback over each element of the stream, then flatten the result by one level.
+     *
+     * The callback receives the value, the key, and the function itself:
+     * $func($value, $key, callable $self). See Single::flatMapWithKeys() for the recursive-flatMap
+     * pattern using the third argument. Outer and inner keys are discarded — the result is yielded
+     * with auto-generated sequential numeric keys.
+     *
+     * @param callable(mixed, mixed, callable): mixed $func fn($value, $key, $self): mixed|iterable
+     *
+     * @return Stream
+     *
+     * @see Single::flatMapWithKeys()
+     */
+    public function flatMapWithKeys(callable $func): self
+    {
+        $this->iterable = Single::flatMapWithKeys($this->iterable, $func);
         return $this;
     }
 

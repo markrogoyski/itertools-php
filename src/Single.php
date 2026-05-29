@@ -273,6 +273,27 @@ final class Single
     }
 
     /**
+     * Filter the iterable, keeping only elements for which the key-aware predicate is true.
+     *
+     * Unlike {@see Single::filter()}, the predicate receives both the value and the key:
+     * $predicate($value, $key). The predicate's return value is coerced via a (bool) cast.
+     * Keys are preserved on the kept elements.
+     *
+     * @param iterable<mixed>             $data
+     * @param callable(mixed, mixed): mixed $predicate fn($value, $key): bool
+     *
+     * @return \Generator<mixed>
+     */
+    public static function filterWithKeys(iterable $data, callable $predicate): \Generator
+    {
+        foreach ($data as $key => $datum) {
+            if ((bool) $predicate($datum, $key)) {
+                yield $key => $datum;
+            }
+        }
+    }
+
+    /**
      * Flatten an iterable by a number of dimensions.
      *
      * Ex: [[1, 2], [3, 4], 5] => [1, 2, 3, 4, 5] // Flattened by one dimension
@@ -484,6 +505,24 @@ final class Single
     }
 
     /**
+     * Map a function onto every element of the iteration, passing both value and key to the callback.
+     *
+     * Unlike {@see Single::map()}, the callback receives both the value and the key:
+     * $func($value, $key). The transformed value is yielded with its original key preserved.
+     *
+     * @param iterable<mixed>             $data
+     * @param callable(mixed, mixed): mixed $func fn($value, $key): mixed
+     *
+     * @return \Generator
+     */
+    public static function mapWithKeys(iterable $data, callable $func): \Generator
+    {
+        foreach ($data as $key => $datum) {
+            yield $key => $func($datum, $key);
+        }
+    }
+
+    /**
      * Map a function onto every element of the iteration, unpacking each element positionally as arguments.
      *
      * Each element of $data must itself be iterable. Its values are passed positionally
@@ -537,6 +576,47 @@ final class Single
     {
         foreach ($data as $datum) {
             $unflattened = $mapper($datum, $mapper);
+            if (\is_iterable($unflattened)) {
+                foreach ($unflattened as $flattenedItem) {
+                    yield $flattenedItem;
+                }
+            } else {
+                yield $unflattened;
+            }
+        }
+    }
+
+    /**
+     * Map a key-aware callback over each element, then flatten the result by one level.
+     *
+     * Unlike {@see Single::flatMap()}, the callback receives both the value and the key, plus
+     * the function itself as a third argument:
+     *
+     *     $func($value, $key, callable $self): mixed|iterable
+     *
+     * The third argument enables recursive flat-mapping over nested iterables with arrow-function
+     * syntax (which cannot otherwise reference itself). For example, to fully flatten a nested
+     * structure regardless of its keys:
+     *
+     *     Single::flatMapWithKeys($data, fn ($value, $key, $self) => \is_iterable($value)
+     *         ? Single::flatMapWithKeys($value, $self)
+     *         : [$value]);
+     *
+     * Like {@see Single::flatMap()}, the callback may return a scalar (yielded as-is) or an
+     * iterable (flattened by one level). Outer and inner keys are discarded — the result is
+     * yielded with auto-generated sequential numeric keys, because flattening produces key
+     * collisions and surprising results. For key-preserving 1:1 mapping, use
+     * {@see Single::mapWithKeys()} instead.
+     *
+     * @param iterable<mixed>                       $data
+     * @param callable(mixed, mixed, callable): mixed $func fn($value, $key, $self): mixed|iterable
+     *
+     * @return \Generator
+     */
+    public static function flatMapWithKeys(iterable $data, callable $func): \Generator
+    {
+        foreach ($data as $key => $datum) {
+            $unflattened = $func($datum, $key, $func);
             if (\is_iterable($unflattened)) {
                 foreach ($unflattened as $flattenedItem) {
                     yield $flattenedItem;

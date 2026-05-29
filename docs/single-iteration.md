@@ -256,6 +256,27 @@ foreach (Single::filterKeys($olympics, $summerFilter) as $year => $hostCity) {
 // 2020: Tokyo
 ```
 
+### Filter With Keys
+Filter out elements from the iterable, passing both the value and the key to the predicate.
+
+Keeps elements for which the predicate—called as `$predicate($value, $key)`—is truthy (coerced via `(bool)`). Keys are preserved.
+
+```Single::filterWithKeys(iterable $data, callable $predicate)```
+
+```php
+use IterTools\Single;
+
+$inventory = ['apples' => 5, 'bananas' => 0, 'avocados' => 3, 'cherries' => 0];
+
+$inStockStartingWithA = fn ($count, $name) => $count > 0 && \str_starts_with($name, 'a');
+
+foreach (Single::filterWithKeys($inventory, $inStockStartingWithA) as $name => $count) {
+    print("$name: $count" . \PHP_EOL);
+}
+// apples: 5
+// avocados: 3
+```
+
 ### Flat Map
 Map a function only the elements of the iterable and then flatten the results.
 
@@ -271,6 +292,25 @@ foreach (Single::flatMap($data, $mapper) as $number) {
     print($number . ' ');
 }
 // 1 -1 2 -2 3 -3 4 -4 5 -5
+```
+
+### Flat Map With Keys
+Map a key-aware function onto each element and then flatten the results by one level.
+
+The callback is called as `$func($value, $key, callable $self)`. The third argument is the function itself, enabling recursive flat-mapping over nested iterables with arrow-function syntax. Like `flatMap`, outer and inner keys are discarded—the result is yielded with auto-generated sequential numeric keys. For key-preserving 1:1 mapping, use `mapWithKeys` instead.
+
+```Single::flatMapWithKeys(iterable $data, callable $func)```
+
+```php
+use IterTools\Single;
+
+$data = ['a' => 1, 'b' => 2, 'c' => 3];
+$func = fn ($value, $key) => [$key, $value];
+
+foreach (Single::flatMapWithKeys($data, $func) as $item) {
+    print($item . ' ');
+}
+// a 1 b 2 c 3
 ```
 
 ### Flatten
@@ -405,6 +445,28 @@ foreach (Single::map($grades, $strictParentsOpinion) as $actualGrade) {
     print($actualGrade);
 }
 // A, F, F, F, A
+```
+
+### Map With Keys
+Map a function onto each element, passing both the value and the key to the callback.
+
+The callback is called as `$func($value, $key)`. The transformed value is yielded with its original key preserved.
+
+```Single::mapWithKeys(iterable $data, callable $func)```
+
+```php
+use IterTools\Single;
+
+$prices = ['apple' => 1.5, 'banana' => 0.75, 'cherry' => 3.0];
+
+$label = fn ($price, $name) => "$name: \$$price";
+
+foreach (Single::mapWithKeys($prices, $label) as $key => $labeled) {
+    print("$key => $labeled" . \PHP_EOL);
+}
+// apple => apple: $1.5
+// banana => banana: $0.75
+// cherry => cherry: $3
 ```
 
 ### Map Spread

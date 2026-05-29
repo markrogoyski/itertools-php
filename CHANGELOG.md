@@ -5,6 +5,13 @@
 ### New Features
 * Single
   * `range` — lazy finite arithmetic progression
+  * `mapWithKeys` — key-aware map; callback receives `($value, $key)`, keys preserved
+  * `filterWithKeys` — key-aware filter; predicate receives `($value, $key)`, keys preserved
+  * `flatMapWithKeys` — key-aware flat map; callback receives `($value, $key, $self)`, result flattened by one level with auto-generated numeric keys
+* Stream
+  * `mapWithKeys` — fluent key-aware map
+  * `filterWithKeys` — fluent key-aware filter
+  * `flatMapWithKeys` — fluent key-aware flat map
 
 ### Changes
 * `Stream::ofRange` is now lazy — it no longer materializes the full sequence via `\range()` and delegates to `Single::range`. Composing it with downstream limiters (e.g. `Stream::ofRange(1, PHP_INT_MAX)->limit(5)`) is now safe.

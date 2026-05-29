@@ -695,6 +695,24 @@ $result = Stream::of($olympics)
 // 2022 => Beijing
 ```
 
+#### Filter With Keys
+Фильтрует поток, передавая в предикат и значение, и ключ.
+
+Оставляет элементы, для которых предикат — вызываемый как `$predicate($value, $key)` — возвращает истину (приводится к `(bool)`). Ключи сохраняются.
+
+```$stream->filterWithKeys(callable $predicate): Stream```
+
+```php
+$inventory = ['apples' => 5, 'bananas' => 0, 'avocados' => 3, 'cherries' => 0];
+
+$inStockStartingWithA = fn ($count, $name) => $count > 0 && \str_starts_with($name, 'a');
+
+$result = Stream::of($inventory)
+    ->filterWithKeys($inStockStartingWithA)
+    ->toAssociativeArray();
+// ['apples' => 5, 'avocados' => 3]
+```
+
 #### Flat Map
 Отображение коллекции из потока с уплощением результата на 1 уровень вложенности.
 
@@ -707,6 +725,22 @@ $result = Stream::of($data)
     ->flatMap($mapper)
     ->toArray();
 // [1, 2, 2, 3, 4, 4, 5]
+```
+
+#### Flat Map With Keys
+Отображение коллекции из потока функцией, учитывающей ключи, с последующим уплощением результата на 1 уровень.
+
+Функция вызывается как `$func($value, $key, callable $self)`. Третий аргумент — сама функция, что позволяет рекурсивно уплощать вложенные коллекции. Внешние и внутренние ключи отбрасываются — результат отдаётся с автоматически сгенерированными последовательными числовыми ключами.
+
+```$stream->flatMapWithKeys(callable $func): Stream```
+
+```php
+$data = ['a' => 1, 'b' => 2, 'c' => 3];
+$func = fn ($value, $key) => [$key, $value];
+$result = Stream::of($data)
+    ->flatMapWithKeys($func)
+    ->toArray();
+// ['a', 1, 'b', 2, 'c', 3]
 ```
 
 #### Flatten
@@ -875,6 +909,24 @@ $result = Stream::of($grades)
     ->map(fn ($grade) => $grade === 100 ? 'A' : 'F')
     ->toArray();
 // A, F, F, F, A
+```
+
+#### Map With Keys
+Отображение хранимой в потоке коллекции функцией, в которую передаются и значение, и ключ.
+
+Функция вызывается как `$func($value, $key)`. Преобразованное значение отдаётся с сохранением исходного ключа.
+
+```$stream->mapWithKeys(callable $func): Stream```
+
+```php
+use IterTools\Stream;
+
+$prices = ['apple' => 1.5, 'banana' => 0.75, 'cherry' => 3.0];
+
+$result = Stream::of($prices)
+    ->mapWithKeys(fn ($price, $name) => "$name: \$$price")
+    ->toAssociativeArray();
+// ['apple' => 'apple: $1.5', 'banana' => 'banana: $0.75', 'cherry' => 'cherry: $3']
 ```
 
 #### Map Spread

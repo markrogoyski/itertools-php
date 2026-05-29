@@ -251,6 +251,27 @@ foreach (Single::filterKeys($olympics, $summerFilter) as $year => $hostCity) {
 // 2020: Tokyo
 ```
 
+### Filter With Keys
+Фильтрует коллекцию, передавая в предикат и значение, и ключ.
+
+Оставляет элементы, для которых предикат — вызываемый как `$predicate($value, $key)` — возвращает истину (приводится к `(bool)`). Ключи сохраняются.
+
+```Single::filterWithKeys(iterable $data, callable $predicate)```
+
+```php
+use IterTools\Single;
+
+$inventory = ['apples' => 5, 'bananas' => 0, 'avocados' => 3, 'cherries' => 0];
+
+$inStockStartingWithA = fn ($count, $name) => $count > 0 && \str_starts_with($name, 'a');
+
+foreach (Single::filterWithKeys($inventory, $inStockStartingWithA) as $name => $count) {
+    print("$name: $count" . \PHP_EOL);
+}
+// apples: 5
+// avocados: 3
+```
+
 ### Flat Map
 Отображение коллекции с уплощением результата на 1 уровень вложенности.
 
@@ -264,6 +285,23 @@ foreach (Single::flatMap($data, $mapper) as $number) {
     print($number . ' ');
 }
 // 1 -1 2 -2 3 -3 4 -4 5 -5
+```
+
+### Flat Map With Keys
+Отображение коллекции функцией, учитывающей ключи, с последующим уплощением результата на 1 уровень.
+
+Функция вызывается как `$func($value, $key, callable $self)`. Третий аргумент — сама функция, что позволяет рекурсивно уплощать вложенные коллекции с помощью стрелочных функций. Как и в `flatMap`, внешние и внутренние ключи отбрасываются — результат отдаётся с автоматически сгенерированными последовательными числовыми ключами. Для отображения 1:1 с сохранением ключей используйте `mapWithKeys`.
+
+```Single::flatMapWithKeys(iterable $data, callable $func)```
+
+```php
+use IterTools\Single;
+$data = ['a' => 1, 'b' => 2, 'c' => 3];
+$func = fn ($value, $key) => [$key, $value];
+foreach (Single::flatMapWithKeys($data, $func) as $item) {
+    print($item . ' ');
+}
+// a 1 b 2 c 3
 ```
 
 ### Flatten
@@ -398,6 +436,28 @@ foreach (Single::map($grades, $strictParentsOpinion) as $actualGrade) {
     print($actualGrade);
 }
 // A, F, F, F, A
+```
+
+### Map With Keys
+Отображение коллекции функцией, в которую передаются и значение, и ключ.
+
+Функция вызывается как `$func($value, $key)`. Преобразованное значение отдаётся с сохранением исходного ключа.
+
+```Single::mapWithKeys(iterable $data, callable $func)```
+
+```php
+use IterTools\Single;
+
+$prices = ['apple' => 1.5, 'banana' => 0.75, 'cherry' => 3.0];
+
+$label = fn ($price, $name) => "$name: \$$price";
+
+foreach (Single::mapWithKeys($prices, $label) as $key => $labeled) {
+    print("$key => $labeled" . \PHP_EOL);
+}
+// apple => apple: $1.5
+// banana => banana: $0.75
+// cherry => cherry: $3
 ```
 
 ### Map Spread
