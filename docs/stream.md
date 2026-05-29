@@ -580,6 +580,24 @@ $compressed = Stream::of($readings)
 
 See also [Set::distinctAdjacentBy](set-iteration.md#distinct-adjacent-by).
 
+#### Drop Last
+Iterate all elements of the stream except the last `$count`.
+
+```$stream->dropLast(int $count): Stream```
+
+Single pass, queue-based: the trailing `$count` elements are never yielded. If `$count` is `0`, all elements are yielded; if `$count` is greater than or equal to the stream length, nothing is yielded. Keys are preserved.
+
+```php
+use IterTools\Stream;
+
+$rows = ['row 1', 'row 2', 'row 3', 'TOTAL'];
+
+$result = Stream::of($rows)
+    ->dropLast(1)
+    ->toArray();
+// row 1, row 2, row 3
+```
+
 #### Drop While
 Drop elements from the stream while the predicate function is true.
 
@@ -1528,6 +1546,24 @@ $stream = Stream::of($a)
     ->symmetricDifferenceCoerciveWith($b, $c)
     ->toArray();
 // 4, 5, 6, 7, 8, 9
+```
+
+#### Take Last
+Iterate the last `$count` elements of the stream.
+
+```$stream->takeLast(int $count): Stream```
+
+Lazy-but-bounded: only a ring buffer of size `$count` is held in memory. If `$count` is `0`, nothing is yielded; if `$count` is greater than the stream length, all elements are yielded. Keys are preserved.
+
+```php
+use IterTools\Stream;
+
+$logLines = ['line 1', 'line 2', 'line 3', 'line 4', 'line 5'];
+
+$result = Stream::of($logLines)
+    ->takeLast(2)
+    ->toArray();
+// line 4, line 5
 ```
 
 #### Take While

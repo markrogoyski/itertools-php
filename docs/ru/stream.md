@@ -572,6 +572,24 @@ $compressed = Stream::of($readings)
 
 См. также [Set::distinctAdjacentBy](set-iteration.md#distinct-adjacent-by).
 
+#### Drop Last
+Перебирает все элементы потока, кроме последних `$count`.
+
+```$stream->dropLast(int $count): Stream```
+
+Один проход на основе очереди: последние `$count` элементов никогда не возвращаются. Если `$count` равен `0`, возвращаются все элементы; если `$count` больше или равен длине потока, не возвращается ничего. Ключи сохраняются.
+
+```php
+use IterTools\Stream;
+
+$rows = ['row 1', 'row 2', 'row 3', 'TOTAL'];
+
+$result = Stream::of($rows)
+    ->dropLast(1)
+    ->toArray();
+// row 1, row 2, row 3
+```
+
 #### Drop While
 Пропускает элементы из потока, пока предикат возвращает истину.
 
@@ -1517,6 +1535,24 @@ $stream = Stream::of($a)
     ->symmetricDifferenceCoerciveWith($b, $c)
     ->toArray();
 // 4, 5, 6, 7, 8, 9
+```
+
+#### Take Last
+Перебирает последние `$count` элементов потока.
+
+```$stream->takeLast(int $count): Stream```
+
+Ленивый, но ограниченный: в памяти удерживается только кольцевой буфер размера `$count`. Если `$count` равен `0`, не возвращается ничего; если `$count` больше длины потока, возвращаются все элементы. Ключи сохраняются.
+
+```php
+use IterTools\Stream;
+
+$logLines = ['line 1', 'line 2', 'line 3', 'line 4', 'line 5'];
+
+$result = Stream::of($logLines)
+    ->takeLast(2)
+    ->toArray();
+// line 4, line 5
 ```
 
 #### Take While

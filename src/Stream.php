@@ -503,6 +503,42 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Iterate the last $count elements of the stream.
+     *
+     * Lazy-but-bounded: only a ring buffer of size $count is held in memory.
+     *
+     * @param int $count ≥ 0
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if $count is negative
+     *
+     * @see Single::takeLast
+     */
+    public function takeLast(int $count): self
+    {
+        $this->iterable = Single::takeLast($this->iterable, $count);
+        return $this;
+    }
+
+    /**
+     * Iterate all elements of the stream except the last $count.
+     *
+     * @param int $count ≥ 0
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if $count is negative
+     *
+     * @see Single::dropLast
+     */
+    public function dropLast(int $count): self
+    {
+        $this->iterable = Single::dropLast($this->iterable, $count);
+        return $this;
+    }
+
+    /**
      * Map a function onto every element of the stream
      *
      * @param callable $func

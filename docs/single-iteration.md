@@ -128,6 +128,24 @@ foreach (Single::compressAssociative($starWarsEpisodes, $originalTrilogyNumbers)
 // VI: Return of the Jedi
 ```
 
+### Drop Last
+Iterate all elements of the iterable except the last `$count`.
+
+Single pass, queue-based: the trailing `$count` elements are never yielded. If `$count` is `0`, all elements are yielded. If `$count` is greater than or equal to the iterable length, nothing is yielded. Keys are preserved.
+
+```Single::dropLast(iterable $data, int $count)```
+
+```php
+use IterTools\Single;
+
+$reportRows = ['Alice', 'Bob', 'Carol', 'TOTAL'];
+
+foreach (Single::dropLast($reportRows, 1) as $name) {
+    print($name);
+}
+// Alice, Bob, Carol
+```
+
 ### Drop While
 Drop elements from the iterable while the predicate function is true.
 
@@ -699,6 +717,24 @@ foreach (Single::string($string) as $character) {
     $listOfCharacters[] = $character;
 }
 // ['M', 'i', 'c', 'k', 'e', 'y', 'M', 'o', 'u', 's', 'e']
+```
+
+### Take Last
+Iterate the last `$count` elements of the iterable.
+
+Lazy-but-bounded: only a ring buffer of size `$count` is held in memory, so it is safe over very large (but finite) inputs. If `$count` is `0`, nothing is yielded. If `$count` is greater than the iterable length, all elements are yielded. Keys are preserved.
+
+```Single::takeLast(iterable $data, int $count)```
+
+```php
+use IterTools\Single;
+
+$logLines = ['line 1', 'line 2', 'line 3', 'line 4', 'line 5'];
+
+foreach (Single::takeLast($logLines, 2) as $line) {
+    print($line);
+}
+// line 4, line 5
 ```
 
 ### Take While

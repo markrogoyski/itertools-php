@@ -103,6 +103,7 @@ Quick Reference
 | [`chunkwiseOverlap`](docs/single-iteration.md#chunkwise-overlap)       | Iterate by overlapped chunks                 | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
 | [`compress`](docs/single-iteration.md#compress)                        | Filter out elements not selected             | `Single::compress($data, $selectors)`                       |
 | [`compressAssociative`](docs/single-iteration.md#compress-associative) | Filter out elements by keys not selected     | `Single::compressAssociative($data, $selectorKeys)`         |
+| [`dropLast`](docs/single-iteration.md#drop-last)                       | Iterate all elements except the last N       | `Single::dropLast($data, $count)`                           |
 | [`dropWhile`](docs/single-iteration.md#drop-while)                     | Drop elements while predicate is true        | `Single::dropWhile($data, $predicate)`                      |
 | [`enumerate`](docs/single-iteration.md#enumerate)                      | Iterate [index, value] pairs                 | `Single::enumerate($data, [$start])`                        |
 | [`filter`](docs/single-iteration.md#filter)                            | Filter for elements where predicate is true  | `Single::filterTrue($data, $predicate)`                     |
@@ -131,6 +132,7 @@ Quick Reference
 | [`slice`](docs/single-iteration.md#slice)                              | Extract a slice of the iterable              | `Single::slice($data, [$start], [$count], [$step])`         |
 | [`splitWhen`](docs/single-iteration.md#split-when)                     | Split iterable into groups when predicate matches | `Single::splitWhen($data, $predicate)`                  |
 | [`string`](docs/single-iteration.md#string)                            | Iterate the characters of a string           | `Single::string($string)`                                   |
+| [`takeLast`](docs/single-iteration.md#take-last)                       | Iterate the last N elements                  | `Single::takeLast($data, $count)`                           |
 | [`takeWhile`](docs/single-iteration.md#take-while)                     | Iterate elements while predicate is true     | `Single::takeWhile($data, $predicate)`                      |
 
 #### Infinite Iteration
@@ -302,6 +304,7 @@ Quick Reference
 | [`distinctAdjacent`](docs/stream.md#distinct-adjacent)                                | Remove only consecutive duplicates                                                        | `$stream->distinctAdjacent()`                                                     |
 | [`distinctAdjacentBy`](docs/stream.md#distinct-adjacent-by)                           | Remove only consecutive duplicates using custom key                                       | `$stream->distinctAdjacentBy($keyFn)`                                             |
 | [`distinctBy`](docs/stream.md#distinct-by)                                            | Filter out elements: iterate only unique items using custom comparator                    | `$stream->distinct($compareBy)`                                                   |
+| [`dropLast`](docs/stream.md#drop-last)                                                | Iterate all elements of the stream except the last N                                      | `$stream->dropLast($count)`                                                       |
 | [`dropWhile`](docs/stream.md#drop-while)                                              | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`                                                  |
 | [`duplicates`](docs/stream.md#duplicates)                                             | Iterate values that appear more than once                                                 | `$stream->duplicates([$strict])`                                                  |
 | [`duplicatesBy`](docs/stream.md#duplicates-by)                                        | Iterate duplicates using a custom key function                                            | `$stream->duplicatesBy($keyFn)`                                                   |
@@ -359,6 +362,7 @@ Quick Reference
 | [`differenceCoerciveWith`](docs/stream.md#difference-coercive-with)                     | Difference of iterable source and given iterables with type coercion                      | `$stream->differenceCoerciveWith(...$iterables)`                                  |
 | [`symmetricDifferenceWith`](docs/stream.md#symmetric-difference-with)                   | Symmetric difference of iterable source and given iterables                               | `$stream->symmetricDifferenceWith(...$iterables)`                                 |
 | [`symmetricDifferenceCoerciveWith`](docs/stream.md#symmetric-difference-coercive-with) | Symmetric difference of iterable source and given iterables with type coercion            | `$stream->symmetricDifferenceCoerciveWith(...$iterables)`                         |
+| [`takeLast`](docs/stream.md#take-last)                                                | Iterate the last N elements of the stream                                                 | `$stream->takeLast($count)`                                                       |
 | [`takeWhile`](docs/stream.md#take-while)                                              | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                                                  |
 | [`unionWith`](docs/stream.md#union-with)                                                | Union of stream with iterables                                                            | `$stream->unionWith(...$iterables)`                                               |
 | [`unionCoerciveWith`](docs/stream.md#union-coercive-with)                               | Union of stream with iterables with type coercion                                         | `$stream->unionCoerciveWith(...$iterables)`                                       |

@@ -126,6 +126,24 @@ foreach (Single::compressAssociative($starWarsEpisodes, $originalTrilogyNumbers)
 // VI: Return of the Jedi
 ```
 
+### Drop Last
+Перебирает все элементы итерируемого объекта, кроме последних `$count`.
+
+Один проход на основе очереди: последние `$count` элементов никогда не возвращаются. Если `$count` равен `0`, возвращаются все элементы. Если `$count` больше или равен длине итерируемого объекта, не возвращается ничего. Ключи сохраняются.
+
+```Single::dropLast(iterable $data, int $count)```
+
+```php
+use IterTools\Single;
+
+$reportRows = ['Alice', 'Bob', 'Carol', 'TOTAL'];
+
+foreach (Single::dropLast($reportRows, 1) as $name) {
+    print($name);
+}
+// Alice, Bob, Carol
+```
+
 ### Drop While
 Пропускает элементы, пока предикат возвращает истину.
 
@@ -684,6 +702,24 @@ foreach (Single::string($string) as $character) {
     $listOfCharacters[] = $character;
 }
 // ['M', 'i', 'c', 'k', 'e', 'y', 'M', 'o', 'u', 's', 'e']
+```
+
+### Take Last
+Перебирает последние `$count` элементов итерируемого объекта.
+
+Ленивый, но ограниченный: в памяти удерживается только кольцевой буфер размера `$count`, поэтому метод безопасен для очень больших (но конечных) входных данных. Если `$count` равен `0`, не возвращается ничего. Если `$count` больше длины итерируемого объекта, возвращаются все элементы. Ключи сохраняются.
+
+```Single::takeLast(iterable $data, int $count)```
+
+```php
+use IterTools\Single;
+
+$logLines = ['line 1', 'line 2', 'line 3', 'line 4', 'line 5'];
+
+foreach (Single::takeLast($logLines, 2) as $line) {
+    print($line);
+}
+// line 4, line 5
 ```
 
 ### Take While

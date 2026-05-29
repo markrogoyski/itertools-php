@@ -490,6 +490,86 @@ final class Single
     }
 
     /**
+     * Iterate the last $count elements of the iteration.
+     *
+     * Yields the final $count elements, preserving their keys. Lazy-but-bounded: only a
+     * ring buffer of size $count is ever held in memory, so it is safe over very large
+     * (but finite) inputs. If $count is larger than the iteration length, all elements
+     * are yielded. If $count is 0, nothing is yielded.
+     *
+     * @param iterable<mixed> $data
+     * @param int             $count ≥ 0, number of elements to take from the end
+     *
+     * @return \Generator<mixed>
+     *
+     * @throws \InvalidArgumentException if $count is negative
+     */
+    public static function takeLast(iterable $data, int $count): \Generator
+    {
+        if ($count < 0) {
+            throw new \InvalidArgumentException("Count must be ≥ 0. Got $count");
+        }
+
+        if ($count === 0) {
+            return;
+        }
+
+        $buffer = [];
+        $index = 0;
+        foreach ($data as $key => $datum) {
+            $buffer[$index] = [$key, $datum];
+            if ($index >= $count) {
+                unset($buffer[$index - $count]);
+            }
+            $index++;
+        }
+
+        foreach ($buffer as [$key, $datum]) {
+            yield $key => $datum;
+        }
+    }
+
+    /**
+     * Iterate all elements of the iteration except the last $count.
+     *
+     * Yields every element except the final $count, preserving keys. Queue-based, single
+     * pass: an element is only yielded once $count further elements have been seen, so the
+     * trailing $count elements are never emitted. If $count is ≥ the iteration length,
+     * nothing is yielded. If $count is 0, all elements are yielded.
+     *
+     * @param iterable<mixed> $data
+     * @param int             $count ≥ 0, number of elements to drop from the end
+     *
+     * @return \Generator<mixed>
+     *
+     * @throws \InvalidArgumentException if $count is negative
+     */
+    public static function dropLast(iterable $data, int $count): \Generator
+    {
+        if ($count < 0) {
+            throw new \InvalidArgumentException("Count must be ≥ 0. Got $count");
+        }
+
+        if ($count === 0) {
+            yield from $data;
+            return;
+        }
+
+        $buffer = [];
+        $index = 0;
+        foreach ($data as $key => $datum) {
+            $buffer[$index] = [$key, $datum];
+            if ($index >= $count) {
+                /** @psalm-suppress PossiblyInvalidArrayOffset */
+                [$bufferedKey, $bufferedDatum] = $buffer[$index - $count];
+                unset($buffer[$index - $count]);
+                yield $bufferedKey => $bufferedDatum;
+            }
+            $index++;
+        }
+    }
+
+    /**
      * Map a function onto every element of the iteration
      *
      * @param iterable<mixed> $data
