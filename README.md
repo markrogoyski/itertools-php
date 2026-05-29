@@ -158,7 +158,9 @@ Quick Reference
 | Iterator                                        | Description                             | Code Snippet                                       |
 |-------------------------------------------------|-----------------------------------------|----------------------------------------------------|
 | [`frequencies`](docs/math-iteration.md#frequencies)                   | Frequency distribution of data          | `Math::frequencies($data, [$strict])`              |
+| [`frequenciesBy`](docs/math-iteration.md#frequencies-by)              | Frequency distribution by key function  | `Math::frequenciesBy($data, $keyFunc, [$strict])`  |
 | [`relativeFrequencies`](docs/math-iteration.md#relative-frequencies)  | Relative frequency distribution of data | `Math::relativeFrequencies($data, [$strict])`      |
+| [`relativeFrequenciesBy`](docs/math-iteration.md#relative-frequencies-by) | Relative frequency distribution by key function | `Math::relativeFrequenciesBy($data, $keyFunc, [$strict])` |
 | [`runningAverage`](docs/math-iteration.md#running-average)            | Running average accumulation            | `Math::runningAverage($numbers, $initialValue)`    |
 | [`runningDifference`](docs/math-iteration.md#running-difference)      | Running difference accumulation         | `Math::runningDifference($numbers, $initialValue)` |
 | [`runningMax`](docs/math-iteration.md#running-max)                    | Running maximum accumulation            | `Math::runningMax($numbers, $initialValue)`        |
@@ -240,6 +242,8 @@ Quick Reference
 | [`isPartitioned`](docs/summary.md#is-partitioned)                      | True if partitioned with items true according to predicate before others | `Summary::isPartitioned($data, $predicate)`       |
 | [`isSorted`](docs/summary.md#is-sorted)                                | True if iterable sorted                                                  | `Summary::isSorted($data)`                        |
 | [`isReversed`](docs/summary.md#is-reversed)                            | True if iterable reverse sorted                                          | `Summary::isReversed($data)`                      |
+| [`isSortedBy`](docs/summary.md#is-sorted-by)                           | True if iterable sorted by key function                                  | `Summary::isSortedBy($data, $keyFunc)`            |
+| [`isReversedBy`](docs/summary.md#is-reversed-by)                       | True if iterable reverse sorted by key function                          | `Summary::isReversedBy($data, $keyFunc)`          |
 | [`noneMatch`](docs/summary.md#none-match)                              | True if none of items true according to predicate                        | `Summary::noneMatch($data, $predicate)`           |
 | [`same`](docs/summary.md#same)                                         | True if iterables are the same                                           | `Summary::same(...$iterables)`                    |
 | [`sameCount`](docs/summary.md#same-count)                              | True if iterables have the same lengths                                  | `Summary::sameCount(...$iterables)`               |
@@ -251,6 +255,7 @@ Quick Reference
 |------------------------------------------------------------|----------------------------------------------|---------------------------------------------------------------|
 | [`toAverage`](docs/reduce.md#to-average)                   | Mean average of elements                     | `Reduce::toAverage($numbers)`                                 |
 | [`toCount`](docs/reduce.md#to-count)                       | Reduce to length of iterable                 | `Reduce::toCount($data)`                                      |
+| [`toCountBy`](docs/reduce.md#to-count-by)                  | Reduce to counts keyed by key function       | `Reduce::toCountBy($data, $keyFunc)`                          |
 | [`toFirst`](docs/reduce.md#to-first)                       | Reduce to its first value                    | `Reduce::toFirst($data)`                                      |
 | [`toFirstAndLast`](docs/reduce.md#to-first-and-last)       | Reduce to its first and last values          | `Reduce::toFirstAndLast($data)`                               |
 | [`toFirstMatch`](docs/reduce.md#to-first-match)            | Reduce to first value matching predicate     | `Reduce::toFirstMatch($data, $predicate, [$default])`         |
@@ -318,6 +323,7 @@ Quick Reference
 | [`flatMapWithKeys`](docs/stream.md#flat-map-with-keys)                                | Key-aware map onto elements and flatten result                                            | `$stream->flatMapWithKeys($func)`                                                 |
 | [`flatten`](docs/stream.md#flatten)                                                   | Flatten multidimensional stream                                                           | `$stream->flatten($dimensions)`                                                   |
 | [`frequencies`](docs/stream.md#frequencies)                                           | Frequency distribution                                                                    | `$stream->frequencies([$strict])`                                                 |
+| [`frequenciesBy`](docs/stream.md#frequencies-by)                                      | Frequency distribution by key function                                                    | `$stream->frequenciesBy($keyFunc, [$strict])`                                     |
 | [`groupAdjacentBy`](docs/stream.md#group-adjacent-by)                                 | Group adjacent elements sharing an extracted key                                          | `$stream->groupAdjacentBy($keyFn)`                                                |
 | [`groupBy`](docs/stream.md#group-by)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction, [$itemKeyFunc])`                             |
 | [`infiniteCycle`](docs/stream.md#infinite-cycle)                                        | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                                                        |
@@ -342,6 +348,7 @@ Quick Reference
 | [`prepend`](docs/stream.md#prepend)                                                   | Prepend values to the front of the stream                                                 | `$stream->prepend(...$values)`                                                    |
 | [`reindex`](docs/stream.md#reindex)                                                   | Reindex keys of key-value stream                                                          | `$stream->reindex($reindexer)`                                                    |
 | [`relativeFrequencies`](docs/stream.md#relative-frequencies)                          | Relative frequency distribution                                                           | `$stream->relativeFrequencies([$strict])`                                         |
+| [`relativeFrequenciesBy`](docs/stream.md#relative-frequencies-by)                     | Relative frequency distribution by key function                                           | `$stream->relativeFrequenciesBy($keyFunc, [$strict])`                             |
 | [`reverse`](docs/stream.md#reverse)                                                   | Reverse elements of the stream                                                            | `$stream->reverse()`                                                              |
 | [`roundRobinWith`](docs/stream.md#round-robin-with)                                   | Yield values from the stream and given iterables in round-robin order                     | `$stream->roundRobinWith(...$iterables)`                                          |
 | [`runningAverage`](docs/stream.md#running-average)                                    | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`                                          |
@@ -396,6 +403,8 @@ Quick Reference
 | [`isPartitioned`](docs/stream.md#is-partitioned)                             | Returns true if partitioned with items true according to predicate before others | `$stream::isPartitioned($predicate)`                   |
 | [`isSorted`](docs/stream.md#is-sorted)                                       | Returns true if stream is sorted in ascending order                              | `$stream->isSorted()`                                  |
 | [`isReversed`](docs/stream.md#is-reversed)                                   | Returns true if stream is sorted in reverse descending order                     | `$stream->isReversed()`                                |
+| [`isSortedBy`](docs/stream.md#is-sorted-by)                                  | Returns true if stream is sorted in ascending order by key function              | `$stream->isSortedBy($keyFunc)`                        |
+| [`isReversedBy`](docs/stream.md#is-reversed-by)                              | Returns true if stream is sorted in reverse descending order by key function     | `$stream->isReversedBy($keyFunc)`                      |
 | [`noneMatch`](docs/stream.md#none-match)                                     | Returns true if none of the items in stream match predicate                      | `$stream->noneMatch($predicate)`                       |
 | [`sameWith`](docs/stream.md#same-with)                                         | Returns true if stream and all given collections are the same                    | `$stream->sameWith(...$iterables)`                     |
 | [`sameCountWith`](docs/stream.md#same-count-with)                              | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`                |
@@ -407,6 +416,7 @@ Quick Reference
 |------------------------------------------------------------|------------------------------------------------------|---------------------------------------------------------|
 | [`toAverage`](docs/stream.md#to-average)                   | Reduces stream to the mean average of its items      | `$stream->toAverage()`                                  |
 | [`toCount`](docs/stream.md#to-count)                       | Reduces stream to its length                         | `$stream->toCount()`                                    |
+| [`toCountBy`](docs/stream.md#to-count-by)                  | Reduces stream to counts keyed by key function       | `$stream->toCountBy($keyFunc)`                          |
 | [`toFirst`](docs/stream.md#to-first)                       | Reduces stream to its first value                    | `$stream->toFirst()`                                    |
 | [`toFirstAndLast`](docs/stream.md#to-first-and-last)       | Reduces stream to its first and last values          | `$stream->toFirstAndLast()`                             |
 | [`toFirstMatch`](docs/stream.md#to-first-match)            | Reduces stream to first value matching predicate     | `$stream->toFirstMatch($predicate, [$default])`         |

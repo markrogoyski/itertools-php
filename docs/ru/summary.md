@@ -332,6 +332,48 @@ $boolean = Summary::isReversed($numbers);
 // false
 ```
 
+### Is Sorted By
+Возвращает истину, если значения, вычисленные функцией-ключом, упорядочены по неубыванию (по возрастанию).
+
+- Вычисленные значения должны быть сравнимы.
+- Для пустой коллекции или коллекции из одного элемента всегда возвращает истину.
+
+```Summary::isSortedBy(iterable $data, callable $keyFunc): bool```
+
+```php
+use IterTools\Summary;
+
+$people = [
+    (object)['name' => 'Alice', 'age' => 25],
+    (object)['name' => 'Bob',   'age' => 30],
+    (object)['name' => 'Carol', 'age' => 42],
+];
+
+$boolean = Summary::isSortedBy($people, fn ($person) => $person->age);
+// true
+```
+
+### Is Reversed By
+Возвращает истину, если значения, вычисленные функцией-ключом, упорядочены по невозрастанию (по убыванию).
+
+- Вычисленные значения должны быть сравнимы.
+- Для пустой коллекции или коллекции из одного элемента всегда возвращает истину.
+
+```Summary::isReversedBy(iterable $data, callable $keyFunc): bool```
+
+```php
+use IterTools\Summary;
+
+$people = [
+    (object)['name' => 'Carol', 'age' => 42],
+    (object)['name' => 'Bob',   'age' => 30],
+    (object)['name' => 'Alice', 'age' => 25],
+];
+
+$boolean = Summary::isReversedBy($people, fn ($person) => $person->age);
+// true
+```
+
 ### None Match
 Возвращает истину, если для всех элементов коллекции предикат вернул ложь.
 

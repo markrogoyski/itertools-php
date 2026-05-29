@@ -201,6 +201,47 @@ final class Reduce
     }
 
     /**
+     * Reduces given iterable to an array of counts keyed by the value returned
+     * from the key function.
+     *
+     * Single pass over the input. The key function must return an int or string
+     * (the only valid array key types); any other return type throws a \TypeError
+     * naming the offending type. This avoids PHP's implicit array-key coercion
+     * (deprecation notices for null and float keys, surprising bool→1/0 collapse).
+     *
+     * Note: PHP arrays coerce numeric-string keys to int — a key function that
+     * returns the string "1" and one that returns the int 1 collapse into a single
+     * int key 1 with the combined count. Callers needing to distinguish those should
+     * use a different data structure upstream.
+     *
+     * @template T
+     *
+     * @param iterable<T>       $data
+     * @param callable(T): mixed $keyFunc must return int|string at runtime
+     *
+     * @return array<int|string, int>
+     *
+     * @throws \TypeError if $keyFunc returns a value that is not int|string
+     */
+    public static function toCountBy(iterable $data, callable $keyFunc): array
+    {
+        $counts = [];
+
+        foreach ($data as $datum) {
+            $key = $keyFunc($datum);
+            if (!\is_int($key) && !\is_string($key)) {
+                throw new \TypeError(
+                    \sprintf('Key function must return int|string, got %s', \gettype($key)),
+                );
+            }
+
+            $counts[$key] = ($counts[$key] ?? 0) + 1;
+        }
+
+        return $counts;
+    }
+
+    /**
      * Reduces given collection to the sum of its items.
      *
      * @param iterable<numeric> $data

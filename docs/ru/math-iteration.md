@@ -25,6 +25,24 @@ foreach (Math::frequencies($grades) as $grade => $frequency) {
 // A: 2, B: 3, C: 1
 ```
 
+### Frequencies By
+Возвращает распределение частот элементов, сгруппированных по значению, которое возвращает функция-ключ.
+
+```Math::frequenciesBy(iterable $data, callable $keyFunc, bool $strict = true): \Generator```
+
+Функция-ключ должна возвращать `int` или `string` (единственные допустимые типы ключей массива). При любом другом типе возвращаемого значения выбрасывается `\TypeError` с указанием некорректного типа. По умолчанию выполняет сравнение в [режиме строгой типизации](README.md#режимы-типизации); передайте `false` аргумента `$strict`, чтобы работать в режиме приведения типов (при котором числовая строка-ключ, например `"1"`, объединяется с целочисленным ключом `1`).
+
+```php
+use IterTools\Math;
+
+$words = ['apple', 'pear', 'banana', 'kiwi'];
+
+foreach (Math::frequenciesBy($words, fn ($word) => \strlen($word)) as $length => $frequency) {
+    print("$length: $frequency" . \PHP_EOL);
+}
+// 5: 1, 4: 2, 6: 1
+```
+
 ### Relative Frequencies
 Возвращает генератор, при обходе которого ключами оказываются элементы поданной на вход последовательности,
 а значениями — относительные частоты вхождений соответствующих элементов.
@@ -42,6 +60,24 @@ foreach (Math::relativeFrequencies($grades) as $grade => $frequency) {
     print("$grade: $frequency" . \PHP_EOL);
 }
 // A: 0.33, B: 0.5, C: 0.166
+```
+
+### Relative Frequencies By
+Возвращает распределение относительных частот элементов, сгруппированных по значению, которое возвращает функция-ключ, нормированное к диапазону [0, 1].
+
+```Math::relativeFrequenciesBy(iterable $data, callable $keyFunc, bool $strict = true): \Generator```
+
+Использует тот же контракт функции-ключа (`int|string`) и семантику `$strict`, что и [`frequenciesBy`](#frequencies-by).
+
+```php
+use IterTools\Math;
+
+$words = ['apple', 'pear', 'kiwi', 'plum'];
+
+foreach (Math::relativeFrequenciesBy($words, fn ($word) => \strlen($word)) as $length => $frequency) {
+    print("$length: $frequency" . \PHP_EOL);
+}
+// 5: 0.25, 4: 0.75
 ```
 
 ### Running Average

@@ -24,6 +24,27 @@ foreach (Math::frequencies($grades) as $grade => $frequency) {
 // A: 2, B: 3, C: 1
 ```
 
+### Frequencies By
+Returns a frequency distribution of the data grouped by the value returned from the key function.
+
+```Math::frequenciesBy(iterable $data, callable $keyFunc, bool $strict = true): \Generator```
+
+The key function must return an `int` or `string` (the only valid array-key types). Any other
+return type throws a `\TypeError` naming the offending type. Defaults to
+[strict type](../README.md#strict-and-coercive-types) comparisons; set strict to false for type
+coercion comparisons (under which a numeric-string key such as `"1"` collapses with the int key `1`).
+
+```php
+use IterTools\Math;
+
+$words = ['apple', 'pear', 'banana', 'kiwi'];
+
+foreach (Math::frequenciesBy($words, fn ($word) => \strlen($word)) as $length => $frequency) {
+    print("$length: $frequency" . \PHP_EOL);
+}
+// 5: 1, 4: 2, 6: 1
+```
+
 ### Relative Frequencies
 Returns a relative frequency distribution of the data.
 
@@ -40,6 +61,25 @@ foreach (Math::relativeFrequencies($grades) as $grade => $frequency) {
     print("$grade: $frequency" . \PHP_EOL);
 }
 // A: 0.33, B: 0.5, C: 0.166
+```
+
+### Relative Frequencies By
+Returns a relative frequency distribution of the data grouped by the value returned from the key function.
+
+```Math::relativeFrequenciesBy(iterable $data, callable $keyFunc, bool $strict = true): \Generator```
+
+Shares the `int|string` key-function contract and strict semantics of
+[`frequenciesBy`](#frequencies-by).
+
+```php
+use IterTools\Math;
+
+$words = ['apple', 'pear', 'kiwi', 'plum'];
+
+foreach (Math::relativeFrequenciesBy($words, fn ($word) => \strlen($word)) as $length => $frequency) {
+    print("$length: $frequency" . \PHP_EOL);
+}
+// 5: 0.25, 4: 0.75
 ```
 
 ### Running Average

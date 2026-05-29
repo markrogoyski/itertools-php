@@ -36,6 +36,26 @@ $length = Reduce::toCount($someIterable);
 // 3
 ```
 
+### To Count By
+Reduces iterable to an array of counts keyed by the value returned from the key function.
+
+```Reduce::toCountBy(iterable $data, callable $keyFunc): array```
+
+The key function must return an `int` or `string` (the only valid array-key types). Any other
+return type throws a `\TypeError` naming the offending type.
+
+> Note: PHP arrays coerce numeric-string keys to int — a key function that returns the string `"1"`
+> and one that returns the int `1` collapse into a single int key `1` with the combined count.
+
+```php
+use IterTools\Reduce;
+
+$words = ['apple', 'pear', 'banana', 'kiwi', 'plum'];
+
+$counts = Reduce::toCountBy($words, fn ($word) => \strlen($word));
+// [5 => 1, 4 => 3, 6 => 1]
+```
+
 ### To First
 Reduces iterable to its first element.
 

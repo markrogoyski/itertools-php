@@ -716,6 +716,46 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns a frequency distribution of stream elements grouped by the value
+     * returned from the key function.
+     *
+     * The key function must return an int or string; any other return type throws
+     * a \TypeError when the stream is consumed.
+     *
+     * @param callable(mixed): (int|string) $keyFunc
+     * @param bool                          $strict
+     *
+     * @return $this
+     *
+     * @see Math::frequenciesBy()
+     */
+    public function frequenciesBy(callable $keyFunc, bool $strict = true): self
+    {
+        $this->iterable = Math::frequenciesBy($this->iterable, $keyFunc, $strict);
+        return $this;
+    }
+
+    /**
+     * Returns a relative frequency distribution of stream elements grouped by the
+     * value returned from the key function, normalized to the range [0, 1].
+     *
+     * The key function must return an int or string; any other return type throws
+     * a \TypeError when the stream is consumed.
+     *
+     * @param callable(mixed): (int|string) $keyFunc
+     * @param bool                          $strict
+     *
+     * @return $this
+     *
+     * @see Math::relativeFrequenciesBy()
+     */
+    public function relativeFrequenciesBy(callable $keyFunc, bool $strict = true): self
+    {
+        $this->iterable = Math::relativeFrequenciesBy($this->iterable, $keyFunc, $strict);
+        return $this;
+    }
+
+    /**
      * Sorts the stream.
      *
      * If comparator is null, then elements of the iterable source must be comparable.
@@ -2383,6 +2423,44 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Returns true if the values projected by the key function are sorted in
+     * non-decreasing (ascending) order; otherwise false.
+     *
+     * Projected values must be comparable.
+     *
+     * Returns true if iterable source is empty or has only one element.
+     *
+     * @param callable(mixed): mixed $keyFunc
+     *
+     * @return bool
+     *
+     * @see Summary::isSortedBy()
+     */
+    public function isSortedBy(callable $keyFunc): bool
+    {
+        return Summary::isSortedBy($this->iterable, $keyFunc);
+    }
+
+    /**
+     * Returns true if the values projected by the key function are sorted in
+     * non-increasing (reverse descending) order; otherwise false.
+     *
+     * Projected values must be comparable.
+     *
+     * Returns true if iterable source is empty or has only one element.
+     *
+     * @param callable(mixed): mixed $keyFunc
+     *
+     * @return bool
+     *
+     * @see Summary::isReversedBy()
+     */
+    public function isReversedBy(callable $keyFunc): bool
+    {
+        return Summary::isReversedBy($this->iterable, $keyFunc);
+    }
+
+    /**
      * Returns true if iterable source and all given collections are the same.
      *
      * For single iterable or empty iterables list returns true.
@@ -2484,6 +2562,24 @@ final class Stream implements \IteratorAggregate
     public function toCount(): int
     {
         return Reduce::toCount($this->iterable);
+    }
+
+    /**
+     * Reduces iterable source to an array of counts keyed by the value returned
+     * from the key function.
+     *
+     * The key function must return an int or string; any other return type throws
+     * a \TypeError.
+     *
+     * @param callable(mixed): (int|string) $keyFunc
+     *
+     * @return array<int|string, int>
+     *
+     * @see Reduce::toCountBy()
+     */
+    public function toCountBy(callable $keyFunc): array
+    {
+        return Reduce::toCountBy($this->iterable, $keyFunc);
     }
 
     /**

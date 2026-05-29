@@ -799,6 +799,25 @@ $result = Stream::of($grades)
 // ['A' => 2, 'B' => 3, 'C' => 1]
 ```
 
+#### Frequencies By
+Frequency distribution of the stream elements grouped by the value returned from the key function.
+
+```$stream->frequenciesBy(callable $keyFunc, bool $strict = true): Stream```
+
+The key function must return an `int` or `string`; any other return type throws a `\TypeError` when the stream is consumed.
+
+```php
+use IterTools\Stream;
+
+$words = ['apple', 'pear', 'banana', 'kiwi'];
+
+$result = Stream::of($words)
+    ->frequenciesBy(fn ($word) => \strlen($word))
+    ->toAssociativeArray();
+
+// [5 => 1, 4 => 2, 6 => 1]
+```
+
 #### Group By
 Return a stream grouping by a common data element.
 
@@ -1108,6 +1127,25 @@ $result = Stream::of($grades)
     ->toAssociativeArray();
 
 // A => 0.33, B => 0.5, C => 0.166
+```
+
+#### Relative Frequencies By
+Relative frequency distribution of the stream elements grouped by the value returned from the key function.
+
+```$stream->relativeFrequenciesBy(callable $keyFunc, bool $strict = true): Stream```
+
+The key function must return an `int` or `string`; any other return type throws a `\TypeError` when the stream is consumed.
+
+```php
+use IterTools\Stream;
+
+$words = ['apple', 'pear', 'kiwi', 'plum'];
+
+$result = Stream::of($words)
+    ->relativeFrequenciesBy(fn ($word) => \strlen($word))
+    ->toAssociativeArray();
+
+// [5 => 0.25, 4 => 0.75]
 ```
 
 #### Reverse
@@ -2385,6 +2423,52 @@ $result = Stream::of($input)
 // false
 ```
 
+##### Is Sorted By
+Returns true if the values projected by the key function are sorted in non-decreasing (ascending) order; otherwise false.
+
+```$stream->isSortedBy(callable $keyFunc): bool```
+
+Projected values must be comparable.
+
+Returns true if iterable source is empty or has only one element.
+
+```php
+use IterTools\Stream;
+
+$people = [
+    (object)['name' => 'Alice', 'age' => 25],
+    (object)['name' => 'Bob',   'age' => 30],
+    (object)['name' => 'Carol', 'age' => 42],
+];
+
+$result = Stream::of($people)
+    ->isSortedBy(fn ($person) => $person->age);
+// true
+```
+
+##### Is Reversed By
+Returns true if the values projected by the key function are sorted in non-increasing (reverse descending) order; otherwise false.
+
+```$stream->isReversedBy(callable $keyFunc): bool```
+
+Projected values must be comparable.
+
+Returns true if iterable source is empty or has only one element.
+
+```php
+use IterTools\Stream;
+
+$people = [
+    (object)['name' => 'Carol', 'age' => 42],
+    (object)['name' => 'Bob',   'age' => 30],
+    (object)['name' => 'Alice', 'age' => 25],
+];
+
+$result = Stream::of($people)
+    ->isReversedBy(fn ($person) => $person->age);
+// true
+```
+
 ##### None Match
 Returns true if no element matches the predicate function.
 
@@ -2513,6 +2597,23 @@ $input = [10, 20, 30, 40, 50];
 $result = Stream::of($iterable)
     ->toCount();
 // 5
+```
+
+##### To Count By
+Reduces iterable source to an array of counts keyed by the value returned from the key function.
+
+```$stream->toCountBy(callable $keyFunc): array```
+
+The key function must return an `int` or `string`; any other return type throws a `\TypeError`.
+
+```php
+use IterTools\Stream;
+
+$words = ['apple', 'pear', 'banana', 'kiwi', 'plum'];
+
+$result = Stream::of($words)
+    ->toCountBy(fn ($word) => \strlen($word));
+// [5 => 1, 4 => 3, 6 => 1]
 ```
 
 ##### To First

@@ -791,6 +791,25 @@ $result = Stream::of($grades)
 // ['A' => 2, 'B' => 3, 'C' => 1]
 ```
 
+#### Frequencies By
+Частота распределения элементов потока, сгруппированных по значению, которое возвращает функция-ключ.
+
+```$stream->frequenciesBy(callable $keyFunc, bool $strict = true): Stream```
+
+Функция-ключ должна возвращать `int` или `string`; при любом другом типе возвращаемого значения при обходе потока выбрасывается `\TypeError`.
+
+```php
+use IterTools\Stream;
+
+$words = ['apple', 'pear', 'banana', 'kiwi'];
+
+$result = Stream::of($words)
+    ->frequenciesBy(fn ($word) => \strlen($word))
+    ->toAssociativeArray();
+
+// [5 => 1, 4 => 2, 6 => 1]
+```
+
 #### Group By
 Группирует элементы из потока по заданному правилу.
 
@@ -1097,6 +1116,25 @@ $result = Stream::of($grades)
     ->toAssociativeArray();
 
 // A => 0.33, B => 0.5, C => 0.166
+```
+
+#### Relative Frequencies By
+Относительная частота распределения элементов потока, сгруппированных по значению, которое возвращает функция-ключ.
+
+```$stream->relativeFrequenciesBy(callable $keyFunc, bool $strict = true): Stream```
+
+Функция-ключ должна возвращать `int` или `string`; при любом другом типе возвращаемого значения при обходе потока выбрасывается `\TypeError`.
+
+```php
+use IterTools\Stream;
+
+$words = ['apple', 'pear', 'kiwi', 'plum'];
+
+$result = Stream::of($words)
+    ->relativeFrequenciesBy(fn ($word) => \strlen($word))
+    ->toAssociativeArray();
+
+// [5 => 0.25, 4 => 0.75]
 ```
 
 #### Reverse
@@ -2378,6 +2416,52 @@ $result = Stream::of($input)
 // false
 ```
 
+##### Is Sorted By
+Возвращает истину, если значения, вычисленные функцией-ключом, упорядочены по неубыванию (по возрастанию), иначе — ложь.
+
+```$stream->isSortedBy(callable $keyFunc): bool```
+
+Вычисленные значения должны быть сравнимы.
+
+Для пустой коллекции или коллекции из одного элемента всегда возвращает истину.
+
+```php
+use IterTools\Stream;
+
+$people = [
+    (object)['name' => 'Alice', 'age' => 25],
+    (object)['name' => 'Bob',   'age' => 30],
+    (object)['name' => 'Carol', 'age' => 42],
+];
+
+$result = Stream::of($people)
+    ->isSortedBy(fn ($person) => $person->age);
+// true
+```
+
+##### Is Reversed By
+Возвращает истину, если значения, вычисленные функцией-ключом, упорядочены по невозрастанию (по убыванию), иначе — ложь.
+
+```$stream->isReversedBy(callable $keyFunc): bool```
+
+Вычисленные значения должны быть сравнимы.
+
+Для пустой коллекции или коллекции из одного элемента всегда возвращает истину.
+
+```php
+use IterTools\Stream;
+
+$people = [
+    (object)['name' => 'Carol', 'age' => 42],
+    (object)['name' => 'Bob',   'age' => 30],
+    (object)['name' => 'Alice', 'age' => 25],
+];
+
+$result = Stream::of($people)
+    ->isReversedBy(fn ($person) => $person->age);
+// true
+```
+
 ##### None Match
 Возвращает истину, если для всех элементов из потока предикат вернул ложь.
 
@@ -2506,6 +2590,23 @@ $input = [10, 20, 30, 40, 50];
 $result = Stream::of($iterable)
     ->toCount();
 // 5
+```
+
+##### To Count By
+Сворачивает коллекцию элементов из потока в массив количеств, сгруппированных по значению, которое возвращает функция-ключ.
+
+```$stream->toCountBy(callable $keyFunc): array```
+
+Функция-ключ должна возвращать `int` или `string`; при любом другом типе возвращаемого значения выбрасывается `\TypeError`.
+
+```php
+use IterTools\Stream;
+
+$words = ['apple', 'pear', 'banana', 'kiwi', 'plum'];
+
+$result = Stream::of($words)
+    ->toCountBy(fn ($word) => \strlen($word));
+// [5 => 1, 4 => 3, 6 => 1]
 ```
 
 ##### To First

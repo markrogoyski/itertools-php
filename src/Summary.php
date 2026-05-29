@@ -149,6 +149,42 @@ final class Summary
     }
 
     /**
+     * Returns true if the values projected by the key function are sorted in
+     * non-decreasing (ascending) order; otherwise false.
+     *
+     * Projected values must be comparable.
+     *
+     * Returns true if given collection is empty or has only one element.
+     *
+     * @param iterable<mixed>       $data
+     * @param callable(mixed): mixed $keyFunc
+     *
+     * @return bool
+     */
+    public static function isSortedBy(iterable $data, callable $keyFunc): bool
+    {
+        return self::isSorted(Single::map($data, $keyFunc));
+    }
+
+    /**
+     * Returns true if the values projected by the key function are sorted in
+     * non-increasing (reverse descending) order; otherwise false.
+     *
+     * Projected values must be comparable.
+     *
+     * Returns true if given collection is empty or has only one element.
+     *
+     * @param iterable<mixed>       $data
+     * @param callable(mixed): mixed $keyFunc
+     *
+     * @return bool
+     */
+    public static function isReversedBy(iterable $data, callable $keyFunc): bool
+    {
+        return self::isReversed(Single::map($data, $keyFunc));
+    }
+
+    /**
      * Returns true if all given collections are the same.
      *
      * For single iterable or empty iterables list returns true.

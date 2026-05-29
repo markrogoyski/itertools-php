@@ -71,6 +71,93 @@ final class Math
     }
 
     /**
+     * Returns a frequency distribution of iterable elements grouped by the value
+     * returned from the key function, showing how often each group occurs.
+     *
+     * The key function must return an int or string (the only valid array key
+     * types); any other return type throws a \TypeError naming the offending type.
+     * This avoids PHP's implicit array-key coercion (deprecation notices for null
+     * and float keys, surprising bool→1/0 collapse).
+     *
+     * The $strict flag controls value-hash strictness exactly as in
+     * {@see Math::frequencies()} — under non-strict comparison a numeric-string key
+     * such as "1" collapses with the int key 1.
+     *
+     * @template T
+     *
+     * @param iterable<T>       $data
+     * @param callable(T): mixed $keyFunc must return int|string at runtime
+     * @param bool              $strict
+     *
+     * @return \Generator<int|string, int>
+     *
+     * @throws \TypeError if $keyFunc returns a value that is not int|string
+     */
+    public static function frequenciesBy(iterable $data, callable $keyFunc, bool $strict = true): \Generator
+    {
+        $usages = [];
+        $keys   = [];
+
+        foreach ($data as $datum) {
+            $key = $keyFunc($datum);
+            if (!\is_int($key) && !\is_string($key)) {
+                throw new \TypeError(
+                    \sprintf('Key function must return int|string, got %s', \gettype($key)),
+                );
+            }
+
+            $hash = UniqueExtractor::getString($key, $strict);
+
+            if (!\array_key_exists($hash, $usages)) {
+                $usages[$hash] = 0;
+                $keys[$hash]   = $key;
+            }
+
+            $usages[$hash]++;
+        }
+
+        /**
+         * @var int|string $key
+         * @var int        $usageCount
+         */
+        foreach (Multi::zipEqual($keys, $usages) as [$key, $usageCount]) {
+            yield $key => $usageCount;
+        }
+    }
+
+    /**
+     * Returns a relative frequency distribution of iterable elements grouped by the
+     * value returned from the key function, normalized to the range [0, 1].
+     *
+     * Shares the int|string key-function contract and $strict semantics of
+     * {@see Math::frequenciesBy()}.
+     *
+     * @template T
+     *
+     * @param iterable<T>       $data
+     * @param callable(T): mixed $keyFunc must return int|string at runtime
+     * @param bool              $strict
+     *
+     * @return \Generator<int|string, float>
+     *
+     * @throws \TypeError if $keyFunc returns a value that is not int|string
+     */
+    public static function relativeFrequenciesBy(iterable $data, callable $keyFunc, bool $strict = true): \Generator
+    {
+        $frequencies = [];
+        $totalCount = 0;
+
+        foreach (self::frequenciesBy($data, $keyFunc, $strict) as $key => $count) {
+            $frequencies[] = [$key, $count];
+            $totalCount += $count;
+        }
+
+        foreach ($frequencies as [$key, $count]) {
+            yield $key => ($count / $totalCount);
+        }
+    }
+
+    /**
      * Accumulate the running total over a list of numbers
      *
      * @param iterable<int|float> $numbers

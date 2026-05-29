@@ -337,6 +337,48 @@ $boolean = Summary::isReversed($numbers);
 // false
 ```
 
+### Is Sorted By
+Returns true if the values projected by the key function are sorted in non-decreasing (ascending) order, otherwise false.
+
+- Projected values must be comparable.
+- Returns true if empty or has only one element.
+
+```Summary::isSortedBy(iterable $data, callable $keyFunc): bool```
+
+```php
+use IterTools\Summary;
+
+$people = [
+    (object)['name' => 'Alice', 'age' => 25],
+    (object)['name' => 'Bob',   'age' => 30],
+    (object)['name' => 'Carol', 'age' => 42],
+];
+
+$boolean = Summary::isSortedBy($people, fn ($person) => $person->age);
+// true
+```
+
+### Is Reversed By
+Returns true if the values projected by the key function are sorted in non-increasing (reverse descending) order, otherwise false.
+
+- Projected values must be comparable.
+- Returns true if empty or has only one element.
+
+```Summary::isReversedBy(iterable $data, callable $keyFunc): bool```
+
+```php
+use IterTools\Summary;
+
+$people = [
+    (object)['name' => 'Carol', 'age' => 42],
+    (object)['name' => 'Bob',   'age' => 30],
+    (object)['name' => 'Alice', 'age' => 25],
+];
+
+$boolean = Summary::isReversedBy($people, fn ($person) => $person->age);
+// true
+```
+
 ### None Match
 Returns true if no element matches the predicate function.
 
