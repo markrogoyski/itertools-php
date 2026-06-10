@@ -109,3 +109,22 @@ foreach (Random::sample($population, 3) as $item) {
 }
 // e.g.: c, a, e [random, no repeats]
 ```
+
+### Reservoir Sample
+Sample up to `$size` elements uniformly at random in a single pass (Algorithm R).
+
+```Random::reservoirSample(iterable $data, int $size, ?\Random\Engine $engine = null): array```
+
+* Does not materialize the full input — only a reservoir of at most `$size` items is held in memory, so it is safe over very large (but finite) inputs. An infinite source is invalid: Algorithm R must consume the whole input.
+* Returns up to `$size` items (fewer if the input is shorter). When `$size >= count` of the input, the entire input is returned in original order and **zero** random draws occur — this differs deliberately from [`sample`](#sample), which throws `\LengthException` on oversize `$size`.
+* Output keys are sequential 0-indexed.
+* Throws `\InvalidArgumentException` if `$size` is negative.
+
+```php
+use IterTools\Random;
+
+$logLines = $hugeLogFileLineGenerator; // millions of lines, never fully materialized
+
+$reservoir = Random::reservoirSample($logLines, 5);
+// e.g.: 5 lines drawn uniformly at random in one pass
+```

@@ -10,6 +10,12 @@
   * `flatMapWithKeys` — key-aware flat map; callback receives `($value, $key, $self)`, result flattened by one level with auto-generated numeric keys
   * `takeLast` — iterate the last N elements; lazy-but-bounded ring buffer, keys preserved
   * `dropLast` — iterate all elements except the last N; single-pass queue, keys preserved
+  * `windowed` — sliding windows of size N advancing by a step; supports gapped windows (`step > size`) and an optional trailing partial window
+  * `withFirst` — pair each element with an is-first boolean flag; lazy, O(1) memory
+  * `withLast` — pair each element with an is-last boolean flag; single-element lookahead, lazy, O(1) memory
+  * `withFirstAndLast` — pair each element with is-first/is-last boolean flags ("mark ends"); single-element lookahead, lazy, O(1) memory
+* Random
+  * `reservoirSample` — single-pass uniform random sample (Algorithm R); does not materialize the input; returns the whole input in original order when `size >= count`
 * Math
   * `frequenciesBy` — frequency distribution grouped by a key function; key function must return `int|string`
   * `relativeFrequenciesBy` — relative frequency distribution grouped by a key function; key function must return `int|string`
@@ -34,6 +40,11 @@
   * `isReversedBy` — terminal; true if values projected by a key function are non-increasing
   * `toCountBy` — terminal; reduce to an array of counts keyed by a key function
   * `ofCsvFileAssoc` — source; stream a CSV file as associative arrays keyed by header
+  * `windowed` — fluent sliding windows of elements
+  * `withFirst` — fluent pair each element with an is-first flag
+  * `withLast` — fluent pair each element with an is-last flag
+  * `withFirstAndLast` — fluent pair each element with is-first/is-last flags
+  * `reservoirSample` — fluent but **eager** single-pass uniform random sample; consumes the upstream immediately at call time
 
 ### Changes
 * `Stream::ofRange` is now lazy — it no longer materializes the full sequence via `\range()` and delegates to `Single::range`. Composing it with downstream limiters (e.g. `Stream::ofRange(1, PHP_INT_MAX)->limit(5)`) is now safe.

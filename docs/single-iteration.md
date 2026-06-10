@@ -65,6 +65,7 @@ Return overlapped chunks of elements.
 
 * Chunk size must be at least 1.
 * Overlap size must be less than chunk size.
+* See also [Windowed](#windowed) — a step-based sibling that additionally supports gapped windows (`$step > $size`).
 
 ```php
 use IterTools\Single;
@@ -840,4 +841,86 @@ foreach (Single::splitWhen($values, fn ($x) => $x === 0) as $group) {
 // 1,2
 // 0,3
 // 0,4
+```
+
+### Windowed
+Iterate sliding windows of `$size` elements, advancing `$step` elements between windows.
+
+```Single::windowed(iterable $data, int $size, int $step = 1, bool $partial = false)```
+
+A step-based sibling of [Chunkwise Overlap](#chunkwise-overlap) that additionally supports gapped windows (`$step > $size`), which `chunkwiseOverlap` cannot express.
+
+* Window size must be at least 1; step must be at least 1.
+* Each window is a 0-indexed list array; source keys are discarded. Memory is bounded by O(`$size`).
+* For `1 <= $step <= $size`, this is equivalent to `chunkwiseOverlap($data, $size, $size - $step, includeIncompleteTail: $partial)`.
+* When `$step > $size`, the `$step - $size` elements following each full window are dropped (gapped windows).
+* `$partial` controls whether a final incomplete window is emitted. **Note:** it defaults to `false` — the opposite of `chunkwiseOverlap`'s `includeIncompleteTail`, which defaults to `true`.
+
+```php
+use IterTools\Single;
+
+$temperatures = [1, 2, 3, 4, 5];
+
+foreach (Single::windowed($temperatures, 3) as $window) {
+    // [1, 2, 3], [2, 3, 4], [3, 4, 5]
+}
+
+foreach (Single::windowed($temperatures, 2, 2, partial: true) as $window) {
+    // [1, 2], [3, 4], [5]
+}
+```
+
+### With First
+Pair every element with a boolean flag marking whether it is the first element.
+
+```Single::withFirst(iterable $data)```
+
+Yields `[bool $isFirst, mixed $value]` tuples. Fully lazy with O(1) memory. Source keys are discarded; output keys are sequential 0-indexed.
+
+```php
+use IterTools\Single;
+
+$lines = ['header', 'row 1', 'row 2'];
+
+foreach (Single::withFirst($lines) as [$isFirst, $line]) {
+    print($isFirst ? "H: $line" : "  $line");
+}
+// H: header
+//   row 1
+//   row 2
+```
+
+### With Last
+Pair every element with a boolean flag marking whether it is the last element.
+
+```Single::withLast(iterable $data)```
+
+Yields `[bool $isLast, mixed $value]` tuples. Uses a single-element lookahead, so it is lazy with O(1) memory. Source keys are discarded; output keys are sequential 0-indexed.
+
+```php
+use IterTools\Single;
+
+$items = ['a', 'b', 'c'];
+
+foreach (Single::withLast($items) as [$isLast, $item]) {
+    print($isLast ? "$item." : "$item, ");
+}
+// a, b, c.
+```
+
+### With First And Last
+Pair every element with boolean flags marking whether it is the first and/or last element.
+
+```Single::withFirstAndLast(iterable $data)```
+
+Yields `[bool $isFirst, bool $isLast, mixed $value]` tuples — the common "mark ends" pattern. A single-element input yields one `[true, true, $value]` tuple. Uses a single-element lookahead, so it is lazy with O(1) memory. Source keys are discarded; output keys are sequential 0-indexed.
+
+```php
+use IterTools\Single;
+
+$items = ['a', 'b', 'c'];
+
+foreach (Single::withFirstAndLast($items) as [$isFirst, $isLast, $item]) {
+    // [true, false, 'a'], [false, false, 'b'], [false, true, 'c']
+}
 ```

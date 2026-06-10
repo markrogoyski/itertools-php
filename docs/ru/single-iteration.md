@@ -65,6 +65,7 @@ foreach (Single::chunkwise($movies, 3) as $trilogy) {
 
 * Минимальный размер чанка — 1.
 * Размер наложения должен быть меньше длины чанка.
+* См. также [Windowed](#windowed) — основанный на шаге аналог, дополнительно поддерживающий окна с пропусками (`$step > $size`).
 
 ```php
 use IterTools\Single;
@@ -824,4 +825,86 @@ foreach (Single::splitWhen($values, fn ($x) => $x === 0) as $group) {
 // 1,2
 // 0,3
 // 0,4
+```
+
+### Windowed
+Итерирует скользящие окна из `$size` элементов, сдвигаясь на `$step` элементов между окнами.
+
+```Single::windowed(iterable $data, int $size, int $step = 1, bool $partial = false)```
+
+Это основанный на шаге аналог метода [Chunkwise Overlap](#chunkwise-overlap), который дополнительно поддерживает окна с пропусками (`$step > $size`), что `chunkwiseOverlap` выразить не может.
+
+* Размер окна должен быть не меньше 1; шаг должен быть не меньше 1.
+* Каждое окно — это list-массив с индексами от 0; ключи исходной коллекции отбрасываются. Память ограничена O(`$size`).
+* При `1 <= $step <= $size` эквивалентно `chunkwiseOverlap($data, $size, $size - $step, includeIncompleteTail: $partial)`.
+* При `$step > $size` `$step - $size` элементов после каждого полного окна отбрасываются (окна с пропусками).
+* `$partial` управляет тем, отдаётся ли последнее неполное окно. **Обратите внимание:** по умолчанию `false` — противоположно `includeIncompleteTail` у `chunkwiseOverlap`, у которого по умолчанию `true`.
+
+```php
+use IterTools\Single;
+
+$temperatures = [1, 2, 3, 4, 5];
+
+foreach (Single::windowed($temperatures, 3) as $window) {
+    // [1, 2, 3], [2, 3, 4], [3, 4, 5]
+}
+
+foreach (Single::windowed($temperatures, 2, 2, partial: true) as $window) {
+    // [1, 2], [3, 4], [5]
+}
+```
+
+### With First
+Сопоставляет каждому элементу булев флаг, отмечающий, является ли он первым элементом.
+
+```Single::withFirst(iterable $data)```
+
+Отдаёт кортежи `[bool $isFirst, mixed $value]`. Полностью ленивый, память O(1). Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+
+```php
+use IterTools\Single;
+
+$lines = ['header', 'row 1', 'row 2'];
+
+foreach (Single::withFirst($lines) as [$isFirst, $line]) {
+    print($isFirst ? "H: $line" : "  $line");
+}
+// H: header
+//   row 1
+//   row 2
+```
+
+### With Last
+Сопоставляет каждому элементу булев флаг, отмечающий, является ли он последним элементом.
+
+```Single::withLast(iterable $data)```
+
+Отдаёт кортежи `[bool $isLast, mixed $value]`. Использует опережающее чтение на один элемент, поэтому ленивый, память O(1). Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+
+```php
+use IterTools\Single;
+
+$items = ['a', 'b', 'c'];
+
+foreach (Single::withLast($items) as [$isLast, $item]) {
+    print($isLast ? "$item." : "$item, ");
+}
+// a, b, c.
+```
+
+### With First And Last
+Сопоставляет каждому элементу булевы флаги, отмечающие, является ли он первым и/или последним элементом.
+
+```Single::withFirstAndLast(iterable $data)```
+
+Отдаёт кортежи `[bool $isFirst, bool $isLast, mixed $value]` — распространённый шаблон «пометить края». Коллекция из одного элемента отдаёт один кортеж `[true, true, $value]`. Использует опережающее чтение на один элемент, поэтому ленивый, память O(1). Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+
+```php
+use IterTools\Single;
+
+$items = ['a', 'b', 'c'];
+
+foreach (Single::withFirstAndLast($items) as [$isFirst, $isLast, $item]) {
+    // [true, false, 'a'], [false, false, 'b'], [false, true, 'c']
+}
 ```

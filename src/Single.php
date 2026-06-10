@@ -1135,4 +1135,171 @@ final class Single
             }
         }
     }
+
+    /**
+     * Pair every element with a boolean flag marking whether it is the first element.
+     *
+     * Yields [bool $isFirst, mixed $value] tuples. Fully lazy with O(1) memory.
+     *
+     * Source keys are discarded; output keys are sequential 0-indexed (matching the
+     * house convention for tuple-emitting methods such as {@see Single::enumerate()}).
+     *
+     * @param iterable<mixed> $data
+     *
+     * @return \Generator<int, array{0: bool, 1: mixed}>
+     */
+    public static function withFirst(iterable $data): \Generator
+    {
+        $isFirst = true;
+        foreach ($data as $datum) {
+            yield [$isFirst, $datum];
+            $isFirst = false;
+        }
+    }
+
+    /**
+     * Pair every element with a boolean flag marking whether it is the last element.
+     *
+     * Yields [bool $isLast, mixed $value] tuples. Uses a single-element lookahead, so it is
+     * lazy with O(1) memory.
+     *
+     * Source keys are discarded; output keys are sequential 0-indexed (matching the
+     * house convention for tuple-emitting methods such as {@see Single::enumerate()}).
+     *
+     * @param iterable<mixed> $data
+     *
+     * @return \Generator<int, array{0: bool, 1: mixed}>
+     */
+    public static function withLast(iterable $data): \Generator
+    {
+        $hasPrevious = false;
+        /** @var mixed $previous */
+        $previous = null;
+
+        foreach ($data as $datum) {
+            if ($hasPrevious) {
+                yield [false, $previous];
+            }
+            $previous = $datum;
+            $hasPrevious = true;
+        }
+
+        if ($hasPrevious) {
+            yield [true, $previous];
+        }
+    }
+
+    /**
+     * Pair every element with boolean flags marking whether it is the first and/or last element.
+     *
+     * Yields [bool $isFirst, bool $isLast, mixed $value] tuples — the common "mark ends" pattern.
+     * A single-element input yields one [true, true, $value] tuple. Uses a single-element
+     * lookahead, so it is lazy with O(1) memory.
+     *
+     * Source keys are discarded; output keys are sequential 0-indexed (matching the
+     * house convention for tuple-emitting methods such as {@see Single::enumerate()}).
+     *
+     * @param iterable<mixed> $data
+     *
+     * @return \Generator<int, array{0: bool, 1: bool, 2: mixed}>
+     */
+    public static function withFirstAndLast(iterable $data): \Generator
+    {
+        $hasPrevious = false;
+        $isFirst = true;
+        /** @var mixed $previous */
+        $previous = null;
+
+        foreach ($data as $datum) {
+            if ($hasPrevious) {
+                yield [$isFirst, false, $previous];
+                $isFirst = false;
+            }
+            $previous = $datum;
+            $hasPrevious = true;
+        }
+
+        if ($hasPrevious) {
+            yield [$isFirst, true, $previous];
+        }
+    }
+
+    /**
+     * Yield sliding windows of $size elements, advancing $step elements between windows.
+     *
+     * A step-based sibling of {@see Single::chunkwiseOverlap()} that additionally supports
+     * gapped windows ($step > $size), which `chunkwiseOverlap` cannot express.
+     *
+     * Each window is a 0-indexed list array; source keys are discarded. Memory is bounded by
+     * O($size).
+     *
+     * For 1 <= $step <= $size this is exactly equivalent to
+     * `chunkwiseOverlap($data, $size, $size - $step, includeIncompleteTail: $partial)`: at most one
+     * trailing partial window is emitted, and only when the final element did not already complete
+     * a full window. Note $partial defaults to false — intentionally the opposite of
+     * `chunkwiseOverlap`'s $includeIncompleteTail default of true.
+     *
+     * For $step > $size, windows start at element indices 0, $step, 2*$step, …; the
+     * ($step - $size) elements following each full window are dropped, and a trailing partial may
+     * begin only at a valid window start, never inside a skip gap.
+     *
+     * Implementation note: the gap is handled by a dedicated skip counter — a
+     * chunkwiseOverlap-style buffer-drop alone cannot express it and would silently collapse
+     * $step > $size down to $step == $size.
+     *
+     * @template T
+     * @param iterable<T> $data
+     * @param int $size  window length (must be ≥ 1)
+     * @param int $step  number of elements to advance between window starts (must be ≥ 1)
+     * @param bool $partial whether to emit a final incomplete window
+     *
+     * @return \Generator<int, list<T>>
+     *
+     * @throws \InvalidArgumentException if $size < 1 or $step < 1
+     */
+    public static function windowed(iterable $data, int $size, int $step = 1, bool $partial = false): \Generator
+    {
+        if ($size < 1) {
+            throw new \InvalidArgumentException("Window size must be ≥ 1. Got {$size}");
+        }
+        if ($step < 1) {
+            throw new \InvalidArgumentException("Step must be ≥ 1. Got {$step}");
+        }
+
+        /** @var list<T> $window */
+        $window = [];
+        $skip = 0;
+        $lastIterationYielded = false;
+
+        foreach ($data as $datum) {
+            $lastIterationYielded = false;
+
+            // In the gap between windows ($step > $size); drop the element (see doc block)
+            if ($skip > 0) {
+                $skip--;
+                continue;
+            }
+
+            $window[] = $datum;
+
+            if (\count($window) === $size) {
+                yield $window;
+                $lastIterationYielded = true;
+
+                if ($step < $size) {
+                    // Overlapping: retain the trailing ($size - $step) elements
+                    $window = \array_slice($window, $step);
+                } else {
+                    // Tiling or gapped
+                    $window = [];
+                    $skip = $step - $size;
+                }
+            }
+        }
+
+        // At most one trailing partial window (see doc block)
+        if ($partial && !$lastIterationYielded && \count($window) > 0) {
+            yield $window;
+        }
+    }
 }

@@ -134,6 +134,10 @@ Quick Reference
 | [`string`](docs/single-iteration.md#string)                            | Iterate the characters of a string           | `Single::string($string)`                                   |
 | [`takeLast`](docs/single-iteration.md#take-last)                       | Iterate the last N elements                  | `Single::takeLast($data, $count)`                           |
 | [`takeWhile`](docs/single-iteration.md#take-while)                     | Iterate elements while predicate is true     | `Single::takeWhile($data, $predicate)`                      |
+| [`windowed`](docs/single-iteration.md#windowed)                        | Iterate sliding windows of elements          | `Single::windowed($data, $size, [$step], [$partial])`       |
+| [`withFirst`](docs/single-iteration.md#with-first)                     | Pair each element with an is-first flag      | `Single::withFirst($data)`                                  |
+| [`withFirstAndLast`](docs/single-iteration.md#with-first-and-last)     | Pair each element with is-first/is-last flags | `Single::withFirstAndLast($data)`                          |
+| [`withLast`](docs/single-iteration.md#with-last)                       | Pair each element with an is-last flag       | `Single::withLast($data)`                                   |
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
@@ -151,6 +155,7 @@ Quick Reference
 | [`coinFlip`](docs/random-iteration.md#coinflip)                   | Random coin flips (0 or 1)        | `Random::coinFlip($repetitions)`           |
 | [`number`](docs/random-iteration.md#number)                       | Random numbers                    | `Random::number($min, $max, $repetitions)` |
 | [`percentage`](docs/random-iteration.md#percentage)               | Random percentage between 0 and 1 | `Random::percentage($repetitions)`         |
+| [`reservoirSample`](docs/random-iteration.md#reservoir-sample)    | Single-pass uniform random sample | `Random::reservoirSample($data, $size, [$engine])` |
 | [`rockPaperScissors`](docs/random-iteration.md#rockpaperscissors) | Random rock-paper-scissors hands  | `Random::rockPaperScissors($repetitions)`  |
 | [`sample`](docs/random-iteration.md#sample)                       | Random sample without replacement | `Random::sample($data, $size, [$engine])`  |
 
@@ -353,6 +358,7 @@ Quick Reference
 | [`reindex`](docs/stream.md#reindex)                                                   | Reindex keys of key-value stream                                                          | `$stream->reindex($reindexer)`                                                    |
 | [`relativeFrequencies`](docs/stream.md#relative-frequencies)                          | Relative frequency distribution                                                           | `$stream->relativeFrequencies([$strict])`                                         |
 | [`relativeFrequenciesBy`](docs/stream.md#relative-frequencies-by)                     | Relative frequency distribution by key function                                           | `$stream->relativeFrequenciesBy($keyFunc, [$strict])`                             |
+| [`reservoirSample`](docs/stream.md#reservoir-sample)                                  | Single-pass uniform random sample (eager)                                                 | `$stream->reservoirSample($size, [$engine])`                                      |
 | [`reverse`](docs/stream.md#reverse)                                                   | Reverse elements of the stream                                                            | `$stream->reverse()`                                                              |
 | [`roundRobinWith`](docs/stream.md#round-robin-with)                                   | Yield values from the stream and given iterables in round-robin order                     | `$stream->roundRobinWith(...$iterables)`                                          |
 | [`runningAverage`](docs/stream.md#running-average)                                    | Accumulate the running average (mean) over iterable source                                | `$stream->runningAverage($initialValue)`                                          |
@@ -378,6 +384,10 @@ Quick Reference
 | [`unionWith`](docs/stream.md#union-with)                                                | Union of stream with iterables                                                            | `$stream->unionWith(...$iterables)`                                               |
 | [`unionCoerciveWith`](docs/stream.md#union-coercive-with)                               | Union of stream with iterables with type coercion                                         | `$stream->unionCoerciveWith(...$iterables)`                                       |
 | [`unzip`](docs/stream.md#unzip)                                                         | Transpose rows of the stream into columns (inverse of zip)                                | `$stream->unzip()`                                                                |
+| [`windowed`](docs/stream.md#windowed)                                                 | Iterate sliding windows of elements                                                       | `$stream->windowed($size, [$step], [$partial])`                                   |
+| [`withFirst`](docs/stream.md#with-first)                                              | Pair each element with an is-first flag                                                   | `$stream->withFirst()`                                                            |
+| [`withFirstAndLast`](docs/stream.md#with-first-and-last)                              | Pair each element with is-first/is-last flags                                             | `$stream->withFirstAndLast()`                                                     |
+| [`withLast`](docs/stream.md#with-last)                                                | Pair each element with an is-last flag                                                    | `$stream->withLast()`                                                             |
 | [`zip`](docs/stream.md#zip)                                                             | Zip rows of the stream column-wise (transpose), stopping at shortest                      | `$stream->zip()`                                                                  |
 | [`zipLongest`](docs/stream.md#zip-longest)                                              | Zip rows of the stream column-wise, continuing until longest (missing → null)             | `$stream->zipLongest()`                                                           |
 | [`zipFilled`](docs/stream.md#zip-filled)                                                | Zip rows of the stream column-wise, continuing until longest with filler                  | `$stream->zipFilled($filler)`                                                     |

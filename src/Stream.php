@@ -2005,6 +2005,100 @@ final class Stream implements \IteratorAggregate
         return $this;
     }
 
+    /**
+     * Pair every element of the stream with a boolean flag marking whether it is the first element.
+     *
+     * Yields [bool $isFirst, mixed $value] tuples. Source keys are discarded; output keys are
+     * sequential 0-indexed.
+     *
+     * @return Stream
+     *
+     * @see Single::withFirst()
+     */
+    public function withFirst(): self
+    {
+        $this->iterable = Single::withFirst($this->iterable);
+        return $this;
+    }
+
+    /**
+     * Pair every element of the stream with a boolean flag marking whether it is the last element.
+     *
+     * Yields [bool $isLast, mixed $value] tuples. Source keys are discarded; output keys are
+     * sequential 0-indexed.
+     *
+     * @return Stream
+     *
+     * @see Single::withLast()
+     */
+    public function withLast(): self
+    {
+        $this->iterable = Single::withLast($this->iterable);
+        return $this;
+    }
+
+    /**
+     * Pair every element of the stream with flags marking whether it is the first and/or last element.
+     *
+     * Yields [bool $isFirst, bool $isLast, mixed $value] tuples. Source keys are discarded; output
+     * keys are sequential 0-indexed.
+     *
+     * @return Stream
+     *
+     * @see Single::withFirstAndLast()
+     */
+    public function withFirstAndLast(): self
+    {
+        $this->iterable = Single::withFirstAndLast($this->iterable);
+        return $this;
+    }
+
+    /**
+     * Yield sliding windows of $size elements from the stream, advancing $step elements between windows.
+     *
+     * Each window is a 0-indexed list array; source keys are discarded. Supports gapped windows
+     * ($step > $size). Note $partial defaults to false — the opposite of
+     * {@see Stream::chunkwiseOverlap()}'s $includeIncompleteTail default.
+     *
+     * @param int  $size    window length (must be ≥ 1)
+     * @param int  $step    number of elements to advance between window starts (must be ≥ 1)
+     * @param bool $partial whether to emit a final incomplete window
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if $size < 1 or $step < 1
+     *
+     * @see Single::windowed()
+     */
+    public function windowed(int $size, int $step = 1, bool $partial = false): self
+    {
+        $this->iterable = Single::windowed($this->iterable, $size, $step, $partial);
+        return $this;
+    }
+
+    /**
+     * Sample up to $size elements uniformly at random in a single pass (Algorithm R).
+     *
+     * Unlike the lazy {@see Stream::sample()}, this operation is eager: it consumes the upstream
+     * immediately at call time and binds the resulting array as the new stream source. When
+     * $size >= the stream length, the entire stream is returned in original order with zero random
+     * draws. Output keys are sequential 0-indexed.
+     *
+     * @param int                 $size   number of elements to draw (must be ≥ 0).
+     * @param \Random\Engine|null $engine optional Random engine.
+     *
+     * @return Stream
+     *
+     * @throws \InvalidArgumentException if $size is negative.
+     *
+     * @see Random::reservoirSample()
+     */
+    public function reservoirSample(int $size, ?\Random\Engine $engine = null): self
+    {
+        $this->iterable = Random::reservoirSample($this->iterable, $size, $engine);
+        return $this;
+    }
+
     // STREAM TERMINAL OPERATIONS
 
     /**

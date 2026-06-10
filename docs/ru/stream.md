@@ -459,6 +459,7 @@ $result = Stream::of($friends)
 
 * Минимальный размер чанка — 1.
 * Размер наложения должен быть меньше длины чанка.
+* См. также [Windowed](#windowed) — основанный на шаге аналог, дополнительно поддерживающий окна с пропусками (`$step > $size`).
 
 ```php
 use IterTools\Stream;
@@ -2119,6 +2120,91 @@ use IterTools\Stream;
 
 $result = Stream::of([1, 2, 3, 4, 5])->sample(3)->toArray();
 // например: [4, 1, 5]
+```
+
+#### Reservoir Sample
+Возвращает равномерно случайную выборку до `$size` элементов потока за один проход (алгоритм R).
+
+```$stream->reservoirSample(int $size, ?\Random\Engine $engine = null): Stream```
+
+* В отличие от ленивого [`sample`](#sample), эта операция **энергичная**: она потребляет вышестоящий поток немедленно в момент вызова и связывает полученный массив как новый источник потока.
+* Когда `$size >=` длины потока, весь поток возвращается в исходном порядке без единой случайной выборки. Ключи результата — последовательные, начиная с 0.
+* Бросает `\InvalidArgumentException`, если `$size` отрицателен.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    ->reservoirSample(3)
+    ->toArray();
+// например: [2, 7, 9]
+```
+
+#### Windowed
+Итерирует скользящие окна из `$size` элементов потока, сдвигаясь на `$step` элементов между окнами.
+
+```$stream->windowed(int $size, int $step = 1, bool $partial = false): Stream```
+
+* Каждое окно — это list-массив с индексами от 0; ключи исходной коллекции отбрасываются. Поддерживает окна с пропусками (`$step > $size`).
+* При `1 <= $step <= $size` эквивалентно `chunkwiseOverlap($size, $size - $step, includeIncompleteTail: $partial)` (см. [Chunkwise Overlap](#chunkwise-overlap)).
+* `$partial` управляет тем, отдаётся ли последнее неполное окно. **Обратите внимание:** по умолчанию `false` — противоположно значению по умолчанию `true` у `includeIncompleteTail` в `chunkwiseOverlap`.
+* Бросает `\InvalidArgumentException`, если `$size < 1` или `$step < 1`.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3, 4, 5])
+    ->windowed(3)
+    ->toArray();
+// [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+```
+
+#### With First
+Сопоставляет каждому элементу потока булев флаг, отмечающий, является ли он первым элементом.
+
+```$stream->withFirst(): Stream```
+
+Отдаёт кортежи `[bool $isFirst, mixed $value]`. Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of(['a', 'b', 'c'])
+    ->withFirst()
+    ->toArray();
+// [[true, 'a'], [false, 'b'], [false, 'c']]
+```
+
+#### With Last
+Сопоставляет каждому элементу потока булев флаг, отмечающий, является ли он последним элементом.
+
+```$stream->withLast(): Stream```
+
+Отдаёт кортежи `[bool $isLast, mixed $value]`. Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of(['a', 'b', 'c'])
+    ->withLast()
+    ->toArray();
+// [[false, 'a'], [false, 'b'], [true, 'c']]
+```
+
+#### With First And Last
+Сопоставляет каждому элементу потока флаги, отмечающие, является ли он первым и/или последним элементом.
+
+```$stream->withFirstAndLast(): Stream```
+
+Отдаёт кортежи `[bool $isFirst, bool $isLast, mixed $value]`. Поток из одного элемента отдаёт один кортеж `[true, true, $value]`. Ключи исходной коллекции отбрасываются; ключи результата — последовательные, начиная с 0.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of(['a', 'b', 'c'])
+    ->withFirstAndLast()
+    ->toArray();
+// [[true, false, 'a'], [false, false, 'b'], [false, true, 'c']]
 ```
 
 ### Завершающие операции

@@ -469,6 +469,7 @@ Return a stream consisting of overlapping chunks of elements from the stream.
 
 * Chunk size must be at least 1.
 * Overlap size must be less than chunk size.
+* See also [Windowed](#windowed) — a step-based sibling that additionally supports gapped windows (`$step > $size`).
 
 ```php
 use IterTools\Stream;
@@ -2123,6 +2124,91 @@ use IterTools\Stream;
 
 $result = Stream::of([1, 2, 3, 4, 5])->sample(3)->toArray();
 // e.g.: [4, 1, 5]
+```
+
+#### Reservoir Sample
+Sample up to `$size` elements from the stream uniformly at random in a single pass (Algorithm R).
+
+```$stream->reservoirSample(int $size, ?\Random\Engine $engine = null): Stream```
+
+* Unlike the lazy [`sample`](#sample), this operation is **eager**: it consumes the upstream immediately at call time and binds the resulting array as the new stream source.
+* When `$size >=` the stream length, the entire stream is returned in original order with zero random draws. Output keys are sequential 0-indexed.
+* Throws `\InvalidArgumentException` if `$size` is negative.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    ->reservoirSample(3)
+    ->toArray();
+// e.g.: [2, 7, 9]
+```
+
+#### Windowed
+Iterate sliding windows of `$size` elements from the stream, advancing `$step` elements between windows.
+
+```$stream->windowed(int $size, int $step = 1, bool $partial = false): Stream```
+
+* Each window is a 0-indexed list array; source keys are discarded. Supports gapped windows (`$step > $size`).
+* For `1 <= $step <= $size`, this is equivalent to `chunkwiseOverlap($size, $size - $step, includeIncompleteTail: $partial)` (see [Chunkwise Overlap](#chunkwise-overlap)).
+* `$partial` controls whether a final incomplete window is emitted. **Note:** it defaults to `false` — the opposite of `chunkwiseOverlap`'s `includeIncompleteTail` default of `true`.
+* Throws `\InvalidArgumentException` if `$size < 1` or `$step < 1`.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of([1, 2, 3, 4, 5])
+    ->windowed(3)
+    ->toArray();
+// [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+```
+
+#### With First
+Pair every element of the stream with a boolean flag marking whether it is the first element.
+
+```$stream->withFirst(): Stream```
+
+Yields `[bool $isFirst, mixed $value]` tuples. Source keys are discarded; output keys are sequential 0-indexed.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of(['a', 'b', 'c'])
+    ->withFirst()
+    ->toArray();
+// [[true, 'a'], [false, 'b'], [false, 'c']]
+```
+
+#### With Last
+Pair every element of the stream with a boolean flag marking whether it is the last element.
+
+```$stream->withLast(): Stream```
+
+Yields `[bool $isLast, mixed $value]` tuples. Source keys are discarded; output keys are sequential 0-indexed.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of(['a', 'b', 'c'])
+    ->withLast()
+    ->toArray();
+// [[false, 'a'], [false, 'b'], [true, 'c']]
+```
+
+#### With First And Last
+Pair every element of the stream with flags marking whether it is the first and/or last element.
+
+```$stream->withFirstAndLast(): Stream```
+
+Yields `[bool $isFirst, bool $isLast, mixed $value]` tuples. A single-element stream yields one `[true, true, $value]` tuple. Source keys are discarded; output keys are sequential 0-indexed.
+
+```php
+use IterTools\Stream;
+
+$result = Stream::of(['a', 'b', 'c'])
+    ->withFirstAndLast()
+    ->toArray();
+// [[true, false, 'a'], [false, false, 'b'], [false, true, 'c']]
 ```
 
 ### Stream Terminal Operations
