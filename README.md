@@ -276,15 +276,21 @@ Quick Reference
 | [`toOnly`](docs/reduce.md#to-only)                         | Reduce to its sole element                   | `Reduce::toOnly($data)`                                       |
 | [`consume`](docs/reduce.md#consume)                        | Drain iterable, discarding values            | `Reduce::consume($data)`                                      |
 | [`toMax`](docs/reduce.md#to-max)                           | Reduce to its largest element                | `Reduce::toMax($numbers, [$compareBy])`                       |
+| [`toMedian`](docs/reduce.md#to-median)                     | Reduce to its median value                   | `Reduce::toMedian($numbers)`                                  |
 | [`toMin`](docs/reduce.md#to-min)                           | Reduce to its smallest element               | `Reduce::toMin($numbers, [$compareBy])`                       |
 | [`toMinMax`](docs/reduce.md#to-min-max)                    | Reduce to array of upper and lower bounds    | `Reduce::toMinMax($numbers, [$compareBy])`                    |
+| [`toMode`](docs/reduce.md#to-mode)                         | Reduce to a list of its modes (most frequent) | `Reduce::toMode($data)`                                       |
 | [`toNth`](docs/reduce.md#to-nth)                           | Reduce to value at nth position              | `Reduce::toNth($data, $position)`                             |
+| [`toPercentile`](docs/reduce.md#to-percentile)             | Reduce to value at given percentile [0, 100] | `Reduce::toPercentile($numbers, $percentile)`                 |
 | [`toProduct`](docs/reduce.md#to-product)                   | Reduce to the product of its elements        | `Reduce::toProduct($numbers)`                                 |
+| [`toQuantile`](docs/reduce.md#to-quantile)                 | Reduce to value at given quantile [0, 1]     | `Reduce::toQuantile($numbers, $quantile)`                     |
 | [`toRandomValue`](docs/reduce.md#to-random-value)          | Reduce to random value from iterable         | `Reduce::toRandomValue($data)`                                |
 | [`toRange`](docs/reduce.md#to-range)                       | Reduce to difference of max and min values   | `Reduce::toRange($numbers)`                                   |
+| [`toStandardDeviation`](docs/reduce.md#to-standard-deviation) | Reduce to standard deviation (population/sample) | `Reduce::toStandardDeviation($numbers, [$sample])`            |
 | [`toString`](docs/reduce.md#to-string)                     | Reduce to joined string                      | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
 | [`toSum`](docs/reduce.md#to-sum)                           | Reduce to the sum of its elements            | `Reduce::toSum($numbers)`                                     |
 | [`toValue`](docs/reduce.md#to-value)                       | Reduce to value using callable reducer       | `Reduce::toValue($data, $reducer, $initialValue)`             |
+| [`toVariance`](docs/reduce.md#to-variance)                 | Reduce to variance (population/sample)       | `Reduce::toVariance($numbers, [$sample])`                     |
 
 ### Stream Iteration Tools
 #### Stream Sources
@@ -444,6 +450,12 @@ Quick Reference
 | [`toMax`](docs/stream.md#to-max)                           | Reduces stream to its max value                      | `$stream->toMax([$compareBy])`                          |
 | [`toMin`](docs/stream.md#to-min)                           | Reduces stream to its min value                      | `$stream->toMin([$compareBy])`                          |
 | [`toMinMax`](docs/stream.md#to-min-max)                    | Reduces stream to array of upper and lower bounds    | `$stream->toMinMax([$compareBy])`                       |
+| [`toMedian`](docs/stream.md#to-median)                     | Reduces stream to its median value                   | `$stream->toMedian()`                                   |
+| [`toMode`](docs/stream.md#to-mode)                         | Reduces stream to a list of its modes                | `$stream->toMode()`                                     |
+| [`toVariance`](docs/stream.md#to-variance)                 | Reduces stream to variance                           | `$stream->toVariance([$sample])`                        |
+| [`toStandardDeviation`](docs/stream.md#to-standard-deviation) | Reduces stream to standard deviation                 | `$stream->toStandardDeviation([$sample])`               |
+| [`toPercentile`](docs/stream.md#to-percentile)             | Reduces stream to value at given percentile          | `$stream->toPercentile($percentile)`                    |
+| [`toQuantile`](docs/stream.md#to-quantile)                 | Reduces stream to value at given quantile            | `$stream->toQuantile($quantile)`                        |
 | [`toNth`](docs/stream.md#to-nth)                           | Reduces stream to value at nth position              | `$stream->toNth($position)`                             |
 | [`toProduct`](docs/stream.md#to-product)                   | Reduces stream to the product of its items           | `$stream->toProduct()`                                  |
 | [`toString`](docs/stream.md#to-string)                     | Reduces stream to joined string                      | `$stream->toString([$separator], [$prefix], [$suffix])` |

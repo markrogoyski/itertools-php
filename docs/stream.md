@@ -2903,6 +2903,24 @@ $result = Stream::of($iterable)
 // 3
 ```
 
+##### To Median
+Reduces iterable source to its median value.
+
+```$stream->toMedian(): int|float|null```
+
+- For an even number of elements, the median is the mean of the two middle values.
+- Returns null if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$grades = [100, 90, 95, 85, 94];
+
+$median = Stream::of($grades)
+    ->toMedian();
+// 94
+```
+
 ##### To Min
 Reduces iterable source to its min value.
 
@@ -2941,6 +2959,24 @@ $numbers = [1, 2, 7, -1, -2, -3];
 // [-3, 7]
 ```
 
+##### To Mode
+Reduces iterable source to a list of its modes (the most frequent values).
+
+```$stream->toMode(): array```
+
+- Returns every value tied for the maximum frequency, in first-seen order.
+- Returns an empty array if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$votes = ['red', 'blue', 'red', 'green', 'blue', 'red'];
+
+$modes = Stream::of($votes)
+    ->toMode();
+// ['red']
+```
+
 ##### To Nth
 Reduces stream to value at the nth position.
 
@@ -2975,6 +3011,25 @@ $result = Stream::of([1, 2, 3, 4, 5])
 // 3
 ```
 
+##### To Percentile
+Reduces iterable source to its value at the given percentile.
+
+```$stream->toPercentile(float $percentile): int|float|null```
+
+- Uses the R-7 / linear-interpolation method (the NumPy default). Percentile `0` is the minimum, `100` is the maximum.
+- `$percentile` must be in the inclusive range `[0, 100]`; otherwise throws `\InvalidArgumentException`.
+- Returns null if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$scores = [10, 20, 30, 40, 50];
+
+$p75 = Stream::of($scores)
+    ->toPercentile(75);
+// 40
+```
+
 ##### To Product
 Reduces stream to the product of its items.
 
@@ -2990,6 +3045,25 @@ $input = [1, 2, 3, 4, 5];
 $result = Stream::of($iterable)
     ->toProduct();
 // 120
+```
+
+##### To Quantile
+Reduces iterable source to its value at the given quantile.
+
+```$stream->toQuantile(float $quantile): int|float|null```
+
+- Accepts a quantile in the inclusive range `[0, 1]` (e.g. `0.25` is the first quartile / 25th percentile).
+- `$quantile` must be in the inclusive range `[0, 1]`; otherwise throws `\InvalidArgumentException`.
+- Returns null if iterable source is empty.
+
+```php
+use IterTools\Stream;
+
+$scores = [10, 20, 30, 40, 50];
+
+$q3 = Stream::of($scores)
+    ->toQuantile(0.75);
+// 40
 ```
 
 ##### To Random Value
@@ -3023,6 +3097,24 @@ $grades = [100, 90, 80, 85, 95];
 $range = Stream::of($numbers)
     ->toRange();
 // 20
+```
+
+##### To Standard Deviation
+Reduces iterable source to the standard deviation of its values.
+
+```$stream->toStandardDeviation(bool $sample = false): float|null```
+
+- Square root of the variance. Population standard deviation by default; pass `$sample = true` for the sample standard deviation (Bessel's correction).
+- Returns null if iterable source is empty, or for the sample standard deviation of a single value.
+
+```php
+use IterTools\Stream;
+
+$numbers = [2, 4, 4, 4, 5, 5, 7, 9];
+
+$stddev = Stream::of($numbers)
+    ->toStandardDeviation();
+// 2.0
 ```
 
 ##### To String
@@ -3079,6 +3171,24 @@ $input = [1, 2, 3, 4, 5];
 $result = Stream::of($iterable)
     ->toValue(fn ($carry, $item) => $carry + $item);
 // 15
+```
+
+##### To Variance
+Reduces iterable source to the variance of its values.
+
+```$stream->toVariance(bool $sample = false): float|null```
+
+- Population variance by default; pass `$sample = true` for the sample variance (Bessel's correction).
+- Returns null if iterable source is empty, or for the sample variance of a single value.
+
+```php
+use IterTools\Stream;
+
+$numbers = [1, 2, 3, 4, 5];
+
+$variance = Stream::of($numbers)
+    ->toVariance();
+// 2.0
 ```
 
 #### Transformation Terminal Operations

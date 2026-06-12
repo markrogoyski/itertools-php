@@ -285,6 +285,23 @@ $highestRatedMovie = Reduce::toMax($movieRatings, $compareBy);
 // ];
 ```
 
+### To Median
+Возвращает медиану коллекции.
+
+```Reduce::toMedian(iterable $data): int|float|null```
+
+- Для чётного количества элементов медиана равна среднему арифметическому двух средних значений.
+- Для пустой коллекции возвращает `null`.
+
+```php
+use IterTools\Reduce;
+
+$grades = [100, 90, 95, 85, 94];
+
+$median = Reduce::toMedian($grades);
+// 94
+```
+
 ### To Min
 Возвращает минимальный элемент коллекции.
 
@@ -381,6 +398,25 @@ $bestAndWorstSubject = Reduce::toMinMax($reportCard, $compareBy);
 // ]
 ```
 
+### To Mode
+Возвращает список мод коллекции (наиболее часто встречающихся значений).
+
+```Reduce::toMode(iterable $data): array```
+
+- Возвращает все значения с максимальной частотой в порядке первого появления (для коллекции без повторов возвращаются все её значения).
+- Для мультимодальных данных возвращается несколько мод.
+- Значения сравниваются строго, поэтому `1`, `1.0` и `'1'` считаются различными.
+- Для пустой коллекции возвращает пустой массив.
+
+```php
+use IterTools\Reduce;
+
+$votes = ['red', 'blue', 'red', 'green', 'blue', 'red'];
+
+$modes = Reduce::toMode($votes);
+// ['red']
+```
+
 ### To Nth
 Возвращает n-й элемент коллекции.
 
@@ -420,6 +456,24 @@ Reduce::toOnly([]);        // бросает \LengthException
 Reduce::toOnly([1, 2, 3]); // бросает \LengthException
 ```
 
+### To Percentile
+Возвращает значение коллекции для заданного процентиля.
+
+```Reduce::toPercentile(iterable $data, float $percentile): int|float|null```
+
+- Используется метод R-7 / линейной интерполяции (по умолчанию в NumPy). Процентиль `0` — это минимум, `100` — максимум.
+- Аргумент `$percentile` должен находиться в диапазоне `[0, 100]`; иначе выбрасывается `\InvalidArgumentException`.
+- Для пустой коллекции возвращает `null`.
+
+```php
+use IterTools\Reduce;
+
+$scores = [10, 20, 30, 40, 50];
+
+$p75 = Reduce::toPercentile($scores, 75);
+// 40
+```
+
 ### To Product
 Возвращает произведение элементов коллекции.
 
@@ -434,6 +488,24 @@ $primeFactors = [5, 2, 2];
 
 $number = Reduce::toProduct($primeFactors);
 // 20
+```
+
+### To Quantile
+Возвращает значение коллекции для заданного квантиля.
+
+```Reduce::toQuantile(iterable $data, float $quantile): int|float|null```
+
+- Тонкая обёртка над `toPercentile`, принимающая квантиль в диапазоне `[0, 1]` (например, `0.25` — первый квартиль / 25-й процентиль).
+- Аргумент `$quantile` должен находиться в диапазоне `[0, 1]`; иначе выбрасывается `\InvalidArgumentException`.
+- Для пустой коллекции возвращает `null`.
+
+```php
+use IterTools\Reduce;
+
+$scores = [10, 20, 30, 40, 50];
+
+$q3 = Reduce::toQuantile($scores, 0.75);
+// 40
 ```
 
 ### To Random Value
@@ -464,6 +536,26 @@ $grades = [100, 90, 80, 85, 95];
 
 $range = Reduce::toRange($numbers);
 // 20
+```
+
+### To Standard Deviation
+Возвращает стандартное отклонение значений коллекции.
+
+```Reduce::toStandardDeviation(iterable $data, bool $sample = false): float|null```
+
+- Квадратный корень из дисперсии. По умолчанию — стандартное отклонение генеральной совокупности; при `$sample = true` — выборочное стандартное отклонение (поправка Бесселя).
+- Возвращает `null` для пустой коллекции или для выборочного стандартного отклонения единственного значения. Стандартное отклонение генеральной совокупности для единственного значения равно `0.0`.
+
+```php
+use IterTools\Reduce;
+
+$numbers = [2, 4, 4, 4, 5, 5, 7, 9];
+
+$populationStdDev = Reduce::toStandardDeviation($numbers);
+// 2.0
+
+$sampleStdDev = Reduce::toStandardDeviation($numbers, true);
+// 2.138...
 ```
 
 ### To String
@@ -517,6 +609,26 @@ $sum   = fn ($carry, $item) => $carry + $item;
 
 $result = Reduce::toValue($input, $sum, 0);
 // 15
+```
+
+### To Variance
+Возвращает дисперсию значений коллекции.
+
+```Reduce::toVariance(iterable $data, bool $sample = false): float|null```
+
+- По умолчанию — дисперсия генеральной совокупности; при `$sample = true` — выборочная дисперсия (поправка Бесселя, деление на `N - 1`).
+- Возвращает `null` для пустой коллекции или для выборочной дисперсии единственного значения (`N - 1 = 0` не определено). Дисперсия генеральной совокупности для единственного значения равна `0.0`.
+
+```php
+use IterTools\Reduce;
+
+$numbers = [1, 2, 3, 4, 5];
+
+$populationVariance = Reduce::toVariance($numbers);
+// 2.0
+
+$sampleVariance = Reduce::toVariance($numbers, true);
+// 2.5
 ```
 
 ### Consume

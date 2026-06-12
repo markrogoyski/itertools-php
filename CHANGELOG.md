@@ -24,6 +24,12 @@
   * `isReversedBy` — true if values projected by a key function are non-increasing
 * Reduce
   * `toCountBy` — reduce to an array of counts keyed by a key function; key function must return `int|string`
+  * `toMedian` — reduce to the median value; mean of the two middle values for even-length input
+  * `toMode` — reduce to a list of the most frequent values (all modes, in first-seen order)
+  * `toVariance` — reduce to the population (default) or sample variance
+  * `toStandardDeviation` — reduce to the population (default) or sample standard deviation
+  * `toPercentile` — reduce to the value at a percentile `[0, 100]` (R-7 / linear interpolation)
+  * `toQuantile` — reduce to the value at a quantile `[0, 1]`
 * File
   * `writeLines` — write an iterable of lines to a file resource; separator inserted between lines, no trailing separator
   * `writeCsv` — write an iterable of rows to a file resource as CSV, with optional header row
@@ -39,6 +45,12 @@
   * `isSortedBy` — terminal; true if values projected by a key function are non-decreasing
   * `isReversedBy` — terminal; true if values projected by a key function are non-increasing
   * `toCountBy` — terminal; reduce to an array of counts keyed by a key function
+  * `toMedian` — terminal; reduce to the median value
+  * `toMode` — terminal; reduce to a list of the most frequent values
+  * `toVariance` — terminal; reduce to the population or sample variance
+  * `toStandardDeviation` — terminal; reduce to the population or sample standard deviation
+  * `toPercentile` — terminal; reduce to the value at a percentile `[0, 100]`
+  * `toQuantile` — terminal; reduce to the value at a quantile `[0, 1]`
   * `ofCsvFileAssoc` — source; stream a CSV file as associative arrays keyed by header
   * `windowed` — fluent sliding windows of elements
   * `withFirst` — fluent pair each element with an is-first flag

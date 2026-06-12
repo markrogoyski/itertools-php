@@ -291,6 +291,23 @@ $highestRatedMovie = Reduce::toMax($movieRatings, $compareBy);
 // ];
 ```
 
+### To Median
+Reduces to the median value.
+
+```Reduce::toMedian(iterable $data): int|float|null```
+
+- For an even number of elements, the median is the mean of the two middle values.
+- Returns null if collection is empty.
+
+```php
+use IterTools\Reduce;
+
+$grades = [100, 90, 95, 85, 94];
+
+$median = Reduce::toMedian($grades);
+// 94
+```
+
 ### To Min
 Reduces to the min value.
 
@@ -390,6 +407,25 @@ $bestAndWorstSubject = Reduce::toMinMax($reportCard, $compareBy);
 // ]
 ```
 
+### To Mode
+Reduces to a list of its modes (the most frequent values).
+
+```Reduce::toMode(iterable $data): array```
+
+- Returns every value tied for the maximum frequency, in first-seen order (an all-unique input returns all of its values).
+- Multimodal inputs return multiple modes.
+- Values are compared strictly, so `1`, `1.0`, and `'1'` count as distinct.
+- Returns an empty array if collection is empty.
+
+```php
+use IterTools\Reduce;
+
+$votes = ['red', 'blue', 'red', 'green', 'blue', 'red'];
+
+$modes = Reduce::toMode($votes);
+// ['red']
+```
+
 ### To Nth
 Reduces to value at the nth position.
 
@@ -429,6 +465,24 @@ Reduce::toOnly([]);        // throws \LengthException
 Reduce::toOnly([1, 2, 3]); // throws \LengthException
 ```
 
+### To Percentile
+Reduces to its value at the given percentile.
+
+```Reduce::toPercentile(iterable $data, float $percentile): int|float|null```
+
+- Uses the R-7 / linear-interpolation method (the NumPy default). Percentile `0` is the minimum, `100` is the maximum.
+- `$percentile` must be in the inclusive range `[0, 100]`; otherwise throws `\InvalidArgumentException`.
+- Returns null if collection is empty.
+
+```php
+use IterTools\Reduce;
+
+$scores = [10, 20, 30, 40, 50];
+
+$p75 = Reduce::toPercentile($scores, 75);
+// 40
+```
+
 ### To Product
 Reduces to the product of its elements.
 
@@ -443,6 +497,24 @@ $primeFactors = [5, 2, 2];
 
 $number = Reduce::toProduct($primeFactors);
 // 20
+```
+
+### To Quantile
+Reduces to its value at the given quantile.
+
+```Reduce::toQuantile(iterable $data, float $quantile): int|float|null```
+
+- Thin wrapper over `toPercentile` that accepts a quantile in the inclusive range `[0, 1]` (e.g. `0.25` is the first quartile / 25th percentile).
+- `$quantile` must be in the inclusive range `[0, 1]`; otherwise throws `\InvalidArgumentException`.
+- Returns null if collection is empty.
+
+```php
+use IterTools\Reduce;
+
+$scores = [10, 20, 30, 40, 50];
+
+$q3 = Reduce::toQuantile($scores, 0.75);
+// 40
 ```
 
 ### To Random Value
@@ -473,6 +545,26 @@ $grades = [100, 90, 80, 85, 95];
 
 $range = Reduce::toRange($numbers);
 // 20
+```
+
+### To Standard Deviation
+Reduces to the standard deviation of its values.
+
+```Reduce::toStandardDeviation(iterable $data, bool $sample = false): float|null```
+
+- Square root of the variance. Population standard deviation by default; pass `$sample = true` for the sample standard deviation (Bessel's correction).
+- Returns null if collection is empty, or for the sample standard deviation of a single value. The population standard deviation of a single value is `0.0`.
+
+```php
+use IterTools\Reduce;
+
+$numbers = [2, 4, 4, 4, 5, 5, 7, 9];
+
+$populationStdDev = Reduce::toStandardDeviation($numbers);
+// 2.0
+
+$sampleStdDev = Reduce::toStandardDeviation($numbers, true);
+// 2.138...
 ```
 
 ### To String
@@ -526,6 +618,26 @@ $sum   = fn ($carry, $item) => $carry + $item;
 
 $result = Reduce::toValue($input, $sum, 0);
 // 15
+```
+
+### To Variance
+Reduces to the variance of its values.
+
+```Reduce::toVariance(iterable $data, bool $sample = false): float|null```
+
+- Population variance by default; pass `$sample = true` for the sample variance (Bessel's correction — divides by `N - 1`).
+- Returns null if collection is empty, or for the sample variance of a single value (`N - 1 = 0` is undefined). The population variance of a single value is `0.0`.
+
+```php
+use IterTools\Reduce;
+
+$numbers = [1, 2, 3, 4, 5];
+
+$populationVariance = Reduce::toVariance($numbers);
+// 2.0
+
+$sampleVariance = Reduce::toVariance($numbers, true);
+// 2.5
 ```
 
 ### Consume

@@ -2829,6 +2829,130 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Reduces iterable source to its median value.
+     *
+     * For an even number of elements the median is the mean of the two middle values.
+     *
+     * Returns null if iterable source is empty.
+     *
+     * @return int|float|null
+     *
+     * @see Reduce::toMedian()
+     */
+    public function toMedian(): int|float|null
+    {
+        /** @var iterable<int|float> $iterable */
+        $iterable = $this->iterable;
+        return Reduce::toMedian($iterable);
+    }
+
+    /**
+     * Reduces iterable source to a list of its modes (the most frequent values).
+     *
+     * Returns every value tied for the maximum frequency, in first-seen order.
+     *
+     * Returns an empty array if iterable source is empty.
+     *
+     * @return list<mixed>
+     *
+     * @see Reduce::toMode()
+     */
+    public function toMode(): array
+    {
+        return Reduce::toMode($this->iterable);
+    }
+
+    /**
+     * Reduces iterable source to the variance of its values.
+     *
+     * Population variance by default; pass $sample = true for the sample variance
+     * (Bessel's correction).
+     *
+     * Returns null if iterable source is empty, or for the sample variance of a
+     * single value.
+     *
+     * @param bool $sample population variance when false (default), sample variance when true
+     *
+     * @return float|null
+     *
+     * @see Reduce::toVariance()
+     */
+    public function toVariance(bool $sample = false): ?float
+    {
+        /** @var iterable<int|float> $iterable */
+        $iterable = $this->iterable;
+        return Reduce::toVariance($iterable, $sample);
+    }
+
+    /**
+     * Reduces iterable source to the standard deviation of its values.
+     *
+     * Population standard deviation by default; pass $sample = true for the sample
+     * standard deviation (Bessel's correction).
+     *
+     * Returns null if iterable source is empty, or for the sample standard deviation
+     * of a single value.
+     *
+     * @param bool $sample population standard deviation when false (default), sample when true
+     *
+     * @return float|null
+     *
+     * @see Reduce::toStandardDeviation()
+     */
+    public function toStandardDeviation(bool $sample = false): ?float
+    {
+        /** @var iterable<int|float> $iterable */
+        $iterable = $this->iterable;
+        return Reduce::toStandardDeviation($iterable, $sample);
+    }
+
+    /**
+     * Reduces iterable source to its value at the given percentile.
+     *
+     * Uses the R-7 / linear-interpolation method (the NumPy default). Percentile 0
+     * is the minimum, 100 is the maximum.
+     *
+     * Returns null if iterable source is empty.
+     *
+     * @param float $percentile in the inclusive range [0, 100]
+     *
+     * @return int|float|null
+     *
+     * @throws \InvalidArgumentException if $percentile is outside [0, 100]
+     *
+     * @see Reduce::toPercentile()
+     */
+    public function toPercentile(float $percentile): int|float|null
+    {
+        /** @var iterable<int|float> $iterable */
+        $iterable = $this->iterable;
+        return Reduce::toPercentile($iterable, $percentile);
+    }
+
+    /**
+     * Reduces iterable source to its value at the given quantile.
+     *
+     * Accepts a quantile in the inclusive range [0, 1] (e.g. 0.25 is the first
+     * quartile / 25th percentile).
+     *
+     * Returns null if iterable source is empty.
+     *
+     * @param float $quantile in the inclusive range [0, 1]
+     *
+     * @return int|float|null
+     *
+     * @throws \InvalidArgumentException if $quantile is outside [0, 1]
+     *
+     * @see Reduce::toQuantile()
+     */
+    public function toQuantile(float $quantile): int|float|null
+    {
+        /** @var iterable<int|float> $iterable */
+        $iterable = $this->iterable;
+        return Reduce::toQuantile($iterable, $quantile);
+    }
+
+    /**
      * Returns the first element of iterable source.
      *
      * @return mixed

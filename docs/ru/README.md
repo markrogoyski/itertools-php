@@ -272,6 +272,12 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`toMax`](reduce.md#to-max)                                 | Максимальный элемент коллекции                                                      | `Reduce::toMax($numbers, [$compareBy])`                       |
 | [`toMin`](reduce.md#to-min)                                 | Минимальный элемент коллекции                                                       | `Reduce::toMin($numbers, [$compareBy])`                       |
 | [`toMinMax`](reduce.md#to-min-max)                          | Минимальный и максимальный элемент коллекции                                        | `Reduce::toMinMax($numbers, [$compareBy])`                    |
+| [`toMedian`](reduce.md#to-median)                            | Медиана коллекции                                                                   | `Reduce::toMedian($numbers)`                                  |
+| [`toMode`](reduce.md#to-mode)                                | Список мод коллекции (наиболее частых значений)                                     | `Reduce::toMode($data)`                                       |
+| [`toVariance`](reduce.md#to-variance)                        | Дисперсия (генеральная/выборочная)                                                  | `Reduce::toVariance($numbers, [$sample])`                     |
+| [`toStandardDeviation`](reduce.md#to-standard-deviation)     | Стандартное отклонение (генеральное/выборочное)                                     | `Reduce::toStandardDeviation($numbers, [$sample])`            |
+| [`toPercentile`](reduce.md#to-percentile)                    | Значение коллекции для заданного процентиля [0, 100]                                | `Reduce::toPercentile($numbers, $percentile)`                 |
+| [`toQuantile`](reduce.md#to-quantile)                        | Значение коллекции для заданного квантиля [0, 1]                                    | `Reduce::toQuantile($numbers, $quantile)`                     |
 | [`toNth`](reduce.md#to-nth)                                 | N-й элемент коллекции                                                               | `Reduce::toNth($data, $position)`                             |
 | [`toProduct`](reduce.md#to-product)                         | Произведение элементов коллекции                                                    | `Reduce::toProduct($numbers)`                                 |
 | [`toRandomValue`](reduce.md#to-random-value)                | Случайный элемент из коллекции                                                      | `Reduce::toRandomValue($data)`                                |
@@ -437,6 +443,12 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`toMax`](stream.md#to-max)                             | Максимальное значение из элементов коллекции                        | `$stream->toMax([$compareBy])`                          |
 | [`toMin`](stream.md#to-min)                             | Минимальное значение из элементов коллекции                         | `$stream->toMin([$compareBy])`                          |
 | [`toMinMax`](stream.md#to-min-max)                      | Минимальное и максимальное значения из элементов коллекции          | `$stream->toMinMax([$compareBy])`                       |
+| [`toMedian`](stream.md#to-median)                        | Медиана коллекции из потока                                         | `$stream->toMedian()`                                   |
+| [`toMode`](stream.md#to-mode)                            | Список мод коллекции из потока                                      | `$stream->toMode()`                                     |
+| [`toVariance`](stream.md#to-variance)                    | Дисперсия значений коллекции из потока                              | `$stream->toVariance([$sample])`                        |
+| [`toStandardDeviation`](stream.md#to-standard-deviation) | Стандартное отклонение значений коллекции из потока                 | `$stream->toStandardDeviation([$sample])`               |
+| [`toPercentile`](stream.md#to-percentile)                | Значение коллекции из потока для заданного процентиля               | `$stream->toPercentile($percentile)`                    |
+| [`toQuantile`](stream.md#to-quantile)                    | Значение коллекции из потока для заданного квантиля                 | `$stream->toQuantile($quantile)`                        |
 | [`toNth`](stream.md#to-nth)                             | N-й элемент коллекции                                               | `$stream->toNth($position)`                             |
 | [`toProduct`](stream.md#to-product)                     | Произведение элементов коллекции                                    | `$stream->toProduct()`                                  |
 | [`toString`](stream.md#to-string)                       | Преобразование коллекции в строку                                   | `$stream->toString([$separator], [$prefix], [$suffix])` |

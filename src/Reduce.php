@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\NoValueMonad;
+use IterTools\Util\UniqueExtractor;
 
 final class Reduce
 {
@@ -302,6 +303,253 @@ final class Reduce
 
         /** @psalm-suppress InvalidOperand */
         return $count ? ($sum / $count) : null;
+    }
+
+    /**
+     * Reduces given collection to its median value.
+     *
+     * For an even number of elements the median is the linear interpolation
+     * (mean) of the two middle values.
+     *
+     * Returns null if given collection is empty.
+     *
+     * @param iterable<int|float> $data
+     *
+     * @return int|float|null
+     */
+    public static function toMedian(iterable $data): int|float|null
+    {
+        $values = static::toSortedValues($data);
+
+        $count = \count($values);
+        if ($count === 0) {
+            return null;
+        }
+
+        $mid = \intdiv($count, 2);
+
+        if ($count % 2 === 1) {
+            return $values[$mid];
+        }
+
+        /** @psalm-suppress InvalidOperand */
+        return ($values[$mid - 1] + $values[$mid]) / 2;
+    }
+
+    /**
+     * Reduces given collection to a list of its modes (the most frequent values).
+     *
+     * Returns every value tied for the maximum frequency, in first-seen order
+     * (so an all-unique input returns all of its values). Multimodal inputs
+     * return multiple modes.
+     *
+     * Returns an empty array if given collection is empty.
+     *
+     * @param iterable<mixed> $data
+     *
+     * @return list<mixed>
+     */
+    public static function toMode(iterable $data): array
+    {
+        /** @var array<string, int> $counts */
+        $counts = [];
+        /** @var array<string, mixed> $values */
+        $values = [];
+
+        foreach ($data as $datum) {
+            $hash = UniqueExtractor::getString($datum, true);
+
+            if (!\array_key_exists($hash, $counts)) {
+                $counts[$hash] = 0;
+                $values[$hash] = $datum;
+            }
+
+            $counts[$hash]++;
+        }
+
+        if (\count($counts) === 0) {
+            return [];
+        }
+
+        $maxCount = \max($counts);
+
+        /** @var list<mixed> $modes */
+        $modes = [];
+        foreach ($counts as $hash => $count) {
+            if ($count === $maxCount) {
+                /** @var mixed $mode */
+                $mode = $values[$hash];
+                $modes[] = $mode;
+            }
+        }
+
+        return $modes;
+    }
+
+    /**
+     * Reduces given collection to the variance of its values.
+     *
+     * Population variance by default; pass $sample = true for the sample variance
+     * (Bessel's correction — divides by N - 1).
+     *
+     * Returns null if given collection is empty. Also returns null for the sample
+     * variance of a single value (N - 1 = 0 is undefined). The population variance
+     * of a single value is 0.0.
+     *
+     * @param iterable<int|float> $data
+     * @param bool                $sample population variance when false (default), sample variance when true
+     *
+     * @return float|null
+     */
+    public static function toVariance(iterable $data, bool $sample = false): ?float
+    {
+        $values = static::toNumericList($data);
+
+        $count = \count($values);
+        if ($count === 0 || ($sample && $count === 1)) {
+            return null;
+        }
+
+        /** @psalm-suppress InvalidOperand */
+        $mean = \array_sum($values) / $count;
+
+        $sumSquaredDiffs = 0.0;
+        foreach ($values as $value) {
+            /** @psalm-suppress InvalidOperand */
+            $sumSquaredDiffs += ($value - $mean) ** 2;
+        }
+
+        $divisor = $sample ? $count - 1 : $count;
+
+        /** @psalm-suppress InvalidOperand */
+        return $sumSquaredDiffs / $divisor;
+    }
+
+    /**
+     * Reduces given collection to the standard deviation of its values.
+     *
+     * Square root of the variance. Population standard deviation by default; pass
+     * $sample = true for the sample standard deviation (Bessel's correction).
+     *
+     * Returns null whenever the underlying variance is null (empty collection, or
+     * the sample standard deviation of a single value). The population standard
+     * deviation of a single value is 0.0.
+     *
+     * @param iterable<int|float> $data
+     * @param bool                $sample population standard deviation when false (default), sample when true
+     *
+     * @return float|null
+     */
+    public static function toStandardDeviation(iterable $data, bool $sample = false): ?float
+    {
+        $variance = static::toVariance($data, $sample);
+
+        return $variance === null ? null : \sqrt($variance);
+    }
+
+    /**
+     * Reduces given collection to its value at the given percentile.
+     *
+     * Uses the R-7 / linear-interpolation method (the NumPy default): the
+     * percentile rank is mapped onto the sorted values and interpolated between
+     * the two nearest ranks. Percentile 0 is the minimum, 100 is the maximum.
+     *
+     * Returns null if given collection is empty.
+     *
+     * @param iterable<int|float> $data
+     * @param float               $percentile in the inclusive range [0, 100]
+     *
+     * @return int|float|null
+     *
+     * @throws \InvalidArgumentException if $percentile is outside [0, 100] or NAN
+     */
+    public static function toPercentile(iterable $data, float $percentile): int|float|null
+    {
+        if (\is_nan($percentile) || $percentile < 0 || $percentile > 100) {
+            $shown = \is_nan($percentile) ? 'NAN' : (string) $percentile;
+            throw new \InvalidArgumentException("Percentile must be between 0 and 100. Got {$shown}.");
+        }
+
+        $values = static::toSortedValues($data);
+
+        $count = \count($values);
+        if ($count === 0) {
+            return null;
+        }
+
+        if ($count === 1) {
+            return $values[0];
+        }
+
+        /** @psalm-suppress InvalidOperand */
+        $rank       = ($count - 1) * ($percentile / 100);
+        $lowerIndex = (int) \floor($rank);
+        /** @psalm-suppress InvalidOperand */
+        $fraction   = $rank - $lowerIndex;
+
+        if ($fraction === 0.0) {
+            return $values[$lowerIndex];
+        }
+
+        /** @psalm-suppress InvalidOperand */
+        return $values[$lowerIndex] + $fraction * ($values[$lowerIndex + 1] - $values[$lowerIndex]);
+    }
+
+    /**
+     * Reduces given collection to its value at the given quantile.
+     *
+     * Thin wrapper over {@see Reduce::toPercentile()} that accepts a quantile in the
+     * inclusive range [0, 1] (e.g. 0.25 is the first quartile / 25th percentile).
+     *
+     * Returns null if given collection is empty.
+     *
+     * @param iterable<int|float> $data
+     * @param float               $quantile in the inclusive range [0, 1]
+     *
+     * @return int|float|null
+     *
+     * @throws \InvalidArgumentException if $quantile is outside [0, 1] or NAN
+     */
+    public static function toQuantile(iterable $data, float $quantile): int|float|null
+    {
+        if (\is_nan($quantile) || $quantile < 0 || $quantile > 1) {
+            $shown = \is_nan($quantile) ? 'NAN' : (string) $quantile;
+            throw new \InvalidArgumentException("Quantile must be between 0 and 1. Got {$shown}.");
+        }
+
+        return static::toPercentile($data, $quantile * 100.0);
+    }
+
+    /**
+     * Materializes an iterable of numbers into a list.
+     *
+     * @param iterable<int|float> $data
+     *
+     * @return list<int|float>
+     */
+    private static function toNumericList(iterable $data): array
+    {
+        $values = [];
+        foreach ($data as $datum) {
+            $values[] = $datum;
+        }
+
+        return $values;
+    }
+
+    /**
+     * Materializes an iterable of numbers into an ascending-sorted list.
+     *
+     * @param iterable<int|float> $data
+     *
+     * @return list<int|float>
+     */
+    private static function toSortedValues(iterable $data): array
+    {
+        $values = static::toNumericList($data);
+        \sort($values);
+
+        return $values;
     }
 
     /**
