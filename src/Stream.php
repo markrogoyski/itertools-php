@@ -1941,6 +1941,10 @@ final class Stream implements \IteratorAggregate
     /**
      * Peek at each element between other Stream operations to do some action without modifying the stream.
      *
+     * Lazy: the callback is invoked once per element, at the moment the element is pulled through the
+     * stream by a downstream operation. Elements that downstream never consumes are never peeked.
+     * Values and keys pass through unchanged.
+     *
      * Useful for debugging purposes.
      *
      * @param callable $callback
@@ -1949,17 +1953,25 @@ final class Stream implements \IteratorAggregate
      */
     public function peek(callable $callback): self
     {
-        [$this->iterable, $peekable] = Transform::tee($this->iterable, 2);
+        $iterable = $this->iterable;
 
-        foreach ($peekable as $element) {
-            $callback($element);
-        }
+        $this->iterable = (static function () use ($iterable, $callback): \Generator {
+            foreach ($iterable as $key => $datum) {
+                $callback($datum);
+                yield $key => $datum;
+            }
+        })();
 
         return $this;
     }
 
     /**
      * Peek at the entire stream between other Stream operations to do some action without modifying the stream.
+     *
+     * Operates on the stream as a whole, and is eager: unlike the per-element peek(), the callback is
+     * invoked once, at the time peekStream() is called, before any downstream operation runs. It
+     * receives its own Stream over a tee'd copy of the source; consuming that Stream inside the
+     * callback buffers the upstream so the main stream can replay it afterwards.
      *
      * Useful for debugging purposes.
      *
@@ -1978,6 +1990,10 @@ final class Stream implements \IteratorAggregate
     /**
      * Peek at each element between other Stream operations to print each item without modifying the stream.
      *
+     * Eager: delegates to peekStream(), so the entire upstream is printed and buffered at the time
+     * peekPrint() is called, before any downstream operation runs. The per-element laziness of peek()
+     * does not apply here.
+     *
      * Useful for debugging purposes.
      *
      * @param string $separator
@@ -1994,6 +2010,10 @@ final class Stream implements \IteratorAggregate
 
     /**
      * Peek at each element between other Stream operations to print_r each item without modifying the stream.
+     *
+     * Eager: delegates to peekStream(), so the entire upstream is printed and buffered at the time
+     * peekPrintR() is called, before any downstream operation runs. The per-element laziness of peek()
+     * does not apply here.
      *
      * Useful for debugging purposes.
      *

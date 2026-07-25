@@ -468,10 +468,17 @@ final class Single
     /**
      * Limit iteration to a max size limit
      *
+     * Lazy: the source is never advanced beyond the elements that are yielded. Once $limit
+     * elements have been yielded, iteration stops without pulling a further element, so a
+     * side-effecting source (file handle, HTTP pagination, DB cursor) is not over-read. A
+     * $limit of 0 does not touch the source at all.
+     *
      * @param iterable<mixed> $data
      * @param int             $limit ≥ 0, max count of iteration
      *
      * @return \Generator<mixed>
+     *
+     * @throws \InvalidArgumentException if $limit is negative
      */
     public static function limit(iterable $data, int $limit): \Generator
     {
@@ -479,13 +486,16 @@ final class Single
             throw new \InvalidArgumentException("Limit must be ≥ 0. Got $limit");
         }
 
+        if ($limit === 0) {
+            return;
+        }
+
         $i = 0;
         foreach ($data as $key => $datum) {
-            if ($i >= $limit) {
+            yield $key => $datum;
+            if (++$i >= $limit) {
                 return;
             }
-            yield $key => $datum;
-            $i++;
         }
     }
 
@@ -761,6 +771,12 @@ final class Single
     /**
      * Extract a slice of the collection.
      *
+     * Lazy: the source is never advanced beyond the last element that is yielded. Once $count
+     * elements have been yielded, iteration stops without pulling a further element, so a
+     * side-effecting source (file handle, HTTP pagination, DB cursor) is not over-read. A
+     * $count of 0 does not touch the source at all. Note that elements skipped by $start or
+     * $step must still be pulled to be skipped over.
+     *
      * @template T
      *
      * @param iterable<T> $data
@@ -784,6 +800,10 @@ final class Single
             throw new \InvalidArgumentException("Parameter 'step' must be positive");
         }
 
+        if ($count === 0) {
+            return;
+        }
+
         $index = 0;
         $yielded = 0;
         foreach ($data as $datum) {
@@ -791,12 +811,13 @@ final class Single
                 continue;
             }
 
-            if ($count !== null && $yielded === $count) {
-                break;
-            }
             $yielded++;
 
             yield $datum;
+
+            if ($count !== null && $yielded === $count) {
+                return;
+            }
         }
     }
 

@@ -435,6 +435,8 @@ Iterate up to a limit.
 
 Stops even if more data available if limit reached.
 
+Lazy: the source is never advanced beyond the elements that are yielded, so a side-effecting source (file handle, HTTP pagination, database cursor) is not over-read. A limit of 0 does not touch the source at all.
+
 ```Single::limit(iterable $data, int $limit)```
 
 ```php
@@ -688,6 +690,8 @@ foreach (Single::skip($prequelsRemoved, 3, 3) as $nonSequel) {
 
 ### Slice
 Extract a slice of the iterable.
+
+Lazy: the source is never advanced beyond the last element that is yielded, so a side-effecting source (file handle, HTTP pagination, database cursor) is not over-read. A count of 0 does not touch the source at all. Elements skipped by `$start` or `$step` must still be pulled in order to be skipped over.
 
 ```Single::slice(iterable $data, int $start = 0, int $count = null, int $step = 1)```
 

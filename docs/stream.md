@@ -945,6 +945,8 @@ Return a stream up to a limit.
 
 Stops even if more data available if limit reached.
 
+Lazy: the upstream is never advanced beyond the elements that are yielded. A limit of 0 does not touch the upstream at all.
+
 ```$stream->limit(int $limit): Stream```
 
 ```php
@@ -1336,6 +1338,8 @@ $onlyTheBest = Stream::of($movies)
 
 #### Slice
 Extract a slice of the stream.
+
+Lazy: the upstream is never advanced beyond the last element that is yielded. A count of 0 does not touch the upstream at all. Elements skipped by `$start` or `$step` must still be pulled in order to be skipped over.
 
 ```$stream->slice(int $start = 0, int $count = null, int $step = 1)```
 
@@ -3420,6 +3424,8 @@ Stream::of($data)
 #### Peek
 Peek at each element between other Stream operations to do some action without modifying the stream.
 
+Lazy: the callback fires once per element, at the moment a downstream operation pulls that element through the stream. Elements that downstream never consumes are never peeked.
+
 ```$stream->peek(callable $callback): Stream```
 
 ```php
@@ -3435,6 +3441,8 @@ Stream::of(['some', 'items'])
 
 #### Peek Stream
 Peek at the entire stream between other Stream operations to do some action without modifying the stream.
+
+Operates on the stream as a whole, and is eager: unlike the per-element `peek`, the callback is invoked once, at the time `peekStream()` is called, before any downstream operation runs. It receives its own stream over a copy of the source; consuming that stream inside the callback buffers the upstream so the main stream can replay it afterwards.
 
 ```$stream->peekStream(callable $callback): Stream```
 
@@ -3452,7 +3460,9 @@ Stream::of(['some', 'items'])
 #### Peek Print
 Peek at each element between other Stream operations to print each item without modifying the stream.
 
-```$stream->peekPrint(string $separator = '', string $prefix = '', string $suffix = ''): void```
+Eager: delegates to `peekStream`, so the entire upstream is printed and buffered at the time `peekPrint()` is called, before any downstream operation runs. The per-element laziness of `peek` does not apply here.
+
+```$stream->peekPrint(string $separator = '', string $prefix = '', string $suffix = ''): Stream```
 
 ```php
 use IterTools\Stream;
@@ -3466,7 +3476,9 @@ Stream::of(['some', 'items'])
 #### Peek PrintR
 Peek at each element between other Stream operations to `print_r` each item without modifying the stream.
 
-```$stream->peekPrintR(callable $callback): void```
+Eager: delegates to `peekStream`, so the entire upstream is printed and buffered at the time `peekPrintR()` is called, before any downstream operation runs. The per-element laziness of `peek` does not apply here.
+
+```$stream->peekPrintR(): Stream```
 
 ```php
 use IterTools\Stream;

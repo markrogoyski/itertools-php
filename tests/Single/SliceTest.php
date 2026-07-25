@@ -1813,4 +1813,98 @@ class SliceTest extends \PHPUnit\Framework\TestCase
             [[0, 1, -2]],
         ];
     }
+
+    /**
+     * @test         slice does not consume the source past the last sliced element
+     * @dataProvider dataProviderForLaziness
+     * @param        array $config
+     * @param        array $expected
+     * @param        array $expectedConsumed
+     */
+    public function testDoesNotConsumeSourcePastLastSlicedElement(
+        array $config,
+        array $expected,
+        array $expectedConsumed
+    ): void {
+        // Given a source that records every element pulled from it
+        $consumed = [];
+        $input = (static function () use (&$consumed): \Generator {
+            foreach ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as $datum) {
+                $consumed[] = $datum;
+                yield $datum;
+            }
+        })();
+
+        // When
+        $result = [];
+        foreach (Single::slice($input, ...$config) as $item) {
+            $result[] = $item;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+
+        // And the source was never advanced beyond the last element that was yielded
+        $this->assertSame($expectedConsumed, $consumed);
+    }
+
+    public static function dataProviderForLaziness(): array
+    {
+        return [
+            [[0, 0], [], []],
+            [[5, 0], [], []],
+            [[0, 3], [1, 2, 3], [1, 2, 3]],
+            [[0, 1], [1], [1]],
+            [[2, 3], [3, 4, 5], [1, 2, 3, 4, 5]],
+            [[0, 3, 2], [1, 3, 5], [1, 2, 3, 4, 5]],
+            [[1, 2, 3], [2, 5], [1, 2, 3, 4, 5]],
+            [[0, 10], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+            [[0, 20], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+            [[0, null], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
+        ];
+    }
+
+    /**
+     * @test slice does not pull from a source that errors past the last sliced element
+     */
+    public function testDoesNotPullFromSourceThatErrorsPastCount(): void
+    {
+        // Given a source that throws on the pull following the third element
+        $input = (static function (): \Generator {
+            yield 1;
+            yield 2;
+            yield 3;
+            throw new \RuntimeException('Source iterated past the count');
+        })();
+
+        // When
+        $result = [];
+        foreach (Single::slice($input, 0, 3) as $item) {
+            $result[] = $item;
+        }
+
+        // Then no exception was thrown
+        $this->assertSame([1, 2, 3], $result);
+    }
+
+    /**
+     * @test slice of zero count does not pull from the source at all
+     */
+    public function testZeroCountDoesNotPullFromSource(): void
+    {
+        // Given a source that throws as soon as it is iterated
+        $input = (static function (): \Generator {
+            yield from [];
+            throw new \RuntimeException('Source iterated past the count');
+        })();
+
+        // When
+        $result = [];
+        foreach (Single::slice($input, 0, 0) as $item) {
+            $result[] = $item;
+        }
+
+        // Then no exception was thrown
+        $this->assertSame([], $result);
+    }
 }

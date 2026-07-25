@@ -64,6 +64,15 @@
 * `Stream::ofRange` validation errors (zero step, conflicting direction, step magnitude greater than span, non-finite operands) now surface as `\InvalidArgumentException` at first iteration (e.g. on `->toArray()`), rather than at construction time via PHP's `\ValueError`.
 * `Stream::ofRange` is stricter than native `\range()` in two cases that previously succeeded via delegation: a step magnitude that exceeds the span (e.g. `ofRange(1, 5, 10)`, previously `[1]`) and a negative step that disagrees with the inferred direction (e.g. `ofRange(1, 5, -1)`, previously `[1, 2, 3, 4, 5]`) now both throw `\InvalidArgumentException`. Use the absolute step magnitude or omit the step argument.
 
+### Bug Fixes
+* `Stream::peek` is now lazy per element, as documented. Previously it eagerly consumed the entire upstream and invoked the callback for every element at the time `peek()` was called, before any downstream operation ran (e.g. `->peek($fn)->limit(3)` invoked the callback for every element of the source). The callback now fires once per element as downstream operations pull elements through the stream; elements never consumed downstream are never peeked. Values and keys pass through unchanged.
+* `Single::limit` (and `Stream::limit`) no longer over-consume the source by one element. Previously the limit was checked only after the source had already been advanced, so `limit(3)` pulled 4 elements from the source and `limit(0)` pulled 1. The extra read was invisible for arrays, but observable — and unwanted — for side-effecting sources such as file handles, HTTP pagination, and database cursors, and it caused a source that errors past the limit to throw. `limit($n)` now pulls exactly the elements it yields, and `limit(0)` does not touch the source at all.
+* `Single::slice` (and `Stream::slice`) no longer over-consume the source past the last yielded element, for the same reason. Previously `slice($data, 0, 3)` pulled 4 elements, and with a step it pulled further still (`slice($data, 0, 3, 2)` pulled 7 elements to yield 3). The count is now checked after yielding, and a `$count` of 0 does not touch the source at all. Elements skipped by `$start` or `$step` must still be pulled in order to be skipped over.
+
+### Known Limitations
+* `Stream::peekStream` remains whole-stream and eager, by design: the callback is invoked at the time `peekStream()` is called, and if the callback consumes its copy of the stream, the upstream is buffered so the main stream can replay it afterwards.
+* `Stream::peekPrint` and `Stream::peekPrintR` delegate to `peekStream` and are therefore still eager — they print the entire upstream at call time, before any downstream operation runs, despite being documented as per-element. `Stream::peek`'s new laziness does not extend to them. Making them lazy is a behavioral change requiring a decision about prefix/separator/suffix placement on a stream that may never be fully consumed, and is deferred to a future release.
+
 ## v2.4.0 - 2026-05-06
 
 ### New Features

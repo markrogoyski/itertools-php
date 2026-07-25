@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools\Tests\Stream;
 
 use IterTools\Stream;
+use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
@@ -98,7 +99,7 @@ class PeekTest extends \PHPUnit\Framework\TestCase
                     ->zipWith([11, 22, 33, 44, 55]),
                 fn (Stream $stream) => $stream
                     ->limit(3),
-                [[1, 11], [2, 22], [3, 33], [4, 44], [5, 55]],
+                [[1, 11], [2, 22], [3, 33]],
                 [[1, 11], [2, 22], [3, 33]],
             ],
             [
@@ -226,7 +227,7 @@ class PeekTest extends \PHPUnit\Framework\TestCase
                     ->zipWith([11, 22, 33, 44, 55]),
                 fn (Stream $stream) => $stream
                     ->limit(3),
-                [[1, 11], [2, 22], [3, 33], [4, 44], [5, 55]],
+                [[1, 11], [2, 22], [3, 33]],
                 [[1, 11], [2, 22], [3, 33]],
             ],
             [
@@ -354,7 +355,7 @@ class PeekTest extends \PHPUnit\Framework\TestCase
                     ->zipWith([11, 22, 33, 44, 55]),
                 fn (Stream $stream) => $stream
                     ->limit(3),
-                [[1, 11], [2, 22], [3, 33], [4, 44], [5, 55]],
+                [[1, 11], [2, 22], [3, 33]],
                 [[1, 11], [2, 22], [3, 33]],
             ],
             [
@@ -482,7 +483,7 @@ class PeekTest extends \PHPUnit\Framework\TestCase
                     ->zipWith([11, 22, 33, 44, 55]),
                 fn (Stream $stream) => $stream
                     ->limit(3),
-                [[1, 11], [2, 22], [3, 33], [4, 44], [5, 55]],
+                [[1, 11], [2, 22], [3, 33]],
                 [[1, 11], [2, 22], [3, 33]],
             ],
             [
@@ -518,5 +519,297 @@ class PeekTest extends \PHPUnit\Framework\TestCase
                 ['a' => 2, 'c' => 4],
             ],
         ];
+    }
+
+    /**
+     * @test Stream::peek is lazy — only elements pulled by downstream are peeked (array)
+     */
+    public function testLazyPeeksOnlyConsumedElementsArray(): void
+    {
+        // Given
+        $data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        $peeked = [];
+
+        // When
+        $result = Stream::of($data)
+            ->peek(static function ($item) use (&$peeked) {
+                $peeked[] = $item;
+            })
+            ->limit(3)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3], $result);
+
+        // And the spy was called exactly once per element consumed downstream
+        $this->assertSame([1, 2, 3], $peeked);
+    }
+
+    /**
+     * @test Stream::peek is lazy — only elements pulled by downstream are peeked (generator)
+     */
+    public function testLazyPeeksOnlyConsumedElementsGenerator(): void
+    {
+        // Given
+        $data = GeneratorFixture::getGenerator([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $peeked = [];
+
+        // When
+        $result = Stream::of($data)
+            ->peek(static function ($item) use (&$peeked) {
+                $peeked[] = $item;
+            })
+            ->limit(3)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3], $result);
+
+        // And the spy was called exactly once per element consumed downstream
+        $this->assertSame([1, 2, 3], $peeked);
+    }
+
+    /**
+     * @test Stream::peek is lazy — only elements pulled by downstream are peeked (iterator)
+     */
+    public function testLazyPeeksOnlyConsumedElementsIterator(): void
+    {
+        // Given
+        $data = new ArrayIteratorFixture([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $peeked = [];
+
+        // When
+        $result = Stream::of($data)
+            ->peek(static function ($item) use (&$peeked) {
+                $peeked[] = $item;
+            })
+            ->limit(3)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3], $result);
+
+        // And the spy was called exactly once per element consumed downstream
+        $this->assertSame([1, 2, 3], $peeked);
+    }
+
+    /**
+     * @test Stream::peek is lazy — only elements pulled by downstream are peeked (traversable)
+     */
+    public function testLazyPeeksOnlyConsumedElementsTraversable(): void
+    {
+        // Given
+        $data = new IteratorAggregateFixture([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $peeked = [];
+
+        // When
+        $result = Stream::of($data)
+            ->peek(static function ($item) use (&$peeked) {
+                $peeked[] = $item;
+            })
+            ->limit(3)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3], $result);
+
+        // And the spy was called exactly once per element consumed downstream
+        $this->assertSame([1, 2, 3], $peeked);
+    }
+
+    /**
+     * @test Stream::peek does not consume the upstream past what downstream requests
+     */
+    public function testLazyDoesNotConsumeUpstreamPastLimit(): void
+    {
+        // Given: a source that errors if iterated past index 3
+        $data = (static function (): \Generator {
+            yield 1;
+            yield 2;
+            yield 3;
+            throw new \RuntimeException('Source iterated too far');
+        })();
+        $peeked = [];
+
+        // When
+        $result = Stream::of($data)
+            ->peek(static function ($item) use (&$peeked) {
+                $peeked[] = $item;
+            })
+            ->limit(3)
+            ->toArray();
+
+        // Then: no exception was thrown, and the spy was called exactly once
+        // per element consumed downstream
+        $this->assertSame([1, 2, 3], $result);
+        $this->assertSame([1, 2, 3], $peeked);
+    }
+
+    /**
+     * @test Stream::peek callback fires before downstream consumes each element (array)
+     */
+    public function testCallbackFiresBeforeDownstreamForEachElementArray(): void
+    {
+        // Given
+        $data = [1, 2, 3];
+        $log = [];
+
+        // When
+        Stream::of($data)
+            ->peek(static function ($item) use (&$log) {
+                $log[] = "peek: {$item}";
+            })
+            ->map(static function ($item) use (&$log) {
+                $log[] = "map: {$item}";
+                return $item;
+            })
+            ->toArray();
+
+        // Then: interleaved per element, not phase-by-phase
+        $this->assertSame(['peek: 1', 'map: 1', 'peek: 2', 'map: 2', 'peek: 3', 'map: 3'], $log);
+    }
+
+    /**
+     * @test Stream::peek callback fires before downstream consumes each element (generator)
+     */
+    public function testCallbackFiresBeforeDownstreamForEachElementGenerator(): void
+    {
+        // Given
+        $data = GeneratorFixture::getGenerator([1, 2, 3]);
+        $log = [];
+
+        // When
+        Stream::of($data)
+            ->peek(static function ($item) use (&$log) {
+                $log[] = "peek: {$item}";
+            })
+            ->map(static function ($item) use (&$log) {
+                $log[] = "map: {$item}";
+                return $item;
+            })
+            ->toArray();
+
+        // Then: interleaved per element, not phase-by-phase
+        $this->assertSame(['peek: 1', 'map: 1', 'peek: 2', 'map: 2', 'peek: 3', 'map: 3'], $log);
+    }
+
+    /**
+     * @test Stream::peek callback fires before downstream consumes each element (iterator)
+     */
+    public function testCallbackFiresBeforeDownstreamForEachElementIterator(): void
+    {
+        // Given
+        $data = new ArrayIteratorFixture([1, 2, 3]);
+        $log = [];
+
+        // When
+        Stream::of($data)
+            ->peek(static function ($item) use (&$log) {
+                $log[] = "peek: {$item}";
+            })
+            ->map(static function ($item) use (&$log) {
+                $log[] = "map: {$item}";
+                return $item;
+            })
+            ->toArray();
+
+        // Then: interleaved per element, not phase-by-phase
+        $this->assertSame(['peek: 1', 'map: 1', 'peek: 2', 'map: 2', 'peek: 3', 'map: 3'], $log);
+    }
+
+    /**
+     * @test Stream::peek callback fires before downstream consumes each element (traversable)
+     */
+    public function testCallbackFiresBeforeDownstreamForEachElementTraversable(): void
+    {
+        // Given
+        $data = new IteratorAggregateFixture([1, 2, 3]);
+        $log = [];
+
+        // When
+        Stream::of($data)
+            ->peek(static function ($item) use (&$log) {
+                $log[] = "peek: {$item}";
+            })
+            ->map(static function ($item) use (&$log) {
+                $log[] = "map: {$item}";
+                return $item;
+            })
+            ->toArray();
+
+        // Then: interleaved per element, not phase-by-phase
+        $this->assertSame(['peek: 1', 'map: 1', 'peek: 2', 'map: 2', 'peek: 3', 'map: 3'], $log);
+    }
+
+    /**
+     * @test Stream::peek passes elements through unchanged with keys preserved (array)
+     */
+    public function testPreservesElementsAndKeysArray(): void
+    {
+        // Given
+        $data = ['a' => 1, 'b' => 2, 'c' => 3];
+
+        // When
+        $result = Stream::of($data)
+            ->peek(static function ($item) {
+            })
+            ->toAssociativeArray();
+
+        // Then
+        $this->assertSame(['a' => 1, 'b' => 2, 'c' => 3], $result);
+    }
+
+    /**
+     * @test Stream::peek passes elements through unchanged with keys preserved (generator)
+     */
+    public function testPreservesElementsAndKeysGenerator(): void
+    {
+        // Given
+        $data = GeneratorFixture::getKeyValueGenerator(['a' => 1, 'b' => 2, 'c' => 3]);
+
+        // When
+        $result = Stream::of($data)
+            ->peek(static function ($item) {
+            })
+            ->toAssociativeArray();
+
+        // Then
+        $this->assertSame(['a' => 1, 'b' => 2, 'c' => 3], $result);
+    }
+
+    /**
+     * @test Stream::peek passes elements through unchanged with keys preserved (iterator)
+     */
+    public function testPreservesElementsAndKeysIterator(): void
+    {
+        // Given
+        $data = new \ArrayIterator(['a' => 1, 'b' => 2, 'c' => 3]);
+
+        // When
+        $result = Stream::of($data)
+            ->peek(static function ($item) {
+            })
+            ->toAssociativeArray();
+
+        // Then
+        $this->assertSame(['a' => 1, 'b' => 2, 'c' => 3], $result);
+    }
+
+    /**
+     * @test Stream::peek passes elements through unchanged with keys preserved (traversable)
+     */
+    public function testPreservesElementsAndKeysTraversable(): void
+    {
+        // Given
+        $data = new IteratorAggregateFixture(['a' => 1, 'b' => 2, 'c' => 3]);
+
+        // When
+        $result = Stream::of($data)
+            ->peek(static function ($item) {
+            })
+            ->toAssociativeArray();
+
+        // Then
+        $this->assertSame(['a' => 1, 'b' => 2, 'c' => 3], $result);
     }
 }
