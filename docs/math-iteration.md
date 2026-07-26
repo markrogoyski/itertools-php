@@ -34,6 +34,12 @@ return type throws a `\TypeError` naming the offending type. Defaults to
 [strict type](../README.md#strict-and-coercive-types) comparisons; set strict to false for type
 coercion comparisons (under which a numeric-string key such as `"1"` collapses with the int key `1`).
 
+Under strict comparisons those remain separate groups, but PHP array keys canonicalize numeric
+strings — so materializing the generator (via `iterator_to_array`, or a `Stream` terminal that
+builds an array) merges them and keeps only one of the two counts. Iterate the generator directly
+to observe every group, or use [`Reduce::toCountBy`](reduce.md#to-count-by), which combines such
+keys into one summed count instead.
+
 ```php
 use IterTools\Math;
 

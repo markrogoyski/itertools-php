@@ -194,7 +194,7 @@ $firstFive = Stream::ofRange(1, PHP_INT_MAX)
 // 1, 2, 3, 4, 5
 ```
 
-> Note: prior to v2.5.0, `Stream::ofRange` materialized the full sequence eagerly via `\range()` and, when given two numeric-string inputs without leading zeros, preserved string-typed output (e.g. `ofRange("1", "5")` yielded `["1", ..., "5"]`). The lazy rewrite normalizes all numeric-string inputs to `int`/`float` uniformly.
+> Note: prior to this release, `Stream::ofRange` materialized the full sequence eagerly via `\range()` and, when given two numeric-string inputs without leading zeros, preserved string-typed output (e.g. `ofRange("1", "5")` yielded `["1", ..., "5"]`). The lazy rewrite normalizes all numeric-string inputs to `int`/`float` uniformly. It also pins native `\range()`'s PHP 8.3+ numeric semantics on every supported PHP version, so an integer-valued float step on int operands now yields ints (`ofRange(1, 5, 1.0)` → `[1, 2, 3, 4, 5]`) where PHP 8.2 previously yielded floats.
 
 #### Of Rock Paper Scissors
 Creates stream of rock-paper-scissors hands.
@@ -2912,7 +2912,7 @@ Reduces iterable source to its median value.
 
 ```$stream->toMedian(): int|float|null```
 
-- For an even number of elements, the median is the mean of the two middle values.
+- For an even number of elements, the median is the mean of the two middle values, computed so that it neither overflows when the two middle values sum beyond `PHP_FLOAT_MAX` nor loses precision when their span exceeds the integer range. Two identical middle values return that value, including `INF`.
 - Returns null if iterable source is empty.
 
 ```php
@@ -3022,6 +3022,8 @@ Reduces iterable source to its value at the given percentile.
 
 - Uses the R-7 / linear-interpolation method (the NumPy default). Percentile `0` is the minimum, `100` is the maximum.
 - `$percentile` must be in the inclusive range `[0, 100]`; otherwise throws `\InvalidArgumentException`.
+- The interpolation does not overflow when the two neighbouring values span more than `PHP_FLOAT_MAX`.
+- Percentile `50` returns exactly what `toMedian` returns, for every source.
 - Returns null if iterable source is empty.
 
 ```php
@@ -3109,7 +3111,8 @@ Reduces iterable source to the standard deviation of its values.
 ```$stream->toStandardDeviation(bool $sample = false): float|null```
 
 - Square root of the variance. Population standard deviation by default; pass `$sample = true` for the sample standard deviation (Bessel's correction).
-- Returns null if iterable source is empty, or for the sample standard deviation of a single value.
+- Inherits the single-pass, `O(1)`-memory and overflow behavior of `toVariance`.
+- Returns null if iterable source is empty, or for the sample standard deviation of a single value. The null cases take precedence over `NAN`, matching `toVariance`.
 
 ```php
 use IterTools\Stream;
@@ -3183,7 +3186,11 @@ Reduces iterable source to the variance of its values.
 ```$stream->toVariance(bool $sample = false): float|null```
 
 - Population variance by default; pass `$sample = true` for the sample variance (Bessel's correction).
-- Returns null if iterable source is empty, or for the sample variance of a single value.
+- Uses a scaled online algorithm with a compensated running mean: a single pass in `O(1)` memory, so the stream is never materialized.
+- The result is stable across orderings of the source to within floating-point rounding, but is **not** bit-reproducible — different orderings may differ in the last ulp.
+- Stays finite whenever the variance is representable, even when intermediate quantities are not (the variance of `[-1.4e154, 1.4e154, 0]` is `~1.31e308`, though the variance of its leading pair already exceeds `PHP_FLOAT_MAX`).
+- A **non-finite value anywhere in the source yields `NAN`**, since deviations from an infinite mean are `INF - INF`. A variance that is itself too large to represent is reported as `INF`, never as a negative number.
+- Returns null if iterable source is empty, or for the sample variance of a single value. **The null cases take precedence over `NAN`**: `toVariance([INF], true)` is `null`, while `toVariance([INF])` is `NAN`.
 
 ```php
 use IterTools\Stream;

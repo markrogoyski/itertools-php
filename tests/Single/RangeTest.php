@@ -651,12 +651,14 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test integer-valued float step on int operands keeps int output (matches native range)
+     * @test integer-valued float step on int operands keeps int output (matches PHP 8.3+ native range)
      */
     public function testIntegerValuedFloatStepKeepsIntOutput(): void
     {
         // Given
-        // Native PHP: range(1, 5, 1.0) → [int(1), int(2), int(3), int(4), int(5)].
+        // PHP 8.3+ native range(1, 5, 1.0) → [int(1), int(2), int(3), int(4), int(5)]; PHP 8.2
+        // sends any float step down the float path and yields floats. Single::range pins the
+        // 8.3+ types on every supported version, hence the literal expectation below.
         // Only a step with a non-integer fractional part (e.g. 1.5) promotes ints to floats.
 
         // When
@@ -827,18 +829,31 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     // -----------------------------------------------------------------------
 
     /**
-     * @test         span overflow with large step yields the same sequence as native \range()
+     * @test         span overflow with a PHP_INT_MAX step yields the pinned sequence
      * @dataProvider dataProviderForLargeStepSpanOverflow
      *
      * The integer span (endI - startI) overflows PHP_INT_MAX, but the step magnitude
-     * is large enough that only 2–3 elements result. Native \range() handles these
-     * cleanly; the previous span-overflow guard rejected them outright.
+     * is large enough that only 2–3 elements result. The previous span-overflow guard
+     * rejected these outright.
+     *
+     * Expectations are literals rather than native \range() output, because native is
+     * not version-stable here: PHP 8.2's range() carries the step in a C double and
+     * then casts it to zend_ulong, and (double)PHP_INT_MAX rounds up to 2^63 — so on
+     * 8.2 the step becomes PHP_INT_MAX + 1, which either trips the span check (throwing
+     * ValueError) or advances one element too far. PHP 8.3+ keeps an int step exact.
+     * Single::range uses the exact step on every supported version.
+     *
+     * @param int       $start
+     * @param int       $end
+     * @param int       $step
+     * @param list<int> $expected
      */
-    public function testLargeStepSpanOverflowMatchesNative(int $start, int $end, int $step): void
-    {
-        // Given
-        $expected = \range($start, $end, $step);
-
+    public function testLargeStepSpanOverflowYieldsPinnedSequence(
+        int $start,
+        int $end,
+        int $step,
+        array $expected
+    ): void {
         // When
         $actual = \iterator_to_array(Single::range($start, $end, $step), false);
 
@@ -846,15 +861,52 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $actual);
     }
 
+    /**
+     * @return array<string, array{int, int, int, list<int>}>
+     */
     public static function dataProviderForLargeStepSpanOverflow(): array
     {
         return [
-            'ascending PHP_INT_MIN to 0 with PHP_INT_MAX step' => [\PHP_INT_MIN, 0, \PHP_INT_MAX],
-            'ascending PHP_INT_MIN to PHP_INT_MAX with PHP_INT_MAX step' => [\PHP_INT_MIN, \PHP_INT_MAX, \PHP_INT_MAX],
-            'descending 0 to PHP_INT_MIN with PHP_INT_MAX step' => [0, \PHP_INT_MIN, \PHP_INT_MAX],
-            'descending PHP_INT_MAX to PHP_INT_MIN with PHP_INT_MAX step' => [\PHP_INT_MAX, \PHP_INT_MIN, \PHP_INT_MAX],
-            'ascending -2 to PHP_INT_MAX-1 with PHP_INT_MAX step' => [-2, \PHP_INT_MAX - 1, \PHP_INT_MAX],
-            'descending PHP_INT_MAX-1 to -2 with PHP_INT_MAX step' => [\PHP_INT_MAX - 1, -2, \PHP_INT_MAX],
+            'ascending PHP_INT_MIN to 0 with PHP_INT_MAX step' => [
+                \PHP_INT_MIN, 0, \PHP_INT_MAX,
+                [-9223372036854775807 - 1, -1],
+            ],
+            'ascending PHP_INT_MIN to PHP_INT_MAX with PHP_INT_MAX step' => [
+                \PHP_INT_MIN, \PHP_INT_MAX, \PHP_INT_MAX,
+                [-9223372036854775807 - 1, -1, 9223372036854775806],
+            ],
+            'descending 0 to PHP_INT_MIN with PHP_INT_MAX step' => [
+                0, \PHP_INT_MIN, \PHP_INT_MAX,
+                [0, -9223372036854775807],
+            ],
+            'descending PHP_INT_MAX to PHP_INT_MIN with PHP_INT_MAX step' => [
+                \PHP_INT_MAX, \PHP_INT_MIN, \PHP_INT_MAX,
+                [9223372036854775807, 0, -9223372036854775807],
+            ],
+            'ascending -2 to PHP_INT_MAX-1 with PHP_INT_MAX step' => [
+                -2, \PHP_INT_MAX - 1, \PHP_INT_MAX,
+                [-2, 9223372036854775805],
+            ],
+            'descending PHP_INT_MAX-1 to -2 with PHP_INT_MAX step' => [
+                \PHP_INT_MAX - 1, -2, \PHP_INT_MAX,
+                [9223372036854775806, -1],
+            ],
+            'ascending 0 to PHP_INT_MAX with PHP_INT_MAX step (step equals span)' => [
+                0, \PHP_INT_MAX, \PHP_INT_MAX,
+                [0, 9223372036854775807],
+            ],
+            'descending PHP_INT_MAX to 0 with PHP_INT_MAX step (step equals span)' => [
+                \PHP_INT_MAX, 0, \PHP_INT_MAX,
+                [9223372036854775807, 0],
+            ],
+            'ascending PHP_INT_MIN to -1 with PHP_INT_MAX step' => [
+                \PHP_INT_MIN, -1, \PHP_INT_MAX,
+                [-9223372036854775807 - 1, -1],
+            ],
+            'descending -1 to PHP_INT_MIN with PHP_INT_MAX step' => [
+                -1, \PHP_INT_MIN, \PHP_INT_MAX,
+                [-1, -9223372036854775807 - 1],
+            ],
         ];
     }
 
@@ -909,6 +961,21 @@ class RangeTest extends \PHPUnit\Framework\TestCase
 
     // -----------------------------------------------------------------------
     // Exhaustive oracle-driven test suite (native \range() as truth source)
+    //
+    // These matrices deliberately cover only inputs whose native behavior is
+    // stable across every supported PHP version: all-int operands with a small
+    // int step, and all-float operands with a float step.
+    //
+    // The cases where native \range() differs by version are asserted separately
+    // against literals, never against the running PHP:
+    //   - integer-valued float steps (8.2 yields floats, 8.3+ ints)
+    //     → testIntegerValuedFloatStepKeepsIntOutput,
+    //       testMixedIntFloatOperandsProduceDocumentedTypes
+    //   - negative steps on increasing ranges (8.2 abs()'d them, 8.3+ throws)
+    //     → testConflictingDirectionAscendingOperandsNegativeStep
+    //   - non-finite operands (8.3+ throws) → testNonFiniteOperandsThrow
+    //   - a step of PHP_INT_MAX, which 8.2 inflates to PHP_INT_MAX + 1 by routing
+    //     it through a C double → testLargeStepSpanOverflowYieldsPinnedSequence
     // -----------------------------------------------------------------------
 
     /**
@@ -950,16 +1017,9 @@ class RangeTest extends \PHPUnit\Framework\TestCase
             [\PHP_INT_MIN + 10, \PHP_INT_MIN, 1], [\PHP_INT_MIN + 10, \PHP_INT_MIN, 2],
             // Step exactly equal to span
             [0, 5, 5], [5, 0, 5], [-5, 5, 10], [5, -5, 10],
-            // Span-overflow with large step (the Codex P2 cases)
-            [\PHP_INT_MIN, 0, \PHP_INT_MAX],
-            [0, \PHP_INT_MIN, \PHP_INT_MAX],
-            [\PHP_INT_MIN, \PHP_INT_MAX, \PHP_INT_MAX],
-            [\PHP_INT_MAX, \PHP_INT_MIN, \PHP_INT_MAX],
-            [-2, \PHP_INT_MAX - 1, \PHP_INT_MAX],
-            [\PHP_INT_MAX - 1, -2, \PHP_INT_MAX],
-            // Step = PHP_INT_MAX with smaller spans
-            [0, \PHP_INT_MAX, \PHP_INT_MAX], [\PHP_INT_MAX, 0, \PHP_INT_MAX],
-            [\PHP_INT_MIN, -1, \PHP_INT_MAX], [-1, \PHP_INT_MIN, \PHP_INT_MAX],
+            // NOTE: steps of PHP_INT_MAX are deliberately absent — see
+            // testLargeStepSpanOverflowYieldsPinnedSequence for why native \range()
+            // cannot be the oracle there.
         ];
         foreach ($combos as $c) {
             $cases["range({$c[0]}, {$c[1]}, {$c[2]})"] = $c;
@@ -1031,23 +1091,29 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test mixed int/float operands produce the same output type as native \range()
+     * @test mixed int/float operands produce the documented output types
+     *
+     * Expectations are literals rather than native \range() output on purpose. PHP 8.3
+     * changed range() so that an integer-valued float step is interpreted as an int,
+     * while PHP 8.2 sends any float step down the float path. Single::range pins the
+     * PHP 8.3+ types on every supported version, so comparing against the running PHP's
+     * \range() would assert different things on 8.2 than on 8.3+.
      */
-    public function testMixedIntFloatOperandsMatchNativeTypes(): void
+    public function testMixedIntFloatOperandsProduceDocumentedTypes(): void
     {
         // int start, float end → all floats
-        $this->assertSame(\range(1, 5.0), \iterator_to_array(Single::range(1, 5.0), false));
+        $this->assertSame([1.0, 2.0, 3.0, 4.0, 5.0], \iterator_to_array(Single::range(1, 5.0), false));
 
         // float start, int end → all floats
-        $this->assertSame(\range(1.0, 5), \iterator_to_array(Single::range(1.0, 5), false));
+        $this->assertSame([1.0, 2.0, 3.0, 4.0, 5.0], \iterator_to_array(Single::range(1.0, 5), false));
 
         // int start, int end, int step → all ints
-        $this->assertSame(\range(1, 5, 1), \iterator_to_array(Single::range(1, 5, 1), false));
+        $this->assertSame([1, 2, 3, 4, 5], \iterator_to_array(Single::range(1, 5, 1), false));
 
-        // int operands, integer-valued float step → all ints (native behavior)
-        $this->assertSame(\range(1, 5, 1.0), \iterator_to_array(Single::range(1, 5, 1.0), false));
+        // int operands, integer-valued float step → all ints (PHP 8.3+ native behavior)
+        $this->assertSame([1, 2, 3, 4, 5], \iterator_to_array(Single::range(1, 5, 1.0), false));
 
         // int operands, fractional float step → all floats
-        $this->assertSame(\range(1, 5, 1.5), \iterator_to_array(Single::range(1, 5, 1.5), false));
+        $this->assertSame([1.0, 2.5, 4.0], \iterator_to_array(Single::range(1, 5, 1.5), false));
     }
 }

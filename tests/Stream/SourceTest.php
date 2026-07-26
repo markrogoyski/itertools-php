@@ -869,11 +869,12 @@ class SourceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test ofRange integer-valued float step on int operands keeps int output (matches native range)
+     * @test ofRange integer-valued float step on int operands keeps int output (matches PHP 8.3+ native range)
      */
     public function testOfRangeIntegerValuedFloatStepKeepsIntOutput(): void
     {
-        // Native PHP: range(1, 5, 1.0) → ints. Stream::ofRange must match.
+        // PHP 8.3+ native range(1, 5, 1.0) → ints; PHP 8.2 → floats. Stream::ofRange pins the
+        // 8.3+ types on every supported version, so the expectation is a literal, not \range().
         $this->assertSame([1, 2, 3, 4, 5], Stream::ofRange(1, 5, 1.0)->toArray());
         // Numeric-string endpoints with int-valued float step also keep int output.
         $this->assertSame([1, 2, 3, 4, 5], Stream::ofRange('1', '5', 1.0)->toArray());

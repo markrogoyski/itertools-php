@@ -1006,8 +1006,11 @@ final class Single
      * is used internally. A negative step is accepted only when the inferred direction
      * is descending, or when `$start == $end` (single-element range, step sign ignored).
      *
-     * Output type follows native `\range()`: a float `$start` or `$end` always promotes;
-     * an integer-valued float step on int operands preserves int output.
+     * Output type pins native `\range()`'s PHP 8.3+ semantics on every supported PHP version:
+     * a float `$start` or `$end` always promotes, and an integer-valued float step on int
+     * operands preserves int output. This is deliberately not a passthrough to whatever the
+     * running PHP does — PHP 8.2's native `\range()` sends any float step down the float path,
+     * so `range(1, 5, 1.0)` yields floats there but ints here.
      *
      * @param int|float $start
      * @param int|float $end

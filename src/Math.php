@@ -83,6 +83,12 @@ final class Math
      * {@see Math::frequencies()} — under non-strict comparison a numeric-string key
      * such as "1" collapses with the int key 1.
      *
+     * Under strict comparison those stay separate groups, but PHP array keys canonicalize
+     * numeric strings, so materializing the generator (via iterator_to_array, or a Stream
+     * terminal that builds an array) merges them and keeps only one of the two counts.
+     * Iterate the generator directly to observe every group, or use
+     * {@see Reduce::toCountBy()}, which combines such keys into one summed count instead.
+     *
      * @template T
      *
      * @param iterable<T>       $data

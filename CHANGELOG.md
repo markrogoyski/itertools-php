@@ -24,16 +24,16 @@
   * `isReversedBy` — true if values projected by a key function are non-increasing
 * Reduce
   * `toCountBy` — reduce to an array of counts keyed by a key function; key function must return `int|string`
-  * `toMedian` — reduce to the median value; mean of the two middle values for even-length input
+  * `toMedian` — reduce to the median value; mean of the two middle values for even-length input, computed without overflowing when those values sum beyond `PHP_FLOAT_MAX` and without losing precision when their span exceeds the integer range; two identical middle values return that value, including `INF`
   * `toMode` — reduce to a list of the most frequent values (all modes, in first-seen order)
-  * `toVariance` — reduce to the population (default) or sample variance
-  * `toStandardDeviation` — reduce to the population (default) or sample standard deviation
-  * `toPercentile` — reduce to the value at a percentile `[0, 100]` (R-7 / linear interpolation)
+  * `toVariance` — reduce to the population (default) or sample variance; a scaled online algorithm with a compensated running mean, giving a single pass in `O(1)` memory that never materializes the input, is order-stable to within floating-point rounding, and stays finite whenever the variance is representable even when intermediate quantities are not. A non-finite value anywhere in the input yields `NAN`, except where the `null` cases (empty collection, sample variance of a single value) apply — those take precedence
+  * `toStandardDeviation` — reduce to the population (default) or sample standard deviation; inherits `toVariance`'s single-pass, `O(1)`-memory, order-stability and overflow behavior
+  * `toPercentile` — reduce to the value at a percentile `[0, 100]` (R-7 / linear interpolation); interpolation does not overflow when the two neighbouring values span more than `PHP_FLOAT_MAX`, and percentile `50` returns exactly what `toMedian` returns
   * `toQuantile` — reduce to the value at a quantile `[0, 1]`
 * File
   * `writeLines` — write an iterable of lines to a file resource; separator inserted between lines, no trailing separator
   * `writeCsv` — write an iterable of rows to a file resource as CSV, with optional header row
-  * `readCsvAssoc` — iterate CSV rows as associative arrays keyed by header (inferred from the first row or supplied explicitly); validates headers and row-length consistency
+  * `readCsvAssoc` — iterate CSV rows as associative arrays keyed by header (inferred from the first row or supplied explicitly); validates headers and row-length consistency. Rows are `array<int|string, string|null>`: headers are strings, but PHP coerces canonical numeric-string headers (`"1"`, `"2020"`) to integer array keys
 * Stream
   * `mapWithKeys` — fluent key-aware map
   * `filterWithKeys` — fluent key-aware filter
@@ -58,11 +58,17 @@
   * `withFirstAndLast` — fluent pair each element with is-first/is-last flags
   * `reservoirSample` — fluent but **eager** single-pass uniform random sample; consumes the upstream immediately at call time
 
+### Breaking Changes
+
+All of the following are confined to `Stream::ofRange`, which previously delegated straight to PHP's native `\range()` and therefore inherited its per-version behavior.
+
+* `Stream::ofRange` numeric-string inputs are uniformly coerced to `int`/`float` before iteration. Previously, two matching numeric-string inputs without leading zeros would preserve string-typed output (e.g. `ofRange("1", "5")` yielded `["1", ..., "5"]`); now it yields `[1, ..., 5]`. Alpha string inputs continue to throw `\InvalidArgumentException` with the existing "must be numeric" message.
+* `Stream::ofRange` validation errors are now `\InvalidArgumentException` rather than PHP's `\ValueError`. Which layer rejects the input determines when it is raised: non-numeric strings, and numeric strings that overflow to a non-finite value (e.g. `ofRange("1e309", "1e310")`), are still rejected eagerly by `Stream::ofRange` itself, while the checks performed by `Single::range` — zero step, conflicting step direction, step magnitude greater than the span, non-finite `int|float` operands — are deferred until the first iteration (e.g. on `->toArray()`).
+* `Stream::ofRange(1, 5, -1)` now throws instead of yielding `[1, 2, 3, 4, 5]`. This affects PHP 8.2 callers only: PHP 8.3+ native `\range()` already rejected a negative step on an increasing range, so the sequence was never produced there. Use the absolute step magnitude or omit the step argument.
+* `Stream::ofRange` pins native `\range()`'s PHP 8.3+ numeric semantics on every supported PHP version, via `Single::range`. Most visibly, an integer-valued float step on integer operands now yields ints (`ofRange(1, 5, 1.0)` → `[1, 2, 3, 4, 5]`); PHP 8.2's native `\range()` sends any float step down the float path and yielded floats there.
+
 ### Changes
 * `Stream::ofRange` is now lazy — it no longer materializes the full sequence via `\range()` and delegates to `Single::range`. Composing it with downstream limiters (e.g. `Stream::ofRange(1, PHP_INT_MAX)->limit(5)`) is now safe.
-* `Stream::ofRange` numeric-string inputs are uniformly coerced to `int`/`float` before iteration. Previously, two matching numeric-string inputs without leading zeros would preserve string-typed output (e.g. `ofRange("1", "5")` yielded `["1", ..., "5"]`); now it yields `[1, ..., 5]`. Alpha string inputs continue to throw `\InvalidArgumentException` with the existing "must be numeric" message.
-* `Stream::ofRange` validation errors (zero step, conflicting direction, step magnitude greater than span, non-finite operands) now surface as `\InvalidArgumentException` at first iteration (e.g. on `->toArray()`), rather than at construction time via PHP's `\ValueError`.
-* `Stream::ofRange` is stricter than native `\range()` in two cases that previously succeeded via delegation: a step magnitude that exceeds the span (e.g. `ofRange(1, 5, 10)`, previously `[1]`) and a negative step that disagrees with the inferred direction (e.g. `ofRange(1, 5, -1)`, previously `[1, 2, 3, 4, 5]`) now both throw `\InvalidArgumentException`. Use the absolute step magnitude or omit the step argument.
 
 ### Bug Fixes
 * `Stream::peek` is now lazy per element, as documented. Previously it eagerly consumed the entire upstream and invoked the callback for every element at the time `peek()` was called, before any downstream operation ran (e.g. `->peek($fn)->limit(3)` invoked the callback for every element of the source). The callback now fires once per element as downstream operations pull elements through the stream; elements never consumed downstream are never peeked. Values and keys pass through unchanged.
