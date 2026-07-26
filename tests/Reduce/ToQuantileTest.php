@@ -183,4 +183,57 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEqualsWithDelta($percentile, $quantile, self::DELTA);
     }
+
+    /**
+     * @test         toQuantile does not overflow when the interpolated span exceeds PHP_FLOAT_MAX
+     * @dataProvider dataProviderForHugeSpan
+     * @param        array $data
+     * @param        float $quantile
+     * @param        float $expected
+     */
+    public function testInterpolationOverHugeSpanDoesNotOverflow(array $data, float $quantile, float $expected): void
+    {
+        // When
+        $result = Reduce::toQuantile($data, $quantile);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test toQuantile at the median quantile of the two integer extremes keeps the exact half-unit result
+     */
+    public function testMedianQuantileOfIntegerExtremesIsExact(): void
+    {
+        // Given the widest possible integer span, whose midpoint is exactly -0.5
+        $data = [\PHP_INT_MIN, \PHP_INT_MAX];
+
+        // When
+        $result = Reduce::toQuantile($data, 0.5);
+
+        // Then
+        $this->assertSame(-0.5, $result);
+    }
+
+    /**
+     * @test toQuantile between two identical infinities is that infinity
+     */
+    public function testInterpolationBetweenIdenticalInfinitiesIsThatInfinity(): void
+    {
+        // When
+        $result = Reduce::toQuantile([\INF, \INF], 0.5);
+
+        // Then
+        $this->assertSame(\INF, $result);
+    }
+
+    public static function dataProviderForHugeSpan(): array
+    {
+        return [
+            [[-1e308, 1e308], 0.5, 0.0],
+            [[-1e308, 1e308], 0.75, 5e307],
+            [[-1e308, 1e308], 0.25, -5e307],
+            [[-1.5e308, 1.5e308], 0.5, 0.0],
+        ];
+    }
 }

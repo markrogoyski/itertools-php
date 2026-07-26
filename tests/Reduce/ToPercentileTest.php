@@ -215,4 +215,119 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta(5000.5, $p50, self::DELTA);
         $this->assertEqualsWithDelta(10000, $p100, self::DELTA);
     }
+
+    /**
+     * @test         toPercentile does not overflow when the interpolated span exceeds PHP_FLOAT_MAX
+     * @dataProvider dataProviderForHugeSpan
+     * @param        array $data
+     * @param        float $percentile
+     * @param        float $expected
+     */
+    public function testInterpolationOverHugeSpanDoesNotOverflow(array $data, float $percentile, float $expected): void
+    {
+        // When
+        $result = Reduce::toPercentile($data, $percentile);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForHugeSpan(): array
+    {
+        return [
+            [[-1e308, 1e308], 50, 0.0],
+            [[-1e308, 1e308], 75, 5e307],
+            [[-1e308, 1e308], 25, -5e307],
+            [[-1.5e308, 1.5e308], 50, 0.0],
+        ];
+    }
+
+    /**
+     * @test toPercentile at the 50th percentile of the two integer extremes keeps the exact half-unit result
+     */
+    public function testMedianPercentileOfIntegerExtremesIsExact(): void
+    {
+        // Given the widest possible integer span, whose midpoint is exactly -0.5
+        $data = [\PHP_INT_MIN, \PHP_INT_MAX];
+
+        // When
+        $result = Reduce::toPercentile($data, 50);
+
+        // Then
+        $this->assertSame(-0.5, $result);
+    }
+
+    /**
+     * @test         toPercentile at the 50th percentile agrees with toMedian
+     * @dataProvider dataProviderForMedianAgreement
+     * @param        array $data
+     */
+    public function testFiftiethPercentileAgreesWithMedian(array $data): void
+    {
+        // When
+        $percentile = Reduce::toPercentile($data, 50);
+        $median     = Reduce::toMedian($data);
+
+        // Then
+        $this->assertSame($median, $percentile);
+    }
+
+    public static function dataProviderForMedianAgreement(): array
+    {
+        return [
+            [[1, 2]],
+            [[2, 4]],
+            [[1, 2, 3]],
+            [[1, 2, 3, 4]],
+            [[3, 1, 4, 1, 5, 9]],
+            [[\PHP_INT_MIN, \PHP_INT_MAX]],
+            [[-1e308, 1e308]],
+            [[1e308, 1e308]],
+            [[0.1, 0.1]],
+        ];
+    }
+
+    /**
+     * @test         toPercentile between two identical infinities is that infinity
+     * @dataProvider dataProviderForIdenticalInfiniteNeighbours
+     * @param        array $data
+     * @param        float $percentile
+     * @param        float $expected
+     */
+    public function testInterpolationBetweenIdenticalInfinitiesIsThatInfinity(
+        array $data,
+        float $percentile,
+        float $expected
+    ): void {
+        // When
+        $result = Reduce::toPercentile($data, $percentile);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForIdenticalInfiniteNeighbours(): array
+    {
+        return [
+            [[\INF, \INF], 50, \INF],
+            [[\INF, \INF], 25, \INF],
+            [[-\INF, -\INF], 50, -\INF],
+            [[1, \INF, \INF, \INF], 50, \INF],
+        ];
+    }
+
+    /**
+     * @test toPercentile interpolating between two identical neighbours returns that value exactly
+     */
+    public function testInterpolationBetweenIdenticalNeighboursIsExact(): void
+    {
+        // Given a value whose weighted recombination is not exact in binary floating point
+        $data = [0.1, 0.1, 0.1, 0.1];
+
+        // When (a percentile that lands strictly between two ranks)
+        $result = Reduce::toPercentile($data, 30);
+
+        // Then
+        $this->assertSame(0.1, $result);
+    }
 }

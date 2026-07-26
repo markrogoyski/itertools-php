@@ -163,4 +163,86 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta(3.5, $fromSorted, self::DELTA);
         $this->assertEqualsWithDelta($fromSorted, $fromUnsorted, self::DELTA);
     }
+
+    /**
+     * @test         toMedian does not overflow when the two middle values sum beyond PHP_FLOAT_MAX
+     * @dataProvider dataProviderForHugeMiddleValues
+     * @param        array $data
+     * @param        float $expected
+     */
+    public function testEvenMedianOfHugeValuesDoesNotOverflow(array $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toMedian($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForHugeMiddleValues(): array
+    {
+        return [
+            [[1e308, 1e308], 1e308],
+            [[1e308, 1.5e308], 1.25e308],
+            [[-1e308, -1e308], -1e308],
+            [[-1.5e308, -1e308], -1.25e308],
+            [[-1e308, 1e308], 0.0],
+            [[-1.5e308, 1e308], -2.5e307],
+        ];
+    }
+
+    /**
+     * @test toMedian of the two integer extremes keeps the exactly representable half-unit result
+     */
+    public function testEvenMedianOfIntegerExtremesIsExact(): void
+    {
+        // Given the widest possible integer span, whose midpoint is exactly -0.5
+        $data = [\PHP_INT_MIN, \PHP_INT_MAX];
+
+        // When
+        $result = Reduce::toMedian($data);
+
+        // Then (PHP_INT_MIN + PHP_INT_MAX is -1, so the midpoint is -0.5, not 0.0)
+        $this->assertSame(-0.5, $result);
+    }
+
+    /**
+     * @test         toMedian of two identical infinities is that infinity
+     * @dataProvider dataProviderForIdenticalInfiniteMiddleValues
+     * @param        array $data
+     * @param        float $expected
+     */
+    public function testEvenMedianOfIdenticalInfinitiesIsThatInfinity(array $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toMedian($data);
+
+        // Then (the midpoint of two equal values is that value, INF - INF notwithstanding)
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForIdenticalInfiniteMiddleValues(): array
+    {
+        return [
+            [[\INF, \INF], \INF],
+            [[-\INF, -\INF], -\INF],
+            // Sorts to [1, INF, INF, INF], so both middle values are INF
+            [[1, \INF, \INF, \INF], \INF],
+        ];
+    }
+
+    /**
+     * @test toMedian of two identical middle values returns that value exactly
+     */
+    public function testEvenMedianOfIdenticalMiddleValuesIsExact(): void
+    {
+        // Given a value whose halving-and-summing is not exact in binary floating point
+        $data = [0.1, 0.1];
+
+        // When
+        $result = Reduce::toMedian($data);
+
+        // Then
+        $this->assertSame(0.1, $result);
+    }
 }

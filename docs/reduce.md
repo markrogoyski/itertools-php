@@ -296,7 +296,7 @@ Reduces to the median value.
 
 ```Reduce::toMedian(iterable $data): int|float|null```
 
-- For an even number of elements, the median is the mean of the two middle values.
+- For an even number of elements, the median is the mean of the two middle values, computed so that it neither overflows when the two middle values sum beyond `PHP_FLOAT_MAX` nor loses precision when their span exceeds the integer range (`toMedian([PHP_INT_MIN, PHP_INT_MAX])` is `-0.5`, not `0.0`). Two identical middle values return that value, including `INF`.
 - Returns null if collection is empty.
 
 ```php
@@ -472,6 +472,8 @@ Reduces to its value at the given percentile.
 
 - Uses the R-7 / linear-interpolation method (the NumPy default). Percentile `0` is the minimum, `100` is the maximum.
 - `$percentile` must be in the inclusive range `[0, 100]`; otherwise throws `\InvalidArgumentException`.
+- The interpolation does not overflow when the two neighbouring values span more than `PHP_FLOAT_MAX`.
+- Percentile `50` returns exactly what `toMedian` returns, for every input.
 - Returns null if collection is empty.
 
 ```php
@@ -553,7 +555,9 @@ Reduces to the standard deviation of its values.
 ```Reduce::toStandardDeviation(iterable $data, bool $sample = false): float|null```
 
 - Square root of the variance. Population standard deviation by default; pass `$sample = true` for the sample standard deviation (Bessel's correction).
+- Inherits the single-pass, `O(1)`-memory and overflow behavior of `toVariance`.
 - Returns null if collection is empty, or for the sample standard deviation of a single value. The population standard deviation of a single value is `0.0`.
+- **The null cases take precedence over `NAN`**, matching `toVariance`: `toStandardDeviation([INF], true)` is `null`, while `toStandardDeviation([INF])` is `NAN`.
 
 ```php
 use IterTools\Reduce;
@@ -626,7 +630,12 @@ Reduces to the variance of its values.
 ```Reduce::toVariance(iterable $data, bool $sample = false): float|null```
 
 - Population variance by default; pass `$sample = true` for the sample variance (Bessel's correction — divides by `N - 1`).
+- Uses a scaled online algorithm with a compensated running mean: a single pass in `O(1)` memory, so the collection is never materialized and large lazy iterables are safe.
+- The result is stable across orderings of the input to within floating-point rounding. It is **not** bit-reproducible — floating-point addition is not associative, so different orderings may differ in the last ulp. The compensated mean does remove the gross order-dependence that an uncompensated one has for a large offset with a small spread (e.g. `1e16, 1e16 + 2, 1e16 + 4`, where the answer would otherwise vary by 50% with ordering).
+- Stays finite whenever the variance is representable, even when intermediate quantities are not: the variance of `[-1.4e154, 1.4e154, 0]` is `~1.31e308`, though the variance of its leading pair (`1.96e308`) already exceeds `PHP_FLOAT_MAX`.
+- A **non-finite value anywhere in the input yields `NAN`**, since deviations from an infinite mean are `INF - INF`. A variance that is itself too large to represent is reported as `INF`, never as a negative number.
 - Returns null if collection is empty, or for the sample variance of a single value (`N - 1 = 0` is undefined). The population variance of a single value is `0.0`.
+- **The null cases take precedence over `NAN`**: `toVariance([INF], true)` is `null`, not `NAN`, because with a single observation there is no sample variance to compute at all, whatever that observation happens to be. The population variance of one value is defined, so `toVariance([INF])` is `NAN`.
 
 ```php
 use IterTools\Reduce;

@@ -288,6 +288,54 @@ CSV_END;
     }
 
     /**
+     * @test readCsvAssoc keys rows by canonical numeric headers as integers (PHP array key coercion)
+     */
+    public function testReadCsvAssocNumericHeadersBecomeIntegerKeys(): void
+    {
+        // Given a CSV whose headers include a canonical numeric string
+        $file = FileFixture::createFromLines(['1,name', 'alpha,beta'], $this->root->url());
+
+        // When
+        $result = \iterator_to_array(File::readCsvAssoc($file), false);
+
+        // Then PHP coerces the canonical numeric header to an integer array key
+        $this->assertEquals([[1 => 'alpha', 'name' => 'beta']], $result);
+        $this->assertSame([1, 'name'], \array_keys($result[0]));
+    }
+
+    /**
+     * @test readCsvAssoc keeps non-canonical numeric-looking headers as string keys
+     */
+    public function testReadCsvAssocNonCanonicalNumericHeadersStayStrings(): void
+    {
+        // Given headers that look numeric but are not canonical integer strings
+        $file = FileFixture::createFromLines(['01,1.0, 1,+1', 'a,b,c,d'], $this->root->url());
+
+        // When
+        $result = \iterator_to_array(File::readCsvAssoc($file), false);
+
+        // Then
+        $this->assertSame(['01', '1.0', ' 1', '+1'], \array_keys($result[0]));
+    }
+
+    /**
+     * @test readCsvAssoc does not lose columns when numeric headers coerce to integer keys
+     */
+    public function testReadCsvAssocNumericHeadersDoNotCollide(): void
+    {
+        // Given a common real-world shape: year columns
+        $file = FileFixture::createFromLines(['2020,2021,2022', '10,20,30'], $this->root->url());
+
+        // When
+        $result = \iterator_to_array(File::readCsvAssoc($file), false);
+
+        // Then every column survives
+        $this->assertCount(3, $result[0]);
+        $this->assertSame([2020, 2021, 2022], \array_keys($result[0]));
+        $this->assertSame(['10', '20', '30'], \array_values($result[0]));
+    }
+
+    /**
      * @test readCsvAssoc rejects a non-resource argument
      */
     public function testReadCsvAssocError(): void

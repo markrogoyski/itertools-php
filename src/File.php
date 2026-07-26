@@ -70,13 +70,19 @@ final class File
      * distinguished from an empty field, so its lone null matches the one-header count and is yielded
      * as a row with a null value rather than throwing.
      *
+     * Headers are strings, but PHP array keys canonicalize: a header that is a canonical integer
+     * string ("1", "2020") becomes an integer key in the yielded rows, hence the int|string key
+     * type. This coercion is injective over canonical forms — non-canonical numeric-looking headers
+     * ("01", "1.0", " 1", "+1", digits beyond PHP_INT_MAX) stay string keys — so no column can be
+     * lost to a key collision, and the duplicate-header check already rejects the ambiguous cases.
+     *
      * @param resource           $fileResource File handle stream opened for reading
      * @param array<string>|null $headers      (optional) explicit header list; null infers from the first row
      * @param string             $separator
      * @param string             $enclosure
      * @param string             $escape
      *
-     * @return \Generator<array<string, string|null>>
+     * @return \Generator<array<int|string, string|null>>
      *
      * @throws \InvalidArgumentException if invalid resource given, or a header is empty, non-string, or duplicated
      * @throws \RuntimeException if a data row's field count does not match the header count

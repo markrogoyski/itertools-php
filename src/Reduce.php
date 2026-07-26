@@ -309,7 +309,8 @@ final class Reduce
      * Reduces given collection to its median value.
      *
      * For an even number of elements the median is the linear interpolation
-     * (mean) of the two middle values.
+     * (mean) of the two middle values, computed so that it does not overflow
+     * for middle values whose sum exceeds PHP_FLOAT_MAX.
      *
      * Returns null if given collection is empty.
      *
@@ -332,8 +333,7 @@ final class Reduce
             return $values[$mid];
         }
 
-        /** @psalm-suppress InvalidOperand */
-        return ($values[$mid - 1] + $values[$mid]) / 2;
+        return static::midpoint($values[$mid - 1], $values[$mid]);
     }
 
     /**
@@ -392,9 +392,29 @@ final class Reduce
      * Population variance by default; pass $sample = true for the sample variance
      * (Bessel's correction — divides by N - 1).
      *
+     * A single pass over the collection in O(1) memory, so the input is never materialized.
+     * Two refinements to the textbook online algorithm keep the result finite and stable:
+     * the running mean is carried in compensated (double-double) form, and the variance is
+     * carried in scaled form so that no intermediate quantity overflows while the final
+     * result is still representable.
+     *
+     * The result is stable across orderings of the input to within floating-point rounding.
+     * It is not bit-reproducible: floating-point addition is not associative, so different
+     * orderings may differ in the last ulp.
+     *
+     * A non-finite value anywhere in the input yields NAN, since deviations from an infinite
+     * mean are INF - INF. A variance that is itself too large to represent (for example values
+     * straddling zero at PHP_FLOAT_MAX, whose true variance approaches 1e616) is reported as
+     * INF, never as a negative number.
+     *
      * Returns null if given collection is empty. Also returns null for the sample
      * variance of a single value (N - 1 = 0 is undefined). The population variance
      * of a single value is 0.0.
+     *
+     * Those null cases take precedence over NAN: toVariance([INF], true) is null, not NAN,
+     * because with a single observation there is no sample variance to compute at all,
+     * whatever that observation happens to be. The population variance of one value is
+     * defined, so toVariance([INF]) is NAN.
      *
      * @param iterable<int|float> $data
      * @param bool                $sample population variance when false (default), sample variance when true
@@ -403,26 +423,101 @@ final class Reduce
      */
     public static function toVariance(iterable $data, bool $sample = false): ?float
     {
-        $values = static::toNumericList($data);
+        $count = 0;
 
-        $count = \count($values);
+        // The running mean is carried in double-double form ($meanHi + $meanLo). A mean that is not
+        // representable as a single double — the case for a large offset with an ulp-scale spread,
+        // such as 1e16, 1e16 + 2, 1e16 + 4, whose mean 1e16 + 2 lands between representable
+        // neighbours as the sequence is built up — would otherwise round away the very spread being
+        // measured, making the result depend on the order the values arrive in.
+        $meanHi = 0.0;
+        $meanLo = 0.0;
+
+        // The variance is carried in scaled form as $scale ** 2 * $weight, and $scale ** 2 is never
+        // materialized. Storing the variance directly overflows on an intermediate prefix even when
+        // the final result is representable: for [-1.4e154, 1.4e154, 0] the variance of the leading
+        // pair is 1.96e308, past PHP_FLOAT_MAX, and a saturated accumulator can never come back down
+        // to the representable answer of 1.31e308. $scale tracks the largest deviation step seen and
+        // $weight the remaining factor, so magnitude and multiplicity stay separated until the end.
+        $scale  = 0.0;
+        $weight = 0.0;
+
+        // A non-finite input has to be tracked explicitly rather than inferred from the accumulator:
+        // for all-equal values such as [5, 5, NAN] the spread stays zero and the NAN leaves no trace.
+        $hasNonFinite = false;
+
+        foreach ($data as $value) {
+            ++$count;
+
+            if (!\is_finite((float) $value)) {
+                $hasNonFinite = true;
+            }
+
+            /** @psalm-suppress InvalidOperand */
+            $delta = ($value - $meanHi) - $meanLo;
+            /** @psalm-suppress InvalidOperand */
+            $step = $delta / $count;
+
+            // $meanHi + $step in double-double: 2Sum recovers the low bits the addition rounds off.
+            $sum     = $meanHi + $step;
+            $shifted = $sum - $meanHi;
+            $meanLo += ($meanHi - ($sum - $shifted)) + ($step - $shifted);
+            $meanHi  = $sum;
+
+            if (\is_finite($meanHi)) {
+                // Renormalize so $meanHi carries the leading bits and $meanLo only the residue.
+                $renormalized = $meanHi + $meanLo;
+                $meanLo      -= $renormalized - $meanHi;
+                $meanHi       = $renormalized;
+            } else {
+                // The mean itself overflowed, making the compensation term NAN (from INF - INF).
+                // Discard it so that subsequent deviations stay signed infinities rather than NAN.
+                $meanLo = 0.0;
+            }
+
+            if ($count > 1) {
+                // The normalized form of Welford's M2_n = M2_{n-1} + delta^2 * (n-1)/n, divided
+                // through by n and then rewritten over $scale: with t = |delta/n| the update is
+                // var_n = var_{n-1} * (n-1)/n + t^2 * (n-1). Both terms are non-negative, so the
+                // accumulator can reach INF but can never go negative.
+                $t      = \abs($step);
+                $shrink = ($count - 1) / $count;
+
+                if ($t > $scale) {
+                    // Rebase onto the larger scale. The ratio is below 1, so nothing can overflow.
+                    $ratio = $scale / $t;
+                    /** @psalm-suppress InvalidOperand */
+                    $weight = $weight * $ratio * $ratio * $shrink + ($count - 1);
+                    $scale  = $t;
+                } else {
+                    // $scale is 0 only while every step has been 0, and infinite only once a
+                    // deviation has already overflowed; in both cases the contribution is 0.
+                    $ratio = ($scale > 0.0 && \is_finite($scale)) ? $t / $scale : 0.0;
+                    /** @psalm-suppress InvalidOperand */
+                    $weight = $weight * $shrink + $ratio * $ratio * ($count - 1);
+                }
+            }
+        }
+
+        // Checked before $hasNonFinite: an undefined divisor is a property of the collection's size,
+        // not of its values, so null wins over NAN for the sample variance of one non-finite value.
         if ($count === 0 || ($sample && $count === 1)) {
             return null;
         }
 
-        /** @psalm-suppress InvalidOperand */
-        $mean = \array_sum($values) / $count;
-
-        $sumSquaredDiffs = 0.0;
-        foreach ($values as $value) {
-            /** @psalm-suppress InvalidOperand */
-            $sumSquaredDiffs += ($value - $mean) ** 2;
+        if ($hasNonFinite) {
+            return \NAN;
         }
 
-        $divisor = $sample ? $count - 1 : $count;
+        // Unscale by interleaving the two multiplications. ($scale * $scale) * $weight would reach
+        // INF for a representable variance whenever $weight < 1, which is exactly the prefix-overflow
+        // case; multiplying $weight in first keeps every intermediate within range.
+        $variance = ($scale * $weight) * $scale;
 
+        // Bessel's correction, applied as a single ratio so that a large population variance is not
+        // pushed to INF by an intermediate multiplication.
         /** @psalm-suppress InvalidOperand */
-        return $sumSquaredDiffs / $divisor;
+        return $sample ? $variance * ($count / ($count - 1)) : $variance;
     }
 
     /**
@@ -430,6 +525,11 @@ final class Reduce
      *
      * Square root of the variance. Population standard deviation by default; pass
      * $sample = true for the sample standard deviation (Bessel's correction).
+     *
+     * Inherits the single-pass, O(1)-memory and overflow behavior of {@see Reduce::toVariance()}.
+     *
+     * The null cases likewise take precedence over NAN: toStandardDeviation([INF], true)
+     * is null, while toStandardDeviation([INF]) is NAN.
      *
      * Returns null whenever the underlying variance is null (empty collection, or
      * the sample standard deviation of a single value). The population standard
@@ -453,6 +553,9 @@ final class Reduce
      * Uses the R-7 / linear-interpolation method (the NumPy default): the
      * percentile rank is mapped onto the sorted values and interpolated between
      * the two nearest ranks. Percentile 0 is the minimum, 100 is the maximum.
+     *
+     * The interpolation does not overflow when the two neighbouring values span more
+     * than PHP_FLOAT_MAX (for example straddling zero at extreme magnitudes).
      *
      * Returns null if given collection is empty.
      *
@@ -491,8 +594,7 @@ final class Reduce
             return $values[$lowerIndex];
         }
 
-        /** @psalm-suppress InvalidOperand */
-        return $values[$lowerIndex] + $fraction * ($values[$lowerIndex + 1] - $values[$lowerIndex]);
+        return static::interpolate($values[$lowerIndex], $values[$lowerIndex + 1], $fraction);
     }
 
     /**
@@ -550,6 +652,80 @@ final class Reduce
         \sort($values);
 
         return $values;
+    }
+
+    /**
+     * Computes the midpoint of two numbers without overflowing on extreme magnitudes.
+     *
+     * Equal values short-circuit. Beyond that, which form is safe depends only on the signs, so
+     * neither branch can overflow:
+     *
+     * - Opposite signs (or a zero): $lo + $hi cannot overflow, because the magnitudes cancel rather
+     *   than add. This form is used because it is also exact for integers — the span PHP_INT_MAX -
+     *   PHP_INT_MIN overflows into a float and rounds away the one-unit asymmetry, turning the true
+     *   midpoint -0.5 into 0.0, whereas PHP_INT_MIN + PHP_INT_MAX is exactly -1.
+     * - Same sign: $hi - $lo cannot overflow, because the magnitudes subtract. This form returns
+     *   $lo exactly when the two values are equal, which halving each operand would not do for
+     *   subnormals, and it keeps the integer result that (($lo + $hi) / 2) gives for evenly
+     *   divisible integer inputs.
+     *
+     * @param int|float $lo
+     * @param int|float $hi
+     *
+     * @return int|float
+     */
+    private static function midpoint(int|float $lo, int|float $hi): int|float
+    {
+        // The midpoint of a value and itself is that value. Taken first so that two identical
+        // infinities return that infinity rather than the NAN that INF - INF would give below.
+        if ($lo === $hi) {
+            return $lo;
+        }
+
+        if (($lo <= 0 && $hi >= 0) || ($hi <= 0 && $lo >= 0)) {
+            /** @psalm-suppress InvalidOperand */
+            return ($lo + $hi) / 2;
+        }
+
+        /** @psalm-suppress InvalidOperand */
+        return $lo + ($hi - $lo) / 2;
+    }
+
+    /**
+     * Linearly interpolates between two numbers without overflowing on extreme magnitudes.
+     *
+     * The direct form $lo + $fraction * ($hi - $lo) is preferred: it returns $lo exactly when the
+     * two values are equal, which the weighted form does not (0.1 * 0.7 + 0.1 * 0.3 is not 0.1).
+     * It is only abandoned when the span $hi - $lo is itself unrepresentable, where the weighted
+     * form is used instead — being a convex combination it always lies between $lo and $hi and so
+     * cannot overflow.
+     *
+     * A fraction of exactly 0.5 is delegated to {@see Reduce::midpoint()}: that is the one
+     * interpolation computable exactly for integer bounds, and delegating keeps
+     * toPercentile($data, 50) identical to toMedian($data) rather than merely close to it.
+     *
+     * @param int|float $lo
+     * @param int|float $hi
+     * @param float     $fraction in the inclusive range [0, 1]
+     *
+     * @return int|float
+     */
+    private static function interpolate(int|float $lo, int|float $hi, float $fraction): int|float
+    {
+        if ($fraction === 0.5) {
+            return static::midpoint($lo, $hi);
+        }
+
+        /** @psalm-suppress InvalidOperand */
+        $span = $hi - $lo;
+
+        if (\is_finite((float) $span)) {
+            /** @psalm-suppress InvalidOperand */
+            return $lo + $fraction * $span;
+        }
+
+        /** @psalm-suppress InvalidOperand */
+        return $lo * (1 - $fraction) + $hi * $fraction;
     }
 
     /**

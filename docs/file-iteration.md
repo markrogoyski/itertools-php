@@ -31,6 +31,8 @@ If `$headers` is `null`, the first row of the file is consumed and used as the h
 
 Headers (inferred or explicit) are validated before any data is yielded: each header must be a non-empty string, and the list must be unique. A data row whose field count differs from the header count throws a `\RuntimeException` naming the 1-based data row number (blank lines are reported by `fgetcsv` as a single field and so trigger this error rather than being silently skipped). The one exception is a single-column file: there a blank line cannot be distinguished from an empty field, so it is yielded as a row with a `null` value instead of throwing.
 
+Headers are strings, but PHP array keys canonicalize: a header that is a canonical integer string (`"1"`, `"2020"`) becomes an **integer** key in the yielded rows, so a row is `array<int|string, string|null>`. This coercion is injective over canonical forms — non-canonical numeric-looking headers (`"01"`, `"1.0"`, `" 1"`, `"+1"`, digits beyond `PHP_INT_MAX`) stay string keys — so no column can be lost to a key collision, and the duplicate-header check already rejects the ambiguous cases.
+
 ```php
 use IterTools\File;
 
