@@ -9,12 +9,12 @@
 ### ASort
 Сортирует коллекцию с сохранением ключей.
 
-```Sort::sort(iterable $data, callable $comparator = null)```
+```Sort::asort(iterable $data, ?callable $comparator = null)```
 
 Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
 
 ```php
-use IterTools\Single;
+use IterTools\Sort;
 $worldPopulations = [
     'China'     => 1_439_323_776,
     'India'     => 1_380_004_385,
@@ -22,7 +22,7 @@ $worldPopulations = [
     'Pakistan'  => 220_892_340,
     'USA'       => 331_002_651,
 ];
-foreach (Sort::sort($worldPopulations) as $country => $population) {
+foreach (Sort::asort($worldPopulations) as $country => $population) {
     print("$country: $population" . \PHP_EOL);
 }
 // Pakistan: 220,892,340
@@ -35,12 +35,12 @@ foreach (Sort::sort($worldPopulations) as $country => $population) {
 ### Sort
 Сортирует коллекцию.
 
-```Sort::sort(iterable $data, callable $comparator = null)```
+```Sort::sort(iterable $data, ?callable $comparator = null)```
 
 Если `$comparator` не передан, элементы коллекции должны быть сравнимы.
 
 ```php
-use IterTools\Single;
+use IterTools\Sort;
 
 $data = [3, 4, 5, 9, 8, 7, 1, 6, 2];
 

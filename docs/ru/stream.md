@@ -233,7 +233,7 @@ $withInitial = Stream::of($numbers)
 #### ASort
 Сортирует коллекцию в потоке с сохранением ключей.
 
-```$stream->asort(callable $comparator = null)```
+```$stream->asort(?callable $comparator = null)```
 
 Если `$comparator` не передан, элементы хранимой коллекции должны быть сравнимы.
 
@@ -664,7 +664,7 @@ $result = Stream::of($input)
 #### Filter True
 Возвращает из потока только истинные элементы. Истинность определяется предикатом.
 
-```$stream->filterTrue(callable $predicate = null): Stream```
+```$stream->filterTrue(?callable $predicate = null): Stream```
 
 По умолчанию (если не передан) предикат приводит элементы коллекции к `bool`.
 
@@ -680,7 +680,7 @@ $result = Stream::of($input)
 #### Filter False
 Возвращает из потока только ложные элементы. Истинность определяется предикатом.
 
-```$stream->filterFalse(callable $predicate = null): Stream```
+```$stream->filterFalse(?callable $predicate = null): Stream```
 
 По умолчанию (если не передан) предикат приводит элементы коллекции к `bool`.
 

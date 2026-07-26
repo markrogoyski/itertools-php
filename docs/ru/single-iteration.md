@@ -54,7 +54,7 @@ foreach (Single::chunkwise($movies, 3) as $trilogy) {
 // [
 //     ['Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith'],
 //     ['A New Hope', 'Empire Strikes Back', 'Return of the Jedi'],
-//     ['The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker]'
+//     ['The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker']
 // ]
 ```
 
@@ -80,7 +80,7 @@ foreach (Single::chunkwiseOverlap($numbers, 3, 1) as $chunk) {
 ### Compress
 Отфильтровывает невыбранные элементы из коллекции.
 
-```Single::compress(string $data, $selectors)```
+```Single::compress(iterable $data, iterable $selectors)```
 
 ```php
 use IterTools\Single;
@@ -101,7 +101,7 @@ foreach (Single::compress($movies, $goodMovies) as $goodMovie) {
 ### Compress Associative
 Возвращает элементы из коллекции по заданным ключам.
 
-```Single::compressAssociative(string $data, array $selectorKeys)```
+```Single::compressAssociative(iterable $data, array $selectorKeys)```
 
 * Ключами могут быть только строки или целые числа (по аналогии с ключами PHP-массивов).
 
@@ -208,7 +208,7 @@ foreach (Single::filter($starWarsEpisodes, $goodMoviePredicate) as $goodMovie) {
 
 Если предикат не передан, значения элементов коллекции приводятся к `bool` для оценки.
 
-```Single::filterFalse(iterable $data, callable $predicate = null)```
+```Single::filterTrue(iterable $data, ?callable $predicate = null)```
 
 ```php
 use IterTools\Single;
@@ -225,7 +225,7 @@ foreach (Single::filterTrue($reportCardGrades) as $goodGrade) {
 
 Если предикат не передан, значения элементов коллекции приводятся к `bool` для оценки.
 
-```Single::filterFalse(iterable $data, callable $predicate = null)```
+```Single::filterFalse(iterable $data, ?callable $predicate = null)```
 
 ```php
 use IterTools\Single;
@@ -341,7 +341,7 @@ foreach (Single::flatten($multidimensional) as $number) {
 ### Group By
 Группирует элементы коллекции по заданному правилу.
 
-```Single::groupBy(iterable $data, callable $groupKeyFunction, callable $itemKeyFunction = null)```
+```Single::groupBy(iterable $data, callable $groupKeyFunction, ?callable $itemKeyFunction = null)```
 
 * Функция `$groupKeyFunction` должна возвращать общий ключ (или коллекцию ключей) для элементов группы.
 * Функция `$itemKeyFunction` (опциональный аргумент) позволяет назначить кастомные индексы эелементам в группе.
@@ -590,7 +590,7 @@ foreach (Single::repeat($data, $repetitions) as $repeated) {
 ### Reindex
 Переиндексирует key-value коллекцию, используя функцию-индексатор.
 
-```Single::reindex(string $data, callable $indexer)```
+```Single::reindex(iterable $data, callable $indexer)```
 
 ```php
 use IterTools\Single;
@@ -680,7 +680,7 @@ foreach (Single::skip($prequelsRemoved, 3, 3) as $nonSequel) {
 
 Ленивая операция: источник никогда не продвигается дальше последнего возвращённого элемента, поэтому источник с побочными эффектами (файловый дескриптор, постраничные HTTP-запросы, курсор БД) не вычитывается лишний раз. При `$count`, равном 0, источник не затрагивается вовсе. Элементы, пропускаемые из-за `$start` или `$step`, всё же должны быть вычитаны, чтобы быть пропущенными.
 
-```Single::slice(iterable $data, int $start = 0, int $count = null, int $step = 1)```
+```Single::slice(iterable $data, int $start = 0, ?int $count = null, int $step = 1)```
 
 ```php
 use IterTools\Single;

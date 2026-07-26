@@ -240,7 +240,7 @@ $withInitial = Stream::of($numbers)
 #### ASort
 Sorts the stream, maintaining keys.
 
-```$stream->asort(callable $comparator = null)```
+```$stream->asort(?callable $comparator = null)```
 
 If comparator is not provided, the elements of the iterable source must be comparable.
 
@@ -654,7 +654,7 @@ $result = Stream::of($seasons)
 ```
 
 #### Filter
-Filter out elements from the stream only keeping elements where there predicate function is true.
+Filter out elements from the stream only keeping elements where the predicate function is true.
 
 ```$stream->filter(callable $predicate): Stream```
 
@@ -670,9 +670,10 @@ $result = Stream::of($input)
 ```
 
 #### Filter True
-Filter out elements from the stream only keeping elements that are truthy.
+Filter out elements from the stream only keeping elements that are truthy. If a predicate is
+provided, keep only the elements for which it returns true.
 
-```$stream->filterTrue(): Stream```
+```$stream->filterTrue(?callable $predicate = null): Stream```
 
 ```php
 use IterTools\Stream;
@@ -686,9 +687,10 @@ $result = Stream::of($input)
 ```
 
 #### Filter False
-Filter out elements from the stream only keeping elements that are falsy.
+Filter out elements from the stream only keeping elements that are falsy. If a predicate is
+provided, keep only the elements for which it returns false.
 
-```$stream->filterFalse(): Stream```
+```$stream->filterFalse(?callable $predicate = null): Stream```
 
 ```php
 use IterTools\Stream;
@@ -702,7 +704,7 @@ $result = Stream::of($input)
 ```
 
 #### Filter Keys
-Filter out elements from stream only keeping elements where the predicate function on the keys are true.
+Filter out elements from the stream only keeping elements where the predicate function on the keys is true.
 
 ```$stream->filterKeys(callable $filter): Stream```
 
@@ -3523,4 +3525,3 @@ $items = [$string, $array, $object];
 Stream::of($words)->varDump();
 // var_dump output
 ```
-

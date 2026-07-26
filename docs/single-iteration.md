@@ -54,7 +54,7 @@ foreach (Single::chunkwise($movies, 3) as $trilogy) {
 // [
 //     ['Phantom Menace', 'Attack of the Clones', 'Revenge of the Sith'],
 //     ['A New Hope', 'Empire Strikes Back', 'Return of the Jedi'],
-//     ['The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker]'
+//     ['The Force Awakens', 'The Last Jedi', 'The Rise of Skywalker']
 // ]
 ```
 
@@ -80,7 +80,7 @@ foreach (Single::chunkwiseOverlap($numbers, 3, 1) as $chunk) {
 ### Compress
 Compress an iterable by filtering out data that is not selected.
 
-```Single::compress(string $data, $selectors)```
+```Single::compress(iterable $data, iterable $selectors)```
 
 ```php
 use IterTools\Single;
@@ -101,7 +101,7 @@ foreach (Single::compress($movies, $goodMovies) as $goodMovie) {
 ### Compress Associative
 Compress an iterable by filtering out keys that are not selected.
 
-```Single::compressAssociative(string $data, array $selectorKeys)```
+```Single::compressAssociative(iterable $data, array $selectorKeys)```
 
 * Standard PHP array/iterator keys only (string, integer).
 
@@ -208,7 +208,7 @@ foreach (Single::filter($starWarsEpisodes, $goodMoviePredicate) as $goodMovie) {
 ### Filter True
 Filter out elements from the iterable only returning elements that are truthy.
 
-```Single::filterTrue(iterable $data)```
+```Single::filterTrue(iterable $data, ?callable $predicate = null)```
 
 ```php
 use IterTools\Single;
@@ -226,7 +226,7 @@ Filter out elements from the iterable only returning elements where the predicat
 
 If no predicate is provided, the boolean value of the data is used.
 
-```Single::filterFalse(iterable $data, callable $predicate)```
+```Single::filterFalse(iterable $data, ?callable $predicate = null)```
 
 ```php
 use IterTools\Single;
@@ -352,7 +352,7 @@ foreach (Single::flatten($multidimensional) as $number) {
 ### Group By
 Group data by a common data element.
 
-```Single::groupBy(iterable $data, callable $groupKeyFunction, callable $itemKeyFunction = null)```
+```Single::groupBy(iterable $data, callable $groupKeyFunction, ?callable $itemKeyFunction = null)```
 
 * The `$groupKeyFunction` determines the key to group elements by.
 * The optional `$itemKeyFunction` allows custom indexes within each group member.
@@ -599,7 +599,7 @@ foreach (Single::repeat($data, $repetitions) as $repeated) {
 ### Reindex
 Reindex keys of key-value iterable using indexer function.
 
-```Single::reindex(string $data, callable $indexer)```
+```Single::reindex(iterable $data, callable $indexer)```
 
 ```php
 use IterTools\Single;
@@ -693,7 +693,7 @@ Extract a slice of the iterable.
 
 Lazy: the source is never advanced beyond the last element that is yielded, so a side-effecting source (file handle, HTTP pagination, database cursor) is not over-read. A count of 0 does not touch the source at all. Elements skipped by `$start` or `$step` must still be pulled in order to be skipped over.
 
-```Single::slice(iterable $data, int $start = 0, int $count = null, int $step = 1)```
+```Single::slice(iterable $data, int $start = 0, ?int $count = null, int $step = 1)```
 
 ```php
 use IterTools\Single;

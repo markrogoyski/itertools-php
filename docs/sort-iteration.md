@@ -9,12 +9,12 @@ Tools for iterating sorted collections.
 ### ASort
 Iterate the collection sorted while maintaining the associative key index relations.
 
-```Sort::sort(iterable $data, callable $comparator = null)```
+```Sort::asort(iterable $data, ?callable $comparator = null)```
 
 Uses default sorting if optional comparator function not provided.
 
 ```php
-use IterTools\Single;
+use IterTools\Sort;
 
 $worldPopulations = [
     'China'     => 1_439_323_776,
@@ -24,7 +24,7 @@ $worldPopulations = [
     'USA'       => 331_002_651,
 ];
 
-foreach (Sort::sort($worldPopulations) as $country => $population) {
+foreach (Sort::asort($worldPopulations) as $country => $population) {
     print("$country: $population" . \PHP_EOL);
 }
 // Pakistan: 220,892,340
@@ -37,12 +37,12 @@ foreach (Sort::sort($worldPopulations) as $country => $population) {
 ### Sort
 Iterate the collection sorted.
 
-```Sort::sort(iterable $data, callable $comparator = null)```
+```Sort::sort(iterable $data, ?callable $comparator = null)```
 
 Uses default sorting if optional comparator function not provided.
 
 ```php
-use IterTools\Single;
+use IterTools\Sort;
 
 $data = [3, 4, 5, 9, 8, 7, 1, 6, 2];
 
