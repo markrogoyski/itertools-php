@@ -173,4 +173,25 @@ class DuplicatesTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame([0, 1], $keys);
     }
+    /**
+     * @test duplicates reports nothing for freshly built objects
+     */
+    public function testReportsNoDuplicatesForFreshObjects(): void
+    {
+        // Given
+        $source = (static function (): \Generator {
+            for ($i = 1; $i <= 6; ++$i) {
+                yield (object) ['value' => $i];
+            }
+        })();
+
+        // When
+        $ids = [];
+        foreach (Set::duplicates($source) as $value) {
+            $ids[] = \spl_object_id($value);
+        }
+
+        // Then
+        $this->assertSame([], $ids);
+    }
 }

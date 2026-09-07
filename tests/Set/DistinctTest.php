@@ -1377,4 +1377,25 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($obj1, $result[0]);
         $this->assertSame($obj2, $result[1]);
     }
+    /**
+     * @test distinct keeps freshly built objects distinct when the consumer does not retain them
+     */
+    public function testKeepsFreshObjectsDistinctWhenConsumerDiscardsThem(): void
+    {
+        // Given
+        $source = (static function (): \Generator {
+            for ($i = 1; $i <= 6; ++$i) {
+                yield (object) ['value' => $i];
+            }
+        })();
+
+        // When
+        $ids = [];
+        foreach (Set::distinct($source) as $value) {
+            $ids[] = \spl_object_id($value);
+        }
+
+        // Then
+        $this->assertCount(6, $ids);
+    }
 }

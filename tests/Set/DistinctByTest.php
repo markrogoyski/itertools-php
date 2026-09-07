@@ -686,4 +686,18 @@ class DistinctByTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+    /**
+     * @test distinctBy keeps freshly projected objects distinct
+     */
+    public function testKeepsFreshlyProjectedObjectsDistinct(): void
+    {
+        // When
+        $ids = [];
+        foreach (Set::distinctBy([1, 2, 3, 4, 5, 6], static fn (int $value): object => (object) ['value' => $value]) as $value) {
+            $ids[] = $value;
+        }
+
+        // Then
+        $this->assertSame([1, 2, 3, 4, 5, 6], $ids);
+    }
 }

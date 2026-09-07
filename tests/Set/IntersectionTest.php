@@ -730,4 +730,30 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);
     }
+    /**
+     * @test intersection of disjoint fresh objects is empty
+     */
+    public function testIsEmptyForDisjointFreshObjects(): void
+    {
+        // Given
+        $left = (static function (): \Generator {
+            for ($i = 1; $i <= 6; ++$i) {
+                yield (object) ['value' => $i];
+            }
+        })();
+        $right = (static function (): \Generator {
+            for ($i = 1; $i <= 6; ++$i) {
+                yield (object) ['value' => $i];
+            }
+        })();
+
+        // When
+        $ids = [];
+        foreach (Set::intersection($left, $right) as $value) {
+            $ids[] = \spl_object_id($value);
+        }
+
+        // Then
+        $this->assertSame([], $ids);
+    }
 }

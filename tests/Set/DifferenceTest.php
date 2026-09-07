@@ -541,4 +541,30 @@ class DifferenceTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);
     }
+    /**
+     * @test difference keeps every value when both sides are disjoint fresh objects
+     */
+    public function testKeepsEveryValueForDisjointFreshObjects(): void
+    {
+        // Given
+        $left = (static function (): \Generator {
+            for ($i = 1; $i <= 6; ++$i) {
+                yield (object) ['value' => $i];
+            }
+        })();
+        $right = (static function (): \Generator {
+            for ($i = 1; $i <= 6; ++$i) {
+                yield (object) ['value' => $i];
+            }
+        })();
+
+        // When
+        $ids = [];
+        foreach (Set::difference($left, $right) as $value) {
+            $ids[] = \spl_object_id($value);
+        }
+
+        // Then
+        $this->assertCount(6, $ids);
+    }
 }

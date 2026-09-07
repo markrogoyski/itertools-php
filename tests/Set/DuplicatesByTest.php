@@ -178,4 +178,18 @@ class DuplicatesByTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame([0, 1], $keys);
     }
+    /**
+     * @test duplicatesBy reports nothing when every projection is a fresh object
+     */
+    public function testReportsNoDuplicatesForFreshlyProjectedObjects(): void
+    {
+        // When
+        $result = [];
+        foreach (Set::duplicatesBy([1, 2, 3, 4, 5, 6], static fn (int $value): object => (object) ['value' => $value]) as $value) {
+            $result[] = $value;
+        }
+
+        // Then
+        $this->assertSame([], $result);
+    }
 }

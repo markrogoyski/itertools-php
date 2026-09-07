@@ -32,13 +32,16 @@ final class Set
      */
     public static function distinct(iterable $data, bool $strict = true): \Generator
     {
-        $map = [];
+        // Values are stored, not just flagged: in strict mode an object's ID string comes from
+        // its spl_object_id, which PHP reuses once the object is freed. Keeping the value alive
+        // keeps that ID reserved so a later, unrelated object cannot inherit it.
+        $seen = [];
 
         foreach ($data as $datum) {
             $hash = UniqueExtractor::getString($datum, $strict);
 
-            if (!isset($map[$hash])) {
-                $map[$hash] = true;
+            if (!\array_key_exists($hash, $seen)) {
+                $seen[$hash] = $datum;
                 yield $datum;
             }
         }
@@ -56,13 +59,15 @@ final class Set
      */
     public static function distinctBy(iterable $data, callable $compareBy): \Generator
     {
-        $map = [];
+        // Projected values are stored so their spl_object_id stays reserved; see distinct().
+        $seen = [];
 
         foreach ($data as $datum) {
-            $hash = UniqueExtractor::getString($compareBy($datum), true);
+            $comparable = $compareBy($datum);
+            $hash = UniqueExtractor::getString($comparable, true);
 
-            if (!isset($map[$hash])) {
-                $map[$hash] = true;
+            if (!\array_key_exists($hash, $seen)) {
+                $seen[$hash] = $comparable;
                 yield $datum;
             }
         }
@@ -88,13 +93,14 @@ final class Set
      */
     public static function duplicates(iterable $data, bool $strict = true): \Generator
     {
+        // Values are stored so their spl_object_id stays reserved; see distinct().
         $seen = [];
         $emitted = [];
 
         foreach ($data as $datum) {
             $hash = UniqueExtractor::getString($datum, $strict);
-            if (!isset($seen[$hash])) {
-                $seen[$hash] = true;
+            if (!\array_key_exists($hash, $seen)) {
+                $seen[$hash] = $datum;
                 continue;
             }
             if (!isset($emitted[$hash])) {
@@ -121,13 +127,15 @@ final class Set
      */
     public static function duplicatesBy(iterable $data, callable $keyFn): \Generator
     {
+        // Extracted keys are stored so their spl_object_id stays reserved; see distinct().
         $seen = [];
         $emitted = [];
 
         foreach ($data as $datum) {
-            $hash = UniqueExtractor::getString($keyFn($datum), true);
-            if (!isset($seen[$hash])) {
-                $seen[$hash] = true;
+            $key = $keyFn($datum);
+            $hash = UniqueExtractor::getString($key, true);
+            if (!\array_key_exists($hash, $seen)) {
+                $seen[$hash] = $key;
                 continue;
             }
             if (!isset($emitted[$hash])) {
@@ -440,7 +448,6 @@ final class Set
         iterable ...$iterables
     ): \Generator {
         $usageMap = new UsageMap($strict);
-        $valuesMap = [];
 
         $multipleIterator = new JustifyMultipleIterator(NoValueMonad::getInstance(), ...$iterables);
 
@@ -452,15 +459,13 @@ final class Set
 
                 $usageMap->addUsage($value, (string)$owner);
 
-                $valuesMap[UniqueExtractor::getString($value, $strict)] = $value;
-
                 if ($usageMap->getOwnersCount($value) === \count($iterables)) {
                     $usageMap->deleteUsage($value);
                 }
             }
         }
 
-        foreach ($valuesMap as $value) {
+        foreach ($usageMap->getValues() as $value) {
             foreach (Single::repeat($value, $usageMap->getUsagesCount($value)) as $item) {
                 yield $item;
             }
@@ -481,20 +486,27 @@ final class Set
         iterable $a,
         iterable ...$iterables
     ): \Generator {
-        $subtractCounts = [];
+        /**
+         * Each entry pairs a remaining count with the value it was derived from. Holding the
+         * value keeps its spl_object_id reserved in strict mode, so a later object from $a
+         * cannot inherit the ID of an already-freed one and be subtracted by mistake.
+         *
+         * @var array<string, array{0: int, 1: mixed}> $subtracted
+         */
+        $subtracted = [];
 
         foreach ($iterables as $iterable) {
             foreach ($iterable as $value) {
                 $hash = UniqueExtractor::getString($value, $strict);
-                $subtractCounts[$hash] = ($subtractCounts[$hash] ?? 0) + 1;
+                $subtracted[$hash] = [($subtracted[$hash][0] ?? 0) + 1, $value];
             }
         }
 
         foreach ($a as $value) {
             $hash = UniqueExtractor::getString($value, $strict);
 
-            if (isset($subtractCounts[$hash]) && $subtractCounts[$hash] > 0) {
-                $subtractCounts[$hash]--;
+            if (($subtracted[$hash][0] ?? 0) > 0) {
+                $subtracted[$hash][0]--;
             } else {
                 yield $value;
             }

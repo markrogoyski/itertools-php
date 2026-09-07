@@ -18,6 +18,16 @@ final class UsageMap
      */
     private array $deletedMap = [];
     /**
+     * Values behind each hash, in first-seen order.
+     *
+     * Registering a value also retains it: in strict mode an object's ID string comes from its
+     * spl_object_id, which PHP reuses once the object is freed. Holding the value keeps that ID
+     * reserved so a later, unrelated object cannot inherit it and merge with its usage counts.
+     *
+     * @var array<string, mixed>
+     */
+    private array $values = [];
+    /**
      * @param bool $strict
      */
     public function __construct(private readonly bool $strict)
@@ -36,6 +46,10 @@ final class UsageMap
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
 
+        if (!\array_key_exists($hash, $this->values)) {
+            $this->values[$hash] = $value;
+        }
+
         if (!isset($this->addedMap[$hash])) {
             $this->addedMap[$hash] = [];
         }
@@ -47,6 +61,16 @@ final class UsageMap
         $this->addedMap[$hash][$owner]++;
 
         return $hash;
+    }
+
+    /**
+     * Returns every registered value, keyed by its unique hash string, in first-seen order.
+     *
+     * @return array<string, mixed>
+     */
+    public function getValues(): array
+    {
+        return $this->values;
     }
 
     /**

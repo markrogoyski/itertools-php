@@ -9,6 +9,9 @@
 * Transform: lazy replayable `memoize`.
 * Stream: parity for the new APIs plus `peekWithKeys` and `callForEachWithKeys`.
 
+### Bug Fixes
+* Set: `distinct`, `distinctBy`, `duplicates`, `duplicatesBy`, `difference`, `intersection`, `partialIntersection`, and `union` could equate unrelated objects in strict mode. An object's identity string is derived from its `spl_object_id`, which PHP reuses once the object is freed, so an object hashed and then discarded could hand its identity to a later, unrelated object. Hashed values are now retained for the lifetime of the comparison.
+
 ## v2.5.0 - 2026-07-25
 
 ### New Features
