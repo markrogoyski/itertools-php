@@ -176,6 +176,26 @@ final class Single
     }
 
     /**
+     * Drop elements while a key-aware predicate is truthy.
+     *
+     * @param iterable<mixed> $data
+     * @param callable(mixed, mixed): mixed $predicate
+     *
+     * @return \Generator<mixed>
+     */
+    public static function dropWhileWithKeys(iterable $data, callable $predicate): \Generator
+    {
+        $drop = true;
+        foreach ($data as $key => $datum) {
+            if ($drop && (bool) $predicate($datum, $key)) {
+                continue;
+            }
+            $drop = false;
+            yield $key => $datum;
+        }
+    }
+
+    /**
      * Yield [index, value] pairs from the iterable.
      *
      * The index is sequential starting from $start, independent of the source iterable's keys.
@@ -380,6 +400,24 @@ final class Single
             } else {
                 break;
             }
+        }
+    }
+
+    /**
+     * Return elements while a key-aware predicate is truthy.
+     *
+     * @param iterable<mixed> $data
+     * @param callable(mixed, mixed): mixed $predicate
+     *
+     * @return \Generator<mixed>
+     */
+    public static function takeWhileWithKeys(iterable $data, callable $predicate): \Generator
+    {
+        foreach ($data as $key => $datum) {
+            if (!(bool) $predicate($datum, $key)) {
+                return;
+            }
+            yield $key => $datum;
         }
     }
 

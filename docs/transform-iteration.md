@@ -84,3 +84,10 @@ $array = [1, 2, 3, 4, 5];
 
 $iterator = Transform::toIterator($array);
 ```
+## Memoize
+
+`Transform::memoize(iterable $iterable): IteratorAggregate` makes a source replayable while consuming it only on demand. Each consumer replays cached `[key, value]` pairs from the beginning and shares one source traversal. Duplicate keys and object identity are preserved.
+
+Consumers may be interleaved: cached positions are replayed independently, while whichever consumer first reaches the frontier advances the shared source by one item. If the source throws, the successful prefix remains replayable and every consumer reaching the failure boundary receives the same exception object. Re-entrant source advancement is unsupported.
+
+The cache grows with the furthest position consumed and is retained for the wrapper lifetime. Arrays and replayable iterator aggregates are also wrapped and therefore retain both their original representation and the demanded cache. Use `tee(n)` for a known number of concurrent branches and potential buffer release; use `memoize()` when an unknown number of future consumers must replay from the start. Fully consuming an infinite source, or retaining a long prefix, can use unbounded memory.

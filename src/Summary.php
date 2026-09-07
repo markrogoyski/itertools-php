@@ -34,6 +34,23 @@ final class Summary
     }
 
     /**
+     * Returns true if all elements match a key-aware predicate.
+     *
+     * @param iterable<mixed> $data
+     * @param callable(mixed, mixed): mixed $predicate
+     */
+    public static function allMatchWithKeys(iterable $data, callable $predicate): bool
+    {
+        foreach ($data as $key => $datum) {
+            if (!(bool) $predicate($datum, $key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Returns true if any element matches the predicate function.
      *
      * Empty iterables return false.
@@ -50,6 +67,23 @@ final class Summary
                 return true;
             }
         }
+        return false;
+    }
+
+    /**
+     * Returns true if any element matches a key-aware predicate.
+     *
+     * @param iterable<mixed> $data
+     * @param callable(mixed, mixed): mixed $predicate
+     */
+    public static function anyMatchWithKeys(iterable $data, callable $predicate): bool
+    {
+        foreach ($data as $key => $datum) {
+            if ((bool) $predicate($datum, $key)) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -74,6 +108,23 @@ final class Summary
     }
 
     /**
+     * Returns true if no element matches a key-aware predicate.
+     *
+     * @param iterable<mixed> $data
+     * @param callable(mixed, mixed): mixed $predicate
+     */
+    public static function noneMatchWithKeys(iterable $data, callable $predicate): bool
+    {
+        foreach ($data as $key => $datum) {
+            if ((bool) $predicate($datum, $key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Return true if all elements in given collection are unique.
      *
      * Empty iterables return true.
@@ -93,6 +144,70 @@ final class Summary
                 return false;
             }
             $usageMap[$hash] = true;
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns true when all values have the same UniqueExtractor identity.
+     *
+     * @param iterable<mixed> $data
+     */
+    public static function allEqual(iterable $data, bool $strict = true): bool
+    {
+        $found = false;
+        $firstHash = '';
+        foreach ($data as $datum) {
+            $hash = UniqueExtractor::getString($datum, $strict);
+            if (!$found) {
+                $found = true;
+                $firstHash = $hash;
+            } elseif ($hash !== $firstHash) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns true when all projected keys have the same UniqueExtractor identity.
+     *
+     * @param iterable<mixed> $data
+     * @param callable(mixed): mixed $keyFunc
+     */
+    public static function allEqualBy(iterable $data, callable $keyFunc, bool $strict = true): bool
+    {
+        $found = false;
+        $firstHash = '';
+
+        /**
+         * The first projected key is held for the whole comparison. A key function that builds a
+         * fresh object would otherwise have it freed right after hashing, letting PHP reuse its
+         * spl_object_id for the next projection and equate distinct objects in strict mode.
+         *
+         * @var mixed $firstKey
+         */
+        $firstKey = null;
+
+        foreach ($data as $datum) {
+            $key = $keyFunc($datum);
+
+            if (!$found) {
+                $found = true;
+                $firstKey = $key;
+                $firstHash = UniqueExtractor::getString($key, $strict);
+                continue;
+            }
+
+            if ($key === $firstKey) {
+                continue;
+            }
+
+            if (UniqueExtractor::getString($key, $strict) !== $firstHash) {
+                return false;
+            }
         }
 
         return true;

@@ -488,3 +488,26 @@ $boolean = Summary::startsWithCoercive($digits, ['1', '2']);
 $boolean = Summary::startsWith($digits, ['1', '2']);
 // false (strict comparison)
 ```
+## All Equal
+
+`Summary::allEqual(iterable $data, bool $strict = true): bool` returns whether every value has the same `UniqueExtractor` identity; empty input is true. `allEqualBy($data, $keyFunc, $strict)` compares projected identities and calls its projection once for every consumed value.
+
+Strictness follows `allUnique`: in coercive mode `null`, `''`, `0`, `0.0`, and `false` are all equivalent. Repeated `NAN` values are also equivalent. A non-serializable object in coercive mode throws `InvalidArgumentException`.
+
+See also `allUnique`, which requires every identity to be different, and `same`, which compares multiple iterables with one another.
+
+## All Equal By
+
+`Summary::allEqualBy(iterable $data, callable $keyFunc, bool $strict = true): bool` applies `$keyFunc` once per consumed value and compares the resulting identities. It short-circuits on the first mismatch.
+
+## All Match With Keys
+
+`Summary::allMatchWithKeys(iterable $data, callable $predicate): bool` calls `$predicate($value, $key)` and stops at the first falsy result. Empty input returns `true`.
+
+## Any Match With Keys
+
+`Summary::anyMatchWithKeys(iterable $data, callable $predicate): bool` stops at the first truthy result. Empty input returns `false`.
+
+## None Match With Keys
+
+`Summary::noneMatchWithKeys(iterable $data, callable $predicate): bool` stops at the first truthy result. Empty input returns `true`. All three key-aware predicates coerce callback results with `(bool)`.

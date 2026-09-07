@@ -3525,3 +3525,50 @@ $items = [$string, $array, $object];
 Stream::of($words)->varDump();
 // var_dump output
 ```
+## Merge Sorted With
+
+`$stream->mergeSortedWith(iterable ...$iterables): Stream` lazily and stably merges the already-sorted stream with additional sorted sources. The current stream is the first source, source keys are discarded, and ties from it take precedence.
+
+## Merge Sorted By With
+
+`$stream->mergeSortedByWith(callable $keyFunc, iterable ...$iterables): Stream` performs the same merge using a projection computed once per queued value.
+
+## Take While With Keys
+
+`$stream->takeWhileWithKeys(callable $predicate): Stream` passes `($value, $key)`, preserves keys, and stops permanently at the first falsy result.
+
+## Drop While With Keys
+
+`$stream->dropWhileWithKeys(callable $predicate): Stream` discards items while `($value, $key)` is truthy, then yields the rest without further predicate calls.
+
+## Peek With Keys
+
+`$stream->peekWithKeys(callable $callback): Stream` lazily invokes `$callback($value, $key)` immediately before yielding each demanded item and preserves the item unchanged.
+
+## Memoize
+
+`$stream->memoize(): Stream` caches demanded values at its current point in the mutable pipeline. Repeated terminals can replay a one-shot source, but transformations added afterward are not themselves cached; call `memoize()` again after them when their results must also be replayed. The retained cache grows to the furthest consumed position and is never released during the memoized iterable's lifetime.
+
+## All Match With Keys
+
+`$stream->allMatchWithKeys(callable $predicate): bool` is a short-circuiting terminal using `$predicate($value, $key)`.
+
+## Any Match With Keys
+
+`$stream->anyMatchWithKeys(callable $predicate): bool` stops on the first truthy callback result.
+
+## None Match With Keys
+
+`$stream->noneMatchWithKeys(callable $predicate): bool` stops on the first truthy callback result and returns its negation.
+
+## All Equal
+
+`$stream->allEqual(bool $strict = true): bool` uses the same strict or coercive identity rules as `allUnique`. Empty streams return `true`.
+
+## All Equal By
+
+`$stream->allEqualBy(callable $keyFunc, bool $strict = true): bool` compares projected identities and short-circuits on the first mismatch.
+
+## Call For Each With Keys
+
+`$stream->callForEachWithKeys(callable $func): void` eagerly invokes `$func($value, $key)` once for every item.

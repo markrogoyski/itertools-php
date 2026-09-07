@@ -190,3 +190,12 @@ $events = [
 ```
 
 See also: [`Stream::unzip`](stream.md#unzip).
+## Merge Sorted
+
+`Multi::mergeSorted(iterable ...$iterables)` lazily performs a stable k-way merge of sources already sorted in non-decreasing order. It uses `O(k)` memory and `O(log k)` work per value; source keys are discarded. Equal values from earlier source arguments are emitted first. Unlike `chain`, it interleaves sources by value.
+
+The sources are not touched until iteration starts, and at most one pending value per source is retained. Infinite sorted sources are supported. A direct `NAN` throws `InvalidArgumentException` with `Multi::mergeSorted cannot order NAN` when reached; values already yielded are not rolled back.
+
+## Merge Sorted By
+
+`Multi::mergeSortedBy(callable $keyFunc, iterable ...$iterables)` has the same stable, lazy behavior, comparing cached projections and calling `$keyFunc` exactly once for each value placed in the merge heap. A projected `NAN` throws with `Multi::mergeSortedBy key function returned NAN`.

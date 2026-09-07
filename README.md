@@ -88,6 +88,8 @@ Quick Reference
 | Iterator                    | Description                                                                             | Code Snippet                                  |
 |-----------------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------|
 | [`chain`](docs/multi-iteration.md#chain)           | Chain multiple iterables together                                                       | `Multi::chain($list1, $list2)`                |
+| [`mergeSorted`](docs/multi-iteration.md#merge-sorted) | Lazily merge already-sorted iterables                                                  | `Multi::mergeSorted(...$iterables)`           |
+| [`mergeSortedBy`](docs/multi-iteration.md#merge-sorted-by) | Lazily merge iterables sorted by a projected key                                | `Multi::mergeSortedBy($keyFunc, ...$iterables)` |
 | [`roundRobin`](docs/multi-iteration.md#roundrobin) | Yield one value at a time from multiple iterables, rotating across sources              | `Multi::roundRobin($list1, $list2)`           |
 | [`zip`](docs/multi-iteration.md#zip)               | Iterate multiple collections simultaneously until the shortest iterator completes       | `Multi::zip($list1, $list2)`                  |
 | [`zipEqual`](docs/multi-iteration.md#zipequal)     | Iterate multiple collections of equal length simultaneously, error if lengths not equal | `Multi::zipEqual($list1, $list2)`             |
@@ -105,6 +107,7 @@ Quick Reference
 | [`compressAssociative`](docs/single-iteration.md#compress-associative) | Filter out elements by keys not selected     | `Single::compressAssociative($data, $selectorKeys)`         |
 | [`dropLast`](docs/single-iteration.md#drop-last)                       | Iterate all elements except the last N       | `Single::dropLast($data, $count)`                           |
 | [`dropWhile`](docs/single-iteration.md#drop-while)                     | Drop elements while predicate is true        | `Single::dropWhile($data, $predicate)`                      |
+| [`dropWhileWithKeys`](docs/single-iteration.md#drop-while-with-keys)   | Drop while a value/key predicate is true     | `Single::dropWhileWithKeys($data, $predicate)`              |
 | [`enumerate`](docs/single-iteration.md#enumerate)                      | Iterate [index, value] pairs                 | `Single::enumerate($data, [$start])`                        |
 | [`filter`](docs/single-iteration.md#filter)                            | Filter for elements where predicate is true  | `Single::filter($data, $predicate)`                         |
 | [`filterTrue`](docs/single-iteration.md#filter-true)                   | Filter for truthy elements                   | `Single::filterTrue($data)`                                 |
@@ -134,6 +137,7 @@ Quick Reference
 | [`string`](docs/single-iteration.md#string)                            | Iterate the characters of a string           | `Single::string($string)`                                   |
 | [`takeLast`](docs/single-iteration.md#take-last)                       | Iterate the last N elements                  | `Single::takeLast($data, $count)`                           |
 | [`takeWhile`](docs/single-iteration.md#take-while)                     | Iterate elements while predicate is true     | `Single::takeWhile($data, $predicate)`                      |
+| [`takeWhileWithKeys`](docs/single-iteration.md#take-while-with-keys)   | Iterate while a value/key predicate is true  | `Single::takeWhileWithKeys($data, $predicate)`              |
 | [`windowed`](docs/single-iteration.md#windowed)                        | Iterate sliding windows of elements          | `Single::windowed($data, $size, [$step], [$partial])`       |
 | [`withFirst`](docs/single-iteration.md#with-first)                     | Pair each element with an is-first flag      | `Single::withFirst($data)`                                  |
 | [`withFirstAndLast`](docs/single-iteration.md#with-first-and-last)     | Pair each element with is-first/is-last flags | `Single::withFirstAndLast($data)`                          |
@@ -226,6 +230,7 @@ Quick Reference
 | Iterator                                       | Description                                  | Code Snippet                                                      |
 |------------------------------------------------|----------------------------------------------|-------------------------------------------------------------------|
 | [`partition`](docs/transform-iteration.md#partition)                      | Partition iterable into truthy and falsy lists | `Transform::partition($data, $predicate)`                       |
+| [`memoize`](docs/transform-iteration.md#memoize)                            | Lazily cache an iterable for replay          | `Transform::memoize($data)`                                    |
 | [`tee`](docs/transform-iteration.md#tee)                                  | Iterate duplicate iterators                  | `Transform::tee($data, $count)`                                   |
 | [`toArray`](docs/transform-iteration.md#to-array)                         | Transform iterable to an array               | `Transform::toArray($data)`                                       |
 | [`toAssociativeArray`](docs/transform-iteration.md#to-associative-array)  | Transform iterable to an associative array   | `Transform::toAssociativeArray($data, [$keyFunc], [$valueFunc])`  |
@@ -235,8 +240,12 @@ Quick Reference
 | Summary                                                 | Description                                                              | Code Snippet                                      |
 |---------------------------------------------------------|--------------------------------------------------------------------------|---------------------------------------------------|
 | [`allMatch`](docs/summary.md#all-match)                                | True if all items are true according to predicate                        | `Summary::allMatch($data, $predicate)`            |
+| [`allMatchWithKeys`](docs/summary.md#all-match-with-keys)                | True if a value/key predicate matches every item                          | `Summary::allMatchWithKeys($data, $predicate)`    |
+| [`allEqual`](docs/summary.md#all-equal)                                 | True if all items have one equivalence identity                           | `Summary::allEqual($data, [$strict])`             |
+| [`allEqualBy`](docs/summary.md#all-equal-by)                             | True if all projected keys have one equivalence identity                  | `Summary::allEqualBy($data, $keyFunc, [$strict])` |
 | [`allUnique`](docs/summary.md#all-unique)                              | True if all items are unique                                             | `Summary::allUnique($data, [$strict])`            |
 | [`anyMatch`](docs/summary.md#any-match)                                | True if any item is true according to predicate                          | `Summary::anyMatch($data, $predicate)`            |
+| [`anyMatchWithKeys`](docs/summary.md#any-match-with-keys)                | True if a value/key predicate matches any item                            | `Summary::anyMatchWithKeys($data, $predicate)`    |
 | [`arePermutations`](docs/summary.md#are-permutations)                  | True if iterables are permutations of each other                         | `Summary::arePermutations(...$iterables)`         |
 | [`arePermutationsCoercive`](docs/summary.md#are-permutations-coercive) | True if iterables are permutations of each other with type coercion      | `Summary::arePermutationsCoercive(...$iterables)` |
 | [`atLeastN`](docs/summary.md#at-least-n)                               | True if at least n items are true according to predicate                 | `Summary::atLeastN($data, $n, [$predicate])`      |
@@ -253,6 +262,7 @@ Quick Reference
 | [`isSortedBy`](docs/summary.md#is-sorted-by)                           | True if iterable sorted by key function                                  | `Summary::isSortedBy($data, $keyFunc)`            |
 | [`isReversedBy`](docs/summary.md#is-reversed-by)                       | True if iterable reverse sorted by key function                          | `Summary::isReversedBy($data, $keyFunc)`          |
 | [`noneMatch`](docs/summary.md#none-match)                              | True if none of items true according to predicate                        | `Summary::noneMatch($data, $predicate)`           |
+| [`noneMatchWithKeys`](docs/summary.md#none-match-with-keys)              | True if a value/key predicate matches no items                            | `Summary::noneMatchWithKeys($data, $predicate)`   |
 | [`same`](docs/summary.md#same)                                         | True if iterables are the same                                           | `Summary::same(...$iterables)`                    |
 | [`sameCount`](docs/summary.md#same-count)                              | True if iterables have the same lengths                                  | `Summary::sameCount(...$iterables)`               |
 | [`startsWith`](docs/summary.md#starts-with)                            | True if iterable starts with the given prefix                            | `Summary::startsWith($data, $prefix)`             |
@@ -326,6 +336,7 @@ Quick Reference
 | [`distinctBy`](docs/stream.md#distinct-by)                                            | Filter out elements: iterate only unique items using custom comparator                    | `$stream->distinctBy($compareBy)`                                                 |
 | [`dropLast`](docs/stream.md#drop-last)                                                | Iterate all elements of the stream except the last N                                      | `$stream->dropLast($count)`                                                       |
 | [`dropWhile`](docs/stream.md#drop-while)                                              | Drop elements from the iterable source while the predicate function is true               | `$stream->dropWhile($predicate)`                                                  |
+| [`dropWhileWithKeys`](docs/stream.md#drop-while-with-keys)                            | Drop elements while a value/key predicate is true                                         | `$stream->dropWhileWithKeys($predicate)`                                          |
 | [`duplicates`](docs/stream.md#duplicates)                                             | Iterate values that appear more than once                                                 | `$stream->duplicates([$strict])`                                                  |
 | [`duplicatesBy`](docs/stream.md#duplicates-by)                                        | Iterate duplicates using a custom key function                                            | `$stream->duplicatesBy($keyFn)`                                                   |
 | [`enumerate`](docs/stream.md#enumerate)                                               | Iterate [index, value] pairs                                                              | `$stream->enumerate([$start])`                                                    |
@@ -350,6 +361,9 @@ Quick Reference
 | [`map`](docs/stream.md#map)                                                           | Map function onto elements                                                                | `$stream->map($function)`                                                         |
 | [`mapWithKeys`](docs/stream.md#map-with-keys)                                         | Map value- and key-aware function onto elements                                           | `$stream->mapWithKeys($func)`                                                     |
 | [`mapSpread`](docs/stream.md#map-spread)                                              | Map function onto elements, splatting items as positional args                            | `$stream->mapSpread($function)`                                                   |
+| [`memoize`](docs/stream.md#memoize)                                                   | Lazily cache the stream at this pipeline point for replay                                  | `$stream->memoize()`                                                              |
+| [`mergeSortedWith`](docs/stream.md#merge-sorted-with)                                 | Merge the sorted stream with additional sorted iterables                                  | `$stream->mergeSortedWith(...$iterables)`                                         |
+| [`mergeSortedByWith`](docs/stream.md#merge-sorted-by-with)                            | Merge sources sorted by a projected key                                                   | `$stream->mergeSortedByWith($keyFunc, ...$iterables)`                             |
 | [`padLeft`](docs/stream.md#pad-left)                                                  | Pad the stream on the left to a minimum length                                            | `$stream->padLeft($length, $fill)`                                                |
 | [`padRight`](docs/stream.md#pad-right)                                                | Pad the stream on the right to a minimum length                                           | `$stream->padRight($length, $fill)`                                               |
 | [`pairwise`](docs/stream.md#pairwise)                                                 | Return pairs of elements from iterable source                                             | `$stream->pairwise()`                                                             |
@@ -387,6 +401,7 @@ Quick Reference
 | [`symmetricDifferenceCoerciveWith`](docs/stream.md#symmetric-difference-coercive-with) | Symmetric difference of iterable source and given iterables with type coercion            | `$stream->symmetricDifferenceCoerciveWith(...$iterables)`                         |
 | [`takeLast`](docs/stream.md#take-last)                                                | Iterate the last N elements of the stream                                                 | `$stream->takeLast($count)`                                                       |
 | [`takeWhile`](docs/stream.md#take-while)                                              | Return elements from the iterable source as long as the predicate is true                 | `$stream->takeWhile($predicate)`                                                  |
+| [`takeWhileWithKeys`](docs/stream.md#take-while-with-keys)                            | Return elements while a value/key predicate is true                                       | `$stream->takeWhileWithKeys($predicate)`                                          |
 | [`unionWith`](docs/stream.md#union-with)                                                | Union of stream with iterables                                                            | `$stream->unionWith(...$iterables)`                                               |
 | [`unionCoerciveWith`](docs/stream.md#union-coercive-with)                               | Union of stream with iterables with type coercion                                         | `$stream->unionCoerciveWith(...$iterables)`                                       |
 | [`unzip`](docs/stream.md#unzip)                                                         | Transpose rows of the stream into columns (inverse of zip)                                | `$stream->unzip()`                                                                |
@@ -408,8 +423,12 @@ Quick Reference
 | Terminal Operation                                               | Description                                                                      | Code Snippet                                           |
 |------------------------------------------------------------------|----------------------------------------------------------------------------------|--------------------------------------------------------|
 | [`allMatch`](docs/stream.md#all-match)                                       | Returns true if all items in stream match predicate                              | `$stream->allMatch($predicate)`                        |
+| [`allMatchWithKeys`](docs/stream.md#all-match-with-keys)                       | Returns true if a value/key predicate matches every item                         | `$stream->allMatchWithKeys($predicate)`                |
+| [`allEqual`](docs/stream.md#all-equal)                                        | Returns true if all stream items are equal under the selected identity rules      | `$stream->allEqual([$strict])`                         |
+| [`allEqualBy`](docs/stream.md#all-equal-by)                                    | Returns true if all projected keys are equal                                      | `$stream->allEqualBy($keyFunc, [$strict])`             |
 | [`allUnique`](docs/stream.md#all-unique)                                     | Returns true if all items in stream are unique                                   | `$stream->allUnique([$strict]])`                       |
 | [`anyMatch`](docs/stream.md#any-match)                                       | Returns true if any item in stream matches predicate                             | `$stream->anyMatch($predicate)`                        |
+| [`anyMatchWithKeys`](docs/stream.md#any-match-with-keys)                       | Returns true if a value/key predicate matches any item                           | `$stream->anyMatchWithKeys($predicate)`                |
 | [`arePermutationsWith`](docs/stream.md#are-permutations-with)                  | Returns true if all iterables permutations of stream                             | `$stream->arePermutationsWith(...$iterables)`          |
 | [`arePermutationsCoerciveWith`](docs/stream.md#are-permutations-coercive-with) | Returns true if all iterables permutations of stream with type coercion          | `$stream->arePermutationsCoerciveWith(...$iterables)`  |
 | [`atLeastN`](docs/stream.md#at-least-n)                                      | Returns true if at least n items are true according to predicate                 | `$stream->atLeastN($n, [$predicate])`                  |
@@ -426,6 +445,7 @@ Quick Reference
 | [`isSortedBy`](docs/stream.md#is-sorted-by)                                  | Returns true if stream is sorted in ascending order by key function              | `$stream->isSortedBy($keyFunc)`                        |
 | [`isReversedBy`](docs/stream.md#is-reversed-by)                              | Returns true if stream is sorted in reverse descending order by key function     | `$stream->isReversedBy($keyFunc)`                      |
 | [`noneMatch`](docs/stream.md#none-match)                                     | Returns true if none of the items in stream match predicate                      | `$stream->noneMatch($predicate)`                       |
+| [`noneMatchWithKeys`](docs/stream.md#none-match-with-keys)                     | Returns true if a value/key predicate matches no items                           | `$stream->noneMatchWithKeys($predicate)`               |
 | [`sameWith`](docs/stream.md#same-with)                                         | Returns true if stream and all given collections are the same                    | `$stream->sameWith(...$iterables)`                     |
 | [`sameCountWith`](docs/stream.md#same-count-with)                              | Returns true if stream and all given collections have the same lengths           | `$stream->sameCountWith(...$iterables)`                |
 | [`startsWith`](docs/stream.md#starts-with)                                   | Returns true if stream starts with the given prefix                              | `$stream->startsWith($prefix)`                         |
@@ -476,6 +496,7 @@ Quick Reference
 | Terminal Operation              | Description                                    | Code Snippet                                         |
 |---------------------------------|------------------------------------------------|------------------------------------------------------|
 | [`callForEach`](docs/stream.md#call-for-each) | Perform action via function on each item       | `$stream->callForEach($function)`                    |
+| [`callForEachWithKeys`](docs/stream.md#call-for-each-with-keys) | Perform an action with each value and key | `$stream->callForEachWithKeys($function)`            |
 | [`consume`](docs/stream.md#consume)           | Drain stream, discarding values                | `$stream->consume()`                                 |
 | [`print`](docs/stream.md#print)               | `print` each item in the stream                | `$stream->print([$separator], [$prefix], [$suffix])` |
 | [`printLn`](docs/stream.md#print-line)        | `print` each item on a new line                | `$stream->printLn()`                                 |
@@ -486,6 +507,7 @@ Quick Reference
 | Debug Operation              | Description                                              | Code Snippet                     |
 |------------------------------|----------------------------------------------------------|----------------------------------|
 | [`peek`](docs/stream.md#peek)              | Peek at each element between stream operations           | `$stream->peek($peekFunc)`       |
+| [`peekWithKeys`](docs/stream.md#peek-with-keys) | Lazily peek at each value and key                      | `$stream->peekWithKeys($peekFunc)` |
 | [`peekStream`](docs/stream.md#peek-stream) | Peek at the entire stream between operations             | `$stream->peekStream($peekFunc)` |
 | [`peekPrint`](docs/stream.md#peek-print)   | Peek at each element by printing between operations      | `$stream->peekPrint()`           |
 | [`peekPrintR`](docs/stream.md#peek-printr) | Peek at each element by doing print-r between operations | `$stream->peekPrintR()`          |
@@ -496,6 +518,8 @@ Documentation
 -------------
 
 Full documentation with detailed descriptions, signatures, and code examples for each function.
+
+Additional unreleased APIs include `Multi::mergeSorted()` / `mergeSortedBy()`, `Summary::allEqual()` / `allEqualBy()`, key-aware `*WithKeys` operations, and `Transform::memoize()`. Nonterminal Stream equivalents remain lazy; summary and side-effect terminals consume only as described by their individual contracts.
 
 #### Loop Iteration
 - [Multi Iteration](docs/multi-iteration.md) — Chain, RoundRobin, Unzip, Zip, ZipEqual, ZipFilled, ZipLongest

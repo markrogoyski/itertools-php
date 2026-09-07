@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Iterators\TeeIterator;
+use IterTools\Util\Iterators\MemoizedIterable;
 
 final class Transform
 {
@@ -74,6 +75,21 @@ final class Transform
             \is_array($iterable) => new \ArrayIterator($iterable), // @phpstan-ignore function.alreadyNarrowedType
             default => throw new \LogicException(\gettype($iterable) . ' type is not an expected iterable type (Iterator|Traversable|array)'),
         };
+    }
+
+    /**
+     * Lazily cache an iterable so current and future consumers can replay it.
+     *
+     * @template TKey
+     * @template TValue
+     *
+     * @param iterable<TKey, TValue> $iterable
+     *
+     * @return \IteratorAggregate<TKey, TValue>
+     */
+    public static function memoize(iterable $iterable): \IteratorAggregate
+    {
+        return new MemoizedIterable($iterable);
     }
 
     /**

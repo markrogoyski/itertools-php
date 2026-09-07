@@ -324,6 +324,19 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Drop elements while a key-aware predicate is truthy.
+     *
+     * @param callable(mixed, mixed): mixed $predicate
+     *
+     * @see Single::dropWhileWithKeys()
+     */
+    public function dropWhileWithKeys(callable $predicate): self
+    {
+        $this->iterable = Single::dropWhileWithKeys($this->iterable, $predicate);
+        return $this;
+    }
+
+    /**
      * Yield [index, value] pairs from the stream.
      *
      * The index is sequential starting from $start, independent of the source iterable's keys.
@@ -356,6 +369,19 @@ final class Stream implements \IteratorAggregate
     public function takeWhile(callable $predicate): self
     {
         $this->iterable = Single::takeWhile($this->iterable, $predicate);
+        return $this;
+    }
+
+    /**
+     * Return elements while a key-aware predicate is truthy.
+     *
+     * @param callable(mixed, mixed): mixed $predicate
+     *
+     * @see Single::takeWhileWithKeys()
+     */
+    public function takeWhileWithKeys(callable $predicate): self
+    {
+        $this->iterable = Single::takeWhileWithKeys($this->iterable, $predicate);
         return $this;
     }
 
@@ -1036,6 +1062,37 @@ final class Stream implements \IteratorAggregate
     public function chainWith(iterable ...$iterables): self
     {
         $this->iterable = Multi::chain($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Lazily merge this stream with sorted iterables.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return Stream
+     *
+     * @see Multi::mergeSorted()
+     */
+    public function mergeSortedWith(iterable ...$iterables): self
+    {
+        $this->iterable = Multi::mergeSorted($this->iterable, ...$iterables);
+        return $this;
+    }
+
+    /**
+     * Lazily merge this stream with iterables sorted by a projected key.
+     *
+     * @param callable(mixed): mixed $keyFunc
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return Stream
+     *
+     * @see Multi::mergeSortedBy()
+     */
+    public function mergeSortedByWith(callable $keyFunc, iterable ...$iterables): self
+    {
+        $this->iterable = Multi::mergeSortedBy($keyFunc, $this->iterable, ...$iterables);
         return $this;
     }
 
@@ -1966,6 +2023,24 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Lazily invoke a callback with each value and key without changing the stream.
+     *
+     * @param callable(mixed, mixed): mixed $callback
+     */
+    public function peekWithKeys(callable $callback): self
+    {
+        $iterable = $this->iterable;
+        $this->iterable = (static function () use ($iterable, $callback): \Generator {
+            foreach ($iterable as $key => $datum) {
+                $callback($datum, $key);
+                yield $key => $datum;
+            }
+        })();
+
+        return $this;
+    }
+
+    /**
      * Peek at the entire stream between other Stream operations to do some action without modifying the stream.
      *
      * Operates on the stream as a whole, and is eager: unlike the per-element peek(), the callback is
@@ -2116,6 +2191,19 @@ final class Stream implements \IteratorAggregate
     public function reservoirSample(int $size, ?\Random\Engine $engine = null): self
     {
         $this->iterable = Random::reservoirSample($this->iterable, $size, $engine);
+        return $this;
+    }
+
+    /**
+     * Lazily make the current stream replayable by caching demanded values.
+     *
+     * @return Stream
+     *
+     * @see Transform::memoize()
+     */
+    public function memoize(): self
+    {
+        $this->iterable = Transform::memoize($this->iterable);
         return $this;
     }
 
@@ -2276,6 +2364,12 @@ final class Stream implements \IteratorAggregate
         return Summary::allMatch($this->iterable, $predicate);
     }
 
+    /** @param callable(mixed, mixed): mixed $predicate */
+    public function allMatchWithKeys(callable $predicate): bool
+    {
+        return Summary::allMatchWithKeys($this->iterable, $predicate);
+    }
+
     /**
      * Returns true if any element matches the predicate function.
      *
@@ -2290,6 +2384,12 @@ final class Stream implements \IteratorAggregate
     public function anyMatch(callable $predicate): bool
     {
         return Summary::anyMatch($this->iterable, $predicate);
+    }
+
+    /** @param callable(mixed, mixed): mixed $predicate */
+    public function anyMatchWithKeys(callable $predicate): bool
+    {
+        return Summary::anyMatchWithKeys($this->iterable, $predicate);
     }
 
     /**
@@ -2514,6 +2614,12 @@ final class Stream implements \IteratorAggregate
         return Summary::noneMatch($this->iterable, $predicate);
     }
 
+    /** @param callable(mixed, mixed): mixed $predicate */
+    public function noneMatchWithKeys(callable $predicate): bool
+    {
+        return Summary::noneMatchWithKeys($this->iterable, $predicate);
+    }
+
     /**
      * Returns true if all elements in stream are unique.
      *
@@ -2528,6 +2634,17 @@ final class Stream implements \IteratorAggregate
     public function allUnique(bool $strict = true): bool
     {
         return Summary::allUnique($this->iterable, $strict);
+    }
+
+    public function allEqual(bool $strict = true): bool
+    {
+        return Summary::allEqual($this->iterable, $strict);
+    }
+
+    /** @param callable(mixed): mixed $keyFunc */
+    public function allEqualBy(callable $keyFunc, bool $strict = true): bool
+    {
+        return Summary::allEqualBy($this->iterable, $keyFunc, $strict);
     }
 
     /**
@@ -3260,6 +3377,14 @@ final class Stream implements \IteratorAggregate
     {
         foreach ($this->iterable as $item) {
             $func($item);
+        }
+    }
+
+    /** @param callable(mixed, mixed): mixed $func */
+    public function callForEachWithKeys(callable $func): void
+    {
+        foreach ($this->iterable as $key => $item) {
+            $func($item, $key);
         }
     }
 

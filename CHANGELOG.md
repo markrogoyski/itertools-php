@@ -1,5 +1,14 @@
 # IterTools PHP Change Log
 
+## [Unreleased]
+
+### New Features
+* Multi: lazy stable `mergeSorted` and `mergeSortedBy`, with fluent merge operations.
+* Single: key-aware `takeWhileWithKeys` and `dropWhileWithKeys`.
+* Summary: `allEqual`, `allEqualBy`, and key-aware match summaries.
+* Transform: lazy replayable `memoize`.
+* Stream: parity for the new APIs plus `peekWithKeys` and `callForEachWithKeys`.
+
 ## v2.5.0 - 2026-07-25
 
 ### New Features

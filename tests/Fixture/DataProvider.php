@@ -16,6 +16,22 @@ use IterTools\Transform;
 
 trait DataProvider
 {
+    /**
+     * @return array<string, array{0: iterable<mixed, int>, 1: array<mixed, int>}>
+     */
+    public static function dataProviderForKeyAwareIterable(): array
+    {
+        $associative = ['one' => 1, 'two' => 2, 'three' => 3, 'four' => 4];
+        $indexed = [1, 2, 3, 4];
+
+        return [
+            'array' => [$associative, $associative],
+            'generator' => [GeneratorFixture::getKeyValueGenerator($associative), $associative],
+            'iterator' => [new ArrayIteratorFixture($indexed), $indexed],
+            'iterator aggregate' => [new IteratorAggregateFixture($associative), $associative],
+        ];
+    }
+
     public static function dataProviderForEmptyIterable(): array
     {
         return [
@@ -63,6 +79,8 @@ trait DataProvider
     {
         return [
             [Multi::chain([1, 2, 3], [4, 5, 6])],
+            [Multi::mergeSorted([1, 3, 5], [2, 4, 6])],
+            [Multi::mergeSortedBy(fn ($value) => $value, [1, 3, 5], [2, 4, 6])],
             [Multi::roundRobin([1, 2, 3], [4, 5, 6])],
             [Multi::zip([1, 2, 3], [4, 5, 6])],
             [Multi::zipEqual([1, 2, 3], [4, 5, 6])],
@@ -81,6 +99,7 @@ trait DataProvider
             [Single::compress([1, 2, 3, 4, 5], [1, 1, 0, 0, 1])],
             [Single::compressAssociative(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5], ['a', 'b', 'd'])],
             [Single::dropWhile([1, 2, 3, 4, 5], fn ($x) => $x < 2)],
+            [Single::dropWhileWithKeys([1, 2, 3, 4, 5], fn ($value, $key) => $key < 1)],
             [Single::enumerate([1, 2, 3, 4, 5])],
             [Single::filter([1, 2, 3, 4, 5], fn ($x) => $x < 2)],
             [Single::filterTrue([1, 2, 3, 4, 5], fn ($x) => $x < 2)],
@@ -103,6 +122,7 @@ trait DataProvider
             [Single::slice([1, 2, 3, 4, 5], 1, 4)],
             [Single::string('abcdefg')],
             [Single::takeWhile([1, 2, 3, 4, 5], fn ($x) => $x < 2)],
+            [Single::takeWhileWithKeys([1, 2, 3, 4, 5], fn ($value, $key) => $key < 2)],
         ];
     }
 
@@ -176,6 +196,7 @@ trait DataProvider
         return [
             [Transform::partition([1, 2, 3, 4, 5], fn ($x) => $x % 2 === 0)],
             [Transform::tee([1, 2, 3, 4, 5], 2)],
+            [Transform::memoize([1, 2, 3, 4, 5])],
             [Transform::toArray([1, 2, 3, 4, 5])],
             [Transform::toAssociativeArray([1, 2, 3, 4, 5])],
             [Transform::toIterator([1, 2, 3, 4, 5])],
@@ -233,6 +254,7 @@ trait DataProvider
             [Stream::of([1, 1, 2, 2, 3, 3, 4, 4, 5, 5])->distinctAdjacent()],
             [Stream::of([1, 1, 2, 2, 3, 3, 4, 4, 5, 5])->distinctAdjacentBy(fn ($x) => $x)],
             [Stream::of([1, 2, 3, 4, 5])->dropWhile(fn ($x) => $x < 2)],
+            [Stream::of([1, 2, 3, 4, 5])->dropWhileWithKeys(fn ($value, $key) => $key < 1)],
             [Stream::of([1, 2, 3, 4, 5])->enumerate()],
             [Stream::of([1, 2, 3, 4, 5])->filter(fn ($x) => $x < 2)],
             [Stream::of([1, 2, 3, 4, 5])->filterTrue()],
@@ -248,12 +270,15 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->intersectionWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->intersectionCoerciveWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->limit(3)],
+            [Stream::of([1, 3, 5])->mergeSortedWith([2, 4, 6])],
+            [Stream::of([1, 3, 5])->mergeSortedByWith(fn ($value) => $value, [2, 4, 6])],
             [Stream::of([1, 2, 3, 4, 5])->map(fn ($x) => $x**2)],
             [Stream::of([[1, 2], [3, 4]])->mapSpread(fn ($a, $b) => $a + $b)],
             [Stream::of([1, 2, 3, 4, 5])->pairwise()],
             [Stream::of([1, 2, 3, 4, 5])->partialIntersectionWith(1, [2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->partialIntersectionCoerciveWith(1, [2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->peek(fn ($x) => $x)],
+            [Stream::of([1, 2, 3, 4, 5])->peekWithKeys(fn ($value, $key) => $key)],
             [Stream::of([1, 2, 3])->productWith(['a', 'b'])],
             [Stream::of([1, 2, 3])->permutations(2)],
             [Stream::of([1, 2, 3])->combinations(2)],
@@ -278,7 +303,9 @@ trait DataProvider
             [Stream::of([1, 2, 3, 4, 5])->symmetricDifferenceWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->symmetricDifferenceCoerciveWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->takeWhile(fn ($x) => $x < 2)],
+            [Stream::of([1, 2, 3, 4, 5])->takeWhileWithKeys(fn ($value, $key) => $key < 2)],
             [Stream::of([1, 2, 3, 4, 5])->tee(2)],
+            [Stream::of([1, 2, 3, 4, 5])->memoize()],
             [Stream::of([1, 2, 3, 4, 5])->unionWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->unionCoerciveWith([2, 3, 4])],
             [Stream::of([1, 2, 3, 4, 5])->zipWith([6, 7, 8, 9, 10])],

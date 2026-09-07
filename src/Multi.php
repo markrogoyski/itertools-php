@@ -6,6 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\Iterators\StrictMultipleIterator;
+use IterTools\Util\MergeSortedHeap;
 
 final class Multi
 {
@@ -134,6 +135,93 @@ final class Multi
                 /** @var mixed $item */
                 yield $item;
             }
+        }
+    }
+
+    /**
+     * Lazily merge sorted iterables, preserving source order for equal values.
+     *
+     * Inputs must be sorted in non-decreasing order. Source keys are discarded.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    public static function mergeSorted(iterable ...$iterables): \Generator
+    {
+        yield from self::mergeSortedInternal(
+            static fn (mixed $value): mixed => $value,
+            'Multi::mergeSorted cannot order NAN',
+            ...$iterables,
+        );
+    }
+
+    /**
+     * Lazily merge iterables sorted by a projected key.
+     *
+     * Inputs must be sorted in non-decreasing projected-key order. Source keys are discarded.
+     *
+     * @param callable(mixed): mixed $keyFunc
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    public static function mergeSortedBy(callable $keyFunc, iterable ...$iterables): \Generator
+    {
+        yield from self::mergeSortedInternal(
+            $keyFunc,
+            'Multi::mergeSortedBy key function returned NAN',
+            ...$iterables,
+        );
+    }
+
+    /**
+     * @param callable(mixed): mixed $keyFunc
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \Generator<mixed>
+     */
+    private static function mergeSortedInternal(
+        callable $keyFunc,
+        string $nanMessage,
+        iterable ...$iterables,
+    ): \Generator {
+        $heap = new MergeSortedHeap();
+
+        // Ordinals are counted independently of the variadic's own keys: named arguments give
+        // those keys strings, which would collapse to the same heap tie-breaker.
+        $sourceOrdinal = 0;
+
+        foreach ($iterables as $iterable) {
+            $iterator = Transform::toIterator($iterable);
+            $iterator->rewind();
+            if ($iterator->valid()) {
+                $value = $iterator->current();
+                $key = $keyFunc($value);
+                self::assertMergeKeyIsNotNan($key, $nanMessage);
+                $heap->insert([$key, $sourceOrdinal, $value, $iterator]);
+            }
+            ++$sourceOrdinal;
+        }
+
+        while (!$heap->isEmpty()) {
+            [$_key, $sourceOrdinal, $value, $iterator] = $heap->extract();
+            yield $value;
+
+            $iterator->next();
+            if ($iterator->valid()) {
+                $nextValue = $iterator->current();
+                $nextKey = $keyFunc($nextValue);
+                self::assertMergeKeyIsNotNan($nextKey, $nanMessage);
+                $heap->insert([$nextKey, $sourceOrdinal, $nextValue, $iterator]);
+            }
+        }
+    }
+
+    private static function assertMergeKeyIsNotNan(mixed $key, string $message): void
+    {
+        if (\is_float($key) && \is_nan($key)) {
+            throw new \InvalidArgumentException($message);
         }
     }
 

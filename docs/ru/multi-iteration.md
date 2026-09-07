@@ -193,3 +193,10 @@ $events = [
 ```
 
 См. также: [`Stream::unzip`](stream.md#unzip).
+## Merge Sorted
+
+`Multi::mergeSorted(iterable ...$iterables)` лениво и стабильно сливает уже отсортированные источники; ключи отбрасываются, а равные значения из более раннего источника идут первыми. Хранится не более одного ожидающего значения на источник. `NAN` отклоняется только при достижении с сообщением `Multi::mergeSorted cannot order NAN`.
+
+## Merge Sorted By
+
+`Multi::mergeSortedBy(callable $keyFunc, iterable ...$iterables)` сравнивает сохранённые проекции и вызывает `$keyFunc` один раз для каждого помещённого в очередь значения. Для проекции `NAN` используется сообщение `Multi::mergeSortedBy key function returned NAN`.
