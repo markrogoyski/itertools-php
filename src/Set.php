@@ -465,6 +465,9 @@ final class Set
             }
         }
 
+        // The map yields the last value registered for each equivalence class, which is the
+        // representative this function has always emitted -- observable in coercive mode, where
+        // values of different types share a class.
         foreach ($usageMap->getValues() as $value) {
             foreach (Single::repeat($value, $usageMap->getUsagesCount($value)) as $item) {
                 yield $item;

@@ -11,6 +11,8 @@
 
 ### Bug Fixes
 * Set: `distinct`, `distinctBy`, `duplicates`, `duplicatesBy`, `difference`, `intersection`, `partialIntersection`, `union`, and `symmetricDifference` could equate unrelated objects in strict mode. An object's identity string is derived from its `spl_object_id`, which PHP reuses once the object is freed, so an object hashed and then discarded could hand its identity to a later, unrelated object. Hashed values are now retained for the lifetime of the comparison.
+* Set: `symmetricDifference`/`symmetricDifferenceCoercive` could emit an inconsistent representative value for an equivalence class; the last-seen value is now used consistently.
+* Summary: `allEqual`/`allEqualBy` could treat a shared, mutated key object as unchanged in coercive mode because it short-circuited on instance identity instead of current value.
 
 ## v2.5.0 - 2026-07-25
 

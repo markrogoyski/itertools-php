@@ -843,4 +843,59 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);
     }
+
+
+    /**
+     * @test         coercive symmetric difference yields the last-seen representative of each equivalence class
+     * @dataProvider dataProviderForLastSeenRepresentative
+     * @param        array<iterable<mixed>> $iterables
+     * @param        array<mixed> $expected
+     */
+    public function testYieldsLastSeenRepresentative(array $iterables, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Set::symmetricDifferenceCoercive(...$iterables) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForLastSeenRepresentative(): array
+    {
+        return [
+            'array' => [
+                [
+                    [1],
+                    ['1', '1'],
+                ],
+                ['1'],
+            ],
+            'generator' => [
+                [
+                    GeneratorFixture::getGenerator([1]),
+                    GeneratorFixture::getGenerator(['1', '1']),
+                ],
+                ['1'],
+            ],
+            'iterator' => [
+                [
+                    new ArrayIteratorFixture([1]),
+                    new ArrayIteratorFixture(['1', '1']),
+                ],
+                ['1'],
+            ],
+            'iterator aggregate' => [
+                [
+                    new IteratorAggregateFixture([1]),
+                    new IteratorAggregateFixture(['1', '1']),
+                ],
+                ['1'],
+            ],
+        ];
+    }
 }

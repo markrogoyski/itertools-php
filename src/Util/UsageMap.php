@@ -18,11 +18,18 @@ final class UsageMap
      */
     private array $deletedMap = [];
     /**
-     * Values behind each hash, in first-seen order.
+     * The most recently registered value behind each hash, keyed in first-seen order.
      *
      * Registering a value also retains it: in strict mode an object's ID string comes from its
      * spl_object_id, which PHP reuses once the object is freed. Holding the value keeps that ID
      * reserved so a later, unrelated object cannot inherit it and merge with its usage counts.
+     * Overwriting does not weaken that: values sharing a hash in strict mode are the same
+     * instance, so the retained object is never released, and the hashes that do merge distinct
+     * values (coercive scalars and serialized objects) are not derived from an ID at all.
+     *
+     * The last value wins so that consumers report the same representative of an equivalence
+     * class that they did before this map retained values -- for coercive comparisons that is an
+     * observable type-level difference, e.g. the '1' rather than the 1 of [1] vs ['1', '1'].
      *
      * @var array<string, mixed>
      */
@@ -46,9 +53,7 @@ final class UsageMap
     {
         $hash = UniqueExtractor::getString($value, $this->strict);
 
-        if (!\array_key_exists($hash, $this->values)) {
-            $this->values[$hash] = $value;
-        }
+        $this->values[$hash] = $value;
 
         if (!isset($this->addedMap[$hash])) {
             $this->addedMap[$hash] = [];
@@ -64,7 +69,7 @@ final class UsageMap
     }
 
     /**
-     * Returns every registered value, keyed by its unique hash string, in first-seen order.
+     * Returns the latest registered value for each unique hash string, in first-seen key order.
      *
      * @return array<string, mixed>
      */

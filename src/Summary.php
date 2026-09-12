@@ -182,26 +182,20 @@ final class Summary
         $found = false;
         $firstHash = '';
 
-        /**
-         * The first projected key is held for the whole comparison. A key function that builds a
-         * fresh object would otherwise have it freed right after hashing, letting PHP reuse its
-         * spl_object_id for the next projection and equate distinct objects in strict mode.
-         *
-         * @var mixed $firstKey
-         */
-        $firstKey = null;
-
+        // Every key is hashed, including one that is the very same instance as its predecessor:
+        // in coercive mode equivalence is decided by current serialized state, so a shared key
+        // object the caller mutates between projections is not equal to itself as first seen.
+        //
+        // $key must keep holding the previous projection across the $keyFunc call. In strict mode
+        // an object's hash is its spl_object_id, which PHP reuses once the object is freed; the
+        // held reference keeps the comparison basis alive so a fresh key cannot inherit its ID.
+        // Do not fold the projection into the hashing call.
         foreach ($data as $datum) {
             $key = $keyFunc($datum);
 
             if (!$found) {
                 $found = true;
-                $firstKey = $key;
                 $firstHash = UniqueExtractor::getString($key, $strict);
-                continue;
-            }
-
-            if ($key === $firstKey) {
                 continue;
             }
 

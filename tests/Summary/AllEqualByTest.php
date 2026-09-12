@@ -86,4 +86,31 @@ class AllEqualByTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertTrue($result);
     }
+
+    public function testCoerciveModeComparesMutatedStateOfASharedProjectedObject(): void
+    {
+        // Given
+        $key = (object) ['version' => 0];
+
+        // When
+        $result = Summary::allEqualBy([1, 2], static function (int $version) use ($key): object {
+            $key->version = $version;
+            return $key;
+        }, false);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    public function testCoerciveModeEquatesASharedProjectedObjectLeftUnmutated(): void
+    {
+        // Given
+        $key = (object) ['version' => 0];
+
+        // When
+        $result = Summary::allEqualBy([1, 2], static fn (): object => $key, false);
+
+        // Then
+        $this->assertTrue($result);
+    }
 }
