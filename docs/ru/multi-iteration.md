@@ -193,10 +193,55 @@ $events = [
 ```
 
 См. также: [`Stream::unzip`](stream.md#unzip).
-## Merge Sorted
+### Merge Sorted
 
-`Multi::mergeSorted(iterable ...$iterables)` лениво и стабильно сливает уже отсортированные источники; ключи отбрасываются, а равные значения из более раннего источника идут первыми. Хранится не более одного ожидающего значения на источник. `NAN` отклоняется только при достижении с сообщением `Multi::mergeSorted cannot order NAN`.
+`Multi::mergeSorted(iterable ...$iterables)` лениво и стабильно выполняет k-путевое слияние источников, уже отсортированных по неубыванию. Используется `O(k)` памяти и `O(log k)` работы на каждое значение; ключи источников отбрасываются. Равные значения из более раннего источника идут первыми. В отличие от `chain`, слияние чередует источники по значению.
 
-## Merge Sorted By
+Источники не затрагиваются до начала итерации, и на каждый источник хранится не более одного ожидающего значения. Бесконечные отсортированные источники поддерживаются. Прямое значение `NAN` выбрасывает `InvalidArgumentException` с сообщением `Multi::mergeSorted cannot order NAN` при его достижении; уже выданные значения не откатываются.
 
-`Multi::mergeSortedBy(callable $keyFunc, iterable ...$iterables)` сравнивает сохранённые проекции и вызывает `$keyFunc` один раз для каждого помещённого в очередь значения. Для проекции `NAN` используется сообщение `Multi::mergeSortedBy key function returned NAN`.
+```php
+use IterTools\Multi;
+
+$morningTemps = [12.5, 13.1, 14.0];
+$afternoonTemps = [12.9, 13.4, 13.8];
+
+foreach (Multi::mergeSorted($morningTemps, $afternoonTemps) as $temp) {
+    // 12.5, 12.9, 13.1, 13.4, 13.8, 14.0
+}
+```
+
+**Предусловие:** каждый источник должен быть уже отсортирован по неубыванию. `mergeSorted` это не проверяет — неотсортированный ввод молча даёт некорректно упорядоченный результат вместо исключения:
+
+```php
+// Неотсортированный ввод не проверяется; результат не будет осмысленно отсортирован
+foreach (Multi::mergeSorted([3, 1, 2], [0]) as $value) {
+    // 0, 3, 1, 2 -- отсортируйте каждый источник перед слиянием
+}
+```
+
+Слияние бесконечных отсортированных источников — забираем только нужное количество значений:
+```php
+use IterTools\Infinite;
+use IterTools\Single;
+
+$evens = Infinite::count(0, 2);
+$odds = Infinite::count(1, 2);
+
+$firstTen = \iterator_to_array(Single::limit(Multi::mergeSorted($evens, $odds), 10));
+// [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+### Merge Sorted By
+
+`Multi::mergeSortedBy(callable $keyFunc, iterable ...$iterables)` обладает тем же стабильным ленивым поведением, сравнивая закэшированные проекции и вызывая `$keyFunc` ровно один раз для каждого значения, помещаемого в очередь слияния. Для проекции `NAN` используется сообщение `Multi::mergeSortedBy key function returned NAN`.
+
+```php
+use IterTools\Multi;
+
+$short = ['a', 'bbb'];
+$long = ['cc', 'dddd'];
+
+foreach (Multi::mergeSortedBy('\strlen', $short, $long) as $value) {
+    // 'a', 'cc', 'bbb', 'dddd'
+}
+```

@@ -190,12 +190,55 @@ $events = [
 ```
 
 See also: [`Stream::unzip`](stream.md#unzip).
-## Merge Sorted
+### Merge Sorted
 
 `Multi::mergeSorted(iterable ...$iterables)` lazily performs a stable k-way merge of sources already sorted in non-decreasing order. It uses `O(k)` memory and `O(log k)` work per value; source keys are discarded. Equal values from earlier source arguments are emitted first. Unlike `chain`, it interleaves sources by value.
 
 The sources are not touched until iteration starts, and at most one pending value per source is retained. Infinite sorted sources are supported. A direct `NAN` throws `InvalidArgumentException` with `Multi::mergeSorted cannot order NAN` when reached; values already yielded are not rolled back.
 
-## Merge Sorted By
+```php
+use IterTools\Multi;
+
+$morningTemps = [12.5, 13.1, 14.0];
+$afternoonTemps = [12.9, 13.4, 13.8];
+
+foreach (Multi::mergeSorted($morningTemps, $afternoonTemps) as $temp) {
+    // 12.5, 12.9, 13.1, 13.4, 13.8, 14.0
+}
+```
+
+**Precondition:** every source must already be sorted in non-decreasing order. `mergeSorted` does not validate this — passing unsorted input silently produces incorrectly ordered output instead of throwing:
+
+```php
+// Unsorted input is not validated; the result is not meaningfully sorted
+foreach (Multi::mergeSorted([3, 1, 2], [0]) as $value) {
+    // 0, 3, 1, 2 -- sort each source before merging
+}
+```
+
+Merging infinite sorted sources — take only as many values as needed:
+```php
+use IterTools\Infinite;
+use IterTools\Single;
+
+$evens = Infinite::count(0, 2);
+$odds = Infinite::count(1, 2);
+
+$firstTen = \iterator_to_array(Single::limit(Multi::mergeSorted($evens, $odds), 10));
+// [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+### Merge Sorted By
 
 `Multi::mergeSortedBy(callable $keyFunc, iterable ...$iterables)` has the same stable, lazy behavior, comparing cached projections and calling `$keyFunc` exactly once for each value placed in the merge heap. A projected `NAN` throws with `Multi::mergeSortedBy key function returned NAN`.
+
+```php
+use IterTools\Multi;
+
+$short = ['a', 'bbb'];
+$long = ['cc', 'dddd'];
+
+foreach (Multi::mergeSortedBy('\strlen', $short, $long) as $value) {
+    // 'a', 'cc', 'bbb', 'dddd'
+}
+```

@@ -83,6 +83,62 @@ class MergeSortedByTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $yielded);
     }
 
+    public function testPropagatesKeyFunctionExceptionWithoutWrapping(): void
+    {
+        // Given
+        $exception = new \RuntimeException('key function failed');
+        $keyFunc = static function (int $value) use ($exception): int {
+            if ($value === 2) {
+                throw $exception;
+            }
+            return $value;
+        };
+        $merged = Multi::mergeSortedBy($keyFunc, [1, 2], [3]);
+        $yielded = [];
+
+        // When
+        try {
+            foreach ($merged as $value) {
+                $yielded[] = $value;
+            }
+            $this->fail('Expected key function exception to propagate');
+        } catch (\RuntimeException $e) {
+            // Then
+            $this->assertSame($exception, $e);
+            $this->assertNull($e->getPrevious());
+        }
+
+        // Then
+        $this->assertSame([1], $yielded);
+    }
+
+    public function testPropagatesSourceExceptionWithoutWrapping(): void
+    {
+        // Given
+        $exception = new \RuntimeException('source failed');
+        $failing = (static function () use ($exception): \Generator {
+            yield 1;
+            throw $exception;
+        })();
+        $merged = Multi::mergeSortedBy(static fn (int $value): int => $value, $failing, [2]);
+        $yielded = [];
+
+        // When
+        try {
+            foreach ($merged as $value) {
+                $yielded[] = $value;
+            }
+            $this->fail('Expected source exception to propagate');
+        } catch (\RuntimeException $e) {
+            // Then
+            $this->assertSame($exception, $e);
+            $this->assertNull($e->getPrevious());
+        }
+
+        // Then
+        $this->assertSame([1], $yielded);
+    }
+
     public function testPreservesSourceOrderWithNamedArguments(): void
     {
         // Given

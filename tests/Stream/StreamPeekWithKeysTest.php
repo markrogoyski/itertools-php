@@ -8,6 +8,27 @@ use IterTools\Stream;
 
 class StreamPeekWithKeysTest extends \PHPUnit\Framework\TestCase
 {
+    use \IterTools\Tests\Fixture\DataProvider;
+
+    /** @dataProvider dataProviderForKeyAwareIterable */
+    public function testPreservesValuesAndKeysAcrossIterableTypes(iterable $data, array $expectedInput): void
+    {
+        // Given
+        $received = [];
+
+        // When
+        $result = Stream::of($data)
+            ->peekWithKeys(static function (int $value, mixed $key) use (&$received): void {
+                $received[] = [$value, $key];
+            })
+            ->toAssociativeArray();
+
+        // Then
+        $this->assertSame($expectedInput, $result);
+        $this->assertSame(\array_values($expectedInput), \array_column($received, 0));
+        $this->assertSame(\array_keys($expectedInput), \array_column($received, 1));
+    }
+
     public function testIsLazyPreservesItemsAndRunsBeforeDownstreamMap(): void
     {
         // Given
