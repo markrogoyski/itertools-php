@@ -19,4 +19,14 @@ class StreamDropWhileWithKeysTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame(\array_slice($expectedInput, 2, null, true), $result);
     }
+
+    /** @dataProvider dataProviderForEmptyIterable */
+    public function testEmptyIterableYieldsNothing(iterable $data): void
+    {
+        // When
+        $result = Stream::of($data)->dropWhileWithKeys(static fn (mixed $value): bool => true)->toAssociativeArray();
+
+        // Then
+        $this->assertSame([], $result);
+    }
 }

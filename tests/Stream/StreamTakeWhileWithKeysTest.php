@@ -19,4 +19,14 @@ class StreamTakeWhileWithKeysTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame(\array_slice($expectedInput, 0, 2, true), $result);
     }
+
+    /** @dataProvider dataProviderForEmptyIterable */
+    public function testEmptyIterableYieldsNothing(iterable $data): void
+    {
+        // When
+        $result = Stream::of($data)->takeWhileWithKeys(static fn (mixed $value): bool => true)->toAssociativeArray();
+
+        // Then
+        $this->assertSame([], $result);
+    }
 }

@@ -492,7 +492,21 @@ $boolean = Summary::startsWith($digits, ['1', '2']);
 
 `Summary::allEqual(iterable $data, bool $strict = true): bool` returns whether every value has the same `UniqueExtractor` identity; empty input is true. `allEqualBy($data, $keyFunc, $strict)` compares projected identities and calls its projection once for every consumed value.
 
-Strictness follows `allUnique`: in coercive mode `null`, `''`, `0`, `0.0`, and `false` are all equivalent. Repeated `NAN` values are also equivalent. A non-serializable object in coercive mode throws `InvalidArgumentException`.
+Strictness follows `allUnique`: in coercive mode `null`, `''`, `0`, `0.0`, and `false` are all equivalent (the `numeric_0` equivalence class). Repeated `NAN` values are also equivalent. A non-serializable object in coercive mode throws `InvalidArgumentException`.
+
+```Summary::allEqual(iterable $data, bool $strict = true): bool```
+
+```php
+use IterTools\Summary;
+
+$values = [null, '', 0, 0.0, false];
+
+$boolean = Summary::allEqual($values);
+// false (strict comparison: null, '', 0, 0.0, and false are distinct identities)
+
+$boolean = Summary::allEqual($values, false);
+// true (coercive comparison: all five values share the numeric_0 equivalence class)
+```
 
 See also `allUnique`, which requires every identity to be different, and `same`, which compares multiple iterables with one another.
 

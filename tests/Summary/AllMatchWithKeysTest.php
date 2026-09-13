@@ -11,7 +11,7 @@ class AllMatchWithKeysTest extends \PHPUnit\Framework\TestCase
     use \IterTools\Tests\Fixture\DataProvider;
 
     /** @dataProvider dataProviderForKeyAwareIterable */
-    public function testReceivesValueThenKeyAndCoercesTruthyResults(iterable $data): void
+    public function testReceivesValueThenKeyAndCoercesTruthyResults(iterable $data, array $expectedInput): void
     {
         // Given
         $received = [];
@@ -25,6 +25,7 @@ class AllMatchWithKeysTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertTrue($result);
         $this->assertSame([1, 2, 3, 4], \array_column($received, 0));
+        $this->assertSame(\array_keys($expectedInput), \array_column($received, 1));
     }
 
     public function testShortCircuitsWithoutPullingFollowingValue(): void
@@ -38,5 +39,12 @@ class AllMatchWithKeysTest extends \PHPUnit\Framework\TestCase
 
         // When / Then
         $this->assertFalse(Summary::allMatchWithKeys($source, static fn (int $value): int => $value));
+    }
+
+    /** @dataProvider dataProviderForEmptyIterable */
+    public function testEmptyIterableIsTrue(iterable $data): void
+    {
+        // When / Then
+        $this->assertTrue(Summary::allMatchWithKeys($data, static fn (mixed $value, mixed $key): bool => false));
     }
 }

@@ -5,10 +5,38 @@ declare(strict_types=1);
 namespace IterTools\Tests\Summary;
 
 use IterTools\Summary;
+use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
+use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
 class AllEqualByTest extends \PHPUnit\Framework\TestCase
 {
+    use \IterTools\Tests\Fixture\DataProvider;
+
+    /** @dataProvider dataProviderForEmptyIterable */
+    public function testEmptyIterableIsTrue(iterable $data): void
+    {
+        // When / Then
+        $this->assertTrue(Summary::allEqualBy($data, static fn (mixed $value): mixed => $value));
+    }
+
+    /** @dataProvider singletonIterableProvider */
+    public function testSingletonIterableIsTrue(iterable $data): void
+    {
+        // When / Then
+        $this->assertTrue(Summary::allEqualBy($data, static fn (int $value): int => $value));
+    }
+
+    public static function singletonIterableProvider(): array
+    {
+        return [
+            'array' => [[1]],
+            'generator' => [GeneratorFixture::getGenerator([1])],
+            'iterator' => [new ArrayIteratorFixture([1])],
+            'iterator aggregate' => [new IteratorAggregateFixture([1])],
+        ];
+    }
+
     public function testDistinctValuesCanProjectToSameIdentity(): void
     {
         // Given

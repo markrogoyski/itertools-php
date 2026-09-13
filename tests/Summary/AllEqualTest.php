@@ -11,18 +11,44 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
 class AllEqualTest extends \PHPUnit\Framework\TestCase
 {
-    /** @dataProvider equalIterableProvider */
-    public function testEmptySingleAndRepeatedValues(iterable $data): void
+    use \IterTools\Tests\Fixture\DataProvider;
+
+    /** @dataProvider dataProviderForEmptyIterable */
+    public function testEmptyIterableIsTrue(iterable $data): void
     {
         // When / Then
         $this->assertTrue(Summary::allEqual($data));
     }
 
-    public static function equalIterableProvider(): array
+    /** @dataProvider singletonIterableProvider */
+    public function testSingletonIterableIsTrue(iterable $data): void
+    {
+        // When / Then
+        $this->assertTrue(Summary::allEqual($data));
+    }
+
+    public static function singletonIterableProvider(): array
     {
         return [
-            'empty array' => [[]],
-            'single generator' => [GeneratorFixture::getGenerator([null])],
+            'array' => [[1]],
+            'generator' => [GeneratorFixture::getGenerator([1])],
+            'iterator' => [new ArrayIteratorFixture([1])],
+            'iterator aggregate' => [new IteratorAggregateFixture([1])],
+        ];
+    }
+
+    /** @dataProvider repeatedEqualValueProvider */
+    public function testRepeatedEqualValuesAreTrue(iterable $data): void
+    {
+        // When / Then
+        $this->assertTrue(Summary::allEqual($data));
+    }
+
+    public static function repeatedEqualValueProvider(): array
+    {
+        return [
+            'array' => [[[1], [1]]],
+            'generator' => [GeneratorFixture::getGenerator([null, null])],
             'iterator' => [new ArrayIteratorFixture([[1], [1]])],
             'iterator aggregate' => [new IteratorAggregateFixture(['x', 'x'])],
         ];

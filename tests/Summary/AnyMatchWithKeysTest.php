@@ -11,7 +11,7 @@ class AnyMatchWithKeysTest extends \PHPUnit\Framework\TestCase
     use \IterTools\Tests\Fixture\DataProvider;
 
     /** @dataProvider dataProviderForKeyAwareIterable */
-    public function testReceivesValueThenKeyAndCoercesResults(iterable $data): void
+    public function testReceivesValueThenKeyAndCoercesResults(iterable $data, array $expectedInput): void
     {
         // Given
         $received = [];
@@ -25,5 +25,13 @@ class AnyMatchWithKeysTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertTrue($result);
         $this->assertSame([1, 2, 3], \array_column($received, 0));
+        $this->assertSame(\array_slice(\array_keys($expectedInput), 0, 3), \array_column($received, 1));
+    }
+
+    /** @dataProvider dataProviderForEmptyIterable */
+    public function testEmptyIterableIsFalse(iterable $data): void
+    {
+        // When / Then
+        $this->assertFalse(Summary::anyMatchWithKeys($data, static fn (mixed $value, mixed $key): bool => true));
     }
 }

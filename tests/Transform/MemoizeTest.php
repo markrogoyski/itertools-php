@@ -108,6 +108,22 @@ class MemoizeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($object, $tuples[2][1]);
     }
 
+    public function testReplaysEmptySourceAndDoesNotReinitialize(): void
+    {
+        // Given
+        $aggregate = new CountingIteratorAggregateFixture([]);
+        $memoized = Transform::memoize($aggregate);
+
+        // When
+        $first = \iterator_to_array($memoized, false);
+        $second = \iterator_to_array($memoized, false);
+
+        // Then
+        $this->assertSame([], $first);
+        $this->assertSame([], $second);
+        $this->assertSame(1, $aggregate->getIteratorCallCount());
+    }
+
     public function testConstructionDoesNotTouchIteratorAggregateSource(): void
     {
         // Given
