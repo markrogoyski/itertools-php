@@ -3506,7 +3506,7 @@ Stream::of(['some', 'items'])
   ->foreach($someComplexCallable);
 ```
 
-##### Print R
+#### Print R
 Вызывает `print_r()` для каждого элемента из потока.
 
 ```$stream->printR(): void```
@@ -3520,7 +3520,7 @@ Stream::of($words)->printR();
 // print_r output
 ```
 
-##### Var Dump
+#### Var Dump
 Вызывает `var_dump()` для каждого элемента из потока.
 
 ```$stream->varDump(): void```
