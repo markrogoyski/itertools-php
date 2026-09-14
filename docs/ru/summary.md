@@ -483,22 +483,22 @@ $boolean = Summary::startsWithCoercive($digits, ['1', '2']);
 $boolean = Summary::startsWith($digits, ['1', '2']);
 // false (строгое сравнение)
 ```
-## All Equal
+### All Equal
 
 `Summary::allEqual($data, $strict)` использует те же строгие и нестрогие правила идентичности, что и `allUnique`. Пустой вход возвращает `true`; в нестрогом режиме `null`, пустая строка, ноль и `false` эквивалентны. Повторяющиеся `NAN` также эквивалентны. Несериализуемый объект в нестрогом режиме бросает `InvalidArgumentException`.
 
-## All Equal By
+### All Equal By
 
 `Summary::allEqualBy($data, $keyFunc, $strict)` вызывает проекцию один раз на потреблённый элемент и останавливается на первом различии.
 
-## All Match With Keys
+### All Match With Keys
 
 `allMatchWithKeys` вызывает предикат как `($value, $key)` и останавливается на первом ложном результате. Для пустого входа результат `true`.
 
-## Any Match With Keys
+### Any Match With Keys
 
 `anyMatchWithKeys` останавливается на первом истинном результате; для пустого входа возвращает `false`.
 
-## None Match With Keys
+### None Match With Keys
 
 `noneMatchWithKeys` останавливается на первом истинном результате; для пустого входа возвращает `true`. Результаты всех трёх предикатов приводятся через `(bool)`.

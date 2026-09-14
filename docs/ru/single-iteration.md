@@ -912,10 +912,10 @@ foreach (Single::withFirstAndLast($items) as [$isFirst, $isLast, $item]) {
     // [true, false, 'a'], [false, false, 'b'], [false, true, 'c']
 }
 ```
-## Take While With Keys
+### Take While With Keys
 
 `Single::takeWhileWithKeys($data, $predicate)` лениво передаёт callback аргументы `($value, $key)`, сохраняет ключи и окончательно останавливается на первом ложном результате.
 
-## Drop While With Keys
+### Drop While With Keys
 
 `Single::dropWhileWithKeys($data, $predicate)` отбрасывает элементы, пока callback `($value, $key)` истинен, затем возвращает остаток без дальнейших вызовов предиката. Ключи сохраняются.

@@ -2211,6 +2211,26 @@ $result = Stream::of(['a', 'b', 'c'])
 // [[true, false, 'a'], [false, false, 'b'], [false, true, 'c']]
 ```
 
+#### Merge Sorted With
+
+`mergeSortedWith(...$iterables)` лениво и стабильно сливает отсортированный поток с дополнительными отсортированными источниками. Текущий поток считается первым источником.
+
+#### Merge Sorted By With
+
+`mergeSortedByWith($keyFunc, ...$iterables)` выполняет такое же слияние по однократно вычисляемой проекции.
+
+#### Take While With Keys
+
+`takeWhileWithKeys($predicate)` передаёт `($value, $key)`, сохраняет ключи и останавливается на первом ложном результате.
+
+#### Drop While With Keys
+
+`dropWhileWithKeys($predicate)` отбрасывает элементы до первого ложного результата, затем возвращает остаток без дальнейших вызовов предиката.
+
+#### Memoize
+
+`memoize()` кэширует значения в текущей точке изменяемого pipeline. Последующие преобразования не кэшируются автоматически; при необходимости вызовите `memoize()` после них снова. Кэш растёт до максимально потреблённой позиции и не освобождается.
+
 ### Завершающие операции
 
 #### Саммари о потоке
@@ -2662,6 +2682,26 @@ $digits = [1, 2, 3];
 $boolean = Stream::of($digits)->startsWithCoercive(['1', '2']);
 // true (приведение типов)
 ```
+
+##### All Match With Keys
+
+`allMatchWithKeys($predicate)` — короткозамыкающая завершающая операция с callback `($value, $key)`.
+
+##### Any Match With Keys
+
+`anyMatchWithKeys($predicate)` останавливается на первом истинном результате.
+
+##### None Match With Keys
+
+`noneMatchWithKeys($predicate)` останавливается на первом истинном результате и возвращает его отрицание.
+
+##### All Equal
+
+`allEqual($strict)` использует те же правила идентичности, что и `allUnique`; пустой поток возвращает `true`.
+
+##### All Equal By
+
+`allEqualBy($keyFunc, $strict)` сравнивает проекции и останавливается на первом различии.
 
 #### Редуцирование
 
@@ -3393,6 +3433,10 @@ Stream::of($data)
 // </ul>
 ```
 
+##### Call For Each With Keys
+
+`callForEachWithKeys($func)` eagerly вызывает `$func($value, $key)` для каждого элемента и возвращает `void`.
+
 ### Операции для дебаггинга
 #### Peek
 Позволяет просмотреть каждый элемент между другими потоковыми операциями, чтобы выполнить какое-либо действие без влияния на поток.
@@ -3489,50 +3533,6 @@ $items = [$string, $array, $object];
 Stream::of($words)->varDump();
 // var_dump output
 ```
-## Merge Sorted With
-
-`mergeSortedWith(...$iterables)` лениво и стабильно сливает отсортированный поток с дополнительными отсортированными источниками. Текущий поток считается первым источником.
-
-## Merge Sorted By With
-
-`mergeSortedByWith($keyFunc, ...$iterables)` выполняет такое же слияние по однократно вычисляемой проекции.
-
-## Take While With Keys
-
-`takeWhileWithKeys($predicate)` передаёт `($value, $key)`, сохраняет ключи и останавливается на первом ложном результате.
-
-## Drop While With Keys
-
-`dropWhileWithKeys($predicate)` отбрасывает элементы до первого ложного результата, затем возвращает остаток без дальнейших вызовов предиката.
-
-## Peek With Keys
+#### Peek With Keys
 
 `peekWithKeys($callback)` лениво вызывает `$callback($value, $key)` перед передачей каждого запрошенного элемента дальше.
-
-## Memoize
-
-`memoize()` кэширует значения в текущей точке изменяемого pipeline. Последующие преобразования не кэшируются автоматически; при необходимости вызовите `memoize()` после них снова. Кэш растёт до максимально потреблённой позиции и не освобождается.
-
-## All Match With Keys
-
-`allMatchWithKeys($predicate)` — короткозамыкающая завершающая операция с callback `($value, $key)`.
-
-## Any Match With Keys
-
-`anyMatchWithKeys($predicate)` останавливается на первом истинном результате.
-
-## None Match With Keys
-
-`noneMatchWithKeys($predicate)` останавливается на первом истинном результате и возвращает его отрицание.
-
-## All Equal
-
-`allEqual($strict)` использует те же правила идентичности, что и `allUnique`; пустой поток возвращает `true`.
-
-## All Equal By
-
-`allEqualBy($keyFunc, $strict)` сравнивает проекции и останавливается на первом различии.
-
-## Call For Each With Keys
-
-`callForEachWithKeys($func)` eagerly вызывает `$func($value, $key)` для каждого элемента и возвращает `void`.

@@ -84,7 +84,7 @@ $array = [1, 2, 3, 4, 5];
 
 $iterator = Transform::toIterator($array);
 ```
-## Memoize
+### Memoize
 
 `Transform::memoize(iterable $iterable): IteratorAggregate` makes a source replayable while consuming it only on demand. Each consumer replays cached `[key, value]` pairs from the beginning and shares one source traversal. Duplicate keys and object identity are preserved.
 

@@ -928,10 +928,10 @@ foreach (Single::withFirstAndLast($items) as [$isFirst, $isLast, $item]) {
     // [true, false, 'a'], [false, false, 'b'], [false, true, 'c']
 }
 ```
-## Take While With Keys
+### Take While With Keys
 
 `Single::takeWhileWithKeys($data, $predicate)` yields source values and keys while `$predicate($value, $key)` is truthy. It consumes the first failing item but does not yield it.
 
-## Drop While With Keys
+### Drop While With Keys
 
 `Single::dropWhileWithKeys($data, $predicate)` discards values while `$predicate($value, $key)` is truthy, then yields the first failing item and the remainder without further predicate calls. Both methods are lazy and preserve keys.
