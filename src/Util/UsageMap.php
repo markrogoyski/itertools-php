@@ -31,9 +31,25 @@ final class UsageMap
      * class that they did before this map retained values -- for coercive comparisons that is an
      * observable type-level difference, e.g. the '1' rather than the 1 of [1] vs ['1', '1'].
      *
+     * Registering a value additionally retains the identity anchors its hash depends on, in
+     * {@see self::$anchors}, so nested identities stay pinned independently of which
+     * representative the last-seen slot above currently holds; see {@see Identity}.
+     *
      * @var array<string, mixed>
      */
     private array $values = [];
+    /**
+     * Every anchor of every distinct hash this map has seen, appended on first sight and never
+     * removed -- deleting a usage does not delete the identities it depended on. See
+     * {@see Identity}; {@see ValueCounter} retains anchors for the same reason.
+     *
+     * Deliberately write-only: retention is achieved by holding the references, not by reading
+     * them back, so there is no consumer of this list inside the class.
+     *
+     * @var list<object|resource>
+     */
+    // @phpstan-ignore property.onlyWritten
+    private array $anchors = [];
     /**
      * @param bool $strict
      */
@@ -51,12 +67,17 @@ final class UsageMap
      */
     public function addUsage(mixed $value, string $owner): string
     {
-        $hash = UniqueExtractor::getString($value, $this->strict);
+        $identity = UniqueExtractor::identify($value, $this->strict);
+        $hash = $identity->key;
 
         $this->values[$hash] = $value;
 
         if (!isset($this->addedMap[$hash])) {
             $this->addedMap[$hash] = [];
+
+            foreach ($identity->anchors as $anchor) {
+                $this->anchors[] = $anchor;
+            }
         }
 
         if (!isset($this->addedMap[$hash][$owner])) {
