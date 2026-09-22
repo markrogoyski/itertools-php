@@ -305,6 +305,25 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
                 true,
                 [$func1, $func2],
             ],
+            // 4.7 public regression: floats that are unequal despite the coercive-adjacent
+            // rounding of the naive sum stay distinct in strict mode.
+            [
+                [0.1 + 0.2, 0.3],
+                true,
+                [0.1 + 0.2, 0.3],
+            ],
+            // 4.7 public regression: -0.0 and 0.0 are the same number in strict mode.
+            [
+                [-0.0, 0.0],
+                true,
+                [-0.0],
+            ],
+            // 4.7 public regression: large integers near PHP_INT_MAX stay distinct in coercive mode.
+            [
+                [\PHP_INT_MAX, \PHP_INT_MAX - 1],
+                false,
+                [\PHP_INT_MAX, \PHP_INT_MAX - 1],
+            ],
         ];
     }
 
@@ -604,6 +623,22 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
                 $gen([$func1 = fn () => 1, $func2 = fn () => 1, $func1]),
                 true,
                 [$func1, $func2],
+            ],
+            // 4.7 public regression: see dataProviderForArray for the rationale of each case.
+            [
+                $gen([0.1 + 0.2, 0.3]),
+                true,
+                [0.1 + 0.2, 0.3],
+            ],
+            [
+                $gen([-0.0, 0.0]),
+                true,
+                [-0.0],
+            ],
+            [
+                $gen([\PHP_INT_MAX, \PHP_INT_MAX - 1]),
+                false,
+                [\PHP_INT_MAX, \PHP_INT_MAX - 1],
             ],
         ];
     }
@@ -905,6 +940,22 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
                 true,
                 [$func1, $func2],
             ],
+            // 4.7 public regression: see dataProviderForArray for the rationale of each case.
+            [
+                $iter([0.1 + 0.2, 0.3]),
+                true,
+                [0.1 + 0.2, 0.3],
+            ],
+            [
+                $iter([-0.0, 0.0]),
+                true,
+                [-0.0],
+            ],
+            [
+                $iter([\PHP_INT_MAX, \PHP_INT_MAX - 1]),
+                false,
+                [\PHP_INT_MAX, \PHP_INT_MAX - 1],
+            ],
         ];
     }
 
@@ -1205,6 +1256,22 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
                 true,
                 [$func1, $func2],
             ],
+            // 4.7 public regression: see dataProviderForArray for the rationale of each case.
+            [
+                $trav([0.1 + 0.2, 0.3]),
+                true,
+                [0.1 + 0.2, 0.3],
+            ],
+            [
+                $trav([-0.0, 0.0]),
+                true,
+                [-0.0],
+            ],
+            [
+                $trav([\PHP_INT_MAX, \PHP_INT_MAX - 1]),
+                false,
+                [\PHP_INT_MAX, \PHP_INT_MAX - 1],
+            ],
         ];
     }
 
@@ -1397,5 +1464,28 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertCount(6, $ids);
+    }
+
+    /**
+     * @test distinct keeps freshly built closures distinct in coercive mode when the consumer
+     *       does not retain them; closures hash by instance in both modes.
+     */
+    public function testKeepsFreshClosuresDistinctInCoerciveModeWhenConsumerDiscardsThem(): void
+    {
+        // Given
+        $source = (static function (): \Generator {
+            for ($i = 1; $i <= 3; ++$i) {
+                yield static fn () => $i;
+            }
+        })();
+
+        // When
+        $ids = [];
+        foreach (Set::distinct($source, false) as $value) {
+            $ids[] = \spl_object_id($value);
+        }
+
+        // Then
+        $this->assertCount(3, $ids);
     }
 }

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\Identity;
 use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\NoValueMonad;
 use IterTools\Util\UniqueExtractor;
 use IterTools\Util\UsageMap;
+use IterTools\Util\ValueCounter;
 
 final class Set
 {
@@ -27,13 +29,11 @@ final class Set
         // Retains the objects, closures, generators, and resources it has compared by
         // instance (including nested ones) for the generator's lifetime; see README
         // "Strict and Coercive Types" > Retained values.
-        $seen = [];
+        // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
+        $counter = new ValueCounter($strict);
 
         foreach ($data as $datum) {
-            $hash = UniqueExtractor::getString($datum, $strict);
-
-            if (!\array_key_exists($hash, $seen)) {
-                $seen[$hash] = $datum;
+            if ($counter->add($datum) === 1) {
                 yield $datum;
             }
         }
@@ -54,14 +54,13 @@ final class Set
     public static function distinctBy(iterable $data, callable $compareBy): \Generator
     {
         // Retains the projected values' anchors (see distinct()) for the generator's lifetime.
-        $seen = [];
+        // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
+        $counter = new ValueCounter(true);
 
         foreach ($data as $datum) {
             $comparable = $compareBy($datum);
-            $hash = UniqueExtractor::getString($comparable, true);
 
-            if (!\array_key_exists($hash, $seen)) {
-                $seen[$hash] = $comparable;
+            if ($counter->add($comparable) === 1) {
                 yield $datum;
             }
         }
@@ -85,17 +84,11 @@ final class Set
     public static function duplicates(iterable $data, bool $strict = true): \Generator
     {
         // Retains anchors for values it has compared by instance; see distinct().
-        $seen = [];
-        $emitted = [];
+        // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
+        $counter = new ValueCounter($strict);
 
         foreach ($data as $datum) {
-            $hash = UniqueExtractor::getString($datum, $strict);
-            if (!\array_key_exists($hash, $seen)) {
-                $seen[$hash] = $datum;
-                continue;
-            }
-            if (!isset($emitted[$hash])) {
-                $emitted[$hash] = true;
+            if ($counter->add($datum) === 2) {
                 yield $datum;
             }
         }
@@ -120,18 +113,13 @@ final class Set
     public static function duplicatesBy(iterable $data, callable $keyFn): \Generator
     {
         // Retains extracted keys' anchors; see distinct().
-        $seen = [];
-        $emitted = [];
+        // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
+        $counter = new ValueCounter(true);
 
         foreach ($data as $datum) {
             $key = $keyFn($datum);
-            $hash = UniqueExtractor::getString($key, true);
-            if (!\array_key_exists($hash, $seen)) {
-                $seen[$hash] = $key;
-                continue;
-            }
-            if (!isset($emitted[$hash])) {
-                $emitted[$hash] = true;
+
+            if ($counter->add($key) === 2) {
                 yield $datum;
             }
         }
@@ -464,18 +452,24 @@ final class Set
         iterable ...$iterables
     ): \Generator {
         /**
-         * Each entry pairs a remaining count with the value it was derived from. Holding the
-         * value keeps its spl_object_id reserved in strict mode, so a later object from $a
-         * cannot inherit the ID of an already-freed one and be subtracted by mistake.
+         * Each entry pairs a remaining count with the value it was derived from and the
+         * identity anchors that value's hash depends on. Holding the value keeps its
+         * spl_object_id reserved in strict mode, so a later object from $a cannot inherit the
+         * ID of an already-freed one and be subtracted by mistake; the anchors additionally
+         * pin identities nested inside the value once arrays hash recursively — see Identity.
          *
-         * @var array<string, array{0: int, 1: mixed}> $subtracted
+         * @var array<string, array{0: int, 1: mixed, 2: list<object|resource>}> $subtracted
          */
         $subtracted = [];
 
         foreach ($iterables as $iterable) {
             foreach ($iterable as $value) {
-                $hash = UniqueExtractor::getString($value, $strict);
-                $subtracted[$hash] = [($subtracted[$hash][0] ?? 0) + 1, $value];
+                $identity = UniqueExtractor::identify($value, $strict);
+                $subtracted[$identity->key] = [
+                    ($subtracted[$identity->key][0] ?? 0) + 1,
+                    $value,
+                    $identity->anchors,
+                ];
             }
         }
 
