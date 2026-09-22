@@ -10,8 +10,8 @@ namespace IterTools\Util;
  *
  * An anchor is a value that {@see UniqueExtractor} hashed by identity rather than by content:
  * every object in strict mode (ordinary objects, enum cases, closures, generators), closures,
- * generators and resources in coercive mode, and — once arrays hash recursively — the same kinds
- * of values found inside an array.
+ * generators and resources in coercive mode, and the same kinds of values found inside an array
+ * at any depth.
  *
  * Those keys are built from `spl_object_id()` and `get_resource_id()`, and neither id is unique
  * over time: it is unique only among the values that are alive at the moment it is read. PHP
