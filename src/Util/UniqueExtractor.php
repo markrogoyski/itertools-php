@@ -42,6 +42,9 @@ final class UniqueExtractor
      * Follows the strict or coercive contract documented on this class and in README.md,
      * section "Strict and Coercive Types".
      *
+     * The key format is internal: it encodes the value as `type:payload` and may change. Only
+     * equality and inequality of keys is meaningful, never their spelling.
+     *
      * @param mixed $var
      * @param bool $strict
      *
@@ -52,26 +55,98 @@ final class UniqueExtractor
     public static function getString(mixed $var, bool $strict): string
     {
         return match (true) {
-            \is_array($var) => 'array_' . \serialize($var),
-            \is_resource($var) => 'resource_' . \get_resource_type($var) . '_' . (string) $var,
-            $var instanceof \Generator => 'generator_' . \spl_object_id($var),
-            $var instanceof \Closure => 'closure_' . \spl_object_id($var),
-            \is_object($var) => 'object_' . ($strict ? \spl_object_id($var) : self::serializeObject($var)),
-            \is_float($var) && \is_nan($var) => 'double_NAN',
-            $strict && \is_bool($var) => 'boolean_' . \intval($var),
-            /** @phpstan-ignore cast.string */
-            $strict => \gettype($var) . '_' . (string) $var,
-            \is_bool($var) => 'numeric_' . self::normalizeNumeric(\floatval($var)),
-            \is_numeric($var) => 'numeric_' . self::normalizeNumeric(\floatval($var)),
-            $var === null || $var === '' => 'numeric_0',
-            /** @phpstan-ignore cast.string */
-            default => 'scalar_' . (string) $var,
+            $var === null => $strict ? 'null' : 'int:0',
+            \is_bool($var) => ($strict ? 'bool:' : 'int:') . (int) $var,
+            \is_int($var) => 'int:' . $var,
+            \is_float($var) => self::floatKey($var, $strict),
+            \is_string($var) => self::stringKey($var, $strict),
+            // A closed resource is no longer \is_resource(), so it needs its own test, and that
+            // test has to run before \is_object(). Its id survives the close, so an open and a
+            // closed handle keep the same key.
+            \is_resource($var), \gettype($var) === 'resource (closed)' => 'resource:' . \get_resource_id($var),
+            \is_object($var) => self::objectKey($var, $strict),
+            // Only arrays are left. They still hash by \serialize(), whose equality matches
+            // neither mode exactly; hashing them element-wise is a separate change.
+            default => 'array_' . \serialize($var),
         };
     }
 
-    private static function normalizeNumeric(float $value): string
+    /**
+     * Key of a float: bit-exact, except that integral values collapse onto their integer in coercive mode.
+     */
+    private static function floatKey(float $var, bool $strict): string
     {
-        return $value === 0.0 ? '0' : (string) $value;
+        if (\is_nan($var)) {
+            return 'nan';
+        }
+
+        // -0.0 === 0.0 and they are the same number, so the sign of zero must not reach the key.
+        $value = $var === 0.0 ? 0.0 : $var;
+
+        if (!$strict && self::isIntegralWithinIntRange($value)) {
+            return 'int:' . (int) $value;
+        }
+
+        return 'float:' . \bin2hex(\pack('E', $value));
+    }
+
+    /**
+     * Is the float a whole number that the platform's int type can hold exactly?
+     */
+    private static function isIntegralWithinIntRange(float $value): bool
+    {
+        // The upper bound is exclusive and derived from PHP_INT_MIN: (float) PHP_INT_MAX rounds
+        // up to 2**63, which is out of int range, so comparing against it would accept a float
+        // whose int cast is undefined. INF and -INF fail these comparisons and never fold.
+        return $value == \floor($value)
+            && $value >= (float) \PHP_INT_MIN
+            && $value < -(float) \PHP_INT_MIN;
+    }
+
+    /**
+     * Key of a string: exact content, except that coercive mode hashes numeric strings by their number.
+     */
+    private static function stringKey(string $var, bool $strict): string
+    {
+        if ($strict) {
+            return self::rawStringKey($var);
+        }
+
+        if ($var === '') {
+            return 'int:0';
+        }
+
+        if (\is_numeric($var)) {
+            // "$s + 0" applies PHP's own numeric-string rules and yields an int or a float,
+            // which is then hashed by the rules for that type.
+            $number = $var + 0;
+
+            return \is_int($number) ? 'int:' . $number : self::floatKey($number, false);
+        }
+
+        return self::rawStringKey($var);
+    }
+
+    /**
+     * Key of a string's exact bytes, length-framed so that delimiters and NUL bytes cannot collide.
+     */
+    private static function rawStringKey(string $var): string
+    {
+        return 'string:' . \strlen($var) . ':' . $var;
+    }
+
+    /**
+     * Key of an object: by instance, except for ordinary objects in coercive mode.
+     */
+    private static function objectKey(object $var, bool $strict): string
+    {
+        if ($strict || $var instanceof \Generator || $var instanceof \Closure) {
+            return 'object:' . \spl_object_id($var);
+        }
+
+        $serialized = self::serializeObject($var);
+
+        return 'serialized:' . \strlen($serialized) . ':' . $serialized;
     }
 
     /**
