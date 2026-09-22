@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\Identity;
 use IterTools\Util\UniqueExtractor;
 use IterTools\Util\UsageMap;
+use IterTools\Util\ValueCounter;
 
 /**
  * Tools to get summarized answers about iterables.
@@ -138,14 +140,13 @@ final class Summary
      */
     public static function allUnique(iterable $data, bool $strict = true): bool
     {
-        $usageMap = [];
+        // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
+        $counter = new ValueCounter($strict);
 
         foreach ($data as $datum) {
-            $hash = UniqueExtractor::getString($datum, $strict);
-            if (\array_key_exists($hash, $usageMap)) {
+            if ($counter->add($datum) > 1) {
                 return false;
             }
-            $usageMap[$hash] = true;
         }
 
         return true;
@@ -160,14 +161,12 @@ final class Summary
      */
     public static function allEqual(iterable $data, bool $strict = true): bool
     {
-        $found = false;
-        $firstHash = '';
+        // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
+        $counter = new ValueCounter($strict);
+
         foreach ($data as $datum) {
-            $hash = UniqueExtractor::getString($datum, $strict);
-            if (!$found) {
-                $found = true;
-                $firstHash = $hash;
-            } elseif ($hash !== $firstHash) {
+            $counter->add($datum);
+            if ($counter->size() > 1) {
                 return false;
             }
         }
@@ -186,26 +185,25 @@ final class Summary
     public static function allEqualBy(iterable $data, callable $keyFunc, bool $strict = true): bool
     {
         $found = false;
-        $firstHash = '';
+        $firstIdentity = null;
 
         // Every key is hashed, including one that is the very same instance as its predecessor:
         // in coercive mode equivalence is decided by current serialized state, so a shared key
         // object the caller mutates between projections is not equal to itself as first seen.
         //
-        // $key must keep holding the previous projection across the $keyFunc call. In strict mode
-        // an object's hash is its spl_object_id, which PHP reuses once the object is freed; the
-        // held reference keeps the comparison basis alive so a fresh key cannot inherit its ID.
-        // Do not fold the projection into the hashing call.
+        // $firstIdentity must keep holding the first projection's Identity across every later
+        // $keyFunc call, not just its key string. See Identity for why the anchors are held.
         foreach ($data as $datum) {
             $key = $keyFunc($datum);
 
             if (!$found) {
                 $found = true;
-                $firstHash = UniqueExtractor::getString($key, $strict);
+                $firstIdentity = UniqueExtractor::identify($key, $strict);
                 continue;
             }
 
-            if (UniqueExtractor::getString($key, $strict) !== $firstHash) {
+            /** @var Identity $firstIdentity */
+            if (UniqueExtractor::getString($key, $strict) !== $firstIdentity->key) {
                 return false;
             }
         }

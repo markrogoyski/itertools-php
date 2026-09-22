@@ -141,4 +141,24 @@ class AllEqualByTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertTrue($result);
     }
+
+    /**
+     * Guard for the ValueCounter/Identity migration: a generator projecting to a fresh object
+     * each time must keep comparing unequal in strict mode, not just when the source is an array.
+     */
+    public function testFreshProjectedObjectsFromGeneratorAreNotEqualStrict(): void
+    {
+        // Given
+        $source = (static function (): \Generator {
+            for ($i = 0; $i < 2; $i++) {
+                yield $i;
+            }
+        })();
+
+        // When
+        $result = Summary::allEqualBy($source, static fn (int $value): object => (object) ['value' => $value]);
+
+        // Then
+        $this->assertFalse($result);
+    }
 }

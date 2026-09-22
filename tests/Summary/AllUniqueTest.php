@@ -78,6 +78,54 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
+    /**
+     * Regression for defect 8: a freed object's spl_object_id can be reissued to a later,
+     * unrelated object. Each yielded object is dropped by the consumer before the next is
+     * produced, so this can only be reproduced through a generator, not the four fixtures.
+     *
+     * @test allUnique retains identity anchors so ephemeral objects are not falsely merged
+     */
+    public function testEphemeralObjectsAreAllUniqueStrict(): void
+    {
+        // Given
+        $data = self::freshObjectGenerator();
+
+        // When
+        $result = Summary::allUnique($data, true);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test allUnique retains identity anchors for closures, which hash by instance in both modes
+     */
+    public function testEphemeralClosuresAreAllUniqueCoercive(): void
+    {
+        // Given
+        $data = self::freshClosureGenerator();
+
+        // When
+        $result = Summary::allUnique($data, false);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    private static function freshObjectGenerator(): \Generator
+    {
+        for ($i = 0; $i < 3; $i++) {
+            yield new \stdClass();
+        }
+    }
+
+    private static function freshClosureGenerator(): \Generator
+    {
+        for ($i = 0; $i < 3; $i++) {
+            yield fn () => $i;
+        }
+    }
+
     public static function dataProviderForArrayStrictTrue(): array
     {
         return [

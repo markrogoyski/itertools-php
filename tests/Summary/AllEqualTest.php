@@ -113,4 +113,38 @@ class AllEqualTest extends \PHPUnit\Framework\TestCase
         // When
         Summary::allEqual([(object) ['callback' => static fn (): null => null]], false);
     }
+
+    /**
+     * Guard for the ValueCounter migration: a generator of fresh stdClass instances must
+     * still be reported unequal in strict mode. Passes today; retention makes it safe on
+     * purpose rather than by accident.
+     */
+    public function testFreshObjectsFromGeneratorAreNotEqualStrict(): void
+    {
+        // Given
+        $data = (static function (): \Generator {
+            for ($i = 0; $i < 2; $i++) {
+                yield new \stdClass();
+            }
+        })();
+
+        // When / Then
+        $this->assertFalse(Summary::allEqual($data));
+    }
+
+    /**
+     * Closures hash by instance in coercive mode too, so fresh closures must not compare equal.
+     */
+    public function testFreshClosuresFromGeneratorAreNotEqualCoercive(): void
+    {
+        // Given
+        $data = (static function (): \Generator {
+            for ($i = 0; $i < 2; $i++) {
+                yield fn () => $i;
+            }
+        })();
+
+        // When / Then
+        $this->assertFalse(Summary::allEqual($data, false));
+    }
 }
