@@ -1,5 +1,22 @@
 # IterTools PHP Change Log
 
+## v2.7.0 - 2026-09-22
+
+### Bug Fixes
+* `UniqueExtractor` (the shared equality kernel behind `Set`, `Summary`, `Math`, and `Reduce`): floats hashed at the ini `precision` setting (14 digits by default) instead of by exact value, so `0.1 + 0.2` and `0.3` could merge and the answer depended on `precision`/`serialize_precision`; floats now hash by exact bits.
+* `UniqueExtractor`: `-0.0` and `0.0` hashed to different keys in strict mode although `-0.0 === 0.0`; they now share a key.
+* `UniqueExtractor`: coercive mode routed integers through `floatval`, merging integers beyond `2^53` (e.g. `9007199254740992` and `9007199254740993`); integers now hash by their exact value.
+* `UniqueExtractor`: a resource's key changed when it was closed, splitting one handle's identity across its open and closed state; the key is now the resource id alone.
+* `UniqueExtractor`: arrays hashed via `serialize()`, so nested closures and generators threw a bare `\Exception` instead of the documented `\InvalidArgumentException`, and nested resources all compared equal to each other, and to `0`; arrays now hash element-wise through the same rules as their elements.
+* Summary: `allUnique` used a hand-rolled hash map that kept only keys, not the values a key depends on, so a freed object's reused `spl_object_id` could falsely merge with a later, unrelated object and return `false` for distinct objects freed during iteration; it now retains the identities its hashes depend on.
+* Set, Summary, Math, Reduce: retaining a hashed value did not pin an identity reachable only through a reused reference slot (e.g. a generator yielding `[&$slot]` and reassigning `$slot`), so such objects could be recycled mid-iteration and falsely merge; identities nested inside arrays are now retained for the comparison's lifetime.
+
+### Changes
+* Arrays now compare element-wise under the active mode instead of by `serialize()`. In strict mode, nested objects, closures, generators, and resources compare by instance, and nested `-0.0` equals `0.0`. In coercive mode, `[1]` and `['1']` are now equal (e.g. `Set::distinct([[1], ['1']], false)` yields one element; `Set::unionCoercive([[1]], [['1']])` yields one).
+* Arrays nested deeper than 256 levels, including self-referential arrays, now throw `\InvalidArgumentException` where they previously went through `serialize()`.
+* Coercive scalar comparison is documented as numeric equivalence, not PHP `==`: `'abc'` is not equal to `true`, and `0`, `''`, `null`, and `false` remain one value.
+* The README "Strict and Coercive Types" section is now the single source of truth for strict and coercive comparison, including which values are retained for the lifetime of a comparison.
+
 ## v2.6.0 - 2026-09-21
 
 ### New Features
