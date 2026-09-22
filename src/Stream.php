@@ -743,6 +743,8 @@ final class Stream implements \IteratorAggregate
      * Returns a frequency distribution of stream elements
      * showing how often each different value in the collection occurs.
      *
+     * @see Math::frequencies()
+     *
      * @param bool $strict
      *
      * @return $this
@@ -756,6 +758,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns a relative frequency distribution of stream elements
      * showing how often each different value in the collection occurs.
+     *
+     * @see Math::relativeFrequencies()
      *
      * @param bool $strict
      *
@@ -1574,21 +1578,13 @@ final class Stream implements \IteratorAggregate
     /**
      * Filter out elements from the iterable source only returning unique elements.
      *
-     * If $strict is true:
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
-     *  - arrays: compares serialized.
-     *
-     * If $strict is false:
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
-     *  - arrays: compares serialized.
+     * Equality follows the strict or coercive rules in README "Strict and Coercive Types".
      *
      * @param bool $strict
      *
      * @return Stream
      *
-     * @see Single::distinct()
+     * @see Set::distinct()
      */
     public function distinct(bool $strict = true): self
     {
@@ -1599,13 +1595,14 @@ final class Stream implements \IteratorAggregate
     /**
      * Filter out elements from the iterable source only returning unique elements.
      *
-     * Using $compareBy function for getting comparable value.
+     * Using $compareBy function for getting comparable value. Comparison of projected
+     * values is strict; see README "Strict and Coercive Types".
      *
      * @param callable $compareBy
      *
      * @return $this
      *
-     * @see Single::distinctBy()
+     * @see Set::distinctBy()
      */
     public function distinctBy(callable $compareBy): self
     {
@@ -1616,8 +1613,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Remove only consecutive duplicates from the stream (Unix `uniq` behavior).
      *
-     * Each element is compared strictly (===) to the previous element yielded.
-     * Non-adjacent duplicates are kept. Source keys are discarded.
+     * Each element is compared strictly (===) to the previous element yielded; see README
+     * "Strict and Coercive Types". Non-adjacent duplicates are kept. Source keys are discarded.
      *
      * @return Stream
      *
@@ -1632,8 +1629,9 @@ final class Stream implements \IteratorAggregate
     /**
      * Remove only consecutive duplicates from the stream, comparing values returned by $keyFn.
      *
-     * Each element's extracted key is compared strictly (===) to the previous element's key.
-     * Non-adjacent duplicates are kept. Source keys are discarded.
+     * Each element's extracted key is compared strictly (===) to the previous element's key;
+     * see README "Strict and Coercive Types". Non-adjacent duplicates are kept. Source keys
+     * are discarded.
      *
      * @param callable $keyFn
      *
@@ -1650,7 +1648,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Yield each duplicated value once, at the moment its second occurrence is observed.
      *
-     * Source keys are discarded; output keys are sequential 0-indexed.
+     * Source keys are discarded; output keys are sequential 0-indexed. Equality follows the
+     * strict or coercive rules in README "Strict and Coercive Types".
      *
      * @param bool $strict
      *
@@ -1668,7 +1667,8 @@ final class Stream implements \IteratorAggregate
      * Yield each value whose extracted key duplicates a previously seen key, once at the
      * moment of the second occurrence.
      *
-     * Source keys are discarded; output keys are sequential 0-indexed.
+     * Source keys are discarded; output keys are sequential 0-indexed. Comparison of
+     * extracted keys is strict; see README "Strict and Coercive Types".
      *
      * @param callable $keyFn
      *
@@ -1800,9 +1800,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates the intersection of iterable source and given iterables in strict type mode.
      *
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
-     *  - arrays: compares serialized.
+     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param array<iterable<mixed>> ...$iterables
      *
@@ -1819,9 +1818,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates the intersection of iterable source and given iterables in non-strict type mode.
      *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
-     *  - arrays: compares serialized.
+     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param array<iterable<mixed>> ...$iterables
      *
@@ -1838,9 +1836,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates the symmetric difference of iterable source and given iterables in strict type mode.
      *
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
-     *  - arrays: compares serialized.
+     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -1857,9 +1854,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates the symmetric difference of iterable source and given iterables in non-strict type mode.
      *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
-     *  - arrays: compares serialized.
+     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -1876,11 +1872,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates the difference of iterable source and given iterables in strict type mode.
      *
-     * Returns elements from the source not present in any given iterables.
-     *
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
-     *  - arrays: compares serialized.
+     * Returns elements from the source not present in any given iterables. Equality follows
+     * the strict rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -1897,11 +1890,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates the difference of iterable source and given iterables in non-strict type mode.
      *
-     * Returns elements from the source not present in any given iterables.
-     *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
-     *  - arrays: compares serialized.
+     * Returns elements from the source not present in any given iterables. Equality follows
+     * the coercive rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -1918,9 +1908,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates partial intersection of iterable source and given iterables in strict type mode.
      *
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
-     *  - arrays: compares serialized.
+     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param positive-int $minIntersectionCount
      * @param array<iterable<mixed>> ...$iterables
@@ -1938,9 +1927,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates partial intersection of iterable source and given iterables in non-strict type mode.
      *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
-     *  - arrays: compares serialized.
+     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param positive-int $minIntersectionCount
      * @param array<iterable<mixed>> ...$iterables
@@ -1958,9 +1946,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates union of iterable source and given iterables in strict type mode.
      *
-     *  - scalars: compares strictly by type;
-     *  - objects: always treats different instances as not equal to each other;
-     *  - arrays: compares serialized.
+     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param array<iterable<mixed>> ...$iterables
      *
@@ -1977,9 +1964,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates union of iterable source and given iterables using type coercion.
      *
-     *  - scalars: compares non-strictly by value;
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable);
-     *  - arrays: compares serialized.
+     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param array<iterable<mixed>> ...$iterables
      *
@@ -2395,11 +2381,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if the stream contains the needle (using strict-type comparison).
      *
-     * Strict-type comparison:
-     *  - scalars: compares strictly by type (1 does not match '1', 0 does not match false)
-     *  - objects: matches only the same instance
-     *  - arrays: compares strictly by ===
-     *  - NaN: never matches NaN (since NaN !== NaN)
+     * Equality follows the strict rules in README "Strict and Coercive Types" (NaN never
+     * matches NaN here, since this comparison uses === directly).
      *
      * Short-circuits on first match.
      *
@@ -2417,11 +2400,7 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if the stream contains the needle (using type coercion).
      *
-     * Coercive (non-strict) type comparison:
-     *  - scalars: compares non-strictly by value (1 matches '1', 0 matches false, '1e2' matches 100)
-     *  - objects: compares serialized (throws \InvalidArgumentException if needle or any visited datum is not serializable)
-     *  - arrays: compares serialized
-     *  - NaN: matches NaN (consistent with other coercive operations in this library)
+     * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * Short-circuits on first match.
      *
@@ -2623,7 +2602,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if all elements in stream are unique.
      *
-     * Empty iterables return true.
+     * Empty iterables return true. Equality follows the strict or coercive rules in README
+     * "Strict and Coercive Types".
      *
      * @param bool $strict
      *
@@ -2636,12 +2616,24 @@ final class Stream implements \IteratorAggregate
         return Summary::allUnique($this->iterable, $strict);
     }
 
+    /**
+     * Returns true when all elements have the same UniqueExtractor identity, per README
+     * "Strict and Coercive Types".
+     *
+     * @see Summary::allEqual()
+     */
     public function allEqual(bool $strict = true): bool
     {
         return Summary::allEqual($this->iterable, $strict);
     }
 
-    /** @param callable(mixed): mixed $keyFunc */
+    /**
+     * Returns true when all projected keys have the same UniqueExtractor identity, per
+     * README "Strict and Coercive Types".
+     *
+     * @param callable(mixed): mixed $keyFunc
+     * @see Summary::allEqualBy()
+     */
     public function allEqualBy(callable $keyFunc, bool $strict = true): bool
     {
         return Summary::allEqualBy($this->iterable, $keyFunc, $strict);
@@ -2752,12 +2744,9 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if stream and given collections are permutations of each other (using strict-type comparisons).
      *
-     * Returns true if no collections given.
-     *
-     * Strict-type comparisons:
-     *  - scalars: compares strictly by type
-     *  - objects: always treats different instances as not equal to each other
-     *  - arrays: compares serialized
+     * Returns true if no collections given. Equality follows the strict rules in README
+     * "Strict and Coercive Types". Retains the last-seen representative per distinct value;
+     * see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -2774,12 +2763,9 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if stream and given collections are permutations of each other (using type coercion).
      *
-     * Returns true if no collections given.
-     *
-     * Coercive (non-strict) type comparisons:
-     *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
-     *  - arrays: compares serialized
+     * Returns true if no collections given. Equality follows the coercive rules in README
+     * "Strict and Coercive Types". Retains the last-seen representative per distinct value;
+     * see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -2988,7 +2974,9 @@ final class Stream implements \IteratorAggregate
      *
      * Returns every value tied for the maximum frequency, in first-seen order.
      *
-     * Returns an empty array if iterable source is empty.
+     * Returns an empty array if iterable source is empty. Equality follows the strict rules
+     * in README "Strict and Coercive Types". Retains one representative per distinct value,
+     * since it is part of the output.
      *
      * @return list<mixed>
      *

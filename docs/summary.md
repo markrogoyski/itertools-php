@@ -143,11 +143,9 @@ Returns true if the iterable contains the needle using [strict-type comparison](
 
 ```Summary::contains(iterable $data, mixed $needle): bool```
 
-- Scalars are compared strictly by type (`1` does not match `'1'`; `0` does not match `false`).
-- Objects match only the same instance.
-- Arrays are compared with `===`.
-- `NaN` never matches `NaN` (since `NaN !== NaN`).
-- Short-circuits on the first match.
+Equality follows the [strict rules](../README.md#strict-and-coercive-types) (`NaN` never
+matches `NaN` here, since this comparison uses `===` directly). Short-circuits on the first
+match.
 
 ```php
 use IterTools\Summary;
@@ -169,11 +167,10 @@ Returns true if the iterable contains the needle using [type coercion](../README
 
 ```Summary::containsCoercive(iterable $data, mixed $needle): bool```
 
-- Scalars are compared non-strictly by value (`1` matches `'1'`; `0` matches `false`; `'1e2'` matches `100`).
-- Objects are compared by serialized value (throws `\InvalidArgumentException` if needle or any visited datum is not serializable).
-- Arrays are compared by serialized value.
-- `NaN` matches `NaN` (consistent with other coercive operations in this library).
-- Short-circuits on the first match: a non-serializable datum is only reached if no earlier datum matched.
+Equality follows the [coercive rules](../README.md#strict-and-coercive-types): scalars are
+compared by numeric value (`1` matches `'1'`; `0` matches `false`; `'1e2'` matches `100`).
+Short-circuits on the first match: a non-serializable datum is only reached if no earlier
+datum matched.
 
 ```php
 use IterTools\Summary;
@@ -212,16 +209,11 @@ $boolean = Summary::endsWith($path, ['error.log']);
 ```
 
 ### Ends With Coercive
-Returns true if the iterable ends with the given suffix (using type coercion).
+Returns true if the iterable ends with the given suffix using [type coercion](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
 - Empty suffix returns true without consuming the source.
 - Both source and suffix must be finite.
-- Coercive (non-strict) value comparison:
-  - scalars: compares non-strictly by value (1 matches '1', 0 matches false)
-  - objects: compares serialized (throws `\InvalidArgumentException` if not serializable)
-  - arrays: compares serialized
-  - `NaN` matches `NaN`
 
 ```Summary::endsWithCoercive(iterable $data, iterable $suffix): bool```
 
@@ -465,15 +457,10 @@ $boolean = Summary::startsWith($path, ['etc']);
 ```
 
 ### Starts With Coercive
-Returns true if the iterable starts with the given prefix (using type coercion).
+Returns true if the iterable starts with the given prefix using [type coercion](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
 - Empty prefix returns true without consuming the source.
-- Coercive (non-strict) value comparison:
-  - scalars: compares non-strictly by value (1 matches '1', 0 matches false)
-  - objects: compares serialized (throws `\InvalidArgumentException` if not serializable)
-  - arrays: compares serialized
-  - `NaN` matches `NaN`
 
 ```Summary::startsWithCoercive(iterable $data, iterable $prefix): bool```
 
@@ -492,7 +479,7 @@ $boolean = Summary::startsWith($digits, ['1', '2']);
 
 `Summary::allEqual(iterable $data, bool $strict = true): bool` returns whether every value has the same `UniqueExtractor` identity; empty input is true. `allEqualBy($data, $keyFunc, $strict)` compares projected identities and calls its projection once for every consumed value.
 
-Strictness follows `allUnique`: in coercive mode `null`, `''`, `0`, `0.0`, and `false` are all equivalent (the `numeric_0` equivalence class). Repeated `NAN` values are also equivalent. A non-serializable object in coercive mode throws `InvalidArgumentException`.
+Strictness follows `allUnique`; see [Strict and Coercive Types](../README.md#strict-and-coercive-types).
 
 ```Summary::allEqual(iterable $data, bool $strict = true): bool```
 

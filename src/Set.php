@@ -14,15 +14,7 @@ final class Set
     /**
      * Iterate only the distinct elements.
      *
-     * Strict-type comparisons:
-     *  - scalars: compares strictly by type
-     *  - objects: always treats different instances as not equal to each other
-     *  - arrays: compares serialized
-     *
-     * Coercive (non-strict) type comparisons:
-     *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
-     *  - arrays: compares serialized
+     * Equality follows the strict or coercive rules in README "Strict and Coercive Types".
      *
      * @template T
      * @param iterable<T> $data
@@ -32,9 +24,9 @@ final class Set
      */
     public static function distinct(iterable $data, bool $strict = true): \Generator
     {
-        // Values are stored, not just flagged: in strict mode an object's ID string comes from
-        // its spl_object_id, which PHP reuses once the object is freed. Keeping the value alive
-        // keeps that ID reserved so a later, unrelated object cannot inherit it.
+        // Retains the objects, closures, generators, and resources it has compared by
+        // instance (including nested ones) for the generator's lifetime; see README
+        // "Strict and Coercive Types" > Retained values.
         $seen = [];
 
         foreach ($data as $datum) {
@@ -50,6 +42,8 @@ final class Set
     /**
      * Iterate only the distinct elements using $compareBy function for getting comparable value.
      *
+     * Comparison of projected values is strict; see README "Strict and Coercive Types".
+     *
      * @template T
      *
      * @param iterable<T> $data
@@ -59,7 +53,7 @@ final class Set
      */
     public static function distinctBy(iterable $data, callable $compareBy): \Generator
     {
-        // Projected values are stored so their spl_object_id stays reserved; see distinct().
+        // Retains the projected values' anchors (see distinct()) for the generator's lifetime.
         $seen = [];
 
         foreach ($data as $datum) {
@@ -79,10 +73,7 @@ final class Set
      * Example: [1, 2, 1, 1, 2, 3] yields [1, 2].
      *
      * Source keys are discarded; output keys are sequential 0-indexed. $strict mirrors
-     * Set::distinct comparison semantics:
-     *
-     *  - strict: scalars by ===; objects by instance; arrays by serialization;
-     *  - coercive: scalars by ==; objects/arrays by serialization (objects must be serializable).
+     * Set::distinct comparison semantics; see README "Strict and Coercive Types".
      *
      * @template T
      *
@@ -93,7 +84,7 @@ final class Set
      */
     public static function duplicates(iterable $data, bool $strict = true): \Generator
     {
-        // Values are stored so their spl_object_id stays reserved; see distinct().
+        // Retains anchors for values it has compared by instance; see distinct().
         $seen = [];
         $emitted = [];
 
@@ -116,7 +107,8 @@ final class Set
      *
      * The first value whose key collides is the one yielded; subsequent collisions for
      * that key are not yielded again. Source keys are discarded; output keys are
-     * sequential 0-indexed. Comparison of extracted keys is strict.
+     * sequential 0-indexed. Comparison of extracted keys is strict; see README
+     * "Strict and Coercive Types".
      *
      * @template T
      *
@@ -127,7 +119,7 @@ final class Set
      */
     public static function duplicatesBy(iterable $data, callable $keyFn): \Generator
     {
-        // Extracted keys are stored so their spl_object_id stays reserved; see distinct().
+        // Retains extracted keys' anchors; see distinct().
         $seen = [];
         $emitted = [];
 
@@ -208,10 +200,8 @@ final class Set
      *
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      *
-     * Strict-type comparisons:
-     *  - scalars: compares strictly by type
-     *  - objects: always treats different instances as not equal to each other
-     *  - arrays: compares serialized
+     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -227,10 +217,8 @@ final class Set
      *
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      *
-     * Coercive (non-strict) type comparisons:
-     *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
-     *  - arrays: compares serialized
+     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -247,10 +235,8 @@ final class Set
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      * If minIntersectionCount is 1, then multiset union rules apply.
      *
-     * Strict-type comparisons:
-     *  - scalars: compares strictly by type
-     *  - objects: always treats different instances as not equal to each other
-     *  - arrays: compares serialized
+     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param positive-int $minIntersectionCount
      * @param iterable<mixed> ...$iterables
@@ -268,10 +254,8 @@ final class Set
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      * If minIntersectionCount is 1, then multiset union rules apply.
      *
-     * Coercive (non-strict) type comparisons:
-     *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
-     *  - arrays: compares serialized
+     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param positive-int $minIntersectionCount
      * @param iterable<mixed> ...$iterables
@@ -288,10 +272,8 @@ final class Set
      *
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      *
-     * Strict-type comparisons:
-     *  - scalars: compares strictly by type
-     *  - objects: always treats different instances as not equal to each other
-     *  - arrays: compares serialized
+     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -307,10 +289,8 @@ final class Set
      *
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      *
-     * Coercive (non-strict) type comparisons:
-     *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
-     *  - arrays: compares serialized
+     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -327,10 +307,9 @@ final class Set
      * Returns elements from the first iterable not present in any other iterables.
      * If input iterables produce duplicate items, then multiset difference rules apply.
      *
-     * Strict-type comparisons:
-     *  - scalars: compares strictly by type
-     *  - objects: always treats different instances as not equal to each other
-     *  - arrays: compares serialized
+     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
+     * objects, closures, generators, and resources it has compared by instance, including the
+     * subtracted values, for the generator's lifetime.
      *
      * @param iterable<mixed> $a
      * @param iterable<mixed> ...$iterables
@@ -348,10 +327,9 @@ final class Set
      * Returns elements from the first iterable not present in any other iterables.
      * If input iterables produce duplicate items, then multiset difference rules apply.
      *
-     * Coercive (non-strict) type comparisons:
-     *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
-     *  - arrays: compares serialized
+     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
+     * closures, generators, and resources it has compared by instance, including the
+     * subtracted values, for the generator's lifetime.
      *
      * @param iterable<mixed> $a
      * @param iterable<mixed> ...$iterables
@@ -368,10 +346,8 @@ final class Set
      *
      * If input iterables produce duplicate items, then multiset difference rules apply.
      *
-     * Strict-type comparisons:
-     *  - scalars: compares strictly by type
-     *  - objects: always treats different instances as not equal to each other
-     *  - arrays: compares serialized
+     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -387,10 +363,8 @@ final class Set
      *
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      *
-     * Coercive (non-strict) type comparisons:
-     *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
-     *  - arrays: compares serialized
+     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *

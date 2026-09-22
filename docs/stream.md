@@ -2369,11 +2369,9 @@ Returns true if the stream contains the needle using [strict-type comparison](..
 
 ```$stream->contains(mixed $needle): bool```
 
-- Scalars are compared strictly by type (`1` does not match `'1'`; `0` does not match `false`).
-- Objects match only the same instance.
-- Arrays are compared with `===`.
-- `NaN` never matches `NaN`.
-- Short-circuits on the first match.
+Equality follows the [strict rules](../README.md#strict-and-coercive-types) (`NaN` never
+matches `NaN` here, since this comparison uses `===` directly). Short-circuits on the first
+match.
 
 ```php
 use IterTools\Stream;
@@ -2392,11 +2390,9 @@ Returns true if the stream contains the needle using [type coercion](../README.m
 
 ```$stream->containsCoercive(mixed $needle): bool```
 
-- Scalars are compared non-strictly by value (`1` matches `'1'`; `0` matches `false`; `'1e2'` matches `100`).
-- Objects are compared by serialized value (throws `\InvalidArgumentException` if needle or any visited datum is not serializable).
-- Arrays are compared by serialized value.
-- `NaN` matches `NaN`.
-- Short-circuits on the first match.
+Equality follows the [coercive rules](../README.md#strict-and-coercive-types): scalars are
+compared by numeric value (`1` matches `'1'`; `0` matches `false`; `'1e2'` matches `100`).
+Short-circuits on the first match.
 
 ```php
 use IterTools\Stream;
@@ -2434,7 +2430,7 @@ Returns true if the stream ends with the given suffix using [type coercion](../R
 - Compares values pairwise; keys are ignored.
 - Empty suffix returns true without consuming the stream.
 - The stream must be finite.
-- Scalars are compared non-strictly by value, objects and arrays by serialized value, and `NaN` matches `NaN`.
+- Equality follows the [coercive rules](../README.md#strict-and-coercive-types).
 - Throws `\InvalidArgumentException` if a non-serializable object is reached during comparison.
 
 ```$stream->endsWithCoercive(iterable $suffix): bool```
@@ -2680,7 +2676,7 @@ Returns true if the stream starts with the given prefix using [type coercion](..
 
 - Compares values pairwise; keys are ignored.
 - Empty prefix returns true without consuming the stream.
-- Scalars are compared non-strictly by value, objects and arrays by serialized value, and `NaN` matches `NaN`.
+- Equality follows the [coercive rules](../README.md#strict-and-coercive-types).
 - Throws `\InvalidArgumentException` if a non-serializable object is reached during comparison.
 
 ```$stream->startsWithCoercive(iterable $prefix): bool```

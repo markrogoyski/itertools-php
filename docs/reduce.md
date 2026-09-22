@@ -414,7 +414,7 @@ Reduces to a list of its modes (the most frequent values).
 
 - Returns every value tied for the maximum frequency, in first-seen order (an all-unique input returns all of its values).
 - Multimodal inputs return multiple modes.
-- Values are compared strictly, so `1`, `1.0`, and `'1'` count as distinct.
+- Values are compared using the [strict rules](../README.md#strict-and-coercive-types), so `1`, `1.0`, and `'1'` count as distinct.
 - Returns an empty array if collection is empty.
 
 ```php

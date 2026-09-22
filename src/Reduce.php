@@ -345,6 +345,9 @@ final class Reduce
      *
      * Returns an empty array if given collection is empty.
      *
+     * Equality follows the strict rules in README "Strict and Coercive Types". Retains one
+     * representative per distinct value, since it is part of the output.
+     *
      * @param iterable<mixed> $data
      *
      * @return list<mixed>

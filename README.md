@@ -580,17 +580,62 @@ foreach (Multi::chain(Single::string($letters), Single::string($numbers)) as $ch
 
 ## Strict and Coercive Types
 
-When there is an option, the default will do strict type comparisons:
+Functions that compare values accept a `$strict` flag (default `true`). This section is the
+single source of truth for what strict and coercive comparison mean; individual function
+docs link here instead of restating it.
 
-* scalars: compares strictly by type
-* objects: always treats different instances as not equal to each other
-* arrays: compares serialized
+### Strict mode
 
-When type coercion (non-strict types) is available and enabled via optional flag:
+Two values are equal iff `$a === $b`, with one exception: `NAN` equals `NAN`, at any depth.
 
-* scalars: compares by value via type juggling
-* objects: compares serialized (throws `\InvalidArgumentException` if the object cannot be serialized)
-* arrays: compares serialized
+* **Scalars:** same type and same value. Floats compare bit-exactly except `-0.0 === 0.0`.
+* **Objects, closures, generators:** same instance.
+* **Resources:** same resource id. A closed resource keeps its id, so closing a handle does
+  not change its identity.
+* **Arrays:** same keys in the same order, with values compared recursively under these rules.
+
+### Coercive mode (numeric equivalence)
+
+* `int`, `float`, `bool`, `null`, `''`, and numeric strings compare by numeric value.
+  Integers are preserved exactly. A value that is integral and within the integer range
+  compares as that integer, so `1`, `1.0`, `'1'`, `'1e0'`, `true` are one value. Values
+  outside the integer range, or non-integral, compare as bit-exact floats. `0`, `0.0`, `-0.0`,
+  `'0'`, `false`, `null`, and `''` are one value.
+* Numeric strings follow PHP's numeric-string rules. A string containing a decimal point or
+  an exponent is a float even when mathematically integral: `'9007199254740993'` stays
+  exact, `'9007199254740993.0'` does not. This boundary is documented, not worked around.
+* Non-numeric strings compare by exact content. `'abc'` does not equal `true`; `'INF'` does
+  not equal `INF`.
+* `NAN` equals `NAN`.
+* Objects compare by serialized state via `serialize()`, and throw
+  `\InvalidArgumentException` when not serializable. This is the one deliberate exception to
+  precision independence: floats and resources inside a serialized object follow
+  `serialize()` semantics (`serialize_precision`, resources as `i:0`). This is a known
+  limitation.
+* Closures and generators compare by instance. Resources compare by id, open or closed.
+* Arrays: same keys in the same order, with values compared recursively under coercive
+  rules. `[1]` and `['1']` are equal. Keys are not coerced (PHP already normalizes `'1'`
+  to `1`).
+
+### Limits
+
+Arrays nested deeper than `UniqueExtractor::MAX_DEPTH` (256) throw
+`\InvalidArgumentException`. This is a depth limit, not cycle detection: it also rejects
+sufficiently deep acyclic arrays. It is the chosen strategy for failing cleanly on a
+self-referential array, where PHP's own `==` would fatal.
+
+### Retained values
+
+Every function that compares by identity (strict mode, and coercive mode for closures,
+generators, and resources) pins the objects, closures, generators, and resources it has
+compared by instance — including ones nested inside arrays — for as long as its generator is
+alive, so a freed object's identity cannot be reused by a later, unrelated value.
+
+* `frequencies`, `relativeFrequencies`, `frequenciesBy`, `relativeFrequenciesBy`, `toMode`
+  (and their `Stream` counterparts) additionally retain one representative per distinct
+  value, since it is part of the output.
+* `intersection*`, `union*`, `symmetricDifference*`, `arePermutations*` additionally retain
+  the last-seen representative per distinct value.
 
 Standards
 ---------

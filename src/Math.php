@@ -12,6 +12,9 @@ final class Math
      * Returns a frequency distribution of iterable elements
      * showing how often each different value in the collection occurs.
      *
+     * Equality follows the strict or coercive rules in README "Strict and Coercive Types".
+     * Retains one representative per distinct value, since it is part of the output.
+     *
      * @template T
      *
      * @param iterable<T> $data
@@ -48,6 +51,9 @@ final class Math
      * Returns a relative frequency distribution of iterable elements
      * showing how often each different value in the collection occurs.
      *
+     * Shares the retention behavior of {@see Math::frequencies()}: one representative per
+     * distinct value is retained, since it is part of the output.
+     *
      * @template T
      *
      * @param iterable<T> $data
@@ -80,8 +86,9 @@ final class Math
      * and float keys, surprising bool→1/0 collapse).
      *
      * The $strict flag controls value-hash strictness exactly as in
-     * {@see Math::frequencies()} — under non-strict comparison a numeric-string key
-     * such as "1" collapses with the int key 1.
+     * {@see Math::frequencies()}; see README "Strict and Coercive Types" — under coercive
+     * comparison a numeric-string key such as "1" collapses with the int key 1. Retains one
+     * representative per distinct key, since it is part of the output.
      *
      * Under strict comparison those stay separate groups, but PHP array keys canonicalize
      * numeric strings, so materializing the generator (via iterator_to_array, or a Stream
@@ -135,8 +142,8 @@ final class Math
      * Returns a relative frequency distribution of iterable elements grouped by the
      * value returned from the key function, normalized to the range [0, 1].
      *
-     * Shares the int|string key-function contract and $strict semantics of
-     * {@see Math::frequenciesBy()}.
+     * Shares the int|string key-function contract, $strict semantics, and retention
+     * behavior of {@see Math::frequenciesBy()}.
      *
      * @template T
      *

@@ -127,7 +127,9 @@ final class Summary
     /**
      * Return true if all elements in given collection are unique.
      *
-     * Empty iterables return true.
+     * Empty iterables return true. Equality follows the strict or coercive rules in README
+     * "Strict and Coercive Types". Retains the objects, closures, generators, and resources
+     * it has compared by instance for as long as iteration continues.
      *
      * @param iterable<mixed> $data
      * @param bool $strict
@@ -150,7 +152,9 @@ final class Summary
     }
 
     /**
-     * Returns true when all values have the same UniqueExtractor identity.
+     * Returns true when all values have the same UniqueExtractor identity, per README
+     * "Strict and Coercive Types". Retains the first value's identity-bearing objects,
+     * closures, generators, and resources for as long as iteration continues.
      *
      * @param iterable<mixed> $data
      */
@@ -172,7 +176,9 @@ final class Summary
     }
 
     /**
-     * Returns true when all projected keys have the same UniqueExtractor identity.
+     * Returns true when all projected keys have the same UniqueExtractor identity, per README
+     * "Strict and Coercive Types". Retains the first projection's identity-bearing objects,
+     * closures, generators, and resources for as long as iteration continues.
      *
      * @param iterable<mixed> $data
      * @param callable(mixed): mixed $keyFunc
@@ -450,10 +456,8 @@ final class Summary
      *
      * Returns true if no collections given or for single collection.
      *
-     * Strict-type comparisons:
-     *  - scalars: compares strictly by type
-     *  - objects: always treats different instances as not equal to each other
-     *  - arrays: compares serialized
+     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -471,10 +475,8 @@ final class Summary
      *
      * Returns true if no collections given or for single collection.
      *
-     * Coercive (non-strict) type comparisons:
-     *  - scalars: compares non-strictly by value
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
-     *  - arrays: compares serialized
+     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
+     * last-seen representative per distinct value; see the Retained values subsection there.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -534,7 +536,7 @@ final class Summary
      *
      * Empty prefix → true without consuming the source.
      *
-     * Strict-type comparison uses ===.
+     * Strict-type comparison uses ===; see README "Strict and Coercive Types".
      *
      * @param iterable<mixed> $data
      * @param iterable<mixed> $prefix must be finite
@@ -553,11 +555,7 @@ final class Summary
      *
      * Empty prefix → true without consuming the source.
      *
-     * Coercive (non-strict) value comparison:
-     *  - scalars: compares non-strictly by value (1 matches '1', 0 matches false)
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
-     *  - arrays: compares serialized
-     *  - NaN: matches NaN (consistent with other coercive operations in this library)
+     * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> $data
      * @param iterable<mixed> $prefix must be finite
@@ -580,7 +578,7 @@ final class Summary
      *
      * Both source and suffix must be finite. Buffers up to count($suffix) elements via a sliding window.
      *
-     * Strict-type comparison uses ===.
+     * Strict-type comparison uses ===; see README "Strict and Coercive Types".
      *
      * @param iterable<mixed> $data   must be finite
      * @param iterable<mixed> $suffix must be finite
@@ -601,11 +599,7 @@ final class Summary
      *
      * Both source and suffix must be finite. Buffers up to count($suffix) elements via a sliding window.
      *
-     * Coercive (non-strict) value comparison:
-     *  - scalars: compares non-strictly by value (1 matches '1', 0 matches false)
-     *  - objects: compares serialized (throws \InvalidArgumentException if not serializable)
-     *  - arrays: compares serialized
-     *  - NaN: matches NaN (consistent with other coercive operations in this library)
+     * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> $data   must be finite
      * @param iterable<mixed> $suffix must be finite
@@ -696,14 +690,7 @@ final class Summary
     /**
      * Pairwise equality used by startsWith and endsWith (strict and coercive variants).
      *
-     * Strict mode uses ===.
-     *
-     * Coercive mode follows the library-wide contract (mirrors containsCoercive,
-     * arePermutationsCoercive, etc.):
-     *  - scalars: compared non-strictly by value (1 matches '1', 0 matches false)
-     *  - objects: compared by serialized value (throws \InvalidArgumentException if not serializable)
-     *  - arrays: compared by serialized value
-     *  - NaN matches NaN
+     * Equality follows the strict or coercive rules in README "Strict and Coercive Types".
      *
      * @param mixed $a
      * @param mixed $b
@@ -722,11 +709,8 @@ final class Summary
     /**
      * Returns true if the given iterable contains the needle (using strict-type comparison).
      *
-     * Strict-type comparison:
-     *  - scalars: compares strictly by type (1 does not match '1', 0 does not match false)
-     *  - objects: matches only the same instance
-     *  - arrays: compares strictly by ===
-     *  - NaN: never matches NaN (since NaN !== NaN)
+     * Equality follows the strict rules in README "Strict and Coercive Types" (NaN never
+     * matches NaN here, since this comparison uses === directly, not UniqueExtractor).
      *
      * Short-circuits on first match.
      *
@@ -749,11 +733,7 @@ final class Summary
     /**
      * Returns true if the given iterable contains the needle (using type coercion).
      *
-     * Coercive (non-strict) type comparison:
-     *  - scalars: compares non-strictly by value (1 matches '1', 0 matches false, '1e2' matches 100)
-     *  - objects: compares serialized (throws \InvalidArgumentException if needle or any visited datum is not serializable)
-     *  - arrays: compares serialized
-     *  - NaN: matches NaN (consistent with other coercive operations in this library)
+     * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * Short-circuits on first match: a non-serializable datum is only reached if no
      * earlier datum has matched, so a match before such a datum returns true without throwing.
