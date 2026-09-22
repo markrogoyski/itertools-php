@@ -45,6 +45,7 @@ final class ValueCounter
      *
      * @var list<object|resource|closed-resource>
      */
+    // @phpstan-ignore property.onlyWritten
     private array $anchors = [];
 
     /**
@@ -112,18 +113,5 @@ final class ValueCounter
     public function counts(): array
     {
         return $this->counts;
-    }
-
-    /**
-     * Every identity-bearing value this counter pins, in first-seen order.
-     *
-     * The counter already holds these for its own lifetime; a consumer only needs them to hand
-     * that retention on to something longer-lived than the counter. See {@see Identity}.
-     *
-     * @return list<object|resource|closed-resource>
-     */
-    public function anchors(): array
-    {
-        return $this->anchors;
     }
 }

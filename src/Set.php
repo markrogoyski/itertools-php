@@ -458,7 +458,7 @@ final class Set
          * ID of an already-freed one and be subtracted by mistake; the anchors additionally
          * pin identities nested inside the value once arrays hash recursively — see Identity.
          *
-         * @var array<string, array{0: int, 1: mixed, 2: list<object|resource>}> $subtracted
+         * @var array<string, array{0: int, 1: mixed, 2: list<object|resource|closed-resource>}> $subtracted
          */
         $subtracted = [];
 

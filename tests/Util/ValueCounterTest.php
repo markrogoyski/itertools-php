@@ -152,26 +152,6 @@ class ValueCounterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test anchors() reports the identity-bearing values, once per distinct value
-     */
-    public function testAnchorsReportsIdentityBearingValuesOncePerDistinctValue(): void
-    {
-        // Given
-        $counter = new ValueCounter(true);
-        $object = new \stdClass();
-        $resource = \fopen('php://memory', 'r');
-
-        // When
-        $counter->add($object);
-        $counter->add($object);
-        $counter->add($resource);
-        $counter->add('a scalar has no anchor');
-
-        // Then
-        $this->assertSame([$object, $resource], $counter->anchors());
-    }
-
-    /**
      * @test a registered object stays alive for as long as the counter does
      */
     public function testRegisteredObjectIsRetained(): void
