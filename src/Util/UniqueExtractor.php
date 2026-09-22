@@ -27,6 +27,10 @@ namespace IterTools\Util;
  * Limits: arrays nested deeper than the depth limit (see MAX_DEPTH) throw
  * \InvalidArgumentException. This is a depth limit, not cycle detection.
  *
+ * Keys derived from an identity are only meaningful while that identity is alive: see
+ * {@see Identity} and {@see self::identify()}, which returns the key together with the values it
+ * was derived from.
+ *
  * See README.md, section "Strict and Coercive Types".
  *
  * Based on PHP Type Tool's UniqueExtractor.
@@ -49,10 +53,51 @@ final class UniqueExtractor
      * @param bool $strict
      *
      * @return string
+     */
+    public static function getString(mixed $var, bool $strict): string
+    {
+        $anchors = [];
+
+        return self::key($var, $strict, $anchors);
+    }
+
+    /**
+     * @internal
+     * Returns the unique ID string of given variable together with the values it was derived from.
+     *
+     * Same key as {@see self::getString()}, plus every value that was hashed by identity while
+     * computing it. A consumer that keeps the key must keep the {@see Identity} — see that class
+     * for why an id alone is not enough to tell two values apart over time.
+     *
+     * @param mixed $var
+     * @param bool $strict
+     *
+     * @return Identity
+     */
+    public static function identify(mixed $var, bool $strict): Identity
+    {
+        $anchors = [];
+        $key = self::key($var, $strict, $anchors);
+
+        return new Identity($key, $anchors);
+    }
+
+    /**
+     * Key of any value, appending every value hashed by identity to $anchors.
+     *
+     * This is the single routine behind both entry points: getString() throws the collected
+     * anchors away, identify() hands them to the caller. Values hashed by content (scalars,
+     * strings, serialized objects) contribute no anchors.
+     *
+     * @param mixed $var
+     * @param bool $strict
+     * @param list<object|resource> $anchors
+     *
+     * @return string
      *
      * @psalm-suppress MixedArgument, InvalidOperand
      */
-    public static function getString(mixed $var, bool $strict): string
+    private static function key(mixed $var, bool $strict, array &$anchors): string
     {
         return match (true) {
             $var === null => $strict ? 'null' : 'int:0',
@@ -63,10 +108,12 @@ final class UniqueExtractor
             // A closed resource is no longer \is_resource(), so it needs its own test, and that
             // test has to run before \is_object(). Its id survives the close, so an open and a
             // closed handle keep the same key.
-            \is_resource($var), \gettype($var) === 'resource (closed)' => 'resource:' . \get_resource_id($var),
-            \is_object($var) => self::objectKey($var, $strict),
+            \is_resource($var), \gettype($var) === 'resource (closed)' => self::resourceKey($var, $anchors),
+            \is_object($var) => self::objectKey($var, $strict, $anchors),
             // Only arrays are left. They still hash by \serialize(), whose equality matches
-            // neither mode exactly; hashing them element-wise is a separate change.
+            // neither mode exactly; hashing them element-wise is a separate change. When they do
+            // recurse, each element goes back through this routine with the same $anchors list,
+            // so nested identities are collected without either entry point changing shape.
             default => 'array_' . \serialize($var),
         };
     }
@@ -105,6 +152,8 @@ final class UniqueExtractor
 
     /**
      * Key of a string: exact content, except that coercive mode hashes numeric strings by their number.
+     *
+     * @psalm-suppress InvalidOperand "$var + 0" deliberately applies PHP's numeric-string rules
      */
     private static function stringKey(string $var, bool $strict): string
     {
@@ -136,11 +185,36 @@ final class UniqueExtractor
     }
 
     /**
-     * Key of an object: by instance, except for ordinary objects in coercive mode.
+     * Key of a resource: its id, open or closed. The handle anchors it.
+     *
+     * @param mixed $var an open or closed resource
+     * @param list<object|resource> $anchors
+     *
+     * @psalm-suppress InvalidArgument a closed resource keeps the id get_resource_id() reads
      */
-    private static function objectKey(object $var, bool $strict): string
+    private static function resourceKey(mixed $var, array &$anchors): string
+    {
+        /** @var resource $var */
+        $anchors[] = $var;
+
+        return 'resource:' . \get_resource_id($var);
+    }
+
+    /**
+     * Key of an object: by instance, except for ordinary objects in coercive mode.
+     *
+     * An object hashed by instance anchors itself; one hashed by serialized state is compared by
+     * content and needs no anchor.
+     *
+     * @param object $var
+     * @param bool $strict
+     * @param list<object|resource> $anchors
+     */
+    private static function objectKey(object $var, bool $strict, array &$anchors): string
     {
         if ($strict || $var instanceof \Generator || $var instanceof \Closure) {
+            $anchors[] = $var;
+
             return 'object:' . \spl_object_id($var);
         }
 

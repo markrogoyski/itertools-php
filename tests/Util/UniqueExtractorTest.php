@@ -227,6 +227,386 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test strict mode anchors an ordinary object
+     */
+    public function testIdentifyStrictAnchorsObject(): void
+    {
+        // Given
+        $object = new \stdClass();
+
+        // When
+        $identity = UniqueExtractor::identify($object, true);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($object, $identity->anchors[0]);
+    }
+
+    /**
+     * @test strict mode anchors a closure
+     */
+    public function testIdentifyStrictAnchorsClosure(): void
+    {
+        // Given
+        $closure = static fn (int $x): int => $x + 1;
+
+        // When
+        $identity = UniqueExtractor::identify($closure, true);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($closure, $identity->anchors[0]);
+    }
+
+    /**
+     * @test strict mode anchors a generator
+     */
+    public function testIdentifyStrictAnchorsGenerator(): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $identity = UniqueExtractor::identify($generator, true);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($generator, $identity->anchors[0]);
+    }
+
+    /**
+     * @test strict mode anchors an enum case
+     */
+    public function testIdentifyStrictAnchorsEnumCase(): void
+    {
+        // Given
+        $case = EnumFixture::One;
+
+        // When
+        $identity = UniqueExtractor::identify($case, true);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($case, $identity->anchors[0]);
+    }
+
+    /**
+     * @test strict mode anchors an open resource
+     */
+    public function testIdentifyStrictAnchorsOpenResource(): void
+    {
+        // Given
+        $resource = \fopen('php://memory', 'r');
+
+        // When
+        $identity = UniqueExtractor::identify($resource, true);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($resource, $identity->anchors[0]);
+    }
+
+    /**
+     * @test strict mode anchors a closed resource
+     */
+    public function testIdentifyStrictAnchorsClosedResource(): void
+    {
+        // Given
+        $resource = \fopen('php://memory', 'r');
+        \fclose($resource);
+
+        // When
+        $identity = UniqueExtractor::identify($resource, true);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($resource, $identity->anchors[0]);
+    }
+
+    /**
+     * @test strict mode anchors nothing for a scalar
+     * @dataProvider dataProviderForScalars
+     * @param mixed $value
+     */
+    public function testIdentifyStrictAnchorsNothingForScalar($value): void
+    {
+        // When
+        $identity = UniqueExtractor::identify($value, true);
+
+        // Then
+        $this->assertSame([], $identity->anchors);
+    }
+
+    /**
+     * @test coercive mode anchors nothing for an ordinary object
+     */
+    public function testIdentifyCoerciveAnchorsNothingForObject(): void
+    {
+        // Given
+        $object = new \stdClass();
+
+        // When
+        $identity = UniqueExtractor::identify($object, false);
+
+        // Then
+        $this->assertSame([], $identity->anchors);
+    }
+
+    /**
+     * @test coercive mode anchors a closure
+     */
+    public function testIdentifyCoerciveAnchorsClosure(): void
+    {
+        // Given
+        $closure = static fn (int $x): int => $x + 1;
+
+        // When
+        $identity = UniqueExtractor::identify($closure, false);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($closure, $identity->anchors[0]);
+    }
+
+    /**
+     * @test coercive mode anchors a generator
+     */
+    public function testIdentifyCoerciveAnchorsGenerator(): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $identity = UniqueExtractor::identify($generator, false);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($generator, $identity->anchors[0]);
+    }
+
+    /**
+     * @test coercive mode anchors a resource
+     */
+    public function testIdentifyCoerciveAnchorsResource(): void
+    {
+        // Given
+        $resource = \fopen('php://memory', 'r');
+
+        // When
+        $identity = UniqueExtractor::identify($resource, false);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($resource, $identity->anchors[0]);
+    }
+
+    /**
+     * @test coercive mode anchors nothing for a scalar
+     * @dataProvider dataProviderForScalars
+     * @param mixed $value
+     */
+    public function testIdentifyCoerciveAnchorsNothingForScalar($value): void
+    {
+        // When
+        $identity = UniqueExtractor::identify($value, false);
+
+        // Then
+        $this->assertSame([], $identity->anchors);
+    }
+
+    /**
+     * @return list<array{mixed}>
+     */
+    public static function dataProviderForScalars(): array
+    {
+        return [
+            [0],
+            [-1],
+            [\PHP_INT_MAX],
+            [0.0],
+            [-0.0],
+            [0.5],
+            [\INF],
+            [\NAN],
+            ['abc'],
+            ['1'],
+            [''],
+            [true],
+            [false],
+            [null],
+        ];
+    }
+
+    /**
+     * @test identify() returns the same key as getString()
+     * @dataProvider dataProviderForIdentifyKeyMatchesGetString
+     * @param mixed $value
+     * @param bool $strict
+     */
+    public function testIdentifyKeyMatchesGetString($value, bool $strict): void
+    {
+        // When
+        $identity = UniqueExtractor::identify($value, $strict);
+
+        // Then
+        $this->assertSame(UniqueExtractor::getString($value, $strict), $identity->key);
+    }
+
+    /**
+     * @return list<array{mixed, bool}>
+     */
+    public static function dataProviderForIdentifyKeyMatchesGetString(): array
+    {
+        $object = new \stdClass();
+        $object->value = 1;
+        $closure = static fn (int $x): int => $x + 1;
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        $resource = \fopen('php://memory', 'r');
+
+        return [
+            [0, true],
+            [1.5, true],
+            [\NAN, true],
+            ['1', true],
+            ['', true],
+            [true, true],
+            [null, true],
+            [[1, 2, 3], true],
+            [$object, true],
+            [EnumFixture::One, true],
+            [$closure, true],
+            [$generator, true],
+            [$resource, true],
+            [0, false],
+            [1.5, false],
+            [\NAN, false],
+            ['1', false],
+            ['', false],
+            [true, false],
+            [null, false],
+            [[1, 2, 3], false],
+            [$object, false],
+            [EnumFixture::One, false],
+            [$closure, false],
+            [$generator, false],
+            [$resource, false],
+        ];
+    }
+
+    /**
+     * @test an identity keeps the object it hashed by instance alive
+     */
+    public function testIdentifyRetainsTheObjectItHashedByInstance(): void
+    {
+        // Given
+        $object = new \stdClass();
+        $weakReference = \WeakReference::create($object);
+
+        // When
+        $identity = UniqueExtractor::identify($object, true);
+        unset($object);
+
+        // Then
+        $this->assertNotNull($weakReference->get());
+        $this->assertSame($identity->key, UniqueExtractor::getString($weakReference->get(), true));
+    }
+
+    /**
+     * @test an identity keeps the resource it hashed alive
+     */
+    public function testIdentifyRetainsTheResourceItHashed(): void
+    {
+        // Given
+        $resource = \fopen('php://memory', 'r');
+        $identity = UniqueExtractor::identify($resource, true);
+
+        // When
+        unset($resource);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertTrue(\is_resource($identity->anchors[0]));
+    }
+
+    /**
+     * @test a key alone does not keep the object it describes alive
+     */
+    public function testKeyAloneDoesNotRetainTheObjectItDescribes(): void
+    {
+        // Given
+        $object = new \stdClass();
+        $weakReference = \WeakReference::create($object);
+
+        // When
+        UniqueExtractor::getString($object, true);
+        unset($object);
+
+        // Then
+        $this->assertNull($weakReference->get());
+    }
+
+    /**
+     * @test keys alone let PHP recycle a freed object id, retained anchors do not
+     */
+    public function testRetainedAnchorsKeepRecycledObjectIdsApart(): void
+    {
+        // Given
+        $keys = [];
+        foreach (self::freshObjectsDroppingEach(3) as $object) {
+            $keys[] = UniqueExtractor::getString($object, true);
+            unset($object);
+        }
+
+        if (\count(\array_unique($keys)) === 3) {
+            $this->markTestSkipped('This PHP build did not recycle the freed object ids');
+        }
+
+        // When
+        $identities = [];
+        foreach (self::freshObjectsDroppingEach(3) as $object) {
+            $identities[] = UniqueExtractor::identify($object, true);
+            unset($object);
+        }
+
+        // Then
+        $retainedKeys = [];
+        foreach ($identities as $identity) {
+            $retainedKeys[] = $identity->key;
+        }
+
+        $this->assertCount(3, \array_unique($retainedKeys));
+
+        $laterObjects = [];
+        for ($i = 0; $i < 5; $i++) {
+            $laterObjects[] = new \stdClass();
+        }
+
+        $laterKeys = [];
+        foreach ($laterObjects as $laterObject) {
+            $laterKeys[] = UniqueExtractor::getString($laterObject, true);
+        }
+
+        $this->assertSame([], \array_intersect($retainedKeys, $laterKeys));
+    }
+
+    /**
+     * Yields fresh objects, dropping each one before the next is created, so that PHP is free to
+     * hand the freed spl_object_id to its successor.
+     *
+     * @param int $count
+     *
+     * @return \Generator<int, \stdClass>
+     */
+    private static function freshObjectsDroppingEach(int $count): \Generator
+    {
+        for ($i = 0; $i < $count; $i++) {
+            $object = new \stdClass();
+            yield $object;
+            unset($object);
+        }
+    }
+
+    /**
      * Asserts the strict contract over every ordered pair of the pool: keys are equal iff the
      * values are identical, with NAN equal to NAN.
      *
