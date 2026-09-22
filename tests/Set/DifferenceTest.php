@@ -567,4 +567,45 @@ class DifferenceTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertCount(6, $ids);
     }
+
+    /**
+     * Regression for defect 11: arrays that all share one reference slot collapse without an
+     * identity anchor, because retaining the array does not retain the object it held when it
+     * was yielded. Only a generator can reproduce this, not the four fixtures.
+     *
+     * @test difference keeps every value when both sides are reference-slot arrays
+     */
+    public function testKeepsEveryValueForReferenceSlotArrays(): void
+    {
+        // Given
+        $main = self::referenceSlotArrays();
+        $subtracted = self::referenceSlotArrays();
+
+        // When
+        $result = [];
+        foreach (Set::difference($main, $subtracted) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(5, $result);
+    }
+
+    /**
+     * Yields arrays that all share one reference slot: each yielded [&$slot] follows the next
+     * assignment to $slot, so retaining the array does not retain the object it held when it was
+     * yielded.
+     *
+     * @return \Generator<int, array{0: \stdClass}>
+     */
+    private static function referenceSlotArrays(): \Generator
+    {
+        $slot = null;
+
+        for ($i = 0; $i < 5; $i++) {
+            $slot = new \stdClass();
+
+            yield [&$slot];
+        }
+    }
 }

@@ -772,4 +772,43 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
             [$trav(['a', 'b', 'c']), $trav(['c', 'b']), $trav(['b', 'a', 'c']), $trav(['b', 'c', 'a']), $trav(['c', 'a', 'b']), $trav(['c', 'b', 'a'])],
         ];
     }
+
+    /**
+     * Regression for defect 11: arrays that all share one reference slot collapse without an
+     * identity anchor, because retaining the array does not retain the object it held when it
+     * was yielded. Only a generator can reproduce this, not the four fixtures. Each side builds
+     * its own fresh objects, so the two multisets are disjoint and not permutations of each other.
+     *
+     * @test arePermutations is false for two independent reference-slot array generators
+     */
+    public function testReferenceSlotArraysAreNotPermutations(): void
+    {
+        // Given
+        $a = self::referenceSlotArrays();
+        $b = self::referenceSlotArrays();
+
+        // When
+        $result = Summary::arePermutations($a, $b);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * Yields arrays that all share one reference slot: each yielded [&$slot] follows the next
+     * assignment to $slot, so retaining the array does not retain the object it held when it was
+     * yielded.
+     *
+     * @return \Generator<int, array{0: \stdClass}>
+     */
+    private static function referenceSlotArrays(): \Generator
+    {
+        $slot = null;
+
+        for ($i = 0; $i < 5; $i++) {
+            $slot = new \stdClass();
+
+            yield [&$slot];
+        }
+    }
 }

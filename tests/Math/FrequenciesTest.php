@@ -949,4 +949,47 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
             yield fn () => $i;
         }
     }
+
+    /**
+     * Regression for defect 11: arrays that all share one reference slot collapse without an
+     * identity anchor, because retaining the array does not retain the object it held when it
+     * was yielded. Only a generator can reproduce this, not the four fixtures.
+     *
+     * @test frequencies reports five entries of count one for reference-slot arrays
+     */
+    public function testReferenceSlotArraysReportFiveEntriesOfCountOne(): void
+    {
+        // Given
+        $data = self::referenceSlotArrays();
+
+        // When
+        $frequencies = [];
+        foreach (Math::frequencies($data) as $value => $frequency) {
+            $frequencies[] = [$value, $frequency];
+        }
+
+        // Then
+        $this->assertCount(5, $frequencies);
+        foreach ($frequencies as [, $frequency]) {
+            $this->assertSame(1, $frequency);
+        }
+    }
+
+    /**
+     * Yields arrays that all share one reference slot: each yielded [&$slot] follows the next
+     * assignment to $slot, so retaining the array does not retain the object it held when it was
+     * yielded.
+     *
+     * @return \Generator<int, array{0: \stdClass}>
+     */
+    private static function referenceSlotArrays(): \Generator
+    {
+        $slot = null;
+
+        for ($i = 0; $i < 5; $i++) {
+            $slot = new \stdClass();
+
+            yield [&$slot];
+        }
+    }
 }

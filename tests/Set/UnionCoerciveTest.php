@@ -102,6 +102,12 @@ class UnionCoerciveTest extends \PHPUnit\Framework\TestCase
                 ],
                 [1, 2.2, '3', true, false, INF, [1], (object)[1], (object)[2]],
             ],
+            // 4.7 public regression: coercive comparison recurses into arrays, so [1] and ['1']
+            // merge into one element.
+            [
+                [[[1]], [['1']]],
+                [[1]],
+            ],
         ];
     }
 
@@ -221,6 +227,12 @@ class UnionCoerciveTest extends \PHPUnit\Framework\TestCase
                     $gen([1.0, 2.2, 3, false, INF, [1], (object)[2]]),
                 ],
                 [1, 2.2, '3', true, false, INF, [1], (object)[1], (object)[2]],
+            ],
+            // 4.7 public regression: coercive comparison recurses into arrays, so [1] and ['1']
+            // merge into one element.
+            [
+                [$gen([[1]]), $gen([['1']])],
+                [[1]],
             ],
         ];
     }
@@ -344,6 +356,12 @@ class UnionCoerciveTest extends \PHPUnit\Framework\TestCase
                 ],
                 [1, 2.2, '3', true, false, INF, [1], (object)[1], (object)[2]],
             ],
+            // 4.7 public regression: coercive comparison recurses into arrays, so [1] and ['1']
+            // merge into one element.
+            [
+                [$iter([[1]]), $iter([['1']])],
+                [[1]],
+            ],
         ];
     }
 
@@ -465,6 +483,12 @@ class UnionCoerciveTest extends \PHPUnit\Framework\TestCase
                     $trav([1.0, 2.2, 3, false, INF, [1], (object)[2]]),
                 ],
                 [1, 2.2, '3', true, false, INF, [1], (object)[1], (object)[2]],
+            ],
+            // 4.7 public regression: coercive comparison recurses into arrays, so [1] and ['1']
+            // merge into one element.
+            [
+                [$trav([[1]]), $trav([['1']])],
+                [[1]],
             ],
         ];
     }
