@@ -324,6 +324,12 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
                 false,
                 [\PHP_INT_MAX, \PHP_INT_MAX - 1],
             ],
+            // Array key identity is part of array identity, not noise to ignore.
+            [
+                [['a' => 1], ['b' => 1]],
+                true,
+                [['a' => 1], ['b' => 1]],
+            ],
         ];
     }
 
@@ -639,6 +645,12 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
                 $gen([\PHP_INT_MAX, \PHP_INT_MAX - 1]),
                 false,
                 [\PHP_INT_MAX, \PHP_INT_MAX - 1],
+            ],
+            // Array key identity is part of array identity, not noise to ignore.
+            [
+                $gen([['a' => 1], ['b' => 1]]),
+                true,
+                [['a' => 1], ['b' => 1]],
             ],
         ];
     }
@@ -956,6 +968,12 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
                 false,
                 [\PHP_INT_MAX, \PHP_INT_MAX - 1],
             ],
+            // Array key identity is part of array identity, not noise to ignore.
+            [
+                $iter([['a' => 1], ['b' => 1]]),
+                true,
+                [['a' => 1], ['b' => 1]],
+            ],
         ];
     }
 
@@ -1271,6 +1289,12 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
                 $trav([\PHP_INT_MAX, \PHP_INT_MAX - 1]),
                 false,
                 [\PHP_INT_MAX, \PHP_INT_MAX - 1],
+            ],
+            // Array key identity is part of array identity, not noise to ignore.
+            [
+                $trav([['a' => 1], ['b' => 1]]),
+                true,
+                [['a' => 1], ['b' => 1]],
             ],
         ];
     }

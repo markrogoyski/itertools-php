@@ -92,6 +92,58 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test a forged key- or value-framing prefix cannot make two different arrays collide
+     * @dataProvider dataProviderForForgedFramingPairs
+     * @param mixed $a
+     * @param mixed $b
+     */
+    public function testForgedFramingStaysDistinct($a, $b): void
+    {
+        // When + Then
+        $this->assertNotSame(
+            UniqueExtractor::getString($a, true),
+            UniqueExtractor::getString($b, true),
+            \sprintf('strict: %s vs %s', $this->describe($a), $this->describe($b)),
+        );
+        $this->assertNotSame(
+            UniqueExtractor::getString($a, false),
+            UniqueExtractor::getString($b, false),
+            \sprintf('coercive: %s vs %s', $this->describe($a), $this->describe($b)),
+        );
+    }
+
+    /**
+     * Pairs of arrays that would collide if UniqueExtractor::arrayKey() dropped a framing prefix
+     * it currently keeps.
+     *
+     * Only this one pair is included. It kills the mutant that drops the string-key length
+     * prefix (`'s' . $key` instead of `'s' . \strlen($key) . ':' . $key` in arrayKeyToken()):
+     * without that prefix, key 'x' plus value "p=10:string:1:q" produces the same bytes as key
+     * "x=25:string:15:p" plus value "q".
+     *
+     * No pair here kills the mutant that drops the per-child length prefix in arrayKey() alone,
+     * the mutant that drops the element-count prefix alone, or the two dropped together. A
+     * search over many hand-built and randomized candidates (including array values whose string
+     * content forges an "i{n}=...;" element boundary, and string values that spell out another
+     * array's own encoding) found none that collide under any of those three mutations, provided
+     * this string-key length prefix stays in place. That tracks the reasoning now in arrayKey()'s
+     * docblock: every leaf key format is self-delimiting on its own once string keys are
+     * length-framed, so the count and per-child length prefixes are redundant belt-and-braces,
+     * not load-bearing, and are believed to be genuinely unkillable (equivalent) mutants.
+     *
+     * @return list<array{mixed, mixed}>
+     */
+    public static function dataProviderForForgedFramingPairs(): array
+    {
+        return [
+            [
+                ['x' => 'p=10:string:1:q'],
+                ['x=25:string:15:p' => 'q'],
+            ],
+        ];
+    }
+
+    /**
      * @test keys do not depend on the precision and serialize_precision ini settings
      */
     public function testKeysAreIndependentOfIniPrecision(): void
@@ -106,19 +158,25 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
         // When + Then
         try {
             foreach (['14', '17'] as $precisionSetting) {
-                foreach (['-1', '17', '14'] as $serializePrecisionSetting) {
+                foreach (['-1', '17', '14', '6'] as $serializePrecisionSetting) {
                     \ini_set('precision', $precisionSetting);
                     \ini_set('serialize_precision', $serializePrecisionSetting);
 
                     $this->assertStrictOracle($pool);
 
-                    // serialize_precision = 14 rounds both 0.1 + 0.2 and 0.3 to "0.3", so the two
-                    // objects whose only difference is a float property serialize identically and
-                    // merge. That is the documented serialize() limitation for coercive objects
-                    // (README, "Coercive mode", objects bullet), not a defect of the encoding, so
-                    // that pair is left out of the table under this setting instead of asserted.
+                    // Any serialize_precision from 0 up to (but not including) 17 rounds floats to
+                    // that many significant digits instead of round-tripping them exactly, so both
+                    // 0.1 + 0.2 and 0.3 serialize to the same digits and the two objects whose only
+                    // difference is a float property merge. -1 (use `precision`'s own round-trip
+                    // behavior) and 17 (enough digits to round-trip any double) do not round, so
+                    // they keep the pair apart. That is the documented serialize() limitation for
+                    // coercive objects (README, "Coercive mode", objects bullet), not a defect of
+                    // the encoding, so that pair is left out of the table under this range instead
+                    // of asserted.
+                    $serializePrecisionValue = (int) $serializePrecisionSetting;
+                    $roundsFloats = $serializePrecisionValue >= 0 && $serializePrecisionValue < 17;
                     $this->assertCoerciveTable(
-                        $serializePrecisionSetting === '14' ? $tableWithoutFloatStateObjects : $table,
+                        $roundsFloats ? $tableWithoutFloatStateObjects : $table,
                     );
                 }
             }

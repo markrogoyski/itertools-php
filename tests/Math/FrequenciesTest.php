@@ -164,6 +164,10 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    /**
+     * Values that cannot be used as native array_keys, so these rows are excluded from
+     * testIteratorToArray, which reflects the values into native array keys.
+     */
     public static function dataProviderForArrayNonScalarValues(): array
     {
         $obj1 = new \stdClass();
@@ -179,6 +183,12 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 [$obj1, $obj1, $obj2, $obj2, $obj2],
                 [$obj1, $obj2],
                 [2, 3],
+            ],
+            // Array key identity is part of the value being counted, not noise to ignore.
+            [
+                [['a' => 1], ['b' => 1]],
+                [['a' => 1], ['b' => 1]],
+                [1, 1],
             ],
         ];
     }
@@ -371,6 +381,12 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 $gen([1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a']),
                 [1, 'a', 'b'],
                 [5, 3, 2],
+            ],
+            // Array key identity is part of the value being counted, not noise to ignore.
+            [
+                $gen([['a' => 1], ['b' => 1]]),
+                [['a' => 1], ['b' => 1]],
+                [1, 1],
             ],
         ];
     }
@@ -568,6 +584,12 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 [1, 'a', 'b'],
                 [5, 3, 2],
             ],
+            // Array key identity is part of the value being counted, not noise to ignore.
+            [
+                $iter([['a' => 1], ['b' => 1]]),
+                [['a' => 1], ['b' => 1]],
+                [1, 1],
+            ],
         ];
     }
 
@@ -763,6 +785,12 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 $trav([1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a']),
                 [1, 'a', 'b'],
                 [5, 3, 2],
+            ],
+            // Array key identity is part of the value being counted, not noise to ignore.
+            [
+                $trav([['a' => 1], ['b' => 1]]),
+                [['a' => 1], ['b' => 1]],
+                [1, 1],
             ],
         ];
     }

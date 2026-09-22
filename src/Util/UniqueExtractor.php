@@ -134,8 +134,13 @@ final class UniqueExtractor
     /**
      * Key of an array: `array:{count}[{keytoken}={len}:{childkey};...]`.
      *
-     * Key tokens are `i{n}` for an integer key and `s{len}:{str}` for a string key; every child
-     * key is length-framed, so no element's content can imitate the separators. Children go back
+     * Key tokens are `i{n}` for an integer key and `s{len}:{str}` for a string key; the string-key
+     * length prefix is what stops a key's content from imitating the `=` and `;` separators. The
+     * element count and the per-child length prefix add no further protection of their own: every
+     * leaf key format is already self-delimiting on its own (an explicit length for strings and
+     * serialized objects, a fixed-width or digit-terminated format for everything else, and this
+     * same rule recursively for a nested array), so those two prefixes are mutually redundant
+     * belt-and-braces, kept for readability rather than for collision-freedom. Children go back
      * through {@see self::key()} with the same mode and the same $anchors list, which is what
      * makes an array equal to another exactly when its elements are.
      *

@@ -613,7 +613,11 @@ Two values are equal iff `$a === $b`, with one exception: `NAN` equals `NAN`, at
   `serialize()` semantics (`serialize_precision`, resources as `i:0`). This is a known
   limitation. An object whose `__serialize()` or `__sleep()` embeds its own identity
   (`spl_object_id()`, `spl_object_hash()`) is outside this contract, because a serialized
-  object is compared by content and so is not retained to keep that id reserved.
+  object is compared by content and so is not retained to keep that id reserved. An array
+  reached through an object's serialized state is serialized as PHP's native array syntax
+  (`i:0;` vs `s:1:"1";`), not compared under the coercive rules below, so coercive folding
+  does not apply there: `[new \ArrayObject([1])]` and `[new \ArrayObject(['1'])]` stay
+  distinct.
 * Closures and generators compare by instance. Resources compare by id, open or closed.
 * Arrays: same keys in the same order, with values compared recursively under coercive
   rules. `[1]` and `['1']` are equal. Keys are not coerced (PHP already normalizes `'1'`
