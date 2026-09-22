@@ -120,6 +120,8 @@ class ToModeTest extends \PHPUnit\Framework\TestCase
             [[1.5, 1.5, 2.5], [1.5]],
             // Strings
             [['a', 'b', 'a', 'c'], ['a']],
+            // Float precision independence: 0.1 + 0.2 !== 0.3 bit-exactly, and 0.3 repeats.
+            [[0.1 + 0.2, 0.3, 0.3], [0.3]],
         ];
     }
 
@@ -198,5 +200,34 @@ class ToModeTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertSame([7777], $modes);
+    }
+
+    /**
+     * Regression for defect 8: a freed object's spl_object_id can be reissued to a later,
+     * unrelated object. Each fresh object dropped by the consumer between yields could then be
+     * falsely merged with a repeated object, so this can only be reproduced through a generator,
+     * not the four fixtures.
+     *
+     * @test toMode retains identity anchors so ephemeral objects are not falsely merged with a repeat
+     */
+    public function testEphemeralObjectsWithRepeat(): void
+    {
+        // Given
+        $a = new \stdClass();
+        $data = self::repeatedObjectWithEphemeralsGenerator($a);
+
+        // When
+        $modes = Reduce::toMode($data);
+
+        // Then
+        $this->assertSame([$a], $modes);
+    }
+
+    private static function repeatedObjectWithEphemeralsGenerator(object $a): \Generator
+    {
+        yield $a;
+        yield new \stdClass();
+        yield $a;
+        yield new \stdClass();
     }
 }

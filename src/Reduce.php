@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\NoValueMonad;
-use IterTools\Util\UniqueExtractor;
+use IterTools\Util\ValueCounter;
 
 final class Reduce
 {
@@ -354,26 +354,20 @@ final class Reduce
      */
     public static function toMode(iterable $data): array
     {
-        /** @var array<string, int> $counts */
-        $counts = [];
-        /** @var array<string, mixed> $values */
-        $values = [];
+        // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
+        $counter = new ValueCounter(true);
 
         foreach ($data as $datum) {
-            $hash = UniqueExtractor::getString($datum, true);
-
-            if (!\array_key_exists($hash, $counts)) {
-                $counts[$hash] = 0;
-                $values[$hash] = $datum;
-            }
-
-            $counts[$hash]++;
+            $counter->add($datum);
         }
+
+        $counts = $counter->counts();
 
         if (\count($counts) === 0) {
             return [];
         }
 
+        $values   = $counter->values();
         $maxCount = \max($counts);
 
         /** @var list<mixed> $modes */
