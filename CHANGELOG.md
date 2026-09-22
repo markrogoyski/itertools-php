@@ -1,13 +1,35 @@
 # IterTools PHP Change Log
 
-## [Unreleased]
+## v2.6.0 - 2026-09-21
 
 ### New Features
-* Multi: lazy stable `mergeSorted` and `mergeSortedBy`, with fluent merge operations.
-* Single: key-aware `takeWhileWithKeys` and `dropWhileWithKeys`.
-* Summary: `allEqual`, `allEqualBy`, and key-aware match summaries.
-* Transform: lazy replayable `memoize`.
-* Stream: parity for the new APIs plus `peekWithKeys` and `callForEachWithKeys`.
+* Multi
+  * `mergeSorted`: lazily merge sorted iterables, preserving source order for equal values; source keys are discarded
+  * `mergeSortedBy`: lazily merge iterables sorted by a projected key
+* Single
+  * `takeWhileWithKeys`: return elements while a key-aware predicate is truthy
+  * `dropWhileWithKeys`: drop elements while a key-aware predicate is truthy
+* Summary
+  * `allMatchWithKeys`: true if all elements match a key-aware predicate
+  * `anyMatchWithKeys`: true if any element matches a key-aware predicate
+  * `noneMatchWithKeys`: true if no element matches a key-aware predicate
+  * `allEqual`: true when all values have the same identity, coercive or strict
+  * `allEqualBy`: true when all projected keys have the same identity, coercive or strict
+* Transform
+  * `memoize`: lazily cache an iterable so current and future consumers can replay it
+* Stream
+  * `mergeSortedWith`: fluent lazy merge of this stream with sorted iterables
+  * `mergeSortedByWith`: fluent lazy merge of this stream with iterables sorted by a projected key
+  * `takeWhileWithKeys`: fluent key-aware take-while
+  * `dropWhileWithKeys`: fluent key-aware drop-while
+  * `allMatchWithKeys`: terminal; true if all elements match a key-aware predicate
+  * `anyMatchWithKeys`: terminal; true if any element matches a key-aware predicate
+  * `noneMatchWithKeys`: terminal; true if no element matches a key-aware predicate
+  * `allEqual`: terminal; true when all values have the same identity
+  * `allEqualBy`: terminal; true when all projected keys have the same identity
+  * `memoize`: lazily make the current stream replayable by caching demanded values
+  * `peekWithKeys`: lazily invoke a callback with each value and key without changing the stream
+  * `callForEachWithKeys`: terminal; invoke a callback with each value and key
 
 ### Bug Fixes
 * Set: `distinct`, `distinctBy`, `duplicates`, `duplicatesBy`, `difference`, `intersection`, `partialIntersection`, `union`, and `symmetricDifference` could equate unrelated objects in strict mode. An object's identity string is derived from its `spl_object_id`, which PHP reuses once the object is freed, so an object hashed and then discarded could hand its identity to a later, unrelated object. Hashed values are now retained for the lifetime of the comparison.
