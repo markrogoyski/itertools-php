@@ -41,6 +41,15 @@ final class UniqueExtractor
 {
     /**
      * @internal
+     * Deepest array nesting that can be hashed.
+     *
+     * Depth is counted per value: a scalar is depth 0, `[$scalar]` is depth 1, `[[$scalar]]` is
+     * depth 2. A value at depth greater than this throws \InvalidArgumentException.
+     */
+    public const MAX_DEPTH = 256;
+
+    /**
+     * @internal
      * Returns unique ID string of given variable by its value and type.
      *
      * Follows the strict or coercive contract documented on this class and in README.md,
@@ -58,7 +67,7 @@ final class UniqueExtractor
     {
         $anchors = [];
 
-        return self::key($var, $strict, $anchors);
+        return self::key($var, $strict, $anchors, 0);
     }
 
     /**
@@ -77,7 +86,7 @@ final class UniqueExtractor
     public static function identify(mixed $var, bool $strict): Identity
     {
         $anchors = [];
-        $key = self::key($var, $strict, $anchors);
+        $key = self::key($var, $strict, $anchors, 0);
 
         return new Identity($key, $anchors);
     }
@@ -91,14 +100,20 @@ final class UniqueExtractor
      *
      * @param mixed $var
      * @param bool $strict
-     * @param list<object|resource> $anchors
+     * @param list<object|resource|closed-resource> $anchors
+     * @param int $depth number of arrays enclosing $var, 0 at the top value; see self::MAX_DEPTH
      *
      * @return string
      *
-     * @psalm-suppress MixedArgument, InvalidOperand
+     * @throws \InvalidArgumentException if $var nests arrays deeper than self::MAX_DEPTH
      */
-    private static function key(mixed $var, bool $strict, array &$anchors): string
+    private static function key(mixed $var, bool $strict, array &$anchors, int $depth): string
     {
+        // Arrays are handled before the match so that every arm below describes a leaf value.
+        if (\is_array($var)) {
+            return self::arrayKey($var, $strict, $anchors, $depth);
+        }
+
         return match (true) {
             $var === null => $strict ? 'null' : 'int:0',
             \is_bool($var) => ($strict ? 'bool:' : 'int:') . (int) $var,
@@ -110,12 +125,62 @@ final class UniqueExtractor
             // closed handle keep the same key.
             \is_resource($var), \gettype($var) === 'resource (closed)' => self::resourceKey($var, $anchors),
             \is_object($var) => self::objectKey($var, $strict, $anchors),
-            // Only arrays are left. They still hash by \serialize(), whose equality matches
-            // neither mode exactly; hashing them element-wise is a separate change. When they do
-            // recurse, each element goes back through this routine with the same $anchors list,
-            // so nested identities are collected without either entry point changing shape.
-            default => 'array_' . \serialize($var),
+            // Unreachable: arrays are taken above and every remaining PHP type has an arm. The
+            // arm exists because match(true) would otherwise raise \UnhandledMatchError.
+            default => throw new \InvalidArgumentException('Unsupported value type: ' . \gettype($var)),
         };
+    }
+
+    /**
+     * Key of an array: `array:{count}[{keytoken}={len}:{childkey};...]`.
+     *
+     * Key tokens are `i{n}` for an integer key and `s{len}:{str}` for a string key; every child
+     * key is length-framed, so no element's content can imitate the separators. Children go back
+     * through {@see self::key()} with the same mode and the same $anchors list, which is what
+     * makes an array equal to another exactly when its elements are.
+     *
+     * @param array<array-key, mixed> $var
+     * @param bool $strict
+     * @param list<object|resource|closed-resource> $anchors
+     * @param int $depth number of arrays enclosing $var, 0 if $var is the top value
+     *
+     * @throws \InvalidArgumentException if the nesting exceeds self::MAX_DEPTH
+     */
+    private static function arrayKey(array $var, bool $strict, array &$anchors, int $depth): string
+    {
+        // $var itself sits one level below the array that holds it, so it is at depth $depth + 1.
+        // This is a depth limit, not cycle detection: a self-referential array is caught only
+        // because PHP keeps the reference slot when the array is copied, so the recursion revisits
+        // it and the counter keeps climbing. Cycle detection would need per-call bookkeeping of
+        // every array already visited, and there is no behavior to stay compatible with — PHP's
+        // own == fatals on a self-referential array — so a fixed limit is the cheaper contract.
+        if ($depth >= self::MAX_DEPTH) {
+            throw new \InvalidArgumentException(
+                \sprintf(
+                    'Array is nested deeper than the maximum depth of %d and cannot be hashed. '
+                    . 'This is a depth limit, not cycle detection: a self-referential array reaches it too.',
+                    self::MAX_DEPTH,
+                ),
+            );
+        }
+
+        $elements = '';
+        foreach ($var as $key => $value) {
+            $childKey = self::key($value, $strict, $anchors, $depth + 1);
+            $elements .= self::arrayKeyToken($key) . '=' . \strlen($childKey) . ':' . $childKey . ';';
+        }
+
+        return 'array:' . \count($var) . '[' . $elements . ']';
+    }
+
+    /**
+     * Token for one array key: `i{n}` for an integer key, `s{len}:{str}` for a string key.
+     *
+     * @param array-key $key
+     */
+    private static function arrayKeyToken(int|string $key): string
+    {
+        return \is_int($key) ? 'i' . $key : 's' . \strlen($key) . ':' . $key;
     }
 
     /**
@@ -188,7 +253,7 @@ final class UniqueExtractor
      * Key of a resource: its id, open or closed. The handle anchors it.
      *
      * @param mixed $var an open or closed resource
-     * @param list<object|resource> $anchors
+     * @param list<object|resource|closed-resource> $anchors
      *
      * @psalm-suppress InvalidArgument a closed resource keeps the id get_resource_id() reads
      */
@@ -208,7 +273,7 @@ final class UniqueExtractor
      *
      * @param object $var
      * @param bool $strict
-     * @param list<object|resource> $anchors
+     * @param list<object|resource|closed-resource> $anchors
      */
     private static function objectKey(object $var, bool $strict, array &$anchors): string
     {

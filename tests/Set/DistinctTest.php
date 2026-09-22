@@ -133,7 +133,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
             [
                 [[1], ['1'], [1, 2]],
                 false,
-                [[1], ['1'], [1, 2]],
+                [[1], [1, 2]],
             ],
             [
                 [[1], 'a' => [1]],
@@ -452,7 +452,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
             [
                 $gen([[1], ['1'], [1, 2]]),
                 false,
-                [[1], ['1'], [1, 2]],
+                [[1], [1, 2]],
             ],
             [
                 $gen([[1], 'a' => [1]]),
@@ -768,7 +768,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
             [
                 $iter([[1], ['1'], [1, 2]]),
                 false,
-                [[1], ['1'], [1, 2]],
+                [[1], [1, 2]],
             ],
             [
                 $iter([[1], 'a' => [1]]),
@@ -1084,7 +1084,7 @@ class DistinctTest extends \PHPUnit\Framework\TestCase
             [
                 $trav([[1], ['1'], [1, 2]]),
                 false,
-                [[1], ['1'], [1, 2]],
+                [[1], [1, 2]],
             ],
             [
                 $trav([[1], 'a' => [1]]),

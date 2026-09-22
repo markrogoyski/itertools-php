@@ -43,7 +43,7 @@ final class ValueCounter
      * because a hash can only repeat while the anchors that produced it are alive, and while they
      * are alive no other value can be given their ids.
      *
-     * @var list<object|resource>
+     * @var list<object|resource|closed-resource>
      */
     private array $anchors = [];
 
@@ -120,7 +120,7 @@ final class ValueCounter
      * The counter already holds these for its own lifetime; a consumer only needs them to hand
      * that retention on to something longer-lived than the counter. See {@see Identity}.
      *
-     * @return list<object|resource>
+     * @return list<object|resource|closed-resource>
      */
     public function anchors(): array
     {

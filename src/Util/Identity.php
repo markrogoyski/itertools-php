@@ -30,13 +30,18 @@ namespace IterTools\Util;
  * Anchors are never deduplicated by id: an id is only stable while its anchor is held, which is
  * the whole point of holding them.
  *
+ * A coercive-mode object is hashed by serialized state and so is deliberately not anchored; an
+ * object whose `__serialize()` or `__sleep()` embeds its own identity (`spl_object_id()`,
+ * `spl_object_hash()`) therefore puts a recyclable id into a key that nothing pins, and is outside
+ * this contract.
+ *
  * See README.md, section "Strict and Coercive Types", subsection "Retained values".
  */
 final class Identity
 {
     /**
      * @param string $key unique ID string of the value, in the sense of {@see UniqueExtractor::getString()}
-     * @param list<object|resource> $anchors every value hashed by identity while computing the key
+     * @param list<object|resource|closed-resource> $anchors every value hashed by identity while computing the key
      */
     public function __construct(public readonly string $key, public readonly array $anchors)
     {

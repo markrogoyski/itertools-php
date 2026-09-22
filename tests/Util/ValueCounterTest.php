@@ -212,6 +212,64 @@ class ValueCounterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test arrays sharing one reference slot stay distinct, and their objects stay alive
+     */
+    public function testArraysSharingAReferenceSlotStayDistinct(): void
+    {
+        // Given
+        $counter = new ValueCounter(true);
+        $weakReferences = [];
+
+        // When
+        $counts = [];
+        foreach (self::arraysSharingAReferenceSlot(5, $weakReferences) as $array) {
+            $counts[] = $counter->add($array);
+        }
+        unset($array);
+
+        // Then
+        $this->assertSame([1, 1, 1, 1, 1], $counts);
+        $this->assertSame(5, $counter->size());
+
+        $alive = [];
+        foreach ($weakReferences as $weakReference) {
+            $alive[] = $weakReference->get() !== null;
+        }
+        $this->assertSame([true, true, true, true, true], $alive);
+
+        // When the counter goes, so do the identities it pinned
+        unset($counter);
+
+        $aliveAfterwards = [];
+        foreach ($weakReferences as $weakReference) {
+            $aliveAfterwards[] = $weakReference->get() !== null;
+        }
+        $this->assertSame([false, false, false, false, false], $aliveAfterwards);
+    }
+
+    /**
+     * Yields arrays that all share one reference slot: each yielded [&$slot] follows the next
+     * assignment to $slot, so retaining the array does not retain the object it held when it was
+     * yielded. Only the anchors the counter keeps can do that.
+     *
+     * @param int $count
+     * @param list<\WeakReference<\stdClass>> $weakReferences filled with one reference per object
+     *
+     * @return \Generator<int, array{0: \stdClass}>
+     */
+    private static function arraysSharingAReferenceSlot(int $count, array &$weakReferences): \Generator
+    {
+        $slot = null;
+
+        for ($i = 0; $i < $count; $i++) {
+            $slot = new \stdClass();
+            $weakReferences[] = \WeakReference::create($slot);
+
+            yield [&$slot];
+        }
+    }
+
+    /**
      * Yields fresh objects, dropping each one before the next is created, so that PHP is free to
      * hand the freed spl_object_id to its successor.
      *

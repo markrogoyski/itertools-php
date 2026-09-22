@@ -46,7 +46,7 @@ final class UsageMap
      * Deliberately write-only: retention is achieved by holding the references, not by reading
      * them back, so there is no consumer of this list inside the class.
      *
-     * @var list<object|resource>
+     * @var list<object|resource|closed-resource>
      */
     // @phpstan-ignore property.onlyWritten
     private array $anchors = [];

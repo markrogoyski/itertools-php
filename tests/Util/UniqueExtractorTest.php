@@ -101,16 +101,25 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
         $serializePrecision = \ini_get('serialize_precision');
         $pool = $this->strictPool();
         $table = self::coerciveTable();
+        $tableWithoutFloatStateObjects = self::coerciveTable(false);
 
         // When + Then
         try {
             foreach (['14', '17'] as $precisionSetting) {
-                foreach (['-1', '17'] as $serializePrecisionSetting) {
+                foreach (['-1', '17', '14'] as $serializePrecisionSetting) {
                     \ini_set('precision', $precisionSetting);
                     \ini_set('serialize_precision', $serializePrecisionSetting);
 
                     $this->assertStrictOracle($pool);
-                    $this->assertCoerciveTable($table);
+
+                    // serialize_precision = 14 rounds both 0.1 + 0.2 and 0.3 to "0.3", so the two
+                    // objects whose only difference is a float property serialize identically and
+                    // merge. That is the documented serialize() limitation for coercive objects
+                    // (README, "Coercive mode", objects bullet), not a defect of the encoding, so
+                    // that pair is left out of the table under this setting instead of asserted.
+                    $this->assertCoerciveTable(
+                        $serializePrecisionSetting === '14' ? $tableWithoutFloatStateObjects : $table,
+                    );
                 }
             }
         } finally {
@@ -159,6 +168,171 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             UniqueExtractor::getString($first, false),
             UniqueExtractor::getString($second, false),
         );
+    }
+
+    /**
+     * @test a closed resource nested in an array keeps its identity
+     */
+    public function testNestedClosedResourceKeepsItsIdentity(): void
+    {
+        // Given
+        $closed = \fopen('php://memory', 'r');
+        $otherClosed = \fopen('php://memory', 'r');
+        \fclose($closed);
+        \fclose($otherClosed);
+
+        // When
+        $strictKey = UniqueExtractor::getString([$closed], true);
+        $coerciveKey = UniqueExtractor::getString([$closed], false);
+
+        // Then
+        $this->assertSame($strictKey, UniqueExtractor::getString([$closed], true));
+        $this->assertSame($coerciveKey, UniqueExtractor::getString([$closed], false));
+        $this->assertNotSame($strictKey, UniqueExtractor::getString([$otherClosed], true));
+        $this->assertNotSame($coerciveKey, UniqueExtractor::getString([$otherClosed], false));
+    }
+
+    /**
+     * @test an array nested to the depth limit hashes by its contents
+     */
+    public function testArrayAtTheDepthLimitHashes(): void
+    {
+        // Given
+        $one = 1;
+        $two = 2;
+        for ($i = 0; $i < UniqueExtractor::MAX_DEPTH; $i++) {
+            $one = [$one];
+            $two = [$two];
+        }
+
+        // When
+        $key = UniqueExtractor::getString($one, true);
+
+        // Then
+        $this->assertSame($key, UniqueExtractor::getString($one, true));
+        $this->assertNotSame($key, UniqueExtractor::getString($two, true));
+    }
+
+    /**
+     * @test an array nested one level past the depth limit throws
+     * @dataProvider dataProviderForStrictFlag
+     * @param bool $strict
+     */
+    public function testArrayPastTheDepthLimitThrows(bool $strict): void
+    {
+        // Given
+        $value = 1;
+        for ($i = 0; $i <= UniqueExtractor::MAX_DEPTH; $i++) {
+            $value = [$value];
+        }
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage((string) UniqueExtractor::MAX_DEPTH);
+
+        // When
+        UniqueExtractor::getString($value, $strict);
+    }
+
+    /**
+     * @test a self-referential array throws the depth-limit exception rather than crashing
+     * @dataProvider dataProviderForStrictFlag
+     * @param bool $strict
+     */
+    public function testSelfReferentialArrayThrowsTheDepthLimitException(bool $strict): void
+    {
+        // Given
+        $array = [];
+        $array[] = &$array;
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage((string) UniqueExtractor::MAX_DEPTH);
+
+        // When
+        UniqueExtractor::getString($array, $strict);
+    }
+
+    /**
+     * @return list<array{bool}>
+     */
+    public static function dataProviderForStrictFlag(): array
+    {
+        return [
+            [true],
+            [false],
+        ];
+    }
+
+    /**
+     * @test a closure nested in an array hashes by instance in both modes
+     * @dataProvider dataProviderForStrictFlag
+     * @param bool $strict
+     */
+    public function testNestedClosureHashesByInstance(bool $strict): void
+    {
+        // Given
+        $closure = static fn (int $x): int => $x + 1;
+        $otherClosure = static fn (int $x): int => $x + 1;
+
+        // When
+        $key = UniqueExtractor::getString([[$closure]], $strict);
+
+        // Then
+        $this->assertSame($key, UniqueExtractor::getString([[$closure]], $strict));
+        $this->assertNotSame($key, UniqueExtractor::getString([[$otherClosure]], $strict));
+    }
+
+    /**
+     * @test a generator nested in an array hashes by instance in both modes
+     * @dataProvider dataProviderForStrictFlag
+     * @param bool $strict
+     */
+    public function testNestedGeneratorHashesByInstance(bool $strict): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        $otherGenerator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $key = UniqueExtractor::getString([[$generator]], $strict);
+
+        // Then
+        $this->assertSame($key, UniqueExtractor::getString([[$generator]], $strict));
+        $this->assertNotSame($key, UniqueExtractor::getString([[$otherGenerator]], $strict));
+    }
+
+    /**
+     * @test a non-serializable object nested in an array hashes by instance in strict mode
+     */
+    public function testNestedNonSerializableObjectStrictHashesByInstance(): void
+    {
+        // Given
+        $object = new NonSerializableFixture(1);
+        $otherWithSameState = new NonSerializableFixture(1);
+
+        // When
+        $key = UniqueExtractor::getString([$object], true);
+
+        // Then
+        $this->assertSame($key, UniqueExtractor::getString([$object], true));
+        $this->assertNotSame($key, UniqueExtractor::getString([$otherWithSameState], true));
+    }
+
+    /**
+     * @test a non-serializable object nested in an array throws in coercive mode
+     */
+    public function testNestedNonSerializableObjectNonStrictThrowsException(): void
+    {
+        // Given
+        $object = new NonSerializableFixture(1);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('NonSerializableFixture');
+
+        // When
+        UniqueExtractor::getString([$object], false);
     }
 
     /**
@@ -409,6 +583,97 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
     {
         // When
         $identity = UniqueExtractor::identify($value, false);
+
+        // Then
+        $this->assertSame([], $identity->anchors);
+    }
+
+    /**
+     * @test strict mode anchors every identity nested in an array, in the order it met them
+     */
+    public function testIdentifyStrictAnchorsNestedIdentities(): void
+    {
+        // Given
+        $object1 = new \stdClass();
+        $object2 = new \stdClass();
+        $resource = \fopen('php://memory', 'r');
+
+        // When
+        $identity = UniqueExtractor::identify([$object1, [$object2, $resource]], true);
+
+        // Then
+        $this->assertCount(3, $identity->anchors);
+        $this->assertSame($object1, $identity->anchors[0]);
+        $this->assertSame($object2, $identity->anchors[1]);
+        $this->assertSame($resource, $identity->anchors[2]);
+    }
+
+    /**
+     * @test coercive mode anchors only the nested resource, since ordinary objects hash by state
+     */
+    public function testIdentifyCoerciveAnchorsOnlyTheNestedResource(): void
+    {
+        // Given
+        $object1 = new \stdClass();
+        $object2 = new \stdClass();
+        $resource = \fopen('php://memory', 'r');
+
+        // When
+        $identity = UniqueExtractor::identify([$object1, [$object2, $resource]], false);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($resource, $identity->anchors[0]);
+    }
+
+    /**
+     * @test coercive mode anchors a nested closure alongside a nested resource
+     */
+    public function testIdentifyCoerciveAnchorsNestedClosure(): void
+    {
+        // Given
+        $object = new \stdClass();
+        $closure = static fn (int $x): int => $x + 1;
+        $resource = \fopen('php://memory', 'r');
+
+        // When
+        $identity = UniqueExtractor::identify([$object, [$closure, $resource]], false);
+
+        // Then
+        $this->assertCount(2, $identity->anchors);
+        $this->assertSame($closure, $identity->anchors[0]);
+        $this->assertSame($resource, $identity->anchors[1]);
+    }
+
+    /**
+     * @test anchors are collected through the whole depth limit
+     */
+    public function testIdentifyAnchorsThroughTheDepthLimit(): void
+    {
+        // Given
+        $object = new \stdClass();
+        $value = $object;
+        for ($i = 0; $i < UniqueExtractor::MAX_DEPTH; $i++) {
+            $value = [$value];
+        }
+
+        // When
+        $identity = UniqueExtractor::identify($value, true);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($object, $identity->anchors[0]);
+    }
+
+    /**
+     * @test an array of scalars anchors nothing
+     * @dataProvider dataProviderForStrictFlag
+     * @param bool $strict
+     */
+    public function testIdentifyAnchorsNothingForArrayOfScalars(bool $strict): void
+    {
+        // When
+        $identity = UniqueExtractor::identify([1, 'a', null, [2.5, false], []], $strict);
 
         // Then
         $this->assertSame([], $identity->anchors);
@@ -691,6 +956,7 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
     private function describe($value): string
     {
         return match (true) {
+            \is_array($value) => $this->describeArray($value),
             \is_resource($value) => 'open resource #' . \intval($value),
             \gettype($value) === 'resource (closed)' => 'closed resource #' . \intval($value),
             $value instanceof \Closure => 'Closure #' . \spl_object_id($value),
@@ -699,6 +965,21 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             \is_object($value) => $value::class . ' #' . \spl_object_id($value),
             default => \var_export($value, true),
         };
+    }
+
+    /**
+     * Human-readable label for an array, keys included: key order is part of array identity.
+     *
+     * @param array<array-key, mixed> $value
+     */
+    private function describeArray(array $value): string
+    {
+        $parts = [];
+        foreach ($value as $key => $item) {
+            $parts[] = \var_export($key, true) . ' => ' . $this->describe($item);
+        }
+
+        return '[' . \implode(', ', $parts) . ']';
     }
 
     /**
@@ -757,6 +1038,43 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             $openResource2,
             $closedResource,
             $closedResource,
+            // Arrays nesting the same edge values: element-wise hashing has to reproduce the
+            // whole contract one level down, so every identity and float edge case appears again
+            // inside an array.
+            [],
+            [[]],
+            [\NAN],
+            [\NAN],
+            [-0.0],
+            [0.0],
+            [0.1 + 0.2],
+            [0.3],
+            [0],
+            [$object1],
+            [$object2],
+            [$object1],
+            [EnumFixture::One],
+            [EnumFixture::Two],
+            [$closure],
+            [$generator],
+            [$openResource1],
+            [$openResource2],
+            [$closedResource],
+            // Key order is part of array identity, and element boundaries must survive content
+            // that looks like the encoding's own separators.
+            [1 => 'a', 0 => 'b'],
+            [0 => 'b', 1 => 'a'],
+            ['a', 'b'],
+            ['ab'],
+            ['a;', 'b'],
+            ['a', ';b'],
+            // PHP normalizes the numeric string key to an int key, so these two are one array.
+            ['1' => 'x'],
+            [1 => 'x'],
+            [[1], 2],
+            [1, [2]],
+            [[[1]]],
+            [[[2]]],
         ];
 
         if (\PHP_INT_SIZE === 8) {
@@ -770,9 +1088,12 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
     /**
      * The coercive equivalence table: values share a key iff they are in the same class.
      *
+     * @param bool $withFloatStateObjects whether to include the two objects whose only difference
+     *        is a float property; see {@see self::testKeysAreIndependentOfIniPrecision()}
+     *
      * @return list<list<mixed>>
      */
-    private static function coerciveTable(): array
+    private static function coerciveTable(bool $withFloatStateObjects = true): array
     {
         $object1 = new \stdClass();
         $object1->value = 1;
@@ -780,10 +1101,15 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
         $object2->value = 1;
         $closure1 = static fn (int $x): int => $x + 1;
         $closure2 = static fn (int $x): int => $x + 2;
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
         $openResource1 = \fopen('php://memory', 'r');
         $openResource2 = \fopen('php://memory', 'r');
         $closedResource = \fopen('php://memory', 'r');
         \fclose($closedResource);
+        $floatStateObject1 = new \stdClass();
+        $floatStateObject1->float = 0.1 + 0.2;
+        $floatStateObject2 = new \stdClass();
+        $floatStateObject2->float = 0.3;
 
         $table = [
             [0, 0.0, -0.0, '0', '0.0', ' 0', false, null, ''],
@@ -805,7 +1131,26 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
             [$openResource1],
             [$openResource2],
             [$closedResource, $closedResource],
+            [EnumFixture::One],
+            [EnumFixture::Two],
+            [$generator],
+            // Arrays recurse under the coercive rules, so numeric equivalence applies to elements
+            // while key order and key identity stay strict.
+            [[1], ['1'], [1.0], [true]],
+            [[0], [null], [''], [false]],
+            [[1, 2]],
+            [[2, 1]],
+            [['a' => 1], ['a' => '1']],
+            [[$object1], [$object2]],
+            [[$closure1]],
+            [[$openResource1]],
+            [[$closedResource], [$closedResource]],
         ];
+
+        if ($withFloatStateObjects) {
+            $table[] = [$floatStateObject1];
+            $table[] = [$floatStateObject2];
+        }
 
         if (\PHP_INT_SIZE === 8) {
             $table[] = [9007199254740992, '9007199254740992', 9007199254740992.0, '9007199254740993.0'];
@@ -832,11 +1177,25 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * One reproducible random value: a number, a numeric string, or a shallow array of those.
+     *
+     * @return int|float|string|array<int, int|float|string>
+     */
+    private function randomNumericValue()
+    {
+        if (\mt_rand(0, 3) === 0) {
+            return [$this->randomNumericScalar(), $this->randomNumericScalar()];
+        }
+
+        return $this->randomNumericScalar();
+    }
+
+    /**
      * One reproducible random number or numeric string, drawn from the seeded mt_rand stream.
      *
      * @return int|float|string
      */
-    private function randomNumericValue()
+    private function randomNumericScalar()
     {
         return match (\mt_rand(0, 5)) {
             0 => \mt_rand(-8, 8),

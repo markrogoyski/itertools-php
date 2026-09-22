@@ -611,7 +611,9 @@ Two values are equal iff `$a === $b`, with one exception: `NAN` equals `NAN`, at
   `\InvalidArgumentException` when not serializable. This is the one deliberate exception to
   precision independence: floats and resources inside a serialized object follow
   `serialize()` semantics (`serialize_precision`, resources as `i:0`). This is a known
-  limitation.
+  limitation. An object whose `__serialize()` or `__sleep()` embeds its own identity
+  (`spl_object_id()`, `spl_object_hash()`) is outside this contract, because a serialized
+  object is compared by content and so is not retained to keep that id reserved.
 * Closures and generators compare by instance. Resources compare by id, open or closed.
 * Arrays: same keys in the same order, with values compared recursively under coercive
   rules. `[1]` and `['1']` are equal. Keys are not coerced (PHP already normalizes `'1'`
@@ -620,16 +622,19 @@ Two values are equal iff `$a === $b`, with one exception: `NAN` equals `NAN`, at
 ### Limits
 
 Arrays nested deeper than `UniqueExtractor::MAX_DEPTH` (256) throw
-`\InvalidArgumentException`. This is a depth limit, not cycle detection: it also rejects
-sufficiently deep acyclic arrays. It is the chosen strategy for failing cleanly on a
+`\InvalidArgumentException`. Depth is counted per value: a scalar is depth 0, `[$scalar]` is
+depth 1, `[[$scalar]]` is depth 2. This is a depth limit, not cycle detection: it also
+rejects sufficiently deep acyclic arrays. It is the chosen strategy for failing cleanly on a
 self-referential array, where PHP's own `==` would fatal.
 
 ### Retained values
 
 Every function that compares by identity (strict mode, and coercive mode for closures,
 generators, and resources) pins the objects, closures, generators, and resources it has
-compared by instance — including ones nested inside arrays — for as long as its generator is
-alive, so a freed object's identity cannot be reused by a later, unrelated value.
+compared by instance — including ones nested inside arrays — for as long as it is comparing:
+a generator function until it is exhausted or released, a function returning a single value
+until it returns. A freed object's identity therefore cannot be reused by a later, unrelated
+value while the comparison is still running.
 
 * `frequencies`, `relativeFrequencies`, `frequenciesBy`, `relativeFrequenciesBy`, `toMode`
   (and their `Stream` counterparts) additionally retain one representative per distinct
