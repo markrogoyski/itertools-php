@@ -201,6 +201,18 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 ['1', 1, '2', 2],
                 [1, 1, 1, 1],
             ],
+            // Float precision independence: 0.1 + 0.2 !== 0.3 bit-exactly.
+            [
+                [0.1 + 0.2, 0.3],
+                [0.1 + 0.2, 0.3],
+                [1, 1],
+            ],
+            // Signed zero: -0.0 === 0.0, so one entry with count 2.
+            [
+                [-0.0, 0.0],
+                [-0.0],
+                [2],
+            ],
         ];
     }
 
@@ -382,6 +394,18 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 $gen(['1', 1, '2', 2]),
                 ['1', 1, '2', 2],
                 [1, 1, 1, 1],
+            ],
+            // Float precision independence: 0.1 + 0.2 !== 0.3 bit-exactly.
+            [
+                $gen([0.1 + 0.2, 0.3]),
+                [0.1 + 0.2, 0.3],
+                [1, 1],
+            ],
+            // Signed zero: -0.0 === 0.0, so one entry with count 2.
+            [
+                $gen([-0.0, 0.0]),
+                [-0.0],
+                [2],
             ],
         ];
     }
@@ -567,6 +591,18 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 ['1', 1, '2', 2],
                 [1, 1, 1, 1],
             ],
+            // Float precision independence: 0.1 + 0.2 !== 0.3 bit-exactly.
+            [
+                $iter([0.1 + 0.2, 0.3]),
+                [0.1 + 0.2, 0.3],
+                [1, 1],
+            ],
+            // Signed zero: -0.0 === 0.0, so one entry with count 2.
+            [
+                $iter([-0.0, 0.0]),
+                [-0.0],
+                [2],
+            ],
         ];
     }
 
@@ -751,6 +787,18 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 ['1', 1, '2', 2],
                 [1, 1, 1, 1],
             ],
+            // Float precision independence: 0.1 + 0.2 !== 0.3 bit-exactly.
+            [
+                $trav([0.1 + 0.2, 0.3]),
+                [0.1 + 0.2, 0.3],
+                [1, 1],
+            ],
+            // Signed zero: -0.0 === 0.0, so one entry with count 2.
+            [
+                $trav([-0.0, 0.0]),
+                [-0.0],
+                [2],
+            ],
         ];
     }
 
@@ -834,5 +882,71 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $frequencies[0][1]);
         $this->assertSame($obj2, $frequencies[1][0]);
         $this->assertEquals(1, $frequencies[1][1]);
+    }
+
+    /**
+     * Regression for defect 8: a freed object's spl_object_id can be reissued to a later,
+     * unrelated object. Each yielded object is dropped by the consumer before the next is
+     * produced, so this can only be reproduced through a generator, not the four fixtures.
+     *
+     * @test frequencies retains identity anchors so ephemeral objects are not falsely merged
+     */
+    public function testEphemeralObjectsStrict(): void
+    {
+        // Given
+        $data = self::freshObjectGenerator();
+
+        // When
+        $frequencies = [];
+        foreach (Math::frequencies($data, true) as $value => $frequency) {
+            $frequencies[] = [$value, $frequency];
+        }
+
+        // Then
+        $this->assertCount(3, $frequencies);
+        $this->assertEquals(1, $frequencies[0][1]);
+        $this->assertEquals(1, $frequencies[1][1]);
+        $this->assertEquals(1, $frequencies[2][1]);
+        $this->assertNotSame($frequencies[0][0], $frequencies[1][0]);
+        $this->assertNotSame($frequencies[0][0], $frequencies[2][0]);
+        $this->assertNotSame($frequencies[1][0], $frequencies[2][0]);
+    }
+
+    /**
+     * @test frequencies retains identity anchors for closures, which hash by instance in both modes
+     */
+    public function testEphemeralClosuresCoercive(): void
+    {
+        // Given
+        $data = self::freshClosureGenerator();
+
+        // When
+        $frequencies = [];
+        foreach (Math::frequencies($data, false) as $value => $frequency) {
+            $frequencies[] = [$value, $frequency];
+        }
+
+        // Then
+        $this->assertCount(3, $frequencies);
+        $this->assertEquals(1, $frequencies[0][1]);
+        $this->assertEquals(1, $frequencies[1][1]);
+        $this->assertEquals(1, $frequencies[2][1]);
+        $this->assertNotSame($frequencies[0][0], $frequencies[1][0]);
+        $this->assertNotSame($frequencies[0][0], $frequencies[2][0]);
+        $this->assertNotSame($frequencies[1][0], $frequencies[2][0]);
+    }
+
+    private static function freshObjectGenerator(): \Generator
+    {
+        for ($i = 0; $i < 3; $i++) {
+            yield new \stdClass();
+        }
+    }
+
+    private static function freshClosureGenerator(): \Generator
+    {
+        for ($i = 0; $i < 3; $i++) {
+            yield fn () => $i;
+        }
     }
 }

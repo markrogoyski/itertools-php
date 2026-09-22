@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\UniqueExtractor;
+use IterTools\Util\ValueCounter;
 
 final class Math
 {
@@ -24,25 +24,18 @@ final class Math
      */
     public static function frequencies(iterable $data, bool $strict = true): \Generator
     {
-        $usages = [];
-        $values = [];
+        // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
+        $counter = new ValueCounter($strict);
 
         foreach ($data as $datum) {
-            $hash = UniqueExtractor::getString($datum, $strict);
-
-            if (!\array_key_exists($hash, $usages)) {
-                $usages[$hash] = 0;
-                $values[$hash] = $datum;
-            }
-
-            $usages[$hash]++;
+            $counter->add($datum);
         }
 
         /**
          * @var T $value
          * @var int $usageCount
          */
-        foreach (Multi::zipEqual($values, $usages) as [$value, $usageCount]) {
+        foreach (Multi::zipEqual($counter->values(), $counter->counts()) as [$value, $usageCount]) {
             yield $value => $usageCount;
         }
     }
@@ -108,8 +101,10 @@ final class Math
      */
     public static function frequenciesBy(iterable $data, callable $keyFunc, bool $strict = true): \Generator
     {
-        $usages = [];
-        $keys   = [];
+        // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
+        // Keys here are always int|string, so no anchors are ever produced, but the counter is
+        // used anyway to keep this in step with frequencies().
+        $counter = new ValueCounter($strict);
 
         foreach ($data as $datum) {
             $key = $keyFunc($datum);
@@ -119,21 +114,14 @@ final class Math
                 );
             }
 
-            $hash = UniqueExtractor::getString($key, $strict);
-
-            if (!\array_key_exists($hash, $usages)) {
-                $usages[$hash] = 0;
-                $keys[$hash]   = $key;
-            }
-
-            $usages[$hash]++;
+            $counter->add($key);
         }
 
         /**
          * @var int|string $key
          * @var int        $usageCount
          */
-        foreach (Multi::zipEqual($keys, $usages) as [$key, $usageCount]) {
+        foreach (Multi::zipEqual($counter->values(), $counter->counts()) as [$key, $usageCount]) {
             yield $key => $usageCount;
         }
     }
