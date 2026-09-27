@@ -33,16 +33,16 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
     public function testStrictOracleRandomSample(): void
     {
         // Given
-        \mt_srand(12345);
+        $randomizer = new \Random\Randomizer(new \Random\Engine\Mt19937(12345));
         $values = [];
         for ($i = 0; $i < 60; $i++) {
-            $values[] = $this->randomNumericValue();
+            $values[] = $this->randomNumericValue($randomizer);
         }
 
         // When + Then
         for ($i = 0; $i < 400; $i++) {
-            $a = $values[\mt_rand(0, 59)];
-            $b = $values[\mt_rand(0, 59)];
+            $a = $values[$randomizer->getInt(0, 59)];
+            $b = $values[$randomizer->getInt(0, 59)];
 
             $this->assertSame(
                 $this->strictEquals($a, $b),
@@ -1237,31 +1237,35 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
     /**
      * One reproducible random value: a number, a numeric string, or a shallow array of those.
      *
+     * @param \Random\Randomizer $randomizer seeded by the caller, so the global mt_rand state is untouched
+     *
      * @return int|float|string|array<int, int|float|string>
      */
-    private function randomNumericValue()
+    private function randomNumericValue(\Random\Randomizer $randomizer)
     {
-        if (\mt_rand(0, 3) === 0) {
-            return [$this->randomNumericScalar(), $this->randomNumericScalar()];
+        if ($randomizer->getInt(0, 3) === 0) {
+            return [$this->randomNumericScalar($randomizer), $this->randomNumericScalar($randomizer)];
         }
 
-        return $this->randomNumericScalar();
+        return $this->randomNumericScalar($randomizer);
     }
 
     /**
-     * One reproducible random number or numeric string, drawn from the seeded mt_rand stream.
+     * One reproducible random number or numeric string, drawn from the caller's seeded randomizer.
+     *
+     * @param \Random\Randomizer $randomizer
      *
      * @return int|float|string
      */
-    private function randomNumericScalar()
+    private function randomNumericScalar(\Random\Randomizer $randomizer)
     {
-        return match (\mt_rand(0, 5)) {
-            0 => \mt_rand(-8, 8),
-            1 => \PHP_INT_MAX - \mt_rand(0, 5),
-            2 => \mt_rand(-8, 8) / 4.0,
-            3 => \mt_rand(1, 1 << 20) * (2.0 ** \mt_rand(-30, 30)),
-            4 => (string) \mt_rand(-8, 8),
-            default => (string) (\mt_rand(-8, 8) / 4.0),
+        return match ($randomizer->getInt(0, 5)) {
+            0 => $randomizer->getInt(-8, 8),
+            1 => \PHP_INT_MAX - $randomizer->getInt(0, 5),
+            2 => $randomizer->getInt(-8, 8) / 4.0,
+            3 => $randomizer->getInt(1, 1 << 20) * (2.0 ** $randomizer->getInt(-30, 30)),
+            4 => (string) $randomizer->getInt(-8, 8),
+            default => (string) ($randomizer->getInt(-8, 8) / 4.0),
         };
     }
 }
