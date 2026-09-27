@@ -9,8 +9,9 @@ namespace IterTools\Util;
  * Counts how often each distinct value has been registered.
  *
  * The registry behind the single-collection consumers: distinct, duplicates, allUnique, allEqual,
- * the frequency functions and toMode. Equality is decided by {@see UniqueExtractor} under the
- * strict or coercive contract documented in README.md, section "Strict and Coercive Types".
+ * the frequency functions, toMode, and the subtracted side of difference. Equality is decided by
+ * {@see UniqueExtractor} under the strict or coercive contract documented in README.md, section
+ * "Strict and Coercive Types".
  *
  * First-seen semantics throughout: distinct values appear in {@see self::values()} and
  * {@see self::counts()} in the order they were first registered, and the representative kept for
@@ -43,10 +44,8 @@ final class ValueCounter
     /**
      * Every anchor of every distinct registered value, keyed by {@see UniqueExtractor::anchorId()}.
      *
-     * The array exists to hold references, keyed so that the same object or resource nested in
-     * many distinct registered values is held once instead of once per value. This is safe because
-     * the array itself holds the anchor, so its id cannot be reused while held — a later value with
-     * the same id must therefore be the same anchor.
+     * Keyed by {@see UniqueExtractor::anchorId()}, so the same object or resource nested in many
+     * distinct registered values is held once instead of once per value — see {@see Identity}.
      *
      * @var array<string, object|resource|closed-resource>
      */

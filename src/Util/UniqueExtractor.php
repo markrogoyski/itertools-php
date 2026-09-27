@@ -92,13 +92,14 @@ final class UniqueExtractor
     }
 
     /**
-     * @internal
      * Identity key for one anchor: 'o' followed by its spl_object_id() for an object, 'r' followed
      * by its get_resource_id() for a resource (open or closed). Separate prefixes because the two
      * id spaces overlap.
      *
      * Used both here, to de-duplicate the anchors collected within one call, and by consumers
-     * (ValueCounter, UsageMap, Set::differenceInternal) that de-duplicate anchors across values.
+     * (ValueCounter, UsageMap) that de-duplicate anchors across values.
+     *
+     * @internal
      *
      * @param object|resource|closed-resource $anchor
      *
@@ -118,9 +119,7 @@ final class UniqueExtractor
      *
      * $anchors is keyed by {@see self::anchorId()} rather than being a plain list, so an object or
      * resource nested repeatedly within the same value — e.g. the same object under two branches
-     * of an array — is appended once. This is safe because the array itself holds the anchor, so
-     * its id cannot be reused while held: a later value met with the same id during this same call
-     * must therefore be the same anchor.
+     * of an array — is appended once; see {@see Identity} for why that de-duplication is safe.
      *
      * @param mixed $var
      * @param bool $strict
