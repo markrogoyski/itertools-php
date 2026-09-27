@@ -551,4 +551,38 @@ class DifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);
     }
+
+    /**
+     * A coercively compared object is hashed by its serialized state, so nothing about it needs
+     * to stay alive once it has been compared and counted into the subtracted multiset.
+     *
+     * @test differenceCoercive does not retain the subtracted objects
+     */
+    public function testDoesNotRetainSubtractedObjects(): void
+    {
+        // Given
+        $aliveWhileBuilding = [];
+        $subtracted = (static function () use (&$aliveWhileBuilding): \Generator {
+            $weakReferences = [];
+            for ($i = 0; $i < 3; $i++) {
+                $object = (object) ['value' => $i];
+                $weakReferences[] = \WeakReference::create($object);
+                yield $object;
+                unset($object);
+            }
+            // The last object is still differenceInternal's current loop value, so only the
+            // earlier ones.
+            $aliveWhileBuilding = [$weakReferences[0]->get() !== null, $weakReferences[1]->get() !== null];
+        })();
+
+        // When
+        $result = [];
+        foreach (Set::differenceCoercive([1, 2, 3], $subtracted) as $value) {
+            $result[] = $value;
+        }
+
+        // Then
+        $this->assertSame([1, 2, 3], $result);
+        $this->assertSame([false, false], $aliveWhileBuilding);
+    }
 }

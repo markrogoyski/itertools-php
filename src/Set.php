@@ -290,8 +290,8 @@ final class Set
      * If input iterables produce duplicate items, then multiset difference rules apply.
      *
      * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
-     * objects, closures, generators, and resources it has compared by instance, including the
-     * subtracted values, for the generator's lifetime.
+     * objects, closures, generators, and resources it has compared by instance, including
+     * the identities of the subtracted values, for the generator's lifetime.
      *
      * @param iterable<mixed> $a
      * @param iterable<mixed> ...$iterables
@@ -310,8 +310,8 @@ final class Set
      * If input iterables produce duplicate items, then multiset difference rules apply.
      *
      * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
-     * closures, generators, and resources it has compared by instance, including the
-     * subtracted values, for the generator's lifetime.
+     * closures, generators, and resources it has compared by instance, including
+     * those nested in the subtracted values, for the generator's lifetime.
      *
      * @param iterable<mixed> $a
      * @param iterable<mixed> ...$iterables
@@ -446,24 +446,27 @@ final class Set
         iterable ...$iterables
     ): \Generator {
         /**
-         * Each entry pairs a remaining count with the value it was derived from and the
-         * identity anchors that value's hash depends on. Holding the value keeps its
-         * spl_object_id reserved in strict mode, so a later object from $a cannot inherit the
-         * ID of an already-freed one and be subtracted by mistake; the anchors additionally
-         * pin identities nested inside the value once arrays hash recursively — see Identity.
+         * Each entry pairs a remaining count with the identity anchors the hash was first
+         * derived from. Holding the anchors keeps the objects, closures, generators, and
+         * resources nested in that first value alive, so a later object from $a cannot
+         * inherit the id of an already-freed one and be subtracted by mistake — see Identity.
+         * Anchors are recorded only the first time a hash is seen, same as ValueCounter and
+         * UsageMap: while an entry's anchors are held, no other value can be given their ids,
+         * so a repeat of the hash needs no anchors of its own.
          *
-         * @var array<string, array{0: int, 1: mixed, 2: list<object|resource|closed-resource>}> $subtracted
+         * @var array<string, array{0: int, 1: list<object|resource|closed-resource>}> $subtracted
          */
         $subtracted = [];
 
         foreach ($iterables as $iterable) {
             foreach ($iterable as $value) {
                 $identity = UniqueExtractor::identify($value, $strict);
-                $subtracted[$identity->key] = [
-                    ($subtracted[$identity->key][0] ?? 0) + 1,
-                    $value,
-                    $identity->anchors,
-                ];
+
+                if (isset($subtracted[$identity->key])) {
+                    $subtracted[$identity->key][0]++;
+                } else {
+                    $subtracted[$identity->key] = [1, $identity->anchors];
+                }
             }
         }
 

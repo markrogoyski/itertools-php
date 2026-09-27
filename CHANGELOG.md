@@ -18,7 +18,7 @@
 * Arrays now compare element-wise under the active mode instead of by `serialize()`. In strict mode, nested objects, closures, generators, and resources compare by instance, and nested `-0.0` equals `0.0`. In coercive mode, `[1]` and `['1']` are now equal (e.g. `Set::distinct([[1], ['1']], false)` yields one element; `Set::unionCoercive([[1]], [['1']])` yields one).
 * Arrays nested deeper than 256 levels, including self-referential arrays, now throw `\InvalidArgumentException` where they previously went through `serialize()`.
 * Coercive scalar comparison is documented as numeric equivalence, not PHP `==`: `'abc'` is not equal to `true`, and `0`, `''`, `null`, and `false` remain one value.
-* `intersection*`, `partialIntersection*`, `union*`, `arePermutations*`, and `Summary::allUnique` no longer hold every distinct value in memory for the comparison's lifetime; they retain only the identities their comparisons depend on. `symmetricDifference*` still retains one representative per distinct value, since it is part of the output.
+* `intersection*`, `partialIntersection*`, `union*`, `difference*`, `arePermutations*`, and `Summary::allUnique` no longer hold every distinct value in memory for the comparison's lifetime; they retain only the identities their comparisons depend on. `symmetricDifference*` still retains one representative per distinct value, since it is part of the output.
 * The README "Strict and Coercive Types" section is now the single source of truth for strict and coercive comparison, including which values are retained for the lifetime of a comparison.
 
 ## v2.6.0 - 2026-09-21
