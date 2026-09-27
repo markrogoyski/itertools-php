@@ -42,10 +42,9 @@ final class ValueCounter
      */
     private array $counts = [];
     /**
-     * Every anchor of every distinct registered value, keyed by {@see UniqueExtractor::anchorId()}.
-     *
-     * Keyed by {@see UniqueExtractor::anchorId()}, so the same object or resource nested in many
-     * distinct registered values is held once instead of once per value — see {@see Identity}.
+     * Every anchor of every distinct registered value, keyed by {@see UniqueExtractor::anchorId()}
+     * so the same object or resource nested in many distinct registered values is held once instead
+     * of once per value — see {@see Identity}.
      *
      * @var array<string, object|resource|closed-resource>
      */
@@ -91,7 +90,39 @@ final class ValueCounter
     }
 
     /**
-     * Number of distinct values registered.
+     * Removes one occurrence of $value if any remain; returns whether one was removed.
+     *
+     * When the count reaches zero, the count entry (and the representative in {@see self::$values},
+     * if retained) is unset, so {@see self::counts()} keeps its int<1, max> type and
+     * {@see self::size()}/{@see self::values()} stay consistent with it. Anchors are never removed
+     * by this method -- removing a value does not remove the identities its hash depended on, the
+     * same rule {@see UsageMap} follows; see {@see Identity}.
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public function remove(mixed $value): bool
+    {
+        $hash = UniqueExtractor::getString($value, $this->strict);
+        $count = $this->counts[$hash] ?? 0;
+
+        if ($count === 0) {
+            return false;
+        }
+
+        if ($count === 1) {
+            unset($this->counts[$hash]);
+            unset($this->values[$hash]);
+        } else {
+            $this->counts[$hash] = $count - 1;
+        }
+
+        return true;
+    }
+
+    /**
+     * Number of distinct values with a count above zero.
      *
      * @return int<0, max>
      */

@@ -340,4 +340,130 @@ class ValueCounterTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertNotNull($weakReference->get());
     }
+
+    /**
+     * @test remove() on a value that was never added does nothing
+     */
+    public function testRemoveNeverAddedReturnsFalse(): void
+    {
+        // Given
+        $counter = new ValueCounter(true);
+        $counter->add('a');
+
+        // When
+        $removed = $counter->remove('b');
+
+        // Then
+        $this->assertFalse($removed);
+        $this->assertSame([1], \array_values($counter->counts()));
+    }
+
+    /**
+     * @test remove() consumes one occurrence of a repeated value
+     */
+    public function testRemoveConsumesOneOccurrence(): void
+    {
+        // Given
+        $counter = new ValueCounter(true);
+        $counter->add('a');
+        $counter->add('a');
+
+        // When
+        $removed = $counter->remove('a');
+
+        // Then
+        $this->assertTrue($removed);
+        $this->assertSame([1], \array_values($counter->counts()));
+    }
+
+    /**
+     * @test remove() down to zero drops the entry, and a further remove() returns false
+     */
+    public function testRemoveDownToZeroDropsTheEntry(): void
+    {
+        // Given
+        $counter = new ValueCounter(true);
+        $counter->add('a');
+
+        // When
+        $firstRemoved = $counter->remove('a');
+        $secondRemoved = $counter->remove('a');
+
+        // Then
+        $this->assertTrue($firstRemoved);
+        $this->assertFalse($secondRemoved);
+        $this->assertSame([], $counter->counts());
+        $this->assertSame(0, $counter->size());
+    }
+
+    /**
+     * @test remove() follows the coercive contract for matching values
+     */
+    public function testRemoveFollowsCoerciveMode(): void
+    {
+        // Given
+        $counter = new ValueCounter(false);
+        $counter->add(1);
+
+        // When
+        $removed = $counter->remove('1');
+
+        // Then
+        $this->assertTrue($removed);
+        $this->assertSame([], $counter->counts());
+    }
+
+    /**
+     * @test remove() follows the strict contract, so a differently-typed value does not match
+     */
+    public function testRemoveFollowsStrictMode(): void
+    {
+        // Given
+        $counter = new ValueCounter(true);
+        $counter->add(1);
+
+        // When
+        $removed = $counter->remove('1');
+
+        // Then
+        $this->assertFalse($removed);
+        $this->assertSame([1], \array_values($counter->counts()));
+    }
+
+    /**
+     * @test remove() drops the retained representative once its count hits zero
+     */
+    public function testRemoveDropsRepresentativeWhenCountReachesZero(): void
+    {
+        // Given
+        $counter = new ValueCounter(true, retainValues: true);
+        $counter->add('a');
+
+        // When
+        $counter->remove('a');
+
+        // Then
+        $this->assertSame([], $counter->values());
+    }
+
+    /**
+     * @test remove() never removes the anchors pinned when the value was registered
+     */
+    public function testRemoveKeepsAnchorsAfterCountReachesZero(): void
+    {
+        // Given
+        $counter = new ValueCounter(true);
+        $object = new \stdClass();
+        $counter->add($object);
+
+        // When
+        $counter->remove($object);
+
+        // Then
+        $property = new \ReflectionProperty(ValueCounter::class, 'anchors');
+        $anchors = $property->getValue($counter);
+
+        $this->assertCount(1, $anchors);
+        $this->assertSame($object, \array_values($anchors)[0]);
+    }
 }

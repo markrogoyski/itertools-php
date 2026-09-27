@@ -7,7 +7,6 @@ namespace IterTools;
 use IterTools\Util\Identity;
 use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\NoValueMonad;
-use IterTools\Util\UniqueExtractor;
 use IterTools\Util\UsageMap;
 use IterTools\Util\ValueCounter;
 
@@ -455,19 +454,8 @@ final class Set
             }
         }
 
-        /**
-         * Remaining count per subtracted hash.
-         *
-         * @var array<string, int> $subtracted
-         */
-        $subtracted = $counter->counts();
-
         foreach ($a as $value) {
-            $hash = UniqueExtractor::getString($value, $strict);
-
-            if (($subtracted[$hash] ?? 0) > 0) {
-                $subtracted[$hash]--;
-            } else {
+            if (!$counter->remove($value)) {
                 yield $value;
             }
         }
