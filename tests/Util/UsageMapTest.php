@@ -15,8 +15,7 @@ class UsageMapTest extends \PHPUnit\Framework\TestCase
     /**
      * @test addUsage keeps distinct keys for objects whose freed ids PHP could recycle
      *
-     * Passes today because the map's last-seen representative already pins each hash's
-     * identity; this guards that existing behavior alongside the new anchor retention below.
+     * The map retains no values here, so it is the anchors alone that pin each hash's identity.
      */
     public function testAddUsageKeepsRecycledObjectIdsApart(): void
     {
@@ -32,7 +31,7 @@ class UsageMapTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertCount(3, \array_unique($hashes));
-        $this->assertCount(3, $usageMap->getValues());
+        $this->assertCount(3, $usageMap->getHashes());
     }
 
     /**
@@ -94,5 +93,73 @@ class UsageMapTest extends \PHPUnit\Framework\TestCase
             yield $object;
             unset($object);
         }
+    }
+
+    /**
+     * @test getValues() is unavailable unless the map retains values
+     */
+    public function testGetValuesThrowsWithoutRetention(): void
+    {
+        // Given
+        $usageMap = new UsageMap(true);
+        $usageMap->addUsage(1, 'owner');
+
+        // Then
+        $this->expectException(\LogicException::class);
+
+        // When
+        $usageMap->getValues();
+    }
+
+    /**
+     * @test without value retention, a coercively compared object is not kept alive
+     */
+    public function testCoerciveObjectIsNotRetainedWithoutValueRetention(): void
+    {
+        // Given
+        $usageMap = new UsageMap(false);
+        $object = (object) ['value' => 1];
+        $weakReference = \WeakReference::create($object);
+
+        // When
+        $hash = $usageMap->addUsage($object, 'owner');
+        unset($object);
+
+        // Then
+        $this->assertNull($weakReference->get());
+        $this->assertSame(1, $usageMap->getOwnersCount($hash));
+    }
+
+    /**
+     * @test with value retention, the last value registered under a hash is its representative
+     */
+    public function testRetainsLastSeenRepresentativeWithValueRetention(): void
+    {
+        // Given
+        $usageMap = new UsageMap(false, retainValues: true);
+
+        // When
+        $usageMap->addUsage(1, 'a');
+        $usageMap->addUsage('1', 'b');
+
+        // Then
+        $this->assertSame(['1'], \array_values($usageMap->getValues()));
+    }
+
+    /**
+     * @test getHashes() lists each distinct hash once, in first-seen order, without retaining values
+     */
+    public function testGetHashesListsDistinctHashesInFirstSeenOrder(): void
+    {
+        // Given
+        $usageMap = new UsageMap(true);
+
+        // When
+        $b = $usageMap->addUsage('b', 'owner');
+        $a = $usageMap->addUsage('a', 'owner');
+        $usageMap->addUsage('b', 'other');
+
+        // Then
+        $this->assertSame([$b, $a], $usageMap->getHashes());
     }
 }

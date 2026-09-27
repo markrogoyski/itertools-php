@@ -16,6 +16,10 @@ namespace IterTools\Util;
  * {@see self::counts()} in the order they were first registered, and the representative kept for
  * each of them is the first value registered under its hash, not the last.
  *
+ * Representatives are kept only when asked for at construction: the consumers that report them
+ * (frequencies, toMode) need them, the ones that only count (distinct, allUnique, ...) do not, and
+ * keeping them would hold every distinct value of a stream in memory.
+ *
  * Registering a value also retains the identities its hash was derived from, for as long as the
  * counter lives. See {@see Identity} for why that is necessary — in short, an object or resource
  * id is unique only among the values alive at the moment it is read, so a key kept across
@@ -24,7 +28,8 @@ namespace IterTools\Util;
 final class ValueCounter
 {
     /**
-     * First-seen representative per distinct value, keyed by hash, in first-seen order.
+     * First-seen representative per distinct value, keyed by hash, in first-seen order; empty
+     * unless representatives are retained.
      *
      * @var array<string, mixed>
      */
@@ -50,8 +55,9 @@ final class ValueCounter
 
     /**
      * @param bool $strict whether values compare under the strict or the coercive contract
+     * @param bool $retainValues whether to keep a representative per distinct value for {@see self::values()}
      */
-    public function __construct(private readonly bool $strict)
+    public function __construct(private readonly bool $strict, private readonly bool $retainValues = false)
     {
     }
 
@@ -71,7 +77,9 @@ final class ValueCounter
         $count = ($this->counts[$identity->key] ?? 0) + 1;
 
         if ($count === 1) {
-            $this->values[$identity->key] = $value;
+            if ($this->retainValues) {
+                $this->values[$identity->key] = $value;
+            }
 
             foreach ($identity->anchors as $anchor) {
                 $this->anchors[] = $anchor;
@@ -97,9 +105,15 @@ final class ValueCounter
      * First-seen representative per distinct value, in first-seen order, keyed by hash.
      *
      * @return array<string, mixed>
+     *
+     * @throws \LogicException if the counter was constructed without retaining values
      */
     public function values(): array
     {
+        if (!$this->retainValues) {
+            throw new \LogicException('ValueCounter was constructed without retaining values');
+        }
+
         return $this->values;
     }
 

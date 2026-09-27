@@ -11,6 +11,10 @@ namespace IterTools\Util;
  * hashed exactly once, when it is registered: a retained array holding a reference slot follows
  * later assignments to that slot, so hashing it again could produce a different key and miss
  * (or hit the wrong) counts.
+ *
+ * Identity is pinned by the anchors alone (see {@see self::$anchors}). Representatives are kept
+ * only when asked for at construction, by the one consumer that reports them (symmetric
+ * difference); keeping them otherwise would hold every distinct value of a stream in memory.
  */
 final class UsageMap
 {
@@ -23,22 +27,12 @@ final class UsageMap
      */
     private array $deletedMap = [];
     /**
-     * The most recently registered value behind each hash, keyed in first-seen order.
+     * The most recently registered value behind each hash, keyed in first-seen order; empty
+     * unless representatives are retained.
      *
-     * Registering a value also retains it: in strict mode an object's ID string comes from its
-     * spl_object_id, which PHP reuses once the object is freed. Holding the value keeps that ID
-     * reserved so a later, unrelated object cannot inherit it and merge with its usage counts.
-     * Overwriting does not weaken that: values sharing a hash in strict mode are the same
-     * instance, so the retained object is never released, and the hashes that do merge distinct
-     * values (coercive scalars and serialized objects) are not derived from an ID at all.
-     *
-     * The last value wins so that consumers report the same representative of an equivalence
-     * class that they did before this map retained values -- for coercive comparisons that is an
-     * observable type-level difference, e.g. the '1' rather than the 1 of [1] vs ['1', '1'].
-     *
-     * Registering a value additionally retains the identity anchors its hash depends on, in
-     * {@see self::$anchors}, so nested identities stay pinned independently of which
-     * representative the last-seen slot above currently holds; see {@see Identity}.
+     * The last value wins so that symmetric difference reports the same representative of an
+     * equivalence class that it always has -- for coercive comparisons that is an observable
+     * type-level difference, e.g. the '1' rather than the 1 of [1] vs ['1', '1'].
      *
      * @var array<string, mixed>
      */
@@ -57,8 +51,9 @@ final class UsageMap
     private array $anchors = [];
     /**
      * @param bool $strict
+     * @param bool $retainValues whether to keep the last-seen representative per hash for {@see self::getValues()}
      */
-    public function __construct(private readonly bool $strict)
+    public function __construct(private readonly bool $strict, private readonly bool $retainValues = false)
     {
     }
 
@@ -75,7 +70,9 @@ final class UsageMap
         $identity = UniqueExtractor::identify($value, $this->strict);
         $hash = $identity->key;
 
-        $this->values[$hash] = $value;
+        if ($this->retainValues) {
+            $this->values[$hash] = $value;
+        }
 
         if (!isset($this->addedMap[$hash])) {
             $this->addedMap[$hash] = [];
@@ -98,10 +95,26 @@ final class UsageMap
      * Returns the latest registered value for each unique hash string, in first-seen key order.
      *
      * @return array<string, mixed>
+     *
+     * @throws \LogicException if the map was constructed without retaining values
      */
     public function getValues(): array
     {
+        if (!$this->retainValues) {
+            throw new \LogicException('UsageMap was constructed without retaining values');
+        }
+
         return $this->values;
+    }
+
+    /**
+     * Returns each unique hash string once, in first-seen order.
+     *
+     * @return list<string>
+     */
+    public function getHashes(): array
+    {
+        return \array_keys($this->addedMap);
     }
 
     /**

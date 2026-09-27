@@ -434,4 +434,35 @@ class AllUniqueTest extends \PHPUnit\Framework\TestCase
             [$trav(['a' => 1, 'b' => '1', 'c' => 2])],
         ];
     }
+
+    /**
+     * Regression: allUnique retained every distinct value, although it only needs counts. A
+     * coercively compared object is hashed by its serialized state, so nothing about it needs to
+     * stay alive once it has been compared.
+     *
+     * @test allUnique coercive does not retain the objects it has compared
+     */
+    public function testCoerciveDoesNotRetainComparedObjects(): void
+    {
+        // Given
+        $aliveWhileIterating = [];
+        $data = (static function () use (&$aliveWhileIterating): \Generator {
+            $weakReferences = [];
+            for ($i = 0; $i < 3; $i++) {
+                $object = (object) ['value' => $i];
+                $weakReferences[] = \WeakReference::create($object);
+                yield $object;
+                unset($object);
+            }
+            // The last object is still the consumer's current value, so only the earlier ones.
+            $aliveWhileIterating = [$weakReferences[0]->get() !== null, $weakReferences[1]->get() !== null];
+        })();
+
+        // When
+        $result = Summary::allUnique($data, false);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([false, false], $aliveWhileIterating);
+    }
 }

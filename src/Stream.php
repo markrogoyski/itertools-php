@@ -1800,8 +1800,7 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates the intersection of iterable source and given iterables in strict type mode.
      *
-     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the strict rules in README "Strict and Coercive Types".
      *
      * @param array<iterable<mixed>> ...$iterables
      *
@@ -1818,8 +1817,7 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates the intersection of iterable source and given iterables in non-strict type mode.
      *
-     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param array<iterable<mixed>> ...$iterables
      *
@@ -1908,8 +1906,7 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates partial intersection of iterable source and given iterables in strict type mode.
      *
-     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the strict rules in README "Strict and Coercive Types".
      *
      * @param positive-int $minIntersectionCount
      * @param array<iterable<mixed>> ...$iterables
@@ -1927,8 +1924,7 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates partial intersection of iterable source and given iterables in non-strict type mode.
      *
-     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param positive-int $minIntersectionCount
      * @param array<iterable<mixed>> ...$iterables
@@ -1946,8 +1942,7 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates union of iterable source and given iterables in strict type mode.
      *
-     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the strict rules in README "Strict and Coercive Types".
      *
      * @param array<iterable<mixed>> ...$iterables
      *
@@ -1964,8 +1959,7 @@ final class Stream implements \IteratorAggregate
     /**
      * Iterates union of iterable source and given iterables using type coercion.
      *
-     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param array<iterable<mixed>> ...$iterables
      *
@@ -2745,8 +2739,7 @@ final class Stream implements \IteratorAggregate
      * Returns true if stream and given collections are permutations of each other (using strict-type comparisons).
      *
      * Returns true if no collections given. Equality follows the strict rules in README
-     * "Strict and Coercive Types". Retains the last-seen representative per distinct value;
-     * see the Retained values subsection there.
+     * "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -2764,8 +2757,7 @@ final class Stream implements \IteratorAggregate
      * Returns true if stream and given collections are permutations of each other (using type coercion).
      *
      * Returns true if no collections given. Equality follows the coercive rules in README
-     * "Strict and Coercive Types". Retains the last-seen representative per distinct value;
-     * see the Retained values subsection there.
+     * "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *

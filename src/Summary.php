@@ -454,8 +454,7 @@ final class Summary
      *
      * Returns true if no collections given or for single collection.
      *
-     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the strict rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -473,8 +472,7 @@ final class Summary
      *
      * Returns true if no collections given or for single collection.
      *
-     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -516,7 +514,7 @@ final class Summary
             return false;
         }
 
-        foreach (\array_keys($usageMap->getValues()) as $hash) {
+        foreach ($usageMap->getHashes() as $hash) {
             if (!$usageMap->hasSameOwnerCount($hash, \count($iterables))) {
                 return false;
             }

@@ -64,7 +64,7 @@ class ValueCounterTest extends \PHPUnit\Framework\TestCase
     public function testCoerciveModeKeepsFirstRepresentative(): void
     {
         // Given
-        $counter = new ValueCounter(false);
+        $counter = new ValueCounter(false, retainValues: true);
 
         // When
         $counter->add(1);
@@ -83,7 +83,7 @@ class ValueCounterTest extends \PHPUnit\Framework\TestCase
     public function testStrictModeKeepsIntAndStringApart(): void
     {
         // Given
-        $counter = new ValueCounter(true);
+        $counter = new ValueCounter(true, retainValues: true);
 
         // When
         $counter->add(1);
@@ -101,7 +101,7 @@ class ValueCounterTest extends \PHPUnit\Framework\TestCase
     public function testValuesAndCountsAreInFirstSeenOrder(): void
     {
         // Given
-        $counter = new ValueCounter(true);
+        $counter = new ValueCounter(true, retainValues: true);
 
         // When
         $counter->add('b');
@@ -123,7 +123,7 @@ class ValueCounterTest extends \PHPUnit\Framework\TestCase
     public function testEmptyCounter(): void
     {
         // Given
-        $counter = new ValueCounter(true);
+        $counter = new ValueCounter(true, retainValues: true);
 
         // When + Then
         $this->assertSame(0, $counter->size());
@@ -264,5 +264,58 @@ class ValueCounterTest extends \PHPUnit\Framework\TestCase
             yield $object;
             unset($object);
         }
+    }
+
+    /**
+     * @test values() is unavailable unless the counter retains values
+     */
+    public function testValuesThrowsWithoutRetention(): void
+    {
+        // Given
+        $counter = new ValueCounter(true);
+        $counter->add(1);
+
+        // Then
+        $this->expectException(\LogicException::class);
+
+        // When
+        $counter->values();
+    }
+
+    /**
+     * @test without value retention, a coercively compared object is not kept alive
+     */
+    public function testCoerciveObjectIsNotRetainedWithoutValueRetention(): void
+    {
+        // Given
+        $counter = new ValueCounter(false);
+        $object = (object) ['value' => 1];
+        $weakReference = \WeakReference::create($object);
+
+        // When
+        $counter->add($object);
+        unset($object);
+
+        // Then
+        $this->assertNull($weakReference->get());
+        $this->assertSame(1, $counter->size());
+    }
+
+    /**
+     * @test with value retention, a coercively compared object is kept as its representative
+     */
+    public function testCoerciveObjectIsRetainedWithValueRetention(): void
+    {
+        // Given
+        $counter = new ValueCounter(false, retainValues: true);
+        $object = (object) ['value' => 1];
+        $weakReference = \WeakReference::create($object);
+
+        // When
+        $counter->add($object);
+        unset($object);
+
+        // Then
+        $this->assertNotNull($weakReference->get());
     }
 }

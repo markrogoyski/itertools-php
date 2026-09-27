@@ -355,7 +355,7 @@ final class Reduce
     public static function toMode(iterable $data): array
     {
         // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
-        $counter = new ValueCounter(true);
+        $counter = new ValueCounter(true, retainValues: true);
 
         foreach ($data as $datum) {
             $counter->add($datum);

@@ -25,7 +25,7 @@ final class Math
     public static function frequencies(iterable $data, bool $strict = true): \Generator
     {
         // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
-        $counter = new ValueCounter($strict);
+        $counter = new ValueCounter($strict, retainValues: true);
 
         foreach ($data as $datum) {
             $counter->add($datum);
@@ -104,7 +104,7 @@ final class Math
         // See ValueCounter: it pins the identity anchors a repeated value's hash depends on.
         // Keys here are always int|string, so no anchors are ever produced, but the counter is
         // used anyway to keep this in step with frequencies().
-        $counter = new ValueCounter($strict);
+        $counter = new ValueCounter($strict, retainValues: true);
 
         foreach ($data as $datum) {
             $key = $keyFunc($datum);

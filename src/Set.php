@@ -188,8 +188,7 @@ final class Set
      *
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      *
-     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the strict rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -205,8 +204,7 @@ final class Set
      *
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      *
-     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -223,8 +221,7 @@ final class Set
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      * If minIntersectionCount is 1, then multiset union rules apply.
      *
-     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the strict rules in README "Strict and Coercive Types".
      *
      * @param positive-int $minIntersectionCount
      * @param iterable<mixed> ...$iterables
@@ -242,8 +239,7 @@ final class Set
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      * If minIntersectionCount is 1, then multiset union rules apply.
      *
-     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param positive-int $minIntersectionCount
      * @param iterable<mixed> ...$iterables
@@ -260,8 +256,7 @@ final class Set
      *
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      *
-     * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the strict rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -277,8 +272,7 @@ final class Set
      *
      * If input iterables produce duplicate items, then multiset intersection rules apply.
      *
-     * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
-     * last-seen representative per distinct value; see the Retained values subsection there.
+     * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -409,7 +403,7 @@ final class Set
         bool $strict,
         iterable ...$iterables
     ): \Generator {
-        $usageMap = new UsageMap($strict);
+        $usageMap = new UsageMap($strict, retainValues: true);
 
         $multipleIterator = new JustifyMultipleIterator(NoValueMonad::getInstance(), ...$iterables);
 

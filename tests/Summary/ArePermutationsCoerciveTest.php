@@ -751,4 +751,34 @@ class ArePermutationsCoerciveTest extends \PHPUnit\Framework\TestCase
             [$trav([1, 0, 0]), $trav([false, null, 0]), $trav([0.0, 0, false])],
         ];
     }
+
+    /**
+     * A coercively compared object is hashed by its serialized state, so nothing about it needs
+     * to stay alive once it has been compared.
+     *
+     * @test arePermutationsCoercive does not retain the objects it has compared
+     */
+    public function testDoesNotRetainComparedObjects(): void
+    {
+        // Given
+        $aliveWhileIterating = [];
+        $data = (static function () use (&$aliveWhileIterating): \Generator {
+            $weakReferences = [];
+            for ($i = 0; $i < 3; $i++) {
+                $object = (object) ['value' => $i];
+                $weakReferences[] = \WeakReference::create($object);
+                yield $object;
+                unset($object);
+            }
+            // The last object is still the consumer's current value, so only the earlier ones.
+            $aliveWhileIterating = [$weakReferences[0]->get() !== null, $weakReferences[1]->get() !== null];
+        })();
+
+        // When
+        $result = Summary::arePermutationsCoercive([0, 1, 2], $data);
+
+        // Then
+        $this->assertFalse($result);
+        $this->assertSame([false, false], $aliveWhileIterating);
+    }
 }

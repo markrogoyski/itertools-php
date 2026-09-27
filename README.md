@@ -643,8 +643,8 @@ value while the comparison is still running.
 * `frequencies`, `relativeFrequencies`, `frequenciesBy`, `relativeFrequenciesBy`, `toMode`
   (and their `Stream` counterparts) additionally retain one representative per distinct
   value, since it is part of the output.
-* `intersection*`, `union*`, `symmetricDifference*`, `arePermutations*` additionally retain
-  the last-seen representative per distinct value.
+* `symmetricDifference*` additionally retains the last-seen representative per distinct
+  value, since it is part of the output.
 
 Standards
 ---------

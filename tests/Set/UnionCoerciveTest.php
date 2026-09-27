@@ -648,4 +648,38 @@ class UnionCoerciveTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);
     }
+
+    /**
+     * A coercively compared object is hashed by its serialized state, so nothing about it needs
+     * to stay alive once it has been compared; only symmetric difference reports representatives.
+     *
+     * @test unionCoercive does not retain the objects it has compared
+     */
+    public function testDoesNotRetainComparedObjects(): void
+    {
+        // Given
+        $aliveWhileIterating = [];
+        $data = (static function () use (&$aliveWhileIterating): \Generator {
+            $weakReferences = [];
+            for ($i = 0; $i < 3; $i++) {
+                $object = (object) ['value' => $i];
+                $weakReferences[] = \WeakReference::create($object);
+                yield $object;
+                unset($object);
+            }
+            // The last object is still the consumer's current value, so only the earlier ones.
+            $aliveWhileIterating = [$weakReferences[0]->get() !== null, $weakReferences[1]->get() !== null];
+        })();
+
+        // When
+        $count = 0;
+        foreach (Set::unionCoercive($data) as $value) {
+            $count++;
+            unset($value);
+        }
+
+        // Then
+        $this->assertSame(3, $count);
+        $this->assertSame([false, false], $aliveWhileIterating);
+    }
 }
