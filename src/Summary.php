@@ -505,21 +505,19 @@ final class Summary
         }
 
         $usageMap = new UsageMap($strict);
-        $map = [];
 
         try {
             foreach (Multi::zipEqual(...$iterables) as $values) {
                 foreach ($values as $collectionIndex => $value) {
-                    $hash = $usageMap->addUsage($value, \strval($collectionIndex));
-                    $map[$hash] = $value;
+                    $usageMap->addUsage($value, \strval($collectionIndex));
                 }
             }
         } catch (\LengthException $e) {
             return false;
         }
 
-        foreach ($map as $value) {
-            if (!$usageMap->hasSameOwnerCount($value, \count($iterables))) {
+        foreach (\array_keys($usageMap->getValues()) as $hash) {
+            if (!$usageMap->hasSameOwnerCount($hash, \count($iterables))) {
                 return false;
             }
         }
@@ -745,10 +743,12 @@ final class Summary
      */
     public static function containsCoercive(iterable $data, mixed $needle): bool
     {
-        $needleHash = UniqueExtractor::getString($needle, false);
+        // The Identity, not just its key, is held for the whole loop: it pins the needle's nested
+        // closures, generators and resources so a later datum cannot inherit their ids.
+        $needleIdentity = UniqueExtractor::identify($needle, false);
 
         foreach ($data as $datum) {
-            if (UniqueExtractor::getString($datum, false) === $needleHash) {
+            if (UniqueExtractor::getString($datum, false) === $needleIdentity->key) {
                 return true;
             }
         }

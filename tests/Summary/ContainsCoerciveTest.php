@@ -430,4 +430,32 @@ class ContainsCoerciveTest extends \PHPUnit\Framework\TestCase
         // When
         Summary::containsCoercive($data, $needle);
     }
+
+    /**
+     * Regression: only the needle's hash was kept, not the identities it was derived from. A
+     * needle [&$slot] stops pinning its closure once $slot is reassigned, and a later closure
+     * could then inherit the freed id and match.
+     *
+     * @test containsCoercive does not match a later closure that could inherit the needle's freed id
+     */
+    public function testNeedleIdentityIsPinnedWhileIterating(): void
+    {
+        // Given
+        $slot = static fn () => 1;
+        $needle = [&$slot];
+        $data = (static function () use (&$slot): \Generator {
+            $slot = null;
+            for ($i = 0; $i < 3; $i++) {
+                $closure = static fn () => 1;
+                yield [$closure];
+                unset($closure);
+            }
+        })();
+
+        // When
+        $result = Summary::containsCoercive($data, $needle);
+
+        // Then
+        $this->assertFalse($result);
+    }
 }

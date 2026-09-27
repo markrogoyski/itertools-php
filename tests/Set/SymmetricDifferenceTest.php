@@ -729,4 +729,28 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertCount(12, $ids);
     }
+
+    /**
+     * Regression: counts were looked up by re-hashing the stored representative, and a
+     * representative holding a reference slot hashes differently once the slot is reassigned.
+     * Only a generator can reproduce this, not the four fixtures.
+     *
+     * @test symmetric difference keeps a value whose reference slot is reassigned later
+     */
+    public function testKeepsValueWhoseReferenceSlotIsReassignedLater(): void
+    {
+        // Given
+        $data = (static function (): \Generator {
+            $slot = 1;
+            yield [&$slot];
+            $slot = 2;
+            yield [3];
+        })();
+
+        // When
+        $result = \iterator_to_array(Set::symmetricDifference($data, [[9]]), false);
+
+        // Then
+        $this->assertEqualsCanonicalizing([[2], [3], [9]], $result);
+    }
 }

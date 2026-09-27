@@ -6,6 +6,11 @@ namespace IterTools\Util;
 
 /**
  * @internal
+ *
+ * Every query takes the hash {@see self::addUsage()} returned rather than a value. A value is
+ * hashed exactly once, when it is registered: a retained array holding a reference slot follows
+ * later assignments to that slot, so hashing it again could produce a different key and miss
+ * (or hit the wrong) counts.
  */
 final class UsageMap
 {
@@ -100,37 +105,28 @@ final class UsageMap
     }
 
     /**
-     * Unregister usage of the value.
+     * Unregister usage of the value registered under the hash.
      *
-     * @param mixed $value
-     *
-     * @return string unique hash string
-     *
-     * @psalm-suppress PossiblyUnusedReturnValue
+     * @param string $hash as returned by {@see self::addUsage()}
      */
-    public function deleteUsage(mixed $value): string
+    public function deleteUsage(string $hash): void
     {
-        $hash = UniqueExtractor::getString($value, $this->strict);
-
         if (!isset($this->deletedMap[$hash])) {
             $this->deletedMap[$hash] = 0;
         }
 
         $this->deletedMap[$hash]++;
-
-        return $hash;
     }
 
     /**
-     * Returns number of value's owners.
+     * Returns number of owners of the value registered under the hash.
      *
-     * @param mixed $value
+     * @param string $hash as returned by {@see self::addUsage()}
      *
      * @return int
      */
-    public function getOwnersCount(mixed $value): int
+    public function getOwnersCount(string $hash): int
     {
-        $hash = UniqueExtractor::getString($value, $this->strict);
         $deletesCount = $this->deletedMap[$hash] ?? 0;
 
         $count = 0;
@@ -144,16 +140,15 @@ final class UsageMap
     }
 
     /**
-     * Returns number of value usages with limitation by max owners.
+     * Returns number of usages of the value registered under the hash, with limitation by max owners.
      *
-     * @param mixed $value
+     * @param string $hash as returned by {@see self::addUsage()}
      * @param int $maxOwnersCount
      *
      * @return int
      */
-    public function getUsagesCount(mixed $value, int $maxOwnersCount = 1): int
+    public function getUsagesCount(string $hash, int $maxOwnersCount = 1): int
     {
-        $hash = UniqueExtractor::getString($value, $this->strict);
         $deletesCount = $this->deletedMap[$hash] ?? 0;
 
         $ownersMap = [];
@@ -181,16 +176,15 @@ final class UsageMap
     }
 
     /**
-     * Returns true if all owners have used given value the same number of times.
+     * Returns true if all owners have used the value registered under the hash the same number of times.
      *
-     * @param mixed $value
+     * @param string $hash as returned by {@see self::addUsage()}
      * @param int $ownersCount
      *
      * @return bool
      */
-    public function hasSameOwnerCount(mixed $value, int $ownersCount): bool
+    public function hasSameOwnerCount(string $hash, int $ownersCount): bool
     {
-        $hash = UniqueExtractor::getString($value, $this->strict);
         $map = $this->addedMap[$hash] ?? [];
 
         if (\count($map) !== $ownersCount) {

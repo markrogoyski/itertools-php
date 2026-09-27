@@ -387,11 +387,11 @@ final class Set
                     continue;
                 }
 
-                $usageMap->addUsage($value, (string)$owner);
+                $hash = $usageMap->addUsage($value, (string)$owner);
 
-                if ($usageMap->getOwnersCount($value) === $minIntersectionCount) {
+                if ($usageMap->getOwnersCount($hash) === $minIntersectionCount) {
                     yield $value;
-                    $usageMap->deleteUsage($value);
+                    $usageMap->deleteUsage($hash);
                 }
             }
         }
@@ -419,10 +419,10 @@ final class Set
                     continue;
                 }
 
-                $usageMap->addUsage($value, (string)$owner);
+                $hash = $usageMap->addUsage($value, (string)$owner);
 
-                if ($usageMap->getOwnersCount($value) === \count($iterables)) {
-                    $usageMap->deleteUsage($value);
+                if ($usageMap->getOwnersCount($hash) === \count($iterables)) {
+                    $usageMap->deleteUsage($hash);
                 }
             }
         }
@@ -430,8 +430,8 @@ final class Set
         // The map yields the last value registered for each equivalence class, which is the
         // representative this function has always emitted -- observable in coercive mode, where
         // values of different types share a class.
-        foreach ($usageMap->getValues() as $value) {
-            foreach (Single::repeat($value, $usageMap->getUsagesCount($value)) as $item) {
+        foreach ($usageMap->getValues() as $hash => $value) {
+            foreach (Single::repeat($value, $usageMap->getUsagesCount($hash)) as $item) {
                 yield $item;
             }
         }

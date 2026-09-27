@@ -69,10 +69,10 @@ class UsageMapTest extends \PHPUnit\Framework\TestCase
         $usageMap = new UsageMap(true);
         $object = new \stdClass();
         $weakReference = \WeakReference::create($object);
-        $usageMap->addUsage($object, 'owner');
+        $hash = $usageMap->addUsage($object, 'owner');
 
         // When
-        $usageMap->deleteUsage($object);
+        $usageMap->deleteUsage($hash);
         unset($object);
 
         // Then

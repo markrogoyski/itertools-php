@@ -811,4 +811,34 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
             yield [&$slot];
         }
     }
+
+    /**
+     * Regression: owner counts were looked up by re-hashing the stored representative. Here both
+     * sides first yield a reference-slot array ([1] and [2]) and then move their slot onto the
+     * shared [5], so re-hashing mapped both mismatched entries onto the matching one.
+     *
+     * @test arePermutations is false when mismatched reference-slot arrays are reassigned onto a shared value
+     */
+    public function testMismatchedReferenceSlotArraysReassignedOntoASharedValueAreNotPermutations(): void
+    {
+        // Given
+        $a = (static function (): \Generator {
+            $slot = 1;
+            yield [&$slot];
+            $slot = 5;
+            yield [5];
+        })();
+        $b = (static function (): \Generator {
+            $slot = 2;
+            yield [&$slot];
+            $slot = 5;
+            yield [5];
+        })();
+
+        // When
+        $result = Summary::arePermutations($a, $b);
+
+        // Then
+        $this->assertFalse($result);
+    }
 }
