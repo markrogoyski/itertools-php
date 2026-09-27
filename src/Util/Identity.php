@@ -27,8 +27,11 @@ namespace IterTools\Util;
  * identities its key was derived from. The anchors are the identity-bearing values themselves, so
  * holding them pins those ids whatever the surrounding array does.
  *
- * Anchors are never deduplicated by id: an id is only stable while its anchor is held, which is
- * the whole point of holding them.
+ * Anchors are de-duplicated by the id they hold: {@see UniqueExtractor::key()} collects them into
+ * an array keyed by {@see UniqueExtractor::anchorId()} before this class is handed a plain list,
+ * so the same object or resource met twice while computing one key contributes one anchor. This is
+ * safe because the array itself holds the anchor, so its id cannot be reused while held — a value
+ * met again with the same id during the same call must therefore be the same anchor.
  *
  * A coercive-mode object is hashed by serialized state and so is deliberately not anchored; an
  * object whose `__serialize()` or `__sleep()` embeds its own identity (`spl_object_id()`,

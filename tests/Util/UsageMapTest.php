@@ -96,6 +96,28 @@ class UsageMapTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test an object nested in many distinct values is anchored once, by the id it holds
+     */
+    public function testAnchorsDeduplicateObjectSharedAcrossDistinctValues(): void
+    {
+        // Given
+        $usageMap = new UsageMap(true);
+        $object = new \stdClass();
+
+        // When
+        $usageMap->addUsage([$object, 1], 'owner');
+        $usageMap->addUsage([$object, 2], 'owner');
+        $usageMap->addUsage([$object, 3], 'owner');
+
+        // Then
+        $property = new \ReflectionProperty(UsageMap::class, 'anchors');
+        $anchors = $property->getValue($usageMap);
+
+        $this->assertCount(1, $anchors);
+        $this->assertSame($object, \array_values($anchors)[0]);
+    }
+
+    /**
      * @test getValues() is unavailable unless the map retains values
      */
     public function testGetValuesThrowsWithoutRetention(): void

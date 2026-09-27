@@ -267,6 +267,28 @@ class ValueCounterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test an object nested in many distinct arrays is anchored once, by the id it holds
+     */
+    public function testAnchorsDeduplicateObjectSharedAcrossDistinctValues(): void
+    {
+        // Given
+        $counter = new ValueCounter(true);
+        $object = new \stdClass();
+
+        // When
+        $counter->add([$object, 1]);
+        $counter->add([$object, 2]);
+        $counter->add([$object, 3]);
+
+        // Then
+        $property = new \ReflectionProperty(ValueCounter::class, 'anchors');
+        $anchors = $property->getValue($counter);
+
+        $this->assertCount(1, $anchors);
+        $this->assertSame($object, \array_values($anchors)[0]);
+    }
+
+    /**
      * @test values() is unavailable unless the counter retains values
      */
     public function testValuesThrowsWithoutRetention(): void

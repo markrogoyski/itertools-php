@@ -88,19 +88,43 @@ final class UniqueExtractor
         $anchors = [];
         $key = self::key($var, $strict, $anchors, 0);
 
-        return new Identity($key, $anchors);
+        return new Identity($key, \array_values($anchors));
+    }
+
+    /**
+     * @internal
+     * Identity key for one anchor: 'o' followed by its spl_object_id() for an object, 'r' followed
+     * by its get_resource_id() for a resource (open or closed). Separate prefixes because the two
+     * id spaces overlap.
+     *
+     * Used both here, to de-duplicate the anchors collected within one call, and by consumers
+     * (ValueCounter, UsageMap, Set::differenceInternal) that de-duplicate anchors across values.
+     *
+     * @param object|resource|closed-resource $anchor
+     *
+     * @psalm-suppress InvalidArgument a closed resource keeps the id get_resource_id() reads
+     */
+    public static function anchorId(mixed $anchor): string
+    {
+        return \is_object($anchor) ? 'o' . \spl_object_id($anchor) : 'r' . \get_resource_id($anchor);
     }
 
     /**
      * Key of any value, appending every value hashed by identity to $anchors.
      *
      * This is the single routine behind both entry points: getString() throws the collected
-     * anchors away, identify() hands them to the caller. Values hashed by content (scalars,
-     * strings, serialized objects) contribute no anchors.
+     * anchors away, identify() hands them to the caller, de-duplicated. Values hashed by content
+     * (scalars, strings, serialized objects) contribute no anchors.
+     *
+     * $anchors is keyed by {@see self::anchorId()} rather than being a plain list, so an object or
+     * resource nested repeatedly within the same value — e.g. the same object under two branches
+     * of an array — is appended once. This is safe because the array itself holds the anchor, so
+     * its id cannot be reused while held: a later value met with the same id during this same call
+     * must therefore be the same anchor.
      *
      * @param mixed $var
      * @param bool $strict
-     * @param list<object|resource|closed-resource> $anchors
+     * @param array<string, object|resource|closed-resource> $anchors keyed by self::anchorId()
      * @param int $depth number of arrays enclosing $var, 0 at the top value; see self::MAX_DEPTH
      *
      * @return string
@@ -146,7 +170,7 @@ final class UniqueExtractor
      *
      * @param array<array-key, mixed> $var
      * @param bool $strict
-     * @param list<object|resource|closed-resource> $anchors
+     * @param array<string, object|resource|closed-resource> $anchors keyed by self::anchorId()
      * @param int $depth number of arrays enclosing $var, 0 if $var is the top value
      *
      * @throws \InvalidArgumentException if the nesting exceeds self::MAX_DEPTH
@@ -258,14 +282,14 @@ final class UniqueExtractor
      * Key of a resource: its id, open or closed. The handle anchors it.
      *
      * @param mixed $var an open or closed resource
-     * @param list<object|resource|closed-resource> $anchors
+     * @param array<string, object|resource|closed-resource> $anchors keyed by self::anchorId()
      *
      * @psalm-suppress InvalidArgument a closed resource keeps the id get_resource_id() reads
      */
     private static function resourceKey(mixed $var, array &$anchors): string
     {
         /** @var resource $var */
-        $anchors[] = $var;
+        $anchors[self::anchorId($var)] = $var;
 
         return 'resource:' . \get_resource_id($var);
     }
@@ -278,12 +302,12 @@ final class UniqueExtractor
      *
      * @param object $var
      * @param bool $strict
-     * @param list<object|resource|closed-resource> $anchors
+     * @param array<string, object|resource|closed-resource> $anchors keyed by self::anchorId()
      */
     private static function objectKey(object $var, bool $strict, array &$anchors): string
     {
         if ($strict || $var instanceof \Generator || $var instanceof \Closure) {
-            $anchors[] = $var;
+            $anchors[self::anchorId($var)] = $var;
 
             return 'object:' . \spl_object_id($var);
         }

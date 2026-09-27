@@ -738,6 +738,38 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test the same object nested twice anchors once, by the id it holds
+     */
+    public function testIdentifyDeduplicatesRepeatedObjectAnchor(): void
+    {
+        // Given
+        $object = new \stdClass();
+
+        // When
+        $identity = UniqueExtractor::identify([[$object], [$object]], true);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($object, $identity->anchors[0]);
+    }
+
+    /**
+     * @test the same resource nested twice anchors once, by the id it holds
+     */
+    public function testIdentifyDeduplicatesRepeatedResourceAnchor(): void
+    {
+        // Given
+        $resource = \fopen('php://memory', 'r');
+
+        // When
+        $identity = UniqueExtractor::identify([$resource, [$resource]], true);
+
+        // Then
+        $this->assertCount(1, $identity->anchors);
+        $this->assertSame($resource, $identity->anchors[0]);
+    }
+
+    /**
      * @return list<array{mixed}>
      */
     public static function dataProviderForScalars(): array

@@ -38,14 +38,19 @@ final class UsageMap
      */
     private array $values = [];
     /**
-     * Every anchor of every distinct hash this map has seen, appended on first sight and never
+     * Every anchor of every distinct hash this map has seen, recorded on first sight and never
      * removed -- deleting a usage does not delete the identities it depended on. See
      * {@see Identity}; {@see ValueCounter} retains anchors for the same reason.
      *
-     * Deliberately write-only: retention is achieved by holding the references, not by reading
-     * them back, so there is no consumer of this list inside the class.
+     * Keyed by {@see UniqueExtractor::anchorId()} so that the same object or resource nested in
+     * many distinct registered values is held once instead of once per hash. This is safe because
+     * the array itself holds the anchor, so its id cannot be reused while held — a later value with
+     * the same id must therefore be the same anchor.
      *
-     * @var list<object|resource|closed-resource>
+     * Deliberately write-only: retention is achieved by holding the references, not by reading
+     * them back, so there is no consumer of this map inside the class.
+     *
+     * @var array<string, object|resource|closed-resource>
      */
     // @phpstan-ignore property.onlyWritten
     private array $anchors = [];
@@ -78,7 +83,7 @@ final class UsageMap
             $this->addedMap[$hash] = [];
 
             foreach ($identity->anchors as $anchor) {
-                $this->anchors[] = $anchor;
+                $this->anchors[UniqueExtractor::anchorId($anchor)] = $anchor;
             }
         }
 

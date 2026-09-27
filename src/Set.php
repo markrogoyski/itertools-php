@@ -439,6 +439,9 @@ final class Set
      * @param iterable<mixed> ...$iterables
      *
      * @return \Generator<mixed>
+     *
+     * @psalm-suppress UnusedVariable $anchors below is retained only to hold references; it is
+     * deliberately never read back
      */
     protected static function differenceInternal(
         bool $strict,
@@ -446,26 +449,40 @@ final class Set
         iterable ...$iterables
     ): \Generator {
         /**
-         * Each entry pairs a remaining count with the identity anchors the hash was first
-         * derived from. Holding the anchors keeps the objects, closures, generators, and
-         * resources nested in that first value alive, so a later object from $a cannot
-         * inherit the id of an already-freed one and be subtracted by mistake — see Identity.
-         * Anchors are recorded only the first time a hash is seen, same as ValueCounter and
-         * UsageMap: while an entry's anchors are held, no other value can be given their ids,
-         * so a repeat of the hash needs no anchors of its own.
+         * Remaining count per subtracted hash.
          *
-         * @var array<string, array{0: int, 1: list<object|resource|closed-resource>}> $subtracted
+         * @var array<string, int> $subtracted
          */
         $subtracted = [];
+
+        /**
+         * Every anchor of every distinct subtracted hash, keyed by {@see UniqueExtractor::anchorId()}
+         * and shared across all of them for the whole call. Holding the anchors keeps the objects,
+         * closures, generators, and resources nested in a subtracted value alive, so a later object
+         * from $a cannot inherit the id of an already-freed one and be subtracted by mistake — see
+         * Identity. Keying by id also de-duplicates: an object or resource nested under several
+         * distinct subtracted hashes is held once. This is safe because the array itself holds the
+         * anchor, so its id cannot be reused while held — a later value with the same id must
+         * therefore be the same anchor. Anchors are recorded only the first time a hash is seen,
+         * same as ValueCounter and UsageMap: while a hash's anchors are held, no other value can be
+         * given their ids, so a repeat of the hash needs no anchors of its own.
+         *
+         * @var array<string, object|resource|closed-resource> $anchors
+         */
+        $anchors = [];
 
         foreach ($iterables as $iterable) {
             foreach ($iterable as $value) {
                 $identity = UniqueExtractor::identify($value, $strict);
 
                 if (isset($subtracted[$identity->key])) {
-                    $subtracted[$identity->key][0]++;
+                    $subtracted[$identity->key]++;
                 } else {
-                    $subtracted[$identity->key] = [1, $identity->anchors];
+                    $subtracted[$identity->key] = 1;
+
+                    foreach ($identity->anchors as $anchor) {
+                        $anchors[UniqueExtractor::anchorId($anchor)] = $anchor;
+                    }
                 }
             }
         }
@@ -473,8 +490,8 @@ final class Set
         foreach ($a as $value) {
             $hash = UniqueExtractor::getString($value, $strict);
 
-            if (($subtracted[$hash][0] ?? 0) > 0) {
-                $subtracted[$hash][0]--;
+            if (($subtracted[$hash] ?? 0) > 0) {
+                $subtracted[$hash]--;
             } else {
                 yield $value;
             }
