@@ -121,15 +121,13 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
      * without that prefix, key 'x' plus value "p=10:string:1:q" produces the same bytes as key
      * "x=25:string:15:p" plus value "q".
      *
-     * No pair here kills the mutant that drops the per-child length prefix in arrayKey() alone,
-     * the mutant that drops the element-count prefix alone, or the two dropped together. A
-     * search over many hand-built and randomized candidates (including array values whose string
-     * content forges an "i{n}=...;" element boundary, and string values that spell out another
-     * array's own encoding) found none that collide under any of those three mutations, provided
-     * this string-key length prefix stays in place. That tracks the reasoning now in arrayKey()'s
-     * docblock: every leaf key format is self-delimiting on its own once string keys are
-     * length-framed, so the count and per-child length prefixes are redundant belt-and-braces,
-     * not load-bearing, and are believed to be genuinely unkillable (equivalent) mutants.
+     * No pair here kills the mutant that drops the per-child length prefix in arrayKey() alone.
+     * A search over many hand-built and randomized candidates (including array values whose
+     * string content forges an "i{n}=...;" element boundary, and string values that spell out
+     * another array's own encoding) found none that collide under that mutation, provided this
+     * string-key length prefix stays in place: every leaf key format is self-delimiting on its
+     * own, so the per-child length prefix is believed to be a genuinely unkillable (equivalent)
+     * mutant.
      *
      * @return list<array{mixed, mixed}>
      */
