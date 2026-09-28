@@ -594,6 +594,12 @@ Two values are equal iff `$a === $b`, with one exception: `NAN` equals `NAN`, at
   not change its identity.
 * **Arrays:** same keys in the same order, with values compared recursively under these rules.
 
+Some functions compare with `===` directly and so do not have the `NAN` exception: `NAN`
+never matches `NAN` in `contains`, `startsWith`, `endsWith`, `same`, `distinctAdjacent`,
+`distinctAdjacentBy`, and `groupAdjacentBy`, nor in their `Stream` counterparts (`sameWith`
+for `same`). The `Coercive` variants of `contains`, `startsWith`, and `endsWith` follow the
+coercive rules below.
+
 ### Coercive mode (numeric equivalence)
 
 * `int`, `float`, `bool`, `null`, `''`, and numeric strings compare by numeric value.
