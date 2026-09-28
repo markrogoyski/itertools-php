@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\Identity;
 use IterTools\Util\UniqueExtractor;
 use IterTools\Util\UsageMap;
 use IterTools\Util\ValueCounter;
@@ -157,6 +156,11 @@ final class Summary
      * "Strict and Coercive Types". Retains the first value's identity-bearing objects,
      * closures, generators, and resources for as long as iteration continues.
      *
+     * Every value is hashed, including one that is the very same instance as its predecessor:
+     * in coercive mode equivalence is decided by current serialized state, so a shared object
+     * the caller mutates between iterations is not equal to itself as first seen. See
+     * ValueCounter::add() and Identity for why the first value's anchors stay held throughout.
+     *
      * @param iterable<mixed> $data
      */
     public static function allEqual(iterable $data, bool $strict = true): bool
@@ -177,38 +181,16 @@ final class Summary
     /**
      * Returns true when all projected keys have the same UniqueExtractor identity, per README
      * "Strict and Coercive Types". Retains the first projection's identity-bearing objects,
-     * closures, generators, and resources for as long as iteration continues.
+     * closures, generators, and resources for as long as iteration continues; see
+     * {@see Summary::allEqual()} for the mechanics, which this delegates to. $keyFunc is
+     * projected lazily and is not called past the first mismatch.
      *
      * @param iterable<mixed> $data
      * @param callable(mixed): mixed $keyFunc
      */
     public static function allEqualBy(iterable $data, callable $keyFunc, bool $strict = true): bool
     {
-        $found = false;
-        $firstIdentity = null;
-
-        // Every key is hashed, including one that is the very same instance as its predecessor:
-        // in coercive mode equivalence is decided by current serialized state, so a shared key
-        // object the caller mutates between projections is not equal to itself as first seen.
-        //
-        // $firstIdentity must keep holding the first projection's Identity across every later
-        // $keyFunc call, not just its key string. See Identity for why the anchors are held.
-        foreach ($data as $datum) {
-            $key = $keyFunc($datum);
-
-            if (!$found) {
-                $found = true;
-                $firstIdentity = UniqueExtractor::identify($key, $strict);
-                continue;
-            }
-
-            /** @var Identity $firstIdentity */
-            if (UniqueExtractor::getString($key, $strict) !== $firstIdentity->key) {
-                return false;
-            }
-        }
-
-        return true;
+        return self::allEqual(Single::map($data, $keyFunc), $strict);
     }
 
     /**
