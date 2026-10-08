@@ -1,25 +1,24 @@
 # IterTools PHP Change Log
 
-## v2.7.0 - 2026-09-22
+## v2.7.0 - 2026-10-07
 
 ### Bug Fixes
-* `UniqueExtractor` (the shared equality kernel behind `Set`, `Summary`, `Math`, and `Reduce`): floats hashed at the ini `precision` setting (14 digits by default) instead of by exact value, so `0.1 + 0.2` and `0.3` could merge and the answer depended on `precision`/`serialize_precision`; floats now hash by exact bits.
-* `UniqueExtractor`: `-0.0` and `0.0` hashed to different keys in strict mode although `-0.0 === 0.0`; they now share a key.
-* `UniqueExtractor`: coercive mode routed integers through `floatval`, merging integers beyond `2^53` (e.g. `9007199254740992` and `9007199254740993`); integers now hash by their exact value.
-* `UniqueExtractor`: a resource's key changed when it was closed, splitting one handle's identity across its open and closed state; the key is now the resource id alone.
-* `UniqueExtractor`: arrays hashed via `serialize()`, so nested closures and generators threw a bare `\Exception` instead of the documented `\InvalidArgumentException`, and nested resources all compared equal to each other, and to `0`; arrays now hash element-wise through the same rules as their elements.
-* Summary: `allUnique` used a hand-rolled hash map that kept only keys, not the values a key depends on, so a freed object's reused `spl_object_id` could falsely merge with a later, unrelated object and return `false` for distinct objects freed during iteration; it now retains the identities its hashes depend on.
-* Set, Summary, Math, Reduce: identities nested inside arrays (objects, closures, generators, resources) are now retained for the comparison's lifetime, so an identity reachable only through a reused reference slot (e.g. a generator yielding `[&$slot]` and reassigning `$slot`) cannot be recycled mid-iteration and falsely merge.
-* Set: `symmetricDifference` and `symmetricDifferenceCoercive` looked counts up by re-hashing the retained value, so an array holding a reference slot that was reassigned after it was yielded lost its count and was silently dropped; counts are now looked up by the key computed when the value was seen.
-* Summary: `arePermutations` and `arePermutationsCoercive` re-hashed retained values the same way, so reference-slot arrays reassigned onto a shared value could report `true` for non-permutations.
-* Summary: `containsCoercive` kept only the needle's hash, so a needle array holding a closure, generator, or resource through a reassigned reference slot could match a later value that inherited the freed id; the needle's identities are now retained while iterating.
+* Set, Summary, Math, Reduce: floats were compared at the `precision` ini setting (14 digits by default) instead of by exact value, so `0.1 + 0.2` and `0.3` could be treated as equal and results depended on `precision`/`serialize_precision`; floats now compare by exact value.
+* Set, Summary, Math, Reduce: in strict mode `-0.0` and `0.0` were treated as different values although `-0.0 === 0.0`; they are now equal.
+* Set, Summary, Math, Reduce: in coercive mode, integers beyond `2^53` (e.g. `9007199254740992` and `9007199254740993`) were treated as equal; they now compare by exact value.
+* Set, Summary, Math, Reduce: a resource was treated as a different value once closed; a resource now keeps one identity whether open or closed.
+* Set, Summary, Math, Reduce: arrays containing closures or generators threw a bare `\Exception` instead of the documented `\InvalidArgumentException`, and arrays containing different resources compared equal to each other, and to `0`.
+* Summary: `allUnique` could return `false` for distinct objects when objects were freed during iteration.
+* Set, Summary, Math, Reduce: objects, closures, generators, and resources nested inside arrays could be falsely treated as equal to a later, unrelated value when the original was freed or its reference slot reassigned during iteration (e.g. a generator yielding `[&$slot]` and reassigning `$slot`).
+* Set: `symmetricDifference` and `symmetricDifferenceCoercive` silently dropped arrays holding a reference slot that was reassigned after being yielded.
+* Summary: `arePermutations` and `arePermutationsCoercive` could return `true` for non-permutations when arrays held reference slots reassigned onto a shared value.
+* Summary: `containsCoercive` could match the wrong value when the needle was an array holding a closure, generator, or resource through a reassigned reference slot.
 
 ### Changes
-* Arrays now compare element-wise under the active mode instead of by `serialize()`. In strict mode, nested objects, closures, generators, and resources compare by instance, and nested `-0.0` equals `0.0`. In coercive mode, `[1]` and `['1']` are now equal (e.g. `Set::distinct([[1], ['1']], false)` yields one element; `Set::unionCoercive([[1]], [['1']])` yields one).
-* Arrays nested deeper than 256 levels, including self-referential arrays, now throw `\InvalidArgumentException` where they previously went through `serialize()`.
+* Arrays now compare element-wise under the active mode. In strict mode, nested objects, closures, generators, and resources compare by instance, and nested `-0.0` equals `0.0`. In coercive mode, `[1]` and `['1']` are now equal (e.g. `Set::distinct([[1], ['1']], false)` yields one element; `Set::unionCoercive([[1]], [['1']])` yields one).
+* Arrays nested deeper than 256 levels, including self-referential arrays, now throw `\InvalidArgumentException`.
 * Coercive scalar comparison is documented as numeric equivalence, not PHP `==`: `'abc'` is not equal to `true`, and `0`, `''`, `null`, and `false` remain one value.
-* `intersection*`, `partialIntersection*`, `union*`, `difference*`, `arePermutations*`, and `Summary::allUnique` no longer hold every distinct value in memory for the comparison's lifetime; they retain only the identities their comparisons depend on. `symmetricDifference*` still retains one representative per distinct value, since it is part of the output.
-* The README "Strict and Coercive Types" section is now the single source of truth for strict and coercive comparison, including which values are retained for the lifetime of a comparison.
+* `intersection*`, `partialIntersection*`, `union*`, `difference*`, `arePermutations*`, and `Summary::allUnique` use less memory on large inputs.
 
 ## v2.6.0 - 2026-09-21
 
