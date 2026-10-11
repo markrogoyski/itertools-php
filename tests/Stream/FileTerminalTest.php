@@ -795,4 +795,84 @@ END_OF_EXPECTED;
         $this->expectException(\InvalidArgumentException::class);
         $stream->toCsvFile($file);
     }
+
+    /**
+     * @test toFile throws when the write is truncated
+     */
+    public function testToFileTruncatedWriteThrows(): void
+    {
+        // Given
+        $file = \fopen($this->root->url() . '/' . \uniqid(), 'w');
+        vfsStream::setQuota(3);
+
+        // Then
+        $this->expectException(\RuntimeException::class);
+
+        // When
+        Stream::of(['abcdef'])->toFile($file);
+    }
+
+    /**
+     * @test toFile throws when the header write is truncated
+     */
+    public function testToFileTruncatedHeaderThrows(): void
+    {
+        // Given
+        $file = \fopen($this->root->url() . '/' . \uniqid(), 'w');
+        vfsStream::setQuota(3);
+
+        // Then
+        $this->expectException(\RuntimeException::class);
+
+        // When
+        Stream::of([])->toFile($file, "\n", 'abcdef');
+    }
+
+    /**
+     * @test toFile throws when the footer write is truncated
+     */
+    public function testToFileTruncatedFooterThrows(): void
+    {
+        // Given
+        $file = \fopen($this->root->url() . '/' . \uniqid(), 'w');
+        vfsStream::setQuota(3);
+
+        // Then
+        $this->expectException(\RuntimeException::class);
+
+        // When
+        Stream::of([])->toFile($file, "\n", null, 'abcdef');
+    }
+
+    /**
+     * @test toCsvFile throws when a row write is truncated
+     */
+    public function testToCsvFileTruncatedRowThrows(): void
+    {
+        // Given
+        $file = \fopen($this->root->url() . '/' . \uniqid(), 'w');
+        vfsStream::setQuota(3);
+
+        // Then
+        $this->expectException(\RuntimeException::class);
+
+        // When
+        Stream::of([['abcdef', 'x']])->toCsvFile($file);
+    }
+
+    /**
+     * @test toCsvFile throws when the header write is truncated
+     */
+    public function testToCsvFileTruncatedHeaderThrows(): void
+    {
+        // Given
+        $file = \fopen($this->root->url() . '/' . \uniqid(), 'w');
+        vfsStream::setQuota(3);
+
+        // Then
+        $this->expectException(\RuntimeException::class);
+
+        // When
+        Stream::of([])->toCsvFile($file, ['abcdef', 'x']);
+    }
 }

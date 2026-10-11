@@ -273,6 +273,53 @@ class FlattenTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         flatten yields sequential keys, so iterator_to_array keeps every element
+     * @dataProvider dataProviderForKeys
+     * @param        iterable $iterable
+     * @param        int      $dimensions
+     * @param        array    $expected
+     */
+    public function testKeysAreSequential(iterable $iterable, int $dimensions, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::flatten($iterable, $dimensions));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForKeys(): array
+    {
+        return [
+            'nested lists' => [
+                [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                1,
+                [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            ],
+            'mixed scalars and lists' => [
+                [1, [2, 3], 4, [5]],
+                1,
+                [1, 2, 3, 4, 5],
+            ],
+            'associative inner keys' => [
+                [['a' => 1, 'b' => 2], ['a' => 3, 'b' => 4]],
+                1,
+                [1, 2, 3, 4],
+            ],
+            'two dimensions' => [
+                [[[1, 2], [3]], [[4]]],
+                2,
+                [1, 2, 3, 4],
+            ],
+            'deeper than dimensions' => [
+                [[[1, 2], [3]], [[4]]],
+                1,
+                [[1, 2], [3], [4]],
+            ],
+        ];
+    }
+
+    /**
      * @test flatten with default dimensions
      */
     public function testFlattenWithDefaultDimensions(): void

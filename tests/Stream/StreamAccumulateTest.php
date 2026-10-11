@@ -213,6 +213,20 @@ class StreamAccumulateTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test Stream::accumulate accepts the initial value as a named argument
+     */
+    public function testNamedInitial(): void
+    {
+        // When
+        $result = Stream::of([1, 2])
+            ->accumulate(fn ($a, $b) => $a + $b, initial: 10)
+            ->toArray();
+
+        // Then
+        $this->assertSame([10, 11, 13], $result);
+    }
+
+    /**
      * @test Stream::accumulate throws InvalidArgumentException when more than one initial is given
      */
     public function testTwoInitialsThrows(): void

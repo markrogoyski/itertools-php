@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\ResourcePolicy;
+use IterTools\Util\ResourceWriter;
 
 final class File
 {
@@ -139,6 +140,7 @@ final class File
      * @return void
      *
      * @throws \InvalidArgumentException if file handle stream resource is invalid resource
+     * @throws \RuntimeException if a write fails or is truncated
      *
      * @see fputs()
      */
@@ -146,6 +148,7 @@ final class File
     {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
+        $writer         = new ResourceWriter($fileResource);
         $firstIteration = true;
 
         foreach ($lines as $line) {
@@ -158,7 +161,7 @@ final class File
                 $line = $lineSeparator . $line;
             }
 
-            \fputs($fileResource, $line);
+            $writer->write($line);
         }
     }
 
@@ -178,6 +181,7 @@ final class File
      * @return void
      *
      * @throws \InvalidArgumentException if file handle stream resource is invalid resource
+     * @throws \RuntimeException if a write fails or is truncated
      *
      * @see fputcsv()
      */
@@ -191,12 +195,14 @@ final class File
     ): void {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
+        $writer = new ResourceWriter($fileResource);
+
         if ($header !== null) {
-            \fputcsv($fileResource, $header, $separator, $enclosure, $escape);
+            $writer->writeCsvRow($header, $separator, $enclosure, $escape);
         }
 
         foreach ($rows as $row) {
-            \fputcsv($fileResource, $row, $separator, $enclosure, $escape);
+            $writer->writeCsvRow($row, $separator, $enclosure, $escape);
         }
     }
 

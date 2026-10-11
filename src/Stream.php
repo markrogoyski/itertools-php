@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\ResourcePolicy;
+use IterTools\Util\ResourceWriter;
 
 /**
  * Provides fluent interface for working with iterables.
@@ -2267,15 +2268,18 @@ final class Stream implements \IteratorAggregate
      * @param string|null $footer           (optional) appended to string
      *
      * @return void
+     *
+     * @throws \RuntimeException if a write fails or is truncated
      */
     public function toFile(mixed $fileResource, string $newlineSeparator = \PHP_EOL, ?string $header = null, ?string $footer = null): void
     {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
+        $writer         = new ResourceWriter($fileResource);
         $firstIteration = true;
 
         if ($header !== null) {
-            \fputs($fileResource, $header . $newlineSeparator);
+            $writer->write($header . $newlineSeparator);
         }
 
         foreach ($this->iterable as $line) {
@@ -2288,11 +2292,11 @@ final class Stream implements \IteratorAggregate
                 $line = $newlineSeparator . $line;
             }
 
-            \fputs($fileResource, $line);
+            $writer->write($line);
         }
 
         if ($footer !== null) {
-            \fputs($fileResource, $newlineSeparator . $footer);
+            $writer->write($newlineSeparator . $footer);
         }
     }
 
@@ -2308,6 +2312,8 @@ final class Stream implements \IteratorAggregate
      * @param string             $escape
      *
      * @return void
+     *
+     * @throws \RuntimeException if a write fails or is truncated
      */
     public function toCsvFile(
         mixed $fileResource,
@@ -2318,13 +2324,15 @@ final class Stream implements \IteratorAggregate
     ): void {
         ResourcePolicy::assertIsSatisfied($fileResource);
 
+        $writer = new ResourceWriter($fileResource);
+
         if ($header !== null) {
-            \fputcsv($fileResource, $header, $separator, $enclosure, $escape);
+            $writer->writeCsvRow($header, $separator, $enclosure, $escape);
         }
 
         /** @var array<scalar> $row */
         foreach ($this->iterable as $row) {
-            \fputcsv($fileResource, $row, $separator, $enclosure, $escape);
+            $writer->writeCsvRow($row, $separator, $enclosure, $escape);
         }
     }
 

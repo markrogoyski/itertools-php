@@ -51,7 +51,7 @@ class AsortByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -73,7 +73,7 @@ class AsortByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -95,7 +95,7 @@ class AsortByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -117,7 +117,7 @@ class AsortByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     /**

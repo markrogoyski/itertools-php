@@ -46,7 +46,7 @@ final class Single
 
         if ($hasInitial) {
             /** @var mixed $acc */
-            $acc = $initial[0];
+            $acc = \array_values($initial)[0];
             $started = true;
             yield $acc;
         }
@@ -331,7 +331,9 @@ final class Single
 
         foreach ($data as $datum) {
             if (\is_iterable($datum)) {
-                yield from self::flatten($datum, $dimensions - 1);
+                foreach (self::flatten($datum, $dimensions - 1) as $item) {
+                    yield $item;
+                }
             } else {
                 yield $datum;
             }

@@ -243,4 +243,20 @@ class WriteLinesTest extends \PHPUnit\Framework\TestCase
         // When
         File::writeLines('/not/a/resource', ['a', 'b']);
     }
+
+    /**
+     * @test writeLines throws when the write is truncated
+     */
+    public function testWriteLinesTruncatedWriteThrows(): void
+    {
+        // Given
+        $file = $this->writableFile();
+        vfsStream::setQuota(3);
+
+        // Then
+        $this->expectException(\RuntimeException::class);
+
+        // When
+        File::writeLines($file, ['abcdef']);
+    }
 }

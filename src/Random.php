@@ -21,6 +21,7 @@ final class Random
             throw new \RangeException('Array of items for choice cannot be empty');
         }
 
+        $items = \array_values($items);
         $start = 0;
         $end   = \count($items) - 1;
         foreach (self::number($start, $end, $repetitions, $engine) as $i) {

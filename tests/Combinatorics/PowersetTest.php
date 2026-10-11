@@ -264,6 +264,33 @@ class PowersetTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test powerset yields sequential keys, so iterator_to_array keeps every subset
+     */
+    public function testKeysAreSequential(): void
+    {
+        // Given
+        $data = [1, 2, 3];
+
+        // When
+        $result = \iterator_to_array(Combinatorics::powerset($data));
+
+        // Then
+        $this->assertSame(
+            [
+                [],
+                [1],
+                [2],
+                [3],
+                [1, 2],
+                [1, 3],
+                [2, 3],
+                [1, 2, 3],
+            ],
+            $result
+        );
+    }
+
+    /**
      * @test powerset yields list-array subsets (0-indexed)
      */
     public function testOutputSubsetsAreListArrays(): void

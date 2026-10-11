@@ -424,6 +424,21 @@ class SourceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test stream of random choice from an associative array
+     */
+    public function testStreamOfRandomChoiceAssociativeArray(): void
+    {
+        // Given
+        $stream = Stream::ofRandomChoice(['x' => 'a', 'y' => 'b', 'z' => 'c', 'w' => 'd'], 5, new \Random\Engine\Mt19937(42));
+
+        // When
+        $actual = $stream->toArray();
+
+        // Then
+        $this->assertSame(['c', 'd', 'a', 'c', 'c'], $actual);
+    }
+
+    /**
      * @test stream of random numbers with seeded engine
      */
     public function testStreamOfRandomNumbersWithSeededEngine(): void

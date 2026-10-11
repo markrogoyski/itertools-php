@@ -282,4 +282,36 @@ class WriteCsvTest extends \PHPUnit\Framework\TestCase
         // When
         File::writeCsv('/not/a/resource', [['a', 'b']]);
     }
+
+    /**
+     * @test writeCsv throws when a row write is truncated
+     */
+    public function testWriteCsvTruncatedRowThrows(): void
+    {
+        // Given
+        $file = \fopen($this->root->url() . '/' . \uniqid(), 'w');
+        vfsStream::setQuota(3);
+
+        // Then
+        $this->expectException(\RuntimeException::class);
+
+        // When
+        File::writeCsv($file, [['abcdef', 'x']]);
+    }
+
+    /**
+     * @test writeCsv throws when the header write is truncated
+     */
+    public function testWriteCsvTruncatedHeaderThrows(): void
+    {
+        // Given
+        $file = \fopen($this->root->url() . '/' . \uniqid(), 'w');
+        vfsStream::setQuota(3);
+
+        // Then
+        $this->expectException(\RuntimeException::class);
+
+        // When
+        File::writeCsv($file, [], ['abcdef', 'x']);
+    }
 }

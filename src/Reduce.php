@@ -815,7 +815,26 @@ final class Reduce
      */
     public static function toFirstAndLast(iterable $data): array
     {
-        return [static::toFirst($data), static::toLast($data)];
+        $hasFirst = false;
+        /** @var mixed $first */
+        $first = null;
+        /** @var mixed $last */
+        $last = null;
+
+        foreach ($data as $datum) {
+            /** @var mixed $datum */
+            if (!$hasFirst) {
+                $first    = $datum;
+                $hasFirst = true;
+            }
+            $last = $datum;
+        }
+
+        if (!$hasFirst) {
+            throw new \LengthException('collection is empty');
+        }
+
+        return [$first, $last];
     }
 
     /**

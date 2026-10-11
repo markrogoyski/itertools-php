@@ -1,5 +1,15 @@
 # IterTools PHP Change Log
 
+## v2.7.1 - TBD
+
+### Bug Fixes
+* Combinatorics: `powerset` repeated keys, so `iterator_to_array` kept only some subsets; keys are now sequential.
+* Single: `flatten` repeated keys, so `iterator_to_array` dropped elements; keys are now sequential.
+* Random: `choice` (and `Stream::ofRandomChoice`) returned `null` for associative or sparse arrays.
+* Single: `accumulate` (and `Stream::accumulate`) ignored a named `initial` argument.
+* Reduce: `toFirstAndLast` (and `Stream::toFirstAndLast`) iterated its input twice, which failed on single-pass sources; it now iterates once.
+* File: `writeLines` and `writeCsv`, and Stream: `toFile` and `toCsvFile`, silently accepted failed or truncated writes; they now throw `\RuntimeException`.
+
 ## v2.7.0 - 2026-10-07
 
 ### Bug Fixes

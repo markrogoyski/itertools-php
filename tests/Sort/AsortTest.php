@@ -51,7 +51,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $sortedAscending);
+        $this->assertSame($expected, $sortedAscending);
     }
 
     /**
@@ -95,7 +95,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $sortedDescending);
+        $this->assertSame($expected, $sortedDescending);
     }
 
     /**
@@ -115,7 +115,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public static function dataProviderForArray(): array
@@ -234,7 +234,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
             [
                 ['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1],
                 fn ($lhs, $rhs) => $lhs <=> $rhs,
-                ['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1],
+                ['f' => -6, 'e' => -3, 'a' => 1, 'i' => 1, 'c' => 2, 'b' => 3, 'd' => 5, 'g' => 10, 'h' => 11],
             ],
             [
                 ['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1],
@@ -331,7 +331,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public static function dataProviderForGenerators(): array
@@ -452,7 +452,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
             [
                 $gen(['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1]),
                 fn ($lhs, $rhs) => $lhs <=> $rhs,
-                ['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1],
+                ['f' => -6, 'e' => -3, 'a' => 1, 'i' => 1, 'c' => 2, 'b' => 3, 'd' => 5, 'g' => 10, 'h' => 11],
             ],
             [
                 $gen(['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1]),
@@ -549,7 +549,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public static function dataProviderForIterators(): array
@@ -670,7 +670,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
             [
                 $iter(['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1]),
                 fn ($lhs, $rhs) => $lhs <=> $rhs,
-                ['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1],
+                ['f' => -6, 'e' => -3, 'a' => 1, 'i' => 1, 'c' => 2, 'b' => 3, 'd' => 5, 'g' => 10, 'h' => 11],
             ],
             [
                 $iter(['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1]),
@@ -767,7 +767,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public static function dataProviderForTraversables(): array
@@ -888,7 +888,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
             [
                 $trav(['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1]),
                 fn ($lhs, $rhs) => $lhs <=> $rhs,
-                ['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1],
+                ['f' => -6, 'e' => -3, 'a' => 1, 'i' => 1, 'c' => 2, 'b' => 3, 'd' => 5, 'g' => 10, 'h' => 11],
             ],
             [
                 $trav(['a' => 1, 'b' => 3, 'c' => 2, 'd' => 5, 'e' => -3, 'f' => -6, 'g' => 10, 'h' => 11, 'i' => 1]),
@@ -986,8 +986,8 @@ class AsortTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertCount(4, $values);
-        $this->assertEquals(['a', 'b', 'c', 'z'], $values);
-        $this->assertEquals([1, 0, 0, 1], $keys);
+        $this->assertSame(['a', 'b', 'c', 'z'], $values);
+        $this->assertSame([1, 0, 0, 1], $keys);
     }
 
     /**
@@ -1008,8 +1008,8 @@ class AsortTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertCount(4, $values);
-        $this->assertEquals(['z', 'c', 'b', 'a'], $values);
-        $this->assertEquals([1, 0, 0, 1], $keys);
+        $this->assertSame(['z', 'c', 'b', 'a'], $values);
+        $this->assertSame([1, 0, 0, 1], $keys);
     }
 
     /**
@@ -1030,7 +1030,7 @@ class AsortTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertCount(4, $values);
-        $this->assertEquals(['a', 'a', 'b', 'b'], $values);
-        $this->assertEquals([0, 1, 0, 1], $keys);
+        $this->assertSame(['a', 'a', 'b', 'b'], $values);
+        $this->assertSame([0, 1, 0, 1], $keys);
     }
 }

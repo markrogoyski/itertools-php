@@ -179,6 +179,54 @@ class ChoiceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test choice from an associative array chooses among its values
+     */
+    public function testChoiceAssociativeArray(): void
+    {
+        // Given
+        $items = ['a' => 1, 'b' => 2, 'c' => 3];
+
+        // When
+        $result = \iterator_to_array(Random::choice($items, 50), false);
+
+        // Then
+        $this->assertCount(50, $result);
+        foreach ($result as $choice) {
+            $this->assertContains($choice, [1, 2, 3]);
+        }
+    }
+
+    /**
+     * @test choice from a sparse array chooses among its values
+     */
+    public function testChoiceSparseArray(): void
+    {
+        // Given
+        $items = [10 => 'only'];
+
+        // When
+        $result = \iterator_to_array(Random::choice($items, 3), false);
+
+        // Then
+        $this->assertSame(['only', 'only', 'only'], $result);
+    }
+
+    /**
+     * @test choice from an associative array matches choice from its values for the same seed
+     */
+    public function testChoiceAssociativeArrayMatchesListWithSameSeed(): void
+    {
+        // Given
+        $items = ['x' => 'a', 'y' => 'b', 'z' => 'c', 'w' => 'd'];
+
+        // When
+        $fromAssociative = \iterator_to_array(Random::choice($items, 5, new \Random\Engine\Mt19937(42)), false);
+
+        // Then
+        $this->assertSame(['c', 'd', 'a', 'c', 'c'], $fromAssociative);
+    }
+
+    /**
      * @test choice exception when items is empty
      */
     public function testChoiceItemsEmptyException(): void

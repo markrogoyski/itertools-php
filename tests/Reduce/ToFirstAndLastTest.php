@@ -340,4 +340,74 @@ class ToFirstAndLastTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test toFirstAndLast traverses an IteratorAggregate only once
+     */
+    public function testTraversesAggregateOnce(): void
+    {
+        // Given
+        $aggregate = new class implements \IteratorAggregate {
+            public int $calls = 0;
+
+            public function getIterator(): \Generator
+            {
+                $this->calls++;
+                yield from ($this->calls === 1 ? [1, 2, 3] : [10, 20]);
+            }
+        };
+
+        // When
+        $result = Reduce::toFirstAndLast($aggregate);
+
+        // Then
+        $this->assertSame([1, 3], $result);
+        $this->assertSame(1, $aggregate->calls);
+    }
+
+    /**
+     * @test toFirstAndLast works on an iterator that cannot be rewound a second time
+     */
+    public function testIteratorThatCannotBeRewoundTwice(): void
+    {
+        // Given
+        $iterator = new class implements \Iterator {
+            private int $rewinds = 0;
+            private bool $valid = true;
+
+            public function rewind(): void
+            {
+                if (++$this->rewinds > 1) {
+                    throw new \LogicException('cannot rewind twice');
+                }
+                $this->valid = true;
+            }
+
+            public function valid(): bool
+            {
+                return $this->valid;
+            }
+
+            public function current(): mixed
+            {
+                return 'only';
+            }
+
+            public function key(): mixed
+            {
+                return 0;
+            }
+
+            public function next(): void
+            {
+                $this->valid = false;
+            }
+        };
+
+        // When
+        $result = Reduce::toFirstAndLast($iterator);
+
+        // Then
+        $this->assertSame(['only', 'only'], $result);
+    }
 }

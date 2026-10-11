@@ -262,7 +262,9 @@ final class Combinatorics
         $n = \count($pool);
 
         for ($r = 0; $r <= $n; $r++) {
-            yield from self::combinations($pool, $r);
+            foreach (self::combinations($pool, $r) as $subset) {
+                yield $subset;
+            }
         }
     }
 

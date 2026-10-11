@@ -289,6 +289,21 @@ class AccumulateTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test accumulate accepts the initial value as a named argument
+     */
+    public function testNamedInitial(): void
+    {
+        // Given
+        $data = [1, 2];
+
+        // When
+        $result = \iterator_to_array(Single::accumulate($data, fn ($a, $b) => $a + $b, initial: 10), false);
+
+        // Then
+        $this->assertSame([10, 11, 13], $result);
+    }
+
+    /**
      * @test accumulate treats explicit null as a legitimate initial value
      */
     public function testExplicitNullInitial(): void
