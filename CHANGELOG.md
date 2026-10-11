@@ -9,6 +9,14 @@
 * Single: `accumulate` (and `Stream::accumulate`) ignored a named `initial` argument.
 * Reduce: `toFirstAndLast` (and `Stream::toFirstAndLast`) iterated its input twice, which failed on single-pass sources; it now iterates once.
 * File: `writeLines` and `writeCsv`, and Stream: `toFile` and `toCsvFile`, silently accepted failed or truncated writes; they now throw `\RuntimeException`.
+* Transform: `tee` (and the tee-based `peekStream`, `peekPrint`, `peekPrintR`) replaced a cached `null` value or key with the source's current one when a copy lagged behind another.
+* Transform: `tee` dropped the last line of an `\SplFileObject` without a trailing newline, and yielded nothing for `\SplQueue`, `\SplStack` and `\SplDoublyLinkedList`.
+* Transform: `tee` copies kept each other alive until the cycle collector ran, and a copy that was abandoned partway made the others buffer the whole source; dropped copies now release their buffer immediately.
+* Transform: if the source threw from `current()` after `key()`, `tee` could pair a key with another element's value.
+
+### Changes
+* Transform: `tee` no longer reads the source when it is called; the first element is read when a copy is first used.
+* Transform: a `tee` copy can be rewound repeatedly while it has not advanced, so `isEmpty()` followed by iteration works after `peekStream`, `peekPrint` and `peekPrintR`. A copy that has advanced can no longer be rewound: `rewind()` throws `\LogicException` instead of silently continuing from the current position, as a generator does. A cloned copy is an independent branch that continues from the position of the original.
 
 ## v2.7.0 - 2026-10-07
 

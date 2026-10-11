@@ -4,70 +4,97 @@ declare(strict_types=1);
 
 namespace IterTools\Util\Iterators;
 
-use IterTools\Util\Iterators\RelatedIterator;
-
 /**
+ * Shared, lazily filled buffer behind a set of RelatedIterators.
+ *
+ * - The source is read only when a related iterator first needs an element it has not been given yet.
+ * - Each element is buffered as a key/value pair until every live related iterator has moved past it.
+ * - Related iterators are not retained here, so dropping them frees everything without the cycle collector.
+ *
  * @internal
  *
  * @template TKey
  * @template TValue
- *
- * @extends \NoRewindIterator<TKey, TValue, \Iterator<TKey, TValue>>
  */
-final class TeeIterator extends \NoRewindIterator
+final class TeeIterator
 {
     /**
-     * @var array<RelatedIterator<TKey, TValue>>
+     * @var \Iterator<TKey, TValue>
      */
-    private array $related = [];
+    private \Iterator $source;
+
     /**
-     * @var array<int>
+     * Current position of every live related iterator, by id.
+     *
+     * @var array<int, int>
      */
     private array $positions = [];
+
     /**
-     * @var array<int, TKey>
+     * Buffered key/value pairs, by absolute position.
+     *
+     * @var array<int, array{TKey, TValue}>
      */
-    private array $cacheKeys = [];
+    private array $buffer = [];
+
     /**
-     * @var array<int, TValue>
+     * Lowest position still held in the buffer.
      */
-    private array $cacheValues = [];
+    private int $bufferStart = 0;
+
+    /**
+     * Number of elements read from the source so far.
+     */
+    private int $fetched = 0;
+
+    private bool $rewound = false;
+    private bool $needsAdvance = false;
+    private bool $exhausted = false;
+    private bool $handedOut = false;
+
+    /**
+     * Id for the next cloned related iterator.
+     */
+    private int $nextId;
 
     /**
      * @param \Iterator<TKey, TValue> $iterator
      * @param int $relatedCount
      */
-    public function __construct(\Iterator $iterator, int $relatedCount)
+    public function __construct(\Iterator $iterator, private readonly int $relatedCount)
     {
         if ($relatedCount < 1) {
             throw new \InvalidArgumentException("Count must be ≥ 1. Got {$relatedCount}");
         }
 
-        parent::__construct($iterator);
-        $iterator->rewind();
-
-        for ($i=0; $i<$relatedCount; ++$i) {
-            $this->related[] = new RelatedIterator($this, $i);
-            $this->positions[] = 0;
-        }
-
-        if (parent::valid()) {
-            $this->cacheKeys[] = parent::key();
-            $this->cacheValues[] = parent::current();
-        }
+        $this->source = $iterator;
+        $this->positions = \array_fill(0, $relatedCount, 0);
+        $this->nextId = $relatedCount;
     }
 
     /**
+     * Create the related iterators. They are the only holders of this object, and it holds none of them.
+     *
      * @return array<RelatedIterator<TKey, TValue>>
+     *
+     * @throws \LogicException if called more than once
      */
     public function getRelatedIterators(): array
     {
-        return $this->related;
+        if ($this->handedOut) {
+            throw new \LogicException('Related iterators have already been created');
+        }
+        $this->handedOut = true;
+
+        $related = [];
+        for ($i = 0; $i < $this->relatedCount; ++$i) {
+            $related[] = new RelatedIterator($this, $i);
+        }
+
+        return $related;
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @param RelatedIterator<TKey, TValue>|null $related
      */
     public function next(?RelatedIterator $related = null): void
@@ -76,34 +103,19 @@ final class TeeIterator extends \NoRewindIterator
             throw new \LogicException();
         }
 
-        if (!$related->valid()) {
+        $position = $this->positions[$related->getId()];
+        if (!$this->hasElementAt($position)) {
             return;
         }
 
-        /** @psalm-suppress ArgumentTypeCoercion */
-        [$relPos, $minPos, $maxPos] = [$this->getPosition($related), \min($this->positions), \max($this->positions)]; // @phpstan-ignore argument.type, argument.type
-
-        if ($relPos === $maxPos) {
-            parent::next();
-            if (parent::valid()) {
-                $this->cacheKeys[] = parent::key();
-                $this->cacheValues[] = parent::current();
-            }
-        }
-
-        $this->incrementPosition($related);
-
-        /** @psalm-suppress ArgumentTypeCoercion */
-        if ($minPos < \min($this->positions)) { // @phpstan-ignore argument.type
-            unset($this->cacheKeys[$minPos]);
-            unset($this->cacheValues[$minPos]);
-        }
+        $this->positions[$related->getId()] = $position + 1;
+        $this->releaseConsumed();
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @param RelatedIterator<TKey, TValue>|null $related
+     *
+     * @return TValue|null
      */
     public function current(?RelatedIterator $related = null): mixed
     {
@@ -111,15 +123,15 @@ final class TeeIterator extends \NoRewindIterator
             throw new \LogicException();
         }
 
-        return $this->cacheValues[$this->getPosition($related)] ?? parent::current();
+        $position = $this->positions[$related->getId()];
+
+        return $this->hasElementAt($position) ? $this->buffer[$position][1] : null;
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @param RelatedIterator<TKey, TValue>|null $related
      *
-     * @return TKey
+     * @return TKey|null
      */
     public function key(?RelatedIterator $related = null): mixed
     {
@@ -127,12 +139,12 @@ final class TeeIterator extends \NoRewindIterator
             throw new \LogicException();
         }
 
-        return $this->cacheKeys[$this->getPosition($related)] ?? parent::key();
+        $position = $this->positions[$related->getId()];
+
+        return $this->hasElementAt($position) ? $this->buffer[$position][0] : null;
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @param RelatedIterator<TKey, TValue>|null $related
      */
     public function valid(?RelatedIterator $related = null): bool
@@ -141,29 +153,92 @@ final class TeeIterator extends \NoRewindIterator
             throw new \LogicException();
         }
 
-        /** @psalm-suppress ArgumentTypeCoercion */
-        [$relPos, $maxPos] = [$this->getPosition($related), \max($this->positions)]; // @phpstan-ignore argument.type
-
-        return $relPos !== $maxPos || parent::valid();
+        return $this->hasElementAt($this->positions[$related->getId()]);
     }
 
     /**
      * @param RelatedIterator<TKey, TValue> $related
-     *
-     * @return int
      */
-    private function getPosition(RelatedIterator $related): int
+    public function getPosition(RelatedIterator $related): int
     {
         return $this->positions[$related->getId()];
     }
 
     /**
+     * Register a new branch that continues from the position of an existing one.
+     *
      * @param RelatedIterator<TKey, TValue> $related
      *
-     * @return void
+     * @return int id of the new branch
      */
-    private function incrementPosition(RelatedIterator $related): void
+    public function fork(RelatedIterator $related): int
     {
-        $this->positions[$related->getId()]++;
+        $id = $this->nextId++;
+        $this->positions[$id] = $this->positions[$related->getId()];
+
+        return $id;
+    }
+
+    /**
+     * A related iterator is gone: it no longer holds back buffered elements.
+     *
+     * @param RelatedIterator<TKey, TValue> $related
+     */
+    public function detach(RelatedIterator $related): void
+    {
+        unset($this->positions[$related->getId()]);
+        $this->releaseConsumed();
+    }
+
+    /**
+     * Read from the source until the element at $position is buffered, if the source has one.
+     */
+    private function hasElementAt(int $position): bool
+    {
+        while ($this->fetched <= $position && !$this->exhausted) {
+            $this->fetch();
+        }
+
+        return $position < $this->fetched;
+    }
+
+    /**
+     * Read one element from the source.
+     *
+     * The pair is buffered only once both its key and its value were read, so they cannot get out of step.
+     */
+    private function fetch(): void
+    {
+        if (!$this->rewound) {
+            $this->source->rewind();
+            $this->rewound = true;
+        } elseif ($this->needsAdvance) {
+            $this->source->next();
+            $this->needsAdvance = false;
+        }
+
+        if (!$this->source->valid()) {
+            $this->exhausted = true;
+            $this->source = new \EmptyIterator();
+            return;
+        }
+
+        $value = $this->source->current();
+        $key = $this->source->key();
+
+        $this->buffer[$this->fetched++] = [$key, $value];
+        $this->needsAdvance = true;
+    }
+
+    /**
+     * Drop buffered elements that every live related iterator has moved past.
+     */
+    private function releaseConsumed(): void
+    {
+        $lowest = $this->positions === [] ? $this->fetched : \min($this->positions);
+
+        while ($this->bufferStart < $lowest) {
+            unset($this->buffer[$this->bufferStart++]);
+        }
     }
 }

@@ -837,4 +837,243 @@ class TeeTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals($data, \iterator_to_array($iterator));
         }
     }
+
+    /**
+     * @test tee keeps a cached null value when another copy advances the source
+     */
+    public function testNullValueSurvivesOtherCopyAdvancing(): void
+    {
+        // Given
+        [$a, $b] = Transform::tee([null, 'x'], 2);
+
+        // When
+        $a->next();
+
+        // Then
+        $this->assertNull($b->current());
+        $this->assertSame(0, $b->key());
+        $this->assertSame('x', $a->current());
+    }
+
+    /**
+     * @test tee keeps cached null values for a copy that lags behind
+     */
+    public function testLaggingCopyReplaysNullValues(): void
+    {
+        // Given
+        $data = [null, 1, null, 2];
+        [$a, $b] = Transform::tee($data, 2);
+
+        // When copy a runs one element ahead of copy b
+        $first = [];
+        $second = [];
+        $a->rewind();
+        $b->rewind();
+        foreach ($data as $_) {
+            $first[] = $a->current();
+            $a->next();
+            if ($a->valid()) {
+                $second[] = $b->current();
+                $b->next();
+            }
+        }
+        while ($b->valid()) {
+            $second[] = $b->current();
+            $b->next();
+        }
+
+        // Then
+        $this->assertSame($data, $first);
+        $this->assertSame($data, $second);
+    }
+
+    /**
+     * @test tee keeps a cached null key when another copy advances the source
+     */
+    public function testNullKeySurvivesOtherCopyAdvancing(): void
+    {
+        // Given
+        $generator = (static function () {
+            yield null => 'a';
+            yield 'k' => 'b';
+        })();
+        [$a, $b] = Transform::tee($generator, 2);
+
+        // When
+        $a->next();
+
+        // Then
+        $this->assertNull($b->key());
+        $this->assertSame('a', $b->current());
+        $this->assertSame('k', $a->key());
+    }
+
+    /**
+     * @test tee yields the last line of a file that has no trailing newline
+     */
+    public function testSplFileObjectWithoutTrailingNewline(): void
+    {
+        // Given
+        $file = new \SplTempFileObject();
+        $file->fwrite("a\nb");
+        $file->rewind();
+        $expected = \iterator_to_array($file);
+        $file->rewind();
+
+        // When
+        [$a, $b] = Transform::tee($file, 2);
+
+        // Then
+        $this->assertSame(["a\n", 'b'], \array_values($expected));
+        $this->assertSame($expected, \iterator_to_array($a));
+        $this->assertSame($expected, \iterator_to_array($b));
+    }
+
+    /**
+     * @test tee over an SplQueue
+     */
+    public function testSplQueue(): void
+    {
+        // Given
+        $queue = new \SplQueue();
+        $queue->enqueue('a');
+        $queue->enqueue('b');
+        $queue->enqueue('c');
+
+        // When
+        [$a, $b] = Transform::tee($queue, 2);
+
+        // Then
+        $this->assertSame(['a', 'b', 'c'], \iterator_to_array($a));
+        $this->assertSame(['a', 'b', 'c'], \iterator_to_array($b));
+    }
+
+    /**
+     * @test tee over an SplStack
+     */
+    public function testSplStack(): void
+    {
+        // Given
+        $stack = new \SplStack();
+        $stack->push('a');
+        $stack->push('b');
+        $stack->push('c');
+
+        // When
+        [$a, $b] = Transform::tee($stack, 2);
+
+        // Then
+        $this->assertSame([2 => 'c', 1 => 'b', 0 => 'a'], \iterator_to_array($a));
+        $this->assertSame([2 => 'c', 1 => 'b', 0 => 'a'], \iterator_to_array($b));
+    }
+
+    /**
+     * @test tee over an SplDoublyLinkedList
+     */
+    public function testSplDoublyLinkedList(): void
+    {
+        // Given
+        $list = new \SplDoublyLinkedList();
+        $list->push('a');
+        $list->push('b');
+        $list->push('c');
+
+        // When
+        [$a, $b] = Transform::tee($list, 2);
+
+        // Then
+        $this->assertSame(['a', 'b', 'c'], \iterator_to_array($a));
+        $this->assertSame(['a', 'b', 'c'], \iterator_to_array($b));
+    }
+
+    /**
+     * @test tee does not read the source until a copy is first used
+     */
+    public function testSourceIsNotReadBeforeFirstUse(): void
+    {
+        // Given
+        $log = [];
+        $generator = (static function () use (&$log) {
+            $log[] = 'read';
+            yield 1;
+            yield 2;
+        })();
+
+        // When
+        [$a, $b] = Transform::tee($generator, 2);
+
+        // Then
+        $this->assertSame([], $log);
+
+        // And when
+        $result = \iterator_to_array($a);
+
+        // Then
+        $this->assertSame([1, 2], $result);
+        $this->assertSame(['read'], $log);
+        $this->assertSame([1, 2], \iterator_to_array($b));
+    }
+
+    /**
+     * @test tee never pairs a key with a value from a different element when current() throws
+     */
+    public function testKeysAndValuesStayAlignedWhenCurrentThrows(): void
+    {
+        // Given
+        $source = new class implements \Iterator {
+            private int $i = 0;
+            private bool $thrown = false;
+            private const PAIRS = [['k1', 'v1'], ['k2', 'v2'], ['k3', 'v3']];
+
+            public function rewind(): void
+            {
+                $this->i = 0;
+            }
+
+            public function valid(): bool
+            {
+                return $this->i < \count(self::PAIRS);
+            }
+
+            public function key(): string
+            {
+                return self::PAIRS[$this->i][0];
+            }
+
+            public function current(): string
+            {
+                if ($this->i === 1 && !$this->thrown) {
+                    $this->thrown = true;
+                    throw new \RuntimeException('boom');
+                }
+                return self::PAIRS[$this->i][1];
+            }
+
+            public function next(): void
+            {
+                ++$this->i;
+            }
+        };
+        [$a] = Transform::tee($source, 1);
+
+        // When
+        $pairs = [];
+        $steps = 0;
+        while ($steps++ < 10) {
+            try {
+                if (!$a->valid()) {
+                    break;
+                }
+                $pairs[] = [$a->key(), $a->current()];
+                $a->next();
+            } catch (\RuntimeException) {
+                // the source failed once; keep going
+            }
+        }
+
+        // Then
+        foreach ($pairs as $pair) {
+            $this->assertContains($pair, [['k1', 'v1'], ['k2', 'v2'], ['k3', 'v3']]);
+        }
+    }
 }

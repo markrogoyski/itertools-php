@@ -15,18 +15,26 @@ namespace IterTools\Util\Iterators;
 final class RelatedIterator implements \Iterator
 {
     /**
-     * @var bool
-     */
-    private bool $isRewinded = false;
-
-    /**
      * @param TeeIterator<TKey, TValue> $parentIterator
      * @param int $id
      */
     public function __construct(
         private readonly TeeIterator $parentIterator,
-        private readonly int $id,
+        private int $id,
     ) {
+    }
+
+    /**
+     * A clone is its own branch: it continues independently from the position of the original.
+     */
+    public function __clone()
+    {
+        $this->id = $this->parentIterator->fork($this);
+    }
+
+    public function __destruct()
+    {
+        $this->parentIterator->detach($this);
     }
 
     /**
@@ -63,6 +71,7 @@ final class RelatedIterator implements \Iterator
      */
     public function key(): mixed
     {
+        /** @var TKey */
         return $this->parentIterator->key($this);
     }
 
@@ -77,13 +86,14 @@ final class RelatedIterator implements \Iterator
     /**
      * {@inheritDoc}
      *
-     * @throws \LogicException for repeated calls
+     * Rewinding is a no-op until the iterator advances; after that the elements it has moved past are gone.
+     *
+     * @throws \LogicException if the iterator has advanced
      */
     public function rewind(): void
     {
-        if ($this->isRewinded) {
-            throw new \LogicException('RelatedIterator cannot be rewinded repeatedly');
+        if ($this->parentIterator->getPosition($this) > 0) {
+            throw new \LogicException('RelatedIterator cannot be rewinded after it has advanced');
         }
-        $this->isRewinded = true;
     }
 }

@@ -11,6 +11,40 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class PeekStreamTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @test peekStream keeps null values when the callback reads only part of the stream
+     */
+    public function testNullValuesSurvivePartialPeek(): void
+    {
+        // Given
+        $stream = Stream::of([null, 1, 2]);
+
+        // When
+        $result = $stream
+            ->peekStream(static fn (Stream $peeked) => $peeked->toNth(1))
+            ->toArray();
+
+        // Then
+        $this->assertSame([null, 1, 2], $result);
+    }
+
+    /**
+     * @test a stream can be checked for emptiness and then iterated after peekStream
+     */
+    public function testIsEmptyThenIterateAfterPeek(): void
+    {
+        // Given
+        $stream = Stream::of([1, 2, 3])->peekStream(static fn (Stream $peeked) => null);
+
+        // When
+        $isEmpty = $stream->isEmpty();
+        $result = $stream->toArray();
+
+        // Then
+        $this->assertFalse($isEmpty);
+        $this->assertSame([1, 2, 3], $result);
+    }
+
+    /**
      * @dataProvider dataProviderForArray
      * @param array $input
      * @param callable(iterable $input): Stream $leftChainFunc
