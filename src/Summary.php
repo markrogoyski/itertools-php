@@ -290,19 +290,18 @@ final class Summary
      */
     public static function same(iterable ...$iterables): bool
     {
-        try {
-            foreach (Multi::zipEqual(...$iterables) as $values) {
-                foreach (Single::pairwise($values) as [$lhs, $rhs]) {
-                    if ($lhs !== $rhs) {
-                        return false;
-                    }
+        $iterator = self::comparisonIterator(...$iterables);
+        foreach ($iterator as $values) {
+            foreach (Single::pairwise($values) as [$lhs, $rhs]) {
+                if ($lhs !== $rhs) {
+                    return false;
                 }
             }
-        } catch (\LengthException $e) {
-            return false;
         }
 
-        return true;
+        // Lockstep iteration ends when any input ends; all inputs must have ended.
+        $iterator->setFlags(\MultipleIterator::MIT_NEED_ANY);
+        return !$iterator->valid();
     }
 
     /**
@@ -486,13 +485,15 @@ final class Summary
 
         $usageMap = new UsageMap($strict);
 
-        try {
-            foreach (Multi::zipEqual(...$iterables) as $values) {
-                foreach ($values as $collectionIndex => $value) {
-                    $usageMap->addUsage($value, \strval($collectionIndex));
-                }
+        $iterator = self::comparisonIterator(...$iterables);
+        foreach ($iterator as $values) {
+            foreach ($values as $collectionIndex => $value) {
+                $usageMap->addUsage($value, \strval($collectionIndex));
             }
-        } catch (\LengthException $e) {
+        }
+
+        $iterator->setFlags(\MultipleIterator::MIT_NEED_ANY);
+        if ($iterator->valid()) {
             return false;
         }
 
@@ -503,6 +504,25 @@ final class Summary
         }
 
         return true;
+    }
+
+    /**
+     * Builds a lockstep iterator without turning unequal lengths into exceptions.
+     * The caller checks MIT_NEED_ANY after iteration to detect remaining input.
+     * Exceptions raised by the inputs propagate unchanged.
+     *
+     * @param iterable<mixed> ...$iterables
+     *
+     * @return \MultipleIterator<mixed, mixed>
+     */
+    private static function comparisonIterator(iterable ...$iterables): \MultipleIterator
+    {
+        $iterator = new \MultipleIterator(\MultipleIterator::MIT_NEED_ALL);
+        foreach ($iterables as $iterable) {
+            $iterator->attachIterator(Transform::toIterator($iterable));
+        }
+
+        return $iterator;
     }
 
     /**
