@@ -864,6 +864,8 @@ Return a stream cycling through the elements of stream sequentially forever.
 
 ```$stream->infiniteCycle(): Stream```
 
+A non-array source is read once, lazily, and later passes replay a cache of its elements, so one-pass sources cycle correctly. Keys are preserved. See [`Infinite::cycle`](infinite-iteration.md#cycle).
+
 ```php
 use IterTools\Stream;
 

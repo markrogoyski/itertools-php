@@ -9,6 +9,7 @@ use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Transform;
 
 class InfiniteTest extends \PHPUnit\Framework\TestCase
 {
@@ -315,5 +316,66 @@ class InfiniteTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertSame([2, 4, 6, 8, 10], $result);
+    }
+
+    /**
+     * @test infiniteCycle repeats every pass of a source that can only be iterated once
+     * @dataProvider dataProviderForInfiniteCycleOneShotSources
+     * @param Stream $stream
+     * @param array  $expected
+     */
+    public function testInfiniteCycleOneShotSource(Stream $stream, array $expected): void
+    {
+        // When
+        $result = $stream->infiniteCycle()->limit(\count($expected))->toArray();
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForInfiniteCycleOneShotSources(): array
+    {
+        return [
+            'IteratorIterator around Generator' => [
+                Stream::of(new \IteratorIterator(GeneratorFixture::getGenerator([1, 2, 3]))),
+                [1, 2, 3, 1, 2, 3, 1, 2, 3],
+            ],
+            'memoized Generator' => [
+                Stream::of(GeneratorFixture::getGenerator([1, 2, 3]))->memoize(),
+                [1, 2, 3, 1, 2, 3, 1, 2, 3],
+            ],
+            'tee copy' => [
+                Stream::of(Transform::tee(GeneratorFixture::getGenerator([1, 2, 3]), 2)[0]),
+                [1, 2, 3, 1, 2, 3, 1, 2, 3],
+            ],
+        ];
+    }
+
+    /**
+     * @test infiniteCycle does not consume its source until iterated, then pulls one element at a time
+     */
+    public function testInfiniteCycleIsLazy(): void
+    {
+        // Given
+        $pulled    = 0;
+        $generator = (function () use (&$pulled) {
+            foreach ([1, 2, 3, 4, 5] as $value) {
+                ++$pulled;
+                yield $value;
+            }
+        })();
+
+        // When
+        $stream = Stream::of($generator)->infiniteCycle();
+
+        // Then
+        $this->assertSame(0, $pulled);
+
+        // When
+        $result = $stream->limit(2)->toArray();
+
+        // Then
+        $this->assertSame([1, 2], $result);
+        $this->assertSame(2, $pulled);
     }
 }

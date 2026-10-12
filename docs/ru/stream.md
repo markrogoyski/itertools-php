@@ -851,6 +851,8 @@ foreach ($result as $group => $item) {
 
 ```$stream->infiniteCycle(): Stream```
 
+Источник, не являющийся массивом, читается один раз и лениво, а следующие проходы воспроизводят кэш его элементов, поэтому одноразовые источники зацикливаются корректно. Ключи сохраняются. См. [`Infinite::cycle`](infinite-iteration.md#cycle).
+
 ```php
 use IterTools\Stream;
 

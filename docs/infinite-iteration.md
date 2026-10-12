@@ -28,6 +28,8 @@ Cycle through the elements of a collection sequentially forever.
 
 ```Infinite::cycle(iterable $iterable)```
 
+Arrays are cycled directly. Any other iterable is read only once, lazily: the first pass pulls elements from the source as they are consumed and caches them, and every later pass replays the cache. One-pass sources such as generators, `Transform::tee` copies, `PDOStatement` cursors and wrappers around them therefore cycle correctly. The cache holds one copy of the source's elements. Source keys are preserved on every pass. An empty source yields nothing.
+
 ```php
 use IterTools\Infinite;
 

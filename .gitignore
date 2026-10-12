@@ -5,6 +5,7 @@ composer.phar
 .phpunit.result.cache
 tests/.phpunit.cache/
 CLAUDE.md
+.claude/
 .antigravitycli/
 NEW_FEATURES_PLAN.md
 /~/

@@ -13,9 +13,11 @@
 * Transform: `tee` dropped the last line of an `\SplFileObject` without a trailing newline, and yielded nothing for `\SplQueue`, `\SplStack` and `\SplDoublyLinkedList`.
 * Transform: `tee` copies kept each other alive until the cycle collector ran, and a copy that was abandoned partway made the others buffer the whole source; dropped copies now release their buffer immediately.
 * Transform: if the source threw from `current()` after `key()`, `tee` could pair a key with another element's value.
+* Infinite: `cycle` (and `Stream::infiniteCycle`) threw on the second pass for one-pass sources other than a bare generator: an `\IteratorIterator` around a generator, nested `\IteratorAggregate`s, advanced `tee` copies, memoized streams. It also dropped the first row of a `\PDOStatement`. Every non-array source is now read once and replayed from a cache.
 
 ### Changes
 * Transform: `tee` no longer reads the source when it is called; the first element is read when a copy is first used.
+* Infinite: `cycle` (and `Stream::infiniteCycle`) no longer reads a generator in full when it is called; the first pass reads the source lazily, one element at a time. Generator keys are now preserved instead of renumbered from 0, as for arrays and iterators. A non-array source is read only once, so changes made to a rewindable source after its first pass are not seen.
 * Transform: a `tee` copy can be rewound repeatedly while it has not advanced, so `isEmpty()` followed by iteration works after `peekStream`, `peekPrint` and `peekPrintR`. A copy that has advanced can no longer be rewound: `rewind()` throws `\LogicException` instead of silently continuing from the current position, as a generator does. A cloned copy is an independent branch that continues from the position of the original.
 
 ## v2.7.0 - 2026-10-07

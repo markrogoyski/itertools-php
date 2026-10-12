@@ -1686,6 +1686,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Cycle through the elements of iterable source sequentially forever
      *
+     * One-pass sources are read lazily once and cached for later passes.
+     *
      * @return Stream
      *
      * @see Infinite::cycle()

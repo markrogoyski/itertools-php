@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\Iterators\MemoizedIterable;
+use IterTools\Util\Iterators\ReplayIterator;
+
 final class Infinite
 {
     /**
@@ -28,22 +31,24 @@ final class Infinite
     /**
      * Cycle through the elements of a collection sequentially forever
      *
+     * Arrays are cycled directly. Any other iterable is read only once, lazily: the first pass pulls
+     * elements from the source as they are consumed and caches them, and every later pass replays the
+     * cache. This makes one-pass sources (generators, tee copies, database cursors, wrappers around
+     * them) cycle correctly, at the cost of holding one copy of the source's elements in memory.
+     * Source keys are preserved on every pass. An empty source yields nothing.
+     *
      * @param iterable<mixed> $iterable Finite array or traversable object
      *
      * @return \InfiniteIterator<mixed, mixed, \Iterator<mixed, mixed>>
      */
     public static function cycle(iterable $iterable): \InfiniteIterator
     {
-        if ($iterable instanceof \IteratorAggregate) {
-            $inner = $iterable->getIterator();
-            if ($inner instanceof \Generator) {
-                $iterable = \iterator_to_array($inner, false);
-            }
-        } elseif ($iterable instanceof \Generator) {
-            $iterable = \iterator_to_array($iterable, false);
-        }
+        /** @var \Iterator<mixed, mixed> $iterator */
+        $iterator = \is_array($iterable)
+            ? new \ArrayIterator($iterable)
+            : new ReplayIterator(new MemoizedIterable($iterable));
 
-        return new \InfiniteIterator(Transform::toIterator($iterable));
+        return new \InfiniteIterator($iterator);
     }
 
     /**
