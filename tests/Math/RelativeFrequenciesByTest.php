@@ -250,4 +250,42 @@ class RelativeFrequenciesByTest extends \PHPUnit\Framework\TestCase
             // drain
         }
     }
+
+    /**
+     * @test         relativeFrequenciesBy yields a float when there is only one group
+     * @dataProvider dataProviderForSingleGroup
+     * @param        iterable $data
+     * @param        bool     $strict
+     * @param        array    $expected
+     */
+    public function testSingleGroupYieldsFloat(iterable $data, bool $strict, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::relativeFrequenciesBy($data, fn ($x) => $x % 2 === 0 ? 'even' : 1, $strict));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForSingleGroup(): array
+    {
+        return [
+            'array one element'      => [[2], true, ['even' => 1.0]],
+            'array one group'        => [[2, 4, 6], true, ['even' => 1.0]],
+            'array int key'          => [[1, 3, 5], true, [1 => 1.0]],
+            'array coercive'         => [[1, 3, 5], false, [1 => 1.0]],
+            'generator one element'  => [Fixture\GeneratorFixture::getGenerator([2]), true, ['even' => 1.0]],
+            'generator one group'    => [Fixture\GeneratorFixture::getGenerator([2, 4, 6]), true, ['even' => 1.0]],
+            'generator int key'      => [Fixture\GeneratorFixture::getGenerator([1, 3, 5]), true, [1 => 1.0]],
+            'generator coercive'     => [Fixture\GeneratorFixture::getGenerator([1, 3, 5]), false, [1 => 1.0]],
+            'iterator one element'   => [new Fixture\ArrayIteratorFixture([2]), true, ['even' => 1.0]],
+            'iterator one group'     => [new Fixture\ArrayIteratorFixture([2, 4, 6]), true, ['even' => 1.0]],
+            'iterator int key'       => [new Fixture\ArrayIteratorFixture([1, 3, 5]), true, [1 => 1.0]],
+            'iterator coercive'      => [new Fixture\ArrayIteratorFixture([1, 3, 5]), false, [1 => 1.0]],
+            'aggregate one element'  => [new Fixture\IteratorAggregateFixture([2]), true, ['even' => 1.0]],
+            'aggregate one group'    => [new Fixture\IteratorAggregateFixture([2, 4, 6]), true, ['even' => 1.0]],
+            'aggregate int key'      => [new Fixture\IteratorAggregateFixture([1, 3, 5]), true, [1 => 1.0]],
+            'aggregate coercive'     => [new Fixture\IteratorAggregateFixture([1, 3, 5]), false, [1 => 1.0]],
+        ];
+    }
 }

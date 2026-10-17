@@ -837,4 +837,38 @@ class RelativeFrequenciesTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsWithDelta($expectedValues, \array_keys($result), self::Δ);
         $this->assertEqualsWithDelta($expectedFrequencies, \array_values($result), self::Δ);
     }
+
+    /**
+     * @test         relativeFrequencies yields a float when there is only one distinct value
+     * @dataProvider dataProviderForSingleDistinctValue
+     * @param        iterable $data
+     * @param        bool     $strict
+     * @param        array    $expected
+     */
+    public function testSingleDistinctValueYieldsFloat(iterable $data, bool $strict, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::relativeFrequencies($data, $strict));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForSingleDistinctValue(): array
+    {
+        return [
+            'array one element'               => [['a'], true, ['a' => 1.0]],
+            'array repeated'                  => [['a', 'a', 'a'], true, ['a' => 1.0]],
+            'array coercive collapse'         => [[1, '1', 1.0, true], false, [1 => 1.0]],
+            'generator one element'           => [GeneratorFixture::getGenerator(['a']), true, ['a' => 1.0]],
+            'generator repeated'              => [GeneratorFixture::getGenerator(['a', 'a', 'a']), true, ['a' => 1.0]],
+            'generator coercive collapse'     => [GeneratorFixture::getGenerator([1, '1', 1.0, true]), false, [1 => 1.0]],
+            'iterator one element'            => [new ArrayIteratorFixture(['a']), true, ['a' => 1.0]],
+            'iterator repeated'               => [new ArrayIteratorFixture(['a', 'a', 'a']), true, ['a' => 1.0]],
+            'iterator coercive collapse'      => [new ArrayIteratorFixture([1, '1', 1.0, true]), false, [1 => 1.0]],
+            'aggregate one element'           => [new IteratorAggregateFixture(['a']), true, ['a' => 1.0]],
+            'aggregate repeated'              => [new IteratorAggregateFixture(['a', 'a', 'a']), true, ['a' => 1.0]],
+            'aggregate coercive collapse'     => [new IteratorAggregateFixture([1, '1', 1.0, true]), false, [1 => 1.0]],
+        ];
+    }
 }

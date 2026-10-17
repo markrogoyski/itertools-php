@@ -110,6 +110,22 @@ class StreamPhase6KeyedTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         Stream::relativeFrequenciesBy yields a float for a single group across iterable types
+     * @dataProvider dataProviderForIterableTypes
+     * @param        iterable $data
+     */
+    public function testRelativeFrequenciesBySingleGroupYieldsFloat(iterable $data): void
+    {
+        // When
+        $result = Stream::of($data)
+            ->relativeFrequenciesBy(fn ($x) => 'all')
+            ->toAssociativeArray();
+
+        // Then
+        $this->assertSame(['all' => 1.0], $result);
+    }
+
+    /**
      * @test         Stream::isSortedBy true across iterable types
      * @dataProvider dataProviderForIterableTypes
      * @param        iterable $data

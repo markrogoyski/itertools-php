@@ -23,6 +23,7 @@
 * Infinite: `count` went past `PHP_INT_MAX` (or `PHP_INT_MIN` with a negative step) by yielding floats, repeating the same value forever; it now throws `\OverflowException` when the next value would be out of the integer range.
 * Single: `range` (and `Stream::ofRange`) with a float step yielded an extra trailing element when the operands are too large for the step to be resolved (e.g. `range(1e16, 1e16 + 4, 0.5)` gave 10 elements instead of 9, and `range(1e16, 1e16 + 4, 1.5)` gave 4 instead of 3), and threw "must not exceed span (0)" for distinct integers beyond `2^53` with a fractional step (e.g. `range(2**53, 2**53 + 1, 0.5)`); the span of integer operands is now taken from the integers themselves.
 * Single: `range` (and `Stream::ofRange`) dropped the endpoint of a float range spanning a whole number of steps when float rounding put the last value just past `$end` (e.g. `range(0, 55, 1.1)` stopped at 53.9).
+* Math: `relativeFrequencies` and `relativeFrequenciesBy` (and their Stream wrappers) yielded `int(1)` instead of `1.0` when there was only one distinct value or group; they now always yield floats, as documented.
 
 ### Changes
 * Single: a float `range` (and `Stream::ofRange`) that spans a whole number of steps, to within float rounding error, now ends exactly on `$end`. Native `\range()` drops the endpoint where float rounding puts the last value just past it, so `range(0.3, 0.9, 0.2)` now yields `[0.3, 0.5, 0.7, 0.9]` where native returns `[0.3, 0.5, 0.7]`.

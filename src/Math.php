@@ -65,7 +65,7 @@ final class Math
         }
 
         foreach ($frequencies as [$value, $count]) {
-            yield $value => ($count / $totalCount);
+            yield $value => ((float) $count / (float) $totalCount);
         }
     }
 
@@ -154,7 +154,7 @@ final class Math
         }
 
         foreach ($frequencies as [$key, $count]) {
-            yield $key => ($count / $totalCount);
+            yield $key => ((float) $count / (float) $totalCount);
         }
     }
 

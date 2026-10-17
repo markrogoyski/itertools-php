@@ -216,7 +216,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies(false)
                     ->toAssociativeArray(),
-                ['1' => 1],
+                ['1' => 1.0],
             ],
         ];
     }
@@ -428,7 +428,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies(false)
                     ->toAssociativeArray(),
-                ['1' => 1],
+                ['1' => 1.0],
             ],
         ];
     }
@@ -641,7 +641,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies(false)
                     ->toAssociativeArray(),
-                ['1' => 1],
+                ['1' => 1.0],
             ],
         ];
     }
@@ -852,7 +852,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies(false)
                     ->toAssociativeArray(),
-                ['1' => 1],
+                ['1' => 1.0],
             ],
         ];
     }
