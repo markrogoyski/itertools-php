@@ -17,6 +17,7 @@
 * Summary: `same`, `arePermutations` and `arePermutationsCoercive` (and their Stream wrappers) returned `false` when a source threw `\LengthException`; the exception now propagates. Inputs of different lengths still return `false`.
 * Summary: `startsWith` and `startsWithCoercive` (and the Stream wrappers) advanced the source one element past the prefix, which could throw or consume a line the caller still needed; they now stop at the last element compared.
 * Multi: `roundRobin` (and `Stream::roundRobinWith`) rewound every source up front and advanced each source right after yielding from it, so taking N outputs read more than N values; it is now lazy and pulls exactly the values it yields.
+* Reduce: `toMedian` (and `Stream::toMedian`, and `toPercentile` at 50 / `toQuantile` at 0.5) returned `NAN` when the two middle values were `-INF` and a finite negative number; it now returns `-INF`.
 
 ### Changes
 * Transform: `tee` no longer reads the source when it is called; the first element is read when a copy is first used.

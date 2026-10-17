@@ -2963,7 +2963,7 @@ Reduces iterable source to its median value.
 
 ```$stream->toMedian(): int|float|null```
 
-- For an even number of elements, the median is the mean of the two middle values, computed so that it neither overflows when the two middle values sum beyond `PHP_FLOAT_MAX` nor loses precision when their span exceeds the integer range. Two identical middle values return that value, including `INF`.
+- For an even number of elements, the median is the mean of the two middle values, computed so that it neither overflows when the two middle values sum beyond `PHP_FLOAT_MAX` nor loses precision when their span exceeds the integer range. Two identical middle values return that value, including `INF`. An infinity paired with a finite value returns that infinity, and opposite infinities return `NAN`.
 - Returns null if iterable source is empty.
 
 ```php

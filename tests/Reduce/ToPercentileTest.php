@@ -317,6 +317,39 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toPercentile between an infinity and a finite value is that infinity
+     * @dataProvider dataProviderForInfiniteAndFiniteNeighbours
+     * @param        array $data
+     * @param        float $percentile
+     * @param        float $expected
+     */
+    public function testInterpolationBetweenInfinityAndFiniteValueIsThatInfinity(
+        array $data,
+        float $percentile,
+        float $expected
+    ): void {
+        // When
+        $result = Reduce::toPercentile($data, $percentile);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForInfiniteAndFiniteNeighbours(): array
+    {
+        return [
+            [[-\INF, -1], 50, -\INF],
+            [[-\INF, -1], 25, -\INF],
+            [[-\INF, -1], 75, -\INF],
+            [[1, \INF], 50, \INF],
+            [[1, \INF], 25, \INF],
+            [[1, \INF], 75, \INF],
+            [[-\INF, 1], 50, -\INF],
+            [[-1, \INF], 50, \INF],
+        ];
+    }
+
+    /**
      * @test toPercentile interpolating between two identical neighbours returns that value exactly
      */
     public function testInterpolationBetweenIdenticalNeighboursIsExact(): void

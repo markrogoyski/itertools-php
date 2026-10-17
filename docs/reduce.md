@@ -296,7 +296,7 @@ Reduces to the median value.
 
 ```Reduce::toMedian(iterable $data): int|float|null```
 
-- For an even number of elements, the median is the mean of the two middle values, computed so that it neither overflows when the two middle values sum beyond `PHP_FLOAT_MAX` nor loses precision when their span exceeds the integer range (`toMedian([PHP_INT_MIN, PHP_INT_MAX])` is `-0.5`, not `0.0`). Two identical middle values return that value, including `INF`.
+- For an even number of elements, the median is the mean of the two middle values, computed so that it neither overflows when the two middle values sum beyond `PHP_FLOAT_MAX` nor loses precision when their span exceeds the integer range (`toMedian([PHP_INT_MIN, PHP_INT_MAX])` is `-0.5`, not `0.0`). Two identical middle values return that value, including `INF`. An infinity paired with a finite value returns that infinity (`toMedian([-INF, -1])` is `-INF`), and opposite infinities return `NAN`.
 - Returns null if collection is empty.
 
 ```php

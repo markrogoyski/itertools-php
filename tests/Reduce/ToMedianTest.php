@@ -232,6 +232,56 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toMedian of an infinity and a finite value is that infinity
+     * @dataProvider dataProviderForInfiniteAndFiniteMiddleValues
+     * @param        array $data
+     * @param        float $expected
+     */
+    public function testEvenMedianOfInfinityAndFiniteValueIsThatInfinity(array $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toMedian($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForInfiniteAndFiniteMiddleValues(): array
+    {
+        return [
+            // Same sign
+            [[-\INF, -1], -\INF],
+            [[-\INF, -1.5], -\INF],
+            [[1, \INF], \INF],
+            [[1.5, \INF], \INF],
+            [[-\INF, -\PHP_FLOAT_MAX], -\INF],
+            [[\PHP_FLOAT_MAX, \INF], \INF],
+            // Opposite signs or a zero
+            [[-\INF, 1], -\INF],
+            [[-1, \INF], \INF],
+            [[-\INF, 0], -\INF],
+            [[0, \INF], \INF],
+            // Sorts to [-INF, -INF, -2, 5], so the middle values are -INF and -2
+            [[5, -2, -\INF, -\INF], -\INF],
+        ];
+    }
+
+    /**
+     * @test toMedian of opposite infinities is NAN
+     */
+    public function testEvenMedianOfOppositeInfinitiesIsNan(): void
+    {
+        // Given
+        $data = [\INF, -\INF];
+
+        // When
+        $result = Reduce::toMedian($data);
+
+        // Then (the midpoint of -INF and INF is undefined)
+        $this->assertNan($result);
+    }
+
+    /**
      * @test toMedian of two identical middle values returns that value exactly
      */
     public function testEvenMedianOfIdenticalMiddleValuesIsExact(): void

@@ -654,8 +654,8 @@ final class Reduce
     /**
      * Computes the midpoint of two numbers without overflowing on extreme magnitudes.
      *
-     * Equal values short-circuit. Beyond that, which form is safe depends only on the signs, so
-     * neither branch can overflow:
+     * Equal values short-circuit, and so does an infinity, which no finite partner can move. Beyond
+     * that, which form is safe depends only on the signs, so neither branch can overflow:
      *
      * - Opposite signs (or a zero): $lo + $hi cannot overflow, because the magnitudes cancel rather
      *   than add. This form is used because it is also exact for integers — the span PHP_INT_MAX -
@@ -677,6 +677,14 @@ final class Reduce
         // infinities return that infinity rather than the NAN that INF - INF would give below.
         if ($lo === $hi) {
             return $lo;
+        }
+
+        // An infinity paired with a finite value is that infinity, and opposite infinities are NAN;
+        // the plain sum gives both. The same-sign form below would instead compute
+        // -INF + (finite - -INF) / 2, which is -INF + INF and so NAN.
+        if (\is_infinite((float) $lo) || \is_infinite((float) $hi)) {
+            /** @psalm-suppress InvalidOperand */
+            return $lo + $hi;
         }
 
         if (($lo <= 0 && $hi >= 0) || ($hi <= 0 && $lo >= 0)) {
