@@ -368,8 +368,14 @@ final class Single
                 ? $group
                 : [$group];
 
-            foreach (Set::distinct($itemGroups) as $itemGroup) {
+            // Dedupe by array key, so names PHP normalizes to the same key (2020 and '2020') count once.
+            $distinctItemGroups = [];
+            foreach ($itemGroups as $itemGroup) {
                 /** @var int|string $itemGroup */
+                $distinctItemGroups[$itemGroup] = true;
+            }
+
+            foreach (\array_keys($distinctItemGroups) as $itemGroup) {
                 if ($itemKey === null) {
                     $groups[$itemGroup][] = $item;
                 } else {

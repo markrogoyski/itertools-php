@@ -904,4 +904,232 @@ class GroupByTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEquals($expected, $result);
     }
+
+    /**
+     * @test         groupBy adds an item to a group once when its group names normalize to the same array key
+     * @dataProvider dataProviderForEquivalentGroupNamesArray
+     * @param array $iterable
+     * @param callable $groupKeyFunction
+     * @param array $expected
+     */
+    public function testEquivalentGroupNamesArray(array $iterable, callable $groupKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, $groupKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForEquivalentGroupNamesArray(): array
+    {
+        return [
+            [
+                [['x', [2020, '2020']]],
+                fn ($x) => $x[1],
+                [2020 => [['x', [2020, '2020']]]],
+            ],
+            [
+                [['x', [1, true, '1']]],
+                fn ($x) => $x[1],
+                [1 => [['x', [1, true, '1']]]],
+            ],
+            [
+                [['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]],
+                fn ($x) => $x[1],
+                [
+                    'a' => [['x', ['a', 2020, 'b', '2020']]],
+                    2020 => [['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]],
+                    'b' => [['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]],
+                ],
+            ],
+            [
+                [['x', [1, '1.0']], ['y', ['1.0']]],
+                fn ($x) => $x[1],
+                [
+                    1 => [['x', [1, '1.0']]],
+                    '1.0' => [['x', [1, '1.0']], ['y', ['1.0']]],
+                ],
+            ],
+            [
+                [['x', ['', false]], ['y', [false]]],
+                fn ($x) => $x[1],
+                [
+                    '' => [['x', ['', false]]],
+                    0 => [['x', ['', false]], ['y', [false]]],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy generator adds an item to a group once when its group names normalize to the same array key
+     * @dataProvider dataProviderForEquivalentGroupNamesGenerator
+     * @param \Generator $iterable
+     * @param callable $groupKeyFunction
+     * @param array $expected
+     */
+    public function testEquivalentGroupNamesGenerator(\Generator $iterable, callable $groupKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, $groupKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForEquivalentGroupNamesGenerator(): array
+    {
+        return [
+            [
+                Fixture\GeneratorFixture::getGenerator([['x', [2020, '2020']]]),
+                fn ($x) => $x[1],
+                [2020 => [['x', [2020, '2020']]]],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([['x', [1, true, '1']]]),
+                fn ($x) => $x[1],
+                [1 => [['x', [1, true, '1']]]],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]]),
+                fn ($x) => $x[1],
+                [
+                    'a' => [['x', ['a', 2020, 'b', '2020']]],
+                    2020 => [['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]],
+                    'b' => [['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]],
+                ],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([['x', [1, '1.0']], ['y', ['1.0']]]),
+                fn ($x) => $x[1],
+                [
+                    1 => [['x', [1, '1.0']]],
+                    '1.0' => [['x', [1, '1.0']], ['y', ['1.0']]],
+                ],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([['x', ['', false]], ['y', [false]]]),
+                fn ($x) => $x[1],
+                [
+                    '' => [['x', ['', false]]],
+                    0 => [['x', ['', false]], ['y', [false]]],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy iterator adds an item to a group once when its group names normalize to the same array key
+     * @dataProvider dataProviderForEquivalentGroupNamesIterator
+     * @param \Iterator $iterable
+     * @param callable $groupKeyFunction
+     * @param array $expected
+     */
+    public function testEquivalentGroupNamesIterator(\Iterator $iterable, callable $groupKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, $groupKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForEquivalentGroupNamesIterator(): array
+    {
+        return [
+            [
+                new Fixture\ArrayIteratorFixture([['x', [2020, '2020']]]),
+                fn ($x) => $x[1],
+                [2020 => [['x', [2020, '2020']]]],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([['x', [1, true, '1']]]),
+                fn ($x) => $x[1],
+                [1 => [['x', [1, true, '1']]]],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]]),
+                fn ($x) => $x[1],
+                [
+                    'a' => [['x', ['a', 2020, 'b', '2020']]],
+                    2020 => [['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]],
+                    'b' => [['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]],
+                ],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([['x', [1, '1.0']], ['y', ['1.0']]]),
+                fn ($x) => $x[1],
+                [
+                    1 => [['x', [1, '1.0']]],
+                    '1.0' => [['x', [1, '1.0']], ['y', ['1.0']]],
+                ],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([['x', ['', false]], ['y', [false]]]),
+                fn ($x) => $x[1],
+                [
+                    '' => [['x', ['', false]]],
+                    0 => [['x', ['', false]], ['y', [false]]],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy traversable adds an item to a group once when its group names normalize to the same array key
+     * @dataProvider dataProviderForEquivalentGroupNamesTraversable
+     * @param \Traversable $iterable
+     * @param callable $groupKeyFunction
+     * @param array $expected
+     */
+    public function testEquivalentGroupNamesTraversable(\Traversable $iterable, callable $groupKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, $groupKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForEquivalentGroupNamesTraversable(): array
+    {
+        return [
+            [
+                new Fixture\IteratorAggregateFixture([['x', [2020, '2020']]]),
+                fn ($x) => $x[1],
+                [2020 => [['x', [2020, '2020']]]],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([['x', [1, true, '1']]]),
+                fn ($x) => $x[1],
+                [1 => [['x', [1, true, '1']]]],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]]),
+                fn ($x) => $x[1],
+                [
+                    'a' => [['x', ['a', 2020, 'b', '2020']]],
+                    2020 => [['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]],
+                    'b' => [['x', ['a', 2020, 'b', '2020']], ['y', ['2020', 'b']]],
+                ],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([['x', [1, '1.0']], ['y', ['1.0']]]),
+                fn ($x) => $x[1],
+                [
+                    1 => [['x', [1, '1.0']]],
+                    '1.0' => [['x', [1, '1.0']], ['y', ['1.0']]],
+                ],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([['x', ['', false]], ['y', [false]]]),
+                fn ($x) => $x[1],
+                [
+                    '' => [['x', ['', false]]],
+                    0 => [['x', ['', false]], ['y', [false]]],
+                ],
+            ],
+        ];
+    }
 }
