@@ -194,7 +194,7 @@ $firstFive = Stream::ofRange(1, PHP_INT_MAX)
 // 1, 2, 3, 4, 5
 ```
 
-> Note: prior to this release, `Stream::ofRange` materialized the full sequence eagerly via `\range()` and, when given two numeric-string inputs without leading zeros, preserved string-typed output (e.g. `ofRange("1", "5")` yielded `["1", ..., "5"]`). The lazy rewrite normalizes all numeric-string inputs to `int`/`float` uniformly. It also pins native `\range()`'s PHP 8.3+ numeric semantics on every supported PHP version, so an integer-valued float step on int operands now yields ints (`ofRange(1, 5, 1.0)` → `[1, 2, 3, 4, 5]`) where PHP 8.2 previously yielded floats.
+> Note: prior to this release, `Stream::ofRange` materialized the full sequence eagerly via `\range()` and, when given two numeric-string inputs without leading zeros, preserved string-typed output (e.g. `ofRange("1", "5")` yielded `["1", ..., "5"]`). The lazy rewrite normalizes all numeric-string inputs to `int`/`float` uniformly. It also pins native `\range()`'s PHP 8.3+ numeric semantics on every supported PHP version, so an integer-valued float step on int operands now yields ints (`ofRange(1, 5, 1.0)` → `[1, 2, 3, 4, 5]`) where PHP 8.2 previously yielded floats. One departure from native: a float range that spans a whole number of steps, to within float rounding error, ends exactly on `$end`, so `ofRange(0.3, 0.9, 0.2)` yields `[0.3, 0.5, 0.7, 0.9]` where `\range(0.3, 0.9, 0.2)` returns `[0.3, 0.5, 0.7]` (see [Range](single-iteration.md#range)).
 
 #### Of Rock Paper Scissors
 Creates stream of rock-paper-scissors hands.

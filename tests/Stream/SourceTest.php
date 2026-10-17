@@ -896,16 +896,16 @@ class SourceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test ofRange float range does not yield past $end despite IEEE 754 rounding
+     * @test ofRange float range spanning a whole number of steps ends exactly on $end
      */
-    public function testOfRangeFloatDoesNotOvershoot(): void
+    public function testOfRangeFloatEndsOnEnd(): void
     {
-        // Native \range(0.3, 0.9, 0.2) returns [0.3, 0.5, 0.7].
+        // When
         $result = Stream::ofRange(0.3, 0.9, 0.2)->toArray();
 
-        foreach ($result as $v) {
-            $this->assertLessThanOrEqual(0.9, $v);
-        }
+        // Then
+        // 0.3 + 3 * 0.2 evaluates to 0.9000000000000001, so native \range(0.3, 0.9, 0.2) drops the endpoint.
+        $this->assertSame([0.3, 0.5, 0.7, 0.9], $result);
     }
 
     /**

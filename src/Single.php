@@ -1115,7 +1115,13 @@ final class Single
             $startF = (float)$start;
             $endF = (float)$end;
             $magnitudeF = \abs((float)$step);
-            $spanF = \abs($endF - $startF);
+            // Take the span of int operands from the ints themselves. Distinct ints past 2^53 can share a
+            // float (2^53 and 2^53 + 1), which would collapse the span to 0. An overflowing int subtraction
+            // promotes to float, which is accurate enough there.
+            $intOperands = \is_int($start) && \is_int($end);
+            $spanF = $intOperands
+                ? \abs((float)($end - $start))
+                : \abs($endF - $startF);
 
             if ($magnitudeF > $spanF) {
                 throw new \InvalidArgumentException(
@@ -1139,22 +1145,46 @@ final class Single
                     . "(span={$spanF}, step={$magnitudeF})"
                 );
             }
-            // Add +1 to cover the case where $stepsQuotient is mathematically an
-            // integer but evaluates to N - epsilon in IEEE 754 (e.g. (0.5-0.4)/0.05
-            // → 1.999... not 2.0), which would otherwise truncate the final element.
-            // The clamp below guards against an actual overshoot.
-            $stepsF = (int)\floor($stepsQuotient) + 1;
+            // The quotient is taken as integral when it is within its rounding error of an integer: the
+            // error of the division, the step and the span (about half an epsilon each, relative), plus the
+            // error from storing decimal operands as floats (at most half the float spacing each).
+            // (0.5 - 0.4) / 0.05 evaluates to 1.999... and would otherwise drop the last element. The
+            // operand term only counts while it is under a quarter of a step. Past that, the step is near or
+            // below the float spacing and the decimal intent can't be recovered, so the operands are taken
+            // as exact; int operands always are, since their span is exact. Otherwise an extra trailing
+            // element would be added: range(1e16, 1e16 + 4, 1.5) would yield 4 elements instead of 3, and
+            // range(1e15, 1e15 + 1, 0.278) 5 instead of 4 on a quotient of 3.597.
+            $operandTolerance = $intOperands
+                ? 0.0
+                : (self::halfFloatSpacing($startF) + self::halfFloatSpacing($endF)) / $magnitudeF;
+            if ($operandTolerance >= 0.25) {
+                $operandTolerance = 0.0;
+            }
+            $quotientTolerance = $operandTolerance + 2.0 * \PHP_FLOAT_EPSILON * $stepsQuotient;
+            $stepsF = (int)\round($stepsQuotient);
+            $landsOnEnd = \abs($stepsQuotient - (float)$stepsF) <= $quotientTolerance;
+            if (!$landsOnEnd) {
+                $stepsF = (int)\floor($stepsQuotient);
+            }
             $signF = $ascending ? 1.0 : -1.0;
+            // An integral quotient ends on $end exactly, so its last value is yielded after the loop.
+            // Reconstructing it can miss either way: 50 * 1.1 = 55.000000000000007, and
+            // range(2^53 + 1, 2^53 + 3, 0.5) starts from 2^53.
+            $lastIndex = $landsOnEnd ? $stepsF - 1 : $stepsF;
 
-            for ($i = 0; $i <= $stepsF; ++$i) {
-                $valF = $startF + $signF * ((float)$i * $magnitudeF);
-                // Quotient can be off-by-one when very close to an integer, causing
-                // the reconstructed value to overshoot $end (e.g. 0.3 + 3*0.2 ==
-                // 0.9000000000000001). Clamp.
+            for ($i = 0; $i <= $lastIndex; ++$i) {
+                $offsetF = (float)$i * $magnitudeF;
+                $valF = $startF + $signF * $offsetF;
+                // A value can pass $end through rounding: of $startF (int operands past 2^53), of the offset
+                // or of the addition. It passes by less than a float spacing, so it lands on $end.
                 if ($ascending ? $valF > $endF : $valF < $endF) {
-                    break;
+                    $valF = $endF;
                 }
                 yield $valF;
+            }
+
+            if ($landsOnEnd) {
+                yield $endF;
             }
         } else {
             $startI = (int)$start;
@@ -1369,5 +1399,29 @@ final class Single
         if ($partial && !$lastIterationYielded && \count($window) > 0) {
             yield $window;
         }
+    }
+
+    /**
+     * Half the float spacing at $x: 2^-53 times the largest power of two not above |x|.
+     *
+     * Bounding it by PHP_FLOAT_EPSILON / 2 * |x| instead is up to twice as loose, which accepts
+     * range(1e15, 1e15 + 3.125, 1.1) as 3 steps when no operands that round to these floats give that.
+     * Subnormals are taken as exact: half their spacing, 2^-1075, isn't representable.
+     */
+    private static function halfFloatSpacing(float $x): float
+    {
+        $x = \abs($x);
+        if ($x < \PHP_FLOAT_MIN) {
+            return 0.0;
+        }
+        // log() can be off by one at powers of two; correct the power to bracket $x. Near
+        // PHP_FLOAT_MAX it rounds up to 1024, and 2^1024 overflows to INF, so cap it first.
+        $power = 2.0 ** \min(\floor(\log($x, 2)), 1023.0);
+        if ($power > $x) {
+            $power /= 2.0;
+        } elseif ($power * 2.0 <= $x) {
+            $power *= 2.0;
+        }
+        return $power * (\PHP_FLOAT_EPSILON / 2.0);
     }
 }

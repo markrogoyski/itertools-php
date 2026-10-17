@@ -556,7 +556,8 @@ Yield a finite arithmetic progression of numbers, lazily.
 
 * Direction is inferred from `$start` vs `$end` — not from the sign of `$step`. The step magnitude (`abs($step)`) is used internally.
 * A negative `$step` is accepted only when the direction is descending (or when `$start == $end`).
-* Matches PHP 8.3+ native `\range()` numeric semantics for `int|float` inputs, identically on every supported PHP version — including int output for an integer-valued float step (`range(1, 5, 1.0)` → `[1, 2, 3, 4, 5]`), which PHP 8.2's native `\range()` promotes to floats. String inputs are out of scope (use `Stream::ofRange` for a string-accepting entry point).
+* Follows PHP 8.3+ native `\range()` for `int|float` inputs in output types, direction and step rules, identically on every supported PHP version — including int output for an integer-valued float step (`range(1, 5, 1.0)` → `[1, 2, 3, 4, 5]`), which PHP 8.2's native `\range()` promotes to floats. String inputs are out of scope (use `Stream::ofRange` for a string-accepting entry point).
+* A float range that spans a whole number of steps, to within float rounding error, ends exactly on `$end`, even where float rounding puts the last value just past it. Native `\range()` drops the endpoint there: `Single::range(0.3, 0.9, 0.2)` yields `[0.3, 0.5, 0.7, 0.9]`, where `\range(0.3, 0.9, 0.2)` returns `[0.3, 0.5, 0.7]`.
 * Throws `\InvalidArgumentException` when any operand is non-finite (`INF`/`-INF`/`NAN`), when `$step == 0`, when the step sign conflicts with the operand direction, or when `abs($step) > abs($end - $start)` (strictly greater than).
 * Lazy: safely usable with large bounds when composed with downstream limiters.
 

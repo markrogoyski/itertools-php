@@ -250,6 +250,287 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         float range with a step below float spacing yields floor(span / step) + 1 elements, no extra trailing one
+     * @dataProvider dataProviderForStepBelowFloatSpacing
+     * @param        int|float   $start
+     * @param        int|float   $end
+     * @param        float       $step
+     * @param        array<float> $expected
+     */
+    public function testFloatRangeWithStepBelowFloatSpacingHasNoExtraTrailingElement(
+        int|float $start,
+        int|float $end,
+        float $step,
+        array $expected
+    ): void {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForStepBelowFloatSpacing(): array
+    {
+        // Float spacing is 2 at 1e16 and at 2^53, so the values round, but the count is
+        // still floor(span / step) + 1: span 4 / step 0.5 = 8 → 9 elements; span 3 / step 1.5 = 2 → 3.
+        return [
+            'ascending 1e16 to 1e16 + 4 step 0.5' => [
+                1e16, 1e16 + 4.0, 0.5,
+                [
+                    1e16, 1e16, 1e16,
+                    10000000000000002.0, 10000000000000002.0, 10000000000000002.0,
+                    10000000000000004.0, 10000000000000004.0, 10000000000000004.0,
+                ],
+            ],
+            'descending 1e16 + 4 to 1e16 step 0.5' => [
+                1e16 + 4.0, 1e16, 0.5,
+                [
+                    10000000000000004.0, 10000000000000004.0, 10000000000000004.0,
+                    10000000000000002.0, 10000000000000002.0, 10000000000000002.0,
+                    1e16, 1e16, 1e16,
+                ],
+            ],
+            'int operands 2^53 to 2^53 + 3 step 1.5' => [
+                9007199254740992, 9007199254740995, 1.5,
+                [9007199254740992.0, 9007199254740994.0, 9007199254740996.0],
+            ],
+            // Non-integral quotients: span 4 / step 1.5 = 2.67 → 3 elements; span 6 / step 2.3 = 2.61 → 3.
+            'ascending 1e16 to 1e16 + 4 step 1.5' => [
+                1e16, 1e16 + 4.0, 1.5,
+                [1e16, 10000000000000002.0, 10000000000000004.0],
+            ],
+            'descending 1e16 + 4 to 1e16 step 1.5' => [
+                1e16 + 4.0, 1e16, 1.5,
+                [10000000000000004.0, 10000000000000002.0, 1e16],
+            ],
+            'ascending 1e16 to 1e16 + 6 step 2.3' => [
+                1e16, 1e16 + 6.0, 2.3,
+                [1e16, 10000000000000002.0, 10000000000000004.0],
+            ],
+        ];
+    }
+
+    /**
+     * @test         float range keeps the endpoint when the last value is reconstructed past $end
+     * @dataProvider dataProviderForLastValueReconstructedPastEnd
+     * @param        int|float $start
+     * @param        int|float $end
+     * @param        float     $step
+     * @param        int       $count
+     */
+    public function testFloatRangeKeepsEndpointWhenLastValueIsReconstructedPastEnd(
+        int|float $start,
+        int|float $end,
+        float $step,
+        int $count
+    ): void {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount($count, $result);
+        $this->assertSame((float)$end, $result[$count - 1]);
+    }
+
+    public static function dataProviderForLastValueReconstructedPastEnd(): array
+    {
+        // 50 * 1.1 = 55.000000000000007 and 100 * 0.07 = 7.0000000000000009 overshoot $end.
+        return [
+            'int operands 0 to 55 step 1.1' => [0, 55, 1.1, 51],
+            'float operands 0.0 to 55.0 step 1.1' => [0.0, 55.0, 1.1, 51],
+            'int operands 55 to 0 step 1.1' => [55, 0, 1.1, 51],
+            'float operands 0.0 to 7.0 step 0.07' => [0.0, 7.0, 0.07, 101],
+        ];
+    }
+
+    /**
+     * @test         int operands beyond 2^53 whose start rounds away from $end still end on $end
+     * @dataProvider dataProviderForIntStartRoundingAwayFromEnd
+     * @param        int   $start
+     * @param        int   $end
+     * @param        float $step
+     */
+    public function testFractionalStepOnIntsBeyondFloatPrecisionEndsOnEnd(int $start, int $end, float $step): void
+    {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount(5, $result);
+        $this->assertSame((float)$start, $result[0]);
+        $this->assertSame((float)$end, $result[4]);
+    }
+
+    public static function dataProviderForIntStartRoundingAwayFromEnd(): array
+    {
+        // 2^53 + 1 rounds down to 2^53 and 2^53 + 3 rounds up to 2^53 + 4, away from the other end, so
+        // start + span falls two short of (float)$end.
+        return [
+            'ascending 2^53 + 1 to 2^53 + 3' => [9007199254740993, 9007199254740995, 0.5],
+            'descending 2^53 + 3 to 2^53 + 1' => [9007199254740995, 9007199254740993, 0.5],
+        ];
+    }
+
+    /**
+     * @test         float range with large operands does not add an element for a quotient that is clearly not integral
+     * @dataProvider dataProviderForLargeOperandsWithNonIntegralQuotient
+     * @param        float $start
+     * @param        float $end
+     * @param        float $step
+     * @param        int   $count
+     */
+    public function testFloatRangeWithLargeOperandsHasNoExtraElementForNonIntegralQuotient(
+        float $start,
+        float $end,
+        float $step,
+        int $count
+    ): void {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount($count, $result);
+        $this->assertNotSame($end, $result[$count - 1]);
+    }
+
+    public static function dataProviderForLargeOperandsWithNonIntegralQuotient(): array
+    {
+        // The float spacing is 1/64 at 1e14 and 1/8 at 1e15, so the stored operands are off by at most
+        // half of it each. No decimal operands that round to these floats give a whole number of steps:
+        // span 1.46875 / step 0.3 = 4.896 → 5 elements; span 3.125 / step 1.1 = 2.84 → 3. Span 1 / step 0.278
+        // = 3.597 → 4 is a whole number of steps only if both operands were rounded the furthest possible in
+        // opposite directions, which is too weak a reason to add an element.
+        return [
+            'ascending 1e14 to 1e14 + 1.47 step 0.3' => [1e14, 1e14 + 1.47, 0.3, 5],
+            'descending 1e14 + 1.47 to 1e14 step 0.3' => [1e14 + 1.47, 1e14, 0.3, 5],
+            'ascending 1e15 to 1e15 + 3.125 step 1.1' => [1e15, 1e15 + 3.125, 1.1, 3],
+            'descending 1e15 + 3.125 to 1e15 step 1.1' => [1e15 + 3.125, 1e15, 1.1, 3],
+            'ascending 1e15 to 1e15 + 1 step 0.278' => [1e15, 1e15 + 1, 0.278, 4],
+            'descending 1e15 + 1 to 1e15 step 0.278' => [1e15 + 1, 1e15, 0.278, 4],
+        ];
+    }
+
+    /**
+     * @test float range with a step that resolves large operands keeps the endpoint lost to decimal rounding
+     */
+    public function testFloatRangeWithLargeOperandsKeepsEndpointLostToDecimalRounding(): void
+    {
+        // Given
+        // At 1e12 the float spacing is about 1.2e-4, so a 0.001 step still resolves, but 1e12 + 0.4 and
+        // 1e12 + 0.5 are stored inexactly and span / step comes out just under 100.
+        $start = 1e12 + 0.4;
+        $end   = 1e12 + 0.5;
+        $step  = 0.001;
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount(101, $result);
+        $this->assertSame($end, $result[100]);
+    }
+
+    /**
+     * @test         float range near PHP_FLOAT_MAX keeps the endpoint lost to decimal rounding
+     * @dataProvider dataProviderForOperandsNearFloatMax
+     * @param        float $start
+     * @param        float $end
+     * @param        float $step
+     * @param        int   $count
+     */
+    public function testFloatRangeNearFloatMaxKeepsEndpointLostToDecimalRounding(
+        float $start,
+        float $end,
+        float $step,
+        int $count
+    ): void {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount($count, $result);
+        $this->assertSame($end, $result[$count - 1]);
+    }
+
+    public static function dataProviderForOperandsNearFloatMax(): array
+    {
+        // |start| + |end| is about 2e308, past PHP_FLOAT_MAX, but the step resolves the operands, and
+        // span / step comes out just under 1000. Within a few hundred float spacings of PHP_FLOAT_MAX,
+        // log2 of the operands rounds up to 1024.
+        return [
+            'ascending 1e308 to 1.00001e308' => [1e308, 1.00001e308, 1e300, 1001],
+            'descending 1.00001e308 to 1e308' => [1.00001e308, 1e308, 1e300, 1001],
+            'descending -1e308 to -1.00001e308' => [-1e308, -1.00001e308, 1e300, 1001],
+            'ascending -1.00001e308 to -1e308' => [-1.00001e308, -1e308, 1e300, 1001],
+            'ascending to PHP_FLOAT_MAX step 1e293' => [\PHP_FLOAT_MAX - 1e294, \PHP_FLOAT_MAX, 1e293, 11],
+            'descending from PHP_FLOAT_MAX step 1e293' => [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX - 1e294, 1e293, 11],
+            'ascending to PHP_FLOAT_MAX step 1e300' => [\PHP_FLOAT_MAX - 1e303, \PHP_FLOAT_MAX, 1e300, 1001],
+            'descending to -PHP_FLOAT_MAX step 1e300' => [-\PHP_FLOAT_MAX + 1e303, -\PHP_FLOAT_MAX, 1e300, 1001],
+        ];
+    }
+
+    /**
+     * @test         distinct int operands beyond 2^53 with a fractional step use the exact int span, not the collapsed float span
+     * @dataProvider dataProviderForDistinctIntsBeyondFloatPrecision
+     * @param        int          $start
+     * @param        int          $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testFractionalStepOnDistinctIntsBeyondFloatPrecision(
+        int $start,
+        int $end,
+        float $step,
+        array $expected
+    ): void {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForDistinctIntsBeyondFloatPrecision(): array
+    {
+        // 2^53 and 2^53 + 1 are the same float, but the span is 1, so step 0.5 gives 3 elements.
+        return [
+            'ascending 2^53 to 2^53 + 1' => [
+                9007199254740992, 9007199254740993, 0.5,
+                [9007199254740992.0, 9007199254740992.0, 9007199254740992.0],
+            ],
+            'descending 2^53 + 1 to 2^53' => [
+                9007199254740993, 9007199254740992, 0.5,
+                [9007199254740992.0, 9007199254740992.0, 9007199254740992.0],
+            ],
+            'ascending PHP_INT_MAX - 1 to PHP_INT_MAX' => [
+                \PHP_INT_MAX - 1, \PHP_INT_MAX, 0.5,
+                [9.2233720368547758E18, 9.2233720368547758E18, 9.2233720368547758E18],
+            ],
+            // The int span is exact, so 1 / 0.6 = 1.67 → 2 elements, however coarse the floats are there.
+            'ascending PHP_INT_MAX - 1 to PHP_INT_MAX step 0.6' => [
+                \PHP_INT_MAX - 1, \PHP_INT_MAX, 0.6,
+                [9.2233720368547758E18, 9.2233720368547758E18],
+            ],
+        ];
+    }
+
+    /**
+     * @test distinct int operands beyond 2^53 still reject a fractional step that exceeds their exact span
+     */
+    public function testFractionalStepExceedingExactIntSpanBeyondFloatPrecisionThrows(): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must not exceed span (1)');
+
+        // When
+        foreach (Single::range(9007199254740992, 9007199254740993, 1.5) as $_) {
+            break;
+        }
+    }
+
+    /**
      * @test integer range at PHP_INT_MAX endpoint terminates (regression: accumulator overflow to float)
      */
     public function testIntegerRangeAtPhpIntMaxEndpointTerminates(): void
@@ -615,13 +896,39 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         float range ends on $end where rounding puts the last value past it and native \range() drops it
+     * @dataProvider dataProviderForEndpointNativeDrops
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testFloatRangeEndsOnEndWhereNativeDropsIt(float $start, float $end, float $step, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForEndpointNativeDrops(): array
+    {
+        // 0.3 + 3 * 0.2 = 0.9000000000000001 and 0.9 - 3 * 0.2 = 0.29999999999999993. Native \range()
+        // returns [0.3, 0.5, 0.7] and [0.9, 0.7, 0.5].
+        return [
+            'ascending 0.3 to 0.9 step 0.2' => [0.3, 0.9, 0.2, [0.3, 0.5, 0.7, 0.9]],
+            'descending 0.9 to 0.3 step 0.2' => [0.9, 0.3, 0.2, [0.9, 0.7, 0.5, 0.3]],
+        ];
+    }
+
+    /**
      * @test float range does not yield values past $end (ascending)
      */
     public function testFloatRangeAscendingDoesNotOvershoot(): void
     {
         // Given
         // 0.3 + 3 * 0.2 = 0.9000000000000001 in IEEE 754 — strictly greater than $end (0.9).
-        // Native \range(0.3, 0.9, 0.2) returns [0.3, 0.5, 0.7] (does not include 0.9).
         // Our implementation must not yield values past $end due to float rounding.
 
         // When
@@ -1081,8 +1388,8 @@ class RangeTest extends \PHPUnit\Framework\TestCase
             [0.4, 1.0, 0.05], [0.4, 1.0, 0.1],
             [0.1, 2.0, 0.05], [0.1, 2.0, 0.1],
             [1.0, 0.9, 0.01], [1.0, 0.9, 0.02], [1.0, 0.9, 0.05],
-            // Overshoot cases (already covered but include for sanity)
-            [0.3, 0.9, 0.2], [0.9, 0.3, 0.2],
+            // Overshoot cases are left out: where 0.3 + 3 * 0.2 rounds past 0.9, native drops the
+            // endpoint and Single::range keeps it (see testFloatRangeEndsOnEndWhereNativeDropsIt).
         ];
         foreach ($combos as $c) {
             $cases["range({$c[0]}, {$c[1]}, {$c[2]})"] = $c;
