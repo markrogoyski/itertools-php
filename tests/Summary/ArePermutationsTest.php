@@ -841,4 +841,19 @@ class ArePermutationsTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertFalse($result);
     }
+
+    /**
+     * @test arePermutations accepts named arguments that match its internal parameter names
+     */
+    public function testArePermutationsAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Summary::arePermutations(
+            strict: [1, 2, 3],
+            other: [3, 2, 1],
+        );
+
+        // Then
+        $this->assertTrue($result);
+    }
 }

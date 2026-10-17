@@ -186,4 +186,19 @@ class MergeSortedTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame(\range(0, 9), $result);
     }
+
+    /**
+     * @test mergeSorted accepts named arguments that match its internal parameter names
+     */
+    public function testMergeSortedAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = \iterator_to_array(Multi::mergeSorted(
+            keyFunc: [1, 4],
+            nanMessage: [2, 3],
+        ), false);
+
+        // Then
+        $this->assertSame([1, 2, 3, 4], $result);
+    }
 }

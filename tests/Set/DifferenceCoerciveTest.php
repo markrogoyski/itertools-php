@@ -585,4 +585,20 @@ class DifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([1, 2, 3], $result);
         $this->assertSame([false, false], $aliveWhileBuilding);
     }
+
+    /**
+     * @test differenceCoercive accepts named arguments that match its internal parameter names
+     */
+    public function testDifferenceCoerciveAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = \iterator_to_array(Set::differenceCoercive(
+            [1, 2, 3, 4],
+            strict: ['2'],
+            other: [3.0],
+        ), false);
+
+        // Then
+        $this->assertSame([1, 4], $result);
+    }
 }

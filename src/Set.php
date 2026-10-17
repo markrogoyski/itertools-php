@@ -195,7 +195,7 @@ final class Set
      */
     public static function intersection(iterable ...$iterables): \Generator
     {
-        yield from static::intersectionInternal(true, \count($iterables), ...$iterables);
+        yield from static::intersectionInternal(true, \count($iterables), ...\array_values($iterables));
     }
 
     /**
@@ -211,7 +211,7 @@ final class Set
      */
     public static function intersectionCoercive(iterable ...$iterables): \Generator
     {
-        yield from static::intersectionInternal(false, \count($iterables), ...$iterables);
+        yield from static::intersectionInternal(false, \count($iterables), ...\array_values($iterables));
     }
 
     /**
@@ -229,7 +229,7 @@ final class Set
      */
     public static function partialIntersection(int $minIntersectionCount, iterable ...$iterables): \Generator
     {
-        yield from static::intersectionInternal(true, $minIntersectionCount, ...$iterables);
+        yield from static::intersectionInternal(true, $minIntersectionCount, ...\array_values($iterables));
     }
 
     /**
@@ -247,7 +247,7 @@ final class Set
      */
     public static function partialIntersectionCoercive(int $minIntersectionCount, iterable ...$iterables): \Generator
     {
-        yield from static::intersectionInternal(false, $minIntersectionCount, ...$iterables);
+        yield from static::intersectionInternal(false, $minIntersectionCount, ...\array_values($iterables));
     }
 
     /**
@@ -263,7 +263,7 @@ final class Set
      */
     public static function union(iterable ...$iterables): \Generator
     {
-        return static::partialIntersection(1, ...$iterables);
+        return static::partialIntersection(1, ...\array_values($iterables));
     }
 
     /**
@@ -279,7 +279,7 @@ final class Set
      */
     public static function unionCoercive(iterable ...$iterables): \Generator
     {
-        return static::partialIntersectionCoercive(1, ...$iterables);
+        return static::partialIntersectionCoercive(1, ...\array_values($iterables));
     }
 
     /**
@@ -299,7 +299,7 @@ final class Set
      */
     public static function difference(iterable $a, iterable ...$iterables): \Generator
     {
-        yield from self::differenceInternal(true, $a, ...$iterables);
+        yield from self::differenceInternal(true, $a, ...\array_values($iterables));
     }
 
     /**
@@ -319,7 +319,7 @@ final class Set
      */
     public static function differenceCoercive(iterable $a, iterable ...$iterables): \Generator
     {
-        yield from self::differenceInternal(false, $a, ...$iterables);
+        yield from self::differenceInternal(false, $a, ...\array_values($iterables));
     }
 
     /**
@@ -336,7 +336,7 @@ final class Set
      */
     public static function symmetricDifference(iterable ...$iterables): \Generator
     {
-        yield from self::symmetricDifferenceInternal(true, ...$iterables);
+        yield from self::symmetricDifferenceInternal(true, ...\array_values($iterables));
     }
 
     /**
@@ -353,7 +353,7 @@ final class Set
      */
     public static function symmetricDifferenceCoercive(iterable ...$iterables): \Generator
     {
-        yield from self::symmetricDifferenceInternal(false, ...$iterables);
+        yield from self::symmetricDifferenceInternal(false, ...\array_values($iterables));
     }
 
     /**

@@ -1888,7 +1888,7 @@ final class Stream implements \IteratorAggregate
      */
     public function differenceWith(iterable ...$iterables): self
     {
-        $this->iterable = Set::difference($this->iterable, ...$iterables);
+        $this->iterable = Set::difference($this->iterable, ...\array_values($iterables));
         return $this;
     }
 
@@ -1906,7 +1906,7 @@ final class Stream implements \IteratorAggregate
      */
     public function differenceCoerciveWith(iterable ...$iterables): self
     {
-        $this->iterable = Set::differenceCoercive($this->iterable, ...$iterables);
+        $this->iterable = Set::differenceCoercive($this->iterable, ...\array_values($iterables));
         return $this;
     }
 

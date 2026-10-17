@@ -781,4 +781,19 @@ class ArePermutationsCoerciveTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
         $this->assertSame([false, false], $aliveWhileIterating);
     }
+
+    /**
+     * @test arePermutationsCoercive accepts named arguments that match its internal parameter names
+     */
+    public function testArePermutationsCoerciveAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Summary::arePermutationsCoercive(
+            strict: [1, 2, 3],
+            other: ['3', '2', '1'],
+        );
+
+        // Then
+        $this->assertTrue($result);
+    }
 }

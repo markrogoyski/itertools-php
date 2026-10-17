@@ -797,4 +797,20 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
             yield [&$slot];
         }
     }
+
+    /**
+     * @test intersection accepts named arguments that match its internal parameter names
+     */
+    public function testIntersectionAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = \iterator_to_array(Set::intersection(
+            strict: [1, 2, 3, 4],
+            filler: [2, 3, 4, 5],
+            minIntersectionCount: [3, 4, 5, 6],
+        ), false);
+
+        // Then
+        $this->assertSame([3, 4], $result);
+    }
 }

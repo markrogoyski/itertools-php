@@ -926,4 +926,20 @@ class IntersectionCoerciveTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEqualsCanonicalizing($expected, $result);
     }
+
+    /**
+     * @test intersectionCoercive accepts named arguments that match its internal parameter names
+     */
+    public function testIntersectionCoerciveAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = \iterator_to_array(Set::intersectionCoercive(
+            strict: [1, 2, 3, 4],
+            filler: ['2', '3', '4'],
+            minIntersectionCount: [3.0, 4],
+        ), false);
+
+        // Then
+        $this->assertSame([3, 4], $result);
+    }
 }

@@ -152,7 +152,7 @@ final class Multi
         yield from self::mergeSortedInternal(
             static fn (mixed $value): mixed => $value,
             'Multi::mergeSorted cannot order NAN',
-            ...$iterables,
+            ...\array_values($iterables),
         );
     }
 
@@ -171,7 +171,7 @@ final class Multi
         yield from self::mergeSortedInternal(
             $keyFunc,
             'Multi::mergeSortedBy key function returned NAN',
-            ...$iterables,
+            ...\array_values($iterables),
         );
     }
 

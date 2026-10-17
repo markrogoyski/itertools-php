@@ -445,7 +445,7 @@ final class Summary
      */
     public static function arePermutations(iterable ...$iterables): bool
     {
-        return self::arePermutationsInternal(true, ...$iterables);
+        return self::arePermutationsInternal(true, ...\array_values($iterables));
     }
 
     /**
@@ -463,7 +463,7 @@ final class Summary
      */
     public static function arePermutationsCoercive(iterable ...$iterables): bool
     {
-        return self::arePermutationsInternal(false, ...$iterables);
+        return self::arePermutationsInternal(false, ...\array_values($iterables));
     }
 
     /**

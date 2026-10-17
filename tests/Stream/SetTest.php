@@ -2090,4 +2090,160 @@ class SetTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test intersectionWith accepts named arguments that match its internal parameter names
+     */
+    public function testIntersectionWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3, 4])->intersectionWith(
+            strict: [2, 3, 4, 5],
+            filler: [3, 4, 5, 6],
+            minIntersectionCount: [3, 4],
+        )->toArray();
+
+        // Then
+        $this->assertSame([3, 4], $result);
+    }
+
+    /**
+     * @test intersectionCoerciveWith accepts named arguments that match its internal parameter names
+     */
+    public function testIntersectionCoerciveWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3, 4])->intersectionCoerciveWith(
+            strict: ['2', '3', '4'],
+            filler: [3.0, 4],
+            minIntersectionCount: [3, 4],
+        )->toArray();
+
+        // Then
+        $this->assertSame([3, 4], $result);
+    }
+
+    /**
+     * @test partialIntersectionWith accepts named arguments that match its internal parameter names
+     */
+    public function testPartialIntersectionWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3, 4])->partialIntersectionWith(
+            2,
+            strict: [2, 3, 5],
+            filler: [5],
+        )->toArray();
+
+        // Then
+        $this->assertSame([2, 3, 5], $result);
+    }
+
+    /**
+     * @test partialIntersectionCoerciveWith accepts named arguments that match its internal parameter names
+     */
+    public function testPartialIntersectionCoerciveWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3, 4])->partialIntersectionCoerciveWith(
+            2,
+            strict: ['2', '3', '5'],
+            filler: [5],
+        )->toArray();
+
+        // Then
+        $this->assertSame([2, 3, '5'], $result);
+    }
+
+    /**
+     * @test unionWith accepts named arguments that match its internal parameter names
+     */
+    public function testUnionWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3])->unionWith(
+            strict: [4, 5],
+            filler: [5, 6],
+            minIntersectionCount: [6, 7],
+        )->toArray();
+
+        // Then
+        $this->assertSame([1, 4, 5, 6, 2, 7, 3], $result);
+    }
+
+    /**
+     * @test unionCoerciveWith accepts named arguments that match its internal parameter names
+     */
+    public function testUnionCoerciveWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3])->unionCoerciveWith(
+            strict: ['4'],
+            filler: [5.0],
+            minIntersectionCount: [6],
+        )->toArray();
+
+        // Then
+        $this->assertSame([1, '4', 5.0, 6, 2, 3], $result);
+    }
+
+    /**
+     * @test differenceWith accepts named arguments that match its internal parameter names
+     */
+    public function testDifferenceWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3, 4])->differenceWith(
+            a: [2],
+            strict: [3],
+        )->toArray();
+
+        // Then
+        $this->assertSame([1, 4], $result);
+    }
+
+    /**
+     * @test differenceCoerciveWith accepts named arguments that match its internal parameter names
+     */
+    public function testDifferenceCoerciveWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3, 4])->differenceCoerciveWith(
+            a: ['2'],
+            strict: [3.0],
+        )->toArray();
+
+        // Then
+        $this->assertSame([1, 4], $result);
+    }
+
+    /**
+     * @test symmetricDifferenceWith accepts named arguments that match its internal parameter names
+     */
+    public function testSymmetricDifferenceWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3, 4])->symmetricDifferenceWith(
+            strict: [2, 3, 4, 5],
+            filler: [2, 3, 4],
+        )->toArray();
+
+        // Then
+        $this->assertSame([1, 5], $result);
+    }
+
+    /**
+     * @test symmetricDifferenceCoerciveWith accepts named arguments that match its internal parameter names
+     */
+    public function testSymmetricDifferenceCoerciveWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3, 4])->symmetricDifferenceCoerciveWith(
+            strict: ['2', '3', '4', '5'],
+            filler: [2.0, 3, 4],
+        )->toArray();
+
+        // Then
+        $this->assertSame([1, '5'], $result);
+    }
 }

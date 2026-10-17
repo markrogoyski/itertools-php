@@ -19,6 +19,7 @@
 * Multi: `roundRobin` (and `Stream::roundRobinWith`) rewound every source up front and advanced each source right after yielding from it, so taking N outputs read more than N values; it is now lazy and pulls exactly the values it yields.
 * Reduce: `toMedian` (and `Stream::toMedian`, and `toPercentile` at 50 / `toQuantile` at 0.5) returned `NAN` when the two middle values were `-INF` and a finite negative number; it now returns `-INF`.
 * Single: `groupBy` (and `Stream::groupBy`) added an item to the same group more than once when its group names were distinct values that PHP converts to the same array key, such as `2020` and `'2020'`, or `1` and `true`.
+* Set, Multi, Summary: the set operations, `mergeSorted`, `mergeSortedBy`, `arePermutations` and `arePermutationsCoercive` (and their Stream wrappers, including `differenceWith` and `differenceCoerciveWith`) threw "Named parameter … overwrites previous argument" when an iterable was passed by a name such as `strict`, `filler`, `minIntersectionCount`, `keyFunc`, `nanMessage` or `a`, because the name collided with an internal parameter.
 
 ### Changes
 * Transform: `tee` no longer reads the source when it is called; the first element is read when a copy is first used.

@@ -1235,4 +1235,20 @@ class PartialIntersectionTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame([], $ids);
     }
+
+    /**
+     * @test partialIntersection accepts named arguments that match its internal parameter names
+     */
+    public function testPartialIntersectionAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = \iterator_to_array(Set::partialIntersection(
+            2,
+            strict: [1, 2, 3],
+            filler: [2, 3, 4],
+        ), false);
+
+        // Then
+        $this->assertSame([2, 3], $result);
+    }
 }

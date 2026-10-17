@@ -690,4 +690,20 @@ class UnionTest extends \PHPUnit\Framework\TestCase
             yield [&$slot];
         }
     }
+
+    /**
+     * @test union accepts named arguments that match its internal parameter names
+     */
+    public function testUnionAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = \iterator_to_array(Set::union(
+            strict: [1, 2],
+            filler: [2, 3],
+            minIntersectionCount: [3, 4],
+        ), false);
+
+        // Then
+        $this->assertSame([1, 2, 3, 4], $result);
+    }
 }

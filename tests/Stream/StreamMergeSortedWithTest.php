@@ -62,4 +62,19 @@ class StreamMergeSortedWithTest extends \PHPUnit\Framework\TestCase
         // Then: equal under <=>, current stream's int must still precede the other source's float
         $this->assertSame(['integer', 'double'], \array_map('\gettype', $result));
     }
+
+    /**
+     * @test mergeSortedWith accepts named arguments that match its internal parameter names
+     */
+    public function testMergeSortedWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 4])->mergeSortedWith(
+            keyFunc: [2, 5],
+            nanMessage: [3, 6],
+        )->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3, 4, 5, 6], $result);
+    }
 }

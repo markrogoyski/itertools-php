@@ -922,4 +922,19 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEqualsCanonicalizing([[2], [3], [9]], $result);
     }
+
+    /**
+     * @test symmetricDifferenceCoercive accepts named arguments that match its internal parameter names
+     */
+    public function testSymmetricDifferenceCoerciveAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = \iterator_to_array(Set::symmetricDifferenceCoercive(
+            strict: [1, 2, 3],
+            filler: ['2', '3', '4'],
+        ), false);
+
+        // Then
+        $this->assertSame([1, '4'], $result);
+    }
 }

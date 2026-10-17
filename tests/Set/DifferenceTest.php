@@ -608,4 +608,20 @@ class DifferenceTest extends \PHPUnit\Framework\TestCase
             yield [&$slot];
         }
     }
+
+    /**
+     * @test difference accepts named arguments that match its internal parameter names
+     */
+    public function testDifferenceAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = \iterator_to_array(Set::difference(
+            [1, 2, 3, 4],
+            strict: [2],
+            other: [3],
+        ), false);
+
+        // Then
+        $this->assertSame([1, 4], $result);
+    }
 }

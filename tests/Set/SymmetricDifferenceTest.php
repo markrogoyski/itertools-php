@@ -753,4 +753,19 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEqualsCanonicalizing([[2], [3], [9]], $result);
     }
+
+    /**
+     * @test symmetricDifference accepts named arguments that match its internal parameter names
+     */
+    public function testSymmetricDifferenceAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = \iterator_to_array(Set::symmetricDifference(
+            strict: [1, 2, 3],
+            filler: [2, 3, 4],
+        ), false);
+
+        // Then
+        $this->assertSame([1, 4], $result);
+    }
 }

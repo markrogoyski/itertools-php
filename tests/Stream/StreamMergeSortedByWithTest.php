@@ -64,4 +64,19 @@ class StreamMergeSortedByWithTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame(['a', 'b'], \array_map(static fn (object $item): string => $item->id, $result));
     }
+
+    /**
+     * @test mergeSortedByWith accepts named arguments that match its internal parameter names
+     */
+    public function testMergeSortedByWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 4])->mergeSortedByWith(
+            static fn (int $value): int => $value,
+            nanMessage: [2, 3],
+        )->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 3, 4], $result);
+    }
 }

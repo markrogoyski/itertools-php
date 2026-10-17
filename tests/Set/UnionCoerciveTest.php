@@ -682,4 +682,20 @@ class UnionCoerciveTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(3, $count);
         $this->assertSame([false, false], $aliveWhileIterating);
     }
+
+    /**
+     * @test unionCoercive accepts named arguments that match its internal parameter names
+     */
+    public function testUnionCoerciveAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = \iterator_to_array(Set::unionCoercive(
+            strict: [1, 2],
+            filler: ['2', '3'],
+            minIntersectionCount: [3.0, 4],
+        ), false);
+
+        // Then
+        $this->assertSame([1, '2', 3.0, 4], $result);
+    }
 }

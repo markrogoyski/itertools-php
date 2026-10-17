@@ -2048,4 +2048,32 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test arePermutationsWith accepts named arguments that match its internal parameter names
+     */
+    public function testArePermutationsWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3])->arePermutationsWith(
+            strict: [3, 2, 1],
+        );
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test arePermutationsCoerciveWith accepts named arguments that match its internal parameter names
+     */
+    public function testArePermutationsCoerciveWithAcceptsNamedArgumentsMatchingInternalParameterNames(): void
+    {
+        // When
+        $result = Stream::of([1, 2, 3])->arePermutationsCoerciveWith(
+            strict: ['3', '2', '1'],
+        );
+
+        // Then
+        $this->assertTrue($result);
+    }
 }
