@@ -234,33 +234,42 @@ final class Multi
      *
      * Keys from the source iterables are discarded; the output is sequentially re-indexed.
      *
+     * Lazy: no source is converted, rewound or read until its first turn comes, and a source is
+     * advanced only when its next turn comes. Stopping after a yielded value therefore pulls no
+     * further value from any source and starts no source whose turn has not come, so a
+     * side-effecting source (file handle, HTTP pagination, database cursor) is not over-read.
+     *
+     * Each source is rewound on its first turn: an iterator that was already advanced restarts
+     * from its first element, and a generator that was already started throws at that point,
+     * after the values of earlier sources have been yielded. Pass each source once; passing the
+     * same iterator or generator more than once interleaves reads of one cursor and gives
+     * unspecified results.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return \Generator<mixed>
      */
     public static function roundRobin(iterable ...$iterables): \Generator
     {
+        // A source is converted and rewound on its first turn and advanced on every later one;
+        // $iterators holds only the sources that have started.
         $iterators = [];
-        foreach ($iterables as $iterable) {
-            $iterator = Transform::toIterator($iterable);
-            $iterator->rewind();
-            if ($iterator->valid()) {
-                $iterators[] = $iterator;
-            }
-        }
-
-        while (\count($iterators) > 0) {
-            $stillActive = [];
-            foreach ($iterators as $iterator) {
-                /** @var mixed $value */
-                $value = $iterator->current();
-                yield $value;
-                $iterator->next();
-                if ($iterator->valid()) {
-                    $stillActive[] = $iterator;
+        while (\count($iterables) > 0) {
+            foreach ($iterables as $index => $iterable) {
+                if (isset($iterators[$index])) {
+                    $iterator = $iterators[$index];
+                    $iterator->next();
+                } else {
+                    $iterator = Transform::toIterator($iterable);
+                    $iterator->rewind();
+                    $iterators[$index] = $iterator;
                 }
+                if (!$iterator->valid()) {
+                    unset($iterables[$index], $iterators[$index]);
+                    continue;
+                }
+                yield $iterator->current();
             }
-            $iterators = $stillActive;
         }
     }
 

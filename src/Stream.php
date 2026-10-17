@@ -1142,6 +1142,16 @@ final class Stream implements \IteratorAggregate
      *
      * Keys from the source iterables are discarded; the output is sequentially re-indexed.
      *
+     * Lazy: no source is converted, rewound or read until its first turn comes, and a source is
+     * advanced only when its next turn comes. Stopping after a yielded value therefore pulls no
+     * further value from any source and starts no source whose turn has not come.
+     *
+     * Each source is rewound on its first turn: an iterator that was already advanced restarts
+     * from its first element, and a generator that was already started throws at that point,
+     * after the values of earlier sources have been yielded. Pass each source once; passing the
+     * same iterator or generator more than once interleaves reads of one cursor and gives
+     * unspecified results.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return Stream
@@ -2483,6 +2493,8 @@ final class Stream implements \IteratorAggregate
      *
      * Empty prefix → true without consuming the stream.
      *
+     * Lazy: the stream is never advanced beyond the last element compared.
+     *
      * @param iterable<mixed> $prefix
      *
      * @return bool
@@ -2500,6 +2512,8 @@ final class Stream implements \IteratorAggregate
      * Compares values pairwise; keys are ignored.
      *
      * Empty prefix → true without consuming the stream.
+     *
+     * Lazy: the stream is never advanced beyond the last element compared.
      *
      * @param iterable<mixed> $prefix
      *

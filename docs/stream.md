@@ -1198,6 +1198,15 @@ exhausted, it is skipped in subsequent rounds. Iteration ends when every iterabl
 Unlike `zipWith`, values are yielded individually rather than as tuples. Source keys are discarded;
 the output is sequentially re-indexed.
 
+Lazy: no source is converted, rewound or read until its first turn comes, and a source is advanced
+only when its next turn comes. Stopping after a yielded value therefore pulls no further value from
+any source and starts no source whose turn has not come.
+
+Each source is rewound on its first turn: an iterator that was already advanced restarts from its
+first element, and a generator that was already started throws at that point, after the values of
+earlier sources have been yielded. Pass each source once; passing the same iterator or generator
+more than once interleaves reads of one cursor and gives unspecified results.
+
 ```php
 use IterTools\Stream;
 
@@ -2658,6 +2667,7 @@ Returns true if the stream starts with the given prefix using [strict-type compa
 
 - Compares values pairwise; keys are ignored.
 - Empty prefix returns true without consuming the stream.
+- Lazy: the stream is never advanced beyond the last element compared.
 
 ```$stream->startsWith(iterable $prefix): bool```
 
@@ -2678,6 +2688,7 @@ Returns true if the stream starts with the given prefix using [type coercion](..
 
 - Compares values pairwise; keys are ignored.
 - Empty prefix returns true without consuming the stream.
+- Lazy: the stream is never advanced beyond the last element compared.
 - Equality follows the [coercive rules](../README.md#strict-and-coercive-types).
 - Throws `\InvalidArgumentException` if a non-serializable object is reached during comparison.
 

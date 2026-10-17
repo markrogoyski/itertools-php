@@ -6,9 +6,12 @@ namespace IterTools\Tests\Stream;
 
 use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
+use IterTools\Tests\Fixture\CountingIteratorAggregateFixture;
 use IterTools\Tests\Fixture\DataProvider;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Tests\Fixture\RecordingIteratorAggregateFixture;
+use IterTools\Tests\Fixture\RecordingIteratorFixture;
 
 class StreamRoundRobinWithTest extends \PHPUnit\Framework\TestCase
 {
@@ -133,5 +136,126 @@ class StreamRoundRobinWithTest extends \PHPUnit\Framework\TestCase
         // Then
         // filter -> [1, 3, 5]; roundRobin with [10, 20] -> [1, 10, 3, 20, 5]; *10 -> [10, 100, 30, 200, 50]
         $this->assertSame([10, 100, 30, 200, 50], $result);
+    }
+
+    /**
+     * @test Stream::roundRobinWith - limiting the stream pulls only the values yielded from generator sources
+     */
+    public function testDoesNotPullPastTheLastYieldedValueGenerator(): void
+    {
+        // Given sources that record every value pulled from them
+        $pulled = [];
+        $a = GeneratorFixture::getRecordingGenerator(['a1', 'a2'], $pulled);
+        $b = GeneratorFixture::getRecordingGenerator(['b1', 'b2'], $pulled);
+
+        // When
+        $result = Stream::of($a)
+            ->roundRobinWith($b)
+            ->limit(2)
+            ->toArray();
+
+        // Then
+        $this->assertSame(['a1', 'b1'], $result);
+        $this->assertSame(['a1', 'b1'], $pulled);
+    }
+
+    /**
+     * @test Stream::roundRobinWith - limiting the stream pulls only the values yielded from iterator sources
+     */
+    public function testDoesNotPullPastTheLastYieldedValueIterator(): void
+    {
+        // Given sources that record every value pulled from them
+        $pulled = [];
+        $a = new RecordingIteratorFixture(['a1', 'a2'], $pulled);
+        $b = new RecordingIteratorFixture(['b1', 'b2'], $pulled);
+
+        // When
+        $result = Stream::of($a)
+            ->roundRobinWith($b)
+            ->limit(2)
+            ->toArray();
+
+        // Then
+        $this->assertSame(['a1', 'b1'], $result);
+        $this->assertSame(['a1', 'b1'], $pulled);
+    }
+
+    /**
+     * @test Stream::roundRobinWith - limiting the stream pulls only the values yielded from IteratorAggregate sources
+     */
+    public function testDoesNotPullPastTheLastYieldedValueIteratorAggregate(): void
+    {
+        // Given sources that record every value pulled from them
+        $pulled = [];
+        $a = new RecordingIteratorAggregateFixture(['a1', 'a2'], $pulled);
+        $b = new RecordingIteratorAggregateFixture(['b1', 'b2'], $pulled);
+
+        // When
+        $result = Stream::of($a)
+            ->roundRobinWith($b)
+            ->limit(2)
+            ->toArray();
+
+        // Then
+        $this->assertSame(['a1', 'b1'], $result);
+        $this->assertSame(['a1', 'b1'], $pulled);
+    }
+
+    /**
+     * @test Stream::roundRobinWith - an iterator source keeps its position until its first turn
+     */
+    public function testDoesNotRewindASourceBeforeItsTurnIterator(): void
+    {
+        // Given a second source already advanced past its first value
+        $iterator = new ArrayIteratorFixture([10, 20]);
+        $iterator->next();
+
+        // When
+        $result = Stream::of([1, 2])
+            ->roundRobinWith($iterator)
+            ->limit(1)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1], $result);
+        $this->assertSame(1, $iterator->key());
+        $this->assertSame(20, $iterator->current());
+    }
+
+    /**
+     * @test Stream::roundRobinWith - an IteratorAggregate source's getIterator is not called until its first turn
+     */
+    public function testDoesNotRewindASourceBeforeItsTurnIteratorAggregate(): void
+    {
+        // Given a second source that counts calls to getIterator
+        $aggregate = new CountingIteratorAggregateFixture([10, 20]);
+
+        // When
+        $result = Stream::of([1, 2])
+            ->roundRobinWith($aggregate)
+            ->limit(1)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1], $result);
+        $this->assertSame(0, $aggregate->getIteratorCallCount());
+    }
+
+    /**
+     * @test Stream::roundRobinWith - an advanced iterator source is rewound at its first turn
+     */
+    public function testRewindsASourceAtItsFirstTurnIterator(): void
+    {
+        // Given a second source already advanced past its first value
+        $iterator = new ArrayIteratorFixture([10, 20]);
+        $iterator->next();
+
+        // When
+        $result = Stream::of([1, 2])
+            ->roundRobinWith($iterator)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1, 10, 2, 20], $result);
     }
 }

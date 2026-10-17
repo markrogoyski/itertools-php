@@ -15,9 +15,12 @@
 * Transform: if the source threw from `current()` after `key()`, `tee` could pair a key with another element's value.
 * Infinite: `cycle` (and `Stream::infiniteCycle`) threw on the second pass for one-pass sources other than a bare generator: an `\IteratorIterator` around a generator, nested `\IteratorAggregate`s, advanced `tee` copies, memoized streams. It also dropped the first row of a `\PDOStatement`. Every non-array source is now read once and replayed from a cache.
 * Summary: `same`, `arePermutations` and `arePermutationsCoercive` (and their Stream wrappers) returned `false` when a source threw `\LengthException`; the exception now propagates. Inputs of different lengths still return `false`.
+* Summary: `startsWith` and `startsWithCoercive` (and the Stream wrappers) advanced the source one element past the prefix, which could throw or consume a line the caller still needed; they now stop at the last element compared.
+* Multi: `roundRobin` (and `Stream::roundRobinWith`) rewound every source up front and advanced each source right after yielding from it, so taking N outputs read more than N values; it is now lazy and pulls exactly the values it yields.
 
 ### Changes
 * Transform: `tee` no longer reads the source when it is called; the first element is read when a copy is first used.
+* Multi: `roundRobin` (and `Stream::roundRobinWith`) no longer rewinds every source before yielding. A source that cannot be rewound, such as a generator that was already started, now throws when its first turn comes, after the values of earlier sources have been yielded, instead of before any output.
 * Infinite: `cycle` (and `Stream::infiniteCycle`) no longer reads a generator in full when it is called; the first pass reads the source lazily, one element at a time. Generator keys are now preserved instead of renumbered from 0, as for arrays and iterators. A non-array source is read only once, so changes made to a rewindable source after its first pass are not seen.
 * Transform: a `tee` copy can be rewound repeatedly while it has not advanced, so `isEmpty()` followed by iteration works after `peekStream`, `peekPrint` and `peekPrintR`. A copy that has advanced can no longer be rewound: `rewind()` throws `\LogicException` instead of silently continuing from the current position, as a generator does. A cloned copy is an independent branch that continues from the position of the original.
 

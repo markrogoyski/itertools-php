@@ -15,6 +15,22 @@ class GeneratorFixture
         }
     }
 
+    /**
+     * Yield each value, appending it to $pulled as the generator advances onto it.
+     *
+     * Several generators may share one $pulled log to record the order values were pulled across sources.
+     *
+     * @param array $values
+     * @param array $pulled
+     */
+    public static function getRecordingGenerator(array $values, array &$pulled): \Generator
+    {
+        foreach ($values as $value) {
+            $pulled[] = $value;
+            yield $value;
+        }
+    }
+
     public static function getKeyValueGenerator(array $values): \Generator
     {
         foreach ($values as $key => $value) {

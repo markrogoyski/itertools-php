@@ -438,6 +438,7 @@ Returns true if the iterable starts with the given prefix (using strict-type com
 
 - Compares values pairwise; keys are ignored.
 - Empty prefix returns true without consuming the source.
+- Lazy: the source is never advanced beyond the last element compared, so a side-effecting source (file handle, HTTP pagination, database cursor) is not over-read. On a match the source is left on the last prefix element; on a mismatch, on the mismatching element; if it is shorter than the prefix, exhausted.
 
 ```Summary::startsWith(iterable $data, iterable $prefix): bool```
 
@@ -461,6 +462,7 @@ Returns true if the iterable starts with the given prefix using [type coercion](
 
 - Compares values pairwise; keys are ignored.
 - Empty prefix returns true without consuming the source.
+- Lazy: the source is never advanced beyond the last element compared, so a side-effecting source (file handle, HTTP pagination, database cursor) is not over-read. On a match the source is left on the last prefix element; on a mismatch, on the mismatching element; if it is shorter than the prefix, exhausted.
 
 ```Summary::startsWithCoercive(iterable $data, iterable $prefix): bool```
 

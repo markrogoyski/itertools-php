@@ -316,4 +316,203 @@ class StartsWithCoerciveTest extends \PHPUnit\Framework\TestCase
         // When
         Summary::startsWithCoercive($data, $prefix);
     }
+
+    /**
+     * @test         startsWithCoercive - never advances a generator source past the last element compared
+     * @dataProvider dataProviderForNoOverRead
+     * @param        array<mixed> $prefix
+     * @param        bool         $expected
+     * @param        array<mixed> $expectedPulled
+     */
+    public function testDoesNotAdvancePastLastComparedElementGenerator(
+        array $prefix,
+        bool $expected,
+        array $expectedPulled
+    ): void {
+        // Given a source that records every element pulled from it
+        $pulled = [];
+        $data = Fixture\GeneratorFixture::getRecordingGenerator([1, 2, 3, 4, 5], $pulled);
+
+        // When
+        $result = Summary::startsWithCoercive($data, $prefix);
+
+        // Then
+        $this->assertSame($expected, $result);
+
+        // And the source was never advanced beyond the last element compared
+        $this->assertSame($expectedPulled, $pulled);
+    }
+
+    /**
+     * @test         startsWithCoercive - never advances an iterator source past the last element compared
+     * @dataProvider dataProviderForNoOverRead
+     * @param        array<mixed> $prefix
+     * @param        bool         $expected
+     * @param        array<mixed> $expectedPulled
+     */
+    public function testDoesNotAdvancePastLastComparedElementIterator(
+        array $prefix,
+        bool $expected,
+        array $expectedPulled
+    ): void {
+        // Given a source that records every element pulled from it
+        $pulled = [];
+        $data = new Fixture\RecordingIteratorFixture([1, 2, 3, 4, 5], $pulled);
+
+        // When
+        $result = Summary::startsWithCoercive($data, $prefix);
+
+        // Then
+        $this->assertSame($expected, $result);
+
+        // And the source was never advanced beyond the last element compared
+        $this->assertSame($expectedPulled, $pulled);
+    }
+
+    /**
+     * @test         startsWithCoercive - never advances an IteratorAggregate source past the last element compared
+     * @dataProvider dataProviderForNoOverRead
+     * @param        array<mixed> $prefix
+     * @param        bool         $expected
+     * @param        array<mixed> $expectedPulled
+     */
+    public function testDoesNotAdvancePastLastComparedElementIteratorAggregate(
+        array $prefix,
+        bool $expected,
+        array $expectedPulled
+    ): void {
+        // Given a source that records every element pulled from it
+        $pulled = [];
+        $data = new Fixture\RecordingIteratorAggregateFixture([1, 2, 3, 4, 5], $pulled);
+
+        // When
+        $result = Summary::startsWithCoercive($data, $prefix);
+
+        // Then
+        $this->assertSame($expected, $result);
+
+        // And the source was never advanced beyond the last element compared
+        $this->assertSame($expectedPulled, $pulled);
+    }
+
+    public static function dataProviderForNoOverRead(): array
+    {
+        return [
+            // full match: stops at the last prefix element
+            [[1], true, [1]],
+            [[1, 2], true, [1, 2]],
+            [[1, 2, 3, 4], true, [1, 2, 3, 4]],
+            [[1, 2, 3, 4, 5], true, [1, 2, 3, 4, 5]],
+            // mismatch: stops at the mismatching element
+            [[9], false, [1]],
+            [[1, 9], false, [1, 2]],
+            [[1, 2, 3, 9], false, [1, 2, 3, 4]],
+            // source shorter than prefix
+            [[1, 2, 3, 4, 5, 6], false, [1, 2, 3, 4, 5]],
+        ];
+    }
+
+    /**
+     * @test startsWithCoercive - a generator that throws after yielding the prefix still matches
+     */
+    public function testMatchesWhenSourceThrowsAfterPrefixGenerator(): void
+    {
+        // Given
+        $data = (static function (): \Generator {
+            yield 1;
+            yield 2;
+            throw new \LogicException('Source advanced past the prefix');
+        })();
+
+        // When
+        $result = Summary::startsWithCoercive($data, [1, 2]);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test         startsWithCoercive - leaves a generator source positioned on the last element compared
+     * @dataProvider dataProviderForSourcePosition
+     * @param        array<mixed> $prefix
+     * @param        bool         $expected
+     * @param        int          $expectedKey
+     */
+    public function testLeavesSourceOnLastComparedElementGenerator(array $prefix, bool $expected, int $expectedKey): void
+    {
+        // Given
+        $data = Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4, 5]);
+
+        // When
+        $result = Summary::startsWithCoercive($data, $prefix);
+
+        // Then
+        $this->assertSame($expected, $result);
+        $this->assertSame($expectedKey, $data->key());
+    }
+
+    /**
+     * @test         startsWithCoercive - leaves an iterator source positioned on the last element compared
+     * @dataProvider dataProviderForSourcePosition
+     * @param        array<mixed> $prefix
+     * @param        bool         $expected
+     * @param        int          $expectedKey
+     */
+    public function testLeavesSourceOnLastComparedElementIterator(array $prefix, bool $expected, int $expectedKey): void
+    {
+        // Given
+        $data = new Fixture\ArrayIteratorFixture([1, 2, 3, 4, 5]);
+
+        // When
+        $result = Summary::startsWithCoercive($data, $prefix);
+
+        // Then
+        $this->assertSame($expected, $result);
+        $this->assertSame($expectedKey, $data->key());
+    }
+
+    public static function dataProviderForSourcePosition(): array
+    {
+        return [
+            // full match: on the last prefix element
+            [[1], true, 0],
+            [[1, 2], true, 1],
+            [[1, 2, 3, 4, 5], true, 4],
+            // mismatch: on the mismatching element
+            [[9], false, 0],
+            [[1, 2, 9], false, 2],
+        ];
+    }
+
+    /**
+     * @test startsWithCoercive - leaves a generator source exhausted when it is shorter than the prefix
+     */
+    public function testLeavesSourceExhaustedWhenShorterThanPrefixGenerator(): void
+    {
+        // Given
+        $data = Fixture\GeneratorFixture::getGenerator([1, 2]);
+
+        // When
+        $result = Summary::startsWithCoercive($data, [1, 2, 3]);
+
+        // Then
+        $this->assertFalse($result);
+        $this->assertFalse($data->valid());
+    }
+
+    /**
+     * @test startsWithCoercive - leaves an iterator source exhausted when it is shorter than the prefix
+     */
+    public function testLeavesSourceExhaustedWhenShorterThanPrefixIterator(): void
+    {
+        // Given
+        $data = new Fixture\ArrayIteratorFixture([1, 2]);
+
+        // When
+        $result = Summary::startsWithCoercive($data, [1, 2, 3]);
+
+        // Then
+        $this->assertFalse($result);
+        $this->assertFalse($data->valid());
+    }
 }

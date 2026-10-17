@@ -32,6 +32,16 @@ exhausted, it is skipped in subsequent rounds. Iteration ends when every iterabl
 Unlike `zip`, values are yielded individually rather than as tuples. Source keys are discarded;
 the output is sequentially re-indexed.
 
+Lazy: no source is converted, rewound or read until its first turn comes, and a source is advanced
+only when its next turn comes. Stopping after a yielded value therefore pulls no further value from
+any source and starts no source whose turn has not come, so a side-effecting source (file handle,
+HTTP pagination, database cursor) is not over-read.
+
+Each source is rewound on its first turn: an iterator that was already advanced restarts from its
+first element, and a generator that was already started throws at that point, after the values of
+earlier sources have been yielded. Pass each source once; passing the same iterator or generator
+more than once interleaves reads of one cursor and gives unspecified results.
+
 ```php
 use IterTools\Multi;
 

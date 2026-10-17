@@ -532,6 +532,11 @@ final class Summary
      *
      * Empty prefix → true without consuming the source.
      *
+     * Lazy: the source is never advanced beyond the last element compared. On a match it is
+     * left on the last prefix element; on a mismatch, on the mismatching element; if it is
+     * shorter than the prefix, exhausted. A side-effecting source (file handle, HTTP
+     * pagination, DB cursor) is not over-read.
+     *
      * Strict-type comparison uses ===; see README "Strict and Coercive Types".
      *
      * @param iterable<mixed> $data
@@ -550,6 +555,11 @@ final class Summary
      * Compares values pairwise; keys are ignored.
      *
      * Empty prefix → true without consuming the source.
+     *
+     * Lazy: the source is never advanced beyond the last element compared. On a match it is
+     * left on the last prefix element; on a mismatch, on the mismatching element; if it is
+     * shorter than the prefix, exhausted. A side-effecting source (file handle, HTTP
+     * pagination, DB cursor) is not over-read.
      *
      * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
@@ -627,6 +637,10 @@ final class Summary
                 if (!($dataIt instanceof \Generator)) {
                     $dataIt->rewind();
                 }
+            } else {
+                // Advance only when another prefix element needs comparing, so the source is
+                // never pulled past the last element compared.
+                $dataIt->next();
             }
             if (!$dataIt->valid()) {
                 return false;
@@ -635,7 +649,6 @@ final class Summary
             if (!self::valuesEqual($actual, $expected, $strict)) {
                 return false;
             }
-            $dataIt->next();
         }
 
         return true;

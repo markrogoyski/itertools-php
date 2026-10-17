@@ -8,6 +8,8 @@ use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Tests\Fixture\RecordingIteratorAggregateFixture;
+use IterTools\Tests\Fixture\RecordingIteratorFixture;
 
 class StreamSummaryTier3Test extends \PHPUnit\Framework\TestCase
 {
@@ -337,5 +339,111 @@ class StreamSummaryTier3Test extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertFalse($strict);
         $this->assertTrue($coercive);
+    }
+
+    /**
+     * @test startsWith - does not advance a generator stream past the matched prefix
+     */
+    public function testStartsWithDoesNotAdvancePastPrefixGenerator(): void
+    {
+        // Given
+        $data = (static function (): \Generator {
+            yield 1;
+            yield 2;
+            throw new \LogicException('Stream advanced past the prefix');
+        })();
+
+        // When
+        $result = Stream::of($data)->startsWith([1, 2]);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWith - does not advance an iterator stream past the matched prefix
+     */
+    public function testStartsWithDoesNotAdvancePastPrefixIterator(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Stream::of($data)->startsWith([1, 2]);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([1, 2], $pulled);
+    }
+
+    /**
+     * @test startsWith - does not advance an IteratorAggregate stream past the matched prefix
+     */
+    public function testStartsWithDoesNotAdvancePastPrefixIteratorAggregate(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new RecordingIteratorAggregateFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Stream::of($data)->startsWith([1, 2]);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([1, 2], $pulled);
+    }
+
+    /**
+     * @test startsWithCoercive - does not advance a generator stream past the matched prefix
+     */
+    public function testStartsWithCoerciveDoesNotAdvancePastPrefixGenerator(): void
+    {
+        // Given
+        $data = (static function (): \Generator {
+            yield 1;
+            yield 2;
+            throw new \LogicException('Stream advanced past the prefix');
+        })();
+
+        // When
+        $result = Stream::of($data)->startsWithCoercive(['1', '2']);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWithCoercive - does not advance an iterator stream past the matched prefix
+     */
+    public function testStartsWithCoerciveDoesNotAdvancePastPrefixIterator(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Stream::of($data)->startsWithCoercive(['1', '2']);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([1, 2], $pulled);
+    }
+
+    /**
+     * @test startsWithCoercive - does not advance an IteratorAggregate stream past the matched prefix
+     */
+    public function testStartsWithCoerciveDoesNotAdvancePastPrefixIteratorAggregate(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new RecordingIteratorAggregateFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Stream::of($data)->startsWithCoercive(['1', '2']);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([1, 2], $pulled);
     }
 }
