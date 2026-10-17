@@ -529,7 +529,7 @@ $letters = 'ABCDEFGHI';
 $numbers = '123456789';
 
 foreach (Multi::zip(Single::string($letters), Single::string($numbers)) as [$letter, $number]) {
-     $battleshipMove = new BattleshipMove($letter, $number)
+     $battleshipMove = new BattleshipMove($letter, $number);
 }
 // A1, B2, C3
 ```

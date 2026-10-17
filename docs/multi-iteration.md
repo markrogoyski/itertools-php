@@ -57,6 +57,8 @@ foreach (Multi::roundRobin($queueA, $queueB, $queueC) as $item) {
 
 Round-robin scheduling across worker queues fairly drains tasks from every worker until all are empty:
 ```php
+use IterTools\Multi;
+
 $workerOne   = ['task-1', 'task-4', 'task-7'];
 $workerTwo   = ['task-2', 'task-5'];
 $workerThree = ['task-3', 'task-6', 'task-8', 'task-9'];
@@ -89,6 +91,8 @@ foreach (Multi::zip($languages, $mascots) as [$language, $mascot]) {
 
 Zip works with multiple iterable inputs--not limited to just two.
 ```php
+use IterTools\Multi;
+
 $names          = ['Ryu', 'Ken', 'Chun Li', 'Guile'];
 $countries      = ['Japan', 'USA', 'China', 'USA'];
 $signatureMoves = ['hadouken', 'shoryuken', 'spinning bird kick', 'sonic boom'];
@@ -187,6 +191,8 @@ foreach (Multi::unzip($pairs) as $column) {
 Splitting `(timestamp, value)` event tuples into two parallel series — useful when downstream
 code expects timestamps and values as separate arrays:
 ```php
+use IterTools\Multi;
+
 $events = [
     [1700000000, 12.5],
     [1700000060, 13.1],
@@ -220,6 +226,8 @@ foreach (Multi::mergeSorted($morningTemps, $afternoonTemps) as $temp) {
 **Precondition:** every source must already be sorted in non-decreasing order. `mergeSorted` does not validate this — passing unsorted input silently produces incorrectly ordered output instead of throwing:
 
 ```php
+use IterTools\Multi;
+
 // Unsorted input is not validated; the result is not meaningfully sorted
 foreach (Multi::mergeSorted([3, 1, 2], [0]) as $value) {
     // 0, 3, 1, 2 -- sort each source before merging
@@ -229,6 +237,7 @@ foreach (Multi::mergeSorted([3, 1, 2], [0]) as $value) {
 Merging infinite sorted sources — take only as many values as needed:
 ```php
 use IterTools\Infinite;
+use IterTools\Multi;
 use IterTools\Single;
 
 $evens = Infinite::count(0, 2);

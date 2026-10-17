@@ -32,7 +32,7 @@ $numbers = [1, 2, 3, 4, 5, 6];
 use IterTools\Transform;
 $daysOfWeek = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
 $count = 3;
-[$week1, $week2, $week3] = Transform::tee($data, $count);
+[$week1, $week2, $week3] = Transform::tee($daysOfWeek, $count);
 // Каждый $week — итератор, содержащий ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
 ```
 

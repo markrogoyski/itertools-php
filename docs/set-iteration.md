@@ -16,7 +16,7 @@ Defaults to [strict type](../README.md#strict-and-coercive-types) comparisons. S
 ```php
 use IterTools\Set;
 
-$chessSet = ['rook', 'rook', 'knight', 'knight', 'bishop', 'bishop', 'king', 'queen', 'pawn', 'pawn', ... ];
+$chessSet = ['rook', 'rook', 'knight', 'knight', 'bishop', 'bishop', 'king', 'queen', 'pawn', 'pawn'];
 
 foreach (Set::distinct($chessSet) as $chessPiece) {
     print($chessPiece);
@@ -148,7 +148,7 @@ If input iterables produce duplicate items, then [multiset](https://en.wikipedia
 use IterTools\Set;
 
 $chessPieces = ['rook', 'knight', 'bishop', 'queen', 'king', 'pawn'];
-$shogiPieces = ['rook', 'knight', 'bishop' 'king', 'pawn', 'lance', 'gold general', 'silver general'];
+$shogiPieces = ['rook', 'knight', 'bishop', 'king', 'pawn', 'lance', 'gold general', 'silver general'];
 
 foreach (Set::intersection($chessPieces, $shogiPieces) as $commonPiece) {
     print($commonPiece);
@@ -192,7 +192,7 @@ $supportsInterfaces = ['php', 'java', 'c#', 'typescript'];
 foreach (Set::partialIntersection(2, $staticallyTyped, $dynamicallyTyped, $supportsInterfaces) as $language) {
     print($language);
 }
-// c++, java, c#, go, php
+// php, java, c#, typescript
 ```
 
 ### Partial Intersection Coercive
@@ -205,9 +205,9 @@ Iterates [M-partial intersection](https://github.com/Smoren/partial-intersection
 ```php
 use IterTools\Set;
 
-$set1 = [1, 2, 3],
-$set2 = ['2', '3', 4, 5],
-$set3 = [1, '2'],
+$set1 = [1, 2, 3];
+$set2 = ['2', '3', 4, 5];
+$set3 = [1, '2'];
 
 foreach (Set::partialIntersectionCoercive(2, $set1, $set2, $set3) as $partiallyCommonNumber) {
     print($partiallyCommonNumber);
@@ -311,7 +311,7 @@ $c = [1, 2, 3, 6, 7];
 foreach (Set::union($a, $b, $c) as $item) {
     print($item);
 }
-//1, 2, 3, 4, 6, 7
+// 1, 3, 2, 4, 6, 7
 ```
 
 ### Union Coercive
@@ -331,7 +331,7 @@ $c = [1, 2, 3, 6, 7];
 foreach (Set::unionCoercive($a, $b, $c) as $item) {
     print($item);
 }
-//1, 2, 3, 4, 6, 7
+// 1, 3, 2, 4, 6, 7
 ```
 
 ### Duplicates

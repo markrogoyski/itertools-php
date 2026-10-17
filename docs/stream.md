@@ -118,7 +118,7 @@ use IterTools\Stream;
 $fileHandle = \fopen('path/to/file.txt', 'r');
 
 $result = Stream::of($fileHandle)
-    ->map('strtoupper');
+    ->map('strtoupper')
     ->toArray();
 ```
 
@@ -476,9 +476,9 @@ use IterTools\Stream;
 
 $numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-$result = Stream::of($friends)
+$result = Stream::of($numbers)
     ->chunkwiseOverlap(3, 1)
-    ->toArray()
+    ->toArray();
 // [1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9]
 ```
 
@@ -626,7 +626,7 @@ Once the predicate function returns false once, all remaining elements are retur
 ```php
 use IterTools\Stream;
 
-$input = [1, 2, 3, 4, 5]
+$input = [1, 2, 3, 4, 5];
 
 $result = Stream::of($input)
     ->dropWhile(fn ($value) => $value < 3)
@@ -709,6 +709,8 @@ Filter out elements from the stream only keeping elements where the predicate fu
 ```$stream->filterKeys(callable $filter): Stream```
 
 ```php
+use IterTools\Stream;
+
 $olympics = [
     2000 => 'Sydney',
     2002 => 'Salt Lake City',
@@ -729,7 +731,6 @@ $winterFilter = fn ($year) => $year % 4 === 2;
 $result = Stream::of($olympics)
     ->filterKeys($winterFilter)
     ->toAssociativeArray();
-}
 // 2002 => Salt Lake City
 // 2006 => Turin
 // 2010 => Vancouver
@@ -746,6 +747,8 @@ Keeps elements for which the predicate—called as `$predicate($value, $key)`—
 ```$stream->filterWithKeys(callable $predicate): Stream```
 
 ```php
+use IterTools\Stream;
+
 $inventory = ['apples' => 5, 'bananas' => 0, 'avocados' => 3, 'cherries' => 0];
 
 $inStockStartingWithA = fn ($count, $name) => $count > 0 && \str_starts_with($name, 'a');
@@ -762,8 +765,10 @@ Map a function onto the elements of the stream and flatten the results.
 ```$stream->flatMap(callable $mapper): Stream```
 
 ```php
+use IterTools\Stream;
+
 $data    = [1, 2, 3, 4, 5];
-$mapper  fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item;
+$mapper = fn ($item) => ($item % 2 === 0) ? [$item, $item] : $item;
 
 $result = Stream::of($data)
     ->flatMap($mapper)
@@ -779,6 +784,8 @@ The callback is called as `$func($value, $key, callable $self)`. The third argum
 ```$stream->flatMapWithKeys(callable $func): Stream```
 
 ```php
+use IterTools\Stream;
+
 $data = ['a' => 1, 'b' => 2, 'c' => 3];
 $func = fn ($value, $key) => [$key, $value];
 
@@ -794,10 +801,12 @@ Flatten a multidimensional stream.
 ```$stream->flatten(int $dimensions = 1): Stream```
 
 ```php
+use IterTools\Stream;
+
 $data = [1, [2, 3], [4, 5]];
 
 $result = Stream::of($data)
-    ->flatten($mapper)
+    ->flatten()
     ->toArray();
 // [1, 2, 3, 4, 5]
 ```
@@ -871,10 +880,11 @@ use IterTools\Stream;
 
 $input = [1, 2, 3];
 
-$result = Stream::of($input)
+Stream::of($input)
     ->infiniteCycle()
-    ->print();
-// 1, 2, 3, 1, 2, 3, ...
+    ->limit(7)
+    ->print(', ');
+// 1, 2, 3, 1, 2, 3, 1
 ```
 
 #### Intersection With
@@ -954,7 +964,7 @@ Lazy: the upstream is never advanced beyond the elements that are yielded. A lim
 ```$stream->limit(int $limit): Stream```
 
 ```php
-Use IterTools\Single;
+use IterTools\Stream;
 
 $matrixMovies = ['The Matrix', 'The Matrix Reloaded', 'The Matrix Revolutions', 'The Matrix Resurrections'];
 $limit        = 1;
@@ -1064,7 +1074,7 @@ $numerics   = ['1', '2', 3, 4, 5, 6, 7, '8', '9'];
 $oddNumbers = [1, 3, 5, 7, 9, 11];
 
 $stream = Stream::of($numbers)
-    ->partialIntersectionWith($numerics, $oddNumbers)
+    ->partialIntersectionWith(2, $numerics, $oddNumbers)
     ->toArray();
 // 1, 3, 4, 5, 6, 7, 9
 ```
@@ -1218,6 +1228,8 @@ $result = Stream::of(['A', 'B', 'C'])
 
 Round-robin scheduling fairly drains items from worker queues of unequal size:
 ```php
+use IterTools\Stream;
+
 $workerOne   = ['task-1', 'task-4', 'task-7'];
 $workerTwo   = ['task-2', 'task-5'];
 $workerThree = ['task-3', 'task-6', 'task-8', 'task-9'];
@@ -1644,8 +1656,6 @@ Keep elements from the stream as long as the predicate is true.
 
 ```$stream->takeWhile(callable $predicate): Stream```
 
-If no predicate is provided, the boolean value of the data is used.
-
 ```php
 use IterTools\Stream;
 
@@ -1672,7 +1682,7 @@ $input = [1, 2, 3];
 $stream = Stream::of($input)
     ->unionWith([3, 4, 5, 6])
     ->toArray();
-// [1, 2, 3, 4, 5, 6]
+// [1, 3, 2, 4, 5, 6]
 ```
 
 #### Union Coercive With
@@ -1690,7 +1700,7 @@ $input = [1, 2, 3];
 $stream = Stream::of($input)
     ->unionCoerciveWith(['3', 4, 5, 6])
     ->toArray();
-// [1, 2, 3, 4, 5, 6]
+// [1, '3', 2, 4, 5, 6]
 ```
 
 #### Unzip
@@ -1916,10 +1926,9 @@ use IterTools\Stream;
 $input = [1, 2, 3];
 
 $stream = Stream::of($input)
-    ->zipWith([4, 5, 6])
-    ->zipWith([7, 8, 9])
+    ->zipWith([4, 5, 6], [7, 8, 9])
     ->toArray();
-// [1, 4, 7], [2, 5, 8], [3, 6, 9]
+// [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
 ```
 
 #### Zip Filled With
@@ -2257,7 +2266,7 @@ Returns true if all elements match the predicate function.
 ```$stream->allMatch(callable $predicate): bool```
 
 ```php
-use IterTools\Summary;
+use IterTools\Stream;
 
 $finalFantasyNumbers = [4, 5, 6];
 $isOnSuperNintendo   = fn ($ff) => $ff >= 4 && $ff <= 6;
@@ -2275,9 +2284,9 @@ Returns true if all elements are unique.
 Defaults to [strict type](../README.md#strict-and-coercive-types) comparisons. Set strict to false for type coercion comparisons.
 
 ```php
-use IterTools\Summary;
+use IterTools\Stream;
 
-$items = ['fingerprints', 'snowflakes', 'eyes', 'DNA']
+$items = ['fingerprints', 'snowflakes', 'eyes', 'DNA'];
 
 $boolean = Stream::of($items)
     ->allUnique();
@@ -2290,13 +2299,13 @@ Returns true if any element matches the predicate function.
 ```$stream->anyMatch(callable $predicate): bool```
 
 ```php
-use IterTools\Summary;
+use IterTools\Stream;
 
 $answers          = ['fish', 'towel', 42, "don't panic"];
-$isUltimateAnswer = fn ($a) => a == 42;
+$isUltimateAnswer = fn ($a) => $a == 42;
 
 $boolean = Stream::of($answers)
-    ->anyMatch($answers, $isUltimateAnswer);
+    ->anyMatch($isUltimateAnswer);
 // true
 ```
 
@@ -2306,7 +2315,7 @@ Returns true if all iterables are permutations with stream.
 ```$stream->arePermutationsWith(...$iterables): bool```
 
 ```php
-use IterTools\Summary;
+use IterTools\Stream;
 
 $rite = ['r', 'i', 't', 'e'];
 $reit = ['r', 'e', 'i', 't'];
@@ -2365,7 +2374,7 @@ Returns true if all iterables are permutations with stream with [type coercion](
 ```$stream->arePermutationsCoerciveWith(...$iterables): bool```
 
 ```php
-use IterTools\Summary;
+use IterTools\Stream;
 
 $set2 = [2.0, '1', 3];
 $set3 = [3, 2, 1];
@@ -2464,7 +2473,7 @@ Returns true if exactly n items are true according to a predicate function.
 ```$stream->exactlyN(int $n, callable $predicate = null): bool```
 
 ```php
-use IterTools\Summary;
+use IterTools\Stream;
 
 $twoTruthsAndALie = [true, true, false];
 $n                = 2;
@@ -2479,12 +2488,12 @@ Returns true if the stream is empty having no items.
 ```$stream->isEmpty(): bool```
 
 ```php
-use IterTools\Summary;
+use IterTools\Stream;
 
 $numbers    = [0, 1, 2, 3, 4, 5];
 $filterFunc = fn ($x) => $x > 10;
 
-$boolean = Stream::($numbers)
+$boolean = Stream::of($numbers)
     ->filter($filterFunc)
     ->isEmpty();
 // true
@@ -2499,12 +2508,12 @@ Returns true if all elements of given collection that satisfy the predicate appe
 ```$stream->isPartitioned(callable $predicate = null): bool```
 
 ```php
-use IterTools\Summary;
+use IterTools\Stream;
 
 $numbers          = [0, 2, 4, 1, 3, 5];
 $evensBeforeOdds = fn ($item) => $item % 2 === 0;
 
-$boolean = Stream::($numbers)
+$boolean = Stream::of($numbers)
     ->isPartitioned($evensBeforeOdds);
 // true
 ```
@@ -2611,7 +2620,7 @@ Returns true if no element matches the predicate function.
 ```$stream->noneMatch(callable $predicate): bool```
 
 ```php
-use IterTools\Summary;
+use IterTools\Stream;
 
 $grades         = [45, 50, 61, 0];
 $isPassingGrade = fn ($grade) => $grade >= 70;
@@ -2737,7 +2746,7 @@ use IterTools\Stream;
 
 $input = [2, 4, 6, 8];
 
-$result = Stream::of($iterable)
+$result = Stream::of($input)
     ->toAverage();
 // 5
 ```
@@ -2752,7 +2761,7 @@ use IterTools\Stream;
 
 $input = [10, 20, 30, 40, 50];
 
-$result = Stream::of($iterable)
+$result = Stream::of($input)
     ->toCount();
 // 5
 ```
@@ -2953,7 +2962,7 @@ use IterTools\Stream;
 
 $input = [1, -1, 2, -2, 3, -3];
 
-$result = Stream::of($iterable)
+$result = Stream::of($input)
     ->toMax();
 // 3
 ```
@@ -2990,7 +2999,7 @@ use IterTools\Stream;
 
 $input = [1, -1, 2, -2, 3, -3];
 
-$result = Stream::of($iterable)
+$result = Stream::of($input)
     ->toMin();
 // -3
 ```
@@ -3037,7 +3046,7 @@ Reduces stream to value at the nth position.
 
 ```$stream->toNth(int $position): mixed```
 
-Returns null if iterable source is empty.
+Throws `\LengthException` if the stream has no element at that position, and `\InvalidArgumentException` if the position is negative.
 
 ```php
 use IterTools\Stream;
@@ -3099,7 +3108,7 @@ use IterTools\Stream;
 
 $input = [1, 2, 3, 4, 5];
 
-$result = Stream::of($iterable)
+$result = Stream::of($input)
     ->toProduct();
 // 120
 ```
@@ -3131,12 +3140,12 @@ Reduces stream to a random value within it.
 ```php
 use IterTools\Stream;
 
-$rpsHands = ['rock', 'paper', 'scissors']
+$rpsHands = ['rock', 'paper', 'scissors'];
 
-$range = Stream::of($numbers)
+$rpsHand = Stream::of($rpsHands)
     ->map('strtoupper')
     ->toRandomValue();
-// e.g., rock
+// e.g., ROCK
 ```
 
 ##### To Range
@@ -3151,7 +3160,7 @@ use IterTools\Stream;
 
 $grades = [100, 90, 80, 85, 95];
 
-$range = Stream::of($numbers)
+$range = Stream::of($grades)
     ->toRange();
 // 20
 ```
@@ -3189,13 +3198,13 @@ use IterTools\Stream;
 
 $words = ['IterTools', 'PHP', 'v1.0'];
 
-$string = Stream::of($words)->toString($words);
+$string = Stream::of($words)->toString();
 // IterToolsPHPv1.0
-$string = Stream::of($words)->toString($words, '-');
+$string = Stream::of($words)->toString('-');
 // IterTools-PHP-v1.0
-$string = Stream::of($words)->toString($words, '-', 'Library: ');
+$string = Stream::of($words)->toString('-', 'Library: ');
 // Library: IterTools-PHP-v1.0
-$string = Stream::of($words)->toString($words, '-', 'Library: ', '!');
+$string = Stream::of($words)->toString('-', 'Library: ', '!');
 // Library: IterTools-PHP-v1.0!
 ```
 
@@ -3209,7 +3218,7 @@ use IterTools\Stream;
 
 $input = [1, 2, 3, 4, 5];
 
-$result = Stream::of($iterable)
+$result = Stream::of($input)
     ->toSum();
 // 15
 ```
@@ -3226,7 +3235,7 @@ use IterTools\Stream;
 
 $input = [1, 2, 3, 4, 5];
 
-$result = Stream::of($iterable)
+$result = Stream::of($input)
     ->toValue(fn ($carry, $item) => $carry + $item);
 // 15
 ```
@@ -3277,8 +3286,6 @@ Returns a key-value map of stream elements.
 
 ```php
 use IterTools\Stream;
-
-$keyFunc
 
 $array = Stream::of(['message 1', 'message 2', 'message 3'])
     ->map('strtoupper')
@@ -3339,7 +3346,7 @@ Return several independent (duplicated) streams.
 ```$stream->tee(int $count): array```
 
 ```php
-use IterTools\Transform;
+use IterTools\Stream;
 
 $daysOfWeek = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
 $count = 3;
@@ -3447,7 +3454,7 @@ $starWarsMovies = [
 ];
 $header = ['title', 'episode', 'year'];
 
-Stream::of($data)
+Stream::of($starWarsMovies)
     ->toCsvFile($fh, $header);
 // title,episode,year
 // "Star Wars: Episode IV – A New Hope",IV,1977
@@ -3498,7 +3505,7 @@ $logger = new SimpleLog\Logger('/tmp/log.txt', 'iterTools');
 Stream::of(['some', 'items'])
   ->map('strtoupper')
   ->peek(fn ($x) => $logger->info($x))
-  ->foreach($someComplexCallable);
+  ->callForEach($someComplexCallable);
 ```
 
 #### Peek Stream
@@ -3516,7 +3523,7 @@ $logger = new SimpleLog\Logger('/tmp/log.txt', 'iterTools');
 Stream::of(['some', 'items'])
   ->map('strtoupper')
   ->peekStream(fn ($stream) => $logger->info($stream))
-  ->foreach($someComplexCallable);
+  ->callForEach($someComplexCallable);
 ```
 
 #### Peek Print
@@ -3532,7 +3539,7 @@ use IterTools\Stream;
 Stream::of(['some', 'items'])
   ->map('strtoupper')
   ->peekPrint()
-  ->foreach($someComplexCallable);
+  ->callForEach($someComplexCallable);
 ```
 
 #### Peek PrintR
@@ -3548,7 +3555,7 @@ use IterTools\Stream;
 Stream::of(['some', 'items'])
   ->map('strtoupper')
   ->peekPrintR()
-  ->foreach($someComplexCallable);
+  ->callForEach($someComplexCallable);
 ```
 
 #### Print R
@@ -3561,7 +3568,7 @@ use IterTools\Stream;
 
 $items = [$string, $array, $object];
 
-Stream::of($words)->printR();
+Stream::of($items)->printR();
 // print_r output
 ```
 
@@ -3575,7 +3582,7 @@ use IterTools\Stream;
 
 $items = [$string, $array, $object];
 
-Stream::of($words)->varDump();
+Stream::of($items)->varDump();
 // var_dump output
 ```
 #### Peek With Keys

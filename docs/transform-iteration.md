@@ -34,7 +34,7 @@ use IterTools\Transform;
 $daysOfWeek = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
 $count = 3;
 
-[$week1, $week2, $week3] = Transform::tee($data, $count);
+[$week1, $week2, $week3] = Transform::tee($daysOfWeek, $count);
 // Each $week contains iterator containing ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
 ```
 

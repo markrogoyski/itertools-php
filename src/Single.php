@@ -393,8 +393,6 @@ final class Single
     /**
      * Return elements from the iterable as long as the predicate is true.
      *
-     * If no predicate is provided, the boolean value of the data is used.
-     *
      * @param iterable<mixed> $data
      * @param callable        $predicate
      *

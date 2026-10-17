@@ -60,6 +60,8 @@ foreach (Multi::roundRobin($queueA, $queueB, $queueC) as $item) {
 Round-robin-планирование задач между очередями воркеров: задачи равномерно вычерпываются из всех
 очередей, пока все они не опустеют:
 ```php
+use IterTools\Multi;
+
 $workerOne   = ['task-1', 'task-4', 'task-7'];
 $workerTwo   = ['task-2', 'task-5'];
 $workerThree = ['task-3', 'task-6', 'task-8', 'task-9'];
@@ -92,6 +94,8 @@ foreach (Multi::zip($languages, $mascots) as [$language, $mascot]) {
 
 Может принимать больше двух коллекций на вход.
 ```php
+use IterTools\Multi;
+
 $names          = ['Ryu', 'Ken', 'Chun Li', 'Guile'];
 $countries      = ['Japan', 'USA', 'China', 'USA'];
 $signatureMoves = ['hadouken', 'shoryuken', 'spinning bird kick', 'sonic boom'];
@@ -192,6 +196,8 @@ foreach (Multi::unzip($pairs) as $column) {
 
 Разделение событий вида `(timestamp, value)` на два параллельных ряда:
 ```php
+use IterTools\Multi;
+
 $events = [
     [1700000000, 12.5],
     [1700000060, 13.1],
@@ -225,6 +231,8 @@ foreach (Multi::mergeSorted($morningTemps, $afternoonTemps) as $temp) {
 **Предусловие:** каждый источник должен быть уже отсортирован по неубыванию. `mergeSorted` это не проверяет — неотсортированный ввод молча даёт некорректно упорядоченный результат вместо исключения:
 
 ```php
+use IterTools\Multi;
+
 // Неотсортированный ввод не проверяется; результат не будет осмысленно отсортирован
 foreach (Multi::mergeSorted([3, 1, 2], [0]) as $value) {
     // 0, 3, 1, 2 -- отсортируйте каждый источник перед слиянием
@@ -234,6 +242,7 @@ foreach (Multi::mergeSorted([3, 1, 2], [0]) as $value) {
 Слияние бесконечных отсортированных источников — забираем только нужное количество значений:
 ```php
 use IterTools\Infinite;
+use IterTools\Multi;
 use IterTools\Single;
 
 $evens = Infinite::count(0, 2);

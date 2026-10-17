@@ -36,7 +36,7 @@ $boolean = Summary::allMatch($finalFantasyNumbers, $isOnPlaystation);
 ```php
 use IterTools\Summary;
 
-$items = ['fingerprints', 'snowflakes', 'eyes', 'DNA']
+$items = ['fingerprints', 'snowflakes', 'eyes', 'DNA'];
 
 $boolean = Summary::allUnique($items);
 // true
@@ -51,7 +51,7 @@ $boolean = Summary::allUnique($items);
 use IterTools\Summary;
 
 $answers          = ['fish', 'towel', 42, "don't panic"];
-$isUltimateAnswer = fn ($a) => a == 42;
+$isUltimateAnswer = fn ($a) => $a == 42;
 
 $boolean = Summary::anyMatch($answers, $isUltimateAnswer);
 // true
@@ -274,7 +274,7 @@ $boolean = Summary::isPartitioned($numbers, $evensBeforeOdds);
 ```php
 use IterTools\Summary;
 
-$data = []
+$data = [];
 
 $boolean = Summary::isEmpty($data);
 // true

@@ -519,7 +519,7 @@ Documentation
 
 Full documentation with detailed descriptions, signatures, and code examples for each function.
 
-Additional unreleased APIs include `Multi::mergeSorted()` / `mergeSortedBy()`, `Summary::allEqual()` / `allEqualBy()`, key-aware `*WithKeys` operations, and `Transform::memoize()`. Nonterminal Stream equivalents remain lazy; summary and side-effect terminals consume only as described by their individual contracts.
+APIs added in v2.6.0 include `Multi::mergeSorted()` / `mergeSortedBy()`, `Summary::allEqual()` / `allEqualBy()`, key-aware `*WithKeys` operations, and `Transform::memoize()`. Nonterminal Stream equivalents remain lazy; summary and side-effect terminals consume only as described by their individual contracts.
 
 #### Loop Iteration
 - [Multi Iteration](docs/multi-iteration.md) — Chain, RoundRobin, Unzip, Zip, ZipEqual, ZipFilled, ZipLongest
@@ -559,7 +559,7 @@ $letters = 'ABCDEFGHI';
 $numbers = '123456789';
 
 foreach (Multi::zip(Single::string($letters), Single::string($numbers)) as [$letter, $number]) {
-     $battleshipMove = new BattleshipMove($letter, $number)
+     $battleshipMove = new BattleshipMove($letter, $number);
 }
 // A1, B2, C3
 ```

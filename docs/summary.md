@@ -36,7 +36,7 @@ Defaults to [strict type](../README.md#strict-and-coercive-types) comparisons. S
 ```php
 use IterTools\Summary;
 
-$items = ['fingerprints', 'snowflakes', 'eyes', 'DNA']
+$items = ['fingerprints', 'snowflakes', 'eyes', 'DNA'];
 
 $boolean = Summary::allUnique($items);
 // true
@@ -51,7 +51,7 @@ Returns true if any element matches the predicate function.
 use IterTools\Summary;
 
 $answers          = ['fish', 'towel', 42, "don't panic"];
-$isUltimateAnswer = fn ($a) => a == 42;
+$isUltimateAnswer = fn ($a) => $a == 42;
 
 $boolean = Summary::anyMatch($answers, $isUltimateAnswer);
 // true
@@ -262,7 +262,7 @@ Returns true if the iterable is empty having no items.
 ```php
 use IterTools\Summary;
 
-$data = []
+$data = [];
 
 $boolean = Summary::isEmpty($data);
 // true

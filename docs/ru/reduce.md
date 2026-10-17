@@ -18,7 +18,7 @@ use IterTools\Reduce;
 
 $grades = [100, 90, 95, 85, 94];
 
-$finalGrade = Reduce::toAverage($numbers);
+$finalGrade = Reduce::toAverage($grades);
 // 92.8
 ```
 
@@ -536,7 +536,7 @@ use IterTools\Reduce;
 
 $grades = [100, 90, 80, 85, 95];
 
-$range = Reduce::toRange($numbers);
+$range = Reduce::toRange($grades);
 // 20
 ```
 
