@@ -20,6 +20,7 @@
 * Reduce: `toMedian` (and `Stream::toMedian`, and `toPercentile` at 50 / `toQuantile` at 0.5) returned `NAN` when the two middle values were `-INF` and a finite negative number; it now returns `-INF`.
 * Single: `groupBy` (and `Stream::groupBy`) added an item to the same group more than once when its group names were distinct values that PHP converts to the same array key, such as `2020` and `'2020'`, or `1` and `true`.
 * Set, Multi, Summary: the set operations, `mergeSorted`, `mergeSortedBy`, `arePermutations` and `arePermutationsCoercive` (and their Stream wrappers, including `differenceWith` and `differenceCoerciveWith`) threw "Named parameter … overwrites previous argument" when an iterable was passed by a name such as `strict`, `filler`, `minIntersectionCount`, `keyFunc`, `nanMessage` or `a`, because the name collided with an internal parameter.
+* Infinite: `count` went past `PHP_INT_MAX` (or `PHP_INT_MIN` with a negative step) by yielding floats, repeating the same value forever; it now throws `\OverflowException` when the next value would be out of the integer range.
 
 ### Changes
 * Transform: `tee` no longer reads the source when it is called; the first element is read when a copy is first used.

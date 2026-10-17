@@ -11,6 +11,8 @@ Count sequentially forever.
 
 ```Infinite::count(int $start = 1, int $step = 1)```
 
+Every value is an `int`. Once the next value would go past `PHP_INT_MAX` (or `PHP_INT_MIN` for a negative step), advancing throws `\OverflowException` instead of yielding a float.
+
 ```php
 use IterTools\Infinite;
 

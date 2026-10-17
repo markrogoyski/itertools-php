@@ -116,6 +116,70 @@ class CountTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test          count yields integers up to the edge of the integer range
+     * @dataProvider  dataProviderForIntegerRangeEdge
+     * @param         int   $start
+     * @param         int   $step
+     * @param         array $expected
+     */
+    public function testCountYieldsIntegersUpToIntegerRangeEdge(int $start, int $step, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Infinite::count($start, $step) as $i) {
+            $result[] = $i;
+            if (\count($result) === \count($expected)) {
+                break;
+            }
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test          count throws OverflowException instead of yielding past the integer range
+     * @dataProvider  dataProviderForIntegerRangeEdge
+     * @param         int   $start
+     * @param         int   $step
+     * @param         array $expected
+     */
+    public function testCountPastIntegerRangeEdgeThrowsException(int $start, int $step, array $expected): void
+    {
+        // Given
+        $count = Infinite::count($start, $step);
+        for ($i = 1; $i < \count($expected); $i++) {
+            $count->next();
+        }
+        $this->assertSame(\end($expected), $count->current());
+
+        // Then
+        $this->expectException(\OverflowException::class);
+
+        // When
+        $count->next();
+    }
+
+    public static function dataProviderForIntegerRangeEdge(): array
+    {
+        return [
+            [\PHP_INT_MAX, 1, [\PHP_INT_MAX]],
+            [\PHP_INT_MAX - 2, 1, [\PHP_INT_MAX - 2, \PHP_INT_MAX - 1, \PHP_INT_MAX]],
+            [\PHP_INT_MAX - 5, 10, [\PHP_INT_MAX - 5]],
+            [\PHP_INT_MAX - 20, 10, [\PHP_INT_MAX - 20, \PHP_INT_MAX - 10, \PHP_INT_MAX]],
+            [\PHP_INT_MIN, -1, [\PHP_INT_MIN]],
+            [\PHP_INT_MIN + 2, -1, [\PHP_INT_MIN + 2, \PHP_INT_MIN + 1, \PHP_INT_MIN]],
+            [\PHP_INT_MIN + 5, -10, [\PHP_INT_MIN + 5]],
+            [0, \PHP_INT_MAX, [0, \PHP_INT_MAX]],
+            [-1, \PHP_INT_MIN, [-1]],
+            [0, \PHP_INT_MIN, [0, \PHP_INT_MIN]],
+            [\PHP_INT_MIN, \PHP_INT_MAX, [\PHP_INT_MIN, -1, \PHP_INT_MAX - 1]],
+        ];
+    }
+
+    /**
      * @test count for a long time
      */
     public function testCountForLongTime(): void

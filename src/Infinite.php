@@ -12,10 +12,20 @@ final class Infinite
     /**
      * Count sequentially forever
      *
+     * Every value is an int. The count stops at the edge of the integer range: once the next value
+     * would be greater than PHP_INT_MAX or less than PHP_INT_MIN, advancing throws instead of
+     * yielding a float.
+     *
      * @param int $start Starting point
      * @param int $step  How much to increment the count at each step
      *
      * @return \Generator<int>
+     *
+     * @throws \InvalidArgumentException if step is zero
+     * @throws \OverflowException if the count would go past the integer range
+     *
+     * Psalm infers `never` for a generator whose only exits are throws, ignoring the yield.
+     * @psalm-suppress InvalidReturnType
      */
     public static function count(int $start = 1, int $step = 1): \Generator
     {
@@ -23,8 +33,14 @@ final class Infinite
             throw new \InvalidArgumentException("Step must be non-zero. Got 0. Use Infinite::repeat() to yield the same value infinitely.");
         }
 
-        for ($i = $start; $i < \INF; $i += $step) {
+        $i = $start;
+        while (true) {
             yield $i;
+
+            if ($step > 0 ? $i > \PHP_INT_MAX - $step : $i < \PHP_INT_MIN - $step) {
+                throw new \OverflowException("Count overflowed the integer range: {$i} + {$step} is out of range.");
+            }
+            $i += $step;
         }
     }
 

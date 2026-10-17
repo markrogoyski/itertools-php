@@ -11,6 +11,8 @@
 
 ```Infinite::count(int $start = 1, int $step = 1)```
 
+Каждое значение имеет тип `int`. Когда следующее значение вышло бы за `PHP_INT_MAX` (или за `PHP_INT_MIN` при отрицательном шаге), переход к нему выбрасывает `\OverflowException` вместо того, чтобы вернуть float.
+
 ```php
 use IterTools\Infinite;
 
