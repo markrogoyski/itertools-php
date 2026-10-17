@@ -555,7 +555,7 @@ Reduces to the standard deviation of its values.
 ```Reduce::toStandardDeviation(iterable $data, bool $sample = false): float|null```
 
 - Square root of the variance. Population standard deviation by default; pass `$sample = true` for the sample standard deviation (Bessel's correction).
-- Inherits the single-pass, `O(1)`-memory and overflow behavior of `toVariance`.
+- Inherits the single-pass, `O(1)`-memory and overflow behavior of `toVariance`, but is not computed through the variance itself, so a representable standard deviation is returned even when its square is not representable: `toStandardDeviation([-1e200, 1e200])` is `1e200` (the variance `1e400` is `INF`), and `toStandardDeviation([-1e-200, 1e-200])` is `1e-200` (the variance `1e-400` underflows to `0.0`). A deviation from the mean that itself overflows still yields `INF`, as for `[-PHP_FLOAT_MAX, PHP_FLOAT_MAX]`.
 - Returns null if collection is empty, or for the sample standard deviation of a single value. The population standard deviation of a single value is `0.0`.
 - **The null cases take precedence over `NAN`**, matching `toVariance`: `toStandardDeviation([INF], true)` is `null`, while `toStandardDeviation([INF])` is `NAN`.
 

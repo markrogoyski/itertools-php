@@ -194,6 +194,20 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test Stream::toStandardDeviation is representable when the variance itself overflows or underflows
+     */
+    public function testToStandardDeviationOfUnrepresentableVariance(): void
+    {
+        // When
+        $overflowed  = Stream::of([-1e200, 1e200])->toStandardDeviation();
+        $underflowed = Stream::of([-1e-200, 1e-200])->toStandardDeviation();
+
+        // Then
+        $this->assertEqualsWithDelta(1e200, $overflowed, 1e188);
+        $this->assertEqualsWithDelta(1e-200, $underflowed, 1e-212);
+    }
+
+    /**
      * @test Stream::toStandardDeviation on empty stream is null
      */
     public function testToStandardDeviationEmpty(): void

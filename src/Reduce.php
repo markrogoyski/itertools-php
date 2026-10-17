@@ -420,6 +420,92 @@ final class Reduce
      */
     public static function toVariance(iterable $data, bool $sample = false): ?float
     {
+        [$count, $hasNonFinite, $scale, $weight] = self::toScaledVariance($data);
+
+        // Checked before $hasNonFinite: an undefined divisor is a property of the collection's size,
+        // not of its values, so null wins over NAN for the sample variance of one non-finite value.
+        if ($count === 0 || ($sample && $count === 1)) {
+            return null;
+        }
+
+        if ($hasNonFinite) {
+            return \NAN;
+        }
+
+        // Unscale by interleaving the two multiplications. ($scale * $scale) * $weight would reach
+        // INF for a representable variance whenever $weight < 1, which is exactly the prefix-overflow
+        // case; multiplying $weight in first keeps every intermediate within range.
+        $variance = ($scale * $weight) * $scale;
+
+        // Bessel's correction, applied as a single ratio so that a large population variance is not
+        // pushed to INF by an intermediate multiplication.
+        /** @psalm-suppress InvalidOperand */
+        return $sample ? $variance * ($count / ($count - 1)) : $variance;
+    }
+
+    /**
+     * Reduces given collection to the standard deviation of its values.
+     *
+     * Square root of the variance. Population standard deviation by default; pass
+     * $sample = true for the sample standard deviation (Bessel's correction).
+     *
+     * Inherits the single-pass, O(1)-memory and overflow behavior of {@see Reduce::toVariance()},
+     * but is not computed through the variance itself, so a representable standard deviation is not
+     * lost when its square is out of range. toStandardDeviation([-1e200, 1e200]) is 1e200 although
+     * the variance 1e400 is reported as INF, and toStandardDeviation([-1e-200, 1e-200]) is 1e-200
+     * although the variance 1e-400 underflows to 0.0. A deviation from the mean that itself overflows
+     * still yields INF: toStandardDeviation([-PHP_FLOAT_MAX, PHP_FLOAT_MAX]) is INF.
+     *
+     * The null cases likewise take precedence over NAN: toStandardDeviation([INF], true)
+     * is null, while toStandardDeviation([INF]) is NAN.
+     *
+     * Returns null whenever the underlying variance is null (empty collection, or
+     * the sample standard deviation of a single value). The population standard
+     * deviation of a single value is 0.0.
+     *
+     * @param iterable<int|float> $data
+     * @param bool                $sample population standard deviation when false (default), sample when true
+     *
+     * @return float|null
+     */
+    public static function toStandardDeviation(iterable $data, bool $sample = false): ?float
+    {
+        [$count, $hasNonFinite, $scale, $weight] = self::toScaledVariance($data);
+
+        // The same null-over-NAN precedence as toVariance.
+        if ($count === 0 || ($sample && $count === 1)) {
+            return null;
+        }
+
+        if ($hasNonFinite) {
+            return \NAN;
+        }
+
+        // Bessel's correction goes into $weight, which is at most about $count, so it cannot overflow.
+        if ($sample) {
+            /** @psalm-suppress InvalidOperand */
+            $weight *= $count / ($count - 1);
+        }
+
+        // $scale * sqrt($weight) rather than sqrt($scale ** 2 * $weight): the variance squares the
+        // magnitude and so overflows or underflows for a representable standard deviation, as with
+        // [-1e200, 1e200] (variance 1e400) or [-1e-200, 1e-200] (variance 1e-400).
+        return $scale * \sqrt($weight);
+    }
+
+    /**
+     * The single-pass accumulation behind toVariance and toStandardDeviation.
+     *
+     * Returns the variance in scaled form: the population variance is $scale ** 2 * $weight.
+     * Keeping the two factors apart lets the caller unscale without forming $scale ** 2 when
+     * only the square root is wanted.
+     *
+     * @param iterable<int|float> $data
+     *
+     * @return array{int, bool, float, float} count, whether any value was non-finite, scale, weight
+     */
+    private static function toScaledVariance(iterable $data): array
+    {
         $count = 0;
 
         // The running mean is carried in double-double form ($meanHi + $meanLo). A mean that is not
@@ -496,52 +582,7 @@ final class Reduce
             }
         }
 
-        // Checked before $hasNonFinite: an undefined divisor is a property of the collection's size,
-        // not of its values, so null wins over NAN for the sample variance of one non-finite value.
-        if ($count === 0 || ($sample && $count === 1)) {
-            return null;
-        }
-
-        if ($hasNonFinite) {
-            return \NAN;
-        }
-
-        // Unscale by interleaving the two multiplications. ($scale * $scale) * $weight would reach
-        // INF for a representable variance whenever $weight < 1, which is exactly the prefix-overflow
-        // case; multiplying $weight in first keeps every intermediate within range.
-        $variance = ($scale * $weight) * $scale;
-
-        // Bessel's correction, applied as a single ratio so that a large population variance is not
-        // pushed to INF by an intermediate multiplication.
-        /** @psalm-suppress InvalidOperand */
-        return $sample ? $variance * ($count / ($count - 1)) : $variance;
-    }
-
-    /**
-     * Reduces given collection to the standard deviation of its values.
-     *
-     * Square root of the variance. Population standard deviation by default; pass
-     * $sample = true for the sample standard deviation (Bessel's correction).
-     *
-     * Inherits the single-pass, O(1)-memory and overflow behavior of {@see Reduce::toVariance()}.
-     *
-     * The null cases likewise take precedence over NAN: toStandardDeviation([INF], true)
-     * is null, while toStandardDeviation([INF]) is NAN.
-     *
-     * Returns null whenever the underlying variance is null (empty collection, or
-     * the sample standard deviation of a single value). The population standard
-     * deviation of a single value is 0.0.
-     *
-     * @param iterable<int|float> $data
-     * @param bool                $sample population standard deviation when false (default), sample when true
-     *
-     * @return float|null
-     */
-    public static function toStandardDeviation(iterable $data, bool $sample = false): ?float
-    {
-        $variance = static::toVariance($data, $sample);
-
-        return $variance === null ? null : \sqrt($variance);
+        return [$count, $hasNonFinite, $scale, $weight];
     }
 
     /**

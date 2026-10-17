@@ -3171,7 +3171,7 @@ Reduces iterable source to the standard deviation of its values.
 ```$stream->toStandardDeviation(bool $sample = false): float|null```
 
 - Square root of the variance. Population standard deviation by default; pass `$sample = true` for the sample standard deviation (Bessel's correction).
-- Inherits the single-pass, `O(1)`-memory and overflow behavior of `toVariance`.
+- Inherits the single-pass, `O(1)`-memory and overflow behavior of `toVariance`, but is not computed through the variance itself, so a representable standard deviation is returned even when its square is out of range (e.g. `[-1e200, 1e200]` gives `1e200`).
 - Returns null if iterable source is empty, or for the sample standard deviation of a single value. The null cases take precedence over `NAN`, matching `toVariance`.
 
 ```php

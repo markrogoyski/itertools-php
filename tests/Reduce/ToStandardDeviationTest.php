@@ -306,6 +306,37 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toStandardDeviation is representable when the variance itself overflows or underflows
+     * @dataProvider dataProviderForUnrepresentableVariance
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testRepresentableStdDevOfUnrepresentableVariance(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toStandardDeviation($data, $sample);
+
+        // Then
+        $this->assertEqualsWithDelta($expected, $result, \abs($expected) * 1e-12);
+    }
+
+    public static function dataProviderForUnrepresentableVariance(): array
+    {
+        return [
+            // Variance 1e400 overflows
+            [[-1e200, 1e200], false, 1e200],
+            [[-1e200, 1e200], true, 1.4142135623730951e200],
+            [[-1e200, 0, 1e200], false, 8.164965809277261e199],
+            [[2.0 ** 700, 2.0 ** 700 + 2.0 ** 666], false, 2.0 ** 665],
+            // Variance 1e-400 underflows
+            [[-1e-200, 1e-200], false, 1e-200],
+            [[-1e-200, 1e-200], true, 1.4142135623730951e-200],
+            [[-1e-200, 0, 1e-200], false, 8.164965809277261e-201],
+        ];
+    }
+
+    /**
      * @test toStandardDeviation is invariant to input order
      */
     public function testOrderInvariance(): void
