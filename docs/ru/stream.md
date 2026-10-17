@@ -1051,6 +1051,8 @@ $stream = Stream::of($input)
 
 ```$stream->partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables): Stream```
 
+* `$minIntersectionCount` должен быть не меньше 1, иначе при начале итерации выбрасывается `\InvalidArgumentException`.
+
 ```php
 use IterTools\Stream;
 
@@ -1068,6 +1070,8 @@ $stream = Stream::of($numbers)
 Частичное пересечение хранимой в потоке коллекции с другими переданными коллекциями, вычисляемое в режиме [приведения типов](README.md#режимы-типизации).
 
 ```$stream->partialIntersectionCoerciveWith(int $minIntersectionCount, iterable ...$iterables): Stream```
+
+* `$minIntersectionCount` должен быть не меньше 1, иначе при начале итерации выбрасывается `\InvalidArgumentException`.
 
 ```php
 use IterTools\Stream;

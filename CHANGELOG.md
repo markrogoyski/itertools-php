@@ -25,6 +25,7 @@
 * Single: `range` (and `Stream::ofRange`) dropped the endpoint of a float range spanning a whole number of steps when float rounding put the last value just past `$end` (e.g. `range(0, 55, 1.1)` stopped at 53.9).
 * Math: `relativeFrequencies` and `relativeFrequenciesBy` (and their Stream wrappers) yielded `int(1)` instead of `1.0` when there was only one distinct value or group; they now always yield floats, as documented.
 * Reduce: `toStandardDeviation` (and `Stream::toStandardDeviation`) took the square root of the variance, so it returned `INF` or `0.0` when the variance overflowed or underflowed although the standard deviation was representable (e.g. `[-1e200, 1e200]` gave `INF` instead of `1e200`, and `[-1e-200, 1e-200]` gave `0.0` instead of `1e-200`).
+* Set: `partialIntersection` and `partialIntersectionCoercive` (and `Stream::partialIntersectionWith` and `partialIntersectionCoerciveWith`) silently yielded nothing for a `$minIntersectionCount` below 1, which is documented as a positive integer; they now throw `\InvalidArgumentException` when iteration starts.
 
 ### Changes
 * Single: a float `range` (and `Stream::ofRange`) that spans a whole number of steps, to within float rounding error, now ends exactly on `$end`. Native `\range()` drops the endpoint where float rounding puts the last value just past it, so `range(0.3, 0.9, 0.2)` now yields `[0.3, 0.5, 0.7, 0.9]` where native returns `[0.3, 0.5, 0.7]`.

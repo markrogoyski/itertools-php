@@ -1066,6 +1066,8 @@ Return a stream partially intersecting the stream with the input iterables.
 
 ```$stream->partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables): Stream```
 
+* `$minIntersectionCount` must be at least 1; otherwise `\InvalidArgumentException` is thrown when iteration starts.
+
 ```php
 use IterTools\Stream;
 
@@ -1083,6 +1085,8 @@ $stream = Stream::of($numbers)
 Return a stream partially intersecting the stream with the input iterables using [type coercion](../README.md#strict-and-coercive-types).
 
 ```$stream->partialIntersectionCoerciveWith(int $minIntersectionCount, iterable ...$iterables): Stream```
+
+* `$minIntersectionCount` must be at least 1; otherwise `\InvalidArgumentException` is thrown when iteration starts.
 
 ```php
 use IterTools\Stream;

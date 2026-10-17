@@ -226,9 +226,13 @@ final class Set
      * @param iterable<mixed> ...$iterables
      *
      * @return \Generator<mixed>
+     *
+     * @throws \InvalidArgumentException if $minIntersectionCount is less than 1.
      */
     public static function partialIntersection(int $minIntersectionCount, iterable ...$iterables): \Generator
     {
+        static::assertMinIntersectionCount($minIntersectionCount);
+
         yield from static::intersectionInternal(true, $minIntersectionCount, ...\array_values($iterables));
     }
 
@@ -244,9 +248,13 @@ final class Set
      * @param iterable<mixed> ...$iterables
      *
      * @return \Generator<mixed>
+     *
+     * @throws \InvalidArgumentException if $minIntersectionCount is less than 1.
      */
     public static function partialIntersectionCoercive(int $minIntersectionCount, iterable ...$iterables): \Generator
     {
+        static::assertMinIntersectionCount($minIntersectionCount);
+
         yield from static::intersectionInternal(false, $minIntersectionCount, ...\array_values($iterables));
     }
 
@@ -354,6 +362,18 @@ final class Set
     public static function symmetricDifferenceCoercive(iterable ...$iterables): \Generator
     {
         yield from self::symmetricDifferenceInternal(false, ...\array_values($iterables));
+    }
+
+    /**
+     * @param int $minIntersectionCount
+     *
+     * @throws \InvalidArgumentException if $minIntersectionCount is less than 1.
+     */
+    protected static function assertMinIntersectionCount(int $minIntersectionCount): void
+    {
+        if ($minIntersectionCount < 1) {
+            throw new \InvalidArgumentException("Minimum intersection count must be ≥ 1. Got {$minIntersectionCount}");
+        }
     }
 
     /**

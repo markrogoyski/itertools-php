@@ -1381,4 +1381,40 @@ class PartialIntersectionCoerciveTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame([2, 3], $result);
     }
+
+    /**
+     * @test partialIntersectionCoercive throws for a minimum intersection count below 1
+     * @dataProvider dataProviderForNonPositiveMinIntersectionCount
+     * @param int $minIntersectionCount
+     * @param array<iterable> $iterables
+     */
+    public function testNonPositiveMinIntersectionCountThrows(int $minIntersectionCount, array $iterables): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Minimum intersection count must be ≥ 1. Got {$minIntersectionCount}");
+
+        // When
+        foreach (Set::partialIntersectionCoercive($minIntersectionCount, ...$iterables) as $_) {
+            break;
+        }
+    }
+
+    public static function dataProviderForNonPositiveMinIntersectionCount(): array
+    {
+        return [
+            [0, [[1, 2, 3], [2, 3, 4]]],
+            [-1, [[1, 2, 3], [2, 3, 4]]],
+            [\PHP_INT_MIN, [[1, 2, 3], [2, 3, 4]]],
+            [0, [GeneratorFixture::getGenerator([1, 2, 3]), GeneratorFixture::getGenerator([2, 3, 4])]],
+            [-1, [GeneratorFixture::getGenerator([1, 2, 3]), GeneratorFixture::getGenerator([2, 3, 4])]],
+            [0, [new ArrayIteratorFixture([1, 2, 3]), new ArrayIteratorFixture([2, 3, 4])]],
+            [-1, [new ArrayIteratorFixture([1, 2, 3]), new ArrayIteratorFixture([2, 3, 4])]],
+            [0, [new IteratorAggregateFixture([1, 2, 3]), new IteratorAggregateFixture([2, 3, 4])]],
+            [-1, [new IteratorAggregateFixture([1, 2, 3]), new IteratorAggregateFixture([2, 3, 4])]],
+            [0, [[], []]],
+            [0, [[1, 2, 3]]],
+            [0, []],
+        ];
+    }
 }

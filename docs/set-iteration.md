@@ -181,6 +181,7 @@ Iterates [M-partial intersection](https://github.com/Smoren/partial-intersection
 ```Set::partialIntersection(int $minIntersectionCount, iterable ...$iterables)```
 
 * If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+* `$minIntersectionCount` must be at least 1; otherwise `\InvalidArgumentException` is thrown when iteration starts.
 
 ```php
 use IterTools\Set;
@@ -201,6 +202,7 @@ Iterates [M-partial intersection](https://github.com/Smoren/partial-intersection
 ```Set::partialIntersectionCoercive(int $minIntersectionCount, iterable ...$iterables)```
 
 * If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+* `$minIntersectionCount` must be at least 1; otherwise `\InvalidArgumentException` is thrown when iteration starts.
 
 ```php
 use IterTools\Set;

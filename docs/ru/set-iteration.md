@@ -182,6 +182,7 @@ foreach (Set::intersectionCoercive($numbers, $numerics) as $commonNumber) {
 
 * Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила пересечения [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
 * Если `$minIntersectionCount = 1`, работают правила объединения [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+* `$minIntersectionCount` должен быть не меньше 1, иначе при начале итерации выбрасывается `\InvalidArgumentException`.
 
 ```php
 use IterTools\Set;
@@ -203,6 +204,7 @@ foreach (Set::partialIntersection(2, $staticallyTyped, $dynamicallyTyped, $suppo
 
 * Если хотя бы в одной коллекции встречаются повторяющиеся элементы, работают правила пересечения [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
 * Если `$minIntersectionCount = 1`, работают правила объединения [мультимножеств](https://en.wikipedia.org/wiki/Multiset).
+* `$minIntersectionCount` должен быть не меньше 1, иначе при начале итерации выбрасывается `\InvalidArgumentException`.
 
 ```php
 use IterTools\Set;

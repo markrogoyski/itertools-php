@@ -1920,6 +1920,8 @@ final class Stream implements \IteratorAggregate
      *
      * @return Stream
      *
+     * @throws \InvalidArgumentException if $minIntersectionCount is less than 1.
+     *
      * @see Set::partialIntersection()
      */
     public function partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables): self
@@ -1937,6 +1939,8 @@ final class Stream implements \IteratorAggregate
      * @param array<iterable<mixed>> ...$iterables
      *
      * @return Stream
+     *
+     * @throws \InvalidArgumentException if $minIntersectionCount is less than 1.
      *
      * @see Set::partialIntersectionCoercive()
      */
