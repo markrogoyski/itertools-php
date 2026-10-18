@@ -1056,6 +1056,11 @@ final class Single
      * running PHP does — PHP 8.2's native `\range()` sends any float step down the float path,
      * so `range(1, 5, 1.0)` yields floats there but ints here.
      *
+     * The span of an int operand beyond ±2^53 is exact when the other operand is an int or an integral float
+     * within the int range. Paired with a non-integral float or a float beyond the int range, the int is
+     * converted to float first and the span can be off: `range(PHP_INT_MAX, 2.0 ** 63, 0.5)` sees a span of 0
+     * and yields one element, where the true span of 1 gives three.
+     *
      * @param int|float $start
      * @param int|float $end
      * @param int|float $step (optional) Step magnitude. Defaults to 1.
@@ -1098,12 +1103,23 @@ final class Single
                 || \abs($step) >= (float)\PHP_INT_MAX
             ));
 
-        if ($start == $end) {
+        // Compare and subtract an int operand and an integral float operand in the int domain. The float converts
+        // to int exactly, while the int past 2^53 may not convert to float exactly: 2^53 + 1 and 2.0^53 compare
+        // equal as floats.
+        $startExact = $start;
+        $endExact = $end;
+        if (\is_int($start) && self::isIntegralFloatInIntRange($end)) {
+            $endExact = (int)$end;
+        } elseif (\is_int($end) && self::isIntegralFloatInIntRange($start)) {
+            $startExact = (int)$start;
+        }
+
+        if ($startExact == $endExact) {
             yield $useFloat ? (float)$start : $start;
             return;
         }
 
-        $ascending = $end > $start;
+        $ascending = $endExact > $startExact;
 
         if ($ascending && $step < 0) {
             throw new \InvalidArgumentException(
@@ -1117,10 +1133,10 @@ final class Single
             $magnitudeF = \abs((float)$step);
             // Take the span of int operands from the ints themselves. Distinct ints past 2^53 can share a
             // float (2^53 and 2^53 + 1), which would collapse the span to 0. An overflowing int subtraction
-            // promotes to float, which is accurate enough there.
-            $intOperands = \is_int($start) && \is_int($end);
+            // promotes to float, which is accurate enough there. An integral float operand counts as an int (above).
+            $intOperands = \is_int($startExact) && \is_int($endExact);
             $spanF = $intOperands
-                ? \abs((float)($end - $start))
+                ? \abs((float)($endExact - $startExact))
                 : \abs($endF - $startF);
 
             if ($magnitudeF > $spanF) {
@@ -1399,6 +1415,19 @@ final class Single
         if ($partial && !$lastIterationYielded && \count($window) > 0) {
             yield $window;
         }
+    }
+
+    /**
+     * Whether $x is a float with an integer value in [PHP_INT_MIN, PHP_INT_MAX], so (int)$x is exact.
+     *
+     * (float)PHP_INT_MAX rounds up to 2^63, which is out of range, so the upper bound is exclusive.
+     */
+    private static function isIntegralFloatInIntRange(int|float $x): bool
+    {
+        return \is_float($x)
+            && \fmod($x, 1.0) === 0.0
+            && $x >= (float)\PHP_INT_MIN
+            && $x < -(float)\PHP_INT_MIN;
     }
 
     /**

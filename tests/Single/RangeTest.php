@@ -531,6 +531,138 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         an int operand beyond 2^53 with an integral float operand uses the exact span, not the collapsed float span
+     * @dataProvider dataProviderForIntAndIntegralFloatBeyondFloatPrecision
+     * @param        int|float $start
+     * @param        int|float $end
+     * @param        float     $step
+     * @param        int       $count
+     * @param        float     $first
+     * @param        float     $last
+     */
+    public function testFractionalStepOnIntAndIntegralFloatBeyondFloatPrecision(
+        int|float $start,
+        int|float $end,
+        float $step,
+        int $count,
+        float $first,
+        float $last
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount($count, $result);
+        $this->assertSame($first, $result[0]);
+        $this->assertSame($last, $result[$count - 1]);
+    }
+
+    /**
+     * Only the count and endpoints are asserted: the inner values are $start + i·step in float arithmetic,
+     * which is not correctly rounded once (float)$start is inexact.
+     *
+     * Test data generated with:
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   first, last = float(Fraction(start)), float(Fraction(end))
+     */
+    public static function dataProviderForIntAndIntegralFloatBeyondFloatPrecision(): array
+    {
+        return [
+            'ascending 2^53 + 3 to 2.0^53 + 4' => [
+                9007199254740995, 9007199254740996.0, 0.5,
+                3, 9007199254740996.0, 9007199254740996.0,
+            ],
+            'descending 2.0^53 + 4 to 2^53 + 3' => [
+                9007199254740996.0, 9007199254740995, 0.5,
+                3, 9007199254740996.0, 9007199254740996.0,
+            ],
+            'ascending 2^53 + 1 to 2.0^53 + 4' => [
+                9007199254740993, 9007199254740996.0, 0.5,
+                7, 9007199254740992.0, 9007199254740996.0,
+            ],
+            'descending 2^53 + 1 to 2.0^53, equal as floats' => [
+                9007199254740993, 9007199254740992.0, 0.5,
+                3, 9007199254740992.0, 9007199254740992.0,
+            ],
+            'ascending 2.0^53 to 2^53 + 1, equal as floats' => [
+                9007199254740992.0, 9007199254740993, 0.5,
+                3, 9007199254740992.0, 9007199254740992.0,
+            ],
+            'ascending 2.0^63 - 1024 to PHP_INT_MAX step 600' => [
+                9.2233720368547748E18, \PHP_INT_MAX, 600.0,
+                2, 9.2233720368547748E18, 9.2233720368547758E18,
+            ],
+        ];
+    }
+
+    /**
+     * @test         an int operand beyond 2^53 with an integral float operand rejects a step that exceeds their exact span
+     * @dataProvider dataProviderForStepExceedingExactIntAndIntegralFloatSpan
+     * @param        int|float $start
+     * @param        int|float $end
+     * @param        float     $step
+     * @param        string    $span
+     */
+    public function testFractionalStepExceedingExactIntAndIntegralFloatSpanThrows(
+        int|float $start,
+        int|float $end,
+        float $step,
+        string $span
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("must not exceed span ({$span})");
+
+        // When
+        foreach (Single::range($start, $end, $step) as $_) {
+            break;
+        }
+    }
+
+    /**
+     * Test data generated with:
+     *   abs(Fraction(end) - Fraction(start)) < Fraction(step), span printed as abs(Fraction(end) - Fraction(start))
+     */
+    public static function dataProviderForStepExceedingExactIntAndIntegralFloatSpan(): array
+    {
+        return [
+            '2^53 + 1 to 2.0^53 + 2 step 1.5' => [9007199254740993, 9007199254740994.0, 1.5, '1'],
+            '2.0^63 - 1024 to PHP_INT_MAX step 1023.5' => [9.2233720368547748E18, \PHP_INT_MAX, 1023.5, '1023'],
+        ];
+    }
+
+    /**
+     * @test an int operand beyond 2^53 and an integral float operand that are equal as floats still reject a step
+     *       against their direction
+     */
+    public function testStepDirectionConflictOnIntAndIntegralFloatEqualAsFloatsThrows(): void
+    {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('step direction');
+
+        // When
+        foreach (Single::range(9007199254740992.0, 9007199254740993, -0.5) as $_) {
+            break;
+        }
+    }
+
+    /**
      * @test integer range at PHP_INT_MAX endpoint terminates (regression: accumulator overflow to float)
      */
     public function testIntegerRangeAtPhpIntMaxEndpointTerminates(): void
