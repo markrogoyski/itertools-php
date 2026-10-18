@@ -693,19 +693,25 @@ final class Reduce
     }
 
     /**
-     * Computes the midpoint of two numbers without overflowing on extreme magnitudes.
+     * Computes the correctly rounded midpoint of two numbers without overflowing on extreme magnitudes.
      *
      * Equal values short-circuit, and so does an infinity, which no finite partner can move. Beyond
-     * that, which form is safe depends only on the signs, so neither branch can overflow:
+     * that, the midpoint is rounded once, so it is the float nearest the true midpoint (ties to even):
      *
-     * - Opposite signs (or a zero): $lo + $hi cannot overflow, because the magnitudes cancel rather
-     *   than add. This form is used because it is also exact for integers — the span PHP_INT_MAX -
-     *   PHP_INT_MIN overflows into a float and rounds away the one-unit asymmetry, turning the true
-     *   midpoint -0.5 into 0.0, whereas PHP_INT_MIN + PHP_INT_MAX is exactly -1.
-     * - Same sign: $hi - $lo cannot overflow, because the magnitudes subtract. This form returns
-     *   $lo exactly when the two values are equal, which halving each operand would not do for
-     *   subnormals, and it keeps the integer result that (($lo + $hi) / 2) gives for evenly
-     *   divisible integer inputs.
+     * - Two integers (or an integral float within the integer range, which converts exactly): the
+     *   sum is taken in integer arithmetic, and when it overflows, the floor of the midpoint is.
+     *   An even sum gives an exact integer, and an odd one gives a half, which is converted to
+     *   a float exactly once. Forms like $lo + ($hi - $lo) / 2 round twice past 2^53, first
+     *   converting $lo and then adding the half, which turns …993.5 into …992 instead of …994.
+     *   A float operand makes the result a float, as plain arithmetic would.
+     * - Floats: ($lo + $hi) / 2 rounds once (in the sum; halving is exact unless the sum is so
+     *   small that it was itself exact). Past PHP_FLOAT_MAX / 2 the sum could overflow, so each
+     *   operand is halved instead, except one too small to halve exactly, which is added whole.
+     *
+     * An integer beyond ±2^53 paired with a non-integral float or a float beyond the integer range
+     * is converted to a float before averaging. This can lose precision, and cancellation can
+     * amplify the error substantially: on 64-bit PHP, [PHP_INT_MIN + 1, -(float) PHP_INT_MIN]
+     * gives 0.0 instead of 0.5. Rounding it correctly needs an error-free three-term sum.
      *
      * @param int|float $lo
      * @param int|float $hi
@@ -721,20 +727,101 @@ final class Reduce
         }
 
         // An infinity paired with a finite value is that infinity, and opposite infinities are NAN;
-        // the plain sum gives both. The same-sign form below would instead compute
-        // -INF + (finite - -INF) / 2, which is -INF + INF and so NAN.
+        // the plain sum gives both.
         if (\is_infinite((float) $lo) || \is_infinite((float) $hi)) {
             /** @psalm-suppress InvalidOperand */
             return $lo + $hi;
         }
 
-        if (($lo <= 0 && $hi >= 0) || ($hi <= 0 && $lo >= 0)) {
-            /** @psalm-suppress InvalidOperand */
+        $intLo = static::toExactInt($lo);
+        $intHi = static::toExactInt($hi);
+
+        if ($intLo !== null && $intHi !== null) {
+            $midpoint = static::integerMidpoint($intLo, $intHi);
+
+            return (\is_float($lo) || \is_float($hi)) ? (float) $midpoint : $midpoint;
+        }
+
+        $floatLo = (float) $lo;
+        $floatHi = (float) $hi;
+
+        if (\abs($floatLo) <= \PHP_FLOAT_MAX / 2.0 && \abs($floatHi) <= \PHP_FLOAT_MAX / 2.0) {
+            return ($floatLo + $floatHi) / 2.0;
+        }
+
+        // At least one operand is huge, so the sum could overflow. Halving a normal float is
+        // exact, but halving one below 2 * PHP_FLOAT_MIN can drop its lowest bit.
+        if (\abs($floatLo) < 2.0 * \PHP_FLOAT_MIN) {
+            return $floatLo + $floatHi / 2.0;
+        }
+        if (\abs($floatHi) < 2.0 * \PHP_FLOAT_MIN) {
+            return $floatLo / 2.0 + $floatHi;
+        }
+
+        return $floatLo / 2.0 + $floatHi / 2.0;
+    }
+
+    /**
+     * Computes the correctly rounded midpoint of two integers.
+     *
+     * The midpoint is an integer when the sum is even, and otherwise lies halfway between two
+     * integers. A sum within the integer range (always, for opposite signs) is divided directly:
+     * PHP's int division gives the exact integer, or converts the exact odd sum to a float once
+     * and halves it exactly.
+     *
+     * An overflowing sum means both values share a sign. With 32-bit integers both are within
+     * ±2^53, so they convert to floats exactly, their float sum is exact, and halving it is exact.
+     * With 64-bit integers the midpoint's magnitude is at least 2^62, where floats are at least 512
+     * apart and the midway points between them are even. The true midpoint m + 0.5 (m its floor)
+     * is never one of those midway points, so it rounds like whichever of m and m + 1 is odd, and
+     * that one, m | 1, converts with a single rounding.
+     *
+     * @param int $lo
+     * @param int $hi
+     *
+     * @return int|float
+     */
+    private static function integerMidpoint(int $lo, int $hi): int|float
+    {
+        $overflows = ($lo > 0 && $hi > \PHP_INT_MAX - $lo) || ($lo < 0 && $hi < \PHP_INT_MIN - $lo);
+        if (!$overflows) {
             return ($lo + $hi) / 2;
         }
 
-        /** @psalm-suppress InvalidOperand */
-        return $lo + ($hi - $lo) / 2;
+        if (\abs($lo) <= 9007199254740992 && \abs($hi) <= 9007199254740992) {
+            return ((float) $lo + (float) $hi) / 2.0;
+        }
+
+        if ($lo > $hi) {
+            [$lo, $hi] = [$hi, $lo];
+        }
+
+        // Same sign, so the span cannot overflow; it is non-negative, so intdiv floors it.
+        $span  = $hi - $lo;
+        $floor = $lo + \intdiv($span, 2);
+
+        return $span % 2 === 0 ? $floor : (float) ($floor | 1);
+    }
+
+    /**
+     * Returns the number as an integer if it is one, or a float that converts to an integer exactly.
+     *
+     * @param int|float $number
+     *
+     * @return int|null null for a non-integral float, or one outside the integer range
+     */
+    private static function toExactInt(int|float $number): ?int
+    {
+        if (\is_int($number)) {
+            return $number;
+        }
+
+        // (float) PHP_INT_MIN is exactly -2^63, so the range is [-2^63, 2^63).
+        if ($number >= (float) \PHP_INT_MIN && $number < -(float) \PHP_INT_MIN && \floor($number) === $number) {
+            return (int) $number;
+        }
+
+        return null;
     }
 
     /**

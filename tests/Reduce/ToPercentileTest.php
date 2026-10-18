@@ -258,6 +258,25 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test toPercentile at the 50th percentile of two integers past 2^53 is the correctly rounded midpoint
+     */
+    public function testMedianPercentileOfLargeIntegersIsCorrectlyRounded(): void
+    {
+        // Given middle values whose true midpoint …993.5 lies between the floats …992 and …994
+        // (on 32-bit PHP these literals parse as floats, so the expected value does not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $data = [9007199254740993, 9007199254740994];
+
+        // When
+        $result = Reduce::toPercentile($data, 50);
+
+        // Then
+        $this->assertSame(9007199254740994.0, $result);
+    }
+
+    /**
      * @test         toPercentile at the 50th percentile agrees with toMedian
      * @dataProvider dataProviderForMedianAgreement
      * @param        array $data

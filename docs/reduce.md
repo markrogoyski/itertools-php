@@ -296,7 +296,7 @@ Reduces to the median value.
 
 ```Reduce::toMedian(iterable $data): int|float|null```
 
-- For an even number of elements, the median is the mean of the two middle values, computed so that it neither overflows when the two middle values sum beyond `PHP_FLOAT_MAX` nor loses precision when their span exceeds the integer range (`toMedian([PHP_INT_MIN, PHP_INT_MAX])` is `-0.5`, not `0.0`). Two identical middle values return that value, including `INF`. An infinity paired with a finite value returns that infinity (`toMedian([-INF, -1])` is `-INF`), and opposite infinities return `NAN`.
+- For an even number of elements, the median is the mean of the two middle values, computed so that it neither overflows when the two middle values sum beyond `PHP_FLOAT_MAX` nor loses precision when their span exceeds the integer range (`toMedian([PHP_INT_MIN, PHP_INT_MAX])` is `-0.5`, not `0.0`). The mean is correctly rounded: it is the float nearest the exact mean (`toMedian([2**53 + 1, 2**53 + 2])` is `2**53 + 2`, not `2**53`), with one exception: when an integer beyond ±2^53 is paired with a non-integral float or a float beyond PHP's integer range, the integer is converted to a float before averaging. This can lose precision, and cancellation can amplify the error substantially: on 64-bit PHP, `toMedian([PHP_INT_MIN + 1, -(float) PHP_INT_MIN])` is `0.0` instead of `0.5`. Two identical middle values return that value, including `INF`. An infinity paired with a finite value returns that infinity (`toMedian([-INF, -1])` is `-INF`), and opposite infinities return `NAN`.
 - Returns null if collection is empty.
 
 ```php

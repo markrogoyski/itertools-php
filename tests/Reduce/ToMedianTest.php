@@ -207,6 +207,83 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toMedian of an even count is the correctly rounded midpoint of the middle values
+     * @dataProvider dataProviderForCorrectlyRoundedMidpoints
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testEvenMedianIsCorrectlyRounded(array $data, int|float $expected): void
+    {
+        // When
+        $result = Reduce::toMedian($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact rational midpoint, correctly rounded to a float):
+     *   float((Fraction(a) + Fraction(b)) / 2)
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
+    public static function dataProviderForCorrectlyRoundedMidpoints(): array
+    {
+        return [
+            // Integers whose sum overflows a 32-bit integer (exact on 64-bit, a separate branch on 32-bit)
+            [[1073741824, 1073741825], 1073741824.5],
+            // Subnormals: 79 and 228 units of 2^-1074, so the midpoint 153.5 units rounds to even 154
+            [[3.9E-322, 1.126E-321], 7.6E-322],
+            // Floats far apart in magnitude
+            [[3.769268241603519E+229, 2.4033014673755046E+243], 1.201650733687771E+243],
+            // Floats whose sum overflows PHP_FLOAT_MAX
+            [[7.130610204110192E+307, 1.6682355559978037E+308], 1.1906482882044114E+308],
+            // A float operand keeps the result a float even when the midpoint is an integer
+            [[2, 4.0], 3.0],
+            [[2, 4], 3],
+        ];
+    }
+
+    /**
+     * @test         toMedian of an even count of 64-bit integers is the correctly rounded midpoint
+     * @dataProvider dataProviderForCorrectlyRoundedSixtyFourBitMidpoints
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testEvenMedianOfSixtyFourBitIntegersIsCorrectlyRounded(array $data, int|float $expected): void
+    {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMedian($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact rational midpoint, correctly rounded to a float):
+     *   float((Fraction(a) + Fraction(b)) / 2)
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
+    public static function dataProviderForCorrectlyRoundedSixtyFourBitMidpoints(): array
+    {
+        return [
+            // Integers past 2^53: the true midpoint …993.5 lies between the floats …992 and …994
+            [[9007199254740993, 9007199254740994], 9007199254740994.0],
+            [[-9007199254740995, -9007199254740994], -9007199254740994.0],
+            // Integers whose sum overflows the integer range
+            [[-8111470270762753361, -6048612140903098404], -7.080041205832926E+18],
+            [[6048612140903098405, 8111470270762753362], 7.080041205832926E+18],
+            // An integer past 2^53 paired with an integral float
+            [[9007199254740993, 9007199254740994.0], 9007199254740994.0],
+            [[9007199254740998.0, 9007199254741541], 9007199254741270.0],
+        ];
+    }
+
+    /**
      * @test         toMedian of two identical infinities is that infinity
      * @dataProvider dataProviderForIdenticalInfiniteMiddleValues
      * @param        array $data
