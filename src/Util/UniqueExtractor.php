@@ -25,7 +25,9 @@ namespace IterTools\Util;
  * recursively under these coercive rules.
  *
  * Limits: arrays nested deeper than the depth limit (see MAX_DEPTH) throw
- * \InvalidArgumentException. This is a depth limit, not cycle detection.
+ * \InvalidArgumentException. This is a depth limit, not cycle detection, and it bounds depth,
+ * not memory: a self-referential array is re-hashed at every level until the limit, so the elements
+ * before the reference cost up to about MAX_DEPTH times their size before the exception.
  *
  * Keys derived from an identity are only meaningful while that identity is alive: see
  * {@see Identity} and {@see self::identify()}, which returns the key together with the values it
@@ -181,6 +183,9 @@ final class UniqueExtractor
         // it and the counter keeps climbing. Cycle detection would need per-call bookkeeping of
         // every array already visited, and there is no behavior to stay compatible with — PHP's
         // own == fatals on a self-referential array — so a fixed limit is the cheaper contract.
+        // The cost of that choice is memory: each level's $elements holds the keys of the siblings
+        // hashed before the cycle, so a cycle next to a large payload can exhaust memory_limit
+        // before this throws (documented in README.md, "Limits").
         if ($depth >= self::MAX_DEPTH) {
             throw new \InvalidArgumentException(
                 \sprintf(

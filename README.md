@@ -637,6 +637,12 @@ depth 1, `[[$scalar]]` is depth 2. This is a depth limit, not cycle detection: i
 rejects sufficiently deep acyclic arrays. It is the chosen strategy for failing cleanly on a
 self-referential array, where PHP's own `==` would fatal.
 
+The limit bounds depth, not memory. Before a self-referential array reaches it, the recursion
+hashes the elements that come before the reference again at every level, so memory grows with
+roughly `MAX_DEPTH` times their size: with half a megabyte of data ahead of the reference, a 64 MiB
+`memory_limit` is exhausted before the exception is thrown. Cycle detection is not planned;
+don't pass self-referential arrays.
+
 ### Retained values
 
 Every function that compares by identity (strict mode, and coercive mode for closures,

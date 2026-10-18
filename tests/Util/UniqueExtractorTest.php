@@ -310,6 +310,26 @@ class UniqueExtractorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test a self-referential array whose payload comes before the cycle still throws the depth-limit exception
+     * @dataProvider dataProviderForStrictFlag
+     * @param bool $strict
+     */
+    public function testSelfReferentialArrayWithPayloadBeforeTheCycleThrowsTheDepthLimitException(bool $strict): void
+    {
+        // Given: the payload is hashed again at every level the recursion revisits, so memory grows
+        // with MAX_DEPTH × the payload's key; it is kept small here, see README "Limits"
+        $array = [\str_repeat('x', 1024), 'key' => 1.5];
+        $array[] = &$array;
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage((string) UniqueExtractor::MAX_DEPTH);
+
+        // When
+        UniqueExtractor::getString($array, $strict);
+    }
+
+    /**
      * @return list<array{bool}>
      */
     public static function dataProviderForStrictFlag(): array
