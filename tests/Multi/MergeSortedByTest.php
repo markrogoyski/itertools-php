@@ -83,6 +83,27 @@ class MergeSortedByTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $yielded);
     }
 
+    /**
+     * @test the NAN guard only checks a key that is itself NAN: a NAN nested in a composite key is not
+     *       detected, so nothing throws (the merge order is unspecified; see README "NaN and Ordering")
+     */
+    public function testDoesNotRejectNanNestedInCompositeKey(): void
+    {
+        // Given
+        $merged = Multi::mergeSortedBy(
+            static fn (array $pair): array => $pair,
+            [[1.0, 'a'], [\NAN, 'b']],
+            [[2.0, 'c']],
+        );
+
+        // When
+        $ids = \array_map(static fn (array $pair): string => $pair[1], \iterator_to_array($merged, false));
+
+        // Then
+        \sort($ids);
+        $this->assertSame(['a', 'b', 'c'], $ids);
+    }
+
     public function testPropagatesKeyFunctionExceptionWithoutWrapping(): void
     {
         // Given

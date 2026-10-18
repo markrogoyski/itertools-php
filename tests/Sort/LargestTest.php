@@ -323,6 +323,30 @@ class LargestTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test largest only skips a key that is itself NaN: a NaN nested in a composite key is not detected
+     *       and the element is kept (its position is unspecified; see README "NaN and Ordering")
+     */
+    public function testNanNestedInCompositeKeyIsNotSkipped(): void
+    {
+        // Given
+        $data = [
+            (object)['id' => 'a', 'key' => [2.0, 'a']],
+            (object)['id' => 'b', 'key' => [NAN, 'b']],
+            (object)['id' => 'c', 'key' => [1.0, 'c']],
+        ];
+
+        // When
+        $result = [];
+        foreach (Sort::largest($data, 3, fn ($o) => $o->key) as $item) {
+            $result[] = $item->id;
+        }
+
+        // Then
+        \sort($result);
+        $this->assertSame(['a', 'b', 'c'], $result);
+    }
+
+    /**
      * @test largest returns a Generator
      */
     public function testReturnsGenerator(): void

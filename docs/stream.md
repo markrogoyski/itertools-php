@@ -1486,7 +1486,8 @@ Reduces the stream to the n largest elements (descending order).
 ```$stream->largest(int $n, callable $keyFn = null)```
 
 Uses a bounded heap of size `n` internally — the full stream is never sorted.
-Stable under ties; skips NaN keys; throws `\InvalidArgumentException` for negative `$n`.
+Stable under ties; skips NaN keys (not a NaN nested in a composite key; see
+[NaN and Ordering](../README.md#nan-and-ordering)); throws `\InvalidArgumentException` for negative `$n`.
 
 See also [`Sort::largest()`](sort-iteration.md#largest).
 
@@ -1525,7 +1526,8 @@ Reduces the stream to the n smallest elements (ascending order).
 ```$stream->smallest(int $n, callable $keyFn = null)```
 
 Uses a bounded heap of size `n` internally — the full stream is never sorted.
-Stable under ties; skips NaN keys; throws `\InvalidArgumentException` for negative `$n`.
+Stable under ties; skips NaN keys (not a NaN nested in a composite key; see
+[NaN and Ordering](../README.md#nan-and-ordering)); throws `\InvalidArgumentException` for negative `$n`.
 
 See also [`Sort::smallest()`](sort-iteration.md#smallest).
 

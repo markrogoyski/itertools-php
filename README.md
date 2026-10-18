@@ -658,6 +658,27 @@ value while the comparison is still running.
 * `symmetricDifference*` additionally retains the last-seen representative per distinct
   value, since it is part of the output.
 
+## NaN and Ordering
+
+Functions that order values guard against `NAN` only when the comparison key is itself a
+float `NAN`. The key is the element, or what `$compareBy`, `$keyFn` or `$keyFunc` returns.
+
+* `toMin`, `toMax`, `toMinMax`, `Sort::largest` and `Sort::smallest` skip the element.
+* `isSorted`, `isReversed`, `isSortedBy` and `isReversedBy` return `false`. The check runs on
+  adjacent pairs, so a collection with a single element is sorted even if its key is `NAN`.
+* `mergeSorted` and `mergeSortedBy` throw `\InvalidArgumentException`.
+
+Their `Stream` counterparts behave the same way.
+
+A `NAN` nested inside a composite key, such as `[NAN, $id]` or an object property, is not
+detected. Such keys are compared with PHP's own operators, and PHP orders `NAN` against
+nothing: `NAN <=> 1` and `1 <=> NAN` are both `1`, so `[NAN, 'b']` compares as greater than
+`[1.0, 'a']` and `[1.0, 'a']` compares as greater than `[NAN, 'b']`. The result is then
+unspecified: the element is kept at an arbitrary position, `isSorted` may return `true`, and a
+merge may yield out of order. Inspecting composite keys is not planned. If a composite key can
+contain `NAN`, map it to a comparable value in the key function, or filter those elements out
+first.
+
 Standards
 ---------
 

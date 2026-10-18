@@ -127,7 +127,8 @@ final class Sort
      * Stable: elements with equal comparison keys are retained in original input order
      * when ties exceed available slots, and emitted in insertion order among ties.
      *
-     * NaN policy: elements whose comparison key is NaN are skipped.
+     * NaN policy: elements whose comparison key is NaN are skipped. A NaN nested inside a composite
+     * key (e.g. [NAN, $id]) is not detected; see README "NaN and Ordering".
      *
      * @param iterable<mixed>            $data
      * @param int                        $n     number of largest elements to keep (must be non-negative).
@@ -196,7 +197,8 @@ final class Sort
      * Stable: elements with equal comparison keys are retained in original input order
      * when ties exceed available slots, and emitted in insertion order among ties.
      *
-     * NaN policy: elements whose comparison key is NaN are skipped.
+     * NaN policy: elements whose comparison key is NaN are skipped. A NaN nested inside a composite
+     * key (e.g. [NAN, $id]) is not detected; see README "NaN and Ordering".
      *
      * @param iterable<mixed>            $data
      * @param int                        $n     number of smallest elements to keep (must be non-negative).
