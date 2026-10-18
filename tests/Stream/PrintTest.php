@@ -495,4 +495,55 @@ class PrintTest extends \PHPUnit\Framework\TestCase
         // When
         $stream->callForEach($func);
     }
+
+
+    /**
+     * @test print, printLn and printR format NAN as 'NAN' without raising PHP 8.5's NAN-to-string warning
+     * @dataProvider dataProviderForPrintNan
+     */
+    public function testPrintNan(iterable $data, callable $printer, string $expectedOutput): void
+    {
+        // Given
+        $stream   = Stream::of($data);
+        $raised   = [];
+        $previous = \set_error_handler(static function (int $errno, string $errstr) use (&$raised): bool {
+            $raised[] = $errstr;
+            return true;
+        });
+
+        // Then
+        $this->expectOutputString($expectedOutput);
+
+        try {
+            // When
+            $printer($stream);
+        } finally {
+            \set_error_handler($previous);
+        }
+
+        // Then
+        $this->assertSame([], $raised);
+    }
+
+    public static function dataProviderForPrintNan(): array
+    {
+        $print   = fn (Stream $stream) => $stream->print(', ');
+        $printLn = fn (Stream $stream) => $stream->printLn();
+        $printR  = fn (Stream $stream) => $stream->printR();
+
+        return [
+            'print array'                => [[1, \NAN, 2.5], $print, '1, NAN, 2.5'],
+            'print generator'            => [GeneratorFixture::getGenerator([1, \NAN, 2.5]), $print, '1, NAN, 2.5'],
+            'print iterator'             => [new ArrayIteratorFixture([1, \NAN, 2.5]), $print, '1, NAN, 2.5'],
+            'print iterator aggregate'   => [new IteratorAggregateFixture([1, \NAN, 2.5]), $print, '1, NAN, 2.5'],
+            'printLn array'              => [[1, \NAN, 2.5], $printLn, '1' . \PHP_EOL . 'NAN' . \PHP_EOL . '2.5' . \PHP_EOL],
+            'printLn generator'          => [GeneratorFixture::getGenerator([1, \NAN, 2.5]), $printLn, '1' . \PHP_EOL . 'NAN' . \PHP_EOL . '2.5' . \PHP_EOL],
+            'printLn iterator'           => [new ArrayIteratorFixture([1, \NAN, 2.5]), $printLn, '1' . \PHP_EOL . 'NAN' . \PHP_EOL . '2.5' . \PHP_EOL],
+            'printLn iterator aggregate' => [new IteratorAggregateFixture([1, \NAN, 2.5]), $printLn, '1' . \PHP_EOL . 'NAN' . \PHP_EOL . '2.5' . \PHP_EOL],
+            'printR array'               => [[1, \NAN, 2.5], $printR, '1NAN2.5'],
+            'printR generator'           => [GeneratorFixture::getGenerator([1, \NAN, 2.5]), $printR, '1NAN2.5'],
+            'printR iterator'            => [new ArrayIteratorFixture([1, \NAN, 2.5]), $printR, '1NAN2.5'],
+            'printR iterator aggregate'  => [new IteratorAggregateFixture([1, \NAN, 2.5]), $printR, '1NAN2.5'],
+        ];
+    }
 }

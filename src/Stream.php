@@ -3346,7 +3346,7 @@ final class Stream implements \IteratorAggregate
     {
         foreach ($this->iterable as $item) {
             /** @phpstan-ignore cast.string */
-            print((string) $item . \PHP_EOL);
+            print((\is_float($item) && \is_nan($item) ? 'NAN' : (string) $item) . \PHP_EOL);
         }
     }
 
@@ -3358,7 +3358,7 @@ final class Stream implements \IteratorAggregate
     public function printR(): void
     {
         foreach ($this->iterable as $item) {
-            \print_r($item);
+            \print_r(\is_float($item) && \is_nan($item) ? 'NAN' : $item);
         }
     }
 

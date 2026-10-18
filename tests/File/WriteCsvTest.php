@@ -314,4 +314,54 @@ class WriteCsvTest extends \PHPUnit\Framework\TestCase
         // When
         File::writeCsv($file, [], ['abcdef', 'x']);
     }
+
+
+    /**
+     * @test         writeCsv formats NAN fields as 'NAN' without raising PHP 8.5's NAN-to-string warning
+     * @dataProvider dataProviderForNan
+     * @param        iterable<array<scalar>> $rows
+     */
+    public function testWriteCsvNan(iterable $rows, string $expected): void
+    {
+        // Given
+        $file     = $this->writableFile();
+        $raised   = [];
+        $previous = \set_error_handler(static function (int $errno, string $errstr) use (&$raised): bool {
+            $raised[] = $errstr;
+            return true;
+        });
+
+        try {
+            // When
+            File::writeCsv($file, $rows);
+        } finally {
+            \set_error_handler($previous);
+        }
+
+        // Then
+        $this->assertSame([], $raised);
+        $this->assertSame($expected, $this->readBack($file));
+    }
+
+    public static function dataProviderForNan(): array
+    {
+        return [
+            [
+                [[1, \NAN, 2.5], [\NAN, 'a', \INF]],
+                "1,NAN,2.5\nNAN,a,INF\n",
+            ],
+            [
+                GeneratorFixture::getGenerator([[1, \NAN, 2.5], [\NAN, 'a', \INF]]),
+                "1,NAN,2.5\nNAN,a,INF\n",
+            ],
+            [
+                new ArrayIteratorFixture([[1, \NAN, 2.5], [\NAN, 'a', \INF]]),
+                "1,NAN,2.5\nNAN,a,INF\n",
+            ],
+            [
+                new IteratorAggregateFixture([[1, \NAN, 2.5], [\NAN, 'a', \INF]]),
+                "1,NAN,2.5\nNAN,a,INF\n",
+            ],
+        ];
+    }
 }

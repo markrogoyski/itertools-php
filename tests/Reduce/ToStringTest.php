@@ -510,4 +510,58 @@ class ToStringTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+
+    /**
+     * @test         toString formats NAN as 'NAN' without raising PHP 8.5's NAN-to-string warning
+     * @dataProvider dataProviderForNan
+     * @param        iterable<mixed> $data
+     * @param        string $expected
+     */
+    public function testToStringNan(iterable $data, string $expected): void
+    {
+        // Given
+        $raised   = [];
+        $previous = \set_error_handler(static function (int $errno, string $errstr) use (&$raised): bool {
+            $raised[] = $errstr;
+            return true;
+        });
+
+        try {
+            // When
+            $result = Reduce::toString($data, ', ');
+        } finally {
+            \set_error_handler($previous);
+        }
+
+        // Then
+        $this->assertSame([], $raised);
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForNan(): array
+    {
+        return [
+            [
+                [\NAN],
+                'NAN',
+            ],
+            [
+                [1, \NAN, 2.5, \INF, 'a'],
+                '1, NAN, 2.5, INF, a',
+            ],
+            [
+                GeneratorFixture::getGenerator([1, \NAN, 2.5, \INF, 'a']),
+                '1, NAN, 2.5, INF, a',
+            ],
+            [
+                new ArrayIteratorFixture([1, \NAN, 2.5, \INF, 'a']),
+                '1, NAN, 2.5, INF, a',
+            ],
+            [
+                new IteratorAggregateFixture([1, \NAN, 2.5, \INF, 'a']),
+                '1, NAN, 2.5, INF, a',
+            ],
+        ];
+    }
 }

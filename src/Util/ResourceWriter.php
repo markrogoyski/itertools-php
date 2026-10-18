@@ -47,6 +47,11 @@ final class ResourceWriter
         \ftruncate($scratch, 0);
         \rewind($scratch);
 
+        $row = \array_map(
+            static fn (mixed $field): mixed => \is_float($field) && \is_nan($field) ? 'NAN' : $field,
+            $row
+        );
+
         /** @var array<scalar|null> $row */
         \fputcsv($scratch, $row, $separator, $enclosure, $escape);
         \rewind($scratch);

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace IterTools\Tests\Stream;
 
 use IterTools\Stream;
+use IterTools\Tests\Fixture\ArrayIteratorFixture;
+use IterTools\Tests\Fixture\GeneratorFixture;
+use IterTools\Tests\Fixture\IteratorAggregateFixture;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
@@ -874,5 +877,56 @@ END_OF_EXPECTED;
 
         // When
         Stream::of([])->toCsvFile($file, ['abcdef', 'x']);
+    }
+
+    /**
+     * @test         toCsvFile formats NAN fields as 'NAN' without raising PHP 8.5's NAN-to-string warning
+     * @dataProvider dataProviderForToCsvFileNan
+     * @param        iterable<array<scalar>> $rows
+     */
+    public function testToCsvFileNan(iterable $rows, string $expected): void
+    {
+        // Given
+        $stream   = Stream::of($rows);
+        $filePath = $this->root->url() . '/' . uniqid();
+        $file     = \fopen($filePath, 'w');
+        $raised   = [];
+        $previous = \set_error_handler(static function (int $errno, string $errstr) use (&$raised): bool {
+            $raised[] = $errstr;
+            return true;
+        });
+
+        try {
+            // When
+            $stream->toCsvFile($file);
+        } finally {
+            \set_error_handler($previous);
+        }
+
+        // Then
+        $this->assertSame([], $raised);
+        $this->assertSame($expected, \file_get_contents($filePath));
+    }
+
+    public static function dataProviderForToCsvFileNan(): array
+    {
+        return [
+            [
+                [[1, \NAN, 2.5], [\NAN, 'a', \INF]],
+                "1,NAN,2.5\nNAN,a,INF\n",
+            ],
+            [
+                GeneratorFixture::getGenerator([[1, \NAN, 2.5], [\NAN, 'a', \INF]]),
+                "1,NAN,2.5\nNAN,a,INF\n",
+            ],
+            [
+                new ArrayIteratorFixture([[1, \NAN, 2.5], [\NAN, 'a', \INF]]),
+                "1,NAN,2.5\nNAN,a,INF\n",
+            ],
+            [
+                new IteratorAggregateFixture([[1, \NAN, 2.5], [\NAN, 'a', \INF]]),
+                "1,NAN,2.5\nNAN,a,INF\n",
+            ],
+        ];
     }
 }

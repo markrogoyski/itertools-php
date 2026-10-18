@@ -792,7 +792,7 @@ final class Reduce
         $items = [];
         foreach ($data as $datum) {
             /** @var string|int|float $datum */
-            $items[] = $datum;
+            $items[] = \is_float($datum) && \is_nan($datum) ? 'NAN' : $datum;
         }
 
         $joined = \implode($separator, $items);
