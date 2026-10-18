@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\Arithmetic;
 use IterTools\Util\UniqueExtractor;
 
 final class Single
@@ -1108,10 +1109,10 @@ final class Single
         // equal as floats.
         $startExact = $start;
         $endExact = $end;
-        if (\is_int($start) && self::isIntegralFloatInIntRange($end)) {
-            $endExact = (int)$end;
-        } elseif (\is_int($end) && self::isIntegralFloatInIntRange($start)) {
-            $startExact = (int)$start;
+        if (\is_int($start)) {
+            $endExact = Arithmetic::toExactInt($end) ?? $end;
+        } elseif (\is_int($end)) {
+            $startExact = Arithmetic::toExactInt($start) ?? $start;
         }
 
         if ($startExact == $endExact) {
@@ -1172,7 +1173,7 @@ final class Single
             // range(1e15, 1e15 + 1, 0.278) 5 instead of 4 on a quotient of 3.597.
             $operandTolerance = $intOperands
                 ? 0.0
-                : (self::halfFloatSpacing($startF) + self::halfFloatSpacing($endF)) / $magnitudeF;
+                : (Arithmetic::halfFloatSpacing($startF) + Arithmetic::halfFloatSpacing($endF)) / $magnitudeF;
             if ($operandTolerance >= 0.25) {
                 $operandTolerance = 0.0;
             }
@@ -1415,42 +1416,5 @@ final class Single
         if ($partial && !$lastIterationYielded && \count($window) > 0) {
             yield $window;
         }
-    }
-
-    /**
-     * Whether $x is a float with an integer value in [PHP_INT_MIN, PHP_INT_MAX], so (int)$x is exact.
-     *
-     * (float)PHP_INT_MAX rounds up to 2^63, which is out of range, so the upper bound is exclusive.
-     */
-    private static function isIntegralFloatInIntRange(int|float $x): bool
-    {
-        return \is_float($x)
-            && \fmod($x, 1.0) === 0.0
-            && $x >= (float)\PHP_INT_MIN
-            && $x < -(float)\PHP_INT_MIN;
-    }
-
-    /**
-     * Half the float spacing at $x: 2^-53 times the largest power of two not above |x|.
-     *
-     * Bounding it by PHP_FLOAT_EPSILON / 2 * |x| instead is up to twice as loose, which accepts
-     * range(1e15, 1e15 + 3.125, 1.1) as 3 steps when no operands that round to these floats give that.
-     * Subnormals are taken as exact: half their spacing, 2^-1075, isn't representable.
-     */
-    private static function halfFloatSpacing(float $x): float
-    {
-        $x = \abs($x);
-        if ($x < \PHP_FLOAT_MIN) {
-            return 0.0;
-        }
-        // log() can be off by one at powers of two; correct the power to bracket $x. Near
-        // PHP_FLOAT_MAX it rounds up to 1024, and 2^1024 overflows to INF, so cap it first.
-        $power = 2.0 ** \min(\floor(\log($x, 2)), 1023.0);
-        if ($power > $x) {
-            $power /= 2.0;
-        } elseif ($power * 2.0 <= $x) {
-            $power *= 2.0;
-        }
-        return $power * (\PHP_FLOAT_EPSILON / 2.0);
     }
 }

@@ -227,24 +227,14 @@ final class UniqueExtractor
         // -0.0 === 0.0 and they are the same number, so the sign of zero must not reach the key.
         $value = $var === 0.0 ? 0.0 : $var;
 
-        if (!$strict && self::isIntegralWithinIntRange($value)) {
-            return 'int:' . (int) $value;
+        if (!$strict) {
+            $int = Arithmetic::toExactInt($value);
+            if ($int !== null) {
+                return 'int:' . $int;
+            }
         }
 
         return 'float:' . \bin2hex(\pack('E', $value));
-    }
-
-    /**
-     * Is the float a whole number that the platform's int type can hold exactly?
-     */
-    private static function isIntegralWithinIntRange(float $value): bool
-    {
-        // The upper bound is exclusive and derived from PHP_INT_MIN: (float) PHP_INT_MAX rounds
-        // up to 2**63, which is out of int range, so comparing against it would accept a float
-        // whose int cast is undefined. INF and -INF fail these comparisons and never fold.
-        return $value == \floor($value)
-            && $value >= (float) \PHP_INT_MIN
-            && $value < -(float) \PHP_INT_MIN;
     }
 
     /**

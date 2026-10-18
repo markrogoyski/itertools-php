@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\Arithmetic;
 use IterTools\Util\NoValueMonad;
 use IterTools\Util\ValueCounter;
 
@@ -733,8 +734,8 @@ final class Reduce
             return $lo + $hi;
         }
 
-        $intLo = static::toExactInt($lo);
-        $intHi = static::toExactInt($hi);
+        $intLo = Arithmetic::toExactInt($lo);
+        $intHi = Arithmetic::toExactInt($hi);
 
         if ($intLo !== null && $intHi !== null) {
             $midpoint = static::integerMidpoint($intLo, $intHi);
@@ -801,27 +802,6 @@ final class Reduce
         $floor = $lo + \intdiv($span, 2);
 
         return $span % 2 === 0 ? $floor : (float) ($floor | 1);
-    }
-
-    /**
-     * Returns the number as an integer if it is one, or a float that converts to an integer exactly.
-     *
-     * @param int|float $number
-     *
-     * @return int|null null for a non-integral float, or one outside the integer range
-     */
-    private static function toExactInt(int|float $number): ?int
-    {
-        if (\is_int($number)) {
-            return $number;
-        }
-
-        // (float) PHP_INT_MIN is exactly -2^63, so the range is [-2^63, 2^63).
-        if ($number >= (float) \PHP_INT_MIN && $number < -(float) \PHP_INT_MIN && \floor($number) === $number) {
-            return (int) $number;
-        }
-
-        return null;
     }
 
     /**
