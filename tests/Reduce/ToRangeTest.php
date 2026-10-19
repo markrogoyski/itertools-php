@@ -323,4 +323,284 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame(0, $result);
     }
+
+    /**
+     * @test         toRange array of an int beyond 2^53 and a float, which compare equal or subtract wrongly as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionArray
+     * @param        array        $data
+     * @param        float        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionArray(array $data, float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact comparison and rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * NAN is skipped, and integer strings are converted to int, as PHP does.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionArray(): array
+    {
+        return [
+            'int 2^53 + 1 below float 2.0^53 + 2' => [
+                [9007199254740993, 9007199254740994.0],
+                1.0,
+            ],
+            'int 2^53 + 1 above float 2.0^53, equal as floats' => [
+                [9007199254740993, 9007199254740992.0],
+                1.0,
+            ],
+            'float 2.0^53 first, below int 2^53 + 1, equal as floats' => [
+                [9007199254740992.0, 9007199254740993],
+                1.0,
+            ],
+            'minimum is the float that equals the last int as floats' => [
+                [9007199254740994, 9007199254740992.0, 9007199254740993],
+                2.0,
+            ],
+            'minimum is the first float, maximum the last int' => [
+                [9007199254740992.0, 9007199254740993, 9007199254740994],
+                2.0,
+            ],
+            'negative int -(2^53 + 1) below float -2.0^53' => [
+                [-9007199254740993, -9007199254740992.0],
+                1.0,
+            ],
+            'int 2^62 + 1 below float 2.0^62 + 1024' => [
+                [4611686018427387905, 4611686018427388928.0],
+                1023.0,
+            ],
+            'NAN skipped' => [
+                [9007199254740993, \NAN, 9007199254740992.0],
+                1.0,
+            ],
+            'integer string 2^53 + 1 above float 2.0^53' => [
+                ['9007199254740993', 9007199254740992.0],
+                1.0,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toRange generators of an int beyond 2^53 and a float, which compare equal or subtract wrongly as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionGenerators
+     * @param        \Generator   $data
+     * @param        float        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionGenerators(\Generator $data, float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact comparison and rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * NAN is skipped, and integer strings are converted to int, as PHP does.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionGenerators(): array
+    {
+        $gen = static function (array $data) {
+            return GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            'int 2^53 + 1 below float 2.0^53 + 2' => [
+                $gen([9007199254740993, 9007199254740994.0]),
+                1.0,
+            ],
+            'int 2^53 + 1 above float 2.0^53, equal as floats' => [
+                $gen([9007199254740993, 9007199254740992.0]),
+                1.0,
+            ],
+            'float 2.0^53 first, below int 2^53 + 1, equal as floats' => [
+                $gen([9007199254740992.0, 9007199254740993]),
+                1.0,
+            ],
+            'minimum is the float that equals the last int as floats' => [
+                $gen([9007199254740994, 9007199254740992.0, 9007199254740993]),
+                2.0,
+            ],
+            'minimum is the first float, maximum the last int' => [
+                $gen([9007199254740992.0, 9007199254740993, 9007199254740994]),
+                2.0,
+            ],
+            'negative int -(2^53 + 1) below float -2.0^53' => [
+                $gen([-9007199254740993, -9007199254740992.0]),
+                1.0,
+            ],
+            'int 2^62 + 1 below float 2.0^62 + 1024' => [
+                $gen([4611686018427387905, 4611686018427388928.0]),
+                1023.0,
+            ],
+            'NAN skipped' => [
+                $gen([9007199254740993, \NAN, 9007199254740992.0]),
+                1.0,
+            ],
+            'integer string 2^53 + 1 above float 2.0^53' => [
+                $gen(['9007199254740993', 9007199254740992.0]),
+                1.0,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toRange iterators of an int beyond 2^53 and a float, which compare equal or subtract wrongly as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionIterators
+     * @param        \Iterator    $data
+     * @param        float        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionIterators(\Iterator $data, float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact comparison and rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * NAN is skipped, and integer strings are converted to int, as PHP does.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionIterators(): array
+    {
+        $iter = static function (array $data) {
+            return new ArrayIteratorFixture($data);
+        };
+
+        return [
+            'int 2^53 + 1 below float 2.0^53 + 2' => [
+                $iter([9007199254740993, 9007199254740994.0]),
+                1.0,
+            ],
+            'int 2^53 + 1 above float 2.0^53, equal as floats' => [
+                $iter([9007199254740993, 9007199254740992.0]),
+                1.0,
+            ],
+            'float 2.0^53 first, below int 2^53 + 1, equal as floats' => [
+                $iter([9007199254740992.0, 9007199254740993]),
+                1.0,
+            ],
+            'minimum is the float that equals the last int as floats' => [
+                $iter([9007199254740994, 9007199254740992.0, 9007199254740993]),
+                2.0,
+            ],
+            'minimum is the first float, maximum the last int' => [
+                $iter([9007199254740992.0, 9007199254740993, 9007199254740994]),
+                2.0,
+            ],
+            'negative int -(2^53 + 1) below float -2.0^53' => [
+                $iter([-9007199254740993, -9007199254740992.0]),
+                1.0,
+            ],
+            'int 2^62 + 1 below float 2.0^62 + 1024' => [
+                $iter([4611686018427387905, 4611686018427388928.0]),
+                1023.0,
+            ],
+            'NAN skipped' => [
+                $iter([9007199254740993, \NAN, 9007199254740992.0]),
+                1.0,
+            ],
+            'integer string 2^53 + 1 above float 2.0^53' => [
+                $iter(['9007199254740993', 9007199254740992.0]),
+                1.0,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toRange traversables of an int beyond 2^53 and a float, which compare equal or subtract wrongly as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionTraversables
+     * @param        \Traversable $data
+     * @param        float        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionTraversables(\Traversable $data, float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact comparison and rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * NAN is skipped, and integer strings are converted to int, as PHP does.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionTraversables(): array
+    {
+        $trav = static function (array $data) {
+            return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            'int 2^53 + 1 below float 2.0^53 + 2' => [
+                $trav([9007199254740993, 9007199254740994.0]),
+                1.0,
+            ],
+            'int 2^53 + 1 above float 2.0^53, equal as floats' => [
+                $trav([9007199254740993, 9007199254740992.0]),
+                1.0,
+            ],
+            'float 2.0^53 first, below int 2^53 + 1, equal as floats' => [
+                $trav([9007199254740992.0, 9007199254740993]),
+                1.0,
+            ],
+            'minimum is the float that equals the last int as floats' => [
+                $trav([9007199254740994, 9007199254740992.0, 9007199254740993]),
+                2.0,
+            ],
+            'minimum is the first float, maximum the last int' => [
+                $trav([9007199254740992.0, 9007199254740993, 9007199254740994]),
+                2.0,
+            ],
+            'negative int -(2^53 + 1) below float -2.0^53' => [
+                $trav([-9007199254740993, -9007199254740992.0]),
+                1.0,
+            ],
+            'int 2^62 + 1 below float 2.0^62 + 1024' => [
+                $trav([4611686018427387905, 4611686018427388928.0]),
+                1023.0,
+            ],
+            'NAN skipped' => [
+                $trav([9007199254740993, \NAN, 9007199254740992.0]),
+                1.0,
+            ],
+            'integer string 2^53 + 1 above float 2.0^53' => [
+                $trav(['9007199254740993', 9007199254740992.0]),
+                1.0,
+            ],
+        ];
+    }
 }

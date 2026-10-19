@@ -147,4 +147,95 @@ class ArithmeticTest extends \PHPUnit\Framework\TestCase
             [-0.0, 0.0],
         ];
     }
+
+    /**
+     * @test compare orders two numbers by their exact values
+     * @dataProvider dataProviderForCompare
+     * @param int|float $a
+     * @param int|float $b
+     * @param int       $expected
+     */
+    public function testCompare(int|float $a, int|float $b, int $expected): void
+    {
+        // When
+        $result = Arithmetic::compare($a, $b);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with (Python compares an int and a float by their exact values):
+     *   (a > b) - (a < b)
+     *
+     * @return array<array{int|float, int|float, int}>
+     */
+    public static function dataProviderForCompare(): array
+    {
+        return [
+            [1, 2, -1],
+            [2, 1, 1],
+            [1, 1, 0],
+            [1.5, 1.5, 0],
+            [1, 1.0, 0],
+            [1.0, 1, 0],
+            [1, 1.5, -1],
+            [1.5, 1, 1],
+            [-1, -0.5, -1],
+            [0, -0.0, 0],
+            [-0.0, 0, 0],
+            [-0.0, 0.0, 0],
+            [3, \INF, -1],
+            [\INF, 3, 1],
+            [3, -\INF, 1],
+            [-\INF, 3, -1],
+            [\INF, \INF, 0],
+        ];
+    }
+
+    /**
+     * @test compare orders a 64-bit integer and a float that compare equal once the integer is converted to float
+     * @dataProvider dataProviderForCompareSixtyFourBit
+     * @param int|float $a
+     * @param int|float $b
+     * @param int       $expected
+     */
+    public function testCompareSixtyFourBit(int|float $a, int|float $b, int $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Arithmetic::compare($a, $b);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with (Python compares an int and a float by their exact values):
+     *   (a > b) - (a < b)
+     *
+     * @return array<array{int|float, int|float, int}>
+     */
+    public static function dataProviderForCompareSixtyFourBit(): array
+    {
+        return [
+            [9007199254740993, 9007199254740992.0, 1],
+            [9007199254740992.0, 9007199254740993, -1],
+            [9007199254740993, 9007199254740994.0, -1],
+            [9007199254740994.0, 9007199254740993, 1],
+            [-9007199254740993, -9007199254740992.0, -1],
+            [\PHP_INT_MAX, 2.0 ** 63, -1],
+            [2.0 ** 63, \PHP_INT_MAX, 1],
+            [\PHP_INT_MAX, 2.0 ** 63 - 1024.0, 1],
+            [\PHP_INT_MIN, -(2.0 ** 63), 0],
+            [\PHP_INT_MIN + 1, -(2.0 ** 63), 1],
+            [-(2.0 ** 63), \PHP_INT_MIN + 1, -1],
+            [\PHP_INT_MAX, 1.0e300, -1],
+            [\PHP_INT_MIN, -1.0e300, 1],
+        ];
+    }
 }

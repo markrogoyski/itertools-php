@@ -34,6 +34,45 @@ final class Arithmetic
     }
 
     /**
+     * Compares two numbers by their exact values, returning -1, 0 or 1 as the spaceship operator does.
+     *
+     * PHP compares an int with a float by converting the int to float, which rounds an int beyond ±2^53:
+     * 2^53 + 1 <=> 2.0^53 is 0. NAN is unordered; callers exclude it.
+     *
+     * @param int|float $a
+     * @param int|float $b
+     *
+     * @return int
+     */
+    public static function compare(int|float $a, int|float $b): int
+    {
+        if (\is_int($a) && \is_float($b)) {
+            return self::compareIntToFloat($a, $b);
+        }
+        if (\is_float($a) && \is_int($b)) {
+            return -self::compareIntToFloat($b, $a);
+        }
+
+        return $a <=> $b;
+    }
+
+    /**
+     * Rounding to float is monotonic, so (float) $int <=> $float is right whenever it finds the two unequal.
+     * Equal, the float is an integer, compared in the int domain, unless it is 2^63, just past PHP_INT_MAX.
+     */
+    private static function compareIntToFloat(int $int, float $float): int
+    {
+        $order = (float) $int <=> $float;
+        if ($order !== 0) {
+            return $order;
+        }
+
+        $exact = self::toExactInt($float);
+
+        return $exact === null ? -1 : $int <=> $exact;
+    }
+
+    /**
      * Half the float spacing at $x: 2^-53 times the largest power of two not above |x|.
      *
      * Bounding it by PHP_FLOAT_EPSILON / 2 * |x| instead is up to twice as loose, which makes

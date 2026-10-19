@@ -540,6 +540,8 @@ Reduces given collection to its range (difference between max and min).
 
 Returns `0` if iterable source is empty.
 
+* Values are compared exactly, and an int beyond ±2^53, which a float can't always represent, is subtracted exactly from an int or an integral float within the int range when their difference fits in an int: `Reduce::toRange([2**53 + 1, 2.0**53])` is `1.0`, where `max - min` in PHP gives `0.0`. A difference beyond the int range is taken in float arithmetic and can misround: `Reduce::toRange([-(2**62 + 1), 2.0**62 + 1024])` is 2^63, where the correctly rounded range is 2^63 + 2048. Paired with a non-integral float or a float beyond the int range, the int is converted to float in the subtraction and the range can be off: `Reduce::toRange([PHP_INT_MAX, 2.0**63])` is `0.0`, where the true range is 1.
+
 ```php
 use IterTools\Reduce;
 

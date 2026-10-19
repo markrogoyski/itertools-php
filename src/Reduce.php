@@ -861,16 +861,57 @@ final class Reduce
      *
      * Returns 0 if given collection is empty.
      *
+     * Values are compared exactly, and an int beyond ±2^53 and an integral float within the int range are
+     * subtracted exactly when their difference fits in an int: `toRange([2 ** 53 + 1, 2.0 ** 53])` is `1.0`.
+     * A difference beyond the int range is taken in float arithmetic and can misround:
+     * `toRange([-(2 ** 62 + 1), 2.0 ** 62 + 1024])` is 2^63, where the correctly rounded range is 2^63 + 2048.
+     * Paired with a non-integral float or a float beyond the int range, the int is converted to float in the
+     * subtraction and the range can be off: `toRange([PHP_INT_MAX, 2.0 ** 63])` is `0.0`, where the true range is 1.
+     *
      * @param iterable<numeric> $numbers
      *
      * @return int|float
      */
     public static function toRange(iterable $numbers): int|float
     {
-        [$min, $max] = static::toMinMax($numbers);
+        $min = null;
+        $max = null;
+        foreach ($numbers as $number) {
+            if (!\is_int($number) && !\is_float($number)) {
+                // Numeric strings convert as they would in the subtraction.
+                /** @psalm-suppress InvalidOperand */
+                $number = $number + 0;
+            }
+            if (\is_float($number) && \is_nan($number)) {
+                continue;
+            }
+
+            // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when
+            // they are not. Ties keep \min() and \max()'s choices: the later value for the minimum, the
+            // earlier one for the maximum.
+            if ($min === null || Arithmetic::compare($number, $min) <= 0) {
+                $min = $number;
+            }
+            if ($max === null || Arithmetic::compare($number, $max) > 0) {
+                $max = $number;
+            }
+        }
+
+        if ($min === null || $max === null) {
+            return 0;
+        }
+
+        // Subtract an int and an integral float in the int domain: 2^53 + 1 - 2.0^53 is 1, not 0.0.
+        if (\is_int($min) !== \is_int($max)) {
+            $minInt = Arithmetic::toExactInt($min);
+            $maxInt = Arithmetic::toExactInt($max);
+            if ($minInt !== null && $maxInt !== null) {
+                return (float) ($maxInt - $minInt);
+            }
+        }
 
         /** @psalm-suppress InvalidOperand */
-        return ($max ?? 0) - ($min ?? 0);
+        return $max - $min;
     }
 
     /**
