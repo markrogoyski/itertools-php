@@ -10,6 +10,17 @@ use IterTools\Tests\Fixture;
 class RelativeFrequenciesByTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * Bound for the sum of the relative frequencies against 1. Each term is within 0.5 ulp
+     * (about 1.1e-16) of its exact value, so the sum of the three terms below is within about
+     * 4e-16 of 1.
+     */
+    private const SUM_DELTA = 1e-12;
+
+    /**
+     * Example data generated with Python:
+     *   c = collections.Counter(map(len, ['apple', 'pear', 'kiwi', 'plum']))
+     *   {k: float(Fraction(n, 4)) for k, n in c.items()}
+     *
      * @test relativeFrequenciesBy example usage
      */
     public function testRelativeFrequenciesByExampleUsage(): void
@@ -26,7 +37,7 @@ class RelativeFrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals([5 => 0.25, 4 => 0.75], $frequencies);
+        $this->assertSame([5 => 0.25, 4 => 0.75], $frequencies);
     }
 
     /**
@@ -50,15 +61,31 @@ class RelativeFrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedKeys, $keys);
-        $this->assertEqualsWithDelta($expectedFrequencies, $frequencies, 0.0000001);
+        $this->assertSame($expectedKeys, $keys);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order), key function as in each row
+     * (x, 'even' if x % 2 == 0 else 'odd', len(x), 'all', x % 3):
+     *   c = collections.Counter(map(key, data))
+     *   keys = list(c); frequencies = [float(Fraction(n, len(data))) for n in c.values()]
+     */
     public static function dataProviderForArray(): array
     {
         return [
-            [[], fn ($x) => $x, [], []],
-            [[5], fn ($x) => $x, [5], [1.0]],
+            [
+                [],
+                fn ($x) => $x,
+                [],
+                [],
+            ],
+            [
+                [5],
+                fn ($x) => $x,
+                [5],
+                [1.0],
+            ],
             [
                 [1, 2, 3, 4],
                 fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
@@ -70,6 +97,18 @@ class RelativeFrequenciesByTest extends \PHPUnit\Framework\TestCase
                 fn ($x) => \strlen($x),
                 [5, 4],
                 [0.25, 0.75],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                fn ($x) => $x % 3,
+                [1, 2, 0],
+                [0.4, 0.3, 0.3],
+            ],
+            [
+                [1, 2, 3],
+                fn ($x) => $x,
+                [1, 2, 3],
+                [0.3333333333333333, 0.3333333333333333, 0.3333333333333333],
             ],
         ];
     }
@@ -95,28 +134,54 @@ class RelativeFrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedKeys, $keys);
-        $this->assertEqualsWithDelta($expectedFrequencies, $frequencies, 0.0000001);
+        $this->assertSame($expectedKeys, $keys);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order), key function as in each row
+     * (x, 'even' if x % 2 == 0 else 'odd', len(x), 'all', x % 3):
+     *   c = collections.Counter(map(key, data))
+     *   keys = list(c); frequencies = [float(Fraction(n, len(data))) for n in c.values()]
+     */
     public static function dataProviderForGenerator(): array
     {
-        $gen = fn (array $data) => Fixture\GeneratorFixture::getGenerator($data);
-
         return [
-            [$gen([]), fn ($x) => $x, [], []],
-            [$gen([5]), fn ($x) => $x, [5], [1.0]],
             [
-                $gen([1, 2, 3, 4]),
+                Fixture\GeneratorFixture::getGenerator([]),
+                fn ($x) => $x,
+                [],
+                [],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([5]),
+                fn ($x) => $x,
+                [5],
+                [1.0],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4]),
                 fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
                 ['odd', 'even'],
                 [0.5, 0.5],
             ],
             [
-                $gen(['apple', 'pear', 'kiwi', 'plum']),
+                Fixture\GeneratorFixture::getGenerator(['apple', 'pear', 'kiwi', 'plum']),
                 fn ($x) => \strlen($x),
                 [5, 4],
                 [0.25, 0.75],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn ($x) => $x % 3,
+                [1, 2, 0],
+                [0.4, 0.3, 0.3],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => $x,
+                [1, 2, 3],
+                [0.3333333333333333, 0.3333333333333333, 0.3333333333333333],
             ],
         ];
     }
@@ -142,28 +207,54 @@ class RelativeFrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedKeys, $keys);
-        $this->assertEqualsWithDelta($expectedFrequencies, $frequencies, 0.0000001);
+        $this->assertSame($expectedKeys, $keys);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order), key function as in each row
+     * (x, 'even' if x % 2 == 0 else 'odd', len(x), 'all', x % 3):
+     *   c = collections.Counter(map(key, data))
+     *   keys = list(c); frequencies = [float(Fraction(n, len(data))) for n in c.values()]
+     */
     public static function dataProviderForIterator(): array
     {
-        $iter = fn (array $data) => new Fixture\ArrayIteratorFixture($data);
-
         return [
-            [$iter([]), fn ($x) => $x, [], []],
-            [$iter([5]), fn ($x) => $x, [5], [1.0]],
             [
-                $iter([1, 2, 3, 4]),
+                new Fixture\ArrayIteratorFixture([]),
+                fn ($x) => $x,
+                [],
+                [],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([5]),
+                fn ($x) => $x,
+                [5],
+                [1.0],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, 2, 3, 4]),
                 fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
                 ['odd', 'even'],
                 [0.5, 0.5],
             ],
             [
-                $iter(['apple', 'pear', 'kiwi', 'plum']),
+                new Fixture\ArrayIteratorFixture(['apple', 'pear', 'kiwi', 'plum']),
                 fn ($x) => \strlen($x),
                 [5, 4],
                 [0.25, 0.75],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn ($x) => $x % 3,
+                [1, 2, 0],
+                [0.4, 0.3, 0.3],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => $x,
+                [1, 2, 3],
+                [0.3333333333333333, 0.3333333333333333, 0.3333333333333333],
             ],
         ];
     }
@@ -189,28 +280,54 @@ class RelativeFrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedKeys, $keys);
-        $this->assertEqualsWithDelta($expectedFrequencies, $frequencies, 0.0000001);
+        $this->assertSame($expectedKeys, $keys);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order), key function as in each row
+     * (x, 'even' if x % 2 == 0 else 'odd', len(x), 'all', x % 3):
+     *   c = collections.Counter(map(key, data))
+     *   keys = list(c); frequencies = [float(Fraction(n, len(data))) for n in c.values()]
+     */
     public static function dataProviderForTraversable(): array
     {
-        $trav = fn (array $data) => new Fixture\IteratorAggregateFixture($data);
-
         return [
-            [$trav([]), fn ($x) => $x, [], []],
-            [$trav([5]), fn ($x) => $x, [5], [1.0]],
             [
-                $trav([1, 2, 3, 4]),
+                new Fixture\IteratorAggregateFixture([]),
+                fn ($x) => $x,
+                [],
+                [],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([5]),
+                fn ($x) => $x,
+                [5],
+                [1.0],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, 2, 3, 4]),
                 fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
                 ['odd', 'even'],
                 [0.5, 0.5],
             ],
             [
-                $trav(['apple', 'pear', 'kiwi', 'plum']),
+                new Fixture\IteratorAggregateFixture(['apple', 'pear', 'kiwi', 'plum']),
                 fn ($x) => \strlen($x),
                 [5, 4],
                 [0.25, 0.75],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn ($x) => $x % 3,
+                [1, 2, 0],
+                [0.4, 0.3, 0.3],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => $x,
+                [1, 2, 3],
+                [0.3333333333333333, 0.3333333333333333, 0.3333333333333333],
             ],
         ];
     }
@@ -230,7 +347,7 @@ class RelativeFrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEqualsWithDelta(1.0, $sum, 0.0000001);
+        $this->assertEqualsWithDelta(1.0, $sum, self::SUM_DELTA);
     }
 
     /**

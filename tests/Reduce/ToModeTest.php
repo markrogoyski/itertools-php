@@ -25,7 +25,7 @@ class ToModeTest extends \PHPUnit\Framework\TestCase
         // When
         $modes = Reduce::toMode($votes);
 
-        // Then
+        // Then (statistics.multimode(['red', 'blue', 'red', 'green', 'blue', 'red']))
         $this->assertSame(['red'], $modes);
     }
 
@@ -98,6 +98,12 @@ class ToModeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   statistics.multimode(data)
+     * multimode returns the modes in first-seen order, as toMode documents. Python equality merges 1,
+     * 1.0 and True where toMode's strict equality does not, so no row mixes those types.
+     */
     public static function dataProviderForMode(): array
     {
         return [
@@ -150,7 +156,7 @@ class ToModeTest extends \PHPUnit\Framework\TestCase
         // When
         $modes = Reduce::toMode($data);
 
-        // Then (20 and 10 both occur twice; 20 was seen first)
+        // Then (statistics.multimode([20, 10, 10, 20, 30]): 20 and 10 both occur twice; 20 was seen first)
         $this->assertSame([20, 10], $modes);
     }
 
@@ -167,7 +173,7 @@ class ToModeTest extends \PHPUnit\Framework\TestCase
         $modeA = Reduce::toMode($a);
         $modeB = Reduce::toMode($b);
 
-        // Then
+        // Then (statistics.multimode of each)
         $this->assertSame([2], $modeA);
         $this->assertSame([2], $modeB);
     }
@@ -183,7 +189,9 @@ class ToModeTest extends \PHPUnit\Framework\TestCase
         // When
         $modes = Reduce::toMode($data);
 
-        // Then each occurs once, so all three are modes, in first-seen order
+        // Then each occurs once, so all three are modes, in first-seen order. Not from an oracle:
+        // statistics.multimode gives [1], since Python equality merges 1 and 1.0. The expectation
+        // follows the strict equality documented in README "Strict and Coercive Types".
         $this->assertSame([1, 1.0, '1'], $modes);
     }
 
@@ -198,7 +206,7 @@ class ToModeTest extends \PHPUnit\Framework\TestCase
         // When
         $modes = Reduce::toMode($data);
 
-        // Then
+        // Then (statistics.multimode(list(range(1, 10001)) + [7777, 7777]))
         $this->assertSame([7777], $modes);
     }
 

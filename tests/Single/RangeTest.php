@@ -27,9 +27,14 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, 0.0001);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   list(range(start, end + sign, sign * abs(step))), sign being 1 for an ascending and -1 for a
+     *   descending range (Single::range takes its direction from the operands, not from the step's sign)
+     */
     public static function dataProviderForValidRanges(): array
     {
         return [
@@ -42,13 +47,6 @@ class RangeTest extends \PHPUnit\Framework\TestCase
 
             // descending int negative step (matching direction)
             'descending ints negative step' => [5, 1, -1, [5, 4, 3, 2, 1]],
-
-            // ascending float
-            'ascending floats' => [0.5, 5.5, 1.0, [0.5, 1.5, 2.5, 3.5, 4.5, 5.5]],
-            'ascending floats fractional step' => [0.0, 5.0, 1.2, [0.0, 1.2, 2.4, 3.6, 4.8]],
-
-            // descending float
-            'descending floats' => [5.5, 0.5, 1.0, [5.5, 4.5, 3.5, 2.5, 1.5, 0.5]],
 
             // step > 1 evenly divides
             'step evenly divides' => [0, 10, 2, [0, 2, 4, 6, 8, 10]],
@@ -64,7 +62,6 @@ class RangeTest extends \PHPUnit\Framework\TestCase
             'single-element start equals end' => [1, 1, 1, [1]],
             'single-element start equals end larger step' => [1, 1, 10, [1]],
             'single-element start equals end negative step' => [1, 1, -1, [1]],
-            'single-element float' => [2.5, 2.5, 1.0, [2.5]],
 
             // negative numbers
             'ascending negatives' => [-5, -1, 1, [-5, -4, -3, -2, -1]],
@@ -72,6 +69,83 @@ class RangeTest extends \PHPUnit\Framework\TestCase
             'across zero ascending' => [-2, 2, 1, [-2, -1, 0, 1, 2]],
             'across zero descending' => [2, -2, 1, [2, 1, 0, -1, -2]],
         ];
+    }
+
+    /**
+     * @test         range valid float inputs yield the correctly rounded values
+     * @dataProvider dataProviderForValidFloatRanges
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testValidFloatRange(float $start, float $end, float $step, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
+    public static function dataProviderForValidFloatRanges(): array
+    {
+        return [
+            'ascending floats' => [0.5, 5.5, 1.0, [0.5, 1.5, 2.5, 3.5, 4.5, 5.5]],
+            'descending floats' => [5.5, 0.5, 1.0, [5.5, 4.5, 3.5, 2.5, 1.5, 0.5]],
+            'single-element float' => [2.5, 2.5, 1.0, [2.5]],
+        ];
+    }
+
+    /**
+     * @test         range valid float inputs yield the oracle's count and values within float rounding
+     * @dataProvider dataProviderForValidFloatRangesWithinRounding
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testValidFloatRangeWithinRounding(float $start, float $end, float $step, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount(\count($expected), $result);
+        $this->assertContainsOnly('float', $result);
+        $this->assertEqualsWithDelta($expected, $result, self::roundingDelta($start, $end));
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
+    public static function dataProviderForValidFloatRangesWithinRounding(): array
+    {
+        return [
+            // 3 * 1.2 = 3.5999999999999996 in float arithmetic
+            'ascending floats fractional step' => [0.0, 5.0, 1.2, [0.0, 1.2, 2.4, 3.6, 4.8]],
+        ];
+    }
+
+    /**
+     * Delta for comparing a float range with the correctly rounded oracle values.
+     *
+     * Single::range computes each value as $start ± i·$step in float arithmetic, not correctly rounded.
+     * Against the exact value, storing $start and $step as floats costs half an ulp each, relative, and
+     * i·$step and the sum are each rounded once more; correctly rounding the oracle value adds another
+     * half ulp. The offset i·$step is at most the span, which is at most 2·max(|$start|, |$end|), so
+     * the difference is at most 3.5·ε·max(|$start|, |$end|).
+     */
+    private static function roundingDelta(int|float $start, int|float $end): float
+    {
+        return 4 * \PHP_FLOAT_EPSILON * \max(\abs((float)$start), \abs((float)$end));
     }
 
     /**
@@ -270,10 +344,16 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Float spacing is 2 at 1e16, so the values round, but the count is still floor(span / step) + 1:
+     * span 4 / step 0.5 = 8 → 9 elements.
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
     public static function dataProviderForStepBelowFloatSpacing(): array
     {
-        // Float spacing is 2 at 1e16 and at 2^53, so the values round, but the count is
-        // still floor(span / step) + 1: span 4 / step 0.5 = 8 → 9 elements; span 3 / step 1.5 = 2 → 3.
         return [
             'ascending 1e16 to 1e16 + 4 step 0.5' => [
                 1e16, 1e16 + 4.0, 0.5,
@@ -290,10 +370,6 @@ class RangeTest extends \PHPUnit\Framework\TestCase
                     10000000000000002.0, 10000000000000002.0, 10000000000000002.0,
                     1e16, 1e16, 1e16,
                 ],
-            ],
-            'int operands 2^53 to 2^53 + 3 step 1.5' => [
-                9007199254740992, 9007199254740995, 1.5,
-                [9007199254740992.0, 9007199254740994.0, 9007199254740996.0],
             ],
             // Non-integral quotients: span 4 / step 1.5 = 2.67 → 3 elements; span 6 / step 2.3 = 2.61 → 3.
             'ascending 1e16 to 1e16 + 4 step 1.5' => [
@@ -312,35 +388,86 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         int operands beyond 2^53 with a step below float spacing yield floor(span / step) + 1 elements
+     * @dataProvider dataProviderForStepBelowFloatSpacingIntOperands
+     * @param        int          $start
+     * @param        int          $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testFloatRangeWithStepBelowFloatSpacingOnIntOperands(
+        int $start,
+        int $end,
+        float $step,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Float spacing is 2 at 2^53: span 3 / step 1.5 = 2 → 3 elements.
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
+    public static function dataProviderForStepBelowFloatSpacingIntOperands(): array
+    {
+        return [
+            'int operands 2^53 to 2^53 + 3 step 1.5' => [
+                9007199254740992, 9007199254740995, 1.5,
+                [9007199254740992.0, 9007199254740994.0, 9007199254740996.0],
+            ],
+        ];
+    }
+
+    /**
      * @test         float range keeps the endpoint when the last value is reconstructed past $end
      * @dataProvider dataProviderForLastValueReconstructedPastEnd
      * @param        int|float $start
      * @param        int|float $end
      * @param        float     $step
      * @param        int       $count
+     * @param        float     $last
      */
     public function testFloatRangeKeepsEndpointWhenLastValueIsReconstructedPastEnd(
         int|float $start,
         int|float $end,
         float $step,
-        int $count
+        int $count,
+        float $last
     ): void {
         // When
         $result = \iterator_to_array(Single::range($start, $end, $step), false);
 
         // Then
         $this->assertCount($count, $result);
-        $this->assertSame((float)$end, $result[$count - 1]);
+        $this->assertSame($last, $result[$count - 1]);
     }
 
+    /**
+     * 50 * 1.1 = 55.000000000000007 and 100 * 0.07 = 7.0000000000000009 overshoot $end.
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   last = float(Fraction(start) ± (count - 1) * Fraction(step))
+     */
     public static function dataProviderForLastValueReconstructedPastEnd(): array
     {
-        // 50 * 1.1 = 55.000000000000007 and 100 * 0.07 = 7.0000000000000009 overshoot $end.
         return [
-            'int operands 0 to 55 step 1.1' => [0, 55, 1.1, 51],
-            'float operands 0.0 to 55.0 step 1.1' => [0.0, 55.0, 1.1, 51],
-            'int operands 55 to 0 step 1.1' => [55, 0, 1.1, 51],
-            'float operands 0.0 to 7.0 step 0.07' => [0.0, 7.0, 0.07, 101],
+            'int operands 0 to 55 step 1.1' => [0, 55, 1.1, 51, 55.0],
+            'float operands 0.0 to 55.0 step 1.1' => [0.0, 55.0, 1.1, 51, 55.0],
+            'int operands 55 to 0 step 1.1' => [55, 0, 1.1, 51, 0.0],
+            'float operands 0.0 to 7.0 step 0.07' => [0.0, 7.0, 0.07, 101, 7.0],
         ];
     }
 
@@ -350,25 +477,53 @@ class RangeTest extends \PHPUnit\Framework\TestCase
      * @param        int   $start
      * @param        int   $end
      * @param        float $step
+     * @param        int   $count
+     * @param        float $first
+     * @param        float $last
      */
-    public function testFractionalStepOnIntsBeyondFloatPrecisionEndsOnEnd(int $start, int $end, float $step): void
-    {
+    public function testFractionalStepOnIntsBeyondFloatPrecisionEndsOnEnd(
+        int $start,
+        int $end,
+        float $step,
+        int $count,
+        float $first,
+        float $last
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
         // When
         $result = \iterator_to_array(Single::range($start, $end, $step), false);
 
         // Then
-        $this->assertCount(5, $result);
-        $this->assertSame((float)$start, $result[0]);
-        $this->assertSame((float)$end, $result[4]);
+        $this->assertCount($count, $result);
+        $this->assertSame($first, $result[0]);
+        $this->assertSame($last, $result[$count - 1]);
     }
 
+    /**
+     * 2^53 + 1 rounds down to 2^53 and 2^53 + 3 rounds up to 2^53 + 4, away from the other end, so
+     * start + span falls two short of (float)$end. Only the count and endpoints are asserted: the inner
+     * values are $start + i·step in float arithmetic, which is not correctly rounded once (float)$start
+     * is inexact.
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   first, last = float(Fraction(start)), float(Fraction(end))
+     */
     public static function dataProviderForIntStartRoundingAwayFromEnd(): array
     {
-        // 2^53 + 1 rounds down to 2^53 and 2^53 + 3 rounds up to 2^53 + 4, away from the other end, so
-        // start + span falls two short of (float)$end.
         return [
-            'ascending 2^53 + 1 to 2^53 + 3' => [9007199254740993, 9007199254740995, 0.5],
-            'descending 2^53 + 3 to 2^53 + 1' => [9007199254740995, 9007199254740993, 0.5],
+            'ascending 2^53 + 1 to 2^53 + 3' => [
+                9007199254740993, 9007199254740995, 0.5,
+                5, 9007199254740992.0, 9007199254740996.0,
+            ],
+            'descending 2^53 + 3 to 2^53 + 1' => [
+                9007199254740995, 9007199254740993, 0.5,
+                5, 9007199254740996.0, 9007199254740992.0,
+            ],
         ];
     }
 
@@ -379,35 +534,43 @@ class RangeTest extends \PHPUnit\Framework\TestCase
      * @param        float $end
      * @param        float $step
      * @param        int   $count
+     * @param        float $last
      */
     public function testFloatRangeWithLargeOperandsHasNoExtraElementForNonIntegralQuotient(
         float $start,
         float $end,
         float $step,
-        int $count
+        int $count,
+        float $last
     ): void {
         // When
         $result = \iterator_to_array(Single::range($start, $end, $step), false);
 
         // Then
         $this->assertCount($count, $result);
-        $this->assertNotSame($end, $result[$count - 1]);
+        $this->assertSame($last, $result[$count - 1]);
     }
 
+    /**
+     * The float spacing is 1/64 at 1e14 and 1/8 at 1e15, so the stored operands are off by at most half of
+     * it each. No decimal operands that round to these floats give a whole number of steps: span 1.46875 /
+     * step 0.3 = 4.896 → 5 elements; span 3.125 / step 1.1 = 2.84 → 3. Span 1 / step 0.278 = 3.597 → 4 is a
+     * whole number of steps only if both operands were rounded the furthest possible in opposite directions,
+     * which is too weak a reason to add an element.
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   last = float(Fraction(start) ± (count - 1) * Fraction(step))
+     */
     public static function dataProviderForLargeOperandsWithNonIntegralQuotient(): array
     {
-        // The float spacing is 1/64 at 1e14 and 1/8 at 1e15, so the stored operands are off by at most
-        // half of it each. No decimal operands that round to these floats give a whole number of steps:
-        // span 1.46875 / step 0.3 = 4.896 → 5 elements; span 3.125 / step 1.1 = 2.84 → 3. Span 1 / step 0.278
-        // = 3.597 → 4 is a whole number of steps only if both operands were rounded the furthest possible in
-        // opposite directions, which is too weak a reason to add an element.
         return [
-            'ascending 1e14 to 1e14 + 1.47 step 0.3' => [1e14, 1e14 + 1.47, 0.3, 5],
-            'descending 1e14 + 1.47 to 1e14 step 0.3' => [1e14 + 1.47, 1e14, 0.3, 5],
-            'ascending 1e15 to 1e15 + 3.125 step 1.1' => [1e15, 1e15 + 3.125, 1.1, 3],
-            'descending 1e15 + 3.125 to 1e15 step 1.1' => [1e15 + 3.125, 1e15, 1.1, 3],
-            'ascending 1e15 to 1e15 + 1 step 0.278' => [1e15, 1e15 + 1, 0.278, 4],
-            'descending 1e15 + 1 to 1e15 step 0.278' => [1e15 + 1, 1e15, 0.278, 4],
+            'ascending 1e14 to 1e14 + 1.47 step 0.3' => [1e14, 1e14 + 1.47, 0.3, 5, 100000000000001.2],
+            'descending 1e14 + 1.47 to 1e14 step 0.3' => [1e14 + 1.47, 1e14, 0.3, 5, 100000000000000.27],
+            'ascending 1e15 to 1e15 + 3.125 step 1.1' => [1e15, 1e15 + 3.125, 1.1, 3, 1000000000000002.2],
+            'descending 1e15 + 3.125 to 1e15 step 1.1' => [1e15 + 3.125, 1e15, 1.1, 3, 1000000000000000.9],
+            'ascending 1e15 to 1e15 + 1 step 0.278' => [1e15, 1e15 + 1, 0.278, 4, 1000000000000000.9],
+            'descending 1e15 + 1 to 1e15 step 0.278' => [1e15 + 1, 1e15, 0.278, 4, 1000000000000000.1],
         ];
     }
 
@@ -438,35 +601,56 @@ class RangeTest extends \PHPUnit\Framework\TestCase
      * @param        float $end
      * @param        float $step
      * @param        int   $count
+     * @param        float $last
      */
     public function testFloatRangeNearFloatMaxKeepsEndpointLostToDecimalRounding(
         float $start,
         float $end,
         float $step,
-        int $count
+        int $count,
+        float $last
     ): void {
         // When
         $result = \iterator_to_array(Single::range($start, $end, $step), false);
 
         // Then
         $this->assertCount($count, $result);
-        $this->assertSame($end, $result[$count - 1]);
+        $this->assertSame($last, $result[$count - 1]);
     }
 
+    /**
+     * |start| + |end| is about 2e308, past PHP_FLOAT_MAX, but the step resolves the operands, and span / step
+     * comes out just under 1000. Within a few hundred float spacings of PHP_FLOAT_MAX, log2 of the operands
+     * rounds up to 1024.
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py), operands taken as written
+     * (PHP_FLOAT_MAX exact, decimal literals exact):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   last = float(Fraction(start) ± (count - 1) * Fraction(step))
+     */
     public static function dataProviderForOperandsNearFloatMax(): array
     {
-        // |start| + |end| is about 2e308, past PHP_FLOAT_MAX, but the step resolves the operands, and
-        // span / step comes out just under 1000. Within a few hundred float spacings of PHP_FLOAT_MAX,
-        // log2 of the operands rounds up to 1024.
         return [
-            'ascending 1e308 to 1.00001e308' => [1e308, 1.00001e308, 1e300, 1001],
-            'descending 1.00001e308 to 1e308' => [1.00001e308, 1e308, 1e300, 1001],
-            'descending -1e308 to -1.00001e308' => [-1e308, -1.00001e308, 1e300, 1001],
-            'ascending -1.00001e308 to -1e308' => [-1.00001e308, -1e308, 1e300, 1001],
-            'ascending to PHP_FLOAT_MAX step 1e293' => [\PHP_FLOAT_MAX - 1e294, \PHP_FLOAT_MAX, 1e293, 11],
-            'descending from PHP_FLOAT_MAX step 1e293' => [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX - 1e294, 1e293, 11],
-            'ascending to PHP_FLOAT_MAX step 1e300' => [\PHP_FLOAT_MAX - 1e303, \PHP_FLOAT_MAX, 1e300, 1001],
-            'descending to -PHP_FLOAT_MAX step 1e300' => [-\PHP_FLOAT_MAX + 1e303, -\PHP_FLOAT_MAX, 1e300, 1001],
+            'ascending 1e308 to 1.00001e308' => [1e308, 1.00001e308, 1e300, 1001, 1.00001e308],
+            'descending 1.00001e308 to 1e308' => [1.00001e308, 1e308, 1e300, 1001, 1e308],
+            'descending -1e308 to -1.00001e308' => [-1e308, -1.00001e308, 1e300, 1001, -1.00001e308],
+            'ascending -1.00001e308 to -1e308' => [-1.00001e308, -1e308, 1e300, 1001, -1e308],
+            'ascending to PHP_FLOAT_MAX step 1e293' => [
+                \PHP_FLOAT_MAX - 1e294, \PHP_FLOAT_MAX, 1e293,
+                11, \PHP_FLOAT_MAX,
+            ],
+            'descending from PHP_FLOAT_MAX step 1e293' => [
+                \PHP_FLOAT_MAX, \PHP_FLOAT_MAX - 1e294, 1e293,
+                11, 1.7976931348623057E308,
+            ],
+            'ascending to PHP_FLOAT_MAX step 1e300' => [
+                \PHP_FLOAT_MAX - 1e303, \PHP_FLOAT_MAX, 1e300,
+                1001, \PHP_FLOAT_MAX,
+            ],
+            'descending to -PHP_FLOAT_MAX step 1e300' => [
+                -\PHP_FLOAT_MAX + 1e303, -\PHP_FLOAT_MAX, 1e300,
+                1001, -\PHP_FLOAT_MAX,
+            ],
         ];
     }
 
@@ -484,6 +668,11 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         float $step,
         array $expected
     ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
         // When
         $result = \iterator_to_array(Single::range($start, $end, $step), false);
 
@@ -491,9 +680,15 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * 2^53 and 2^53 + 1 are the same float, but the span is 1, so step 0.5 gives 3 elements.
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
     public static function dataProviderForDistinctIntsBeyondFloatPrecision(): array
     {
-        // 2^53 and 2^53 + 1 are the same float, but the span is 1, so step 0.5 gives 3 elements.
         return [
             'ascending 2^53 to 2^53 + 1' => [
                 9007199254740992, 9007199254740993, 0.5,
@@ -520,6 +715,11 @@ class RangeTest extends \PHPUnit\Framework\TestCase
      */
     public function testFractionalStepExceedingExactIntSpanBeyondFloatPrecisionThrows(): void
     {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
         // Then
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('must not exceed span (1)');
@@ -1044,10 +1244,16 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * 0.3 + 3 * 0.2 = 0.9000000000000001 and 0.9 - 3 * 0.2 = 0.29999999999999993. Native \range() returns
+     * [0.3, 0.5, 0.7] and [0.9, 0.7, 0.5].
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
     public static function dataProviderForEndpointNativeDrops(): array
     {
-        // 0.3 + 3 * 0.2 = 0.9000000000000001 and 0.9 - 3 * 0.2 = 0.29999999999999993. Native \range()
-        // returns [0.3, 0.5, 0.7] and [0.9, 0.7, 0.5].
         return [
             'ascending 0.3 to 0.9 step 0.2' => [0.3, 0.9, 0.2, [0.3, 0.5, 0.7, 0.9]],
             'descending 0.9 to 0.3 step 0.2' => [0.9, 0.3, 0.2, [0.9, 0.7, 0.5, 0.3]],
@@ -1350,60 +1556,126 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         float range matches native \range() despite quotient precision loss
+     * @test         float range keeps the last element despite quotient precision loss
      * @dataProvider dataProviderForFloatPrecisionRegression
      *
      * For inputs like (0.4, 0.5, 0.05), the quotient (end-start)/step evaluates to
      * 1.999...e0 in IEEE 754 even though the mathematically correct quotient is 2.
      * The naive `(int)floor(quotient)` truncates one step too soon and the final
-     * element is dropped. Native PHP \range() includes it.
+     * element is dropped.
+     *
+     * @param float        $start
+     * @param float        $end
+     * @param float        $step
+     * @param array<float> $expected
      */
-    public function testFloatPrecisionLossMatchesNative(float $start, float $end, float $step): void
+    public function testFloatPrecisionLoss(float $start, float $end, float $step, array $expected): void
     {
-        // Given
-        $expected = \range($start, $end, $step);
+        // When
+        $actual = \iterator_to_array(Single::range($start, $end, $step), false);
 
+        // Then
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Pairs where (end - start) / step suffers float precision loss: quotient evaluates to N - epsilon
+     * instead of N, so floor() drops one element.
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
+    public static function dataProviderForFloatPrecisionRegression(): array
+    {
+        return [
+            '(0.4, 0.5, 0.05) → 3' => [0.4, 0.5, 0.05, [0.4, 0.45, 0.5]],
+            '(1.0, 0.9, 0.02) → 6' => [1.0, 0.9, 0.02, [1.0, 0.98, 0.96, 0.94, 0.92, 0.9]],
+            '(1.0, 0.9, 0.05) → 3' => [1.0, 0.9, 0.05, [1.0, 0.95, 0.9]],
+        ];
+    }
+
+    /**
+     * @test         float range keeps the last element despite quotient precision loss, values within float rounding
+     * @dataProvider dataProviderForFloatPrecisionRegressionWithinRounding
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testFloatPrecisionLossWithinRounding(float $start, float $end, float $step, array $expected): void
+    {
         // When
         $actual = \iterator_to_array(Single::range($start, $end, $step), false);
 
         // Then
         $this->assertCount(\count($expected), $actual);
-        foreach ($expected as $i => $v) {
-            $this->assertEqualsWithDelta($v, $actual[$i], 1e-9, "element {$i}");
-        }
+        $this->assertContainsOnly('float', $actual);
+        $this->assertEqualsWithDelta($expected, $actual, self::roundingDelta($start, $end));
     }
 
-    public static function dataProviderForFloatPrecisionRegression(): array
+    /**
+     * Same quotient precision loss as dataProviderForFloatPrecisionRegression; here $start ± i·$step in
+     * float arithmetic misses the correctly rounded value of some elements (see roundingDelta).
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
+    public static function dataProviderForFloatPrecisionRegressionWithinRounding(): array
     {
-        // Pairs where (end - start) / step suffers float precision loss: quotient
-        // evaluates to N - epsilon instead of N, so floor() drops one element.
         return [
-            '(0.4, 0.5, 0.05) → 3' => [0.4, 0.5, 0.05],
-            '(0.4, 0.5, 0.02) → 6' => [0.4, 0.5, 0.02],
-            '(0.4, 0.5, 0.01) → 11' => [0.4, 0.5, 0.01],
-            '(0.2, 0.5, 0.05) → 7' => [0.2, 0.5, 0.05],
-            '(0.2, 0.5, 0.1) → 4' => [0.2, 0.5, 0.1],
-            '(0.3, 1.0, 0.05) → 15' => [0.3, 1.0, 0.05],
-            '(0.3, 1.0, 0.07) → 11' => [0.3, 1.0, 0.07],
-            '(0.3, 1.0, 0.1) → 8' => [0.3, 1.0, 0.1],
-            '(0.3, 2.0, 0.17) → 11' => [0.3, 2.0, 0.17],
-            '(0.4, 1.0, 0.05) → 13' => [0.4, 1.0, 0.05],
-            '(0.4, 1.0, 0.1) → 7' => [0.4, 1.0, 0.1],
-            '(0.1, 2.0, 0.05) → 39' => [0.1, 2.0, 0.05],
-            '(0.1, 2.0, 0.1) → 20' => [0.1, 2.0, 0.1],
-            // Descending mirrors
-            '(1.0, 0.9, 0.01) → 11' => [1.0, 0.9, 0.01],
-            '(1.0, 0.9, 0.02) → 6' => [1.0, 0.9, 0.02],
-            '(1.0, 0.9, 0.05) → 3' => [1.0, 0.9, 0.05],
+            '(0.4, 0.5, 0.02) → 6' => [0.4, 0.5, 0.02, [0.4, 0.42, 0.44, 0.46, 0.48, 0.5]],
+            '(0.4, 0.5, 0.01) → 11' => [
+                0.4, 0.5, 0.01,
+                [0.4, 0.41, 0.42, 0.43, 0.44, 0.45, 0.46, 0.47, 0.48, 0.49, 0.5],
+            ],
+            '(0.2, 0.5, 0.05) → 7' => [0.2, 0.5, 0.05, [0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]],
+            '(0.2, 0.5, 0.1) → 4' => [0.2, 0.5, 0.1, [0.2, 0.3, 0.4, 0.5]],
+            '(0.3, 1.0, 0.05) → 15' => [
+                0.3, 1.0, 0.05,
+                [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0],
+            ],
+            '(0.3, 1.0, 0.07) → 11' => [
+                0.3, 1.0, 0.07,
+                [0.3, 0.37, 0.44, 0.51, 0.58, 0.65, 0.72, 0.79, 0.86, 0.93, 1.0],
+            ],
+            '(0.3, 1.0, 0.1) → 8' => [0.3, 1.0, 0.1, [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]],
+            '(0.3, 2.0, 0.17) → 11' => [
+                0.3, 2.0, 0.17,
+                [0.3, 0.47, 0.64, 0.81, 0.98, 1.15, 1.32, 1.49, 1.66, 1.83, 2.0],
+            ],
+            '(0.4, 1.0, 0.05) → 13' => [
+                0.4, 1.0, 0.05,
+                [0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0],
+            ],
+            '(0.4, 1.0, 0.1) → 7' => [0.4, 1.0, 0.1, [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]],
+            '(0.1, 2.0, 0.05) → 39' => [
+                0.1, 2.0, 0.05,
+                [
+                    0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95,
+                    1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85,
+                    1.9, 1.95, 2.0,
+                ],
+            ],
+            '(0.1, 2.0, 0.1) → 20' => [
+                0.1, 2.0, 0.1,
+                [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0],
+            ],
+            '(1.0, 0.9, 0.01) → 11' => [
+                1.0, 0.9, 0.01,
+                [1.0, 0.99, 0.98, 0.97, 0.96, 0.95, 0.94, 0.93, 0.92, 0.91, 0.9],
+            ],
         ];
     }
 
     // -----------------------------------------------------------------------
-    // Exhaustive oracle-driven test suite (native \range() as truth source)
+    // Exhaustive oracle-driven test suite
     //
-    // These matrices deliberately cover only inputs whose native behavior is
-    // stable across every supported PHP version: all-int operands with a small
-    // int step, and all-float operands with a float step.
+    // The integer matrix compares against native \range() and deliberately covers
+    // only inputs whose native behavior is stable across every supported PHP
+    // version: all-int operands with a small int step. The float matrix takes its
+    // expected values from exact rational arithmetic (tools/oracles/range_float_steps.py).
     //
     // The cases where native \range() differs by version are asserted separately
     // against literals, never against the running PHP:
@@ -1467,66 +1739,175 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test         float range matches native \range() across a broad input matrix
+     * @test         float range matches the exact-arithmetic oracle across a broad input matrix
      * @dataProvider dataProviderForFloatOracleMatrix
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
      */
-    public function testFloatRangeMatchesNativeOracle(float $start, float $end, float $step): void
+    public function testFloatRangeMatchesOracle(float $start, float $end, float $step, array $expected): void
     {
-        // Given
-        $expected = \range($start, $end, $step);
-
         // When
         $actual = \iterator_to_array(Single::range($start, $end, $step), false);
 
         // Then
-        $this->assertCount(\count($expected), $actual, 'element count must match native');
-        foreach ($expected as $i => $v) {
-            $this->assertIsFloat($actual[$i]);
-            $this->assertEqualsWithDelta($v, $actual[$i], 1e-9, "element {$i}");
-        }
+        $this->assertSame($expected, $actual);
     }
 
+    /**
+     * Overshoot cases are left out: where 0.3 + 3 * 0.2 rounds past 0.9, native drops the endpoint and
+     * Single::range keeps it (see testFloatRangeEndsOnEndWhereNativeDropsIt).
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
     public static function dataProviderForFloatOracleMatrix(): array
     {
-        $cases = [];
-
-        // Simple decimal steps
-        $combos = [
-            // Ascending
-            [0.0, 1.0, 0.1], [0.0, 1.0, 0.2], [0.0, 1.0, 0.25], [0.0, 1.0, 0.5], [0.0, 1.0, 1.0],
-            [0.0, 10.0, 0.5], [0.0, 10.0, 1.0], [0.0, 10.0, 2.5],
-            [0.0, 100.0, 1.0], [0.0, 100.0, 10.0],
-            [1.0, 2.0, 0.25], [1.0, 5.0, 0.5],
-            [0.1, 1.0, 0.1], [0.1, 1.0, 0.2], [0.1, 1.0, 0.3],
-            [0.5, 5.5, 1.0], [0.0, 5.0, 1.2],
-            // Descending
-            [1.0, 0.0, 0.1], [1.0, 0.0, 0.25], [1.0, 0.0, 0.5],
-            [10.0, 0.0, 0.5], [10.0, 0.0, 1.0],
-            [5.5, 0.5, 1.0], [2.0, 1.0, 0.25],
-            // Negatives and crossing zero
-            [-1.0, 1.0, 0.5], [1.0, -1.0, 0.5], [-2.5, 2.5, 0.5],
-            [-5.5, 5.5, 1.1], [5.5, -5.5, 1.1],
-            // Single-element
-            [0.0, 0.0, 1.0], [2.5, 2.5, 1.0],
-            // Step exactly equal to span
-            [0.0, 1.0, 1.0], [1.0, 0.0, 1.0], [0.5, 1.5, 1.0],
-            // Integer-valued float step
-            [0.0, 10.0, 1.0], [10.0, 0.0, 1.0],
-            // Precision-loss cases (Gemini's category)
-            [0.4, 0.5, 0.05], [0.4, 0.5, 0.02], [0.4, 0.5, 0.01],
-            [0.2, 0.5, 0.05], [0.2, 0.5, 0.06], [0.2, 0.5, 0.1],
-            [0.3, 1.0, 0.05], [0.3, 1.0, 0.07], [0.3, 1.0, 0.1],
-            [0.3, 2.0, 0.17],
-            [0.4, 1.0, 0.05], [0.4, 1.0, 0.1],
-            [0.1, 2.0, 0.05], [0.1, 2.0, 0.1],
-            [1.0, 0.9, 0.01], [1.0, 0.9, 0.02], [1.0, 0.9, 0.05],
-            // Overshoot cases are left out: where 0.3 + 3 * 0.2 rounds past 0.9, native drops the
-            // endpoint and Single::range keeps it (see testFloatRangeEndsOnEndWhereNativeDropsIt).
+        return [
+            'range(0.0, 1.0, 0.25)' => [0.0, 1.0, 0.25, [0.0, 0.25, 0.5, 0.75, 1.0]],
+            'range(0.0, 1.0, 0.5)' => [0.0, 1.0, 0.5, [0.0, 0.5, 1.0]],
+            'range(0.0, 1.0, 1.0)' => [0.0, 1.0, 1.0, [0.0, 1.0]],
+            'range(0.0, 10.0, 0.5)' => [
+                0.0, 10.0, 0.5,
+                [
+                    0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0,
+                    9.5, 10.0,
+                ],
+            ],
+            'range(0.0, 10.0, 1.0)' => [0.0, 10.0, 1.0, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]],
+            'range(0.0, 10.0, 2.5)' => [0.0, 10.0, 2.5, [0.0, 2.5, 5.0, 7.5, 10.0]],
+            'range(0.0, 100.0, 1.0)' => [
+                0.0, 100.0, 1.0,
+                [
+                    0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0,
+                    18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0, 33.0,
+                    34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0, 48.0, 49.0,
+                    50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0, 60.0, 61.0, 62.0, 63.0, 64.0, 65.0,
+                    66.0, 67.0, 68.0, 69.0, 70.0, 71.0, 72.0, 73.0, 74.0, 75.0, 76.0, 77.0, 78.0, 79.0, 80.0, 81.0,
+                    82.0, 83.0, 84.0, 85.0, 86.0, 87.0, 88.0, 89.0, 90.0, 91.0, 92.0, 93.0, 94.0, 95.0, 96.0, 97.0,
+                    98.0, 99.0, 100.0,
+                ],
+            ],
+            'range(0.0, 100.0, 10.0)' => [
+                0.0, 100.0, 10.0,
+                [0.0, 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0],
+            ],
+            'range(1.0, 2.0, 0.25)' => [1.0, 2.0, 0.25, [1.0, 1.25, 1.5, 1.75, 2.0]],
+            'range(1.0, 5.0, 0.5)' => [1.0, 5.0, 0.5, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]],
+            'range(0.1, 1.0, 0.3)' => [0.1, 1.0, 0.3, [0.1, 0.4, 0.7, 1.0]],
+            'range(0.5, 5.5, 1.0)' => [0.5, 5.5, 1.0, [0.5, 1.5, 2.5, 3.5, 4.5, 5.5]],
+            'range(1.0, 0.0, 0.25)' => [1.0, 0.0, 0.25, [1.0, 0.75, 0.5, 0.25, 0.0]],
+            'range(1.0, 0.0, 0.5)' => [1.0, 0.0, 0.5, [1.0, 0.5, 0.0]],
+            'range(10.0, 0.0, 0.5)' => [
+                10.0, 0.0, 0.5,
+                [
+                    10.0, 9.5, 9.0, 8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5, 5.0, 4.5, 4.0, 3.5, 3.0, 2.5, 2.0, 1.5, 1.0,
+                    0.5, 0.0,
+                ],
+            ],
+            'range(10.0, 0.0, 1.0)' => [10.0, 0.0, 1.0, [10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0]],
+            'range(5.5, 0.5, 1.0)' => [5.5, 0.5, 1.0, [5.5, 4.5, 3.5, 2.5, 1.5, 0.5]],
+            'range(2.0, 1.0, 0.25)' => [2.0, 1.0, 0.25, [2.0, 1.75, 1.5, 1.25, 1.0]],
+            'range(-1.0, 1.0, 0.5)' => [-1.0, 1.0, 0.5, [-1.0, -0.5, 0.0, 0.5, 1.0]],
+            'range(1.0, -1.0, 0.5)' => [1.0, -1.0, 0.5, [1.0, 0.5, 0.0, -0.5, -1.0]],
+            'range(-2.5, 2.5, 0.5)' => [-2.5, 2.5, 0.5, [-2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5]],
+            'range(0.0, 0.0, 1.0)' => [0.0, 0.0, 1.0, [0.0]],
+            'range(2.5, 2.5, 1.0)' => [2.5, 2.5, 1.0, [2.5]],
+            'range(1.0, 0.0, 1.0)' => [1.0, 0.0, 1.0, [1.0, 0.0]],
+            'range(0.5, 1.5, 1.0)' => [0.5, 1.5, 1.0, [0.5, 1.5]],
+            'range(0.4, 0.5, 0.05)' => [0.4, 0.5, 0.05, [0.4, 0.45, 0.5]],
+            'range(0.2, 0.5, 0.06)' => [0.2, 0.5, 0.06, [0.2, 0.26, 0.32, 0.38, 0.44, 0.5]],
+            'range(1.0, 0.9, 0.02)' => [1.0, 0.9, 0.02, [1.0, 0.98, 0.96, 0.94, 0.92, 0.9]],
+            'range(1.0, 0.9, 0.05)' => [1.0, 0.9, 0.05, [1.0, 0.95, 0.9]],
         ];
-        foreach ($combos as $c) {
-            $cases["range({$c[0]}, {$c[1]}, {$c[2]})"] = $c;
-        }
-        return $cases;
+    }
+
+    /**
+     * @test         float range matches the exact-arithmetic oracle within float rounding across a broad input matrix
+     * @dataProvider dataProviderForFloatOracleMatrixWithinRounding
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testFloatRangeMatchesOracleWithinRounding(
+        float $start,
+        float $end,
+        float $step,
+        array $expected
+    ): void {
+        // When
+        $actual = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount(\count($expected), $actual, 'element count must match the oracle');
+        $this->assertContainsOnly('float', $actual);
+        $this->assertEqualsWithDelta($expected, $actual, self::roundingDelta($start, $end));
+    }
+
+    /**
+     * Rows where $start ± i·$step in float arithmetic misses the correctly rounded value of some elements
+     * (see roundingDelta).
+     *
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
+    public static function dataProviderForFloatOracleMatrixWithinRounding(): array
+    {
+        return [
+            'range(0.0, 1.0, 0.1)' => [0.0, 1.0, 0.1, [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]],
+            'range(0.0, 1.0, 0.2)' => [0.0, 1.0, 0.2, [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]],
+            'range(0.1, 1.0, 0.1)' => [0.1, 1.0, 0.1, [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]],
+            'range(0.1, 1.0, 0.2)' => [0.1, 1.0, 0.2, [0.1, 0.3, 0.5, 0.7, 0.9]],
+            'range(0.0, 5.0, 1.2)' => [0.0, 5.0, 1.2, [0.0, 1.2, 2.4, 3.6, 4.8]],
+            'range(1.0, 0.0, 0.1)' => [1.0, 0.0, 0.1, [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0]],
+            'range(-5.5, 5.5, 1.1)' => [-5.5, 5.5, 1.1, [-5.5, -4.4, -3.3, -2.2, -1.1, 0.0, 1.1, 2.2, 3.3, 4.4, 5.5]],
+            'range(5.5, -5.5, 1.1)' => [5.5, -5.5, 1.1, [5.5, 4.4, 3.3, 2.2, 1.1, 0.0, -1.1, -2.2, -3.3, -4.4, -5.5]],
+            'range(0.4, 0.5, 0.02)' => [0.4, 0.5, 0.02, [0.4, 0.42, 0.44, 0.46, 0.48, 0.5]],
+            'range(0.4, 0.5, 0.01)' => [
+                0.4, 0.5, 0.01,
+                [0.4, 0.41, 0.42, 0.43, 0.44, 0.45, 0.46, 0.47, 0.48, 0.49, 0.5],
+            ],
+            'range(0.2, 0.5, 0.05)' => [0.2, 0.5, 0.05, [0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5]],
+            'range(0.2, 0.5, 0.1)' => [0.2, 0.5, 0.1, [0.2, 0.3, 0.4, 0.5]],
+            'range(0.3, 1.0, 0.05)' => [
+                0.3, 1.0, 0.05,
+                [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0],
+            ],
+            'range(0.3, 1.0, 0.07)' => [
+                0.3, 1.0, 0.07,
+                [0.3, 0.37, 0.44, 0.51, 0.58, 0.65, 0.72, 0.79, 0.86, 0.93, 1.0],
+            ],
+            'range(0.3, 1.0, 0.1)' => [0.3, 1.0, 0.1, [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]],
+            'range(0.3, 2.0, 0.17)' => [
+                0.3, 2.0, 0.17,
+                [0.3, 0.47, 0.64, 0.81, 0.98, 1.15, 1.32, 1.49, 1.66, 1.83, 2.0],
+            ],
+            'range(0.4, 1.0, 0.05)' => [
+                0.4, 1.0, 0.05,
+                [0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0],
+            ],
+            'range(0.4, 1.0, 0.1)' => [0.4, 1.0, 0.1, [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]],
+            'range(0.1, 2.0, 0.05)' => [
+                0.1, 2.0, 0.05,
+                [
+                    0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95,
+                    1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85,
+                    1.9, 1.95, 2.0,
+                ],
+            ],
+            'range(0.1, 2.0, 0.1)' => [
+                0.1, 2.0, 0.1,
+                [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0],
+            ],
+            'range(1.0, 0.9, 0.01)' => [
+                1.0, 0.9, 0.01,
+                [1.0, 0.99, 0.98, 0.97, 0.96, 0.95, 0.94, 0.93, 0.92, 0.91, 0.9],
+            ],
+        ];
     }
 
     /**

@@ -133,6 +133,10 @@ class StreamProductWithTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   list(itertools.product(source, *extras))
+     */
     public static function dataProviderForProductWith(): array
     {
         return [

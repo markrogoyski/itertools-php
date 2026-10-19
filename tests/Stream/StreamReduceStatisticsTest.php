@@ -9,8 +9,6 @@ use IterTools\Tests\Fixture;
 
 class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
 {
-    private const DELTA = 0.0000000001;
-
     /**
      * @test Stream::toMedian example usage
      */
@@ -22,8 +20,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $median = Stream::of($grades)->toMedian();
 
-        // Then
-        $this->assertEqualsWithDelta(94, $median, self::DELTA);
+        // Then (statistics.median([100, 90, 95, 85, 94]))
+        $this->assertSame(94, $median);
     }
 
     /**
@@ -36,8 +34,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Stream::of($data)->toMedian();
 
-        // Then (sorted [1,2,2,3,4] → middle is 2)
-        $this->assertEqualsWithDelta(2, $result, self::DELTA);
+        // Then (statistics.median([1, 2, 2, 3, 4]))
+        $this->assertSame(2, $result);
     }
 
     /**
@@ -63,7 +61,7 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $modes = Stream::of($votes)->toMode();
 
-        // Then
+        // Then (statistics.multimode(['red', 'blue', 'red', 'green', 'blue', 'red']))
         $this->assertSame(['red'], $modes);
     }
 
@@ -77,7 +75,7 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Stream::of($data)->toMode();
 
-        // Then (2 appears twice in [1,2,2,3,4])
+        // Then (statistics.multimode([1, 2, 2, 3, 4]))
         $this->assertSame([2], $result);
     }
 
@@ -104,8 +102,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $variance = Stream::of($numbers)->toVariance();
 
-        // Then
-        $this->assertEqualsWithDelta(2.0, $variance, self::DELTA);
+        // Then (exact population variance, rounded once: float(Fraction variance of [1, 2, 3, 4, 5]))
+        $this->assertSame(2.0, $variance);
     }
 
     /**
@@ -118,8 +116,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Stream::of($data)->toVariance();
 
-        // Then (population variance of [1,2,2,3,4])
-        $this->assertEqualsWithDelta(1.04, $result, self::DELTA);
+        // Then (exact population variance, rounded once: float(Fraction variance of [1, 2, 2, 3, 4]))
+        $this->assertSame(1.04, $result);
     }
 
     /**
@@ -133,8 +131,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $variance = Stream::of($numbers)->toVariance(true);
 
-        // Then
-        $this->assertEqualsWithDelta(2.5, $variance, self::DELTA);
+        // Then (exact sample variance, rounded once: float(Fraction sample variance of [1, 2, 3, 4, 5]))
+        $this->assertSame(2.5, $variance);
     }
 
     /**
@@ -160,8 +158,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $stddev = Stream::of($numbers)->toStandardDeviation();
 
-        // Then
-        $this->assertEqualsWithDelta(2.0, $stddev, self::DELTA);
+        // Then (correctly rounded square root of the exact population variance, which is 4)
+        $this->assertSame(2.0, $stddev);
     }
 
     /**
@@ -174,8 +172,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Stream::of($data)->toStandardDeviation();
 
-        // Then (population stddev of [1,2,2,3,4])
-        $this->assertEqualsWithDelta(\sqrt(1.04), $result, self::DELTA);
+        // Then (correctly rounded square root of the exact population variance, 26/25)
+        $this->assertSame(1.019803902718557, $result);
     }
 
     /**
@@ -189,8 +187,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $stddev = Stream::of($numbers)->toStandardDeviation(true);
 
-        // Then
-        $this->assertEqualsWithDelta(\sqrt(2.5), $stddev, self::DELTA);
+        // Then (correctly rounded square root of the exact sample variance, 5/2)
+        $this->assertSame(1.5811388300841898, $stddev);
     }
 
     /**
@@ -202,9 +200,9 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         $overflowed  = Stream::of([-1e200, 1e200])->toStandardDeviation();
         $underflowed = Stream::of([-1e-200, 1e-200])->toStandardDeviation();
 
-        // Then
-        $this->assertEqualsWithDelta(1e200, $overflowed, 1e188);
-        $this->assertEqualsWithDelta(1e-200, $underflowed, 1e-212);
+        // Then (the exact population variance of [-x, x] is x², so the correctly rounded square root is x)
+        $this->assertSame(1e200, $overflowed);
+        $this->assertSame(1e-200, $underflowed);
     }
 
     /**
@@ -230,8 +228,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $p75 = Stream::of($scores)->toPercentile(75);
 
-        // Then
-        $this->assertEqualsWithDelta(40.0, $p75, self::DELTA);
+        // Then (numpy.percentile([10, 20, 30, 40, 50], 75, method='linear'), landing on the element 40)
+        $this->assertSame(40, $p75);
     }
 
     /**
@@ -244,8 +242,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Stream::of($data)->toPercentile(50);
 
-        // Then (50th percentile of [1,2,2,3,4] is 2)
-        $this->assertEqualsWithDelta(2, $result, self::DELTA);
+        // Then (numpy.percentile([1, 2, 2, 3, 4], 50, method='linear'), landing on the element 2)
+        $this->assertSame(2, $result);
     }
 
     /**
@@ -295,8 +293,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $q3 = Stream::of($scores)->toQuantile(0.75);
 
-        // Then
-        $this->assertEqualsWithDelta(40.0, $q3, self::DELTA);
+        // Then (numpy.quantile([10, 20, 30, 40, 50], 0.75, method='linear'), landing on the element 40)
+        $this->assertSame(40, $q3);
     }
 
     /**
@@ -309,8 +307,8 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Stream::of($data)->toQuantile(0.5);
 
-        // Then (0.5 quantile of [1,2,2,3,4] is 2)
-        $this->assertEqualsWithDelta(2, $result, self::DELTA);
+        // Then (numpy.quantile([1, 2, 2, 3, 4], 0.5, method='linear'), landing on the element 2)
+        $this->assertSame(2, $result);
     }
 
     /**
@@ -362,19 +360,21 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
             ->filter(fn ($x) => $x % 2 === 0)
             ->toMedian();
 
-        // Then
-        $this->assertEqualsWithDelta(6, $median, self::DELTA);
+        // Then (statistics.median([2, 4, 6, 8, 10]))
+        $this->assertSame(6, $median);
     }
 
+    /**
+     * The same data, [1, 2, 2, 3, 4], as each iterable type. The tests using it compute different
+     * statistics, so each cites its own oracle where it asserts the expected value.
+     */
     public static function dataProviderForIterableTypes(): array
     {
-        $data = [1, 2, 2, 3, 4];
-
         return [
-            'array'             => [$data],
-            'generator'         => [Fixture\GeneratorFixture::getGenerator($data)],
-            'iterator'          => [new Fixture\ArrayIteratorFixture($data)],
-            'iteratorAggregate' => [new Fixture\IteratorAggregateFixture($data)],
+            'array'             => [[1, 2, 2, 3, 4]],
+            'generator'         => [Fixture\GeneratorFixture::getGenerator([1, 2, 2, 3, 4])],
+            'iterator'          => [new Fixture\ArrayIteratorFixture([1, 2, 2, 3, 4])],
+            'iteratorAggregate' => [new Fixture\IteratorAggregateFixture([1, 2, 2, 3, 4])],
         ];
     }
 }

@@ -542,9 +542,14 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $result = $stream->toArray();
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, 0.001);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
     public static function dataProviderForRangeFloatsDefaultStep(): array
     {
         return [
@@ -632,9 +637,14 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $result = $stream->toArray();
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, 0.001);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
     public static function dataProviderForRangeFloatsCustomStep(): array
     {
         return [
@@ -656,6 +666,44 @@ class SourceTest extends \PHPUnit\Framework\TestCase
                 3.0,
                 [0.0, 3.0, 6.0, 9.0]
             ],
+        ];
+    }
+
+    /**
+     * @test         ofRange floats custom step, values within float rounding
+     * @dataProvider dataProviderForRangeFloatsCustomStepWithinRounding
+     * @param float $start
+     * @param float $end
+     * @param float $step
+     * @param array<float> $expected
+     */
+    public function testOfRangeFloatsCustomStepWithinRounding(float $start, float $end, float $step, array $expected): void
+    {
+        // Given
+        $stream = Stream::ofRange($start, $end, $step);
+
+        // When
+        $result = $stream->toArray();
+
+        // Then
+        // Single::range computes $start + i·$step in float arithmetic, not correctly rounded: storing $start
+        // and $step, the product and the sum each cost half an ulp, plus half an ulp for rounding the
+        // oracle, and i·$step is at most 2·max(|$start|, |$end|), so the values are within
+        // 3.5·ε·max(|$start|, |$end|) of the oracle.
+        $this->assertCount(\count($expected), $result);
+        $this->assertContainsOnly('float', $result);
+        $this->assertEqualsWithDelta($expected, $result, 4 * \PHP_FLOAT_EPSILON * \max(\abs($start), \abs($end)));
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_float_steps.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / Fraction(step)) + 1
+     *   value_i = float(Fraction(start) ± i * Fraction(step))
+     */
+    public static function dataProviderForRangeFloatsCustomStepWithinRounding(): array
+    {
+        return [
+            // 3 * 1.2 = 3.5999999999999996 in float arithmetic
             [
                 0.0,
                 5.0,
@@ -834,7 +882,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $result = Stream::ofRange('1', '5.5', 1.5)->toArray();
 
         // Then
-        $this->assertEqualsWithDelta([1.0, 2.5, 4.0, 5.5], $result, 0.0001);
+        $this->assertSame([1.0, 2.5, 4.0, 5.5], $result);
     }
 
     /**

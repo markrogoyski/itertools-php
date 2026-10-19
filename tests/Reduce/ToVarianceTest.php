@@ -14,8 +14,6 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
 {
     use DataProvider;
 
-    private const DELTA = 0.0000000001;
-
     /**
      * @test toVariance example usage (population)
      */
@@ -27,8 +25,8 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
         // When
         $variance = Reduce::toVariance($numbers);
 
-        // Then
-        $this->assertEqualsWithDelta(2.0, $variance, self::DELTA);
+        // Then (expected value from numpy.var([1, 2, 3, 4, 5], ddof=0))
+        $this->assertSame(2.0, $variance);
     }
 
     /**
@@ -44,7 +42,7 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toVariance($data, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -63,7 +61,7 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toVariance($generator, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -82,7 +80,7 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toVariance($iterator, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -101,25 +99,29 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toVariance($traversable, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   numpy.var(data, ddof=1 if sample else 0)
+     */
     public static function dataProviderForVariance(): array
     {
         return [
-            // Population variance — textbook examples
+            // Population variance
             [[1, 2, 3, 4, 5], false, 2.0],
             [[2, 4, 4, 4, 5, 5, 7, 9], false, 4.0],
             [[10, 20], false, 25.0],
             // Population variance — all equal is 0
             [[7, 7, 7], false, 0.0],
             // Population variance — negatives
-            [[-2, -4, -6], false, 8 / 3],
+            [[-2, -4, -6], false, 2.6666666666666665],
             // Population variance — floats
-            [[1.5, 2.5, 3.5], false, 2 / 3],
-            // Sample variance — textbook examples (Bessel's correction)
+            [[1.5, 2.5, 3.5], false, 0.6666666666666666],
+            // Sample variance (Bessel's correction)
             [[1, 2, 3, 4, 5], true, 2.5],
-            [[2, 4, 4, 4, 5, 5, 7, 9], true, 32 / 7],
+            [[2, 4, 4, 4, 5, 5, 7, 9], true, 4.571428571428571],
             [[10, 20], true, 50.0],
             [[1, 2], true, 0.5],
             // Sample variance — all equal is 0
@@ -225,16 +227,19 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
      */
     public function testVeryLargeNPopulation(): void
     {
-        // Given the uniform sequence 1..10000, whose population variance is (N^2 - 1) / 12
+        // Given the uniform sequence 1..10000, with the expected value generated with Python:
+        //   float(sum((Fraction(x) - mean) ** 2 for x in data) / n), mean = Fraction(sum(data), n)
         $n        = 10000;
         $data     = \range(1, $n);
-        $expected = (($n ** 2) - 1) / 12;
+        $expected = 8333333.25;
 
         // When
         $result = Reduce::toVariance($data);
 
-        // Then (loosened delta accounts for floating-point accumulation over 10000 terms)
-        $this->assertEqualsWithDelta($expected, $result, 0.0001);
+        // Then (the online update rounds once per value, and n independent roundings accumulate like
+        // a random walk, so the relative error grows as about sqrt(n) * epsilon rather than staying
+        // within an ulp; the worst-case bound n * epsilon is far looser)
+        $this->assertEqualsWithDelta($expected, $result, \sqrt($n) * \PHP_FLOAT_EPSILON * $expected);
     }
 
     /**
@@ -253,6 +258,12 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational variance, correctly rounded to a float):
+     *   mean = sum(map(Fraction, data)) / n
+     *   float(sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof))
+     * NumPy cannot serve here: its float64 sum overflows to INF.
+     */
     public static function dataProviderForHugeValues(): array
     {
         return [
@@ -265,18 +276,37 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test toVariance reports a genuinely unrepresentable variance as INF, never as a negative number
+     * @test         toVariance reports a genuinely unrepresentable variance as INF, never as a negative number
+     * @dataProvider dataProviderForUnrepresentableVariance
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
      */
-    public function testUnrepresentableVarianceIsPositiveInfinity(): void
+    public function testUnrepresentableVarianceIsPositiveInfinity(array $data, bool $sample, float $expected): void
     {
-        // Given values whose true variance (~1e616) exceeds PHP_FLOAT_MAX and cannot be represented
-        $data = [-1e308, 1e308];
-
         // When
-        $result = Reduce::toVariance($data);
+        $result = Reduce::toVariance($data, $sample);
 
-        // Then
-        $this->assertSame(\INF, $result);
+        // Then (documented policy is INF for an unrepresentable variance, not NAN)
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact rational variance, correctly rounded to a float, which is
+     * INF at or beyond 2 ** 1024 - 2 ** 970):
+     *   mean = sum(map(Fraction, data)) / n
+     *   float(sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof))
+     */
+    public static function dataProviderForUnrepresentableVariance(): array
+    {
+        return [
+            // The true variance (~1e616) exceeds PHP_FLOAT_MAX
+            [[-1e308, 1e308], false, \INF],
+            [[-1e308, 1e308], true, \INF],
+            // The mean also overflows during accumulation
+            [[-1e308, 1e308, 1e308], false, \INF],
+            [[-1e308, 1e308, 1e308], true, \INF],
+        ];
     }
 
     /**
@@ -284,14 +314,16 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
      */
     public function testLargeIterableMemoryBounded(): void
     {
-        // Given a huge lazy source that costs ~16 MB to materialize
+        // Given a huge lazy source that costs ~16 MB to materialize, with the expected value generated
+        // with Python (NumPy's float64 result is an ulp low here):
+        //   float(sum((Fraction(x) - mean) ** 2 for x in data) / n), mean = Fraction(sum(data), n)
         $n = 1_000_000;
         $largeGen = (function () use ($n) {
             for ($i = 1; $i <= $n; $i++) {
                 yield $i;
             }
         })();
-        $expected = (($n ** 2) - 1) / 12;
+        $expected = 83333333333.25;
 
         // When
         \memory_reset_peak_usage();
@@ -299,8 +331,8 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toVariance($largeGen);
         $peakIncrease = \memory_get_peak_usage() - $before;
 
-        // Then
-        $this->assertEqualsWithDelta($expected, $result, 1.0);
+        // Then (relative error of about sqrt(n) * epsilon from n per-value roundings, as above)
+        $this->assertEqualsWithDelta($expected, $result, \sqrt($n) * \PHP_FLOAT_EPSILON * $expected);
         $this->assertLessThan(4 * 1024 * 1024, $peakIncrease);
     }
 
@@ -317,17 +349,22 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toVariance($data, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, \abs($expected) * 1e-12);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational variance, correctly rounded to a float):
+     *   mean = sum(map(Fraction, data)) / n
+     *   float(sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof))
+     */
     public static function dataProviderForRepresentableVarianceOfHugeValues(): array
     {
         return [
             // Sum of squared deviations is 2e308 (unrepresentable), but the variance itself is not.
-            [[-1e154, 1e154], false, 1e308],
-            [[-1e154, 0, 1e154], false, 6.666666666666667e307],
-            [[-1e154, 0, 1e154], true, 1e308],
-            [[0, 1e154], false, 2.5e307],
+            [[-1e154, 1e154], false, 1.0E+308],
+            [[-1e154, 0, 1e154], false, 6.666666666666667E+307],
+            [[-1e154, 0, 1e154], true, 1.0E+308],
+            [[0, 1e154], false, 2.5E+307],
         ];
     }
 
@@ -344,34 +381,57 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toVariance($data, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, \abs($expected) * 1e-12);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational variance, correctly rounded to a float):
+     *   mean = sum(map(Fraction, data)) / n
+     *   float(sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof))
+     */
     public static function dataProviderForPrefixOverflow(): array
     {
         return [
-            // The variance of the leading pair is ~1.96e308 and ~2.25e308 respectively — both beyond
-            // PHP_FLOAT_MAX — while the variance of the whole collection is representable. An
-            // accumulator that stores the variance directly cannot come back down from INF.
-            [[-1.4e154, 1.4e154, 0], false, 1.3066666666666665e308],
-            [[-1.5e154, 1.5e154, 0, 0], false, 1.1250000000000002e308],
-            [[-1.5e154, 1.5e154, 0, 0], true, 1.5000000000000002e308],
+            // The variance of the leading pair is ~2.25e308 — beyond PHP_FLOAT_MAX — while the
+            // variance of the whole collection is representable. An accumulator that stores the
+            // variance directly cannot come back down from INF.
+            [[-1.5e154, 1.5e154, 0, 0], false, 1.1250000000000002E+308],
+            [[-1.5e154, 1.5e154, 0, 0], true, 1.5000000000000002E+308],
         ];
     }
 
     /**
-     * @test toVariance reports a genuinely unrepresentable variance as INF even when the mean overflows
+     * @test         toVariance is finite, to within rounding, when an intermediate prefix variance is not representable
+     * @dataProvider dataProviderForPrefixOverflowWithinRounding
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
      */
-    public function testUnrepresentableVarianceWithOverflowingMeanIsInfinite(): void
-    {
-        // Given finite values whose mean overflows during accumulation and whose variance is ~1e616
-        $data = [-1e308, 1e308, 1e308];
-
+    public function testPrefixOverflowStillYieldsRepresentableResultWithinRounding(
+        array $data,
+        bool $sample,
+        float $expected
+    ): void {
         // When
-        $result = Reduce::toVariance($data);
+        $result = Reduce::toVariance($data, $sample);
 
-        // Then (documented policy is INF for an unrepresentable variance, not NAN)
-        $this->assertSame(\INF, $result);
+        // Then (the result is not correctly rounded: it passes through a handful of rounded steps — the
+        // per-value updates and the final unscaling — so it may sit a few ulps from the oracle)
+        $this->assertEqualsWithDelta($expected, $result, 4 * \PHP_FLOAT_EPSILON * \abs($expected));
+    }
+
+    /**
+     * Test data generated with Python (exact rational variance, correctly rounded to a float):
+     *   mean = sum(map(Fraction, data)) / n
+     *   float(sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof))
+     */
+    public static function dataProviderForPrefixOverflowWithinRounding(): array
+    {
+        return [
+            // The variance of the leading pair is ~1.96e308 — beyond PHP_FLOAT_MAX — while the
+            // variance of the whole collection is representable.
+            [[-1.4e154, 1.4e154, 0], false, 1.3066666666666667E+308],
+        ];
     }
 
     /**
@@ -386,8 +446,9 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
         $fromData      = Reduce::toVariance($data);
         $fromReordered = Reduce::toVariance($reordered);
 
-        // Then (floating-point accumulation is not bit-reproducible across orderings)
-        $this->assertEqualsWithDelta($fromData, $fromReordered, \abs($fromData) * 1e-12);
+        // Then (floating-point accumulation is not bit-reproducible across orderings, but each ordering
+        // is within a few ulps of the exact variance, so the two are too)
+        $this->assertEqualsWithDelta($fromData, $fromReordered, 4 * \PHP_FLOAT_EPSILON * \abs($fromData));
     }
 
     public static function dataProviderForApproximateOrderStability(): array
@@ -432,18 +493,37 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test toVariance of a large-offset collection matches the exact mathematical variance
+     * @test         toVariance of a large-offset collection matches the exact mathematical variance
+     * @dataProvider dataProviderForLargeOffsetSmallSpread
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
      */
-    public function testLargeOffsetSmallSpreadIsExact(): void
+    public function testLargeOffsetSmallSpreadIsExact(array $data, bool $sample, float $expected): void
     {
-        // Given values 1e16 apart from each other by exactly one ulp step (the true variance is 8/3)
-        $data = [1e16, 1e16 + 2, 1e16 + 4];
-
         // When
-        $result = Reduce::toVariance($data);
+        $result = Reduce::toVariance($data, $sample);
 
         // Then
-        $this->assertEqualsWithDelta(8 / 3, $result, self::DELTA);
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact rational variance, correctly rounded to a float):
+     *   mean = sum(map(Fraction, data)) / n
+     *   float(sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof))
+     * NumPy's float64 mean loses the spread at 1e18 (it gives 60074.666666666664 and 90112.0).
+     */
+    public static function dataProviderForLargeOffsetSmallSpread(): array
+    {
+        return [
+            // Values one ulp step apart at 1e16
+            [[1e16, 1e16 + 2, 1e16 + 4], false, 2.6666666666666665],
+            [[1e16, 1e16 + 2, 1e16 + 4], true, 4.0],
+            // Values two ulp steps apart at 1e18
+            [[1e18, 1e18 + 256, 1e18 + 512], false, 43690.666666666664],
+            [[1e18, 1e18 + 256, 1e18 + 512], true, 65536.0],
+        ];
     }
 
     /**

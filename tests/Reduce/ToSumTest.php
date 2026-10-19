@@ -11,81 +11,85 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
 class ToSumTest extends \PHPUnit\Framework\TestCase
 {
-    protected const ROUND_PRECISION = 0.0001;
-
     /**
      * @test         toSum array
      * @dataProvider dataProviderForArray
-     * @param        array $data
+     * @param        array     $data
      * @param        int|float $expected
      */
-    public function testArray(array $data, $expected)
+    public function testArray(array $data, int|float $expected): void
     {
         // When
         $result = Reduce::toSum($data);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational sum, correctly rounded to a float):
+     *   float(sum(map(Fraction, data)))
+     * null and false are coerced to 0 and true to 1, as PHP arithmetic does.
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
     public static function dataProviderForArray(): array
     {
         return [
             [
                 [],
-                0
+                0,
             ],
             [
                 [0],
-                0
+                0,
             ],
             [
                 [null],
-                0
+                0,
             ],
             [
                 [false],
-                0
+                0,
             ],
             [
                 [null, null],
-                0
+                0,
             ],
             [
                 [null, false],
-                0
+                0,
             ],
             [
                 [true, false],
-                1
+                1,
             ],
             [
                 [false, true],
-                1
+                1,
             ],
             [
                 [0, null, false],
-                0
+                0,
             ],
             [
                 [1, null, false],
-                1
+                1,
             ],
             [
                 [1, null, true],
-                2
+                2,
             ],
             [
                 [1, 2, 3],
-                6
+                6,
             ],
             [
                 [1.1, 2.2, 3.3],
-                6.6
+                6.6,
             ],
             [
                 [1.1, 2, 3.3],
-                6.4
+                6.4,
             ],
         ];
     }
@@ -94,17 +98,23 @@ class ToSumTest extends \PHPUnit\Framework\TestCase
      * @test         toSum generators
      * @dataProvider dataProviderForGenerators
      * @param        \Generator $data
-     * @param        mixed $expected
+     * @param        int|float  $expected
      */
-    public function testGenerators(\Generator $data, $expected)
+    public function testGenerators(\Generator $data, int|float $expected): void
     {
         // When
         $result = Reduce::toSum($data);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational sum, correctly rounded to a float):
+     *   float(sum(map(Fraction, data)))
+     * null and false are coerced to 0 and true to 1, as PHP arithmetic does.
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
     public static function dataProviderForGenerators(): array
     {
         $gen = static function (array $data) {
@@ -114,59 +124,59 @@ class ToSumTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $gen([]),
-                0
+                0,
             ],
             [
                 $gen([0]),
-                0
+                0,
             ],
             [
                 $gen([null]),
-                0
+                0,
             ],
             [
                 $gen([false]),
-                0
+                0,
             ],
             [
                 $gen([null, null]),
-                0
+                0,
             ],
             [
                 $gen([null, false]),
-                0
+                0,
             ],
             [
                 $gen([true, false]),
-                1
+                1,
             ],
             [
                 $gen([false, true]),
-                1
+                1,
             ],
             [
                 $gen([0, null, false]),
-                0
+                0,
             ],
             [
                 $gen([1, null, false]),
-                1
+                1,
             ],
             [
                 $gen([1, null, true]),
-                2
+                2,
             ],
             [
                 $gen([1, 2, 3]),
-                6
+                6,
             ],
             [
                 $gen([1.1, 2.2, 3.3]),
-                6.6
+                6.6,
             ],
             [
                 $gen([1.1, 2, 3.3]),
-                6.4
+                6.4,
             ],
         ];
     }
@@ -174,18 +184,24 @@ class ToSumTest extends \PHPUnit\Framework\TestCase
     /**
      * @test         toSum iterators
      * @dataProvider dataProviderForIterators
-     * @param        \Generator $data
-     * @param        mixed $expected
+     * @param        \Iterator $data
+     * @param        int|float $expected
      */
-    public function testIterators(\Iterator $data, $expected)
+    public function testIterators(\Iterator $data, int|float $expected): void
     {
         // When
         $result = Reduce::toSum($data);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational sum, correctly rounded to a float):
+     *   float(sum(map(Fraction, data)))
+     * null and false are coerced to 0 and true to 1, as PHP arithmetic does.
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
     public static function dataProviderForIterators(): array
     {
         $iter = static function (array $data) {
@@ -195,59 +211,59 @@ class ToSumTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $iter([]),
-                0
+                0,
             ],
             [
                 $iter([0]),
-                0
+                0,
             ],
             [
                 $iter([null]),
-                0
+                0,
             ],
             [
                 $iter([false]),
-                0
+                0,
             ],
             [
                 $iter([null, null]),
-                0
+                0,
             ],
             [
                 $iter([null, false]),
-                0
+                0,
             ],
             [
                 $iter([true, false]),
-                1
+                1,
             ],
             [
                 $iter([false, true]),
-                1
+                1,
             ],
             [
                 $iter([0, null, false]),
-                0
+                0,
             ],
             [
                 $iter([1, null, false]),
-                1
+                1,
             ],
             [
                 $iter([1, null, true]),
-                2
+                2,
             ],
             [
                 $iter([1, 2, 3]),
-                6
+                6,
             ],
             [
                 $iter([1.1, 2.2, 3.3]),
-                6.6
+                6.6,
             ],
             [
                 $iter([1.1, 2, 3.3]),
-                6.4
+                6.4,
             ],
         ];
     }
@@ -256,17 +272,23 @@ class ToSumTest extends \PHPUnit\Framework\TestCase
      * @test         toSum traversables
      * @dataProvider dataProviderForTraversables
      * @param        \Traversable $data
-     * @param        mixed $expected
+     * @param        int|float    $expected
      */
-    public function testTraversables(\Traversable $data, $expected)
+    public function testTraversables(\Traversable $data, int|float $expected): void
     {
         // When
         $result = Reduce::toSum($data);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational sum, correctly rounded to a float):
+     *   float(sum(map(Fraction, data)))
+     * null and false are coerced to 0 and true to 1, as PHP arithmetic does.
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
     public static function dataProviderForTraversables(): array
     {
         $trav = static function (array $data) {
@@ -276,59 +298,59 @@ class ToSumTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 $trav([]),
-                0
+                0,
             ],
             [
                 $trav([0]),
-                0
+                0,
             ],
             [
                 $trav([null]),
-                0
+                0,
             ],
             [
                 $trav([false]),
-                0
+                0,
             ],
             [
                 $trav([null, null]),
-                0
+                0,
             ],
             [
                 $trav([null, false]),
-                0
+                0,
             ],
             [
                 $trav([true, false]),
-                1
+                1,
             ],
             [
                 $trav([false, true]),
-                1
+                1,
             ],
             [
                 $trav([0, null, false]),
-                0
+                0,
             ],
             [
                 $trav([1, null, false]),
-                1
+                1,
             ],
             [
                 $trav([1, null, true]),
-                2
+                2,
             ],
             [
                 $trav([1, 2, 3]),
-                6
+                6,
             ],
             [
                 $trav([1.1, 2.2, 3.3]),
-                6.6
+                6.6,
             ],
             [
                 $trav([1.1, 2, 3.3]),
-                6.4
+                6.4,
             ],
         ];
     }

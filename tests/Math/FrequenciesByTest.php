@@ -10,6 +10,9 @@ use IterTools\Tests\Fixture;
 class FrequenciesByTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * Example data generated with Python:
+     *   collections.Counter(map(len, ['apple', 'pear', 'banana', 'kiwi']))
+     *
      * @test frequenciesBy example usage
      */
     public function testFrequenciesByExampleUsage(): void
@@ -26,7 +29,7 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals([5 => 1, 4 => 2, 6 => 1], $frequencies);
+        $this->assertSame([5 => 1, 4 => 2, 6 => 1], $frequencies);
     }
 
     /**
@@ -50,16 +53,37 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedKeys, $keys);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedKeys, $keys);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order), key function as in each row
+     * (x, 'even' if x % 2 == 0 else 'odd', len(x), 'all', x % 3):
+     *   c = collections.Counter(map(key, data))
+     *   keys = list(c); frequencies = list(c.values())
+     */
     public static function dataProviderForArray(): array
     {
         return [
-            [[], fn ($x) => $x, [], []],
-            [[5], fn ($x) => $x, [5], [1]],
-            [['a'], fn ($x) => $x, ['a'], [1]],
+            [
+                [],
+                fn ($x) => $x,
+                [],
+                [],
+            ],
+            [
+                [5],
+                fn ($x) => $x,
+                [5],
+                [1],
+            ],
+            [
+                ['a'],
+                fn ($x) => $x,
+                ['a'],
+                [1],
+            ],
             [
                 [1, 2, 3, 4, 5, 6],
                 fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
@@ -77,6 +101,18 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
                 fn ($x) => 'all',
                 ['all'],
                 [4],
+            ],
+            [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                fn ($x) => $x % 3,
+                [1, 2, 0],
+                [4, 3, 3],
+            ],
+            [
+                [3, 1, 2, 1, 3, 3],
+                fn ($x) => $x,
+                [3, 1, 2],
+                [3, 2, 1],
             ],
         ];
     }
@@ -102,35 +138,66 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedKeys, $keys);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedKeys, $keys);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order), key function as in each row
+     * (x, 'even' if x % 2 == 0 else 'odd', len(x), 'all', x % 3):
+     *   c = collections.Counter(map(key, data))
+     *   keys = list(c); frequencies = list(c.values())
+     */
     public static function dataProviderForGenerator(): array
     {
-        $gen = fn (array $data) => Fixture\GeneratorFixture::getGenerator($data);
-
         return [
-            [$gen([]), fn ($x) => $x, [], []],
-            [$gen([5]), fn ($x) => $x, [5], [1]],
-            [$gen(['a']), fn ($x) => $x, ['a'], [1]],
             [
-                $gen([1, 2, 3, 4, 5, 6]),
+                Fixture\GeneratorFixture::getGenerator([]),
+                fn ($x) => $x,
+                [],
+                [],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([5]),
+                fn ($x) => $x,
+                [5],
+                [1],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator(['a']),
+                fn ($x) => $x,
+                ['a'],
+                [1],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4, 5, 6]),
                 fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
                 ['odd', 'even'],
                 [3, 3],
             ],
             [
-                $gen(['apple', 'pear', 'banana', 'kiwi']),
+                Fixture\GeneratorFixture::getGenerator(['apple', 'pear', 'banana', 'kiwi']),
                 fn ($x) => \strlen($x),
                 [5, 4, 6],
                 [1, 2, 1],
             ],
             [
-                $gen([10, 20, 30, 40]),
+                Fixture\GeneratorFixture::getGenerator([10, 20, 30, 40]),
                 fn ($x) => 'all',
                 ['all'],
                 [4],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn ($x) => $x % 3,
+                [1, 2, 0],
+                [4, 3, 3],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([3, 1, 2, 1, 3, 3]),
+                fn ($x) => $x,
+                [3, 1, 2],
+                [3, 2, 1],
             ],
         ];
     }
@@ -156,35 +223,66 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedKeys, $keys);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedKeys, $keys);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order), key function as in each row
+     * (x, 'even' if x % 2 == 0 else 'odd', len(x), 'all', x % 3):
+     *   c = collections.Counter(map(key, data))
+     *   keys = list(c); frequencies = list(c.values())
+     */
     public static function dataProviderForIterator(): array
     {
-        $iter = fn (array $data) => new Fixture\ArrayIteratorFixture($data);
-
         return [
-            [$iter([]), fn ($x) => $x, [], []],
-            [$iter([5]), fn ($x) => $x, [5], [1]],
-            [$iter(['a']), fn ($x) => $x, ['a'], [1]],
             [
-                $iter([1, 2, 3, 4, 5, 6]),
+                new Fixture\ArrayIteratorFixture([]),
+                fn ($x) => $x,
+                [],
+                [],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([5]),
+                fn ($x) => $x,
+                [5],
+                [1],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture(['a']),
+                fn ($x) => $x,
+                ['a'],
+                [1],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, 2, 3, 4, 5, 6]),
                 fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
                 ['odd', 'even'],
                 [3, 3],
             ],
             [
-                $iter(['apple', 'pear', 'banana', 'kiwi']),
+                new Fixture\ArrayIteratorFixture(['apple', 'pear', 'banana', 'kiwi']),
                 fn ($x) => \strlen($x),
                 [5, 4, 6],
                 [1, 2, 1],
             ],
             [
-                $iter([10, 20, 30, 40]),
+                new Fixture\ArrayIteratorFixture([10, 20, 30, 40]),
                 fn ($x) => 'all',
                 ['all'],
                 [4],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn ($x) => $x % 3,
+                [1, 2, 0],
+                [4, 3, 3],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([3, 1, 2, 1, 3, 3]),
+                fn ($x) => $x,
+                [3, 1, 2],
+                [3, 2, 1],
             ],
         ];
     }
@@ -210,40 +308,74 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedKeys, $keys);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedKeys, $keys);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order), key function as in each row
+     * (x, 'even' if x % 2 == 0 else 'odd', len(x), 'all', x % 3):
+     *   c = collections.Counter(map(key, data))
+     *   keys = list(c); frequencies = list(c.values())
+     */
     public static function dataProviderForTraversable(): array
     {
-        $trav = fn (array $data) => new Fixture\IteratorAggregateFixture($data);
-
         return [
-            [$trav([]), fn ($x) => $x, [], []],
-            [$trav([5]), fn ($x) => $x, [5], [1]],
-            [$trav(['a']), fn ($x) => $x, ['a'], [1]],
             [
-                $trav([1, 2, 3, 4, 5, 6]),
+                new Fixture\IteratorAggregateFixture([]),
+                fn ($x) => $x,
+                [],
+                [],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([5]),
+                fn ($x) => $x,
+                [5],
+                [1],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture(['a']),
+                fn ($x) => $x,
+                ['a'],
+                [1],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, 2, 3, 4, 5, 6]),
                 fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
                 ['odd', 'even'],
                 [3, 3],
             ],
             [
-                $trav(['apple', 'pear', 'banana', 'kiwi']),
+                new Fixture\IteratorAggregateFixture(['apple', 'pear', 'banana', 'kiwi']),
                 fn ($x) => \strlen($x),
                 [5, 4, 6],
                 [1, 2, 1],
             ],
             [
-                $trav([10, 20, 30, 40]),
+                new Fixture\IteratorAggregateFixture([10, 20, 30, 40]),
                 fn ($x) => 'all',
                 ['all'],
                 [4],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+                fn ($x) => $x % 3,
+                [1, 2, 0],
+                [4, 3, 3],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([3, 1, 2, 1, 3, 3]),
+                fn ($x) => $x,
+                [3, 1, 2],
+                [3, 2, 1],
             ],
         ];
     }
 
     /**
+     * Expected values generated with Python:
+     *   collections.Counter(['NYC', 'LA', 'NYC', 'LA', 'NYC'])
+     *
      * @test frequenciesBy with objects and a property-extracting closure
      */
     public function testObjectsWithPropertyExtractor(): void
@@ -266,10 +398,13 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals(['NYC' => 3, 'LA' => 2], $frequencies);
+        $this->assertSame(['NYC' => 3, 'LA' => 2], $frequencies);
     }
 
     /**
+     * Expected values generated with Python:
+     *   c = collections.Counter([1, 'a', 2, 'a', 1, 'b']); list(c), list(c.values())
+     *
      * @test frequenciesBy with mixed int/string projections preserves both key types
      */
     public function testMixedIntStringProjectionsStrict(): void
@@ -288,11 +423,14 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals([1, 'a', 2, 'b'], $keys);
-        $this->assertEquals([2, 2, 1, 1], $frequencies);
+        $this->assertSame([1, 'a', 2, 'b'], $keys);
+        $this->assertSame([2, 2, 1, 1], $frequencies);
     }
 
     /**
+     * Textbook definition, README "Strict and Coercive Types" (Python equates only equal types here:
+     * it cannot express int 1 and '1' being one key in coercive mode and two in strict mode).
+     *
      * @test frequenciesBy strict vs non-strict value comparison
      */
     public function testStrictVsNonStrict(): void
@@ -307,7 +445,7 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then strict keeps int 1 and string "1" distinct
-        $this->assertEquals([[1, 2], ['1', 2]], $strict);
+        $this->assertSame([[1, 2], ['1', 2]], $strict);
 
         // When non-strict
         $coercive = [];
@@ -317,7 +455,7 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
 
         // Then non-strict collapses int 1 and string "1" together
         $this->assertCount(1, $coercive);
-        $this->assertEquals(4, $coercive[0][1]);
+        $this->assertSame(4, $coercive[0][1]);
     }
 
     /**
@@ -353,6 +491,9 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Expected values generated with Python:
+     *   collections.Counter(['odd', 'even', 'odd', 'even'])
+     *
      * @test frequenciesBy happy path emits no PHP deprecation notices
      */
     public function testNoDeprecationNotices(): void
@@ -377,6 +518,6 @@ class FrequenciesByTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertSame([], $raised);
-        $this->assertEquals(['odd' => 2, 'even' => 2], $result);
+        $this->assertSame(['odd' => 2, 'even' => 2], $result);
     }
 }

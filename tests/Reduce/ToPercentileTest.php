@@ -14,8 +14,6 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
 {
     use DataProvider;
 
-    private const DELTA = 0.0000000001;
-
     /**
      * @test toPercentile example usage
      */
@@ -27,8 +25,8 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         // When
         $p75 = Reduce::toPercentile($scores, 75);
 
-        // Then
-        $this->assertEqualsWithDelta(40.0, $p75, self::DELTA);
+        // Then (numpy.percentile([10, 20, 30, 40, 50], 75, method='linear'), landing on the element 40)
+        $this->assertSame(40, $p75);
     }
 
     /**
@@ -44,7 +42,7 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toPercentile($data, $percentile);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -63,7 +61,7 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toPercentile($generator, $percentile);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -82,7 +80,7 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toPercentile($iterator, $percentile);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -101,9 +99,15 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toPercentile($traversable, $percentile);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   numpy.percentile(data, p, method='linear')
+     * The int-vs-float result type is the library's contract, not the oracle's: a rank that lands on
+     * an element returns that element, and the midpoint of two integers with an even sum is an integer.
+     */
     public static function dataProviderForPercentile(): array
     {
         return [
@@ -115,14 +119,14 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
             [[1, 2, 3, 4], 100, 4],
             // [1,2,3,4,5] — exact-rank landings
             [[1, 2, 3, 4, 5], 0, 1],
-            [[1, 2, 3, 4, 5], 25, 2.0],
-            [[1, 2, 3, 4, 5], 50, 3.0],
-            [[1, 2, 3, 4, 5], 75, 4.0],
+            [[1, 2, 3, 4, 5], 25, 2],
+            [[1, 2, 3, 4, 5], 50, 3],
+            [[1, 2, 3, 4, 5], 75, 4],
             [[1, 2, 3, 4, 5], 100, 5],
             // Fractional percentile requiring interpolation
             [[1, 2, 3, 4, 5], 10, 1.4],
             // Unsorted input (output invariant to order)
-            [[4, 2, 5, 1, 3], 50, 3.0],
+            [[4, 2, 5, 1, 3], 50, 3],
             // Textbook interpolation cases
             [[15, 20, 35, 40, 50], 40, 29.0],
             [[15, 20, 35, 40, 50], 5, 16.0],
@@ -192,9 +196,9 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         $min = Reduce::toPercentile($data, 0);
         $max = Reduce::toPercentile($data, 100);
 
-        // Then
-        $this->assertEqualsWithDelta(1, $min, self::DELTA);
-        $this->assertEqualsWithDelta(9, $max, self::DELTA);
+        // Then (numpy.percentile([5, 1, 9, 3, 7], [0, 100], method='linear'), landing on the elements)
+        $this->assertSame(1, $min);
+        $this->assertSame(9, $max);
     }
 
     /**
@@ -210,10 +214,10 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         $p50  = Reduce::toPercentile($data, 50);
         $p100 = Reduce::toPercentile($data, 100);
 
-        // Then (R-7: median of 1..10000 is the mean of the two middle values)
-        $this->assertEqualsWithDelta(1, $p0, self::DELTA);
-        $this->assertEqualsWithDelta(5000.5, $p50, self::DELTA);
-        $this->assertEqualsWithDelta(10000, $p100, self::DELTA);
+        // Then (numpy.percentile(range(1, 10001), [0, 50, 100], method='linear'))
+        $this->assertSame(1, $p0);
+        $this->assertSame(5000.5, $p50);
+        $this->assertSame(10000, $p100);
     }
 
     /**
@@ -232,6 +236,12 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact R-7 interpolation, correctly rounded to a float):
+     *   h = (len(x) - 1) * Fraction(p) / 100, j = floor(h)
+     *   float(Fraction(x[j]) + (h - j) * (Fraction(x[j + 1]) - Fraction(x[j])))
+     * numpy.percentile is not the oracle here: its span x[j + 1] - x[j] overflows to INF.
+     */
     public static function dataProviderForHugeSpan(): array
     {
         return [
@@ -253,7 +263,7 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toPercentile($data, 50);
 
-        // Then
+        // Then (exact R-7: float((Fraction(-2**63) + Fraction(2**63 - 1)) / 2))
         $this->assertSame(-0.5, $result);
     }
 
@@ -272,7 +282,7 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toPercentile($data, 50);
 
-        // Then
+        // Then (exact R-7: float((Fraction(9007199254740993) + Fraction(9007199254740994)) / 2))
         $this->assertSame(9007199254740994.0, $result);
     }
 
@@ -325,6 +335,10 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python's R-7 quantiles (NumPy gives NAN, from INF - INF in its span):
+     *   statistics.quantiles(data, n=100, method='inclusive')[p - 1]
+     */
     public static function dataProviderForIdenticalInfiniteNeighbours(): array
     {
         return [
@@ -354,6 +368,10 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python's R-7 quantiles (NumPy gives NAN, from INF - INF in its span):
+     *   statistics.quantiles(data, n=100, method='inclusive')[p - 1]
+     */
     public static function dataProviderForInfiniteAndFiniteNeighbours(): array
     {
         return [
@@ -379,7 +397,7 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         // When (a percentile that lands strictly between two ranks)
         $result = Reduce::toPercentile($data, 30);
 
-        // Then
+        // Then (numpy.percentile([0.1, 0.1, 0.1, 0.1], 30, method='linear'))
         $this->assertSame(0.1, $result);
     }
 }

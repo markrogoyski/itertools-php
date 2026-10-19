@@ -13,6 +13,9 @@ use IterTools\Tests\Fixture\NonSerializableFixture;
 class FrequenciesTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * Example data generated with Python:
+     *   c = collections.Counter(['A', 'A', 'B', 'B', 'B', 'C'])
+     *
      * @test frequencies example usage
      */
     public function testFrequenciesExampleUsage(): void
@@ -29,14 +32,14 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        self::assertEqualsCanonicalizing(['A' => 2, 'B' => 3, 'C' => 1], $frequencies);
+        $this->assertSame(['A' => 2, 'B' => 3, 'C' => 1], $frequencies);
     }
 
     /**
-     * @test
+     * @test frequencies array strict
      * @dataProvider dataProviderForArray
+     * @dataProvider dataProviderForArrayFloats
      * @dataProvider dataProviderForArrayStrict
-     * @dataProvider dataProviderForArrayNonScalarValues
      * @param array $data
      * @param array $expectedValues
      * @param array $expectedFrequencies
@@ -54,13 +57,14 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedValues, $values);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedValues, $values);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
     /**
-     * @test
+     * @test frequencies array coercive
      * @dataProvider dataProviderForArray
+     * @dataProvider dataProviderForArrayFloats
      * @dataProvider dataProviderForArrayCoercive
      * @param array $data
      * @param array $expectedValues
@@ -79,10 +83,15 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedValues, $values);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedValues, $values);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order; ints and strings only, which Python
+     * never equates across types):
+     *   c = collections.Counter(data); values = list(c); frequencies = list(c.values())
+     */
     public static function dataProviderForArray(): array
     {
         return [
@@ -165,10 +174,44 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Values that cannot be used as native array_keys, so these rows are excluded from
-     * testIteratorToArray, which reflects the values into native array keys.
+     * Test data generated with Python (floats only, equal under Python ==, strict and coercive
+     * comparison alike, so -0.0 and 0.0 share one entry keyed by the first-seen -0.0):
+     *   c = collections.Counter(data); values = list(c); frequencies = list(c.values())
      */
-    public static function dataProviderForArrayNonScalarValues(): array
+    public static function dataProviderForArrayFloats(): array
+    {
+        return [
+            [
+                [0.5, 0.25, 0.5],
+                [0.5, 0.25],
+                [2, 1],
+            ],
+            [
+                [0.1, 0.1, 0.2],
+                [0.1, 0.2],
+                [2, 1],
+            ],
+            [
+                [0.30000000000000004, 0.3],
+                [0.30000000000000004, 0.3],
+                [1, 1],
+            ],
+            [
+                [-0.0, 0.0],
+                [-0.0],
+                [2],
+            ],
+        ];
+    }
+
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it: it
+     * equates 1, 1.0 and True, and keeps '1' apart): two values are one iff ===, so
+     * 0, '0', null, 0.0 and false are five values; nested arrays compare by key and value,
+     * objects by instance.
+     * Frequencies are the size of each group.
+     */
+    public static function dataProviderForArrayStrict(): array
     {
         $obj1 = new \stdClass();
         $obj2 = new \stdClass();
@@ -180,22 +223,15 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 [2, 1, 1],
             ],
             [
-                [$obj1, $obj1, $obj2, $obj2, $obj2],
-                [$obj1, $obj2],
-                [2, 3],
-            ],
-            // Array key identity is part of the value being counted, not noise to ignore.
-            [
                 [['a' => 1], ['b' => 1]],
                 [['a' => 1], ['b' => 1]],
                 [1, 1],
             ],
-        ];
-    }
-
-    public static function dataProviderForArrayStrict(): array
-    {
-        return [
+            [
+                [$obj1, $obj1, $obj2, $obj2, $obj2],
+                [$obj1, $obj2],
+                [2, 3],
+            ],
             [
                 [0, '0', null, 0.0, false],
                 [0, '0', null, 0.0, false],
@@ -211,24 +247,37 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
                 ['1', 1, '2', 2],
                 [1, 1, 1, 1],
             ],
-            // Float precision independence: 0.1 + 0.2 !== 0.3 bit-exactly.
-            [
-                [0.1 + 0.2, 0.3],
-                [0.1 + 0.2, 0.3],
-                [1, 1],
-            ],
-            // Signed zero: -0.0 === 0.0, so one entry with count 2.
-            [
-                [-0.0, 0.0],
-                [-0.0],
-                [2],
-            ],
         ];
     }
 
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it: it
+     * equates 1, 1.0 and True, and keeps '1' apart): numeric equivalence, so
+     * 0, '0', null, 0.0 and false are one value, 1, '1' and 1.0 are one value; objects
+     * compare by serialized state, so two empty stdClass instances are one value.
+     * Frequencies are the size of each group.
+     */
     public static function dataProviderForArrayCoercive(): array
     {
+        $obj1 = new \stdClass();
+        $obj2 = new \stdClass();
+
         return [
+            [
+                [[1, 2, 3], [1], [1, 2, 3], [2]],
+                [[1, 2, 3], [1], [2]],
+                [2, 1, 1],
+            ],
+            [
+                [['a' => 1], ['b' => 1]],
+                [['a' => 1], ['b' => 1]],
+                [1, 1],
+            ],
+            [
+                [$obj1, $obj1, $obj2, $obj2, $obj2],
+                [$obj1],
+                [5],
+            ],
             [
                 [0, '0', null, 0.0, false],
                 [0],
@@ -248,8 +297,9 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test
+     * @test frequencies generators strict
      * @dataProvider dataProviderForGenerators
+     * @dataProvider dataProviderForGeneratorsFloats
      * @dataProvider dataProviderForGeneratorsStrict
      * @param \Generator $data
      * @param array $expectedValues
@@ -268,13 +318,14 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedValues, $values);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedValues, $values);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
     /**
-     * @test
+     * @test frequencies generators coercive
      * @dataProvider dataProviderForGenerators
+     * @dataProvider dataProviderForGeneratorsFloats
      * @dataProvider dataProviderForGeneratorsCoercive
      * @param \Generator $data
      * @param array $expectedValues
@@ -293,156 +344,213 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedValues, $values);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedValues, $values);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order; ints and strings only, which Python
+     * never equates across types):
+     *   c = collections.Counter(data); values = list(c); frequencies = list(c.values())
+     */
     public static function dataProviderForGenerators(): array
     {
-        $gen = fn ($data) => GeneratorFixture::getGenerator($data);
-
         return [
             [
-                $gen([]),
+                GeneratorFixture::getGenerator([]),
                 [],
                 [],
             ],
             [
-                $gen([0]),
+                GeneratorFixture::getGenerator([0]),
                 [0],
                 [1],
             ],
             [
-                $gen([1]),
+                GeneratorFixture::getGenerator([1]),
                 [1],
                 [1],
             ],
             [
-                $gen(['a']),
+                GeneratorFixture::getGenerator(['a']),
                 ['a'],
                 [1],
             ],
             [
-                $gen([0, 0]),
+                GeneratorFixture::getGenerator([0, 0]),
                 [0],
                 [2],
             ],
             [
-                $gen(['1', '1']),
+                GeneratorFixture::getGenerator(['1', '1']),
                 ['1'],
                 [2],
             ],
             [
-                $gen([0, 1]),
+                GeneratorFixture::getGenerator([0, 1]),
                 [0, 1],
                 [1, 1],
             ],
             [
-                $gen([0, 1, 1]),
+                GeneratorFixture::getGenerator([0, 1, 1]),
                 [0, 1],
                 [1, 2],
             ],
             [
-                $gen([0, 0, 1, 1]),
+                GeneratorFixture::getGenerator([0, 0, 1, 1]),
                 [0, 1],
                 [2, 2],
             ],
             [
-                $gen([0, 0, 0, 1]),
+                GeneratorFixture::getGenerator([0, 0, 0, 1]),
                 [0, 1],
                 [3, 1],
             ],
             [
-                $gen([0, 1, 0, 0]),
+                GeneratorFixture::getGenerator([0, 1, 0, 0]),
                 [0, 1],
                 [3, 1],
             ],
             [
-                $gen([1, 0, 0, 0]),
+                GeneratorFixture::getGenerator([1, 0, 0, 0]),
                 [1, 0],
                 [1, 3],
             ],
             [
-                $gen(['a', 'b', 'c']),
+                GeneratorFixture::getGenerator(['a', 'b', 'c']),
                 ['a', 'b', 'c'],
                 [1, 1, 1],
             ],
             [
-                $gen(['a', 'c', 'b', 'c']),
+                GeneratorFixture::getGenerator(['a', 'c', 'b', 'c']),
                 ['a', 'c', 'b'],
                 [1, 2, 1],
             ],
             [
-                $gen([[1, 2, 3], [1], [1, 2, 3], [2]]),
-                [[1, 2, 3], [1], [2]],
-                [2, 1, 1],
-            ],
-            [
-                $gen([1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a']),
+                GeneratorFixture::getGenerator([1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a']),
                 [1, 'a', 'b'],
                 [5, 3, 2],
-            ],
-            // Array key identity is part of the value being counted, not noise to ignore.
-            [
-                $gen([['a' => 1], ['b' => 1]]),
-                [['a' => 1], ['b' => 1]],
-                [1, 1],
             ],
         ];
     }
 
-    public static function dataProviderForGeneratorsStrict(): array
+    /**
+     * Test data generated with Python (floats only, equal under Python ==, strict and coercive
+     * comparison alike, so -0.0 and 0.0 share one entry keyed by the first-seen -0.0):
+     *   c = collections.Counter(data); values = list(c); frequencies = list(c.values())
+     */
+    public static function dataProviderForGeneratorsFloats(): array
     {
-        $gen = fn ($data) => GeneratorFixture::getGenerator($data);
-
         return [
             [
-                $gen([0, '0', null, 0.0, false]),
-                [0, '0', null, 0.0, false],
-                [1, 1, 1, 1, 1],
+                GeneratorFixture::getGenerator([0.5, 0.25, 0.5]),
+                [0.5, 0.25],
+                [2, 1],
             ],
             [
-                $gen([1, 1.0, true, '1']),
-                [1, 1.0, true, '1'],
-                [1, 1, 1, 1],
+                GeneratorFixture::getGenerator([0.1, 0.1, 0.2]),
+                [0.1, 0.2],
+                [2, 1],
             ],
             [
-                $gen(['1', 1, '2', 2]),
-                ['1', 1, '2', 2],
-                [1, 1, 1, 1],
-            ],
-            // Float precision independence: 0.1 + 0.2 !== 0.3 bit-exactly.
-            [
-                $gen([0.1 + 0.2, 0.3]),
-                [0.1 + 0.2, 0.3],
+                GeneratorFixture::getGenerator([0.30000000000000004, 0.3]),
+                [0.30000000000000004, 0.3],
                 [1, 1],
             ],
-            // Signed zero: -0.0 === 0.0, so one entry with count 2.
             [
-                $gen([-0.0, 0.0]),
+                GeneratorFixture::getGenerator([-0.0, 0.0]),
                 [-0.0],
                 [2],
             ],
         ];
     }
 
-    public static function dataProviderForGeneratorsCoercive(): array
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it: it
+     * equates 1, 1.0 and True, and keeps '1' apart): two values are one iff ===, so
+     * 0, '0', null, 0.0 and false are five values; nested arrays compare by key and value,
+     * objects by instance.
+     * Frequencies are the size of each group.
+     */
+    public static function dataProviderForGeneratorsStrict(): array
     {
-        $gen = fn ($data) => GeneratorFixture::getGenerator($data);
+        $obj1 = new \stdClass();
+        $obj2 = new \stdClass();
 
         return [
             [
-                $gen([0, '0', null, 0.0, false]),
+                GeneratorFixture::getGenerator([[1, 2, 3], [1], [1, 2, 3], [2]]),
+                [[1, 2, 3], [1], [2]],
+                [2, 1, 1],
+            ],
+            [
+                GeneratorFixture::getGenerator([['a' => 1], ['b' => 1]]),
+                [['a' => 1], ['b' => 1]],
+                [1, 1],
+            ],
+            [
+                GeneratorFixture::getGenerator([$obj1, $obj1, $obj2, $obj2, $obj2]),
+                [$obj1, $obj2],
+                [2, 3],
+            ],
+            [
+                GeneratorFixture::getGenerator([0, '0', null, 0.0, false]),
+                [0, '0', null, 0.0, false],
+                [1, 1, 1, 1, 1],
+            ],
+            [
+                GeneratorFixture::getGenerator([1, 1.0, true, '1']),
+                [1, 1.0, true, '1'],
+                [1, 1, 1, 1],
+            ],
+            [
+                GeneratorFixture::getGenerator(['1', 1, '2', 2]),
+                ['1', 1, '2', 2],
+                [1, 1, 1, 1],
+            ],
+        ];
+    }
+
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it: it
+     * equates 1, 1.0 and True, and keeps '1' apart): numeric equivalence, so
+     * 0, '0', null, 0.0 and false are one value, 1, '1' and 1.0 are one value; objects
+     * compare by serialized state, so two empty stdClass instances are one value.
+     * Frequencies are the size of each group.
+     */
+    public static function dataProviderForGeneratorsCoercive(): array
+    {
+        $obj1 = new \stdClass();
+        $obj2 = new \stdClass();
+
+        return [
+            [
+                GeneratorFixture::getGenerator([[1, 2, 3], [1], [1, 2, 3], [2]]),
+                [[1, 2, 3], [1], [2]],
+                [2, 1, 1],
+            ],
+            [
+                GeneratorFixture::getGenerator([['a' => 1], ['b' => 1]]),
+                [['a' => 1], ['b' => 1]],
+                [1, 1],
+            ],
+            [
+                GeneratorFixture::getGenerator([$obj1, $obj1, $obj2, $obj2, $obj2]),
+                [$obj1],
+                [5],
+            ],
+            [
+                GeneratorFixture::getGenerator([0, '0', null, 0.0, false]),
                 [0],
                 [5],
             ],
             [
-                $gen(['1', 1, '2', 2]),
+                GeneratorFixture::getGenerator(['1', 1, '2', 2]),
                 ['1', '2'],
                 [2, 2],
             ],
             [
-                $gen([0, '0', null, 0.0, false, '1', 2, 1, '2', 2.0]),
+                GeneratorFixture::getGenerator([0, '0', null, 0.0, false, '1', 2, 1, '2', 2.0]),
                 [0, '1', 2],
                 [5, 2, 3],
             ],
@@ -450,8 +558,9 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test
+     * @test frequencies iterators strict
      * @dataProvider dataProviderForIterators
+     * @dataProvider dataProviderForIteratorsFloats
      * @dataProvider dataProviderForIteratorsStrict
      * @param \Iterator $data
      * @param array $expectedValues
@@ -470,13 +579,14 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedValues, $values);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedValues, $values);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
     /**
-     * @test
+     * @test frequencies iterators coercive
      * @dataProvider dataProviderForIterators
+     * @dataProvider dataProviderForIteratorsFloats
      * @dataProvider dataProviderForIteratorsCoercive
      * @param \Iterator $data
      * @param array $expectedValues
@@ -495,156 +605,213 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedValues, $values);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedValues, $values);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order; ints and strings only, which Python
+     * never equates across types):
+     *   c = collections.Counter(data); values = list(c); frequencies = list(c.values())
+     */
     public static function dataProviderForIterators(): array
     {
-        $iter = fn ($data) => new ArrayIteratorFixture($data);
-
         return [
             [
-                $iter([]),
+                new ArrayIteratorFixture([]),
                 [],
                 [],
             ],
             [
-                $iter([0]),
+                new ArrayIteratorFixture([0]),
                 [0],
                 [1],
             ],
             [
-                $iter([1]),
+                new ArrayIteratorFixture([1]),
                 [1],
                 [1],
             ],
             [
-                $iter(['a']),
+                new ArrayIteratorFixture(['a']),
                 ['a'],
                 [1],
             ],
             [
-                $iter([0, 0]),
+                new ArrayIteratorFixture([0, 0]),
                 [0],
                 [2],
             ],
             [
-                $iter(['1', '1']),
+                new ArrayIteratorFixture(['1', '1']),
                 ['1'],
                 [2],
             ],
             [
-                $iter([0, 1]),
+                new ArrayIteratorFixture([0, 1]),
                 [0, 1],
                 [1, 1],
             ],
             [
-                $iter([0, 1, 1]),
+                new ArrayIteratorFixture([0, 1, 1]),
                 [0, 1],
                 [1, 2],
             ],
             [
-                $iter([0, 0, 1, 1]),
+                new ArrayIteratorFixture([0, 0, 1, 1]),
                 [0, 1],
                 [2, 2],
             ],
             [
-                $iter([0, 0, 0, 1]),
+                new ArrayIteratorFixture([0, 0, 0, 1]),
                 [0, 1],
                 [3, 1],
             ],
             [
-                $iter([0, 1, 0, 0]),
+                new ArrayIteratorFixture([0, 1, 0, 0]),
                 [0, 1],
                 [3, 1],
             ],
             [
-                $iter([1, 0, 0, 0]),
+                new ArrayIteratorFixture([1, 0, 0, 0]),
                 [1, 0],
                 [1, 3],
             ],
             [
-                $iter(['a', 'b', 'c']),
+                new ArrayIteratorFixture(['a', 'b', 'c']),
                 ['a', 'b', 'c'],
                 [1, 1, 1],
             ],
             [
-                $iter(['a', 'c', 'b', 'c']),
+                new ArrayIteratorFixture(['a', 'c', 'b', 'c']),
                 ['a', 'c', 'b'],
                 [1, 2, 1],
             ],
             [
-                $iter([[1, 2, 3], [1], [1, 2, 3], [2]]),
-                [[1, 2, 3], [1], [2]],
-                [2, 1, 1],
-            ],
-            [
-                $iter([1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a']),
+                new ArrayIteratorFixture([1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a']),
                 [1, 'a', 'b'],
                 [5, 3, 2],
-            ],
-            // Array key identity is part of the value being counted, not noise to ignore.
-            [
-                $iter([['a' => 1], ['b' => 1]]),
-                [['a' => 1], ['b' => 1]],
-                [1, 1],
             ],
         ];
     }
 
-    public static function dataProviderForIteratorsStrict(): array
+    /**
+     * Test data generated with Python (floats only, equal under Python ==, strict and coercive
+     * comparison alike, so -0.0 and 0.0 share one entry keyed by the first-seen -0.0):
+     *   c = collections.Counter(data); values = list(c); frequencies = list(c.values())
+     */
+    public static function dataProviderForIteratorsFloats(): array
     {
-        $iter = fn ($data) => new ArrayIteratorFixture($data);
-
         return [
             [
-                $iter([0, '0', null, 0.0, false]),
-                [0, '0', null, 0.0, false],
-                [1, 1, 1, 1, 1],
+                new ArrayIteratorFixture([0.5, 0.25, 0.5]),
+                [0.5, 0.25],
+                [2, 1],
             ],
             [
-                $iter([1, 1.0, true, '1']),
-                [1, 1.0, true, '1'],
-                [1, 1, 1, 1],
+                new ArrayIteratorFixture([0.1, 0.1, 0.2]),
+                [0.1, 0.2],
+                [2, 1],
             ],
             [
-                $iter(['1', 1, '2', 2]),
-                ['1', 1, '2', 2],
-                [1, 1, 1, 1],
-            ],
-            // Float precision independence: 0.1 + 0.2 !== 0.3 bit-exactly.
-            [
-                $iter([0.1 + 0.2, 0.3]),
-                [0.1 + 0.2, 0.3],
+                new ArrayIteratorFixture([0.30000000000000004, 0.3]),
+                [0.30000000000000004, 0.3],
                 [1, 1],
             ],
-            // Signed zero: -0.0 === 0.0, so one entry with count 2.
             [
-                $iter([-0.0, 0.0]),
+                new ArrayIteratorFixture([-0.0, 0.0]),
                 [-0.0],
                 [2],
             ],
         ];
     }
 
-    public static function dataProviderForIteratorsCoercive(): array
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it: it
+     * equates 1, 1.0 and True, and keeps '1' apart): two values are one iff ===, so
+     * 0, '0', null, 0.0 and false are five values; nested arrays compare by key and value,
+     * objects by instance.
+     * Frequencies are the size of each group.
+     */
+    public static function dataProviderForIteratorsStrict(): array
     {
-        $iter = fn ($data) => new ArrayIteratorFixture($data);
+        $obj1 = new \stdClass();
+        $obj2 = new \stdClass();
 
         return [
             [
-                $iter([0, '0', null, 0.0, false]),
+                new ArrayIteratorFixture([[1, 2, 3], [1], [1, 2, 3], [2]]),
+                [[1, 2, 3], [1], [2]],
+                [2, 1, 1],
+            ],
+            [
+                new ArrayIteratorFixture([['a' => 1], ['b' => 1]]),
+                [['a' => 1], ['b' => 1]],
+                [1, 1],
+            ],
+            [
+                new ArrayIteratorFixture([$obj1, $obj1, $obj2, $obj2, $obj2]),
+                [$obj1, $obj2],
+                [2, 3],
+            ],
+            [
+                new ArrayIteratorFixture([0, '0', null, 0.0, false]),
+                [0, '0', null, 0.0, false],
+                [1, 1, 1, 1, 1],
+            ],
+            [
+                new ArrayIteratorFixture([1, 1.0, true, '1']),
+                [1, 1.0, true, '1'],
+                [1, 1, 1, 1],
+            ],
+            [
+                new ArrayIteratorFixture(['1', 1, '2', 2]),
+                ['1', 1, '2', 2],
+                [1, 1, 1, 1],
+            ],
+        ];
+    }
+
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it: it
+     * equates 1, 1.0 and True, and keeps '1' apart): numeric equivalence, so
+     * 0, '0', null, 0.0 and false are one value, 1, '1' and 1.0 are one value; objects
+     * compare by serialized state, so two empty stdClass instances are one value.
+     * Frequencies are the size of each group.
+     */
+    public static function dataProviderForIteratorsCoercive(): array
+    {
+        $obj1 = new \stdClass();
+        $obj2 = new \stdClass();
+
+        return [
+            [
+                new ArrayIteratorFixture([[1, 2, 3], [1], [1, 2, 3], [2]]),
+                [[1, 2, 3], [1], [2]],
+                [2, 1, 1],
+            ],
+            [
+                new ArrayIteratorFixture([['a' => 1], ['b' => 1]]),
+                [['a' => 1], ['b' => 1]],
+                [1, 1],
+            ],
+            [
+                new ArrayIteratorFixture([$obj1, $obj1, $obj2, $obj2, $obj2]),
+                [$obj1],
+                [5],
+            ],
+            [
+                new ArrayIteratorFixture([0, '0', null, 0.0, false]),
                 [0],
                 [5],
             ],
             [
-                $iter(['1', 1, '2', 2]),
+                new ArrayIteratorFixture(['1', 1, '2', 2]),
                 ['1', '2'],
                 [2, 2],
             ],
             [
-                $iter([0, '0', null, 0.0, false, '1', 2, 1, '2', 2.0]),
+                new ArrayIteratorFixture([0, '0', null, 0.0, false, '1', 2, 1, '2', 2.0]),
                 [0, '1', 2],
                 [5, 2, 3],
             ],
@@ -652,8 +819,9 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test
+     * @test frequencies traversables strict
      * @dataProvider dataProviderForTraversables
+     * @dataProvider dataProviderForTraversablesFloats
      * @dataProvider dataProviderForTraversablesStrict
      * @param \Traversable $data
      * @param array $expectedValues
@@ -672,13 +840,14 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedValues, $values);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedValues, $values);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
     /**
-     * @test
+     * @test frequencies traversables coercive
      * @dataProvider dataProviderForTraversables
+     * @dataProvider dataProviderForTraversablesFloats
      * @dataProvider dataProviderForTraversablesCoercive
      * @param \Traversable $data
      * @param array $expectedValues
@@ -697,156 +866,213 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         }
 
         // Then
-        $this->assertEquals($expectedValues, $values);
-        $this->assertEquals($expectedFrequencies, $frequencies);
+        $this->assertSame($expectedValues, $values);
+        $this->assertSame($expectedFrequencies, $frequencies);
     }
 
+    /**
+     * Test data generated with Python (first-seen order; ints and strings only, which Python
+     * never equates across types):
+     *   c = collections.Counter(data); values = list(c); frequencies = list(c.values())
+     */
     public static function dataProviderForTraversables(): array
     {
-        $trav = fn ($data) => new IteratorAggregateFixture($data);
-
         return [
             [
-                $trav([]),
+                new IteratorAggregateFixture([]),
                 [],
                 [],
             ],
             [
-                $trav([0]),
+                new IteratorAggregateFixture([0]),
                 [0],
                 [1],
             ],
             [
-                $trav([1]),
+                new IteratorAggregateFixture([1]),
                 [1],
                 [1],
             ],
             [
-                $trav(['a']),
+                new IteratorAggregateFixture(['a']),
                 ['a'],
                 [1],
             ],
             [
-                $trav([0, 0]),
+                new IteratorAggregateFixture([0, 0]),
                 [0],
                 [2],
             ],
             [
-                $trav(['1', '1']),
+                new IteratorAggregateFixture(['1', '1']),
                 ['1'],
                 [2],
             ],
             [
-                $trav([0, 1]),
+                new IteratorAggregateFixture([0, 1]),
                 [0, 1],
                 [1, 1],
             ],
             [
-                $trav([0, 1, 1]),
+                new IteratorAggregateFixture([0, 1, 1]),
                 [0, 1],
                 [1, 2],
             ],
             [
-                $trav([0, 0, 1, 1]),
+                new IteratorAggregateFixture([0, 0, 1, 1]),
                 [0, 1],
                 [2, 2],
             ],
             [
-                $trav([0, 0, 0, 1]),
+                new IteratorAggregateFixture([0, 0, 0, 1]),
                 [0, 1],
                 [3, 1],
             ],
             [
-                $trav([0, 1, 0, 0]),
+                new IteratorAggregateFixture([0, 1, 0, 0]),
                 [0, 1],
                 [3, 1],
             ],
             [
-                $trav([1, 0, 0, 0]),
+                new IteratorAggregateFixture([1, 0, 0, 0]),
                 [1, 0],
                 [1, 3],
             ],
             [
-                $trav(['a', 'b', 'c']),
+                new IteratorAggregateFixture(['a', 'b', 'c']),
                 ['a', 'b', 'c'],
                 [1, 1, 1],
             ],
             [
-                $trav(['a', 'c', 'b', 'c']),
+                new IteratorAggregateFixture(['a', 'c', 'b', 'c']),
                 ['a', 'c', 'b'],
                 [1, 2, 1],
             ],
             [
-                $trav([[1, 2, 3], [1], [1, 2, 3], [2]]),
-                [[1, 2, 3], [1], [2]],
-                [2, 1, 1],
-            ],
-            [
-                $trav([1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a']),
+                new IteratorAggregateFixture([1, 'a', 1, 'b', 1, 'a', 1, 'b', 1, 'a']),
                 [1, 'a', 'b'],
                 [5, 3, 2],
-            ],
-            // Array key identity is part of the value being counted, not noise to ignore.
-            [
-                $trav([['a' => 1], ['b' => 1]]),
-                [['a' => 1], ['b' => 1]],
-                [1, 1],
             ],
         ];
     }
 
-    public static function dataProviderForTraversablesStrict(): array
+    /**
+     * Test data generated with Python (floats only, equal under Python ==, strict and coercive
+     * comparison alike, so -0.0 and 0.0 share one entry keyed by the first-seen -0.0):
+     *   c = collections.Counter(data); values = list(c); frequencies = list(c.values())
+     */
+    public static function dataProviderForTraversablesFloats(): array
     {
-        $trav = fn ($data) => new IteratorAggregateFixture($data);
-
         return [
             [
-                $trav([0, '0', null, 0.0, false]),
-                [0, '0', null, 0.0, false],
-                [1, 1, 1, 1, 1],
+                new IteratorAggregateFixture([0.5, 0.25, 0.5]),
+                [0.5, 0.25],
+                [2, 1],
             ],
             [
-                $trav([1, 1.0, true, '1']),
-                [1, 1.0, true, '1'],
-                [1, 1, 1, 1],
+                new IteratorAggregateFixture([0.1, 0.1, 0.2]),
+                [0.1, 0.2],
+                [2, 1],
             ],
             [
-                $trav(['1', 1, '2', 2]),
-                ['1', 1, '2', 2],
-                [1, 1, 1, 1],
-            ],
-            // Float precision independence: 0.1 + 0.2 !== 0.3 bit-exactly.
-            [
-                $trav([0.1 + 0.2, 0.3]),
-                [0.1 + 0.2, 0.3],
+                new IteratorAggregateFixture([0.30000000000000004, 0.3]),
+                [0.30000000000000004, 0.3],
                 [1, 1],
             ],
-            // Signed zero: -0.0 === 0.0, so one entry with count 2.
             [
-                $trav([-0.0, 0.0]),
+                new IteratorAggregateFixture([-0.0, 0.0]),
                 [-0.0],
                 [2],
             ],
         ];
     }
 
-    public static function dataProviderForTraversablesCoercive(): array
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it: it
+     * equates 1, 1.0 and True, and keeps '1' apart): two values are one iff ===, so
+     * 0, '0', null, 0.0 and false are five values; nested arrays compare by key and value,
+     * objects by instance.
+     * Frequencies are the size of each group.
+     */
+    public static function dataProviderForTraversablesStrict(): array
     {
-        $trav = fn ($data) => new IteratorAggregateFixture($data);
+        $obj1 = new \stdClass();
+        $obj2 = new \stdClass();
 
         return [
             [
-                $trav([0, '0', null, 0.0, false]),
+                new IteratorAggregateFixture([[1, 2, 3], [1], [1, 2, 3], [2]]),
+                [[1, 2, 3], [1], [2]],
+                [2, 1, 1],
+            ],
+            [
+                new IteratorAggregateFixture([['a' => 1], ['b' => 1]]),
+                [['a' => 1], ['b' => 1]],
+                [1, 1],
+            ],
+            [
+                new IteratorAggregateFixture([$obj1, $obj1, $obj2, $obj2, $obj2]),
+                [$obj1, $obj2],
+                [2, 3],
+            ],
+            [
+                new IteratorAggregateFixture([0, '0', null, 0.0, false]),
+                [0, '0', null, 0.0, false],
+                [1, 1, 1, 1, 1],
+            ],
+            [
+                new IteratorAggregateFixture([1, 1.0, true, '1']),
+                [1, 1.0, true, '1'],
+                [1, 1, 1, 1],
+            ],
+            [
+                new IteratorAggregateFixture(['1', 1, '2', 2]),
+                ['1', 1, '2', 2],
+                [1, 1, 1, 1],
+            ],
+        ];
+    }
+
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it: it
+     * equates 1, 1.0 and True, and keeps '1' apart): numeric equivalence, so
+     * 0, '0', null, 0.0 and false are one value, 1, '1' and 1.0 are one value; objects
+     * compare by serialized state, so two empty stdClass instances are one value.
+     * Frequencies are the size of each group.
+     */
+    public static function dataProviderForTraversablesCoercive(): array
+    {
+        $obj1 = new \stdClass();
+        $obj2 = new \stdClass();
+
+        return [
+            [
+                new IteratorAggregateFixture([[1, 2, 3], [1], [1, 2, 3], [2]]),
+                [[1, 2, 3], [1], [2]],
+                [2, 1, 1],
+            ],
+            [
+                new IteratorAggregateFixture([['a' => 1], ['b' => 1]]),
+                [['a' => 1], ['b' => 1]],
+                [1, 1],
+            ],
+            [
+                new IteratorAggregateFixture([$obj1, $obj1, $obj2, $obj2, $obj2]),
+                [$obj1],
+                [5],
+            ],
+            [
+                new IteratorAggregateFixture([0, '0', null, 0.0, false]),
                 [0],
                 [5],
             ],
             [
-                $trav(['1', 1, '2', 2]),
+                new IteratorAggregateFixture(['1', 1, '2', 2]),
                 ['1', '2'],
                 [2, 2],
             ],
             [
-                $trav([0, '0', null, 0.0, false, '1', 2, 1, '2', 2.0]),
+                new IteratorAggregateFixture([0, '0', null, 0.0, false, '1', 2, 1, '2', 2.0]),
                 [0, '1', 2],
                 [5, 2, 3],
             ],
@@ -854,11 +1080,14 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * PHP array keys canonicalize numeric strings ('1' becomes int 1), so the keys are compared
+     * loosely; the frequencies are compared strictly.
+     *
      * @test         frequencies iterator_to_array
      * @dataProvider dataProviderForArray
-     * @param array $data
-     * @param array $expectedValues
-     * @param array $expectedFrequencies
+     * @param        array $data
+     * @param        array $expectedValues
+     * @param        array $expectedFrequencies
      */
     public function testIteratorToArray(array $data, array $expectedValues, array $expectedFrequencies): void
     {
@@ -869,8 +1098,9 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         $result = \iterator_to_array($iterator);
 
         // Then
+        // Loose: PHP array keys turn the string '1' into the int 1
         $this->assertEquals($expectedValues, \array_keys($result));
-        $this->assertEquals($expectedFrequencies, \array_values($result));
+        $this->assertSame($expectedFrequencies, \array_values($result));
     }
 
     /**
@@ -907,9 +1137,9 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertCount(2, $frequencies);
         $this->assertSame($obj1, $frequencies[0][0]);
-        $this->assertEquals(2, $frequencies[0][1]);
+        $this->assertSame(2, $frequencies[0][1]);
         $this->assertSame($obj2, $frequencies[1][0]);
-        $this->assertEquals(1, $frequencies[1][1]);
+        $this->assertSame(1, $frequencies[1][1]);
     }
 
     /**
@@ -932,9 +1162,9 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertCount(3, $frequencies);
-        $this->assertEquals(1, $frequencies[0][1]);
-        $this->assertEquals(1, $frequencies[1][1]);
-        $this->assertEquals(1, $frequencies[2][1]);
+        $this->assertSame(1, $frequencies[0][1]);
+        $this->assertSame(1, $frequencies[1][1]);
+        $this->assertSame(1, $frequencies[2][1]);
         $this->assertNotSame($frequencies[0][0], $frequencies[1][0]);
         $this->assertNotSame($frequencies[0][0], $frequencies[2][0]);
         $this->assertNotSame($frequencies[1][0], $frequencies[2][0]);
@@ -956,9 +1186,9 @@ class FrequenciesTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertCount(3, $frequencies);
-        $this->assertEquals(1, $frequencies[0][1]);
-        $this->assertEquals(1, $frequencies[1][1]);
-        $this->assertEquals(1, $frequencies[2][1]);
+        $this->assertSame(1, $frequencies[0][1]);
+        $this->assertSame(1, $frequencies[1][1]);
+        $this->assertSame(1, $frequencies[2][1]);
         $this->assertNotSame($frequencies[0][0], $frequencies[1][0]);
         $this->assertNotSame($frequencies[0][0], $frequencies[2][0]);
         $this->assertNotSame($frequencies[1][0], $frequencies[2][0]);

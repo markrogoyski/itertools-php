@@ -14,8 +14,6 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
 {
     use DataProvider;
 
-    private const DELTA = 0.0000000001;
-
     /**
      * @test toStandardDeviation example usage (population)
      */
@@ -27,8 +25,8 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         // When
         $stddev = Reduce::toStandardDeviation($numbers);
 
-        // Then (population variance is 4.0 → stddev 2.0)
-        $this->assertEqualsWithDelta(2.0, $stddev, self::DELTA);
+        // Then (expected value from numpy.std([2, 4, 4, 4, 5, 5, 7, 9], ddof=0))
+        $this->assertSame(2.0, $stddev);
     }
 
     /**
@@ -44,7 +42,7 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toStandardDeviation($data, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -63,7 +61,7 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toStandardDeviation($generator, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -82,7 +80,7 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toStandardDeviation($iterator, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -101,24 +99,28 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toStandardDeviation($traversable, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   numpy.std(data, ddof=1 if sample else 0)
+     */
     public static function dataProviderForStandardDeviation(): array
     {
         return [
-            // Population stddev = sqrt(population variance)
-            [[1, 2, 3, 4, 5], false, \sqrt(2.0)],
+            // Population standard deviation
+            [[1, 2, 3, 4, 5], false, 1.4142135623730951],
             [[2, 4, 4, 4, 5, 5, 7, 9], false, 2.0],
             [[10, 20], false, 5.0],
             [[7, 7, 7], false, 0.0],
-            // Sample stddev = sqrt(sample variance)
-            [[1, 2, 3, 4, 5], true, \sqrt(2.5)],
-            [[2, 4, 4, 4, 5, 5, 7, 9], true, \sqrt(32 / 7)],
-            [[10, 20], true, \sqrt(50.0)],
+            // Sample standard deviation (Bessel's correction)
+            [[1, 2, 3, 4, 5], true, 1.5811388300841898],
+            [[2, 4, 4, 4, 5, 5, 7, 9], true, 2.138089935299395],
+            [[10, 20], true, 7.0710678118654755],
             [[7, 7, 7], true, 0.0],
             // Floats
-            [[1.5, 2.5, 3.5], false, \sqrt(2 / 3)],
+            [[1.5, 2.5, 3.5], false, 0.816496580927726],
             // Order invariance
             [[9, 5, 4, 4, 7, 4, 2, 5], false, 2.0],
         ];
@@ -176,21 +178,25 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($result);
     }
 
+
     /**
      * @test toStandardDeviation of a very large collection (population)
      */
     public function testVeryLargeNPopulation(): void
     {
-        // Given the uniform sequence 1..10000; population stddev is sqrt((N^2 - 1) / 12)
+        // Given the uniform sequence 1..10000, with the expected value generated with Python as the
+        // correctly rounded square root of the exact variance (see dataProviderForHugeValues)
         $n        = 10000;
         $data     = \range(1, $n);
-        $expected = \sqrt((($n ** 2) - 1) / 12);
+        $expected = 2886.751331514372;
 
         // When
         $result = Reduce::toStandardDeviation($data);
 
-        // Then (loosened delta accounts for floating-point accumulation over 10000 terms)
-        $this->assertEqualsWithDelta($expected, $result, 0.0001);
+        // Then (the online update rounds once per value, and n independent roundings accumulate like
+        // a random walk, so the relative error grows as about sqrt(n) * epsilon rather than staying
+        // within an ulp; the worst-case bound n * epsilon is far looser)
+        $this->assertEqualsWithDelta($expected, $result, \sqrt($n) * \PHP_FLOAT_EPSILON * $expected);
     }
 
     /**
@@ -209,6 +215,14 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof)
+     *   then sqrt(v) correctly rounded: math.isqrt of v scaled by an even power of two to ~128 bits,
+     *   a sticky bit for an inexact root, and one correctly rounded int / int division to a float
+     * NumPy cannot serve here: its float64 sum overflows to INF.
+     */
     public static function dataProviderForHugeValues(): array
     {
         return [
@@ -233,15 +247,22 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toStandardDeviation($data, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, \abs($expected) * 1e-12);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof)
+     *   then sqrt(v) correctly rounded: math.isqrt of v scaled by an even power of two to ~128 bits,
+     *   a sticky bit for an inexact root, and one correctly rounded int / int division to a float
+     */
     public static function dataProviderForRepresentableStdDevOfHugeValues(): array
     {
         return [
-            [[-1e154, 1e154], false, 1e154],
-            [[-1e154, 0, 1e154], false, 8.164965809277261e153],
-            [[0, 1e154], false, 5e153],
+            [[-1e154, 1e154], false, 1.0E+154],
+            [[-1e154, 0, 1e154], false, 8.164965809277261E+153],
+            [[0, 1e154], false, 5.0E+153],
         ];
     }
 
@@ -294,14 +315,53 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toStandardDeviation($data);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, \abs($expected) * 1e-12);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / n
+     *   then sqrt(v) correctly rounded: math.isqrt of v scaled by an even power of two to ~128 bits,
+     *   a sticky bit for an inexact root, and one correctly rounded int / int division to a float
+     */
     public static function dataProviderForPrefixOverflow(): array
     {
         return [
-            [[-1.4e154, 1.4e154, 0], 1.1430952132988163e154],
-            [[-1.5e154, 1.5e154, 0, 0], 1.0606601717798214e154],
+            // The variance of the leading pair is ~1.96e308, beyond PHP_FLOAT_MAX
+            [[-1.4e154, 1.4e154, 0], 1.1430952132988164E+154],
+        ];
+    }
+
+    /**
+     * @test         toStandardDeviation is finite, to within rounding, when an intermediate prefix variance is not representable
+     * @dataProvider dataProviderForPrefixOverflowWithinRounding
+     * @param        array $data
+     * @param        float $expected
+     */
+    public function testPrefixOverflowStillYieldsRepresentableResultWithinRounding(array $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toStandardDeviation($data);
+
+        // Then (the result is not correctly rounded: it passes through a handful of rounded steps — the
+        // per-value updates and the final square root and unscaling — so it may sit a few ulps from the
+        // oracle)
+        $this->assertEqualsWithDelta($expected, $result, 4 * \PHP_FLOAT_EPSILON * \abs($expected));
+    }
+
+    /**
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / n
+     *   then sqrt(v) correctly rounded: math.isqrt of v scaled by an even power of two to ~128 bits,
+     *   a sticky bit for an inexact root, and one correctly rounded int / int division to a float
+     */
+    public static function dataProviderForPrefixOverflowWithinRounding(): array
+    {
+        return [
+            // The variance of the leading pair is ~2.25e308, beyond PHP_FLOAT_MAX
+            [[-1.5e154, 1.5e154, 0, 0], 1.0606601717798214E+154],
         ];
     }
 
@@ -318,21 +378,29 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toStandardDeviation($data, $sample);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, \abs($expected) * 1e-12);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof)
+     *   then sqrt(v) correctly rounded: math.isqrt of v scaled by an even power of two to ~128 bits,
+     *   a sticky bit for an inexact root, and one correctly rounded int / int division to a float
+     */
     public static function dataProviderForUnrepresentableVariance(): array
     {
         return [
             // Variance 1e400 overflows
-            [[-1e200, 1e200], false, 1e200],
-            [[-1e200, 1e200], true, 1.4142135623730951e200],
-            [[-1e200, 0, 1e200], false, 8.164965809277261e199],
-            [[2.0 ** 700, 2.0 ** 700 + 2.0 ** 666], false, 2.0 ** 665],
+            [[-1e200, 1e200], false, 1.0E+200],
+            [[-1e200, 1e200], true, 1.414213562373095E+200],
+            [[-1e200, 0, 1e200], false, 8.16496580927726E+199],
+            // Values 2 ** 666 apart, so the standard deviation is exactly 2 ** 665
+            [[2.0 ** 700, 2.0 ** 700 + 2.0 ** 666], false, 1.5309010345804195E+200],
             // Variance 1e-400 underflows
-            [[-1e-200, 1e-200], false, 1e-200],
-            [[-1e-200, 1e-200], true, 1.4142135623730951e-200],
-            [[-1e-200, 0, 1e-200], false, 8.164965809277261e-201],
+            [[-1e-200, 1e-200], false, 1.0E-200],
+            [[-1e-200, 1e-200], true, 1.414213562373095E-200],
+            [[-1e-200, 0, 1e-200], false, 8.16496580927726E-201],
         ];
     }
 
@@ -354,18 +422,56 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toStandardDeviation of a large-offset collection matches the exact mathematical value
+     * @dataProvider dataProviderForLargeOffsetSmallSpread
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testLargeOffsetSmallSpreadIsExact(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toStandardDeviation($data, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof)
+     *   then sqrt(v) correctly rounded: math.isqrt of v scaled by an even power of two to ~128 bits,
+     *   a sticky bit for an inexact root, and one correctly rounded int / int division to a float
+     * NumPy's float64 mean loses the spread at 1e18 (it gives 245.10133958562255 and 300.1866086286995).
+     */
+    public static function dataProviderForLargeOffsetSmallSpread(): array
+    {
+        return [
+            // Values one ulp step apart at 1e16
+            [[1e16, 1e16 + 2, 1e16 + 4], false, 1.632993161855452],
+            [[1e16, 1e16 + 2, 1e16 + 4], true, 2.0],
+            // Values two ulp steps apart at 1e18
+            [[1e18, 1e18 + 256, 1e18 + 512], false, 209.02312471749786],
+            [[1e18, 1e18 + 256, 1e18 + 512], true, 256.0],
+        ];
+    }
+
+    /**
      * @test toStandardDeviation over a large lazy iterable does not materialize the input
      */
     public function testLargeIterableMemoryBounded(): void
     {
-        // Given a huge lazy source that costs ~16 MB to materialize
+        // Given a huge lazy source that costs ~16 MB to materialize, with the expected value generated
+        // with Python as the correctly rounded square root of the exact variance (see
+        // dataProviderForHugeValues)
         $n = 1_000_000;
         $largeGen = (function () use ($n) {
             for ($i = 1; $i <= $n; $i++) {
                 yield $i;
             }
         })();
-        $expected = \sqrt((($n ** 2) - 1) / 12);
+        $expected = 288675.1345946685;
 
         // When
         \memory_reset_peak_usage();
@@ -373,8 +479,8 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toStandardDeviation($largeGen);
         $peakIncrease = \memory_get_peak_usage() - $before;
 
-        // Then
-        $this->assertEqualsWithDelta($expected, $result, 0.0001);
+        // Then (relative error of about sqrt(n) * epsilon from n per-value roundings, as above)
+        $this->assertEqualsWithDelta($expected, $result, \sqrt($n) * \PHP_FLOAT_EPSILON * $expected);
         $this->assertLessThan(4 * 1024 * 1024, $peakIncrease);
     }
 }

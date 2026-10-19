@@ -127,6 +127,10 @@ class PermutationsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   list(itertools.permutations(data, r))
+     */
     public static function dataProviderForPermutations(): array
     {
         return [

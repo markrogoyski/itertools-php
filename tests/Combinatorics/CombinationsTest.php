@@ -127,6 +127,10 @@ class CombinationsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   list(itertools.combinations(data, r))
+     */
     public static function dataProviderForCombinations(): array
     {
         return [

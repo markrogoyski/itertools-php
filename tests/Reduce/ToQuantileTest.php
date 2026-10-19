@@ -14,8 +14,6 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
 {
     use DataProvider;
 
-    private const DELTA = 0.0000000001;
-
     /**
      * @test toQuantile example usage
      */
@@ -27,8 +25,8 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
         // When
         $q3 = Reduce::toQuantile($scores, 0.75);
 
-        // Then
-        $this->assertEqualsWithDelta(40.0, $q3, self::DELTA);
+        // Then (numpy.quantile([10, 20, 30, 40, 50], 0.75, method='linear'), landing on the element 40)
+        $this->assertSame(40, $q3);
     }
 
     /**
@@ -44,7 +42,7 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toQuantile($data, $quantile);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -63,7 +61,7 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toQuantile($generator, $quantile);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -82,7 +80,7 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toQuantile($iterator, $quantile);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -101,9 +99,15 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toQuantile($traversable, $quantile);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   numpy.quantile(data, q, method='linear')
+     * The int-vs-float result type is the library's contract, not the oracle's: a rank that lands on
+     * an element returns that element, and the midpoint of two integers with an even sum is an integer.
+     */
     public static function dataProviderForQuantile(): array
     {
         return [
@@ -114,9 +118,9 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
             [[1, 2, 3, 4], 0.75, 3.25],
             [[1, 2, 3, 4], 1, 4],
             // Exact-rank landings
-            [[1, 2, 3, 4, 5], 0.5, 3.0],
+            [[1, 2, 3, 4, 5], 0.5, 3],
             // Unsorted input (output invariant to order)
-            [[4, 2, 5, 1, 3], 0.5, 3.0],
+            [[4, 2, 5, 1, 3], 0.5, 3],
             // Single element
             [[42], 0.5, 42],
             // Negatives
@@ -180,8 +184,8 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
         $quantile   = Reduce::toQuantile($data, 0.3);
         $percentile = Reduce::toPercentile($data, 30);
 
-        // Then
-        $this->assertEqualsWithDelta($percentile, $quantile, self::DELTA);
+        // Then (0.3 * 100.0 is exactly 30.0, so both compute the same rank)
+        $this->assertSame($percentile, $quantile);
     }
 
     /**
@@ -211,7 +215,7 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toQuantile($data, 0.5);
 
-        // Then
+        // Then (exact R-7: float((Fraction(-2**63) + Fraction(2**63 - 1)) / 2))
         $this->assertSame(-0.5, $result);
     }
 
@@ -230,7 +234,7 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toQuantile($data, 0.5);
 
-        // Then
+        // Then (exact R-7: float((Fraction(9007199254740993) + Fraction(9007199254740994)) / 2))
         $this->assertSame(9007199254740994.0, $result);
     }
 
@@ -242,10 +246,16 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toQuantile([\INF, \INF], 0.5);
 
-        // Then
+        // Then (statistics.quantiles([INF, INF], n=2, method='inclusive'); NumPy gives NAN from INF - INF)
         $this->assertSame(\INF, $result);
     }
 
+    /**
+     * Test data generated with Python (exact R-7 interpolation at p = 100q, correctly rounded to a float):
+     *   h = (len(x) - 1) * Fraction(q), j = floor(h)
+     *   float(Fraction(x[j]) + (h - j) * (Fraction(x[j + 1]) - Fraction(x[j])))
+     * numpy.quantile is not the oracle here: its span x[j + 1] - x[j] overflows to INF.
+     */
     public static function dataProviderForHugeSpan(): array
     {
         return [

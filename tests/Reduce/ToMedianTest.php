@@ -14,8 +14,6 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
 {
     use DataProvider;
 
-    private const DELTA = 0.0000000001;
-
     /**
      * @test toMedian example usage
      */
@@ -27,8 +25,8 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         // When
         $median = Reduce::toMedian($grades);
 
-        // Then (sorted: 85, 90, 94, 95, 100 — middle is 94)
-        $this->assertEquals(94, $median);
+        // Then (statistics.median([100, 90, 95, 85, 94]))
+        $this->assertSame(94, $median);
     }
 
     /**
@@ -43,7 +41,7 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toMedian($data);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -61,7 +59,7 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toMedian($generator);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -79,7 +77,7 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toMedian($iterator);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
     /**
@@ -97,9 +95,14 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         $result = Reduce::toMedian($traversable);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::DELTA);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   statistics.median(data)
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
     public static function dataProviderForMedian(): array
     {
         return [
@@ -159,9 +162,9 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         $fromSorted   = Reduce::toMedian($sorted);
         $fromUnsorted = Reduce::toMedian($unsorted);
 
-        // Then
-        $this->assertEqualsWithDelta(3.5, $fromSorted, self::DELTA);
-        $this->assertEqualsWithDelta($fromSorted, $fromUnsorted, self::DELTA);
+        // Then (statistics.median([1, 2, 3, 4, 5, 6]))
+        $this->assertSame(3.5, $fromSorted);
+        $this->assertSame($fromSorted, $fromUnsorted);
     }
 
     /**
@@ -179,6 +182,11 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational midpoint, correctly rounded to a float):
+     *   float((Fraction(a) + Fraction(b)) / 2)
+     * statistics.median is not the oracle here: its (a + b) / 2 overflows to INF.
+     */
     public static function dataProviderForHugeMiddleValues(): array
     {
         return [
@@ -202,7 +210,7 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toMedian($data);
 
-        // Then (PHP_INT_MIN + PHP_INT_MAX is -1, so the midpoint is -0.5, not 0.0)
+        // Then (float((Fraction(-2**63) + Fraction(2**63 - 1)) / 2) is -0.5, not 0.0)
         $this->assertSame(-0.5, $result);
     }
 
@@ -298,6 +306,10 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   statistics.median(data)
+     */
     public static function dataProviderForIdenticalInfiniteMiddleValues(): array
     {
         return [
@@ -323,6 +335,10 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   statistics.median(data)
+     */
     public static function dataProviderForInfiniteAndFiniteMiddleValues(): array
     {
         return [
@@ -354,7 +370,7 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toMedian($data);
 
-        // Then (the midpoint of -INF and INF is undefined)
+        // Then (the midpoint of -INF and INF is undefined: statistics.median([INF, -INF]) is nan)
         $this->assertNan($result);
     }
 
@@ -369,7 +385,7 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         // When
         $result = Reduce::toMedian($data);
 
-        // Then
+        // Then (statistics.median([0.1, 0.1]))
         $this->assertSame(0.1, $result);
     }
 }

@@ -131,6 +131,10 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   list(itertools.product(*iterables))
+     */
     public static function dataProviderForProduct(): array
     {
         return [
@@ -216,6 +220,10 @@ class ProductTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([], $result);
     }
 
+    /**
+     * Test data generated with:
+     *   list(itertools.product(*iterables)), which is [] for every row
+     */
     public static function dataProviderForEmptyInProduct(): array
     {
         return [

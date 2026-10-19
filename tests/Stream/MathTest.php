@@ -12,21 +12,33 @@ use IterTools\Tests\Fixture\IteratorAggregateFixture;
 class MathTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param array    $input
+     * @param array $input
      * @param callable $streamFactoryFunc
-     * @param array    $expected
+     * @param array $expected
      * @return void
      * @dataProvider dataProviderForArray
+     * @dataProvider dataProviderForArrayFrequencies
+     * @dataProvider dataProviderForArrayTypeSensitive
      */
     public function testArray(array $input, callable $streamFactoryFunc, array $expected): void
     {
-        // Given
+        // When
         $result = $streamFactoryFunc($input);
 
         // Then
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python, applying each stage of the chain in turn:
+     *   runningTotal       list(itertools.accumulate(seq))               [initial=i]
+     *   runningProduct     list(itertools.accumulate(seq, operator.mul)) [initial=i]
+     *   runningDifference  list(itertools.accumulate(seq, operator.sub, initial=0))[1:]
+     *   runningAverage     [t / n for n, t in enumerate(itertools.accumulate([initial] + seq), 1)]
+     *   runningMax / Min   list(itertools.accumulate(seq, max)) / (seq, min)
+     * The int-vs-float result type is the library's contract, not the oracle's: an average is an
+     * int when the int running total divides evenly by the count, otherwise a float.
+     */
     public static function dataProviderForArray(): array
     {
         return [
@@ -163,6 +175,42 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 1, 1, 1, 1],
             ],
             [
+                [0.5, 1.5, 2.5],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningAverage()
+                    ->toArray(),
+                [0.5, 0.625, 1.0416666666666667],
+            ],
+            [
+                [0.1, 0.2, 0.3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningTotal(0.5)
+                    ->runningMax()
+                    ->toArray(),
+                [0.5, 0.6, 0.8, 1.1],
+            ],
+            [
+                [0.1, 0.2, 0.3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->toArray(),
+                [-0.1, -0.4, -1.0],
+            ],
+        ];
+    }
+
+    /**
+     * Test data generated with Python (first-seen order; strings only, which Python never equates
+     * across types):
+     *   c = collections.Counter(seq)                 [collections.Counter(map(len, seq)) for By]
+     *   frequencies: dict(c)   relative: {k: float(Fraction(n, len(seq))) for k, n in c.items()}
+     */
+    public static function dataProviderForArrayFrequencies(): array
+    {
+        return [
+            [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->frequencies()
@@ -177,20 +225,6 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 ['a' => 1, 'c' => 2, 'b' => 1],
             ],
             [
-                [1, '1'],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->frequencies()
-                    ->toArray(),
-                [1, 1],
-            ],
-            [
-                [1, '1'],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->frequencies(false)
-                    ->toAssociativeArray(),
-                ['1' => 2],
-            ],
-            [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies()
@@ -203,6 +237,45 @@ class MathTest extends \PHPUnit\Framework\TestCase
                     ->relativeFrequencies()
                     ->toAssociativeArray(),
                 ['a' => 0.25, 'c' => 0.5, 'b' => 0.25],
+            ],
+            [
+                ['apple', 'pear', 'banana', 'kiwi', 'plum'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequenciesBy(fn ($word) => \strlen($word))
+                    ->toAssociativeArray(),
+                [5 => 1, 4 => 3, 6 => 1],
+            ],
+            [
+                ['apple', 'pear', 'banana', 'kiwi', 'plum'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->relativeFrequenciesBy(fn ($word) => \strlen($word))
+                    ->toAssociativeArray(),
+                [5 => 0.2, 4 => 0.6, 6 => 0.2],
+            ],
+        ];
+    }
+
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it): strict
+     * keeps int 1 and string '1' as two values, coercive makes them one. toAssociativeArray
+     * merges the two strict keys anyway, because PHP array keys canonicalize '1' to int 1.
+     */
+    public static function dataProviderForArrayTypeSensitive(): array
+    {
+        return [
+            [
+                [1, '1'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toArray(),
+                [1, 1],
+            ],
+            [
+                [1, '1'],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies(false)
+                    ->toAssociativeArray(),
+                ['1' => 2],
             ],
             [
                 [1, '1'],
@@ -223,10 +296,12 @@ class MathTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Generator $input
-     * @param callable   $streamFactoryFunc
-     * @param array      $expected
+     * @param callable $streamFactoryFunc
+     * @param array $expected
      * @return void
      * @dataProvider dataProviderForGenerator
+     * @dataProvider dataProviderForGeneratorFrequencies
+     * @dataProvider dataProviderForGeneratorTypeSensitive
      */
     public function testGenerator(\Generator $input, callable $streamFactoryFunc, array $expected): void
     {
@@ -237,41 +312,49 @@ class MathTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python, applying each stage of the chain in turn:
+     *   runningTotal       list(itertools.accumulate(seq))               [initial=i]
+     *   runningProduct     list(itertools.accumulate(seq, operator.mul)) [initial=i]
+     *   runningDifference  list(itertools.accumulate(seq, operator.sub, initial=0))[1:]
+     *   runningAverage     [t / n for n, t in enumerate(itertools.accumulate([initial] + seq), 1)]
+     *   runningMax / Min   list(itertools.accumulate(seq, max)) / (seq, min)
+     * The int-vs-float result type is the library's contract, not the oracle's: an average is an
+     * int when the int running total divides evenly by the count, otherwise a float.
+     */
     public static function dataProviderForGenerator(): array
     {
-        $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
-
         return [
             [
-                $gen([]),
+                GeneratorFixture::getGenerator([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage()
                     ->toArray(),
                 [],
             ],
             [
-                $gen([]),
+                GeneratorFixture::getGenerator([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage(1)
                     ->toArray(),
                 [1],
             ],
             [
-                $gen([1, 3, 5]),
+                GeneratorFixture::getGenerator([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage()
                     ->toArray(),
                 [1, 2, 3],
             ],
             [
-                $gen([3, 5]),
+                GeneratorFixture::getGenerator([3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage(1)
                     ->toArray(),
                 [1, 2, 3],
             ],
             [
-                $gen([1, 3, 5]),
+                GeneratorFixture::getGenerator([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage()
                     ->runningTotal()
@@ -279,14 +362,14 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 6],
             ],
             [
-                $gen([1, -1, 2, -2, 3, -3]),
+                GeneratorFixture::getGenerator([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMax()
                     ->toArray(),
                 [1, 1, 2, 2, 3, 3],
             ],
             [
-                $gen([1, -1, 2, -2, 3, -3]),
+                GeneratorFixture::getGenerator([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMax()
                     ->runningTotal()
@@ -294,21 +377,21 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 4, 6, 9, 12],
             ],
             [
-                $gen([1, -1, 2, -2, 3, -3]),
+                GeneratorFixture::getGenerator([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMin()
                     ->toArray(),
                 [1, -1, -1, -2, -2, -3],
             ],
             [
-                $gen([1, 2, 3, 4, 5]),
+                GeneratorFixture::getGenerator([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->toArray(),
                 [-1, -3, -6, -10, -15],
             ],
             [
-                $gen([1, 2, 3, 4, 5]),
+                GeneratorFixture::getGenerator([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->runningTotal()
@@ -316,7 +399,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [-1, -4, -10, -20, -35],
             ],
             [
-                $gen([1, 2, 3, 4, 5]),
+                GeneratorFixture::getGenerator([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->runningTotal()
@@ -325,7 +408,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [-1, -4, -10, -20, -35],
             ],
             [
-                $gen([1, 2, 3, 4, 5]),
+                GeneratorFixture::getGenerator([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->runningTotal()
@@ -334,7 +417,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [-1, -1, -1, -1, -1],
             ],
             [
-                $gen([1, -1, 2, -2, 3, -3]),
+                GeneratorFixture::getGenerator([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMin()
                     ->runningTotal()
@@ -342,14 +425,14 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 0, -1, -3, -5, -8],
             ],
             [
-                $gen([1, 2, 3, 4, 5]),
+                GeneratorFixture::getGenerator([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningProduct()
                     ->toArray(),
                 [1, 2, 6, 24, 120],
             ],
             [
-                $gen([1, 2, 3, 4, 5]),
+                GeneratorFixture::getGenerator([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningProduct()
                     ->runningTotal()
@@ -357,7 +440,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 9, 33, 153],
             ],
             [
-                $gen([1, 2, 3, 4, 5]),
+                GeneratorFixture::getGenerator([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningProduct()
                     ->runningTotal()
@@ -366,7 +449,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 9, 33, 153],
             ],
             [
-                $gen([1, 2, 3, 4, 5]),
+                GeneratorFixture::getGenerator([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningProduct()
                     ->runningTotal()
@@ -375,56 +458,117 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 1, 1, 1, 1],
             ],
             [
-                $gen([]),
+                GeneratorFixture::getGenerator([0.5, 1.5, 2.5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningAverage()
+                    ->toArray(),
+                [0.5, 0.625, 1.0416666666666667],
+            ],
+            [
+                GeneratorFixture::getGenerator([0.1, 0.2, 0.3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningTotal(0.5)
+                    ->runningMax()
+                    ->toArray(),
+                [0.5, 0.6, 0.8, 1.1],
+            ],
+            [
+                GeneratorFixture::getGenerator([0.1, 0.2, 0.3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->toArray(),
+                [-0.1, -0.4, -1.0],
+            ],
+        ];
+    }
+
+    /**
+     * Test data generated with Python (first-seen order; strings only, which Python never equates
+     * across types):
+     *   c = collections.Counter(seq)                 [collections.Counter(map(len, seq)) for By]
+     *   frequencies: dict(c)   relative: {k: float(Fraction(n, len(seq))) for k, n in c.items()}
+     */
+    public static function dataProviderForGeneratorFrequencies(): array
+    {
+        return [
+            [
+                GeneratorFixture::getGenerator([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->frequencies()
                     ->toAssociativeArray(),
                 [],
             ],
             [
-                $gen(['a', 'c', 'b', 'c']),
+                GeneratorFixture::getGenerator(['a', 'c', 'b', 'c']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->frequencies()
                     ->toAssociativeArray(),
                 ['a' => 1, 'c' => 2, 'b' => 1],
             ],
             [
-                $gen([1, '1']),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->frequencies()
-                    ->toArray(),
-                [1, 1],
-            ],
-            [
-                $gen([1, '1']),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->frequencies(false)
-                    ->toAssociativeArray(),
-                ['1' => 2],
-            ],
-            [
-                $gen([]),
+                GeneratorFixture::getGenerator([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies()
                     ->toAssociativeArray(),
                 [],
             ],
             [
-                $gen(['a', 'c', 'b', 'c']),
+                GeneratorFixture::getGenerator(['a', 'c', 'b', 'c']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies()
                     ->toAssociativeArray(),
                 ['a' => 0.25, 'c' => 0.5, 'b' => 0.25],
             ],
             [
-                $gen([1, '1']),
+                GeneratorFixture::getGenerator(['apple', 'pear', 'banana', 'kiwi', 'plum']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequenciesBy(fn ($word) => \strlen($word))
+                    ->toAssociativeArray(),
+                [5 => 1, 4 => 3, 6 => 1],
+            ],
+            [
+                GeneratorFixture::getGenerator(['apple', 'pear', 'banana', 'kiwi', 'plum']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->relativeFrequenciesBy(fn ($word) => \strlen($word))
+                    ->toAssociativeArray(),
+                [5 => 0.2, 4 => 0.6, 6 => 0.2],
+            ],
+        ];
+    }
+
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it): strict
+     * keeps int 1 and string '1' as two values, coercive makes them one. toAssociativeArray
+     * merges the two strict keys anyway, because PHP array keys canonicalize '1' to int 1.
+     */
+    public static function dataProviderForGeneratorTypeSensitive(): array
+    {
+        return [
+            [
+                GeneratorFixture::getGenerator([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toArray(),
+                [1, 1],
+            ],
+            [
+                GeneratorFixture::getGenerator([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies(false)
+                    ->toAssociativeArray(),
+                ['1' => 2],
+            ],
+            [
+                GeneratorFixture::getGenerator([1, '1']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies()
                     ->toArray(),
                 [0.5, 0.5],
             ],
             [
-                $gen([1, '1']),
+                GeneratorFixture::getGenerator([1, '1']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies(false)
                     ->toAssociativeArray(),
@@ -435,14 +579,15 @@ class MathTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Iterator $input
-     * @param callable  $streamFactoryFunc
-     * @param array     $expected
+     * @param callable $streamFactoryFunc
+     * @param array $expected
      * @return void
      * @dataProvider dataProviderForIterator
+     * @dataProvider dataProviderForIteratorFrequencies
+     * @dataProvider dataProviderForIteratorTypeSensitive
      */
     public function testIterator(\Iterator $input, callable $streamFactoryFunc, array $expected): void
     {
-        // Given
         // When
         $result = $streamFactoryFunc($input);
 
@@ -450,41 +595,49 @@ class MathTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python, applying each stage of the chain in turn:
+     *   runningTotal       list(itertools.accumulate(seq))               [initial=i]
+     *   runningProduct     list(itertools.accumulate(seq, operator.mul)) [initial=i]
+     *   runningDifference  list(itertools.accumulate(seq, operator.sub, initial=0))[1:]
+     *   runningAverage     [t / n for n, t in enumerate(itertools.accumulate([initial] + seq), 1)]
+     *   runningMax / Min   list(itertools.accumulate(seq, max)) / (seq, min)
+     * The int-vs-float result type is the library's contract, not the oracle's: an average is an
+     * int when the int running total divides evenly by the count, otherwise a float.
+     */
     public static function dataProviderForIterator(): array
     {
-        $iter = fn (array $data) => new ArrayIteratorFixture($data);
-
         return [
             [
-                $iter([]),
+                new ArrayIteratorFixture([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage()
                     ->toArray(),
                 [],
             ],
             [
-                $iter([]),
+                new ArrayIteratorFixture([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage(1)
                     ->toArray(),
                 [1],
             ],
             [
-                $iter([1, 3, 5]),
+                new ArrayIteratorFixture([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage()
                     ->toArray(),
                 [1, 2, 3],
             ],
             [
-                $iter([3, 5]),
+                new ArrayIteratorFixture([3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage(1)
                     ->toArray(),
                 [1, 2, 3],
             ],
             [
-                $iter([1, 3, 5]),
+                new ArrayIteratorFixture([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage()
                     ->runningTotal()
@@ -492,14 +645,14 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 6],
             ],
             [
-                $iter([1, -1, 2, -2, 3, -3]),
+                new ArrayIteratorFixture([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMax()
                     ->toArray(),
                 [1, 1, 2, 2, 3, 3],
             ],
             [
-                $iter([1, -1, 2, -2, 3, -3]),
+                new ArrayIteratorFixture([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMax()
                     ->runningTotal()
@@ -507,21 +660,21 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 4, 6, 9, 12],
             ],
             [
-                $iter([1, -1, 2, -2, 3, -3]),
+                new ArrayIteratorFixture([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMin()
                     ->toArray(),
                 [1, -1, -1, -2, -2, -3],
             ],
             [
-                $iter([1, 2, 3, 4, 5]),
+                new ArrayIteratorFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->toArray(),
                 [-1, -3, -6, -10, -15],
             ],
             [
-                $iter([1, 2, 3, 4, 5]),
+                new ArrayIteratorFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->runningTotal()
@@ -529,7 +682,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [-1, -4, -10, -20, -35],
             ],
             [
-                $iter([1, 2, 3, 4, 5]),
+                new ArrayIteratorFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->runningTotal()
@@ -538,7 +691,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [-1, -4, -10, -20, -35],
             ],
             [
-                $iter([1, 2, 3, 4, 5]),
+                new ArrayIteratorFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->runningTotal()
@@ -547,7 +700,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [-1, -1, -1, -1, -1],
             ],
             [
-                $iter([1, -1, 2, -2, 3, -3]),
+                new ArrayIteratorFixture([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMin()
                     ->runningTotal()
@@ -555,14 +708,14 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 0, -1, -3, -5, -8],
             ],
             [
-                $iter([1, 2, 3, 4, 5]),
+                new ArrayIteratorFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningProduct()
                     ->toArray(),
                 [1, 2, 6, 24, 120],
             ],
             [
-                $iter([1, 2, 3, 4, 5]),
+                new ArrayIteratorFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningProduct()
                     ->runningTotal()
@@ -570,7 +723,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 9, 33, 153],
             ],
             [
-                $iter([1, 2, 3, 4, 5]),
+                new ArrayIteratorFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningProduct()
                     ->runningTotal()
@@ -579,7 +732,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 9, 33, 153],
             ],
             [
-                $iter([1, 2, 3, 4, 5]),
+                new ArrayIteratorFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningProduct()
                     ->runningTotal()
@@ -588,56 +741,117 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 1, 1, 1, 1],
             ],
             [
-                $iter([]),
+                new ArrayIteratorFixture([0.5, 1.5, 2.5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningAverage()
+                    ->toArray(),
+                [0.5, 0.625, 1.0416666666666667],
+            ],
+            [
+                new ArrayIteratorFixture([0.1, 0.2, 0.3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningTotal(0.5)
+                    ->runningMax()
+                    ->toArray(),
+                [0.5, 0.6, 0.8, 1.1],
+            ],
+            [
+                new ArrayIteratorFixture([0.1, 0.2, 0.3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->toArray(),
+                [-0.1, -0.4, -1.0],
+            ],
+        ];
+    }
+
+    /**
+     * Test data generated with Python (first-seen order; strings only, which Python never equates
+     * across types):
+     *   c = collections.Counter(seq)                 [collections.Counter(map(len, seq)) for By]
+     *   frequencies: dict(c)   relative: {k: float(Fraction(n, len(seq))) for k, n in c.items()}
+     */
+    public static function dataProviderForIteratorFrequencies(): array
+    {
+        return [
+            [
+                new ArrayIteratorFixture([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->frequencies()
                     ->toAssociativeArray(),
                 [],
             ],
             [
-                $iter(['a', 'c', 'b', 'c']),
+                new ArrayIteratorFixture(['a', 'c', 'b', 'c']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->frequencies()
                     ->toAssociativeArray(),
                 ['a' => 1, 'c' => 2, 'b' => 1],
             ],
             [
-                $iter([1, '1']),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->frequencies()
-                    ->toArray(),
-                [1, 1],
-            ],
-            [
-                $iter([1, '1']),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->frequencies(false)
-                    ->toAssociativeArray(),
-                ['1' => 2],
-            ],
-            [
-                $iter([]),
+                new ArrayIteratorFixture([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies()
                     ->toAssociativeArray(),
                 [],
             ],
             [
-                $iter(['a', 'c', 'b', 'c']),
+                new ArrayIteratorFixture(['a', 'c', 'b', 'c']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies()
                     ->toAssociativeArray(),
                 ['a' => 0.25, 'c' => 0.5, 'b' => 0.25],
             ],
             [
-                $iter([1, '1']),
+                new ArrayIteratorFixture(['apple', 'pear', 'banana', 'kiwi', 'plum']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequenciesBy(fn ($word) => \strlen($word))
+                    ->toAssociativeArray(),
+                [5 => 1, 4 => 3, 6 => 1],
+            ],
+            [
+                new ArrayIteratorFixture(['apple', 'pear', 'banana', 'kiwi', 'plum']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->relativeFrequenciesBy(fn ($word) => \strlen($word))
+                    ->toAssociativeArray(),
+                [5 => 0.2, 4 => 0.6, 6 => 0.2],
+            ],
+        ];
+    }
+
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it): strict
+     * keeps int 1 and string '1' as two values, coercive makes them one. toAssociativeArray
+     * merges the two strict keys anyway, because PHP array keys canonicalize '1' to int 1.
+     */
+    public static function dataProviderForIteratorTypeSensitive(): array
+    {
+        return [
+            [
+                new ArrayIteratorFixture([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toArray(),
+                [1, 1],
+            ],
+            [
+                new ArrayIteratorFixture([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies(false)
+                    ->toAssociativeArray(),
+                ['1' => 2],
+            ],
+            [
+                new ArrayIteratorFixture([1, '1']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies()
                     ->toArray(),
                 [0.5, 0.5],
             ],
             [
-                $iter([1, '1']),
+                new ArrayIteratorFixture([1, '1']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies(false)
                     ->toAssociativeArray(),
@@ -648,10 +862,12 @@ class MathTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Traversable $input
-     * @param callable     $streamFactoryFunc
-     * @param array        $expected
+     * @param callable $streamFactoryFunc
+     * @param array $expected
      * @return void
      * @dataProvider dataProviderForTraversable
+     * @dataProvider dataProviderForTraversableFrequencies
+     * @dataProvider dataProviderForTraversableTypeSensitive
      */
     public function testTraversable(\Traversable $input, callable $streamFactoryFunc, array $expected): void
     {
@@ -662,41 +878,49 @@ class MathTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python, applying each stage of the chain in turn:
+     *   runningTotal       list(itertools.accumulate(seq))               [initial=i]
+     *   runningProduct     list(itertools.accumulate(seq, operator.mul)) [initial=i]
+     *   runningDifference  list(itertools.accumulate(seq, operator.sub, initial=0))[1:]
+     *   runningAverage     [t / n for n, t in enumerate(itertools.accumulate([initial] + seq), 1)]
+     *   runningMax / Min   list(itertools.accumulate(seq, max)) / (seq, min)
+     * The int-vs-float result type is the library's contract, not the oracle's: an average is an
+     * int when the int running total divides evenly by the count, otherwise a float.
+     */
     public static function dataProviderForTraversable(): array
     {
-        $trav = fn (array $data) => new IteratorAggregateFixture($data);
-
         return [
             [
-                $trav([]),
+                new IteratorAggregateFixture([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage()
                     ->toArray(),
                 [],
             ],
             [
-                $trav([]),
+                new IteratorAggregateFixture([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage(1)
                     ->toArray(),
                 [1],
             ],
             [
-                $trav([1, 3, 5]),
+                new IteratorAggregateFixture([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage()
                     ->toArray(),
                 [1, 2, 3],
             ],
             [
-                $trav([3, 5]),
+                new IteratorAggregateFixture([3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage(1)
                     ->toArray(),
                 [1, 2, 3],
             ],
             [
-                $trav([1, 3, 5]),
+                new IteratorAggregateFixture([1, 3, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningAverage()
                     ->runningTotal()
@@ -704,14 +928,14 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 6],
             ],
             [
-                $trav([1, -1, 2, -2, 3, -3]),
+                new IteratorAggregateFixture([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMax()
                     ->toArray(),
                 [1, 1, 2, 2, 3, 3],
             ],
             [
-                $trav([1, -1, 2, -2, 3, -3]),
+                new IteratorAggregateFixture([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMax()
                     ->runningTotal()
@@ -719,21 +943,21 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 4, 6, 9, 12],
             ],
             [
-                $trav([1, -1, 2, -2, 3, -3]),
+                new IteratorAggregateFixture([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMin()
                     ->toArray(),
                 [1, -1, -1, -2, -2, -3],
             ],
             [
-                $trav([1, 2, 3, 4, 5]),
+                new IteratorAggregateFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->toArray(),
                 [-1, -3, -6, -10, -15],
             ],
             [
-                $trav([1, 2, 3, 4, 5]),
+                new IteratorAggregateFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->runningTotal()
@@ -741,7 +965,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [-1, -4, -10, -20, -35],
             ],
             [
-                $trav([1, 2, 3, 4, 5]),
+                new IteratorAggregateFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->runningTotal()
@@ -750,7 +974,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [-1, -4, -10, -20, -35],
             ],
             [
-                $trav([1, 2, 3, 4, 5]),
+                new IteratorAggregateFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningDifference()
                     ->runningTotal()
@@ -759,7 +983,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [-1, -1, -1, -1, -1],
             ],
             [
-                $trav([1, -1, 2, -2, 3, -3]),
+                new IteratorAggregateFixture([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningMin()
                     ->runningTotal()
@@ -767,13 +991,14 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 0, -1, -3, -5, -8],
             ],
             [
-                $trav([1, 2, 3, 4, 5]),
-                fn (iterable $iterable) => Stream::of($iterable)->runningProduct()
+                new IteratorAggregateFixture([1, 2, 3, 4, 5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
                     ->toArray(),
                 [1, 2, 6, 24, 120],
             ],
             [
-                $trav([1, 2, 3, 4, 5]),
+                new IteratorAggregateFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningProduct()
                     ->runningTotal()
@@ -781,7 +1006,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 9, 33, 153],
             ],
             [
-                $trav([1, 2, 3, 4, 5]),
+                new IteratorAggregateFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningProduct()
                     ->runningTotal()
@@ -790,7 +1015,7 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 3, 9, 33, 153],
             ],
             [
-                $trav([1, 2, 3, 4, 5]),
+                new IteratorAggregateFixture([1, 2, 3, 4, 5]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->runningProduct()
                     ->runningTotal()
@@ -799,56 +1024,117 @@ class MathTest extends \PHPUnit\Framework\TestCase
                 [1, 1, 1, 1, 1],
             ],
             [
-                $trav([]),
+                new IteratorAggregateFixture([0.5, 1.5, 2.5]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningProduct()
+                    ->runningAverage()
+                    ->toArray(),
+                [0.5, 0.625, 1.0416666666666667],
+            ],
+            [
+                new IteratorAggregateFixture([0.1, 0.2, 0.3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningTotal(0.5)
+                    ->runningMax()
+                    ->toArray(),
+                [0.5, 0.6, 0.8, 1.1],
+            ],
+            [
+                new IteratorAggregateFixture([0.1, 0.2, 0.3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->runningDifference()
+                    ->runningTotal()
+                    ->toArray(),
+                [-0.1, -0.4, -1.0],
+            ],
+        ];
+    }
+
+    /**
+     * Test data generated with Python (first-seen order; strings only, which Python never equates
+     * across types):
+     *   c = collections.Counter(seq)                 [collections.Counter(map(len, seq)) for By]
+     *   frequencies: dict(c)   relative: {k: float(Fraction(n, len(seq))) for k, n in c.items()}
+     */
+    public static function dataProviderForTraversableFrequencies(): array
+    {
+        return [
+            [
+                new IteratorAggregateFixture([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->frequencies()
                     ->toAssociativeArray(),
                 [],
             ],
             [
-                $trav(['a', 'c', 'b', 'c']),
+                new IteratorAggregateFixture(['a', 'c', 'b', 'c']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->frequencies()
                     ->toAssociativeArray(),
                 ['a' => 1, 'c' => 2, 'b' => 1],
             ],
             [
-                $trav([1, '1']),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->frequencies()
-                    ->toArray(),
-                [1, 1],
-            ],
-            [
-                $trav([1, '1']),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->frequencies(false)
-                    ->toAssociativeArray(),
-                ['1' => 2],
-            ],
-            [
-                $trav([]),
+                new IteratorAggregateFixture([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies()
                     ->toAssociativeArray(),
                 [],
             ],
             [
-                $trav(['a', 'c', 'b', 'c']),
+                new IteratorAggregateFixture(['a', 'c', 'b', 'c']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies()
                     ->toAssociativeArray(),
                 ['a' => 0.25, 'c' => 0.5, 'b' => 0.25],
             ],
             [
-                $trav([1, '1']),
+                new IteratorAggregateFixture(['apple', 'pear', 'banana', 'kiwi', 'plum']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequenciesBy(fn ($word) => \strlen($word))
+                    ->toAssociativeArray(),
+                [5 => 1, 4 => 3, 6 => 1],
+            ],
+            [
+                new IteratorAggregateFixture(['apple', 'pear', 'banana', 'kiwi', 'plum']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->relativeFrequenciesBy(fn ($word) => \strlen($word))
+                    ->toAssociativeArray(),
+                [5 => 0.2, 4 => 0.6, 6 => 0.2],
+            ],
+        ];
+    }
+
+    /**
+     * Textbook definition, README "Strict and Coercive Types" (Python cannot express it): strict
+     * keeps int 1 and string '1' as two values, coercive makes them one. toAssociativeArray
+     * merges the two strict keys anyway, because PHP array keys canonicalize '1' to int 1.
+     */
+    public static function dataProviderForTraversableTypeSensitive(): array
+    {
+        return [
+            [
+                new IteratorAggregateFixture([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies()
+                    ->toArray(),
+                [1, 1],
+            ],
+            [
+                new IteratorAggregateFixture([1, '1']),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->frequencies(false)
+                    ->toAssociativeArray(),
+                ['1' => 2],
+            ],
+            [
+                new IteratorAggregateFixture([1, '1']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies()
                     ->toArray(),
                 [0.5, 0.5],
             ],
             [
-                $trav([1, '1']),
+                new IteratorAggregateFixture([1, '1']),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->relativeFrequencies(false)
                     ->toAssociativeArray(),

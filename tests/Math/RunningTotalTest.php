@@ -15,20 +15,26 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
      * @param        array $numbers
      * @param        array $expected
      */
-    public function testArray(array $numbers, array $expected)
+    public function testArray(array $numbers, array $expected): void
     {
         // Given
         $result = [];
 
         // When
-        foreach (Math::runningTotal($numbers) as $runningTotal) {
-            $result[] = $runningTotal;
+        foreach (Math::runningTotal($numbers) as $runningValue) {
+            $result[] = $runningValue;
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python:
+     *   list(itertools.accumulate(data))
+     * The int-vs-float result type is the library's contract, not the oracle's: an int result
+     * past the int64 range is a float.
+     */
     public static function dataProviderForArray(): array
     {
         return [
@@ -64,30 +70,112 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3, -4, -5],
                 [1, 3, 6, 2, -3],
             ],
+            [
+                [0.5],
+                [0.5],
+            ],
+            [
+                [0.1, 0.2, 0.3],
+                [0.1, 0.30000000000000004, 0.6000000000000001],
+            ],
+            [
+                [1.5, 2.5, -4.0],
+                [1.5, 4.0, 0.0],
+            ],
+            [
+                [1, 2.5, 3],
+                [1, 3.5, 6.5],
+            ],
+            [
+                [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                [0.1, 0.2, 0.30000000000000004, 0.4, 0.5, 0.6, 0.7, 0.7999999999999999, 0.8999999999999999, 0.9999999999999999],
+            ],
+            [
+                [1.7976931348623157E+308, 1.7976931348623157E+308],
+                [1.7976931348623157E+308, \INF],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningTotal array of integers beyond 2^31
+     * @dataProvider dataProviderForArray64Bit
+     * @param        array $numbers
+     * @param        array $expected
+     */
+    public function testArray64Bit(array $numbers, array $expected): void
+    {
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers.');
+        }
+
+        // Given
+        $result = [];
+
+        // When
+        foreach (Math::runningTotal($numbers) as $runningValue) {
+            $result[] = $runningValue;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python:
+     *   list(itertools.accumulate(data))
+     * The int-vs-float result type is the library's contract, not the oracle's: an int result
+     * past the int64 range is a float.
+     */
+    public static function dataProviderForArray64Bit(): array
+    {
+        return [
+            [
+                [4294967296, 4294967296],
+                [4294967296, 8589934592],
+            ],
+            [
+                [9007199254740992, 1, 1],
+                [9007199254740992, 9007199254740993, 9007199254740994],
+            ],
+            [
+                [\PHP_INT_MAX, 1],
+                [\PHP_INT_MAX, 9.223372036854776E+18],
+            ],
+            [
+                [\PHP_INT_MIN, -1],
+                [\PHP_INT_MIN, -9.223372036854776E+18],
+            ],
         ];
     }
 
     /**
      * @test         runningTotal array with initial value
      * @dataProvider dataProviderForArrayWithInitialValue
-     * @param        array $numbers
-     * @param        int   $initialValue
-     * @param        array $expected
+     * @param        array     $numbers
+     * @param        int|float $initialValue
+     * @param        array     $expected
      */
-    public function testArrayWithInitialValue(array $numbers, int $initialValue, array $expected)
+    public function testArrayWithInitialValue(array $numbers, int|float $initialValue, array $expected): void
     {
         // Given
         $result = [];
 
         // When
-        foreach (Math::runningTotal($numbers, $initialValue) as $runningTotal) {
-            $result[] = $runningTotal;
+        foreach (Math::runningTotal($numbers, $initialValue) as $runningValue) {
+            $result[] = $runningValue;
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python:
+     *   list(itertools.accumulate(data, initial=initial))
+     * The int-vs-float result type is the library's contract, not the oracle's: an int result
+     * past the int64 range is a float.
+     */
     public static function dataProviderForArrayWithInitialValue(): array
     {
         return [
@@ -141,6 +229,73 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
                 5,
                 [5, 6, 8, 11, 7, 2],
             ],
+            [
+                [1, 2],
+                0.5,
+                [0.5, 1.5, 3.5],
+            ],
+            [
+                [0.2, 0.3],
+                0.1,
+                [0.1, 0.30000000000000004, 0.6000000000000001],
+            ],
+            [
+                [1.5, -2.5],
+                -5,
+                [-5, -3.5, -6.0],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningTotal array of integers beyond 2^31 with initial value
+     * @dataProvider dataProviderForArrayWithInitialValue64Bit
+     * @param        array $numbers
+     * @param        int   $initialValue
+     * @param        array $expected
+     */
+    public function testArrayWithInitialValue64Bit(array $numbers, int $initialValue, array $expected): void
+    {
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers.');
+        }
+
+        // Given
+        $result = [];
+
+        // When
+        foreach (Math::runningTotal($numbers, $initialValue) as $runningValue) {
+            $result[] = $runningValue;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python:
+     *   list(itertools.accumulate(data, initial=initial))
+     * The int-vs-float result type is the library's contract, not the oracle's: an int result
+     * past the int64 range is a float.
+     */
+    public static function dataProviderForArrayWithInitialValue64Bit(): array
+    {
+        return [
+            [
+                [1, 2],
+                4294967296,
+                [4294967296, 4294967297, 4294967299],
+            ],
+            [
+                [1],
+                \PHP_INT_MAX,
+                [\PHP_INT_MAX, 9.223372036854776E+18],
+            ],
+            [
+                [-1],
+                \PHP_INT_MIN,
+                [\PHP_INT_MIN, -9.223372036854776E+18],
+            ],
         ];
     }
 
@@ -150,20 +305,26 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
      * @param        \Generator $numbers
      * @param        array      $expected
      */
-    public function testGenerators(\Generator $numbers, array $expected)
+    public function testGenerators(\Generator $numbers, array $expected): void
     {
         // Given
         $result = [];
 
         // When
-        foreach (Math::runningTotal($numbers) as $runningTotal) {
-            $result[] = $runningTotal;
+        foreach (Math::runningTotal($numbers) as $runningValue) {
+            $result[] = $runningValue;
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python:
+     *   list(itertools.accumulate(data))
+     * The int-vs-float result type is the library's contract, not the oracle's: an int result
+     * past the int64 range is a float.
+     */
     public static function dataProviderForGenerators(): array
     {
         return [
@@ -199,6 +360,30 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
                 Fixture\GeneratorFixture::getGenerator([1, 2, 3, -4, -5]),
                 [1, 3, 6, 2, -3],
             ],
+            [
+                Fixture\GeneratorFixture::getGenerator([0.5]),
+                [0.5],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([0.1, 0.2, 0.3]),
+                [0.1, 0.30000000000000004, 0.6000000000000001],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1.5, 2.5, -4.0]),
+                [1.5, 4.0, 0.0],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, 2.5, 3]),
+                [1, 3.5, 6.5],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]),
+                [0.1, 0.2, 0.30000000000000004, 0.4, 0.5, 0.6, 0.7, 0.7999999999999999, 0.8999999999999999, 0.9999999999999999],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1.7976931348623157E+308, 1.7976931348623157E+308]),
+                [1.7976931348623157E+308, \INF],
+            ],
         ];
     }
 
@@ -208,20 +393,26 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
      * @param        iterable $numbers
      * @param        array    $expected
      */
-    public function testIterators(iterable $numbers, array $expected)
+    public function testIterators(iterable $numbers, array $expected): void
     {
         // Given
         $result = [];
 
         // When
-        foreach (Math::runningTotal($numbers) as $runningTotal) {
-            $result[] = $runningTotal;
+        foreach (Math::runningTotal($numbers) as $runningValue) {
+            $result[] = $runningValue;
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python:
+     *   list(itertools.accumulate(data))
+     * The int-vs-float result type is the library's contract, not the oracle's: an int result
+     * past the int64 range is a float.
+     */
     public static function dataProviderForIterators(): array
     {
         return [
@@ -257,6 +448,30 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
                 new Fixture\ArrayIteratorFixture([1, 2, 3, -4, -5]),
                 [1, 3, 6, 2, -3],
             ],
+            [
+                new Fixture\ArrayIteratorFixture([0.5]),
+                [0.5],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([0.1, 0.2, 0.3]),
+                [0.1, 0.30000000000000004, 0.6000000000000001],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1.5, 2.5, -4.0]),
+                [1.5, 4.0, 0.0],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, 2.5, 3]),
+                [1, 3.5, 6.5],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]),
+                [0.1, 0.2, 0.30000000000000004, 0.4, 0.5, 0.6, 0.7, 0.7999999999999999, 0.8999999999999999, 0.9999999999999999],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1.7976931348623157E+308, 1.7976931348623157E+308]),
+                [1.7976931348623157E+308, \INF],
+            ],
         ];
     }
 
@@ -266,20 +481,26 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
      * @param        \Traversable $numbers
      * @param        array        $expected
      */
-    public function testTraversables(\Traversable $numbers, array $expected)
+    public function testTraversables(\Traversable $numbers, array $expected): void
     {
         // Given
         $result = [];
 
         // When
-        foreach (Math::runningTotal($numbers) as $runningTotal) {
-            $result[] = $runningTotal;
+        foreach (Math::runningTotal($numbers) as $runningValue) {
+            $result[] = $runningValue;
         }
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python:
+     *   list(itertools.accumulate(data))
+     * The int-vs-float result type is the library's contract, not the oracle's: an int result
+     * past the int64 range is a float.
+     */
     public static function dataProviderForTraversables(): array
     {
         return [
@@ -315,6 +536,30 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
                 new Fixture\IteratorAggregateFixture([1, 2, 3, -4, -5]),
                 [1, 3, 6, 2, -3],
             ],
+            [
+                new Fixture\IteratorAggregateFixture([0.5]),
+                [0.5],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([0.1, 0.2, 0.3]),
+                [0.1, 0.30000000000000004, 0.6000000000000001],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1.5, 2.5, -4.0]),
+                [1.5, 4.0, 0.0],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, 2.5, 3]),
+                [1, 3.5, 6.5],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]),
+                [0.1, 0.2, 0.30000000000000004, 0.4, 0.5, 0.6, 0.7, 0.7999999999999999, 0.8999999999999999, 0.9999999999999999],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1.7976931348623157E+308, 1.7976931348623157E+308]),
+                [1.7976931348623157E+308, \INF],
+            ],
         ];
     }
 
@@ -324,7 +569,7 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
      * @param        array $numbers
      * @param        array $expected
      */
-    public function testIteratorToArray(array $numbers, array $expected)
+    public function testIteratorToArray(array $numbers, array $expected): void
     {
         // Given
         $iterator = Math::runningTotal($numbers);
@@ -333,6 +578,6 @@ class RunningTotalTest extends \PHPUnit\Framework\TestCase
         $result = \iterator_to_array($iterator);
 
         // Then
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 }

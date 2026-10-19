@@ -109,11 +109,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)->toAverage(),
-                0,
-            ],
-            [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
@@ -121,25 +116,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toAverage(),
-                2,
-            ],
-            [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->toAverage(),
                 null,
-            ],
-            [
-                [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toAverage(),
-                -2,
             ],
             [
                 [],
@@ -263,23 +244,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)->toProduct(),
-                -36,
-            ],
-            [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->toProduct(),
                 null,
-            ],
-            [
-                [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toProduct(),
-                6,
             ],
             [
                 [],
@@ -289,19 +258,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toProduct(),
-                -6,
-            ],
-            [
                 [],
-                fn (iterable $iterable) => Stream::of($iterable)->toSum(),
-                0,
-            ],
-            [
-                [1, -1, 2, -2, 3, -3],
                 fn (iterable $iterable) => Stream::of($iterable)->toSum(),
                 0,
             ],
@@ -313,25 +270,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 0,
             ],
             [
-                [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toSum(),
-                6,
-            ],
-            [
                 [],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->toSum(),
                 0,
-            ],
-            [
-                [1, -1, 2, -2, 3, -3],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toSum(),
-                -6,
             ],
             [
                 [],
@@ -462,16 +405,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     )
                     ->toValue(fn ($carry, $item) => $carry + \array_sum($item), 0),
                 675,
-            ],
-            [
-                [1, 2, 3],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->chainWith(
-                        [4, 5, 6],
-                        [7, 8, 9]
-                    )
-                    ->toSum(),
-                45,
             ],
             [
                 [1, 2, 3],
@@ -629,20 +562,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn () => false)
                     ->toRange(),
                 0,
-            ],
-            [
-                [2, 3, 1, 2, -3, -2, 5, 7, 3],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($number) => $number > 6)
-                    ->toRange(),
-                0,
-            ],
-            [
-                [2, 3, 1, 2, -3, -2, 5, 7, 3],
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->chainWith([6, 10, 4])
-                    ->toRange(),
-                13,
             ],
             [
                 [2, 3, 1, 2, -3, -2, 5, 7, 3],
@@ -821,6 +740,121 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toAverage, toProduct, toSum and toRange of an array stream
+     * @dataProvider dataProviderForArithmeticReductionArray
+     * @param        array     $input
+     * @param        callable  $reducingStreamFactoryFunc
+     * @param        int|float $expected
+     */
+    public function testArithmeticReductionArray(
+        array $input,
+        callable $reducingStreamFactoryFunc,
+        int|float $expected
+    ): void {
+        // When
+        $result = $reducingStreamFactoryFunc($input);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python on the elements that reach the reducer (filter,
+     * itertools.filterfalse and itertools.chain stand in for filterTrue, filterFalse and chainWith):
+     *   toAverage: float(sum(map(Fraction, data)) / len(data))
+     *   toProduct: float(math.prod(map(Fraction, data)))
+     *   toSum:     float(sum(map(Fraction, data)))
+     *   toRange:   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
+    public static function dataProviderForArithmeticReductionArray(): array
+    {
+        return [
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)->toAverage(),
+                0,
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toAverage(),
+                2,
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toAverage(),
+                -2,
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)->toProduct(),
+                -36,
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toProduct(),
+                6,
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toProduct(),
+                -6,
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)->toSum(),
+                0,
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toSum(),
+                6,
+            ],
+            [
+                [1, -1, 2, -2, 3, -3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toSum(),
+                -6,
+            ],
+            [
+                [1, 2, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith(
+                        [4, 5, 6],
+                        [7, 8, 9]
+                    )
+                    ->toSum(),
+                45,
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toRange(),
+                0,
+            ],
+            [
+                [2, 3, 1, 2, -3, -2, 5, 7, 3],
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toRange(),
+                13,
+            ],
+        ];
+    }
+
+    /**
      * @param \Generator $input
      * @param callable   $reducingStreamFactoryFunc
      * @param mixed      $expected
@@ -917,11 +951,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toAverage(),
-                0,
-            ],
-            [
                 $gen([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
@@ -929,25 +958,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toAverage(),
-                2,
-            ],
-            [
                 $gen([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->toAverage(),
                 null,
-            ],
-            [
-                $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toAverage(),
-                -2,
             ],
             [
                 $gen([]),
@@ -1071,23 +1086,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toProduct(),
-                -36,
-            ],
-            [
                 $gen([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->toProduct(),
                 null,
-            ],
-            [
-                $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toProduct(),
-                6,
             ],
             [
                 $gen([]),
@@ -1097,19 +1100,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toProduct(),
-                -6,
-            ],
-            [
                 $gen([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toSum(),
-                0,
-            ],
-            [
-                $gen([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)->toSum(),
                 0,
             ],
@@ -1121,25 +1112,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 0,
             ],
             [
-                $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toSum(),
-                6,
-            ],
-            [
                 $gen([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->toSum(),
                 0,
-            ],
-            [
-                $gen([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toSum(),
-                -6,
             ],
             [
                 $gen([]),
@@ -1278,16 +1255,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [4, 5, 6],
                         [7, 8, 9]
                     )
-                    ->toSum(),
-                45,
-            ],
-            [
-                $gen([1, 2, 3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->chainWith(
-                        [4, 5, 6],
-                        [7, 8, 9]
-                    )
                     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
                     ->toValue(fn ($carry, $item) => $carry + \array_sum($item)),
                 90,
@@ -1361,20 +1328,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn () => false)
                     ->toRange(),
                 0,
-            ],
-            [
-                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($number) => $number > 6)
-                    ->toRange(),
-                0,
-            ],
-            [
-                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->chainWith([6, 10, 4])
-                    ->toRange(),
-                13,
             ],
             [
                 $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
@@ -1553,6 +1506,123 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toAverage, toProduct, toSum and toRange of a generator stream
+     * @dataProvider dataProviderForArithmeticReductionGenerator
+     * @param        \Generator $input
+     * @param        callable   $reducingStreamFactoryFunc
+     * @param        int|float  $expected
+     */
+    public function testArithmeticReductionGenerator(
+        \Generator $input,
+        callable $reducingStreamFactoryFunc,
+        int|float $expected
+    ): void {
+        // When
+        $result = $reducingStreamFactoryFunc($input);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python on the elements that reach the reducer (filter,
+     * itertools.filterfalse and itertools.chain stand in for filterTrue, filterFalse and chainWith):
+     *   toAverage: float(sum(map(Fraction, data)) / len(data))
+     *   toProduct: float(math.prod(map(Fraction, data)))
+     *   toSum:     float(sum(map(Fraction, data)))
+     *   toRange:   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
+    public static function dataProviderForArithmeticReductionGenerator(): array
+    {
+        $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
+
+        return [
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)->toAverage(),
+                0,
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toAverage(),
+                2,
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toAverage(),
+                -2,
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)->toProduct(),
+                -36,
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toProduct(),
+                6,
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toProduct(),
+                -6,
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)->toSum(),
+                0,
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toSum(),
+                6,
+            ],
+            [
+                $gen([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toSum(),
+                -6,
+            ],
+            [
+                $gen([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith(
+                        [4, 5, 6],
+                        [7, 8, 9]
+                    )
+                    ->toSum(),
+                45,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toRange(),
+                0,
+            ],
+            [
+                $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toRange(),
+                13,
+            ],
+        ];
+    }
+
+    /**
      * @param \Iterator $input
      * @param callable  $reducingStreamFactoryFunc
      * @param mixed     $expected
@@ -1649,11 +1719,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toAverage(),
-                0,
-            ],
-            [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
@@ -1661,25 +1726,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toAverage(),
-                2,
-            ],
-            [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->toAverage(),
                 null,
-            ],
-            [
-                $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toAverage(),
-                -2,
             ],
             [
                 $iter([]),
@@ -1803,23 +1854,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toProduct(),
-                -36,
-            ],
-            [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->toProduct(),
                 null,
-            ],
-            [
-                $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toProduct(),
-                6,
             ],
             [
                 $iter([]),
@@ -1829,19 +1868,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toProduct(),
-                -6,
-            ],
-            [
                 $iter([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toSum(),
-                0,
-            ],
-            [
-                $iter([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)->toSum(),
                 0,
             ],
@@ -1853,25 +1880,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 0,
             ],
             [
-                $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toSum(),
-                6,
-            ],
-            [
                 $iter([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->toSum(),
                 0,
-            ],
-            [
-                $iter([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toSum(),
-                -6,
             ],
             [
                 $iter([]),
@@ -2010,16 +2023,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [4, 5, 6],
                         [7, 8, 9]
                     )
-                    ->toSum(),
-                45,
-            ],
-            [
-                $iter([1, 2, 3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->chainWith(
-                        [4, 5, 6],
-                        [7, 8, 9]
-                    )
                     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
                     ->toValue(fn ($carry, $item) => $carry + \array_sum($item)),
                 90,
@@ -2093,20 +2096,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn () => false)
                     ->toRange(),
                 0,
-            ],
-            [
-                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($number) => $number > 6)
-                    ->toRange(),
-                0,
-            ],
-            [
-                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->chainWith([6, 10, 4])
-                    ->toRange(),
-                13,
             ],
             [
                 $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
@@ -2285,6 +2274,123 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toAverage, toProduct, toSum and toRange of an iterator stream
+     * @dataProvider dataProviderForArithmeticReductionIterator
+     * @param        \Iterator $input
+     * @param        callable  $reducingStreamFactoryFunc
+     * @param        int|float $expected
+     */
+    public function testArithmeticReductionIterator(
+        \Iterator $input,
+        callable $reducingStreamFactoryFunc,
+        int|float $expected
+    ): void {
+        // When
+        $result = $reducingStreamFactoryFunc($input);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python on the elements that reach the reducer (filter,
+     * itertools.filterfalse and itertools.chain stand in for filterTrue, filterFalse and chainWith):
+     *   toAverage: float(sum(map(Fraction, data)) / len(data))
+     *   toProduct: float(math.prod(map(Fraction, data)))
+     *   toSum:     float(sum(map(Fraction, data)))
+     *   toRange:   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
+    public static function dataProviderForArithmeticReductionIterator(): array
+    {
+        $iter = fn (array $data) => new ArrayIteratorFixture($data);
+
+        return [
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)->toAverage(),
+                0,
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toAverage(),
+                2,
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toAverage(),
+                -2,
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)->toProduct(),
+                -36,
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toProduct(),
+                6,
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toProduct(),
+                -6,
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)->toSum(),
+                0,
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toSum(),
+                6,
+            ],
+            [
+                $iter([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toSum(),
+                -6,
+            ],
+            [
+                $iter([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith(
+                        [4, 5, 6],
+                        [7, 8, 9]
+                    )
+                    ->toSum(),
+                45,
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toRange(),
+                0,
+            ],
+            [
+                $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toRange(),
+                13,
+            ],
+        ];
+    }
+
+    /**
      * @param \Traversable $input
      * @param callable     $reducingStreamFactoryFunc
      * @param mixed        $expected
@@ -2381,11 +2487,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toAverage(),
-                0,
-            ],
-            [
                 $trav([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
@@ -2393,25 +2494,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toAverage(),
-                2,
-            ],
-            [
                 $trav([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->toAverage(),
                 null,
-            ],
-            [
-                $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toAverage(),
-                -2,
             ],
             [
                 $trav([]),
@@ -2535,23 +2622,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)->toProduct(),
-                -36,
-            ],
-            [
                 $trav([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn ($value) => $value > 0)
                     ->toProduct(),
                 null,
-            ],
-            [
-                $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toProduct(),
-                6,
             ],
             [
                 $trav([]),
@@ -2561,19 +2636,7 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 null,
             ],
             [
-                $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toProduct(),
-                -6,
-            ],
-            [
                 $trav([]),
-                fn (iterable $iterable) => Stream::of($iterable)->toSum(),
-                0,
-            ],
-            [
-                $trav([1, -1, 2, -2, 3, -3]),
                 fn (iterable $iterable) => Stream::of($iterable)->toSum(),
                 0,
             ],
@@ -2585,25 +2648,11 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 0,
             ],
             [
-                $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($value) => $value > 0)
-                    ->toSum(),
-                6,
-            ],
-            [
                 $trav([]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterFalse(fn ($value) => $value > 0)
                     ->toSum(),
                 0,
-            ],
-            [
-                $trav([1, -1, 2, -2, 3, -3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterFalse(fn ($value) => $value > 0)
-                    ->toSum(),
-                -6,
             ],
             [
                 $trav([]),
@@ -2742,16 +2791,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                         [4, 5, 6],
                         [7, 8, 9]
                     )
-                    ->toSum(),
-                45,
-            ],
-            [
-                $trav([1, 2, 3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->chainWith(
-                        [4, 5, 6],
-                        [7, 8, 9]
-                    )
                     ->zipEqualWith([1, 2, 3, 4, 5, 6, 7, 8, 9])
                     ->toValue(fn ($carry, $item) => $carry + \array_sum($item)),
                 90,
@@ -2825,20 +2864,6 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->filterTrue(fn () => false)
                     ->toRange(),
                 0,
-            ],
-            [
-                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->filterTrue(fn ($number) => $number > 6)
-                    ->toRange(),
-                0,
-            ],
-            [
-                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
-                fn (iterable $iterable) => Stream::of($iterable)
-                    ->chainWith([6, 10, 4])
-                    ->toRange(),
-                13,
             ],
             [
                 $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
@@ -3012,6 +3037,123 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->toFirstMatchKey(fn (): bool => true, 'fallback'),
                 'fallback',
+            ],
+        ];
+    }
+
+    /**
+     * @test         toAverage, toProduct, toSum and toRange of a traversable stream
+     * @dataProvider dataProviderForArithmeticReductionTraversable
+     * @param        \Traversable $input
+     * @param        callable     $reducingStreamFactoryFunc
+     * @param        int|float    $expected
+     */
+    public function testArithmeticReductionTraversable(
+        \Traversable $input,
+        callable $reducingStreamFactoryFunc,
+        int|float $expected
+    ): void {
+        // When
+        $result = $reducingStreamFactoryFunc($input);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python on the elements that reach the reducer (filter,
+     * itertools.filterfalse and itertools.chain stand in for filterTrue, filterFalse and chainWith):
+     *   toAverage: float(sum(map(Fraction, data)) / len(data))
+     *   toProduct: float(math.prod(map(Fraction, data)))
+     *   toSum:     float(sum(map(Fraction, data)))
+     *   toRange:   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
+    public static function dataProviderForArithmeticReductionTraversable(): array
+    {
+        $trav = fn (array $data) => new IteratorAggregateFixture($data);
+
+        return [
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)->toAverage(),
+                0,
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toAverage(),
+                2,
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toAverage(),
+                -2,
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)->toProduct(),
+                -36,
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toProduct(),
+                6,
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toProduct(),
+                -6,
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)->toSum(),
+                0,
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($value) => $value > 0)
+                    ->toSum(),
+                6,
+            ],
+            [
+                $trav([1, -1, 2, -2, 3, -3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterFalse(fn ($value) => $value > 0)
+                    ->toSum(),
+                -6,
+            ],
+            [
+                $trav([1, 2, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith(
+                        [4, 5, 6],
+                        [7, 8, 9]
+                    )
+                    ->toSum(),
+                45,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->filterTrue(fn ($number) => $number > 6)
+                    ->toRange(),
+                0,
+            ],
+            [
+                $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),
+                fn (iterable $iterable) => Stream::of($iterable)
+                    ->chainWith([6, 10, 4])
+                    ->toRange(),
+                13,
             ],
         ];
     }

@@ -125,6 +125,11 @@ class PowersetTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   list(chain.from_iterable(combinations(data, r) for r in range(len(data) + 1)))
+     *   (the powerset recipe in the itertools documentation)
+     */
     public static function dataProviderForPowerset(): array
     {
         return [

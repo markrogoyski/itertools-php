@@ -122,6 +122,10 @@ class StreamCombinationsWithReplacementTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with:
+     *   list(itertools.combinations_with_replacement(data, r))
+     */
     public static function dataProviderForCombinationsWithReplacement(): array
     {
         return [

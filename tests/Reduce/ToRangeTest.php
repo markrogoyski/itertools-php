@@ -6,35 +6,38 @@ namespace IterTools\Tests\Reduce;
 
 use IterTools\Reduce;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
+use IterTools\Tests\Fixture\DataProvider;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 
 class ToRangeTest extends \PHPUnit\Framework\TestCase
 {
-    protected const ROUND_PRECISION = 0.0001;
+    use DataProvider;
 
     /**
      * @test         toRange array
      * @dataProvider dataProviderForArray
-     * @param        array $data
+     * @param        array     $data
      * @param        int|float $expected
      */
-    public function testArray(array $data, $expected)
+    public function testArray(array $data, int|float $expected): void
     {
         // When
         $result = Reduce::toRange($data);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * Numeric strings are converted as PHP does: integer strings to int, the rest to float.
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
     public static function dataProviderForArray(): array
     {
         return [
-            [
-                [],
-                0,
-            ],
             [
                 [0],
                 0,
@@ -57,11 +60,11 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [2.2, 3.3, 1.1],
-                2.2,
+                2.1999999999999997,
             ],
             [
                 [2, 3.3, 1.1],
-                2.2,
+                2.1999999999999997,
             ],
             [
                 [2.2, -3.3, -1.1, 2.2, 5.5],
@@ -86,17 +89,23 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
      * @test         toRange generators
      * @dataProvider dataProviderForGenerators
      * @param        \Generator $data
-     * @param        int|float $expected
+     * @param        int|float  $expected
      */
-    public function testGenerators(\Generator $data, $expected)
+    public function testGenerators(\Generator $data, int|float $expected): void
     {
         // When
         $result = Reduce::toRange($data);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * Numeric strings are converted as PHP does: integer strings to int, the rest to float.
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
     public static function dataProviderForGenerators(): array
     {
         $gen = static function (array $data) {
@@ -104,10 +113,6 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            [
-                $gen([]),
-                0,
-            ],
             [
                 $gen([0]),
                 0,
@@ -130,11 +135,11 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $gen([2.2, 3.3, 1.1]),
-                2.2,
+                2.1999999999999997,
             ],
             [
                 $gen([2, 3.3, 1.1]),
-                2.2,
+                2.1999999999999997,
             ],
             [
                 $gen([2.2, -3.3, -1.1, 2.2, 5.5]),
@@ -158,18 +163,24 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
     /**
      * @test         toRange iterators
      * @dataProvider dataProviderForIterators
-     * @param        \Generator $data
+     * @param        \Iterator $data
      * @param        int|float $expected
      */
-    public function testIterators(\Iterator $data, $expected)
+    public function testIterators(\Iterator $data, int|float $expected): void
     {
         // When
         $result = Reduce::toRange($data);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * Numeric strings are converted as PHP does: integer strings to int, the rest to float.
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
     public static function dataProviderForIterators(): array
     {
         $iter = static function (array $data) {
@@ -177,10 +188,6 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            [
-                $iter([]),
-                0,
-            ],
             [
                 $iter([0]),
                 0,
@@ -203,11 +210,11 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $iter([2.2, 3.3, 1.1]),
-                2.2,
+                2.1999999999999997,
             ],
             [
                 $iter([2, 3.3, 1.1]),
-                2.2,
+                2.1999999999999997,
             ],
             [
                 $iter([2.2, -3.3, -1.1, 2.2, 5.5]),
@@ -232,17 +239,23 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
      * @test         toRange traversables
      * @dataProvider dataProviderForTraversables
      * @param        \Traversable $data
-     * @param        int|float $expected
+     * @param        int|float    $expected
      */
-    public function testTraversables(\Traversable $data, $expected)
+    public function testTraversables(\Traversable $data, int|float $expected): void
     {
         // When
         $result = Reduce::toRange($data);
 
         // Then
-        $this->assertEqualsWithDelta($expected, $result, self::ROUND_PRECISION);
+        $this->assertSame($expected, $result);
     }
 
+    /**
+     * Test data generated with Python (exact rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     * Numeric strings are converted as PHP does: integer strings to int, the rest to float.
+     * The int-vs-float result type is the library's contract, not the oracle's.
+     */
     public static function dataProviderForTraversables(): array
     {
         $trav = static function (array $data) {
@@ -250,10 +263,6 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
         };
 
         return [
-            [
-                $trav([]),
-                0,
-            ],
             [
                 $trav([0]),
                 0,
@@ -276,11 +285,11 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 $trav([2.2, 3.3, 1.1]),
-                2.2,
+                2.1999999999999997,
             ],
             [
                 $trav([2, 3.3, 1.1]),
-                2.2,
+                2.1999999999999997,
             ],
             [
                 $trav([2.2, -3.3, -1.1, 2.2, 5.5]),
@@ -299,5 +308,19 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
                 8.3,
             ],
         ];
+    }
+
+    /**
+     * @test         toRange returns zero on empty
+     * @dataProvider dataProviderForEmptyIterable
+     * @param        iterable $data
+     */
+    public function testEmptyReturnsZero(iterable $data): void
+    {
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        $this->assertSame(0, $result);
     }
 }
