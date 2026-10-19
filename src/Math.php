@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\MeanAccumulator;
 use IterTools\Util\ValueCounter;
 
 final class Math
@@ -277,6 +278,9 @@ final class Math
     /**
      * Accumulate the running average (mean) over a list of numbers
      *
+     * The mean of finite values is finite even when their running total overflows, as for
+     * [PHP_FLOAT_MAX, PHP_FLOAT_MAX], whose running averages are both PHP_FLOAT_MAX.
+     *
      * @param iterable<int|float> $numbers
      * @param int|float           $initialValue (Optional) If provided, the running average leads off with the initial value.
      *
@@ -284,11 +288,15 @@ final class Math
      */
     public static function runningAverage(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
-        $n = 0;
-        foreach (Math::runningTotal($numbers, $initialValue) as $runningTotal) {
-            $n++;
-            /** @psalm-suppress InvalidOperand */
-            yield $runningTotal / $n;
+        $mean = new MeanAccumulator($initialValue);
+
+        if ($initialValue !== null) {
+            yield $mean->mean();
+        }
+
+        foreach ($numbers as $number) {
+            $mean->add($number);
+            yield $mean->mean();
         }
     }
 }

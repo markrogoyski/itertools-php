@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Arithmetic;
+use IterTools\Util\MeanAccumulator;
 use IterTools\Util\NoValueMonad;
 use IterTools\Util\ValueCounter;
 
@@ -276,6 +277,9 @@ final class Reduce
     /**
      * Reduces given collection to the mean average of its items.
      *
+     * The mean of finite values is finite even when their sum overflows, as for
+     * [PHP_FLOAT_MAX, PHP_FLOAT_MAX], whose mean is PHP_FLOAT_MAX.
+     *
      * Returns null if given collection is empty.
      *
      * @param iterable<numeric> $data
@@ -284,26 +288,12 @@ final class Reduce
      */
     public static function toAverage(iterable $data): int|float|null
     {
-        /**
-         * @param array{int, int|float} $carry
-         * @param int|float $datum
-         * @return array{int, int|float}
-         */
-        /** @psalm-suppress MixedOperand */
-        $accumulator = static function (array $carry, mixed $datum): array {
-            /** @var int $count */
-            /** @var int|float $sum */
-            [$count, $sum] = $carry;
-            /** @phpstan-ignore binaryOp.invalid */
-            return [$count + 1, $sum + $datum];
-        };
+        $mean = new MeanAccumulator();
+        foreach ($data as $datum) {
+            $mean->add($datum);
+        }
 
-        /** @var array{int, int|float} $result */
-        $result = static::toValue($data, $accumulator, [0, 0]);
-        [$count, $sum] = $result;
-
-        /** @psalm-suppress InvalidOperand */
-        return $count ? ($sum / $count) : null;
+        return $mean->count() === 0 ? null : $mean->mean();
     }
 
     /**

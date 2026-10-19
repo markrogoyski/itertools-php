@@ -567,6 +567,444 @@ class ToAverageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toAverage array whose float sum overflows although the mean is finite
+     * @dataProvider dataProviderForSumOverflowArray
+     * @param        array $data
+     * @param        float $expected
+     */
+    public function testSumOverflowArray(array $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toAverage($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact rational mean, correctly rounded to a float):
+     *   float(sum(map(Fraction, data)) / len(data))
+     */
+    public static function dataProviderForSumOverflowArray(): array
+    {
+        return [
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+                \PHP_FLOAT_MAX,
+            ],
+            [
+                [-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+                -\PHP_FLOAT_MAX,
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+                \PHP_FLOAT_MAX,
+            ],
+            [
+                [1e308, 1e308],
+                1.0E+308,
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+                5.992310449541053E+307,
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+                0.0,
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1.5],
+                4.4942328371557893E+307,
+            ],
+            [
+                [\PHP_FLOAT_MAX, 1, \PHP_FLOAT_MAX],
+                1.1984620899082105E+308,
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1e-310],
+                2.0E-311,
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+                5.992310449541053E+307,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toAverage array with an infinity after the float sum has overflowed
+     * @dataProvider dataProviderForInfinityAfterSumOverflowArray
+     * @param        array $data
+     * @param        float $expected
+     */
+    public function testInfinityAfterSumOverflowArray(array $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toAverage($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python mpmath (Fraction can't hold an infinity, and math.fsum raises
+     * on the intermediate overflow), with mpmath.mp.prec = 2000:
+     *   float(mpmath.fsum(map(mpmath.mpf, data)) / len(data))
+     */
+    public static function dataProviderForInfinityAfterSumOverflowArray(): array
+    {
+        return [
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF],
+                \INF,
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\INF],
+                -\INF,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toAverage generators whose float sum overflows although the mean is finite
+     * @dataProvider dataProviderForSumOverflowGenerators
+     * @param        \Generator $data
+     * @param        float $expected
+     */
+    public function testSumOverflowGenerators(\Generator $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toAverage($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact rational mean, correctly rounded to a float):
+     *   float(sum(map(Fraction, data)) / len(data))
+     */
+    public static function dataProviderForSumOverflowGenerators(): array
+    {
+        $gen = static function (array $data) {
+            return GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            [
+                $gen([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                \PHP_FLOAT_MAX,
+            ],
+            [
+                $gen([-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                -\PHP_FLOAT_MAX,
+            ],
+            [
+                $gen([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                \PHP_FLOAT_MAX,
+            ],
+            [
+                $gen([1e308, 1e308]),
+                1.0E+308,
+            ],
+            [
+                $gen([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                5.992310449541053E+307,
+            ],
+            [
+                $gen([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                0.0,
+            ],
+            [
+                $gen([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1.5]),
+                4.4942328371557893E+307,
+            ],
+            [
+                $gen([\PHP_FLOAT_MAX, 1, \PHP_FLOAT_MAX]),
+                1.1984620899082105E+308,
+            ],
+            [
+                $gen([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1e-310]),
+                2.0E-311,
+            ],
+            [
+                $gen([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                5.992310449541053E+307,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toAverage generators with an infinity after the float sum has overflowed
+     * @dataProvider dataProviderForInfinityAfterSumOverflowGenerators
+     * @param        \Generator $data
+     * @param        float $expected
+     */
+    public function testInfinityAfterSumOverflowGenerators(\Generator $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toAverage($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python mpmath (Fraction can't hold an infinity, and math.fsum raises
+     * on the intermediate overflow), with mpmath.mp.prec = 2000:
+     *   float(mpmath.fsum(map(mpmath.mpf, data)) / len(data))
+     */
+    public static function dataProviderForInfinityAfterSumOverflowGenerators(): array
+    {
+        $gen = static function (array $data) {
+            return GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            [
+                $gen([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF]),
+                \INF,
+            ],
+            [
+                $gen([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\INF]),
+                -\INF,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toAverage iterators whose float sum overflows although the mean is finite
+     * @dataProvider dataProviderForSumOverflowIterators
+     * @param        \Iterator $data
+     * @param        float $expected
+     */
+    public function testSumOverflowIterators(\Iterator $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toAverage($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact rational mean, correctly rounded to a float):
+     *   float(sum(map(Fraction, data)) / len(data))
+     */
+    public static function dataProviderForSumOverflowIterators(): array
+    {
+        $iter = static function (array $data) {
+            return new ArrayIteratorFixture($data);
+        };
+
+        return [
+            [
+                $iter([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                \PHP_FLOAT_MAX,
+            ],
+            [
+                $iter([-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                -\PHP_FLOAT_MAX,
+            ],
+            [
+                $iter([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                \PHP_FLOAT_MAX,
+            ],
+            [
+                $iter([1e308, 1e308]),
+                1.0E+308,
+            ],
+            [
+                $iter([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                5.992310449541053E+307,
+            ],
+            [
+                $iter([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                0.0,
+            ],
+            [
+                $iter([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1.5]),
+                4.4942328371557893E+307,
+            ],
+            [
+                $iter([\PHP_FLOAT_MAX, 1, \PHP_FLOAT_MAX]),
+                1.1984620899082105E+308,
+            ],
+            [
+                $iter([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1e-310]),
+                2.0E-311,
+            ],
+            [
+                $iter([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                5.992310449541053E+307,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toAverage iterators with an infinity after the float sum has overflowed
+     * @dataProvider dataProviderForInfinityAfterSumOverflowIterators
+     * @param        \Iterator $data
+     * @param        float $expected
+     */
+    public function testInfinityAfterSumOverflowIterators(\Iterator $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toAverage($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python mpmath (Fraction can't hold an infinity, and math.fsum raises
+     * on the intermediate overflow), with mpmath.mp.prec = 2000:
+     *   float(mpmath.fsum(map(mpmath.mpf, data)) / len(data))
+     */
+    public static function dataProviderForInfinityAfterSumOverflowIterators(): array
+    {
+        $iter = static function (array $data) {
+            return new ArrayIteratorFixture($data);
+        };
+
+        return [
+            [
+                $iter([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF]),
+                \INF,
+            ],
+            [
+                $iter([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\INF]),
+                -\INF,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toAverage traversables whose float sum overflows although the mean is finite
+     * @dataProvider dataProviderForSumOverflowTraversables
+     * @param        \Traversable $data
+     * @param        float $expected
+     */
+    public function testSumOverflowTraversables(\Traversable $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toAverage($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact rational mean, correctly rounded to a float):
+     *   float(sum(map(Fraction, data)) / len(data))
+     */
+    public static function dataProviderForSumOverflowTraversables(): array
+    {
+        $trav = static function (array $data) {
+            return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            [
+                $trav([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                \PHP_FLOAT_MAX,
+            ],
+            [
+                $trav([-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                -\PHP_FLOAT_MAX,
+            ],
+            [
+                $trav([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                \PHP_FLOAT_MAX,
+            ],
+            [
+                $trav([1e308, 1e308]),
+                1.0E+308,
+            ],
+            [
+                $trav([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                5.992310449541053E+307,
+            ],
+            [
+                $trav([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                0.0,
+            ],
+            [
+                $trav([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1.5]),
+                4.4942328371557893E+307,
+            ],
+            [
+                $trav([\PHP_FLOAT_MAX, 1, \PHP_FLOAT_MAX]),
+                1.1984620899082105E+308,
+            ],
+            [
+                $trav([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1e-310]),
+                2.0E-311,
+            ],
+            [
+                $trav([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                5.992310449541053E+307,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toAverage traversables with an infinity after the float sum has overflowed
+     * @dataProvider dataProviderForInfinityAfterSumOverflowTraversables
+     * @param        \Traversable $data
+     * @param        float $expected
+     */
+    public function testInfinityAfterSumOverflowTraversables(\Traversable $data, float $expected): void
+    {
+        // When
+        $result = Reduce::toAverage($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python mpmath (Fraction can't hold an infinity, and math.fsum raises
+     * on the intermediate overflow), with mpmath.mp.prec = 2000:
+     *   float(mpmath.fsum(map(mpmath.mpf, data)) / len(data))
+     */
+    public static function dataProviderForInfinityAfterSumOverflowTraversables(): array
+    {
+        $trav = static function (array $data) {
+            return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            [
+                $trav([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF]),
+                \INF,
+            ],
+            [
+                $trav([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\INF]),
+                -\INF,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toAverage of opposite infinities after the float sum has overflowed is NAN
+     *
+     * Expected value generated with Python mpmath, with mpmath.mp.prec = 2000:
+     *   float(mpmath.fsum(map(mpmath.mpf, data)) / len(data))
+     */
+    public function testOppositeInfinitiesAfterSumOverflow(): void
+    {
+        // Given
+        $data = [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF, -\INF];
+
+        // When
+        $result = Reduce::toAverage($data);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
      * @test         toAverage returns null on empty
      * @dataProvider dataProviderForEmptyIterable
      * @param        iterable $data

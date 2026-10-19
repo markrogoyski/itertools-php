@@ -666,6 +666,380 @@ class RunningAverageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         runningAverage array whose float running total overflows although the means are finite
+     * @dataProvider dataProviderForSumOverflowArray
+     * @param        array $numbers
+     * @param        array $expected
+     */
+    public function testSumOverflowArray(array $numbers, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Math::runningAverage($numbers) as $runningValue) {
+            $result[] = $runningValue;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (the exact mean of the first n terms, rounded once):
+     *   [float(t / n) for n, t in enumerate(itertools.accumulate(map(Fraction, data)), 1)]
+     */
+    public static function dataProviderForSumOverflowArray(): array
+    {
+        return [
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+            ],
+            [
+                [-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+                [-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307],
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0],
+            ],
+            [
+                [\PHP_FLOAT_MAX, 1, \PHP_FLOAT_MAX],
+                [\PHP_FLOAT_MAX, 8.988465674311579E+307, 1.1984620899082105E+308],
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1e-310],
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0, 2.0E-311],
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0, 3.5953862697246315E+307, 5.992310449541053E+307],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage generators whose float running total overflows although the means are finite
+     * @dataProvider dataProviderForSumOverflowGenerators
+     * @param        \Generator $numbers
+     * @param        array $expected
+     */
+    public function testSumOverflowGenerators(\Generator $numbers, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Math::runningAverage($numbers) as $runningValue) {
+            $result[] = $runningValue;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (the exact mean of the first n terms, rounded once):
+     *   [float(t / n) for n, t in enumerate(itertools.accumulate(map(Fraction, data)), 1)]
+     */
+    public static function dataProviderForSumOverflowGenerators(): array
+    {
+        return [
+            [
+                Fixture\GeneratorFixture::getGenerator([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([\PHP_FLOAT_MAX, 1, \PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, 8.988465674311579E+307, 1.1984620899082105E+308],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1e-310]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0, 2.0E-311],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0, 3.5953862697246315E+307, 5.992310449541053E+307],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage iterators whose float running total overflows although the means are finite
+     * @dataProvider dataProviderForSumOverflowIterators
+     * @param        \Iterator $numbers
+     * @param        array $expected
+     */
+    public function testSumOverflowIterators(\Iterator $numbers, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Math::runningAverage($numbers) as $runningValue) {
+            $result[] = $runningValue;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (the exact mean of the first n terms, rounded once):
+     *   [float(t / n) for n, t in enumerate(itertools.accumulate(map(Fraction, data)), 1)]
+     */
+    public static function dataProviderForSumOverflowIterators(): array
+    {
+        return [
+            [
+                new Fixture\ArrayIteratorFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([\PHP_FLOAT_MAX, 1, \PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, 8.988465674311579E+307, 1.1984620899082105E+308],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1e-310]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0, 2.0E-311],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0, 3.5953862697246315E+307, 5.992310449541053E+307],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage traversables whose float running total overflows although the means are finite
+     * @dataProvider dataProviderForSumOverflowTraversables
+     * @param        \Traversable $numbers
+     * @param        array $expected
+     */
+    public function testSumOverflowTraversables(\Traversable $numbers, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Math::runningAverage($numbers) as $runningValue) {
+            $result[] = $runningValue;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (the exact mean of the first n terms, rounded once):
+     *   [float(t / n) for n, t in enumerate(itertools.accumulate(map(Fraction, data)), 1)]
+     */
+    public static function dataProviderForSumOverflowTraversables(): array
+    {
+        return [
+            [
+                new Fixture\IteratorAggregateFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([\PHP_FLOAT_MAX, 1, \PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, 8.988465674311579E+307, 1.1984620899082105E+308],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, 1e-310]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0, 2.0E-311],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307, 0.0, 3.5953862697246315E+307, 5.992310449541053E+307],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage with an initial value whose float running total overflows
+     * @dataProvider dataProviderForSumOverflowWithInitialValue
+     * @param        array $numbers
+     * @param        float $initialValue
+     * @param        array $expected
+     */
+    public function testSumOverflowWithInitialValue(array $numbers, float $initialValue, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Math::runningAverage($numbers, $initialValue) as $runningValue) {
+            $result[] = $runningValue;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (the exact mean of the first n terms, rounded once):
+     *   [float(t / n) for n, t in enumerate(itertools.accumulate(map(Fraction, [initial] + data)), 1)]
+     */
+    public static function dataProviderForSumOverflowWithInitialValue(): array
+    {
+        return [
+            [
+                [\PHP_FLOAT_MAX],
+                \PHP_FLOAT_MAX,
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+            ],
+            [
+                [\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+                \PHP_FLOAT_MAX,
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 5.992310449541053E+307],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage keeps the sign of a zero initial value
+     * @dataProvider dataProviderForSignedZeroInitialValue
+     * @param        array $numbers
+     * @param        float $initialValue
+     * @param        array $expected
+     */
+    public function testSignedZeroInitialValue(array $numbers, float $initialValue, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningAverage($numbers, $initialValue));
+
+        // Then
+        // -0.0 === 0.0, so compare the exported forms, which differ in the sign.
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with NumPy (Fraction has no signed zero; cumsum starts from the first
+     * element, as IEEE addition does):
+     *   numpy.cumsum([initial] + data) / numpy.arange(1, len(data) + 2)
+     */
+    public static function dataProviderForSignedZeroInitialValue(): array
+    {
+        return [
+            [
+                [],
+                -0.0,
+                [-0.0],
+            ],
+            [
+                [-0.0],
+                -0.0,
+                [-0.0, -0.0],
+            ],
+            [
+                [0.0],
+                -0.0,
+                [-0.0, 0.0],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage with an infinity after the float running total has overflowed
+     * @dataProvider dataProviderForInfinityAfterSumOverflow
+     * @param        array $numbers
+     * @param        array $expected
+     */
+    public function testInfinityAfterSumOverflow(array $numbers, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Math::runningAverage($numbers) as $runningValue) {
+            $result[] = $runningValue;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python mpmath (Fraction can't hold an infinity, and math.fsum raises
+     * on the intermediate overflow), with mpmath.mp.prec = 2000:
+     *   [float(mpmath.fsum(map(mpmath.mpf, data[:k])) / k) for k in range(1, len(data) + 1)]
+     */
+    public static function dataProviderForInfinityAfterSumOverflow(): array
+    {
+        return [
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF],
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF],
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\INF],
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\INF],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage of opposite infinities after the float running total has overflowed
+     *
+     * Expected values generated with Python mpmath, with mpmath.mp.prec = 2000:
+     *   [float(mpmath.fsum(map(mpmath.mpf, data[:k])) / k) for k in range(1, len(data) + 1)]
+     */
+    public function testOppositeInfinitiesAfterSumOverflow(): void
+    {
+        // Given
+        $numbers = [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF, -\INF];
+
+        // When
+        $result = \iterator_to_array(Math::runningAverage($numbers));
+
+        // Then
+        $this->assertSame([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF], \array_slice($result, 0, 3));
+        $this->assertNan($result[3]);
+    }
+
+    /**
      * @test         runningAverage iterator_to_array
      * @dataProvider dataProviderForArray
      * @param        array $numbers
