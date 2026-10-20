@@ -1141,9 +1141,31 @@ final class Single
                 ? \abs((float)($endExact - $startExact))
                 : \abs($endF - $startF);
 
-            if ($magnitudeF > $spanF) {
+            if ($intOperands) {
+                // Compare the step with the exact int span. Converted to float, a span of PHP_INT_MAX rounds up
+                // to 2^63 and lets a step of 2^63 through. A span that overflows int is in [2^63, 2^64), so it
+                // exceeds 2^63 by $high - ($low - PHP_INT_MIN), which fits int; a step at least 2^63 is a float,
+                // and its excess over 2^63 is exact.
+                $magnitude = \abs($step);
+                [$low, $high] = $ascending ? [$startExact, $endExact] : [$endExact, $startExact];
+                $span = $high - $low;
+                if (\is_int($span)) {
+                    $stepExceedsSpan = Arithmetic::compare($magnitude, $span) > 0;
+                    $spanDescription = "({$span})";
+                } else {
+                    $excess = $high - ($low - \PHP_INT_MIN);
+                    $stepExceedsSpan = Arithmetic::compare((float)$magnitude + (float)\PHP_INT_MIN, $excess) > 0;
+                    $spanDescription = "between {$startExact} and {$endExact}";
+                }
+            } else {
+                $magnitude = $magnitudeF;
+                $stepExceedsSpan = $magnitudeF > $spanF;
+                $spanDescription = "({$spanF})";
+            }
+
+            if ($stepExceedsSpan) {
                 throw new \InvalidArgumentException(
-                    "Single::range: step magnitude ({$magnitudeF}) must not exceed span ({$spanF})"
+                    "Single::range: step magnitude ({$magnitude}) must not exceed span {$spanDescription}"
                 );
             }
 

@@ -842,6 +842,141 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         a step that exceeds the exact int span near the int range limits throws, although it doesn't
+     *               exceed the span converted to float
+     * @dataProvider dataProviderForStepExceedingExactIntSpanAtIntRangeLimits
+     * @param        int|float $start
+     * @param        int|float $end
+     * @param        int|float $step
+     * @param        string    $message
+     */
+    public function testStepExceedingExactIntSpanAtIntRangeLimitsThrows(
+        int|float $start,
+        int|float $end,
+        int|float $step,
+        string $message
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($message);
+
+        // When
+        foreach (Single::range($start, $end, $step) as $_) {
+            break;
+        }
+    }
+
+    /**
+     * A span that overflows int is named by its operands.
+     *
+     * Test data generated with (tools/oracles/range_step_exceeds_exact_int_span.py):
+     *   Fraction(abs(step)) > abs(Fraction(end) - Fraction(start)), span printed as abs(Fraction(end) - Fraction(start))
+     */
+    public static function dataProviderForStepExceedingExactIntSpanAtIntRangeLimits(): array
+    {
+        return [
+            '0 to PHP_INT_MAX step (float) PHP_INT_MAX' => [
+                0, \PHP_INT_MAX, (float)\PHP_INT_MAX,
+                'must not exceed span (9223372036854775807)',
+            ],
+            'PHP_INT_MAX to 0 step -(float) PHP_INT_MAX' => [
+                \PHP_INT_MAX, 0, -(float)\PHP_INT_MAX,
+                'must not exceed span (9223372036854775807)',
+            ],
+            'PHP_INT_MAX to 0 step (float) PHP_INT_MAX' => [
+                \PHP_INT_MAX, 0, (float)\PHP_INT_MAX,
+                'must not exceed span (9223372036854775807)',
+            ],
+            '0.0 to PHP_INT_MAX - 1 step PHP_INT_MAX' => [
+                0.0, \PHP_INT_MAX - 1, \PHP_INT_MAX,
+                'step magnitude (9223372036854775807) must not exceed span (9223372036854775806)',
+            ],
+            'PHP_INT_MAX - 1 to 0.0 step -PHP_INT_MAX' => [
+                \PHP_INT_MAX - 1, 0.0, -\PHP_INT_MAX,
+                'step magnitude (9223372036854775807) must not exceed span (9223372036854775806)',
+            ],
+            '0.0 to 2^62 step 2^62 + 1' => [
+                0.0, 4611686018427387904, 4611686018427387905,
+                'step magnitude (4611686018427387905) must not exceed span (4611686018427387904)',
+            ],
+            'PHP_INT_MIN to PHP_INT_MAX step 2.0^64' => [
+                \PHP_INT_MIN, \PHP_INT_MAX, 1.8446744073709552E19,
+                'must not exceed span between -9223372036854775808 and 9223372036854775807',
+            ],
+            'PHP_INT_MAX to PHP_INT_MIN step -2.0^64' => [
+                \PHP_INT_MAX, \PHP_INT_MIN, -1.8446744073709552E19,
+                'must not exceed span between 9223372036854775807 and -9223372036854775808',
+            ],
+            '-1 to PHP_INT_MAX step 2.0^63 + 2048' => [
+                -1, \PHP_INT_MAX, 9.2233720368547779E18,
+                'must not exceed span between -1 and 9223372036854775807',
+            ],
+        ];
+    }
+
+    /**
+     * @test         a step equal to or just under the exact int span near the int range limits doesn't throw
+     * @dataProvider dataProviderForStepWithinExactIntSpanAtIntRangeLimits
+     * @param        int|float    $start
+     * @param        int|float    $end
+     * @param        int|float    $step
+     * @param        array<float> $expected
+     */
+    public function testStepWithinExactIntSpanAtIntRangeLimits(
+        int|float $start,
+        int|float $end,
+        int|float $step,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_step_exceeds_exact_int_span.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) ± i * abs(Fraction(step)))
+     */
+    public static function dataProviderForStepWithinExactIntSpanAtIntRangeLimits(): array
+    {
+        return [
+            'step equal to span: 0.0 to PHP_INT_MAX step PHP_INT_MAX' => [
+                0.0, \PHP_INT_MAX, \PHP_INT_MAX,
+                [0.0, 9.223372036854776E18],
+            ],
+            'step just under span: 0.0 to PHP_INT_MAX step PHP_INT_MAX - 1' => [
+                0.0, \PHP_INT_MAX, \PHP_INT_MAX - 1,
+                [0.0, 9.223372036854776E18],
+            ],
+            'step equal to overflowing span: -1 to PHP_INT_MAX step 2.0^63' => [
+                -1, \PHP_INT_MAX, 9.223372036854776E18,
+                [-1.0, 9.223372036854776E18],
+            ],
+            'step equal to overflowing span: PHP_INT_MAX to -1 step -2.0^63' => [
+                \PHP_INT_MAX, -1, -9.223372036854776E18,
+                [9.223372036854776E18, -1.0],
+            ],
+            'step just under overflowing span: -2 to PHP_INT_MAX step 2.0^63' => [
+                -2, \PHP_INT_MAX, 9.223372036854776E18,
+                [-2.0, 9.223372036854776E18],
+            ],
+        ];
+    }
+
+    /**
      * @test an int operand beyond 2^53 and an integral float operand that are equal as floats still reject a step
      *       against their direction
      */
@@ -1375,15 +1510,19 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test float step at (float)PHP_INT_MAX boundary is handled cleanly without TypeError
+     * @test float step at (float)PHP_INT_MAX boundary rejects the step exceeding the span cleanly, without TypeError
      */
     public function testFloatStepAtPhpIntMaxBoundaryHandledCleanly(): void
     {
         // Given
         // (float)PHP_INT_MAX rounds up to 2^63, just past PHP_INT_MAX. A naive int
         // path triggers a non-representable cast (PHP 8.5+ warning) and then
-        // intdiv() TypeErrors on the float-typed result. Float-path routing yields
-        // a sensible result.
+        // intdiv() TypeErrors on the float-typed result. The step 2^63 exceeds the
+        // exact span 2^63 - 1, so the range rejects it with an InvalidArgumentException.
+        // On 32-bit PHP, (float)PHP_INT_MAX is exact and equal to the span, so it doesn't apply.
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
         $caughtWarning = false;
         $prev = \set_error_handler(static function (int $errno, string $errstr) use (&$caughtWarning): bool {
             $caughtWarning = true;
@@ -1393,10 +1532,11 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         try {
             $threw = null;
             try {
-                $result = \iterator_to_array(Single::range(0, \PHP_INT_MAX, (float)\PHP_INT_MAX), false);
+                foreach (Single::range(0, \PHP_INT_MAX, (float)\PHP_INT_MAX) as $_) {
+                    // unreachable
+                }
             } catch (\Throwable $e) {
                 $threw = $e;
-                $result = [];
             }
         } finally {
             \set_error_handler($prev);
@@ -1404,11 +1544,12 @@ class RangeTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertFalse($caughtWarning, 'no PHP warning should be emitted');
-        $this->assertNull($threw, 'no TypeError should be thrown');
-        $this->assertGreaterThanOrEqual(1, \count($result));
-        foreach ($result as $v) {
-            $this->assertIsFloat($v);
-        }
+        $this->assertNotInstanceOf(\TypeError::class, $threw, 'no TypeError should be thrown');
+        $this->assertInstanceOf(\InvalidArgumentException::class, $threw);
+        $this->assertSame(
+            'Single::range: step magnitude (' . (float)\PHP_INT_MAX . ') must not exceed span (' . \PHP_INT_MAX . ')',
+            $threw->getMessage()
+        );
     }
 
     /**
