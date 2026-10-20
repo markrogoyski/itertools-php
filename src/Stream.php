@@ -183,6 +183,11 @@ final class Stream implements \IteratorAggregate
     /**
      * Create a stream sourced from a CSV file.
      *
+     * The default $escape ('\\') does not round-trip every value: a field that ends in a backslash, such as
+     * C:\Users\, is read as an unclosed quote and swallows the following row(s). Pass $escape = ''
+     * on both the write and the read side to turn the escape character off, as PHP recommends. The default
+     * stays '\\' so that files already written keep their bytes.
+     *
      * @param resource $file  File handle stream opened for reading
      * @param string $separator
      * @param string $enclosure
@@ -206,6 +211,11 @@ final class Stream implements \IteratorAggregate
      *
      * If $headers is null, the first row of the file is consumed and used as the header list.
      * Otherwise, the supplied $headers are used and every row of the file is treated as data.
+     *
+     * The default $escape ('\\') does not round-trip every value: a field that ends in a backslash, such as
+     * C:\Users\, is read as an unclosed quote and swallows the following row(s). Pass $escape = ''
+     * on both the write and the read side to turn the escape character off, as PHP recommends. The default
+     * stays '\\' so that files already written keep their bytes.
      *
      * @param resource           $fileResource File handle stream opened for reading
      * @param array<string>|null $headers      (optional) explicit header list; null infers from the first row
@@ -2328,6 +2338,11 @@ final class Stream implements \IteratorAggregate
      * Writes iterable source to the file line by line.
      *
      * Elements of the iterable source must be array of scalars.
+     *
+     * The default $escape ('\\') does not round-trip every value: a field that ends in a backslash, such as
+     * C:\Users\, reads back as an unclosed quote that swallows the following row(s). Pass $escape = ''
+     * on both the write and the read side to turn the escape character off, as PHP recommends. The default
+     * stays '\\' so that files already written keep their bytes.
      *
      * @param resource           $fileResource File handle stream opened for writing
      * @param array<string>|null $header (optional) header row before data, labelling the columns

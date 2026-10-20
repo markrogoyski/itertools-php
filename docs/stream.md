@@ -67,6 +67,8 @@ Creates a stream of rows of a CSV file.
 
 ```Stream::ofCsvFile(resource $fileHandle, string $separator = ',', string $enclosure = '"', string = $escape = '\\'): Stream```
 
+The default `$escape = '\\'` does not round-trip every value: a field that ends in a backslash, such as `C:\Users\`, is written as `"C:\Users\"`, and the reader takes the final `\"` for an escaped quote, so the field never closes and swallows the following row(s). Pass `$escape = ''` on both the write and the read side to turn the escape character off, as PHP recommends, and read a file with the `$escape` it was written with. The default stays `'\\'` so that files already written keep their bytes.
+
 ```php
 use IterTools\Stream;
 
@@ -80,6 +82,8 @@ $result = Stream::of($fileHandle)
 Creates a stream of rows of a CSV file as associative arrays keyed by header.
 
 ```Stream::ofCsvFileAssoc(resource $fileHandle, ?array $headers = null, string $separator = ',', string $enclosure = '"', string $escape = '\\'): Stream```
+
+The default `$escape = '\\'` does not round-trip every value: a field that ends in a backslash, such as `C:\Users\`, is written as `"C:\Users\"`, and the reader takes the final `\"` for an escaped quote, so the field never closes and swallows the following row(s). `ofCsvFileAssoc` raises no error when the merged row still has the header count (e.g. in a single-column file), and silently loses the rows. Pass `$escape = ''` on both the write and the read side to turn the escape character off, as PHP recommends, and read a file with the `$escape` it was written with. The default stays `'\\'` so that files already written keep their bytes.
 
 If `$headers` is `null`, the first row of the file is consumed and used as the header list. Otherwise, the supplied `$headers` are used and every row is treated as data.
 
@@ -3479,6 +3483,8 @@ Stream::of($words)->printLn();
 Write the contents of the stream to a CSV file.
 
 ```$stream->toCsvFile(resource $fileHandle, array $header = null, string 'separator = ',', string $enclosure = '"', string $escape = '\\'): void```
+
+The default `$escape = '\\'` does not round-trip every value: a field that ends in a backslash, such as `C:\Users\`, is written as `"C:\Users\"`, and the reader takes the final `\"` for an escaped quote, so the field never closes and swallows the following row(s). Pass `$escape = ''` on both the write and the read side to turn the escape character off, as PHP recommends, and read a file with the `$escape` it was written with. The default stays `'\\'` so that files already written keep their bytes.
 
 ```php
 use IterTools\Stream;

@@ -32,6 +32,11 @@ final class File
     /**
      * Iterate the lines of a CSV file, read in from a file handle stream resource.
      *
+     * The default $escape ('\\') does not round-trip every value: a field that ends in a backslash, such as
+     * C:\Users\, is read as an unclosed quote and swallows the following row(s). Pass $escape = '' on both
+     * the write and the read side to turn the escape character off, as PHP recommends. The default stays
+     * '\\' so that files already written keep their bytes.
+     *
      * @param resource $fileResource File handle stream opened for reading
      * @param string   $separator
      * @param string   $enclosure
@@ -76,6 +81,11 @@ final class File
      * type. This coercion is injective over canonical forms — non-canonical numeric-looking headers
      * ("01", "1.0", " 1", "+1", digits beyond PHP_INT_MAX) stay string keys — so no column can be
      * lost to a key collision, and the duplicate-header check already rejects the ambiguous cases.
+     *
+     * The default $escape ('\\') does not round-trip every value: a field that ends in a backslash, such as
+     * C:\Users\, is read as an unclosed quote and swallows the following row(s). Pass $escape = '' on both
+     * the write and the read side to turn the escape character off, as PHP recommends. The default stays
+     * '\\' so that files already written keep their bytes.
      *
      * @param resource           $fileResource File handle stream opened for reading
      * @param array<string>|null $headers      (optional) explicit header list; null infers from the first row
@@ -170,6 +180,11 @@ final class File
      *
      * When $header is not null, it is written as the first row before the data rows.
      * Rows are consumed lazily. Each row must be an array of scalars.
+     *
+     * The default $escape ('\\') does not round-trip every value: a field that ends in a backslash, such as
+     * C:\Users\, reads back as an unclosed quote that swallows the following row(s). Pass $escape = ''
+     * on both the write and the read side to turn the escape character off, as PHP recommends. The default
+     * stays '\\' so that files already written keep their bytes.
      *
      * @param resource                   $fileResource File handle stream opened for writing
      * @param iterable<array<scalar>>    $rows         Rows to write
