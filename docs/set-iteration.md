@@ -263,6 +263,8 @@ Iterates the symmetric difference of iterables.
 
 If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
 
+Given a single iterable, yields its elements, as with an empty second iterable. Given none, yields nothing.
+
 ```php
 use IterTools\Set;
 
@@ -282,6 +284,8 @@ Iterates the symmetric difference of iterables with [type coercion](../README.md
 ```Set::symmetricDifferenceCoercive(iterable ...$iterables)```
 
 If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
+
+Given a single iterable, yields its elements, as with an empty second iterable. Given none, yields nothing.
 
 ```php
 use IterTools\Set;

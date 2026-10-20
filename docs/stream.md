@@ -1618,6 +1618,8 @@ Return a stream of the symmetric difference of the stream and the given iterable
 
 Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
 
+With no given iterables, the stream keeps its own elements, as with an empty iterable.
+
 ```php
 use IterTools\Stream;
 
@@ -1637,6 +1639,8 @@ Return a stream of the symmetric difference of the stream and the given iterable
 ```$stream->symmetricDifferenceCoerciveWith(iterable ...$iterables): Stream```
 
 Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+
+With no given iterables, the stream keeps its own elements, as with an empty iterable.
 
 ```php
 use IterTools\Stream;

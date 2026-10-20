@@ -2248,6 +2248,78 @@ class SetTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         symmetricDifferenceWith and symmetricDifferenceCoerciveWith without extra iterables yield the elements of the source
+     * @dataProvider dataProviderForNoExtraIterables
+     * @param        iterable<mixed> $source
+     * @param        callable $streamFunc
+     * @param        array<mixed> $expected
+     */
+    public function testSymmetricDifferenceWithNoExtraIterablesYieldsSource(
+        iterable $source,
+        callable $streamFunc,
+        array $expected
+    ): void {
+        // Given
+        $stream = Stream::of($source);
+
+        // When
+        $result = $streamFunc($stream);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with the two-argument form, which the no-extra-iterables form must match:
+     *   Set::symmetricDifference($data, []) and Set::symmetricDifferenceCoercive($data, [])
+     */
+    public static function dataProviderForNoExtraIterables(): array
+    {
+        return [
+            'strict array' => [
+                [1, '1', 2, 1, 2],
+                static fn (Stream $stream): array => $stream->symmetricDifferenceWith()->toArray(),
+                [1, 1, '1', 2, 2],
+            ],
+            'strict generator' => [
+                GeneratorFixture::getGenerator([1, '1', 2, 1, 2]),
+                static fn (Stream $stream): array => $stream->symmetricDifferenceWith()->toArray(),
+                [1, 1, '1', 2, 2],
+            ],
+            'strict iterator' => [
+                new ArrayIteratorFixture([1, '1', 2, 1, 2]),
+                static fn (Stream $stream): array => $stream->symmetricDifferenceWith()->toArray(),
+                [1, 1, '1', 2, 2],
+            ],
+            'strict iterator aggregate' => [
+                new IteratorAggregateFixture([1, '1', 2, 1, 2]),
+                static fn (Stream $stream): array => $stream->symmetricDifferenceWith()->toArray(),
+                [1, 1, '1', 2, 2],
+            ],
+            'coercive array' => [
+                [1, '1', 2, 1, 2],
+                static fn (Stream $stream): array => $stream->symmetricDifferenceCoerciveWith()->toArray(),
+                [1, 1, 1, 2, 2],
+            ],
+            'coercive generator' => [
+                GeneratorFixture::getGenerator([1, '1', 2, 1, 2]),
+                static fn (Stream $stream): array => $stream->symmetricDifferenceCoerciveWith()->toArray(),
+                [1, 1, 1, 2, 2],
+            ],
+            'coercive iterator' => [
+                new ArrayIteratorFixture([1, '1', 2, 1, 2]),
+                static fn (Stream $stream): array => $stream->symmetricDifferenceCoerciveWith()->toArray(),
+                [1, 1, 1, 2, 2],
+            ],
+            'coercive iterator aggregate' => [
+                new IteratorAggregateFixture([1, '1', 2, 1, 2]),
+                static fn (Stream $stream): array => $stream->symmetricDifferenceCoerciveWith()->toArray(),
+                [1, 1, 1, 2, 2],
+            ],
+        ];
+    }
+
+    /**
      * @test partialIntersectionWith throws for a minimum intersection count below 1
      * @dataProvider dataProviderForNonPositiveMinIntersectionCount
      * @param int $minIntersectionCount

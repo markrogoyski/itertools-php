@@ -1854,6 +1854,8 @@ final class Stream implements \IteratorAggregate
      * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
      * last-seen representative per distinct value; see the Retained values subsection there.
      *
+     * With no given iterables, the stream keeps its own elements, as with an empty iterable.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return Stream
@@ -1871,6 +1873,8 @@ final class Stream implements \IteratorAggregate
      *
      * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
      * last-seen representative per distinct value; see the Retained values subsection there.
+     *
+     * With no given iterables, the stream keeps its own elements, as with an empty iterable.
      *
      * @param iterable<mixed> ...$iterables
      *

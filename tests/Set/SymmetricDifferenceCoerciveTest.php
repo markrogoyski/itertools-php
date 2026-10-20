@@ -62,7 +62,7 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
                 [
                     [null, null],
                 ],
-                [],
+                [null, null],
             ],
             [
                 [
@@ -244,7 +244,7 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
                 [
                     $gen([null, null]),
                 ],
-                [],
+                [null, null],
             ],
             [
                 [
@@ -426,7 +426,7 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
                 [
                     $iter([null, null]),
                 ],
-                [],
+                [null, null],
             ],
             [
                 [
@@ -608,7 +608,7 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
                 [
                     $trav([null, null]),
                 ],
-                [],
+                [null, null],
             ],
             [
                 [
@@ -844,6 +844,210 @@ class SymmetricDifferenceCoerciveTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
 
+
+    /**
+     * @test         symmetricDifferenceCoercive of a single iterable yields its elements (Array)
+     * @dataProvider dataProviderForSingleIterableArray
+     * @param        iterable<mixed> $iterable
+     * @param        array<mixed> $expected
+     */
+    public function testSingleIterableArray(iterable $iterable, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Set::symmetricDifferenceCoercive($iterable) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with the two-argument form, which the one-argument form must match;
+     * collections.Counter(data).elements() agrees on counts and on first-appearance order:
+     *   Set::symmetricDifferenceCoercive($data, [])
+     */
+    public static function dataProviderForSingleIterableArray(): array
+    {
+        return [
+            'empty' => [
+                [],
+                [],
+            ],
+            'set' => [
+                [1, 2, 3],
+                [1, 2, 3],
+            ],
+            'multiset' => [
+                [1, 2, 1, 3, 2, 1],
+                [1, 1, 1, 2, 2, 3],
+            ],
+            'strings' => [
+                ['a', 'b', 'a'],
+                ['a', 'a', 'b'],
+            ],
+            'types coerced to last-seen representative' => [
+                [1, '1', true, 1.0, 2, '1'],
+                ['1', '1', '1', '1', '1', 2],
+            ],
+        ];
+    }
+
+    /**
+     * @test         symmetricDifferenceCoercive of a single iterable yields its elements (Generator)
+     * @dataProvider dataProviderForSingleIterableGenerator
+     * @param        iterable<mixed> $iterable
+     * @param        array<mixed> $expected
+     */
+    public function testSingleIterableGenerator(iterable $iterable, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Set::symmetricDifferenceCoercive($iterable) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with the two-argument form, which the one-argument form must match;
+     * collections.Counter(data).elements() agrees on counts and on first-appearance order:
+     *   Set::symmetricDifferenceCoercive($data, [])
+     */
+    public static function dataProviderForSingleIterableGenerator(): array
+    {
+        return [
+            'empty' => [
+                GeneratorFixture::getGenerator([]),
+                [],
+            ],
+            'set' => [
+                GeneratorFixture::getGenerator([1, 2, 3]),
+                [1, 2, 3],
+            ],
+            'multiset' => [
+                GeneratorFixture::getGenerator([1, 2, 1, 3, 2, 1]),
+                [1, 1, 1, 2, 2, 3],
+            ],
+            'strings' => [
+                GeneratorFixture::getGenerator(['a', 'b', 'a']),
+                ['a', 'a', 'b'],
+            ],
+            'types coerced to last-seen representative' => [
+                GeneratorFixture::getGenerator([1, '1', true, 1.0, 2, '1']),
+                ['1', '1', '1', '1', '1', 2],
+            ],
+        ];
+    }
+
+    /**
+     * @test         symmetricDifferenceCoercive of a single iterable yields its elements (Iterator)
+     * @dataProvider dataProviderForSingleIterableIterator
+     * @param        iterable<mixed> $iterable
+     * @param        array<mixed> $expected
+     */
+    public function testSingleIterableIterator(iterable $iterable, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Set::symmetricDifferenceCoercive($iterable) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with the two-argument form, which the one-argument form must match;
+     * collections.Counter(data).elements() agrees on counts and on first-appearance order:
+     *   Set::symmetricDifferenceCoercive($data, [])
+     */
+    public static function dataProviderForSingleIterableIterator(): array
+    {
+        return [
+            'empty' => [
+                new ArrayIteratorFixture([]),
+                [],
+            ],
+            'set' => [
+                new ArrayIteratorFixture([1, 2, 3]),
+                [1, 2, 3],
+            ],
+            'multiset' => [
+                new ArrayIteratorFixture([1, 2, 1, 3, 2, 1]),
+                [1, 1, 1, 2, 2, 3],
+            ],
+            'strings' => [
+                new ArrayIteratorFixture(['a', 'b', 'a']),
+                ['a', 'a', 'b'],
+            ],
+            'types coerced to last-seen representative' => [
+                new ArrayIteratorFixture([1, '1', true, 1.0, 2, '1']),
+                ['1', '1', '1', '1', '1', 2],
+            ],
+        ];
+    }
+
+    /**
+     * @test         symmetricDifferenceCoercive of a single iterable yields its elements (IteratorAggregate)
+     * @dataProvider dataProviderForSingleIterableIteratorAggregate
+     * @param        iterable<mixed> $iterable
+     * @param        array<mixed> $expected
+     */
+    public function testSingleIterableIteratorAggregate(iterable $iterable, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Set::symmetricDifferenceCoercive($iterable) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with the two-argument form, which the one-argument form must match;
+     * collections.Counter(data).elements() agrees on counts and on first-appearance order:
+     *   Set::symmetricDifferenceCoercive($data, [])
+     */
+    public static function dataProviderForSingleIterableIteratorAggregate(): array
+    {
+        return [
+            'empty' => [
+                new IteratorAggregateFixture([]),
+                [],
+            ],
+            'set' => [
+                new IteratorAggregateFixture([1, 2, 3]),
+                [1, 2, 3],
+            ],
+            'multiset' => [
+                new IteratorAggregateFixture([1, 2, 1, 3, 2, 1]),
+                [1, 1, 1, 2, 2, 3],
+            ],
+            'strings' => [
+                new IteratorAggregateFixture(['a', 'b', 'a']),
+                ['a', 'a', 'b'],
+            ],
+            'types coerced to last-seen representative' => [
+                new IteratorAggregateFixture([1, '1', true, 1.0, 2, '1']),
+                ['1', '1', '1', '1', '1', 2],
+            ],
+        ];
+    }
 
     /**
      * @test         coercive symmetric difference yields the last-seen representative of each equivalence class

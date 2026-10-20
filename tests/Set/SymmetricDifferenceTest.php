@@ -704,6 +704,210 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing($expected, $result);
     }
     /**
+     * @test         symmetricDifference of a single iterable yields its elements (Array)
+     * @dataProvider dataProviderForSingleIterableArray
+     * @param        iterable<mixed> $iterable
+     * @param        array<mixed> $expected
+     */
+    public function testSingleIterableArray(iterable $iterable, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Set::symmetricDifference($iterable) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with the two-argument form, which the one-argument form must match;
+     * collections.Counter(data).elements() agrees on counts and on first-appearance order:
+     *   Set::symmetricDifference($data, [])
+     */
+    public static function dataProviderForSingleIterableArray(): array
+    {
+        return [
+            'empty' => [
+                [],
+                [],
+            ],
+            'set' => [
+                [1, 2, 3],
+                [1, 2, 3],
+            ],
+            'multiset' => [
+                [1, 2, 1, 3, 2, 1],
+                [1, 1, 1, 2, 2, 3],
+            ],
+            'strings' => [
+                ['a', 'b', 'a'],
+                ['a', 'a', 'b'],
+            ],
+            'types kept distinct' => [
+                [1, '1', true, 1.0, 2, '1'],
+                [1, '1', '1', true, 1.0, 2],
+            ],
+        ];
+    }
+
+    /**
+     * @test         symmetricDifference of a single iterable yields its elements (Generator)
+     * @dataProvider dataProviderForSingleIterableGenerator
+     * @param        iterable<mixed> $iterable
+     * @param        array<mixed> $expected
+     */
+    public function testSingleIterableGenerator(iterable $iterable, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Set::symmetricDifference($iterable) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with the two-argument form, which the one-argument form must match;
+     * collections.Counter(data).elements() agrees on counts and on first-appearance order:
+     *   Set::symmetricDifference($data, [])
+     */
+    public static function dataProviderForSingleIterableGenerator(): array
+    {
+        return [
+            'empty' => [
+                GeneratorFixture::getGenerator([]),
+                [],
+            ],
+            'set' => [
+                GeneratorFixture::getGenerator([1, 2, 3]),
+                [1, 2, 3],
+            ],
+            'multiset' => [
+                GeneratorFixture::getGenerator([1, 2, 1, 3, 2, 1]),
+                [1, 1, 1, 2, 2, 3],
+            ],
+            'strings' => [
+                GeneratorFixture::getGenerator(['a', 'b', 'a']),
+                ['a', 'a', 'b'],
+            ],
+            'types kept distinct' => [
+                GeneratorFixture::getGenerator([1, '1', true, 1.0, 2, '1']),
+                [1, '1', '1', true, 1.0, 2],
+            ],
+        ];
+    }
+
+    /**
+     * @test         symmetricDifference of a single iterable yields its elements (Iterator)
+     * @dataProvider dataProviderForSingleIterableIterator
+     * @param        iterable<mixed> $iterable
+     * @param        array<mixed> $expected
+     */
+    public function testSingleIterableIterator(iterable $iterable, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Set::symmetricDifference($iterable) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with the two-argument form, which the one-argument form must match;
+     * collections.Counter(data).elements() agrees on counts and on first-appearance order:
+     *   Set::symmetricDifference($data, [])
+     */
+    public static function dataProviderForSingleIterableIterator(): array
+    {
+        return [
+            'empty' => [
+                new ArrayIteratorFixture([]),
+                [],
+            ],
+            'set' => [
+                new ArrayIteratorFixture([1, 2, 3]),
+                [1, 2, 3],
+            ],
+            'multiset' => [
+                new ArrayIteratorFixture([1, 2, 1, 3, 2, 1]),
+                [1, 1, 1, 2, 2, 3],
+            ],
+            'strings' => [
+                new ArrayIteratorFixture(['a', 'b', 'a']),
+                ['a', 'a', 'b'],
+            ],
+            'types kept distinct' => [
+                new ArrayIteratorFixture([1, '1', true, 1.0, 2, '1']),
+                [1, '1', '1', true, 1.0, 2],
+            ],
+        ];
+    }
+
+    /**
+     * @test         symmetricDifference of a single iterable yields its elements (IteratorAggregate)
+     * @dataProvider dataProviderForSingleIterableIteratorAggregate
+     * @param        iterable<mixed> $iterable
+     * @param        array<mixed> $expected
+     */
+    public function testSingleIterableIteratorAggregate(iterable $iterable, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Set::symmetricDifference($iterable) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with the two-argument form, which the one-argument form must match;
+     * collections.Counter(data).elements() agrees on counts and on first-appearance order:
+     *   Set::symmetricDifference($data, [])
+     */
+    public static function dataProviderForSingleIterableIteratorAggregate(): array
+    {
+        return [
+            'empty' => [
+                new IteratorAggregateFixture([]),
+                [],
+            ],
+            'set' => [
+                new IteratorAggregateFixture([1, 2, 3]),
+                [1, 2, 3],
+            ],
+            'multiset' => [
+                new IteratorAggregateFixture([1, 2, 1, 3, 2, 1]),
+                [1, 1, 1, 2, 2, 3],
+            ],
+            'strings' => [
+                new IteratorAggregateFixture(['a', 'b', 'a']),
+                ['a', 'a', 'b'],
+            ],
+            'types kept distinct' => [
+                new IteratorAggregateFixture([1, '1', true, 1.0, 2, '1']),
+                [1, '1', '1', true, 1.0, 2],
+            ],
+        ];
+    }
+
+    /**
      * @test symmetric difference keeps every value when both sides are disjoint fresh objects
      */
     public function testKeepsEveryValueForDisjointFreshObjects(): void

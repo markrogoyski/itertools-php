@@ -338,6 +338,9 @@ final class Set
      * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
      * last-seen representative per distinct value; see the Retained values subsection there.
      *
+     * With a single iterable, yields its elements, as with an empty second iterable. With none,
+     * yields nothing.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return \Generator<mixed>
@@ -354,6 +357,9 @@ final class Set
      *
      * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
      * last-seen representative per distinct value; see the Retained values subsection there.
+     *
+     * With a single iterable, yields its elements, as with an empty second iterable. With none,
+     * yields nothing.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -424,6 +430,10 @@ final class Set
     ): \Generator {
         $usageMap = new UsageMap($strict, retainValues: true);
 
+        // A value is dropped once every iterable has it. A lone iterable is treated as if it were
+        // paired with an empty one, so its elements are all kept, not all cancelled.
+        $ownersToCancel = \max(2, \count($iterables));
+
         $multipleIterator = new JustifyMultipleIterator(NoValueMonad::getInstance(), ...$iterables);
 
         foreach ($multipleIterator as $values) {
@@ -434,7 +444,7 @@ final class Set
 
                 $hash = $usageMap->addUsage($value, (string)$owner);
 
-                if ($usageMap->getOwnersCount($hash) === \count($iterables)) {
+                if ($usageMap->getOwnersCount($hash) === $ownersToCancel) {
                     $usageMap->deleteUsage($hash);
                 }
             }
