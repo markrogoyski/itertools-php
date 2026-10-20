@@ -317,6 +317,45 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toVariance of subnormal values is unscaled correctly when a step underflows
+     * @dataProvider dataProviderForStepUnderflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testStepUnderflow(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toVariance($data, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * A Welford step (the gap to the running mean, divided by the count) falls below PHP_FLOAT_MIN. The
+     * variance of subnormal values is far below the smallest subnormal and so is 0.0; a larger value
+     * after the underflowing step gives a representable variance.
+     *
+     * Test data generated with Python (exact rational variance, correctly rounded to a float):
+     *   mean = sum(map(Fraction, data)) / n
+     *   float(sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof))
+     */
+    public static function dataProviderForStepUnderflow(): array
+    {
+        return [
+            [[0, 5e-324], false, 0.0],
+            [[0, 5e-324], true, 0.0],
+            [[-5e-324, 0, 5e-324], false, 0.0],
+            [[-5e-324, 0, 5e-324], true, 0.0],
+            [[0, 5e-324, 1.0], false, 0.2222222222222222],
+            [[0, 5e-324, 1.0], true, 0.3333333333333333],
+            [[0, 5e-324, 1e-150], false, 2.2222222222222223E-301],
+            [[0, 5e-324, 1e-150], true, 3.3333333333333334E-301],
+        ];
+    }
+
+    /**
      * @test toVariance over a large lazy iterable does not materialize the input
      */
     public function testLargeIterableMemoryBounded(): void

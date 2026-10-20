@@ -13,6 +13,14 @@ use IterTools\Util\ValueCounter;
 final class Reduce
 {
     /**
+     * The exact power-of-two factor toScaledVariance rescales its state by once a Welford step underflows
+     * (2^128), and its inverse. Large enough that a step of a rescaled subnormal gap divided by any int
+     * count is normal (2^(128 - 1074 - 63) > 2^-1022).
+     */
+    private const VARIANCE_UPSCALE   = 2.0 ** 128.0;
+    private const VARIANCE_DOWNSCALE = 2.0 ** -128.0;
+
+    /**
      * Reduces given collection like array_reduce() function.
      *
      * But unlike array_reduce(), it works with all iterable types.
@@ -441,7 +449,7 @@ final class Reduce
      */
     public static function toVariance(iterable $data, bool $sample = false): ?float
     {
-        [$count, $hasNonFinite, $scale, $weight] = self::toScaledVariance($data);
+        [$count, $hasNonFinite, $scale, $weight, $rescaled] = self::toScaledVariance($data);
 
         // Checked before $hasNonFinite: an undefined divisor is a property of the collection's size,
         // not of its values, so null wins over NAN for the sample variance of one non-finite value.
@@ -451,6 +459,12 @@ final class Reduce
 
         if ($hasNonFinite) {
             return \NAN;
+        }
+
+        if ($rescaled) {
+            // Undo the rescaling first. It is exact unless $scale lands below PHP_FLOAT_MIN, and then the
+            // variance, at most about $scale ** 2 * $count, is far below the smallest subnormal anyway.
+            $scale *= self::VARIANCE_DOWNSCALE;
         }
 
         // Unscale by interleaving the two multiplications. ($scale * $scale) * $weight would reach
@@ -480,6 +494,12 @@ final class Reduce
      * deviation of that pair, PHP_FLOAT_MAX * sqrt(2). The result is not correctly rounded, so one
      * within a few ulps of PHP_FLOAT_MAX may also come out as INF.
      *
+     * Subnormal values keep their resolution: a step of the running mean that would fall below
+     * PHP_FLOAT_MIN is taken on values rescaled by an exact power of two, so
+     * toStandardDeviation([0, 5e-324], true) is 5e-324, not 0.0. A standard deviation of a few subnormal
+     * steps is still not correctly rounded, and when the exact value lies at or near the midpoint of two
+     * subnormals it can come out one step (5e-324) off.
+     *
      * The null cases likewise take precedence over NAN: toStandardDeviation([INF], true)
      * is null, while toStandardDeviation([INF]) is NAN.
      *
@@ -494,7 +514,7 @@ final class Reduce
      */
     public static function toStandardDeviation(iterable $data, bool $sample = false): ?float
     {
-        [$count, $hasNonFinite, $scale, $weight] = self::toScaledVariance($data);
+        [$count, $hasNonFinite, $scale, $weight, $rescaled] = self::toScaledVariance($data);
 
         // The same null-over-NAN precedence as toVariance.
         if ($count === 0 || ($sample && $count === 1)) {
@@ -511,6 +531,14 @@ final class Reduce
             $weight *= $count / ($count - 1);
         }
 
+        if ($rescaled) {
+            // Undo the rescaling last, so that a subnormal standard deviation is rounded to the subnormal
+            // grid once, from the full-precision product. The product cannot overflow: the rescaling ends
+            // at a value beyond PHP_FLOAT_MAX / 2^128, and the standard deviation of values within that
+            // bound, two of which (the pair whose step underflowed) are next to zero, is below it.
+            return ($scale * \sqrt($weight)) * self::VARIANCE_DOWNSCALE;
+        }
+
         // $scale * sqrt($weight) rather than sqrt($scale ** 2 * $weight): the variance squares the
         // magnitude and so overflows or underflows for a representable standard deviation, as with
         // [-1e200, 1e200] (variance 1e400) or [-1e-200, 1e-200] (variance 1e-400).
@@ -522,11 +550,13 @@ final class Reduce
      *
      * Returns the variance in scaled form: the population variance is $scale ** 2 * $weight.
      * Keeping the two factors apart lets the caller unscale without forming $scale ** 2 when
-     * only the square root is wanted.
+     * only the square root is wanted. When $rescaled is true, $scale is VARIANCE_UPSCALE times
+     * too large (see the underflow branch below).
      *
      * @param iterable<int|float> $data
      *
-     * @return array{int, bool, float, float} count, whether any value was non-finite, scale, weight
+     * @return array{int, bool, float, float, bool} count, whether any value was non-finite, scale,
+     *                                              weight, whether $scale is rescaled
      */
     private static function toScaledVariance(iterable $data): array
     {
@@ -553,11 +583,32 @@ final class Reduce
         // for all-equal values such as [5, 5, NAN] the spread stays zero and the NAN leaves no trace.
         $hasNonFinite = false;
 
+        // Whether $meanHi, $meanLo and $scale, and each value as it arrives, are multiplied by
+        // VARIANCE_UPSCALE, which happens only once a step underflows (see below).
+        $rescaled = false;
+
         foreach ($data as $value) {
             ++$count;
 
             if (!\is_finite((float) $value)) {
                 $hasNonFinite = true;
+            }
+
+            if ($rescaled) {
+                /** @psalm-suppress InvalidOperand */
+                $rescaledValue = $value * self::VARIANCE_UPSCALE;
+
+                if (\is_finite($rescaledValue)) {
+                    $value = $rescaledValue;
+                } else {
+                    // A value beyond PHP_FLOAT_MAX / 2^128 (or a non-finite one) cannot be rescaled.
+                    // Return to the original scale: the rounding of the subnormal-scale state that this
+                    // can cause is negligible next to the gap to such a value.
+                    $meanHi  *= self::VARIANCE_DOWNSCALE;
+                    $meanLo  *= self::VARIANCE_DOWNSCALE;
+                    $scale   *= self::VARIANCE_DOWNSCALE;
+                    $rescaled = false;
+                }
             }
 
             /** @psalm-suppress InvalidOperand */
@@ -577,6 +628,33 @@ final class Reduce
                 $halfDelta = ($value * 0.5 - $meanHi * 0.5) - $meanLo * 0.5;
                 /** @psalm-suppress InvalidOperand */
                 $step = ($halfDelta / $count) * 2.0;
+            } elseif (
+                $step < \PHP_FLOAT_MIN
+                && $step > -\PHP_FLOAT_MIN
+                && !$rescaled
+                && $delta !== 0.0
+                && $count > 1
+                && $scale < 1.0
+                && \abs($meanHi) < 1.0
+            ) {
+                // The step underflows: below PHP_FLOAT_MIN it is rounded to a multiple of 2^-1074, which
+                // for [0, 5e-324] turns 2.5e-324 into 0.0, a 100% error in the spread being measured.
+                // Rescale the state by 2^128 and redo the step, then carry on rescaled. Multiplying by a
+                // power of two is exact while nothing overflows, which the bounds on $scale and $meanHi
+                // ensure, so from here on every step rounds as it would with an unbounded exponent range:
+                // the step of a rescaled gap of even one subnormal ulp is normal. Only an underflowing step
+                // takes this branch (the step of a single value is the value itself, exact), so every
+                // other result is unchanged.
+                $meanHi  *= self::VARIANCE_UPSCALE;
+                $meanLo  *= self::VARIANCE_UPSCALE;
+                $scale   *= self::VARIANCE_UPSCALE;
+                $rescaled = true;
+                /** @psalm-suppress InvalidOperand */
+                $value   *= self::VARIANCE_UPSCALE;
+                /** @psalm-suppress InvalidOperand */
+                $delta    = ($value - $meanHi) - $meanLo;
+                /** @psalm-suppress InvalidOperand */
+                $step     = $delta / $count;
             }
 
             // $meanHi + $step in double-double: 2Sum recovers the low bits the addition rounds off.
@@ -620,7 +698,7 @@ final class Reduce
             }
         }
 
-        return [$count, $hasNonFinite, $scale, $weight];
+        return [$count, $hasNonFinite, $scale, $weight, $rescaled];
     }
 
     /**

@@ -723,6 +723,135 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toStandardDeviation array of subnormal values keeps its precision when a step underflows
+     * @dataProvider dataProviderForStepUnderflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testStepUnderflowArray(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toStandardDeviation($data, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toStandardDeviation generator of subnormal values keeps its precision when a step underflows
+     * @dataProvider dataProviderForStepUnderflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testStepUnderflowGenerator(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($generator, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toStandardDeviation iterator of subnormal values keeps its precision when a step underflows
+     * @dataProvider dataProviderForStepUnderflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testStepUnderflowIterator(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($iterator, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toStandardDeviation traversable of subnormal values keeps its precision when a step underflows
+     * @dataProvider dataProviderForStepUnderflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testStepUnderflowTraversable(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $traversable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($traversable, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * A Welford step (the gap to the running mean, divided by the count) falls below PHP_FLOAT_MIN and
+     * rounds to the coarse subnormal grid, which for [0, 5e-324] turns the step 2.5e-324 into 0.0.
+     *
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof)
+     *   then sqrt(v) correctly rounded: math.isqrt of v scaled by an even power of two to ~128 bits,
+     *   a sticky bit for an inexact root, and one correctly rounded int / int division to a float
+     */
+    public static function dataProviderForStepUnderflow(): array
+    {
+        return [
+            // Two values one subnormal step apart
+            [[0, 5e-324], false, 0.0],
+            [[0, 5e-324], true, 5.0E-324],
+            [[5e-324, 0], false, 0.0],
+            [[5e-324, 0], true, 5.0E-324],
+            [[0, 0, 5e-324], false, 0.0],
+            [[0, 0, 5e-324], true, 5.0E-324],
+            [[-5e-324, 0, 5e-324], false, 5.0E-324],
+            [[-5e-324, 0, 5e-324], true, 5.0E-324],
+            [[5e-324, 0, -5e-324], false, 5.0E-324],
+            [[5e-324, 0, -5e-324], true, 5.0E-324],
+            // Wider subnormal spreads
+            [[1.5e-323, -5e-324, 0, 3.5e-323], false, 1.5E-323],
+            [[1.5e-323, -5e-324, 0, 3.5e-323], true, 2.0E-323],
+            [[1e-320, -3e-321, 2e-321, 7e-322], false, 4.743E-321],
+            [[1e-320, -3e-321, 2e-321, 7e-322], true, 5.474E-321],
+            [[1e-310, 0, 5e-324], false, 4.7140452079104E-311],
+            [[1e-310, 0, 5e-324], true, 5.773502691896E-311],
+            // Subnormal values one step apart
+            [[1e-310, 1e-310 + 5e-324], false, 0.0],
+            [[1e-310, 1e-310 + 5e-324], true, 5.0E-324],
+            // Normal values one subnormal step apart, at the subnormal/normal boundary
+            [[\PHP_FLOAT_MIN, \PHP_FLOAT_MIN + 5e-324], false, 0.0],
+            [[\PHP_FLOAT_MIN, \PHP_FLOAT_MIN + 5e-324], true, 5.0E-324],
+            [[\PHP_FLOAT_MIN, \PHP_FLOAT_MIN + 5e-324, \PHP_FLOAT_MIN], false, 0.0],
+            [[\PHP_FLOAT_MIN, \PHP_FLOAT_MIN + 5e-324, \PHP_FLOAT_MIN], true, 5.0E-324],
+            [[\PHP_FLOAT_MIN - 5e-324, \PHP_FLOAT_MIN, \PHP_FLOAT_MIN + 5e-324], false, 5.0E-324],
+            [[\PHP_FLOAT_MIN - 5e-324, \PHP_FLOAT_MIN, \PHP_FLOAT_MIN + 5e-324], true, 5.0E-324],
+            // A subnormal step followed by a value that dominates the spread
+            [[0, 5e-324, 1.0], false, 0.4714045207910317],
+            [[0, 5e-324, 1.0], true, 0.5773502691896257],
+            // A subnormal step followed by values too large to rescale
+            [[0, 5e-324, 1e300, 1e300], false, 5.0E+299],
+            [[0, 5e-324, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], false, 1.2711610061536462E+308],
+            [[0, 5e-324, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], true, 1.4678102981723262E+308],
+            // An underflowing step after a wide spread, too large to rescale and unaffected by the rounding
+            [[-1e300, 1e300, 0, 5e-324], false, 7.071067811865476E+299],
+            [[-1e300, 1e300, 0, 5e-324], true, 8.164965809277261E+299],
+            [[-1e308, 1e308, 0, 5e-324], false, 7.071067811865476E+307],
+            [[-1e308, 1e308, 0, 5e-324], true, 8.16496580927726E+307],
+        ];
+    }
+
+    /**
      * @test toStandardDeviation is invariant to input order
      */
     public function testOrderInvariance(): void

@@ -220,6 +220,21 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         Stream::toStandardDeviation keeps the precision of subnormal values when a step underflows
+     * @dataProvider dataProviderForIterableTypesOneSubnormalStepApart
+     * @param        iterable $data
+     */
+    public function testToStandardDeviationOfUnderflowingStep(iterable $data): void
+    {
+        // When
+        $result = Stream::of($data)->toStandardDeviation(true);
+
+        // Then (Python: the exact sample variance of [-5e-324, 0, 5e-324] is (5e-324)², so the correctly
+        // rounded square root is 5e-324)
+        $this->assertSame(5.0E-324, $result);
+    }
+
+    /**
      * @test Stream::toStandardDeviation on empty stream is null
      */
     public function testToStandardDeviationEmpty(): void
@@ -402,6 +417,16 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
             'generator'         => [Fixture\GeneratorFixture::getGenerator([-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX])],
             'iterator'          => [new Fixture\ArrayIteratorFixture([-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX])],
             'iteratorAggregate' => [new Fixture\IteratorAggregateFixture([-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX])],
+        ];
+    }
+
+    public static function dataProviderForIterableTypesOneSubnormalStepApart(): array
+    {
+        return [
+            'array'             => [[-5e-324, 0, 5e-324]],
+            'generator'         => [Fixture\GeneratorFixture::getGenerator([-5e-324, 0, 5e-324])],
+            'iterator'          => [new Fixture\ArrayIteratorFixture([-5e-324, 0, 5e-324])],
+            'iteratorAggregate' => [new Fixture\IteratorAggregateFixture([-5e-324, 0, 5e-324])],
         ];
     }
 
