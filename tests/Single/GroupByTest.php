@@ -1132,4 +1132,476 @@ class GroupByTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         groupBy array throws TypeError for a group name that isn't int|string|bool
+     * @dataProvider dataProviderForInvalidGroupNamesArray
+     * @param        array $iterable
+     * @param        callable $groupKeyFunction
+     * @param        string $expectedType
+     */
+    public function testInvalidGroupNamesArray(array $iterable, callable $groupKeyFunction, string $expectedType): void
+    {
+        // Given
+        $groups = Single::groupBy($iterable, $groupKeyFunction);
+
+        // Then
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('Group name must be int|string|bool, got %s', $expectedType));
+
+        // When
+        \iterator_to_array($groups);
+    }
+
+    public static function dataProviderForInvalidGroupNamesArray(): array
+    {
+        return [
+            'float' => [
+                [1, 2, 3],
+                fn ($x) => 4.5,
+                'double',
+            ],
+            'integral float' => [
+                [1, 2, 3],
+                fn ($x) => 4.0,
+                'double',
+            ],
+            'null' => [
+                [1, 2, 3],
+                fn ($x) => null,
+                'NULL',
+            ],
+            'object' => [
+                [1, 2, 3],
+                fn ($x) => (object)['v' => $x],
+                'object',
+            ],
+            'float in a list' => [
+                [1, 2, 3],
+                fn ($x) => ['a', 2.5],
+                'double',
+            ],
+            'integral float in a list' => [
+                [1, 2, 3],
+                fn ($x) => [1, 4.0],
+                'double',
+            ],
+            'null in a list' => [
+                [1, 2, 3],
+                fn ($x) => ['a', null],
+                'NULL',
+            ],
+            'array in a list' => [
+                [1, 2, 3],
+                fn ($x) => ['a', [$x]],
+                'array',
+            ],
+            'object in a list' => [
+                [1, 2, 3],
+                fn ($x) => ['a', (object)['v' => $x]],
+                'object',
+            ],
+            'float for a later item only' => [
+                [1, 2, 3],
+                fn ($x) => $x === 1 ? 'a' : 4.5,
+                'double',
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy array accepts int, string and bool group names, alone or in a list
+     * @dataProvider dataProviderForValidGroupNamesArray
+     * @param        array $iterable
+     * @param        callable $groupKeyFunction
+     * @param        array $expected
+     */
+    public function testValidGroupNamesArray(array $iterable, callable $groupKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, $groupKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForValidGroupNamesArray(): array
+    {
+        return [
+            'int' => [
+                [1, 2, 3],
+                fn ($x) => $x % 2,
+                [1 => [1, 3], 0 => [2]],
+            ],
+            'string' => [
+                [1, 2, 3],
+                fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
+                ['odd' => [1, 3], 'even' => [2]],
+            ],
+            'bool' => [
+                [1, 2, 3],
+                fn ($x) => $x > 1,
+                [0 => [1], 1 => [2, 3]],
+            ],
+            'list of int, string and bool' => [
+                [1, 2, 3],
+                fn ($x) => [$x, 'all', $x > 2],
+                [1 => [1, 3], 'all' => [1, 2, 3], 0 => [1, 2], 2 => [2], 3 => [3]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy generator throws TypeError for a group name that isn't int|string|bool
+     * @dataProvider dataProviderForInvalidGroupNamesGenerator
+     * @param        \Generator $iterable
+     * @param        callable $groupKeyFunction
+     * @param        string $expectedType
+     */
+    public function testInvalidGroupNamesGenerator(\Generator $iterable, callable $groupKeyFunction, string $expectedType): void
+    {
+        // Given
+        $groups = Single::groupBy($iterable, $groupKeyFunction);
+
+        // Then
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('Group name must be int|string|bool, got %s', $expectedType));
+
+        // When
+        \iterator_to_array($groups);
+    }
+
+    public static function dataProviderForInvalidGroupNamesGenerator(): array
+    {
+        return [
+            'float' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => 4.5,
+                'double',
+            ],
+            'integral float' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => 4.0,
+                'double',
+            ],
+            'null' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => null,
+                'NULL',
+            ],
+            'object' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => (object)['v' => $x],
+                'object',
+            ],
+            'float in a list' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => ['a', 2.5],
+                'double',
+            ],
+            'integral float in a list' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => [1, 4.0],
+                'double',
+            ],
+            'null in a list' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => ['a', null],
+                'NULL',
+            ],
+            'array in a list' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => ['a', [$x]],
+                'array',
+            ],
+            'object in a list' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => ['a', (object)['v' => $x]],
+                'object',
+            ],
+            'float for a later item only' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => $x === 1 ? 'a' : 4.5,
+                'double',
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy generator accepts int, string and bool group names, alone or in a list
+     * @dataProvider dataProviderForValidGroupNamesGenerator
+     * @param        \Generator $iterable
+     * @param        callable $groupKeyFunction
+     * @param        array $expected
+     */
+    public function testValidGroupNamesGenerator(\Generator $iterable, callable $groupKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, $groupKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForValidGroupNamesGenerator(): array
+    {
+        return [
+            'int' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => $x % 2,
+                [1 => [1, 3], 0 => [2]],
+            ],
+            'string' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
+                ['odd' => [1, 3], 'even' => [2]],
+            ],
+            'bool' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => $x > 1,
+                [0 => [1], 1 => [2, 3]],
+            ],
+            'list of int, string and bool' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => [$x, 'all', $x > 2],
+                [1 => [1, 3], 'all' => [1, 2, 3], 0 => [1, 2], 2 => [2], 3 => [3]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy iterator throws TypeError for a group name that isn't int|string|bool
+     * @dataProvider dataProviderForInvalidGroupNamesIterator
+     * @param        \Iterator $iterable
+     * @param        callable $groupKeyFunction
+     * @param        string $expectedType
+     */
+    public function testInvalidGroupNamesIterator(\Iterator $iterable, callable $groupKeyFunction, string $expectedType): void
+    {
+        // Given
+        $groups = Single::groupBy($iterable, $groupKeyFunction);
+
+        // Then
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('Group name must be int|string|bool, got %s', $expectedType));
+
+        // When
+        \iterator_to_array($groups);
+    }
+
+    public static function dataProviderForInvalidGroupNamesIterator(): array
+    {
+        return [
+            'float' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => 4.5,
+                'double',
+            ],
+            'integral float' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => 4.0,
+                'double',
+            ],
+            'null' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => null,
+                'NULL',
+            ],
+            'object' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => (object)['v' => $x],
+                'object',
+            ],
+            'float in a list' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => ['a', 2.5],
+                'double',
+            ],
+            'integral float in a list' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => [1, 4.0],
+                'double',
+            ],
+            'null in a list' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => ['a', null],
+                'NULL',
+            ],
+            'array in a list' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => ['a', [$x]],
+                'array',
+            ],
+            'object in a list' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => ['a', (object)['v' => $x]],
+                'object',
+            ],
+            'float for a later item only' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => $x === 1 ? 'a' : 4.5,
+                'double',
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy iterator accepts int, string and bool group names, alone or in a list
+     * @dataProvider dataProviderForValidGroupNamesIterator
+     * @param        \Iterator $iterable
+     * @param        callable $groupKeyFunction
+     * @param        array $expected
+     */
+    public function testValidGroupNamesIterator(\Iterator $iterable, callable $groupKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, $groupKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForValidGroupNamesIterator(): array
+    {
+        return [
+            'int' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => $x % 2,
+                [1 => [1, 3], 0 => [2]],
+            ],
+            'string' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
+                ['odd' => [1, 3], 'even' => [2]],
+            ],
+            'bool' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => $x > 1,
+                [0 => [1], 1 => [2, 3]],
+            ],
+            'list of int, string and bool' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => [$x, 'all', $x > 2],
+                [1 => [1, 3], 'all' => [1, 2, 3], 0 => [1, 2], 2 => [2], 3 => [3]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy traversable throws TypeError for a group name that isn't int|string|bool
+     * @dataProvider dataProviderForInvalidGroupNamesTraversable
+     * @param        \Traversable $iterable
+     * @param        callable $groupKeyFunction
+     * @param        string $expectedType
+     */
+    public function testInvalidGroupNamesTraversable(\Traversable $iterable, callable $groupKeyFunction, string $expectedType): void
+    {
+        // Given
+        $groups = Single::groupBy($iterable, $groupKeyFunction);
+
+        // Then
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('Group name must be int|string|bool, got %s', $expectedType));
+
+        // When
+        \iterator_to_array($groups);
+    }
+
+    public static function dataProviderForInvalidGroupNamesTraversable(): array
+    {
+        return [
+            'float' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => 4.5,
+                'double',
+            ],
+            'integral float' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => 4.0,
+                'double',
+            ],
+            'null' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => null,
+                'NULL',
+            ],
+            'object' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => (object)['v' => $x],
+                'object',
+            ],
+            'float in a list' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => ['a', 2.5],
+                'double',
+            ],
+            'integral float in a list' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => [1, 4.0],
+                'double',
+            ],
+            'null in a list' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => ['a', null],
+                'NULL',
+            ],
+            'array in a list' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => ['a', [$x]],
+                'array',
+            ],
+            'object in a list' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => ['a', (object)['v' => $x]],
+                'object',
+            ],
+            'float for a later item only' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => $x === 1 ? 'a' : 4.5,
+                'double',
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy traversable accepts int, string and bool group names, alone or in a list
+     * @dataProvider dataProviderForValidGroupNamesTraversable
+     * @param        \Traversable $iterable
+     * @param        callable $groupKeyFunction
+     * @param        array $expected
+     */
+    public function testValidGroupNamesTraversable(\Traversable $iterable, callable $groupKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, $groupKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForValidGroupNamesTraversable(): array
+    {
+        return [
+            'int' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => $x % 2,
+                [1 => [1, 3], 0 => [2]],
+            ],
+            'string' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => $x % 2 === 0 ? 'even' : 'odd',
+                ['odd' => [1, 3], 'even' => [2]],
+            ],
+            'bool' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => $x > 1,
+                [0 => [1], 1 => [2, 3]],
+            ],
+            'list of int, string and bool' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => [$x, 'all', $x > 2],
+                [1 => [1, 3], 'all' => [1, 2, 3], 0 => [1, 2], 2 => [2], 3 => [3]],
+            ],
+        ];
+    }
 }

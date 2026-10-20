@@ -482,10 +482,16 @@ final class Stream implements \IteratorAggregate
      *
      * The itemKeyFunction (optional) determines the key of element in group.
      *
+     * A group name must be an int, a string or a bool. A bool becomes the key 0 (false) or 1 (true), so it
+     * merges with those ints. Any other name (float, null, array, object, ...) throws a \TypeError, whether
+     * the groupKeyFunction returns it alone or inside a list of names. Reduce::toCountBy rejects bool too.
+     *
      * @param callable $groupKeyFunction
      * @param callable|null $itemKeyFunction
      *
      * @return Stream
+     *
+     * @throws \TypeError if a group name is not an int, string or bool
      *
      * @see Single::groupBy()
      */

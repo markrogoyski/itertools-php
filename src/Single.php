@@ -349,11 +349,17 @@ final class Single
      *
      * The itemKeyFunction (optional) determines the key of element in group.
      *
+     * A group name must be an int, a string or a bool. A bool becomes the key 0 (false) or 1 (true), so it
+     * merges with those ints. Any other name (float, null, array, object, ...) throws a \TypeError, whether
+     * the groupKeyFunction returns it alone or inside a list of names. Reduce::toCountBy rejects bool too.
+     *
      * @param iterable<mixed> $data
      * @param callable        $groupKeyFunction
      * @param callable|null   $itemKeyFunction
      *
      * @return \Generator<mixed>
+     *
+     * @throws \TypeError if a group name is not an int, string or bool
      */
     public static function groupBy(
         iterable $data,
@@ -373,8 +379,13 @@ final class Single
             // Dedupe by array key, so names PHP normalizes to the same key (2020 and '2020') count once.
             $distinctItemGroups = [];
             foreach ($itemGroups as $itemGroup) {
-                /** @var int|string $itemGroup */
-                $distinctItemGroups[$itemGroup] = true;
+                if (!\is_int($itemGroup) && !\is_string($itemGroup) && !\is_bool($itemGroup)) {
+                    throw new \TypeError(
+                        \sprintf('Group name must be int|string|bool, got %s', \gettype($itemGroup))
+                    );
+                }
+                // A bool name becomes the int key 0 or 1, merging with those ints.
+                $distinctItemGroups[\is_bool($itemGroup) ? (int) $itemGroup : $itemGroup] = true;
             }
 
             foreach (\array_keys($distinctItemGroups) as $itemGroup) {

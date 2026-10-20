@@ -360,6 +360,7 @@ Group data by a common data element.
 
 * The `$groupKeyFunction` determines the key to group elements by.
 * The optional `$itemKeyFunction` allows custom indexes within each group member.
+* A group name must be an `int`, a `string` or a `bool`, whether `$groupKeyFunction` returns it alone or inside a list of names. A `bool` becomes the key `0` (`false`) or `1` (`true`), so it merges with those ints. Any other name (a float, including `4.0`, `null`, an array or an object) throws a `\TypeError`. This differs from [`Reduce::toCountBy`](reduce.md#to-count-by), which rejects `bool` too.
 
 ```php
 use IterTools\Single;
