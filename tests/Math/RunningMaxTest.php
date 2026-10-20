@@ -473,4 +473,216 @@ class RunningMaxTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $result[2]);
         $this->assertEquals(2, $result[3]);
     }
+
+    /**
+     * @test         runningMax array of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionArray
+     * @param        array        $numbers
+     * @param        array        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionArray(array $numbers, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Math::runningMax($numbers) as $runningMax) {
+            $result[] = $runningMax;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   list(itertools.accumulate(data, max))
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionArray(): array
+    {
+        return [
+            'float 2.0^53 then int 2^53 + 1, equal as floats' => [
+                [9007199254740992.0, 9007199254740993],
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'int 2^53 + 1 then float 2.0^53' => [
+                [9007199254740993, 9007199254740992.0],
+                [9007199254740993, 9007199254740993],
+            ],
+            'floats and an int that equal as floats' => [
+                [9007199254740992.0, 9007199254740993, 9007199254740994.0, 9007199254740993],
+                [9007199254740992.0, 9007199254740993, 9007199254740994.0, 9007199254740994.0],
+            ],
+            'int PHP_INT_MAX then float 2.0^63' => [
+                [9223372036854775807, 9.223372036854776e+18],
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningMax generators of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionGenerators
+     * @param        \Generator   $numbers
+     * @param        array        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionGenerators(\Generator $numbers, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Math::runningMax($numbers) as $runningMax) {
+            $result[] = $runningMax;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   list(itertools.accumulate(data, max))
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionGenerators(): array
+    {
+        $gen = static function (array $data) {
+            return Fixture\GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            'float 2.0^53 then int 2^53 + 1, equal as floats' => [
+                $gen([9007199254740992.0, 9007199254740993]),
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'int 2^53 + 1 then float 2.0^53' => [
+                $gen([9007199254740993, 9007199254740992.0]),
+                [9007199254740993, 9007199254740993],
+            ],
+            'floats and an int that equal as floats' => [
+                $gen([9007199254740992.0, 9007199254740993, 9007199254740994.0, 9007199254740993]),
+                [9007199254740992.0, 9007199254740993, 9007199254740994.0, 9007199254740994.0],
+            ],
+            'int PHP_INT_MAX then float 2.0^63' => [
+                $gen([9223372036854775807, 9.223372036854776e+18]),
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningMax iterators of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionIterators
+     * @param        \Iterator    $numbers
+     * @param        array        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionIterators(\Iterator $numbers, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Math::runningMax($numbers) as $runningMax) {
+            $result[] = $runningMax;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   list(itertools.accumulate(data, max))
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionIterators(): array
+    {
+        $iter = static function (array $data) {
+            return new Fixture\ArrayIteratorFixture($data);
+        };
+
+        return [
+            'float 2.0^53 then int 2^53 + 1, equal as floats' => [
+                $iter([9007199254740992.0, 9007199254740993]),
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'int 2^53 + 1 then float 2.0^53' => [
+                $iter([9007199254740993, 9007199254740992.0]),
+                [9007199254740993, 9007199254740993],
+            ],
+            'floats and an int that equal as floats' => [
+                $iter([9007199254740992.0, 9007199254740993, 9007199254740994.0, 9007199254740993]),
+                [9007199254740992.0, 9007199254740993, 9007199254740994.0, 9007199254740994.0],
+            ],
+            'int PHP_INT_MAX then float 2.0^63' => [
+                $iter([9223372036854775807, 9.223372036854776e+18]),
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningMax traversables of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionTraversables
+     * @param        \Traversable $numbers
+     * @param        array        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionTraversables(\Traversable $numbers, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Math::runningMax($numbers) as $runningMax) {
+            $result[] = $runningMax;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   list(itertools.accumulate(data, max))
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionTraversables(): array
+    {
+        $trav = static function (array $data) {
+            return new Fixture\IteratorAggregateFixture($data);
+        };
+
+        return [
+            'float 2.0^53 then int 2^53 + 1, equal as floats' => [
+                $trav([9007199254740992.0, 9007199254740993]),
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'int 2^53 + 1 then float 2.0^53' => [
+                $trav([9007199254740993, 9007199254740992.0]),
+                [9007199254740993, 9007199254740993],
+            ],
+            'floats and an int that equal as floats' => [
+                $trav([9007199254740992.0, 9007199254740993, 9007199254740994.0, 9007199254740993]),
+                [9007199254740992.0, 9007199254740993, 9007199254740994.0, 9007199254740994.0],
+            ],
+            'int PHP_INT_MAX then float 2.0^63' => [
+                $trav([9223372036854775807, 9.223372036854776e+18]),
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+        ];
+    }
 }

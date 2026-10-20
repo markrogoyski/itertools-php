@@ -61,7 +61,10 @@ final class Reduce
                     if (\is_float($comparableValue) && \is_nan($comparableValue)) {
                         return $carry;
                     }
-                    return ($carry instanceof NoValueMonad || $comparableValue < $compareBy($carry))
+                    // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when
+                    // they are not. Arithmetic::min() and max() do the same below.
+                    return ($carry instanceof NoValueMonad
+                        || Arithmetic::compareValues($comparableValue, $compareBy($carry)) < 0)
                         ? $datum
                         : $carry;
                 },
@@ -75,7 +78,7 @@ final class Reduce
                     if (\is_float($datum) && \is_nan($datum)) {
                         return $carry;
                     }
-                    return ($carry instanceof NoValueMonad) ? $datum : \min($carry, $datum);
+                    return ($carry instanceof NoValueMonad) ? $datum : Arithmetic::min($carry, $datum);
                 },
                 NoValueMonad::getInstance()
             );
@@ -108,7 +111,10 @@ final class Reduce
                     if (\is_float($comparableValue) && \is_nan($comparableValue)) {
                         return $carry;
                     }
-                    return ($carry instanceof NoValueMonad || $comparableValue > $compareBy($carry))
+                    // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when
+                    // they are not. Arithmetic::min() and max() do the same below.
+                    return ($carry instanceof NoValueMonad
+                        || Arithmetic::compareValues($compareBy($carry), $comparableValue) < 0)
                         ? $datum
                         : $carry;
                 },
@@ -122,7 +128,7 @@ final class Reduce
                     if (\is_float($datum) && \is_nan($datum)) {
                         return $carry;
                     }
-                    return ($carry instanceof NoValueMonad) ? $datum : \max($carry, $datum);
+                    return ($carry instanceof NoValueMonad) ? $datum : Arithmetic::max($carry, $datum);
                 },
                 NoValueMonad::getInstance()
             );
@@ -154,11 +160,15 @@ final class Reduce
                 if (\is_float($comparableValue) && \is_nan($comparableValue)) {
                     return $carry;
                 }
+                // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when
+                // they are not. Arithmetic::min() and max() do the same below.
                 return [
-                    ($carry[0] instanceof NoValueMonad || $comparableValue <= $compareBy($carry[0]))
+                    ($carry[0] instanceof NoValueMonad
+                        || Arithmetic::compareValues($comparableValue, $compareBy($carry[0])) <= 0)
                         ? $datum
                         : $carry[0],
-                    ($carry[1] instanceof NoValueMonad || $comparableValue >= $compareBy($carry[1]))
+                    ($carry[1] instanceof NoValueMonad
+                        || Arithmetic::compareValues($compareBy($carry[1]), $comparableValue) <= 0)
                         ? $datum
                         : $carry[1],
                 ];
@@ -172,8 +182,8 @@ final class Reduce
                         return $carry;
                     }
                     return [
-                        ($carry[0] instanceof NoValueMonad) ? $datum : \min($carry[0], $datum),
-                        ($carry[1] instanceof NoValueMonad) ? $datum : \max($carry[1], $datum),
+                        ($carry[0] instanceof NoValueMonad) ? $datum : Arithmetic::min($carry[0], $datum),
+                        ($carry[1] instanceof NoValueMonad) ? $datum : Arithmetic::max($carry[1], $datum),
                     ];
                 },
                 [NoValueMonad::getInstance(), NoValueMonad::getInstance()]
@@ -887,14 +897,9 @@ final class Reduce
             }
 
             // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when
-            // they are not. Ties keep \min() and \max()'s choices: the later value for the minimum, the
-            // earlier one for the maximum.
-            if ($min === null || Arithmetic::compare($number, $min) <= 0) {
-                $min = $number;
-            }
-            if ($max === null || Arithmetic::compare($number, $max) > 0) {
-                $max = $number;
-            }
+            // they are not.
+            $min = $min === null ? $number : Arithmetic::min($min, $number);
+            $max = $max === null ? $number : Arithmetic::max($max, $number);
         }
 
         if ($min === null || $max === null) {

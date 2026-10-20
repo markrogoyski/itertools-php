@@ -2067,4 +2067,404 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             [$trav([['v' => NAN], ['v' => 3], ['v' => NAN], ['v' => 1], ['v' => NAN]]), fn ($item) => $item['v'], ['v' => 1]],
         ];
     }
+
+    /**
+     * @test         toMin array of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionArray
+     * @param        array        $data
+     * @param        callable|null $compareBy
+     * @param        mixed        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionArray(array $data, ?callable $compareBy, mixed $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMin($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   min(x for x in data if not nan(x))
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionArray(): array
+    {
+        return [
+            'float 2.0^53 below int 2^53 + 1, equal as floats' => [
+                [9007199254740992.0, 9007199254740993],
+                null,
+                9007199254740992.0,
+            ],
+            'int 2^53 + 1 first, above float 2.0^53' => [
+                [9007199254740993, 9007199254740992.0],
+                null,
+                9007199254740992.0,
+            ],
+            'float 2.0^53 between ints that equal it as floats' => [
+                [9007199254740994, 9007199254740992.0, 9007199254740993],
+                null,
+                9007199254740992.0,
+            ],
+            'int 2^53 + 1 below float 2.0^53 + 2' => [
+                [9007199254740993, 9007199254740994.0],
+                null,
+                9007199254740993,
+            ],
+            'negative int -(2^53 + 1) below float -2.0^53' => [
+                [-9007199254740993, -9007199254740992.0],
+                null,
+                -9007199254740993,
+            ],
+            'int PHP_INT_MAX below float 2.0^63' => [
+                [9223372036854775807, 9.223372036854776e+18],
+                null,
+                9223372036854775807,
+            ],
+            'NAN skipped' => [
+                [9007199254740993, \NAN, 9007199254740992.0],
+                null,
+                9007199254740992.0,
+            ],
+            'compareBy: float 2.0^53 below int 2^53 + 1, equal as floats' => [
+                [['v' => 9007199254740992.0], ['v' => 9007199254740993]],
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: int 2^53 + 1 first, above float 2.0^53' => [
+                [['v' => 9007199254740993], ['v' => 9007199254740992.0]],
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: float 2.0^53 between ints that equal it as floats' => [
+                [['v' => 9007199254740994], ['v' => 9007199254740992.0], ['v' => 9007199254740993]],
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: int 2^53 + 1 below float 2.0^53 + 2' => [
+                [['v' => 9007199254740993], ['v' => 9007199254740994.0]],
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740993],
+            ],
+            'compareBy: negative int -(2^53 + 1) below float -2.0^53' => [
+                [['v' => -9007199254740993], ['v' => -9007199254740992.0]],
+                fn (array $item) => $item['v'],
+                ['v' => -9007199254740993],
+            ],
+            'compareBy: int PHP_INT_MAX below float 2.0^63' => [
+                [['v' => 9223372036854775807], ['v' => 9.223372036854776e+18]],
+                fn (array $item) => $item['v'],
+                ['v' => 9223372036854775807],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMin generators of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionGenerators
+     * @param        \Generator   $data
+     * @param        callable|null $compareBy
+     * @param        mixed        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionGenerators(\Generator $data, ?callable $compareBy, mixed $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMin($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   min(x for x in data if not nan(x))
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionGenerators(): array
+    {
+        $gen = static function (array $data) {
+            return GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            'float 2.0^53 below int 2^53 + 1, equal as floats' => [
+                $gen([9007199254740992.0, 9007199254740993]),
+                null,
+                9007199254740992.0,
+            ],
+            'int 2^53 + 1 first, above float 2.0^53' => [
+                $gen([9007199254740993, 9007199254740992.0]),
+                null,
+                9007199254740992.0,
+            ],
+            'float 2.0^53 between ints that equal it as floats' => [
+                $gen([9007199254740994, 9007199254740992.0, 9007199254740993]),
+                null,
+                9007199254740992.0,
+            ],
+            'int 2^53 + 1 below float 2.0^53 + 2' => [
+                $gen([9007199254740993, 9007199254740994.0]),
+                null,
+                9007199254740993,
+            ],
+            'negative int -(2^53 + 1) below float -2.0^53' => [
+                $gen([-9007199254740993, -9007199254740992.0]),
+                null,
+                -9007199254740993,
+            ],
+            'int PHP_INT_MAX below float 2.0^63' => [
+                $gen([9223372036854775807, 9.223372036854776e+18]),
+                null,
+                9223372036854775807,
+            ],
+            'NAN skipped' => [
+                $gen([9007199254740993, \NAN, 9007199254740992.0]),
+                null,
+                9007199254740992.0,
+            ],
+            'compareBy: float 2.0^53 below int 2^53 + 1, equal as floats' => [
+                $gen([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: int 2^53 + 1 first, above float 2.0^53' => [
+                $gen([['v' => 9007199254740993], ['v' => 9007199254740992.0]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: float 2.0^53 between ints that equal it as floats' => [
+                $gen([['v' => 9007199254740994], ['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: int 2^53 + 1 below float 2.0^53 + 2' => [
+                $gen([['v' => 9007199254740993], ['v' => 9007199254740994.0]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740993],
+            ],
+            'compareBy: negative int -(2^53 + 1) below float -2.0^53' => [
+                $gen([['v' => -9007199254740993], ['v' => -9007199254740992.0]]),
+                fn (array $item) => $item['v'],
+                ['v' => -9007199254740993],
+            ],
+            'compareBy: int PHP_INT_MAX below float 2.0^63' => [
+                $gen([['v' => 9223372036854775807], ['v' => 9.223372036854776e+18]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9223372036854775807],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMin iterators of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionIterators
+     * @param        \Iterator    $data
+     * @param        callable|null $compareBy
+     * @param        mixed        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionIterators(\Iterator $data, ?callable $compareBy, mixed $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMin($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   min(x for x in data if not nan(x))
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionIterators(): array
+    {
+        $iter = static function (array $data) {
+            return new ArrayIteratorFixture($data);
+        };
+
+        return [
+            'float 2.0^53 below int 2^53 + 1, equal as floats' => [
+                $iter([9007199254740992.0, 9007199254740993]),
+                null,
+                9007199254740992.0,
+            ],
+            'int 2^53 + 1 first, above float 2.0^53' => [
+                $iter([9007199254740993, 9007199254740992.0]),
+                null,
+                9007199254740992.0,
+            ],
+            'float 2.0^53 between ints that equal it as floats' => [
+                $iter([9007199254740994, 9007199254740992.0, 9007199254740993]),
+                null,
+                9007199254740992.0,
+            ],
+            'int 2^53 + 1 below float 2.0^53 + 2' => [
+                $iter([9007199254740993, 9007199254740994.0]),
+                null,
+                9007199254740993,
+            ],
+            'negative int -(2^53 + 1) below float -2.0^53' => [
+                $iter([-9007199254740993, -9007199254740992.0]),
+                null,
+                -9007199254740993,
+            ],
+            'int PHP_INT_MAX below float 2.0^63' => [
+                $iter([9223372036854775807, 9.223372036854776e+18]),
+                null,
+                9223372036854775807,
+            ],
+            'NAN skipped' => [
+                $iter([9007199254740993, \NAN, 9007199254740992.0]),
+                null,
+                9007199254740992.0,
+            ],
+            'compareBy: float 2.0^53 below int 2^53 + 1, equal as floats' => [
+                $iter([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: int 2^53 + 1 first, above float 2.0^53' => [
+                $iter([['v' => 9007199254740993], ['v' => 9007199254740992.0]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: float 2.0^53 between ints that equal it as floats' => [
+                $iter([['v' => 9007199254740994], ['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: int 2^53 + 1 below float 2.0^53 + 2' => [
+                $iter([['v' => 9007199254740993], ['v' => 9007199254740994.0]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740993],
+            ],
+            'compareBy: negative int -(2^53 + 1) below float -2.0^53' => [
+                $iter([['v' => -9007199254740993], ['v' => -9007199254740992.0]]),
+                fn (array $item) => $item['v'],
+                ['v' => -9007199254740993],
+            ],
+            'compareBy: int PHP_INT_MAX below float 2.0^63' => [
+                $iter([['v' => 9223372036854775807], ['v' => 9.223372036854776e+18]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9223372036854775807],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMin traversables of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionTraversables
+     * @param        \Traversable $data
+     * @param        callable|null $compareBy
+     * @param        mixed        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionTraversables(\Traversable $data, ?callable $compareBy, mixed $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMin($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   min(x for x in data if not nan(x))
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionTraversables(): array
+    {
+        $trav = static function (array $data) {
+            return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            'float 2.0^53 below int 2^53 + 1, equal as floats' => [
+                $trav([9007199254740992.0, 9007199254740993]),
+                null,
+                9007199254740992.0,
+            ],
+            'int 2^53 + 1 first, above float 2.0^53' => [
+                $trav([9007199254740993, 9007199254740992.0]),
+                null,
+                9007199254740992.0,
+            ],
+            'float 2.0^53 between ints that equal it as floats' => [
+                $trav([9007199254740994, 9007199254740992.0, 9007199254740993]),
+                null,
+                9007199254740992.0,
+            ],
+            'int 2^53 + 1 below float 2.0^53 + 2' => [
+                $trav([9007199254740993, 9007199254740994.0]),
+                null,
+                9007199254740993,
+            ],
+            'negative int -(2^53 + 1) below float -2.0^53' => [
+                $trav([-9007199254740993, -9007199254740992.0]),
+                null,
+                -9007199254740993,
+            ],
+            'int PHP_INT_MAX below float 2.0^63' => [
+                $trav([9223372036854775807, 9.223372036854776e+18]),
+                null,
+                9223372036854775807,
+            ],
+            'NAN skipped' => [
+                $trav([9007199254740993, \NAN, 9007199254740992.0]),
+                null,
+                9007199254740992.0,
+            ],
+            'compareBy: float 2.0^53 below int 2^53 + 1, equal as floats' => [
+                $trav([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: int 2^53 + 1 first, above float 2.0^53' => [
+                $trav([['v' => 9007199254740993], ['v' => 9007199254740992.0]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: float 2.0^53 between ints that equal it as floats' => [
+                $trav([['v' => 9007199254740994], ['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740992.0],
+            ],
+            'compareBy: int 2^53 + 1 below float 2.0^53 + 2' => [
+                $trav([['v' => 9007199254740993], ['v' => 9007199254740994.0]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9007199254740993],
+            ],
+            'compareBy: negative int -(2^53 + 1) below float -2.0^53' => [
+                $trav([['v' => -9007199254740993], ['v' => -9007199254740992.0]]),
+                fn (array $item) => $item['v'],
+                ['v' => -9007199254740993],
+            ],
+            'compareBy: int PHP_INT_MAX below float 2.0^63' => [
+                $trav([['v' => 9223372036854775807], ['v' => 9.223372036854776e+18]]),
+                fn (array $item) => $item['v'],
+                ['v' => 9223372036854775807],
+            ],
+        ];
+    }
 }

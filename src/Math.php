@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\Arithmetic;
 use IterTools\Util\MeanAccumulator;
 use IterTools\Util\ValueCounter;
 
@@ -245,7 +246,7 @@ final class Math
                 yield $max ?? \NAN;
                 continue;
             }
-            $max = $max === null ? $number : \max($max, $number);
+            $max = $max === null ? $number : Arithmetic::max($max, $number);
             yield $max;
         }
     }
@@ -270,7 +271,7 @@ final class Math
                 yield $min ?? \NAN;
                 continue;
             }
-            $min = $min === null ? $number : \min($min, $number);
+            $min = $min === null ? $number : Arithmetic::min($min, $number);
             yield $min;
         }
     }

@@ -238,4 +238,129 @@ class ArithmeticTest extends \PHPUnit\Framework\TestCase
             [\PHP_INT_MIN, -1.0e300, 1],
         ];
     }
+
+    /**
+     * @test compareValues, min and max order a 64-bit integer and a float by their exact values
+     * @dataProvider dataProviderForMinMaxSixtyFourBit
+     * @param int|float $a
+     * @param int|float $b
+     * @param int       $expectedOrder
+     * @param int|float $expectedMin
+     * @param int|float $expectedMax
+     */
+    public function testMinMaxSixtyFourBit(
+        int|float $a,
+        int|float $b,
+        int $expectedOrder,
+        int|float $expectedMin,
+        int|float $expectedMax
+    ): void {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $order = Arithmetic::compareValues($a, $b);
+        $min = Arithmetic::min($a, $b);
+        $max = Arithmetic::max($a, $b);
+
+        // Then
+        $this->assertSame($expectedOrder, $order);
+        $this->assertSame($expectedMin, $min);
+        $this->assertSame($expectedMax, $max);
+    }
+
+    /**
+     * Test data generated with (Python compares an int and a float by their exact values):
+     *   (a > b) - (a < b), min(a, b), max(a, b)
+     * No row is an exact int/float tie, so the tie choice doesn't decide any result.
+     *
+     * @return array<array{int|float, int|float, int, int|float, int|float}>
+     */
+    public static function dataProviderForMinMaxSixtyFourBit(): array
+    {
+        return [
+            [9007199254740993, 9007199254740992.0, 1, 9007199254740992.0, 9007199254740993],
+            [9007199254740992.0, 9007199254740993, -1, 9007199254740992.0, 9007199254740993],
+            [9007199254740993, 9007199254740994.0, -1, 9007199254740993, 9007199254740994.0],
+            [9007199254740994.0, 9007199254740993, 1, 9007199254740993, 9007199254740994.0],
+            [-9007199254740993, -9007199254740992.0, -1, -9007199254740993, -9007199254740992.0],
+            [\PHP_INT_MAX, 2.0 ** 63, -1, \PHP_INT_MAX, 2.0 ** 63],
+            [2.0 ** 63, \PHP_INT_MAX, 1, \PHP_INT_MAX, 2.0 ** 63],
+            [\PHP_INT_MIN + 1, -(2.0 ** 63), 1, -(2.0 ** 63), \PHP_INT_MIN + 1],
+        ];
+    }
+
+    /**
+     * @test min and max leave an int and a float that are exactly equal to \min() and \max()
+     * @dataProvider dataProviderForMinMaxTie
+     * @param int|float $a
+     * @param int|float $b
+     */
+    public function testMinMaxTie(int|float $a, int|float $b): void
+    {
+        // When
+        $min = Arithmetic::min($a, $b);
+        $max = Arithmetic::max($a, $b);
+
+        // Then (which value \min() and \max() return on a tie depends on the PHP version)
+        $this->assertSame(\min($a, $b), $min);
+        $this->assertSame(\max($a, $b), $max);
+    }
+
+    /**
+     * @return array<array{int|float, int|float}>
+     */
+    public static function dataProviderForMinMaxTie(): array
+    {
+        return [
+            [1, 1.0],
+            [1.0, 1],
+            [0, -0.0],
+            [-0.0, 0],
+            [2 ** 53, 2.0 ** 53],
+            [2.0 ** 53, 2 ** 53],
+            [\PHP_INT_MIN, -(2.0 ** 63)],
+            [-(2.0 ** 63), \PHP_INT_MIN],
+        ];
+    }
+
+    /**
+     * @test compareValues, min and max leave a pair that isn't an int and a float to <=>, \min() and \max()
+     * @dataProvider dataProviderForMinMaxNotNumbers
+     * @param mixed $a
+     * @param mixed $b
+     */
+    public function testMinMaxNotNumbers(mixed $a, mixed $b): void
+    {
+        // When
+        $order = Arithmetic::compareValues($a, $b);
+        $min = Arithmetic::min($a, $b);
+        $max = Arithmetic::max($a, $b);
+
+        // Then
+        $this->assertSame($a <=> $b, $order);
+        $this->assertSame(\min($a, $b), $min);
+        $this->assertSame(\max($a, $b), $max);
+    }
+
+    /**
+     * @return array<array{mixed, mixed}>
+     */
+    public static function dataProviderForMinMaxNotNumbers(): array
+    {
+        return [
+            ['a', 'b'],
+            ['b', 'a'],
+            ['10', 9],
+            [9, '10'],
+            ['9007199254740993', 9007199254740992.0],
+            ['abc', 0],
+            [[1, 2], [1, 3]],
+            [true, 1],
+            [1, true],
+            [null, 0],
+        ];
+    }
 }

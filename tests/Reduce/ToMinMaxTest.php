@@ -1199,4 +1199,324 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             [$trav([['v' => NAN], ['v' => 3], ['v' => NAN], ['v' => 1], ['v' => NAN]]), fn ($item) => $item['v'], [['v' => 1], ['v' => 3]]],
         ];
     }
+
+    /**
+     * @test         toMinMax array of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionArray
+     * @param        array        $data
+     * @param        callable|null $compareBy
+     * @param        array        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionArray(array $data, ?callable $compareBy, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   [min(clean), max(clean)] where clean = [x for x in data if not nan(x)]
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionArray(): array
+    {
+        return [
+            'minimum is the float that equals the last int as floats' => [
+                [9007199254740994, 9007199254740992.0, 9007199254740993],
+                null,
+                [9007199254740992.0, 9007199254740994],
+            ],
+            'maximum is the int that equals the first float as floats' => [
+                [9007199254740992.0, 9007199254740993],
+                null,
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'int and float 2^53 apart by 1 in both orders' => [
+                [9007199254740993, 9007199254740992.0, 9007199254740994.0, 9007199254740995],
+                null,
+                [9007199254740992.0, 9007199254740995],
+            ],
+            'int PHP_INT_MAX below float 2.0^63' => [
+                [9.223372036854776e+18, 9223372036854775807],
+                null,
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+            'NAN skipped' => [
+                [9007199254740994, \NAN, 9007199254740992.0, 9007199254740993],
+                null,
+                [9007199254740992.0, 9007199254740994],
+            ],
+            'compareBy: minimum is the float that equals the last int as floats' => [
+                [['v' => 9007199254740994], ['v' => 9007199254740992.0], ['v' => 9007199254740993]],
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740994]],
+            ],
+            'compareBy: maximum is the int that equals the first float as floats' => [
+                [['v' => 9007199254740992.0], ['v' => 9007199254740993]],
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740993]],
+            ],
+            'compareBy: int and float 2^53 apart by 1 in both orders' => [
+                [['v' => 9007199254740993], ['v' => 9007199254740992.0], ['v' => 9007199254740994.0], ['v' => 9007199254740995]],
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740995]],
+            ],
+            'compareBy: int PHP_INT_MAX below float 2.0^63' => [
+                [['v' => 9.223372036854776e+18], ['v' => 9223372036854775807]],
+                fn (array $item) => $item['v'],
+                [['v' => 9223372036854775807], ['v' => 9.223372036854776e+18]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMinMax generators of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionGenerators
+     * @param        \Generator   $data
+     * @param        callable|null $compareBy
+     * @param        array        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionGenerators(\Generator $data, ?callable $compareBy, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   [min(clean), max(clean)] where clean = [x for x in data if not nan(x)]
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionGenerators(): array
+    {
+        $gen = static function (array $data) {
+            return GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            'minimum is the float that equals the last int as floats' => [
+                $gen([9007199254740994, 9007199254740992.0, 9007199254740993]),
+                null,
+                [9007199254740992.0, 9007199254740994],
+            ],
+            'maximum is the int that equals the first float as floats' => [
+                $gen([9007199254740992.0, 9007199254740993]),
+                null,
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'int and float 2^53 apart by 1 in both orders' => [
+                $gen([9007199254740993, 9007199254740992.0, 9007199254740994.0, 9007199254740995]),
+                null,
+                [9007199254740992.0, 9007199254740995],
+            ],
+            'int PHP_INT_MAX below float 2.0^63' => [
+                $gen([9.223372036854776e+18, 9223372036854775807]),
+                null,
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+            'NAN skipped' => [
+                $gen([9007199254740994, \NAN, 9007199254740992.0, 9007199254740993]),
+                null,
+                [9007199254740992.0, 9007199254740994],
+            ],
+            'compareBy: minimum is the float that equals the last int as floats' => [
+                $gen([['v' => 9007199254740994], ['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740994]],
+            ],
+            'compareBy: maximum is the int that equals the first float as floats' => [
+                $gen([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740993]],
+            ],
+            'compareBy: int and float 2^53 apart by 1 in both orders' => [
+                $gen([['v' => 9007199254740993], ['v' => 9007199254740992.0], ['v' => 9007199254740994.0], ['v' => 9007199254740995]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740995]],
+            ],
+            'compareBy: int PHP_INT_MAX below float 2.0^63' => [
+                $gen([['v' => 9.223372036854776e+18], ['v' => 9223372036854775807]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9223372036854775807], ['v' => 9.223372036854776e+18]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMinMax iterators of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionIterators
+     * @param        \Iterator    $data
+     * @param        callable|null $compareBy
+     * @param        array        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionIterators(\Iterator $data, ?callable $compareBy, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   [min(clean), max(clean)] where clean = [x for x in data if not nan(x)]
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionIterators(): array
+    {
+        $iter = static function (array $data) {
+            return new ArrayIteratorFixture($data);
+        };
+
+        return [
+            'minimum is the float that equals the last int as floats' => [
+                $iter([9007199254740994, 9007199254740992.0, 9007199254740993]),
+                null,
+                [9007199254740992.0, 9007199254740994],
+            ],
+            'maximum is the int that equals the first float as floats' => [
+                $iter([9007199254740992.0, 9007199254740993]),
+                null,
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'int and float 2^53 apart by 1 in both orders' => [
+                $iter([9007199254740993, 9007199254740992.0, 9007199254740994.0, 9007199254740995]),
+                null,
+                [9007199254740992.0, 9007199254740995],
+            ],
+            'int PHP_INT_MAX below float 2.0^63' => [
+                $iter([9.223372036854776e+18, 9223372036854775807]),
+                null,
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+            'NAN skipped' => [
+                $iter([9007199254740994, \NAN, 9007199254740992.0, 9007199254740993]),
+                null,
+                [9007199254740992.0, 9007199254740994],
+            ],
+            'compareBy: minimum is the float that equals the last int as floats' => [
+                $iter([['v' => 9007199254740994], ['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740994]],
+            ],
+            'compareBy: maximum is the int that equals the first float as floats' => [
+                $iter([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740993]],
+            ],
+            'compareBy: int and float 2^53 apart by 1 in both orders' => [
+                $iter([['v' => 9007199254740993], ['v' => 9007199254740992.0], ['v' => 9007199254740994.0], ['v' => 9007199254740995]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740995]],
+            ],
+            'compareBy: int PHP_INT_MAX below float 2.0^63' => [
+                $iter([['v' => 9.223372036854776e+18], ['v' => 9223372036854775807]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9223372036854775807], ['v' => 9.223372036854776e+18]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMinMax traversables of an int beyond 2^53 and a float, which compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionTraversables
+     * @param        \Traversable $data
+     * @param        callable|null $compareBy
+     * @param        array        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionTraversables(\Traversable $data, ?callable $compareBy, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   [min(clean), max(clean)] where clean = [x for x in data if not nan(x)]
+     * The data has no exact int/float tie, so the tie choice doesn't decide any result.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionTraversables(): array
+    {
+        $trav = static function (array $data) {
+            return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            'minimum is the float that equals the last int as floats' => [
+                $trav([9007199254740994, 9007199254740992.0, 9007199254740993]),
+                null,
+                [9007199254740992.0, 9007199254740994],
+            ],
+            'maximum is the int that equals the first float as floats' => [
+                $trav([9007199254740992.0, 9007199254740993]),
+                null,
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'int and float 2^53 apart by 1 in both orders' => [
+                $trav([9007199254740993, 9007199254740992.0, 9007199254740994.0, 9007199254740995]),
+                null,
+                [9007199254740992.0, 9007199254740995],
+            ],
+            'int PHP_INT_MAX below float 2.0^63' => [
+                $trav([9.223372036854776e+18, 9223372036854775807]),
+                null,
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+            'NAN skipped' => [
+                $trav([9007199254740994, \NAN, 9007199254740992.0, 9007199254740993]),
+                null,
+                [9007199254740992.0, 9007199254740994],
+            ],
+            'compareBy: minimum is the float that equals the last int as floats' => [
+                $trav([['v' => 9007199254740994], ['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740994]],
+            ],
+            'compareBy: maximum is the int that equals the first float as floats' => [
+                $trav([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740993]],
+            ],
+            'compareBy: int and float 2^53 apart by 1 in both orders' => [
+                $trav([['v' => 9007199254740993], ['v' => 9007199254740992.0], ['v' => 9007199254740994.0], ['v' => 9007199254740995]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0], ['v' => 9007199254740995]],
+            ],
+            'compareBy: int PHP_INT_MAX below float 2.0^63' => [
+                $trav([['v' => 9.223372036854776e+18], ['v' => 9223372036854775807]]),
+                fn (array $item) => $item['v'],
+                [['v' => 9223372036854775807], ['v' => 9.223372036854776e+18]],
+            ],
+        ];
+    }
 }

@@ -57,6 +57,73 @@ final class Arithmetic
     }
 
     /**
+     * Compares two values as the spaceship operator does, except that an int and a float are compared by
+     * their exact values ({@see compare()}).
+     *
+     * PHP evaluates $a < $b as ($a <=> $b) < 0 and $a > $b as ($b <=> $a) < 0, so callers replacing an
+     * operator keep its result for every other pair of values by writing it the same way.
+     *
+     * @param mixed $a
+     * @param mixed $b
+     *
+     * @return int
+     */
+    public static function compareValues(mixed $a, mixed $b): int
+    {
+        if ((\is_int($a) || \is_float($a)) && (\is_int($b) || \is_float($b))) {
+            return self::compare($a, $b);
+        }
+
+        return $a <=> $b;
+    }
+
+    /**
+     * \min() of two values, except that an int and a float are compared by their exact values. Every other
+     * pair, and an exact tie, goes to \min(), whose choice on a tie depends on the PHP version.
+     *
+     * @template T
+     *
+     * @param T $a
+     * @param T $b
+     *
+     * @return T
+     */
+    public static function min(mixed $a, mixed $b): mixed
+    {
+        if ((\is_int($a) || \is_float($a)) && (\is_int($b) || \is_float($b))) {
+            $order = self::compare($a, $b);
+            if ($order !== 0) {
+                return $order < 0 ? $a : $b;
+            }
+        }
+
+        return \min($a, $b);
+    }
+
+    /**
+     * \max() of two values, except that an int and a float are compared by their exact values. Every other
+     * pair, and an exact tie, goes to \max(), whose choice on a tie depends on the PHP version.
+     *
+     * @template T
+     *
+     * @param T $a
+     * @param T $b
+     *
+     * @return T
+     */
+    public static function max(mixed $a, mixed $b): mixed
+    {
+        if ((\is_int($a) || \is_float($a)) && (\is_int($b) || \is_float($b))) {
+            $order = self::compare($a, $b);
+            if ($order !== 0) {
+                return $order > 0 ? $a : $b;
+            }
+        }
+
+        return \max($a, $b);
+    }
+
+    /**
      * Rounding to float is monotonic, so (float) $int <=> $float is right whenever it finds the two unequal.
      * Equal, the float is an integer, compared in the int domain, unless it is 2^63, just past PHP_INT_MAX.
      */
