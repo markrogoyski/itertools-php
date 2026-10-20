@@ -2772,6 +2772,8 @@ $result = Stream::of($input)
 
 ```$stream->toCount(): mixed```
 
+Если источник реализует `Countable`, используется `Countable::count()`, обход не выполняется. `Countable`, который неверно сообщает свой размер, например `\CachingIterator` с `FULL_CACHE` над ещё не прочитанным источником, даёт неверную длину.
+
 ```php
 use IterTools\Stream;
 
@@ -3066,7 +3068,7 @@ $modes = Stream::of($votes)
 
 ```$stream->toNth(int $position): mixed```
 
-Если в потоке нет элемента с такой позицией, выбрасывает `\LengthException`; для отрицательной позиции — `\InvalidArgumentException`.
+Если в потоке нет элемента с такой позицией, выбрасывает `\LengthException`; для отрицательной позиции — `\InvalidArgumentException`. Читает элементы и никогда не обращается к `Countable::count()`, поэтому `Countable`, неверно сообщающий свой размер, не влияет на результат.
 
 ```php
 use IterTools\Stream;
@@ -3158,6 +3160,8 @@ $q3 = Stream::of($scores)
 Возвращает случайный элемент из коллекции потока.
 
 ```$stream->toRandomValue(): mixed```
+
+Если источник реализует `Countable`, индекс выбирается по `Countable::count()`. `Countable`, который неверно сообщает свой размер, например `\CachingIterator` с `FULL_CACHE` над ещё не прочитанным источником, даёт неверный индекс.
 
 ```php
 use IterTools\Stream;

@@ -27,6 +27,8 @@ Reduces iterable to its length.
 
 ```Reduce::toCount(iterable $data): int```
 
+Uses `Countable::count()` when the iterable is countable, without traversing it. A `Countable` that misreports its size, such as a `\CachingIterator` with `FULL_CACHE` over a source it has not read yet, gives a wrong length.
+
 ```php
 use IterTools\Reduce;
 
@@ -435,6 +437,8 @@ Reduces to value at the nth position.
 
 ```Reduce::toNth(iterable $data, int $position): mixed```
 
+Throws `\LengthException` if the iterable has no element at that position, and `\InvalidArgumentException` if the position is negative. Reads the elements and never `Countable::count()`, so a `Countable` that misreports its size does not change the result.
+
 ```php
 use IterTools\Reduce;
 
@@ -529,6 +533,8 @@ $q3 = Reduce::toQuantile($scores, 0.75);
 Reduces given collection to a random value within it.
 
 ```Reduce::toRandomValue(iterable $data): mixed```
+
+Uses `Countable::count()` when the collection is countable to choose the index. A `Countable` that misreports its size, such as a `\CachingIterator` with `FULL_CACHE` over a source it has not read yet, gives a wrong index.
 
 ```php
 use IterTools\Reduce;

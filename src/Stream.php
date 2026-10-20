@@ -2826,6 +2826,9 @@ final class Stream implements \IteratorAggregate
     /**
      * Reduces iterable source to its length.
      *
+     * Uses Countable::count() when the source is countable, so a Countable that misreports its size
+     * (such as a CachingIterator) gives a wrong length.
+     *
      * @return int
      *
      * @see Reduce::toCount()
@@ -3163,6 +3166,9 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns a random element of stream.
      *
+     * Uses Countable::count() when the source is countable to choose the index, so a Countable that
+     * misreports its size (such as a CachingIterator) gives a wrong index.
+     *
      * @return mixed
      *
      * @throws \LengthException if iterable source is empty.
@@ -3194,8 +3200,13 @@ final class Stream implements \IteratorAggregate
     /**
      * Reduces iterable source to its nth element.
      *
+     * Reads the elements, never Countable::count().
+     *
      * @param int $position
      * @return mixed
+     *
+     * @throws \LengthException if iterable source has no element at that position.
+     * @throws \InvalidArgumentException if the position is negative.
      *
      * @see Reduce::toNth()
      */

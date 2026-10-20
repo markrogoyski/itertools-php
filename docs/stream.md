@@ -2778,6 +2778,8 @@ Reduces iterable source to its length.
 
 ```$stream->toCount(): mixed```
 
+Uses `Countable::count()` when the source is countable, without traversing it. A `Countable` that misreports its size, such as a `\CachingIterator` with `FULL_CACHE` over a source it has not read yet, gives a wrong length.
+
 ```php
 use IterTools\Stream;
 
@@ -3072,7 +3074,7 @@ Reduces stream to value at the nth position.
 
 ```$stream->toNth(int $position): mixed```
 
-Throws `\LengthException` if the stream has no element at that position, and `\InvalidArgumentException` if the position is negative.
+Throws `\LengthException` if the stream has no element at that position, and `\InvalidArgumentException` if the position is negative. Reads the elements and never `Countable::count()`, so a `Countable` that misreports its size does not change the result.
 
 ```php
 use IterTools\Stream;
@@ -3164,6 +3166,8 @@ $q3 = Stream::of($scores)
 Reduces stream to a random value within it.
 
 ```$stream->toRandomValue(): mixed```
+
+Uses `Countable::count()` when the source is countable to choose the index. A `Countable` that misreports its size, such as a `\CachingIterator` with `FULL_CACHE` over a source it has not read yet, gives a wrong index.
 
 ```php
 use IterTools\Stream;

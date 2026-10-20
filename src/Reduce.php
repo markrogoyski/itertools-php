@@ -209,6 +209,9 @@ final class Reduce
     /**
      * Reduces given iterable to its length.
      *
+     * Uses Countable::count() when the iterable is countable, without traversing it, so a Countable that
+     * misreports its size (such as a CachingIterator over a source it has not read yet) gives a wrong length.
+     *
      * @param iterable<mixed> $data
      *
      * @return int
@@ -1069,6 +1072,9 @@ final class Reduce
     /**
      * Reduces given collection random value in from within it.
      *
+     * Uses Countable::count() when the iterable is countable to choose the index, so a Countable that
+     * misreports its size (such as a CachingIterator over a source it has not read yet) gives a wrong index.
+     *
      * @param iterable<mixed> $data
      *
      * @return mixed
@@ -1330,6 +1336,9 @@ final class Reduce
     /**
      * Reduces given iterable to the value at the nth position.
      *
+     * Reads the elements, never Countable::count(), so a Countable that misreports its size
+     * (such as a CachingIterator) does not make an element missing or present.
+     *
      * @template T
      *
      * @param iterable<T> $data
@@ -1338,15 +1347,12 @@ final class Reduce
      * @return T
      *
      * @throws \LengthException if given iterable does not contain item with target position.
+     * @throws \InvalidArgumentException if the position is negative.
      */
     public static function toNth(iterable $data, int $position): mixed
     {
         if ($position < 0) {
             throw new \InvalidArgumentException("Position must be non-negative. Got {$position}.");
-        }
-
-        if (\is_countable($data) && \count($data) <= $position) {
-            throw new \LengthException("Given iterable does not contain item with position {$position}");
         }
 
         $i = 0;

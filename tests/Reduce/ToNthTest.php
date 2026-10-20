@@ -9,6 +9,7 @@ use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\CountableIteratorAggregateFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Tests\Fixture\MisreportingCountableFixture;
 
 class ToNthTest extends \PHPUnit\Framework\TestCase
 {
@@ -694,6 +695,77 @@ class ToNthTest extends \PHPUnit\Framework\TestCase
                 $trav([1, 2.2, '3', 'four', [5], (object)[6], true, false, null]),
                 4,
                 [5],
+            ],
+        ];
+    }
+
+    /**
+     * @test toNth reads the elements, not Countable::count(): a count() that under-reports does not hide an element
+     * @dataProvider dataProviderForUnderReportingCountable
+     * @param MisreportingCountableFixture $data
+     * @param int $position
+     * @param mixed $expected
+     */
+    public function testUnderReportingCountableIsTraversed(MisreportingCountableFixture $data, int $position, $expected): void
+    {
+        // When
+        $result = Reduce::toNth($data, $position);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForUnderReportingCountable(): array
+    {
+        return [
+            [
+                new MisreportingCountableFixture([1, 2, 3], 0),
+                0,
+                1,
+            ],
+            [
+                new MisreportingCountableFixture([1, 2, 3], 0),
+                2,
+                3,
+            ],
+            [
+                new MisreportingCountableFixture([1, 2, 3], 1),
+                2,
+                3,
+            ],
+        ];
+    }
+
+    /**
+     * @test toNth reads the elements, not Countable::count(): a count() that over-reports does not invent an element
+     * @dataProvider dataProviderForOverReportingCountable
+     * @param MisreportingCountableFixture $data
+     * @param int $position
+     */
+    public function testOverReportingCountableThrowsFromTraversal(MisreportingCountableFixture $data, int $position): void
+    {
+        // Then
+        $this->expectException(\LengthException::class);
+        $this->expectExceptionMessage("Given iterable does not contain item with position {$position}");
+
+        // When
+        Reduce::toNth($data, $position);
+    }
+
+    public static function dataProviderForOverReportingCountable(): array
+    {
+        return [
+            [
+                new MisreportingCountableFixture([], 5),
+                0,
+            ],
+            [
+                new MisreportingCountableFixture([1, 2, 3], 10),
+                3,
+            ],
+            [
+                new MisreportingCountableFixture([1, 2, 3], 10),
+                7,
             ],
         ];
     }

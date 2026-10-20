@@ -9,6 +9,7 @@ use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\DataProvider;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Tests\Fixture\MisreportingCountableFixture;
 
 class ReduceTest extends \PHPUnit\Framework\TestCase
 {
@@ -3268,5 +3269,36 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
 
         // When
         Stream::of($data)->toRandomValue();
+    }
+
+    /**
+     * @test Stream::toNth reads the elements, not Countable::count()
+     */
+    public function testToNthIgnoresMisreportedCount(): void
+    {
+        // Given
+        $data = new MisreportingCountableFixture([1, 2, 3], 0);
+
+        // When
+        $result = Stream::of($data)->toNth(2);
+
+        // Then
+        $this->assertSame(3, $result);
+    }
+
+    /**
+     * @test Stream::toNth throws LengthException from the traversal when the position is past the end
+     */
+    public function testToNthPastEndWithMisreportedCountThrows(): void
+    {
+        // Given
+        $data = new MisreportingCountableFixture([1, 2, 3], 10);
+
+        // Then
+        $this->expectException(\LengthException::class);
+        $this->expectExceptionMessage('Given iterable does not contain item with position 5');
+
+        // When
+        Stream::of($data)->toNth(5);
     }
 }

@@ -27,6 +27,8 @@ $finalGrade = Reduce::toAverage($grades);
 
 ```Reduce::toCount(iterable $data): int```
 
+Если коллекция реализует `Countable`, используется `Countable::count()`, обход не выполняется. `Countable`, который неверно сообщает свой размер, например `\CachingIterator` с `FULL_CACHE` над ещё не прочитанным источником, даёт неверную длину.
+
 ```php
 use IterTools\Reduce;
 
@@ -426,6 +428,8 @@ $modes = Reduce::toMode($votes);
 
 ```Reduce::toNth(iterable $data, int $position): mixed```
 
+Если в коллекции нет элемента с такой позицией, выбрасывает `\LengthException`; для отрицательной позиции — `\InvalidArgumentException`. Читает элементы и никогда не обращается к `Countable::count()`, поэтому `Countable`, неверно сообщающий свой размер, не влияет на результат.
+
 ```php
 use IterTools\Reduce;
 
@@ -520,6 +524,8 @@ $q3 = Reduce::toQuantile($scores, 0.75);
 Возвращает случайный элемент из коллекции.
 
 ```Reduce::toRandomValue(iterable $data): mixed```
+
+Если коллекция реализует `Countable`, индекс выбирается по `Countable::count()`. `Countable`, который неверно сообщает свой размер, например `\CachingIterator` с `FULL_CACHE` над ещё не прочитанным источником, даёт неверный индекс.
 
 ```php
 use IterTools\Reduce;
