@@ -2856,6 +2856,8 @@ final class Stream implements \IteratorAggregate
      *
      * If $compareBy is not proposed then items of iterable source must be comparable.
      *
+     * If several elements tie on the $compareBy value, returns the first of them.
+     *
      * Returns null if iterable source is empty.
      *
      * @param callable|null $compareBy
@@ -2876,6 +2878,8 @@ final class Stream implements \IteratorAggregate
      *
      * If $compareBy is not proposed then items of iterable source must be comparable.
      *
+     * If several elements tie on the $compareBy value, returns the first of them.
+     *
      * Returns null if iterable source is empty.
      *
      * @param callable|null $compareBy
@@ -2895,6 +2899,9 @@ final class Stream implements \IteratorAggregate
      * Callable param $compareBy must return comparable value.
      *
      * If $compareBy is not proposed then items of iterable source must be comparable.
+     *
+     * If several elements tie on the $compareBy value for the minimum or for the maximum, each bound is the
+     * first of them.
      *
      * Returns [null, null] if iterable source is empty.
      *

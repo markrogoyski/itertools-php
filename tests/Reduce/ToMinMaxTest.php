@@ -1519,4 +1519,524 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         toMinMax array with compareBy keeps the first of tied elements
+     * @dataProvider dataProviderForTieBreakingWithCompareByArray
+     * @param        array        $data
+     * @param        callable     $compareBy
+     * @param        array        $expected
+     */
+    public function testTieBreakingWithCompareByArray(array $data, callable $compareBy, array $expected): void
+    {
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which returns the first of tied elements:
+     *   [min(clean, key=f), max(clean, key=f)] where clean = [e for e in data if not nan(f(e))]
+     *   and f = lambda e: e['key'], or lambda e: -e['key'] for the negated rows
+     */
+    public static function dataProviderForTieBreakingWithCompareByArray(): array
+    {
+        return [
+            'all keys tied' => [
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'c']],
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+            'minimum and maximum tied at several positions' => [
+                [['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']],
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c']],
+            ],
+            'minimum and maximum tied at several positions, negated key' => [
+                [['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']],
+                fn (array $item) => -$item['key'],
+                [['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'b']],
+            ],
+            'whole input is one tied pair' => [
+                [['key' => 5, 'id' => 'a'], ['key' => 5, 'id' => 'b']],
+                fn (array $item) => $item['key'],
+                [['key' => 5, 'id' => 'a'], ['key' => 5, 'id' => 'a']],
+            ],
+            'int key then equal float key' => [
+                [['key' => 1, 'id' => 'a'], ['key' => 1.0, 'id' => 'b']],
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+            'float key then equal int key' => [
+                [['key' => 1.0, 'id' => 'a'], ['key' => 1, 'id' => 'b']],
+                fn (array $item) => $item['key'],
+                [['key' => 1.0, 'id' => 'a'], ['key' => 1.0, 'id' => 'a']],
+            ],
+            'string keys tied' => [
+                [['key' => 'b', 'id' => 'a'], ['key' => 'a', 'id' => 'b'], ['key' => 'b', 'id' => 'c'], ['key' => 'a', 'id' => 'd']],
+                fn (array $item) => $item['key'],
+                [['key' => 'a', 'id' => 'b'], ['key' => 'b', 'id' => 'a']],
+            ],
+            'NAN key skipped before tied keys' => [
+                [['key' => \NAN, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'c']],
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'b']],
+            ],
+            'NAN key between tied keys' => [
+                [['key' => 1, 'id' => 'a'], ['key' => \NAN, 'id' => 'b'], ['key' => 1, 'id' => 'c']],
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMinMax generators with compareBy keeps the first of tied elements
+     * @dataProvider dataProviderForTieBreakingWithCompareByGenerators
+     * @param        \Generator   $data
+     * @param        callable     $compareBy
+     * @param        array        $expected
+     */
+    public function testTieBreakingWithCompareByGenerators(\Generator $data, callable $compareBy, array $expected): void
+    {
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which returns the first of tied elements:
+     *   [min(clean, key=f), max(clean, key=f)] where clean = [e for e in data if not nan(f(e))]
+     *   and f = lambda e: e['key'], or lambda e: -e['key'] for the negated rows
+     */
+    public static function dataProviderForTieBreakingWithCompareByGenerators(): array
+    {
+        $gen = static function (array $data) {
+            return GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            'all keys tied' => [
+                $gen([['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'c']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+            'minimum and maximum tied at several positions' => [
+                $gen([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c']],
+            ],
+            'minimum and maximum tied at several positions, negated key' => [
+                $gen([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (array $item) => -$item['key'],
+                [['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'b']],
+            ],
+            'whole input is one tied pair' => [
+                $gen([['key' => 5, 'id' => 'a'], ['key' => 5, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 5, 'id' => 'a'], ['key' => 5, 'id' => 'a']],
+            ],
+            'int key then equal float key' => [
+                $gen([['key' => 1, 'id' => 'a'], ['key' => 1.0, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+            'float key then equal int key' => [
+                $gen([['key' => 1.0, 'id' => 'a'], ['key' => 1, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1.0, 'id' => 'a'], ['key' => 1.0, 'id' => 'a']],
+            ],
+            'string keys tied' => [
+                $gen([['key' => 'b', 'id' => 'a'], ['key' => 'a', 'id' => 'b'], ['key' => 'b', 'id' => 'c'], ['key' => 'a', 'id' => 'd']]),
+                fn (array $item) => $item['key'],
+                [['key' => 'a', 'id' => 'b'], ['key' => 'b', 'id' => 'a']],
+            ],
+            'NAN key skipped before tied keys' => [
+                $gen([['key' => \NAN, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'c']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'b']],
+            ],
+            'NAN key between tied keys' => [
+                $gen([['key' => 1, 'id' => 'a'], ['key' => \NAN, 'id' => 'b'], ['key' => 1, 'id' => 'c']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMinMax iterators with compareBy keeps the first of tied elements
+     * @dataProvider dataProviderForTieBreakingWithCompareByIterators
+     * @param        \Iterator    $data
+     * @param        callable     $compareBy
+     * @param        array        $expected
+     */
+    public function testTieBreakingWithCompareByIterators(\Iterator $data, callable $compareBy, array $expected): void
+    {
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which returns the first of tied elements:
+     *   [min(clean, key=f), max(clean, key=f)] where clean = [e for e in data if not nan(f(e))]
+     *   and f = lambda e: e['key'], or lambda e: -e['key'] for the negated rows
+     */
+    public static function dataProviderForTieBreakingWithCompareByIterators(): array
+    {
+        $iter = static function (array $data) {
+            return new ArrayIteratorFixture($data);
+        };
+
+        return [
+            'all keys tied' => [
+                $iter([['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'c']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+            'minimum and maximum tied at several positions' => [
+                $iter([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c']],
+            ],
+            'minimum and maximum tied at several positions, negated key' => [
+                $iter([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (array $item) => -$item['key'],
+                [['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'b']],
+            ],
+            'whole input is one tied pair' => [
+                $iter([['key' => 5, 'id' => 'a'], ['key' => 5, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 5, 'id' => 'a'], ['key' => 5, 'id' => 'a']],
+            ],
+            'int key then equal float key' => [
+                $iter([['key' => 1, 'id' => 'a'], ['key' => 1.0, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+            'float key then equal int key' => [
+                $iter([['key' => 1.0, 'id' => 'a'], ['key' => 1, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1.0, 'id' => 'a'], ['key' => 1.0, 'id' => 'a']],
+            ],
+            'string keys tied' => [
+                $iter([['key' => 'b', 'id' => 'a'], ['key' => 'a', 'id' => 'b'], ['key' => 'b', 'id' => 'c'], ['key' => 'a', 'id' => 'd']]),
+                fn (array $item) => $item['key'],
+                [['key' => 'a', 'id' => 'b'], ['key' => 'b', 'id' => 'a']],
+            ],
+            'NAN key skipped before tied keys' => [
+                $iter([['key' => \NAN, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'c']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'b']],
+            ],
+            'NAN key between tied keys' => [
+                $iter([['key' => 1, 'id' => 'a'], ['key' => \NAN, 'id' => 'b'], ['key' => 1, 'id' => 'c']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMinMax traversables with compareBy keeps the first of tied elements
+     * @dataProvider dataProviderForTieBreakingWithCompareByTraversables
+     * @param        \Traversable $data
+     * @param        callable     $compareBy
+     * @param        array        $expected
+     */
+    public function testTieBreakingWithCompareByTraversables(\Traversable $data, callable $compareBy, array $expected): void
+    {
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which returns the first of tied elements:
+     *   [min(clean, key=f), max(clean, key=f)] where clean = [e for e in data if not nan(f(e))]
+     *   and f = lambda e: e['key'], or lambda e: -e['key'] for the negated rows
+     */
+    public static function dataProviderForTieBreakingWithCompareByTraversables(): array
+    {
+        $trav = static function (array $data) {
+            return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            'all keys tied' => [
+                $trav([['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'c']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+            'minimum and maximum tied at several positions' => [
+                $trav([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c']],
+            ],
+            'minimum and maximum tied at several positions, negated key' => [
+                $trav([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (array $item) => -$item['key'],
+                [['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'b']],
+            ],
+            'whole input is one tied pair' => [
+                $trav([['key' => 5, 'id' => 'a'], ['key' => 5, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 5, 'id' => 'a'], ['key' => 5, 'id' => 'a']],
+            ],
+            'int key then equal float key' => [
+                $trav([['key' => 1, 'id' => 'a'], ['key' => 1.0, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+            'float key then equal int key' => [
+                $trav([['key' => 1.0, 'id' => 'a'], ['key' => 1, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1.0, 'id' => 'a'], ['key' => 1.0, 'id' => 'a']],
+            ],
+            'string keys tied' => [
+                $trav([['key' => 'b', 'id' => 'a'], ['key' => 'a', 'id' => 'b'], ['key' => 'b', 'id' => 'c'], ['key' => 'a', 'id' => 'd']]),
+                fn (array $item) => $item['key'],
+                [['key' => 'a', 'id' => 'b'], ['key' => 'b', 'id' => 'a']],
+            ],
+            'NAN key skipped before tied keys' => [
+                $trav([['key' => \NAN, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'c']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'b'], ['key' => 1, 'id' => 'b']],
+            ],
+            'NAN key between tied keys' => [
+                $trav([['key' => 1, 'id' => 'a'], ['key' => \NAN, 'id' => 'b'], ['key' => 1, 'id' => 'c']]),
+                fn (array $item) => $item['key'],
+                [['key' => 1, 'id' => 'a'], ['key' => 1, 'id' => 'a']],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMinMax array with compareBy keeps the first of tied elements, comparing an int beyond 2^53 and a float exactly
+     * @dataProvider dataProviderForTieBreakingWithCompareByBeyondFloatPrecisionArray
+     * @param        array        $data
+     * @param        callable     $compareBy
+     * @param        array        $expected
+     */
+    public function testTieBreakingWithCompareByBeyondFloatPrecisionArray(array $data, callable $compareBy, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which returns the first of tied elements:
+     *   [min(clean, key=f), max(clean, key=f)] where clean = [e for e in data if not nan(f(e))]
+     *   and f = lambda e: e['key'], or lambda e: -e['key'] for the negated rows
+     */
+    public static function dataProviderForTieBreakingWithCompareByBeyondFloatPrecisionArray(): array
+    {
+        return [
+            'int 2^53 then equal float 2.0^53' => [
+                [['key' => 9007199254740992, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'b']],
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992, 'id' => 'a'], ['key' => 9007199254740992, 'id' => 'a']],
+            ],
+            'float 2.0^53 then equal int 2^53' => [
+                [['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992, 'id' => 'b']],
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'a']],
+            ],
+            'tied ints above tied floats that are below them exactly' => [
+                [['key' => 9007199254740993, 'id' => 'a'], ['key' => 9007199254740993, 'id' => 'b'], ['key' => 9007199254740992.0, 'id' => 'c'], ['key' => 9007199254740992.0, 'id' => 'd']],
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992.0, 'id' => 'c'], ['key' => 9007199254740993, 'id' => 'a']],
+            ],
+            'tied floats below tied ints that are above them exactly, negated key' => [
+                [['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'b'], ['key' => 9007199254740993, 'id' => 'c'], ['key' => 9007199254740993, 'id' => 'd']],
+                fn (array $item) => -$item['key'],
+                [['key' => 9007199254740993, 'id' => 'c'], ['key' => 9007199254740992.0, 'id' => 'a']],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMinMax generators with compareBy keeps the first of tied elements, comparing an int beyond 2^53 and a float exactly
+     * @dataProvider dataProviderForTieBreakingWithCompareByBeyondFloatPrecisionGenerators
+     * @param        \Generator   $data
+     * @param        callable     $compareBy
+     * @param        array        $expected
+     */
+    public function testTieBreakingWithCompareByBeyondFloatPrecisionGenerators(\Generator $data, callable $compareBy, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which returns the first of tied elements:
+     *   [min(clean, key=f), max(clean, key=f)] where clean = [e for e in data if not nan(f(e))]
+     *   and f = lambda e: e['key'], or lambda e: -e['key'] for the negated rows
+     */
+    public static function dataProviderForTieBreakingWithCompareByBeyondFloatPrecisionGenerators(): array
+    {
+        $gen = static function (array $data) {
+            return GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            'int 2^53 then equal float 2.0^53' => [
+                $gen([['key' => 9007199254740992, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992, 'id' => 'a'], ['key' => 9007199254740992, 'id' => 'a']],
+            ],
+            'float 2.0^53 then equal int 2^53' => [
+                $gen([['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'a']],
+            ],
+            'tied ints above tied floats that are below them exactly' => [
+                $gen([['key' => 9007199254740993, 'id' => 'a'], ['key' => 9007199254740993, 'id' => 'b'], ['key' => 9007199254740992.0, 'id' => 'c'], ['key' => 9007199254740992.0, 'id' => 'd']]),
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992.0, 'id' => 'c'], ['key' => 9007199254740993, 'id' => 'a']],
+            ],
+            'tied floats below tied ints that are above them exactly, negated key' => [
+                $gen([['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'b'], ['key' => 9007199254740993, 'id' => 'c'], ['key' => 9007199254740993, 'id' => 'd']]),
+                fn (array $item) => -$item['key'],
+                [['key' => 9007199254740993, 'id' => 'c'], ['key' => 9007199254740992.0, 'id' => 'a']],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMinMax iterators with compareBy keeps the first of tied elements, comparing an int beyond 2^53 and a float exactly
+     * @dataProvider dataProviderForTieBreakingWithCompareByBeyondFloatPrecisionIterators
+     * @param        \Iterator    $data
+     * @param        callable     $compareBy
+     * @param        array        $expected
+     */
+    public function testTieBreakingWithCompareByBeyondFloatPrecisionIterators(\Iterator $data, callable $compareBy, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which returns the first of tied elements:
+     *   [min(clean, key=f), max(clean, key=f)] where clean = [e for e in data if not nan(f(e))]
+     *   and f = lambda e: e['key'], or lambda e: -e['key'] for the negated rows
+     */
+    public static function dataProviderForTieBreakingWithCompareByBeyondFloatPrecisionIterators(): array
+    {
+        $iter = static function (array $data) {
+            return new ArrayIteratorFixture($data);
+        };
+
+        return [
+            'int 2^53 then equal float 2.0^53' => [
+                $iter([['key' => 9007199254740992, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992, 'id' => 'a'], ['key' => 9007199254740992, 'id' => 'a']],
+            ],
+            'float 2.0^53 then equal int 2^53' => [
+                $iter([['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'a']],
+            ],
+            'tied ints above tied floats that are below them exactly' => [
+                $iter([['key' => 9007199254740993, 'id' => 'a'], ['key' => 9007199254740993, 'id' => 'b'], ['key' => 9007199254740992.0, 'id' => 'c'], ['key' => 9007199254740992.0, 'id' => 'd']]),
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992.0, 'id' => 'c'], ['key' => 9007199254740993, 'id' => 'a']],
+            ],
+            'tied floats below tied ints that are above them exactly, negated key' => [
+                $iter([['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'b'], ['key' => 9007199254740993, 'id' => 'c'], ['key' => 9007199254740993, 'id' => 'd']]),
+                fn (array $item) => -$item['key'],
+                [['key' => 9007199254740993, 'id' => 'c'], ['key' => 9007199254740992.0, 'id' => 'a']],
+            ],
+        ];
+    }
+
+    /**
+     * @test         toMinMax traversables with compareBy keeps the first of tied elements, comparing an int beyond 2^53 and a float exactly
+     * @dataProvider dataProviderForTieBreakingWithCompareByBeyondFloatPrecisionTraversables
+     * @param        \Traversable $data
+     * @param        callable     $compareBy
+     * @param        array        $expected
+     */
+    public function testTieBreakingWithCompareByBeyondFloatPrecisionTraversables(\Traversable $data, callable $compareBy, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMinMax($data, $compareBy);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which returns the first of tied elements:
+     *   [min(clean, key=f), max(clean, key=f)] where clean = [e for e in data if not nan(f(e))]
+     *   and f = lambda e: e['key'], or lambda e: -e['key'] for the negated rows
+     */
+    public static function dataProviderForTieBreakingWithCompareByBeyondFloatPrecisionTraversables(): array
+    {
+        $trav = static function (array $data) {
+            return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            'int 2^53 then equal float 2.0^53' => [
+                $trav([['key' => 9007199254740992, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992, 'id' => 'a'], ['key' => 9007199254740992, 'id' => 'a']],
+            ],
+            'float 2.0^53 then equal int 2^53' => [
+                $trav([['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992, 'id' => 'b']]),
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'a']],
+            ],
+            'tied ints above tied floats that are below them exactly' => [
+                $trav([['key' => 9007199254740993, 'id' => 'a'], ['key' => 9007199254740993, 'id' => 'b'], ['key' => 9007199254740992.0, 'id' => 'c'], ['key' => 9007199254740992.0, 'id' => 'd']]),
+                fn (array $item) => $item['key'],
+                [['key' => 9007199254740992.0, 'id' => 'c'], ['key' => 9007199254740993, 'id' => 'a']],
+            ],
+            'tied floats below tied ints that are above them exactly, negated key' => [
+                $trav([['key' => 9007199254740992.0, 'id' => 'a'], ['key' => 9007199254740992.0, 'id' => 'b'], ['key' => 9007199254740993, 'id' => 'c'], ['key' => 9007199254740993, 'id' => 'd']]),
+                fn (array $item) => -$item['key'],
+                [['key' => 9007199254740993, 'id' => 'c'], ['key' => 9007199254740992.0, 'id' => 'a']],
+            ],
+        ];
+    }
 }

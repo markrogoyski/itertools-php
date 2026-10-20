@@ -2973,6 +2973,7 @@ Reduces iterable source to its max value.
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
+- If several elements tie on the `$compareBy` value, returns the first of them.
 - Returns null if collection is empty.
 
 ```php
@@ -3011,6 +3012,7 @@ Reduces iterable source to its min value.
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
+- If several elements tie on the `$compareBy` value, returns the first of them.
 - Returns null if collection is empty.
 
 ```php
@@ -3030,6 +3032,7 @@ Reduces stream to array of its upper and lower bounds (max and min).
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
+- If several elements tie for the minimum or for the maximum on the `$compareBy` value, each bound is the first of them.
 - Returns `[null, null]` if given collection is empty.
 
 ```php

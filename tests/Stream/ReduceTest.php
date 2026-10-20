@@ -557,6 +557,16 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 [10, -3],
             ],
             [
+                [['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']],
+                fn (iterable $iterable) => Stream::of($iterable)->toMinMax(fn ($item) => $item['key']),
+                [['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c']],
+            ],
+            [
+                [['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']],
+                fn (iterable $iterable) => Stream::of($iterable)->toMinMax(fn ($item) => -$item['key']),
+                [['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'b']],
+            ],
+            [
                 [2, 3, 1, 2, -3, -2, 5, 7, 3],
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn () => false)
@@ -1321,6 +1331,16 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->chainWith([6, 10, 4])
                     ->toMinMax(fn ($item) => -$item),
                 [10, -3],
+            ],
+            [
+                $gen([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (iterable $iterable) => Stream::of($iterable)->toMinMax(fn ($item) => $item['key']),
+                [['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c']],
+            ],
+            [
+                $gen([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (iterable $iterable) => Stream::of($iterable)->toMinMax(fn ($item) => -$item['key']),
+                [['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'b']],
             ],
             [
                 $gen([2, 3, 1, 2, -3, -2, 5, 7, 3]),
@@ -2091,6 +2111,16 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                 [10, -3],
             ],
             [
+                $iter([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (iterable $iterable) => Stream::of($iterable)->toMinMax(fn ($item) => $item['key']),
+                [['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c']],
+            ],
+            [
+                $iter([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (iterable $iterable) => Stream::of($iterable)->toMinMax(fn ($item) => -$item['key']),
+                [['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'b']],
+            ],
+            [
                 $iter([2, 3, 1, 2, -3, -2, 5, 7, 3]),
                 fn (iterable $iterable) => Stream::of($iterable)
                     ->filterTrue(fn () => false)
@@ -2857,6 +2887,16 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
                     ->chainWith([6, 10, 4])
                     ->toMinMax(fn ($item) => -$item),
                 [10, -3],
+            ],
+            [
+                $trav([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (iterable $iterable) => Stream::of($iterable)->toMinMax(fn ($item) => $item['key']),
+                [['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c']],
+            ],
+            [
+                $trav([['key' => 2, 'id' => 'a'], ['key' => 1, 'id' => 'b'], ['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'd'], ['key' => 3, 'id' => 'e'], ['key' => 2, 'id' => 'f']]),
+                fn (iterable $iterable) => Stream::of($iterable)->toMinMax(fn ($item) => -$item['key']),
+                [['key' => 3, 'id' => 'c'], ['key' => 1, 'id' => 'b']],
             ],
             [
                 $trav([2, 3, 1, 2, -3, -2, 5, 7, 3]),

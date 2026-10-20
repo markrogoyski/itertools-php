@@ -43,6 +43,8 @@ final class Reduce
      * Optional callable param $compareBy must return comparable value.
      * If $compareBy is not provided then items of given collection must be comparable.
      *
+     * If several elements tie on the $compareBy value, returns the first of them.
+     *
      * Returns null if given collection is empty.
      *
      * @param iterable<mixed> $data
@@ -92,6 +94,8 @@ final class Reduce
      *
      * Optional callable param $compareBy must return comparable value.
      * If $compareBy is not provided then items of given collection must be comparable.
+     *
+     * If several elements tie on the $compareBy value, returns the first of them.
      *
      * Returns null if given collection is empty.
      *
@@ -144,6 +148,9 @@ final class Reduce
      *
      * If $compareBy is not proposed then items of given collection must be comparable.
      *
+     * If several elements tie on the $compareBy value for the minimum or for the maximum, each bound is the
+     * first of them.
+     *
      * Returns [null, null] if given collection is empty.
      *
      * @param iterable<numeric> $numbers
@@ -161,14 +168,16 @@ final class Reduce
                     return $carry;
                 }
                 // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when
-                // they are not. Arithmetic::min() and max() do the same below.
+                // they are not. Arithmetic::min() and max() do the same below. Only a strictly smaller
+                // or larger value replaces the carried one, so the first of tied elements wins, as in
+                // toMin() and toMax().
                 return [
                     ($carry[0] instanceof NoValueMonad
-                        || Arithmetic::compareValues($comparableValue, $compareBy($carry[0])) <= 0)
+                        || Arithmetic::compareValues($comparableValue, $compareBy($carry[0])) < 0)
                         ? $datum
                         : $carry[0],
                     ($carry[1] instanceof NoValueMonad
-                        || Arithmetic::compareValues($compareBy($carry[1]), $comparableValue) <= 0)
+                        || Arithmetic::compareValues($compareBy($carry[1]), $comparableValue) < 0)
                         ? $datum
                         : $carry[1],
                 ];
