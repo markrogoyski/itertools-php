@@ -265,4 +265,133 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
             [[-1.5e308, 1.5e308], 0.5, 0.0],
         ];
     }
+
+    /**
+     * @test         toQuantile of data holding NAN is NAN, array
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     * @param        float $quantile
+     */
+    public function testNanArray(array $data, float $quantile): void
+    {
+        // When
+        $result = Reduce::toQuantile($data, $quantile);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * @test         toQuantile of data holding NAN is NAN, generator
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     * @param        float $quantile
+     */
+    public function testNanGenerator(array $data, float $quantile): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toQuantile($generator, $quantile);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * @test         toQuantile of data holding NAN is NAN, iterator
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     * @param        float $quantile
+     */
+    public function testNanIterator(array $data, float $quantile): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toQuantile($iterator, $quantile);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * @test         toQuantile of data holding NAN is NAN, traversable
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     * @param        float $quantile
+     */
+    public function testNanTraversable(array $data, float $quantile): void
+    {
+        // Given
+        $traversable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toQuantile($traversable, $quantile);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * Test data generated with:
+     *   numpy.quantile(data, q, method='linear')
+     * which is nan for every row, wherever the nan sits (scripts: tools/oracles/nan_median_percentile_quantile.py).
+     * The rows cover odd and even lengths, a NAN first, in the middle and last, and a NAN among infinities.
+     */
+    public static function dataProviderForNan(): array
+    {
+        return [
+            [[\NAN, 1, 2], 0.0],
+            [[\NAN, 1, 2], 0.25],
+            [[\NAN, 1, 2], 0.5],
+            [[\NAN, 1, 2], 1.0],
+            [[1, \NAN, 2], 0.0],
+            [[1, \NAN, 2], 0.25],
+            [[1, \NAN, 2], 0.5],
+            [[1, \NAN, 2], 1.0],
+            [[1, 2, \NAN], 0.0],
+            [[1, 2, \NAN], 0.25],
+            [[1, 2, \NAN], 0.5],
+            [[1, 2, \NAN], 1.0],
+            [[\NAN], 0.0],
+            [[\NAN], 0.25],
+            [[\NAN], 0.5],
+            [[\NAN], 1.0],
+            [[\NAN, \NAN], 0.0],
+            [[\NAN, \NAN], 0.25],
+            [[\NAN, \NAN], 0.5],
+            [[\NAN, \NAN], 1.0],
+            [[1, 2, 3, \NAN], 0.0],
+            [[1, 2, 3, \NAN], 0.25],
+            [[1, 2, 3, \NAN], 0.5],
+            [[1, 2, 3, \NAN], 1.0],
+            [[\NAN, 4, 3, 2, 1], 0.0],
+            [[\NAN, 4, 3, 2, 1], 0.25],
+            [[\NAN, 4, 3, 2, 1], 0.5],
+            [[\NAN, 4, 3, 2, 1], 1.0],
+            [[1.5, \NAN, 2.5, 4.5], 0.0],
+            [[1.5, \NAN, 2.5, 4.5], 0.25],
+            [[1.5, \NAN, 2.5, 4.5], 0.5],
+            [[1.5, \NAN, 2.5, 4.5], 1.0],
+            [[-\INF, \NAN, \INF], 0.0],
+            [[-\INF, \NAN, \INF], 0.25],
+            [[-\INF, \NAN, \INF], 0.5],
+            [[-\INF, \NAN, \INF], 1.0],
+        ];
+    }
+
+    /**
+     * @test toQuantile still rejects an out-of-range quantile when the data holds NAN
+     */
+    public function testOutOfRangeQuantileThrowsForDataHoldingNan(): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Reduce::toQuantile([1, \NAN, 3], 1.5);
+    }
 }

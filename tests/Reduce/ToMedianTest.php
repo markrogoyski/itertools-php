@@ -388,4 +388,91 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
         // Then (statistics.median([0.1, 0.1]))
         $this->assertSame(0.1, $result);
     }
+
+    /**
+     * @test         toMedian of data holding NAN is NAN, array
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     */
+    public function testNanArray(array $data): void
+    {
+        // When
+        $result = Reduce::toMedian($data);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * @test         toMedian of data holding NAN is NAN, generator
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     */
+    public function testNanGenerator(array $data): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toMedian($generator);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * @test         toMedian of data holding NAN is NAN, iterator
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     */
+    public function testNanIterator(array $data): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toMedian($iterator);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * @test         toMedian of data holding NAN is NAN, traversable
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     */
+    public function testNanTraversable(array $data): void
+    {
+        // Given
+        $traversable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toMedian($traversable);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * Test data generated with:
+     *   numpy.median(data)
+     * which is nan for every row, wherever the nan sits (scripts: tools/oracles/nan_median_percentile_quantile.py).
+     * The rows cover odd and even lengths, a NAN first, in the middle and last, and a NAN among infinities.
+     */
+    public static function dataProviderForNan(): array
+    {
+        return [
+            [[\NAN, 1, 2]],
+            [[1, \NAN, 2]],
+            [[1, 2, \NAN]],
+            [[\NAN]],
+            [[\NAN, \NAN]],
+            [[1, 2, 3, \NAN]],
+            [[\NAN, 4, 3, 2, 1]],
+            [[1.5, \NAN, 2.5, 4.5]],
+            [[-\INF, \NAN, \INF]],
+            [[\NAN, 7, 7]],
+        ];
+    }
 }

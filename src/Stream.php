@@ -2980,6 +2980,8 @@ final class Stream implements \IteratorAggregate
      *
      * For an even number of elements the median is the mean of the two middle values.
      *
+     * A NAN anywhere in the source yields NAN, whatever its position.
+     *
      * Returns null if iterable source is empty.
      *
      * @return int|float|null
@@ -3061,6 +3063,8 @@ final class Stream implements \IteratorAggregate
      * Uses the R-7 / linear-interpolation method (the NumPy default). Percentile 0
      * is the minimum, 100 is the maximum.
      *
+     * A NAN anywhere in the source yields NAN, whatever its position.
+     *
      * Returns null if iterable source is empty.
      *
      * @param float $percentile in the inclusive range [0, 100]
@@ -3083,6 +3087,8 @@ final class Stream implements \IteratorAggregate
      *
      * Accepts a quantile in the inclusive range [0, 1] (e.g. 0.25 is the first
      * quartile / 25th percentile).
+     *
+     * A NAN anywhere in the source yields NAN, whatever its position.
      *
      * Returns null if iterable source is empty.
      *

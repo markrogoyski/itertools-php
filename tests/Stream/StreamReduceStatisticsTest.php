@@ -377,4 +377,59 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
             'iteratorAggregate' => [new Fixture\IteratorAggregateFixture([1, 2, 2, 3, 4])],
         ];
     }
+
+    /**
+     * @test         Stream::toMedian of a source holding NAN is NAN
+     * @dataProvider dataProviderForIterableTypesHoldingNan
+     * @param        iterable $data
+     */
+    public function testToMedianNan(iterable $data): void
+    {
+        // When
+        $result = Stream::of($data)->toMedian();
+
+        // Then (numpy.median([1, nan, 2]) is nan)
+        $this->assertNan($result);
+    }
+
+    /**
+     * @test         Stream::toPercentile of a source holding NAN is NAN
+     * @dataProvider dataProviderForIterableTypesHoldingNan
+     * @param        iterable $data
+     */
+    public function testToPercentileNan(iterable $data): void
+    {
+        // When
+        $result = Stream::of($data)->toPercentile(25);
+
+        // Then (numpy.percentile([1, nan, 2], 25, method='linear') is nan)
+        $this->assertNan($result);
+    }
+
+    /**
+     * @test         Stream::toQuantile of a source holding NAN is NAN
+     * @dataProvider dataProviderForIterableTypesHoldingNan
+     * @param        iterable $data
+     */
+    public function testToQuantileNan(iterable $data): void
+    {
+        // When
+        $result = Stream::of($data)->toQuantile(0.25);
+
+        // Then (numpy.quantile([1, nan, 2], 0.25, method='linear') is nan)
+        $this->assertNan($result);
+    }
+
+    /**
+     * The same data, [1, NAN, 2], as each iterable type.
+     */
+    public static function dataProviderForIterableTypesHoldingNan(): array
+    {
+        return [
+            'array'             => [[1, \NAN, 2]],
+            'generator'         => [Fixture\GeneratorFixture::getGenerator([1, \NAN, 2])],
+            'iterator'          => [new Fixture\ArrayIteratorFixture([1, \NAN, 2])],
+            'iteratorAggregate' => [new Fixture\IteratorAggregateFixture([1, \NAN, 2])],
+        ];
+    }
 }

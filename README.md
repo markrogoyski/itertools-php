@@ -668,6 +668,10 @@ float `NAN`. The key is the element, or what `$compareBy`, `$keyFn` or `$keyFunc
   after every other value. Elements with a `NAN` key keep their input order, and the others are
   sorted correctly among themselves. `isSorted` still returns `false` for the result. A custom
   `$comparator` is used as given, so it decides where `NAN` goes.
+* `toMedian`, `toPercentile` and `toQuantile` return `NAN` if any element is a float `NAN`, wherever
+  it sits. They read their result from the sorted values, which a `NAN` would misorder, so they
+  propagate it as the arithmetic statistics such as `toVariance` do. An empty input still returns
+  `null`.
 * `isSorted`, `isReversed`, `isSortedBy` and `isReversedBy` return `false`. The check runs on
   adjacent pairs, so a collection with a single element is sorted even if its key is `NAN`.
 * `mergeSorted` and `mergeSortedBy` throw `\InvalidArgumentException`.

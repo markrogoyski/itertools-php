@@ -313,6 +313,9 @@ final class Reduce
      * (mean) of the two middle values, computed so that it does not overflow
      * for middle values whose sum exceeds PHP_FLOAT_MAX.
      *
+     * A NAN anywhere in the input yields NAN, whatever its position, since a NAN has no place in the
+     * order the median is read from. (toMin and toMax, which select a value, skip NAN instead.)
+     *
      * Returns null if given collection is empty.
      *
      * @param iterable<int|float> $data
@@ -321,7 +324,11 @@ final class Reduce
      */
     public static function toMedian(iterable $data): int|float|null
     {
-        $values = static::toSortedValues($data);
+        $values = static::toNumericList($data);
+        if (static::containsNan($values)) {
+            return \NAN;
+        }
+        \sort($values);
 
         $count = \count($values);
         if ($count === 0) {
@@ -596,6 +603,8 @@ final class Reduce
      * The interpolation does not overflow when the two neighbouring values span more
      * than PHP_FLOAT_MAX (for example straddling zero at extreme magnitudes).
      *
+     * A NAN anywhere in the input yields NAN, whatever its position, as for toMedian.
+     *
      * Returns null if given collection is empty.
      *
      * @param iterable<int|float> $data
@@ -612,7 +621,11 @@ final class Reduce
             throw new \InvalidArgumentException("Percentile must be between 0 and 100. Got {$shown}.");
         }
 
-        $values = static::toSortedValues($data);
+        $values = static::toNumericList($data);
+        if (static::containsNan($values)) {
+            return \NAN;
+        }
+        \sort($values);
 
         $count = \count($values);
         if ($count === 0) {
@@ -641,6 +654,8 @@ final class Reduce
      *
      * Thin wrapper over {@see Reduce::toPercentile()} that accepts a quantile in the
      * inclusive range [0, 1] (e.g. 0.25 is the first quartile / 25th percentile).
+     *
+     * A NAN anywhere in the input yields NAN, whatever its position, as for toMedian.
      *
      * Returns null if given collection is empty.
      *
@@ -679,18 +694,22 @@ final class Reduce
     }
 
     /**
-     * Materializes an iterable of numbers into an ascending-sorted list.
+     * Checks whether a list of numbers holds a float NAN.
      *
-     * @param iterable<int|float> $data
+     * NAN has no place in an order, so the order statistics (median, percentile, quantile) can't
+     * sort around it; they propagate it instead, as the arithmetic statistics do.
      *
-     * @return list<int|float>
+     * @param list<int|float> $values
      */
-    private static function toSortedValues(iterable $data): array
+    private static function containsNan(array $values): bool
     {
-        $values = static::toNumericList($data);
-        \sort($values);
+        foreach ($values as $value) {
+            if (\is_float($value) && \is_nan($value)) {
+                return true;
+            }
+        }
 
-        return $values;
+        return false;
     }
 
     /**

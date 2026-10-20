@@ -2991,6 +2991,7 @@ Reduces iterable source to its median value.
 ```$stream->toMedian(): int|float|null```
 
 - For an even number of elements, the median is the mean of the two middle values, computed so that it neither overflows when the two middle values sum beyond `PHP_FLOAT_MAX` nor loses precision when their span exceeds the integer range. Two identical middle values return that value, including `INF`. An infinity paired with a finite value returns that infinity, and opposite infinities return `NAN`.
+- If any item is `NAN`, returns `NAN`, wherever it sits in the source. Sorting cannot place `NAN`, so the median is not defined; statistics propagate `NAN`, whereas the selection functions `toMin` and `toMax` skip it (see [NaN and Ordering](../README.md#nan-and-ordering)).
 - Returns null if iterable source is empty.
 
 ```php
@@ -3102,6 +3103,7 @@ Reduces iterable source to its value at the given percentile.
 - `$percentile` must be in the inclusive range `[0, 100]`; otherwise throws `\InvalidArgumentException`.
 - The interpolation does not overflow when the two neighbouring values span more than `PHP_FLOAT_MAX`.
 - Percentile `50` returns exactly what `toMedian` returns, for every source.
+- If any item is `NAN`, returns `NAN` for every percentile, wherever the `NAN` sits in the source (see `toMedian`). An out-of-range `$percentile` still throws.
 - Returns null if iterable source is empty.
 
 ```php
@@ -3138,6 +3140,7 @@ Reduces iterable source to its value at the given quantile.
 
 - Accepts a quantile in the inclusive range `[0, 1]` (e.g. `0.25` is the first quartile / 25th percentile).
 - `$quantile` must be in the inclusive range `[0, 1]`; otherwise throws `\InvalidArgumentException`.
+- If any item is `NAN`, returns `NAN` for every quantile, wherever the `NAN` sits in the source (see `toMedian`).
 - Returns null if iterable source is empty.
 
 ```php

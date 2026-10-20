@@ -400,4 +400,133 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         // Then (numpy.percentile([0.1, 0.1, 0.1, 0.1], 30, method='linear'))
         $this->assertSame(0.1, $result);
     }
+
+    /**
+     * @test         toPercentile of data holding NAN is NAN, array
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     * @param        float $percentile
+     */
+    public function testNanArray(array $data, float $percentile): void
+    {
+        // When
+        $result = Reduce::toPercentile($data, $percentile);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * @test         toPercentile of data holding NAN is NAN, generator
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     * @param        float $percentile
+     */
+    public function testNanGenerator(array $data, float $percentile): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toPercentile($generator, $percentile);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * @test         toPercentile of data holding NAN is NAN, iterator
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     * @param        float $percentile
+     */
+    public function testNanIterator(array $data, float $percentile): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toPercentile($iterator, $percentile);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * @test         toPercentile of data holding NAN is NAN, traversable
+     * @dataProvider dataProviderForNan
+     * @param        array $data
+     * @param        float $percentile
+     */
+    public function testNanTraversable(array $data, float $percentile): void
+    {
+        // Given
+        $traversable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toPercentile($traversable, $percentile);
+
+        // Then
+        $this->assertNan($result);
+    }
+
+    /**
+     * Test data generated with:
+     *   numpy.percentile(data, p, method='linear')
+     * which is nan for every row, wherever the nan sits (scripts: tools/oracles/nan_median_percentile_quantile.py).
+     * The rows cover odd and even lengths, a NAN first, in the middle and last, and a NAN among infinities.
+     */
+    public static function dataProviderForNan(): array
+    {
+        return [
+            [[\NAN, 1, 2], 0],
+            [[\NAN, 1, 2], 25],
+            [[\NAN, 1, 2], 50],
+            [[\NAN, 1, 2], 100],
+            [[1, \NAN, 2], 0],
+            [[1, \NAN, 2], 25],
+            [[1, \NAN, 2], 50],
+            [[1, \NAN, 2], 100],
+            [[1, 2, \NAN], 0],
+            [[1, 2, \NAN], 25],
+            [[1, 2, \NAN], 50],
+            [[1, 2, \NAN], 100],
+            [[\NAN], 0],
+            [[\NAN], 25],
+            [[\NAN], 50],
+            [[\NAN], 100],
+            [[\NAN, \NAN], 0],
+            [[\NAN, \NAN], 25],
+            [[\NAN, \NAN], 50],
+            [[\NAN, \NAN], 100],
+            [[1, 2, 3, \NAN], 0],
+            [[1, 2, 3, \NAN], 25],
+            [[1, 2, 3, \NAN], 50],
+            [[1, 2, 3, \NAN], 100],
+            [[\NAN, 4, 3, 2, 1], 0],
+            [[\NAN, 4, 3, 2, 1], 25],
+            [[\NAN, 4, 3, 2, 1], 50],
+            [[\NAN, 4, 3, 2, 1], 100],
+            [[1.5, \NAN, 2.5, 4.5], 0],
+            [[1.5, \NAN, 2.5, 4.5], 25],
+            [[1.5, \NAN, 2.5, 4.5], 50],
+            [[1.5, \NAN, 2.5, 4.5], 100],
+            [[-\INF, \NAN, \INF], 0],
+            [[-\INF, \NAN, \INF], 25],
+            [[-\INF, \NAN, \INF], 50],
+            [[-\INF, \NAN, \INF], 100],
+        ];
+    }
+
+    /**
+     * @test toPercentile still rejects an out-of-range percentile when the data holds NAN
+     */
+    public function testOutOfRangePercentileThrowsForDataHoldingNan(): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Reduce::toPercentile([1, \NAN, 3], 150);
+    }
 }
