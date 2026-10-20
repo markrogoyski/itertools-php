@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Arithmetic;
+use IterTools\Util\Truthiness;
 use IterTools\Util\UniqueExtractor;
 use IterTools\Util\UsageMap;
 use IterTools\Util\ValueCounter;
@@ -27,7 +28,7 @@ final class Summary
     public static function allMatch(iterable $data, callable $predicate): bool
     {
         foreach ($data as $datum) {
-            if (!(bool) $predicate($datum)) {
+            if (!Truthiness::of($predicate($datum))) {
                 return false;
             }
         }
@@ -44,7 +45,7 @@ final class Summary
     public static function allMatchWithKeys(iterable $data, callable $predicate): bool
     {
         foreach ($data as $key => $datum) {
-            if (!(bool) $predicate($datum, $key)) {
+            if (!Truthiness::of($predicate($datum, $key))) {
                 return false;
             }
         }
@@ -65,7 +66,7 @@ final class Summary
     public static function anyMatch(iterable $data, callable $predicate): bool
     {
         foreach ($data as $datum) {
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 return true;
             }
         }
@@ -81,7 +82,7 @@ final class Summary
     public static function anyMatchWithKeys(iterable $data, callable $predicate): bool
     {
         foreach ($data as $key => $datum) {
-            if ((bool) $predicate($datum, $key)) {
+            if (Truthiness::of($predicate($datum, $key))) {
                 return true;
             }
         }
@@ -102,7 +103,7 @@ final class Summary
     public static function noneMatch(iterable $data, callable $predicate): bool
     {
         foreach ($data as $datum) {
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 return false;
             }
         }
@@ -118,7 +119,7 @@ final class Summary
     public static function noneMatchWithKeys(iterable $data, callable $predicate): bool
     {
         foreach ($data as $key => $datum) {
-            if ((bool) $predicate($datum, $key)) {
+            if (Truthiness::of($predicate($datum, $key))) {
                 return false;
             }
         }
@@ -344,11 +345,11 @@ final class Summary
             return false;
         }
 
-        $predicate ??= fn(mixed $datum): bool => \boolval($datum);
+        $predicate ??= static fn (mixed $datum): mixed => $datum;
 
         $count = 0;
         foreach ($data as $datum) {
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 $count++;
                 if ($count > $n) {
                     return false;
@@ -381,11 +382,11 @@ final class Summary
             return true;
         }
 
-        $predicate ??= fn (mixed $datum): bool => \boolval($datum);
+        $predicate ??= static fn (mixed $datum): mixed => $datum;
 
         $count = 0;
         foreach ($data as $datum) {
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 $count++;
                 if ($count >= $n) {
                     return true;
@@ -419,11 +420,11 @@ final class Summary
             return false;
         }
 
-        $predicate ??= fn (mixed $datum): bool => \boolval($datum);
+        $predicate ??= static fn (mixed $datum): mixed => $datum;
 
         $count = 0;
         foreach ($data as $datum) {
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 $count++;
                 if ($count > $n) {
                     return false;
@@ -790,12 +791,12 @@ final class Summary
      */
     public static function isPartitioned(iterable $data, ?callable $predicate = null): bool
     {
-        $predicate ??= fn (mixed $item): bool => \boolval($item);
+        $predicate ??= static fn (mixed $item): mixed => $item;
 
         $allTrueSoFar = true;
 
         foreach ($data as $datum) {
-            $currentItemTrue = (bool) $predicate($datum);
+            $currentItemTrue = Truthiness::of($predicate($datum));
 
             if ($allTrueSoFar && !$currentItemTrue) {
                 $allTrueSoFar = false;

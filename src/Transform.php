@@ -6,6 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\Iterators\TeeIterator;
 use IterTools\Util\Iterators\MemoizedIterable;
+use IterTools\Util\Truthiness;
 
 final class Transform
 {
@@ -112,7 +113,7 @@ final class Transform
         $truthy = [];
         $falsy  = [];
         foreach ($data as $datum) {
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 $truthy[] = $datum;
             } else {
                 $falsy[] = $datum;

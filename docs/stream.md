@@ -678,6 +678,8 @@ provided, keep only the elements for which it returns true.
 
 ```$stream->filterTrue(?callable $predicate = null): Stream```
 
+A float `NAN` element or predicate result is truthy; see [NaN and Truthiness](../README.md#nan-and-truthiness).
+
 ```php
 use IterTools\Stream;
 
@@ -694,6 +696,8 @@ Filter out elements from the stream only keeping elements that are falsy. If a p
 provided, keep only the elements for which it returns false.
 
 ```$stream->filterFalse(?callable $predicate = null): Stream```
+
+A float `NAN` element or predicate result is truthy; see [NaN and Truthiness](../README.md#nan-and-truthiness).
 
 ```php
 use IterTools\Stream;

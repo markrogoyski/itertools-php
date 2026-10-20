@@ -210,6 +210,8 @@ foreach (Single::filter($starWarsEpisodes, $goodMoviePredicate) as $goodMovie) {
 
 ```Single::filterTrue(iterable $data, ?callable $predicate = null)```
 
+Элемент или результат предиката float `NAN` считается истинным; см. [NaN и истинность](README.md#nan-и-истинность).
+
 ```php
 use IterTools\Single;
 
@@ -226,6 +228,8 @@ foreach (Single::filterTrue($reportCardGrades) as $goodGrade) {
 Если предикат не передан, значения элементов коллекции приводятся к `bool` для оценки.
 
 ```Single::filterFalse(iterable $data, ?callable $predicate = null)```
+
+Элемент или результат предиката float `NAN` считается истинным; см. [NaN и истинность](README.md#nan-и-истинность).
 
 ```php
 use IterTools\Single;

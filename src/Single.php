@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Arithmetic;
+use IterTools\Util\Truthiness;
 use IterTools\Util\UniqueExtractor;
 
 final class Single
@@ -110,7 +111,7 @@ final class Single
     public static function compress(iterable $data, iterable $selectors): \Generator
     {
         foreach (Multi::zip($data, $selectors) as [$datum, $selector]) {
-            if ($selector) {
+            if (Truthiness::of($selector)) {
                 yield $datum;
             }
         }
@@ -168,7 +169,7 @@ final class Single
     {
         $drop = true;
         foreach ($data as $key => $datum) {
-            if ($drop === true && $predicate($datum)) {
+            if ($drop === true && Truthiness::of($predicate($datum))) {
                 continue;
             }
             $drop = false;
@@ -188,7 +189,7 @@ final class Single
     {
         $drop = true;
         foreach ($data as $key => $datum) {
-            if ($drop && (bool) $predicate($datum, $key)) {
+            if ($drop && Truthiness::of($predicate($datum, $key))) {
                 continue;
             }
             $drop = false;
@@ -228,7 +229,7 @@ final class Single
     public static function filter(iterable $data, callable $predicate): \Generator
     {
         foreach ($data as $key => $datum) {
-            if ($predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 yield $key => $datum;
             }
         }
@@ -246,10 +247,10 @@ final class Single
      */
     public static function filterFalse(iterable $data, ?callable $predicate = null): \Generator
     {
-        $predicate ??= fn(mixed $datum): bool => \boolval($datum);
+        $predicate ??= static fn (mixed $datum): mixed => $datum;
 
         foreach ($data as $key => $datum) {
-            if (!(bool) $predicate($datum)) {
+            if (!Truthiness::of($predicate($datum))) {
                 yield $key => $datum;
             }
         }
@@ -267,10 +268,10 @@ final class Single
      */
     public static function filterTrue(iterable $data, ?callable $predicate = null): \Generator
     {
-        $predicate ??= fn(mixed $datum): bool => \boolval($datum);
+        $predicate ??= static fn (mixed $datum): mixed => $datum;
 
         foreach ($data as $key => $datum) {
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 yield $key => $datum;
             }
         }
@@ -287,7 +288,7 @@ final class Single
     public static function filterKeys(iterable $data, callable $predicate): \Generator
     {
         foreach ($data as $key => $datum) {
-            if ($predicate($key)) {
+            if (Truthiness::of($predicate($key))) {
                 yield $key => $datum;
             }
         }
@@ -308,7 +309,7 @@ final class Single
     public static function filterWithKeys(iterable $data, callable $predicate): \Generator
     {
         foreach ($data as $key => $datum) {
-            if ((bool) $predicate($datum, $key)) {
+            if (Truthiness::of($predicate($datum, $key))) {
                 yield $key => $datum;
             }
         }
@@ -402,7 +403,7 @@ final class Single
     public static function takeWhile(iterable $data, callable $predicate): \Generator
     {
         foreach ($data as $key => $datum) {
-            if ($predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 yield $key => $datum;
             } else {
                 break;
@@ -421,7 +422,7 @@ final class Single
     public static function takeWhileWithKeys(iterable $data, callable $predicate): \Generator
     {
         foreach ($data as $key => $datum) {
-            if (!(bool) $predicate($datum, $key)) {
+            if (!Truthiness::of($predicate($datum, $key))) {
                 return;
             }
             yield $key => $datum;
@@ -912,7 +913,7 @@ final class Single
         $started = false;
 
         foreach ($data as $datum) {
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 if ($started) {
                     yield $current;
                 }

@@ -687,6 +687,26 @@ merge may yield out of order. Inspecting composite keys is not planned. If a com
 contain `NAN`, map it to a comparable value in the key function, or filter those elements out
 first.
 
+## NaN and Truthiness
+
+Functions that test an element or a predicate's return value as a boolean coerce it as a `(bool)`
+cast does, so a float `NAN` is `true`, as it is in PHP. PHP 8.5 raises "unexpected NAN value was
+coerced to bool" for that cast; IterTools treats a `NAN` as `true` before casting, so it raises no
+warning.
+
+* With the default predicate, a `NAN` element is true: `filterTrue` keeps it, `filterFalse` drops
+  it, and `exactlyN`, `atLeastN`, `atMostN` and `isPartitioned` count it as true. A `NAN` selector
+  in `compress` selects its element.
+* A predicate that returns `NAN` matches in `filter`, `filterTrue`, `filterFalse`, `filterKeys`,
+  `filterWithKeys`, `dropWhile`, `dropWhileWithKeys`, `takeWhile`, `takeWhileWithKeys`, `splitWhen`,
+  `allMatch`, `anyMatch` and `noneMatch` and their `WithKeys` variants, `exactlyN`, `atLeastN`,
+  `atMostN`, `isPartitioned`, `toFirstMatch`, `toFirstMatchIndex`, `toFirstMatchKey`, `toLastMatch`,
+  `toLastMatchIndex`, `toLastMatchKey` and `partition`.
+
+Their `Stream` counterparts behave the same way (`toPartition` for `partition`). A `NAN` that your
+own predicate coerces, such as `fn ($x) => !$x`, is PHP's conversion, not the library's, and still
+warns on PHP 8.5.
+
 Standards
 ---------
 

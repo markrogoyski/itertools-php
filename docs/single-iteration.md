@@ -210,6 +210,8 @@ Filter out elements from the iterable only returning elements that are truthy.
 
 ```Single::filterTrue(iterable $data, ?callable $predicate = null)```
 
+A float `NAN` element or predicate result is truthy; see [NaN and Truthiness](../README.md#nan-and-truthiness).
+
 ```php
 use IterTools\Single;
 
@@ -227,6 +229,8 @@ Filter out elements from the iterable only returning elements where the predicat
 If no predicate is provided, the boolean value of the data is used.
 
 ```Single::filterFalse(iterable $data, ?callable $predicate = null)```
+
+A float `NAN` element or predicate result is truthy; see [NaN and Truthiness](../README.md#nan-and-truthiness).
 
 ```php
 use IterTools\Single;

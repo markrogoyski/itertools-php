@@ -7,6 +7,7 @@ namespace IterTools;
 use IterTools\Util\Arithmetic;
 use IterTools\Util\MeanAccumulator;
 use IterTools\Util\NoValueMonad;
+use IterTools\Util\Truthiness;
 use IterTools\Util\ValueCounter;
 
 final class Reduce
@@ -1129,7 +1130,7 @@ final class Reduce
     {
         foreach ($data as $datum) {
             /** @var mixed $datum */
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 return $datum;
             }
         }
@@ -1157,7 +1158,7 @@ final class Reduce
         $index = 0;
         foreach ($data as $datum) {
             /** @var mixed $datum */
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 return $index;
             }
             ++$index;
@@ -1185,7 +1186,7 @@ final class Reduce
     {
         foreach ($data as $key => $datum) {
             /** @var mixed $datum */
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 return $key;
             }
         }
@@ -1214,7 +1215,7 @@ final class Reduce
         $result = $default;
         foreach ($data as $datum) {
             /** @var mixed $datum */
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 $result = $datum;
             }
         }
@@ -1244,7 +1245,7 @@ final class Reduce
         $index  = 0;
         foreach ($data as $datum) {
             /** @var mixed $datum */
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 $result = $index;
             }
             ++$index;
@@ -1274,7 +1275,7 @@ final class Reduce
         $result = $default;
         foreach ($data as $key => $datum) {
             /** @var mixed $datum */
-            if ((bool) $predicate($datum)) {
+            if (Truthiness::of($predicate($datum))) {
                 /** @var mixed $result */
                 $result = $key;
             }

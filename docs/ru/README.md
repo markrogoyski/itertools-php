@@ -668,6 +668,27 @@ foreach (Multi::chain(Single::string($letters), Single::string($numbers)) as $ch
 может содержать `NAN`, отобразите его в сравнимое значение в функции ключа или заранее
 отфильтруйте такие элементы.
 
+## NaN и истинность
+
+Функции, проверяющие элемент или результат предиката как логическое значение, приводят его так
+же, как приведение `(bool)`, поэтому float `NAN` — это `true`, как и в PHP. PHP 8.5 выдаёт для
+такого приведения предупреждение «unexpected NAN value was coerced to bool»; IterTools считает
+`NAN` истинным до приведения, поэтому предупреждения нет.
+
+* С предикатом по умолчанию элемент `NAN` истинен: `filterTrue` его сохраняет, `filterFalse`
+  отбрасывает, а `exactlyN`, `atLeastN`, `atMostN` и `isPartitioned` считают его истинным.
+  Селектор `NAN` в `compress` выбирает свой элемент.
+* Предикат, возвращающий `NAN`, считается сработавшим в `filter`, `filterTrue`, `filterFalse`,
+  `filterKeys`, `filterWithKeys`, `dropWhile`, `dropWhileWithKeys`, `takeWhile`,
+  `takeWhileWithKeys`, `splitWhen`, `allMatch`, `anyMatch` и `noneMatch` и их вариантах
+  `WithKeys`, `exactlyN`, `atLeastN`, `atMostN`, `isPartitioned`, `toFirstMatch`,
+  `toFirstMatchIndex`, `toFirstMatchKey`, `toLastMatch`, `toLastMatchIndex`, `toLastMatchKey` и
+  `partition`.
+
+Их аналоги в `Stream` ведут себя так же (`toPartition` для `partition`). `NAN`, который приводит
+ваш собственный предикат, например `fn ($x) => !$x`, — это преобразование PHP, а не библиотеки,
+и в PHP 8.5 оно по-прежнему выдаёт предупреждение.
+
 Стандарты
 ---------
 

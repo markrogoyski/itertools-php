@@ -670,6 +670,8 @@ $result = Stream::of($input)
 
 По умолчанию (если не передан) предикат приводит элементы коллекции к `bool`.
 
+Элемент или результат предиката float `NAN` считается истинным; см. [NaN и истинность](README.md#nan-и-истинность).
+
 ```php
 use IterTools\Stream;
 $input = [0, 1, 2, 3, 0, 4];
@@ -685,6 +687,8 @@ $result = Stream::of($input)
 ```$stream->filterFalse(?callable $predicate = null): Stream```
 
 По умолчанию (если не передан) предикат приводит элементы коллекции к `bool`.
+
+Элемент или результат предиката float `NAN` считается истинным; см. [NaN и истинность](README.md#nan-и-истинность).
 
 ```php
 use IterTools\Stream;
