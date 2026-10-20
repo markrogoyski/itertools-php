@@ -1248,6 +1248,7 @@ class RangeTest extends \PHPUnit\Framework\TestCase
                     2049 => 4503599627369983.5,
                     3000 => 4.287426845256711E18,
                     4095 => 9.218868437227404E18,
+                    4096 => 9.223372036854774E18,
                 ],
             ],
             'PHP_INT_MAX - 511 to PHP_INT_MIN step -(2^52 - 0.5)' => [
@@ -1260,6 +1261,7 @@ class RangeTest extends \PHPUnit\Framework\TestCase
                     2049 => -4503599627369983.5,
                     3000 => -4.287426845256711E18,
                     4095 => -9.218868437227404E18,
+                    4096 => -9.223372036854774E18,
                 ],
             ],
         ];
@@ -1416,6 +1418,285 @@ class RangeTest extends \PHPUnit\Framework\TestCase
             '-10.0 to -3.6 step 6.4' => [-10.0, -3.6, 6.4, [-10.0, -3.6]],
             '0.1 to 0.7 step 0.6' => [0.1, 0.7, 0.6, [0.1, 0.7]],
             '0.7 to 0.1 step -0.6' => [0.7, 0.1, -0.6, [0.7, 0.1]],
+        ];
+    }
+
+    /**
+     * @test         float operands land on $end only when the exact span is a whole number of steps within the
+     *               operands' rounding, so a span past 2^53 that rounds to whole steps doesn't
+     * @dataProvider dataProviderForLandingOnEndOfExactDoubles
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testFloatOperandsLandOnEndOnlyWithinOperandRounding(
+        float $start,
+        float $end,
+        float $step,
+        array $expected
+    ): void {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Both models agree on every row: the floats passed, and the decimals they are written as.
+     *
+     * Test data generated with (tools/oracles/range_landing_within_operand_rounding.py, doubles):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForLandingOnEndOfExactDoubles(): array
+    {
+        return [
+            '2.0^53 to -0.1 step -2.0^53' => [
+                9007199254740992.0, -0.1, -9007199254740992.0, [9007199254740992.0, 0.0],
+            ],
+            '-2.0^53 to 0.1 step 2.0^53' => [
+                -9007199254740992.0, 0.1, 9007199254740992.0, [-9007199254740992.0, 0.0],
+            ],
+            '2.0^54 to 0.3 step -2.0^53' => [
+                1.8014398509481984E16, 0.3, -9007199254740992.0, [1.8014398509481984E16, 9007199254740992.0],
+            ],
+            '2.0^53 to -0.1 step -2.0^52' => [
+                9007199254740992.0, -0.1, -4503599627370496.0, [9007199254740992.0, 4503599627370496.0, 0.0],
+            ],
+            '2.0^53 to 0.5 step -2.0^52' => [
+                9007199254740992.0, 0.5, -4503599627370496.0, [9007199254740992.0, 4503599627370496.0],
+            ],
+            '1e16 to -0.5 step -1e16' => [1.0E16, -0.5, -1.0E16, [1.0E16, 0.0]],
+            // Neighbours that don't change
+            '2.0^53 to 0.0 step -2.0^53' => [9007199254740992.0, 0.0, -9007199254740992.0, [9007199254740992.0, 0.0]],
+            '-0.1 to 2.0^53 step 2.0^53' => [-0.1, 9007199254740992.0, 9007199254740992.0, [-0.1, 9007199254740992.0]],
+            '-0.5 to 1e20 step 2e19' => [-0.5, 1.0E20, 2.0E19, [-0.5, 2.0E19, 4.0E19, 6.0E19, 8.0E19, 1.0E20]],
+        ];
+    }
+
+    /**
+     * @test         a step above the float span of decimal operands is accepted while the shortfall is within the
+     *               operands' rounding, and the range then lands on $end
+     * @dataProvider dataProviderForLandingOnEndOfDecimals
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testDecimalOperandsLandOnEndWithinOperandRounding(
+        float $start,
+        float $end,
+        float $step,
+        array $expected
+    ): void {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * The floats passed don't land on $end in any row (and those of the first four throw), but the decimals they are
+     * written as do.
+     *
+     * Test data generated with (tools/oracles/range_landing_within_operand_rounding.py, decimal literals as written):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForLandingOnEndOfDecimals(): array
+    {
+        return [
+            '0.1 to 0.3 step 0.2' => [0.1, 0.3, 0.2, [0.1, 0.3]],
+            '0.3 to 0.1 step -0.2' => [0.3, 0.1, -0.2, [0.3, 0.1]],
+            '-0.3 to -0.1 step 0.2' => [-0.3, -0.1, 0.2, [-0.3, -0.1]],
+            '1.1 to 1.3 step 0.2' => [1.1, 1.3, 0.2, [1.1, 1.3]],
+            // Neighbours that don't change
+            '0.1 to 0.3 step 0.1' => [0.1, 0.3, 0.1, [0.1, 0.2, 0.3]],
+            '0.7 to 0.8 step 0.1' => [0.7, 0.8, 0.1, [0.7, 0.8]],
+            '0.0 to 1e23 step 1e22' => [
+                0.0, 1.0E23, 1.0E22,
+                [0.0, 1.0E22, 2.0E22, 3.0E22, 4.0E22, 5.0E22, 6.0E22, 7.0E22, 8.0E22, 9.0E22, 1.0E23],
+            ],
+        ];
+    }
+
+    /**
+     * @test         a step above the span by more than the operands' rounding throws
+     * @dataProvider dataProviderForStepAboveSpanBeyondOperandRounding
+     * @param        float $start
+     * @param        float $end
+     * @param        float $step
+     */
+    public function testStepAboveSpanBeyondOperandRoundingThrows(float $start, float $end, float $step): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must not exceed span');
+
+        // When
+        foreach (Single::range($start, $end, $step) as $_) {
+            break;
+        }
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_landing_within_operand_rounding.py, doubles; the decimal model
+     * agrees):
+     *   abs(Fraction(step)) > abs(Fraction(end) - Fraction(start))
+     */
+    public static function dataProviderForStepAboveSpanBeyondOperandRounding(): array
+    {
+        return [
+            '0.1 to 0.3 step 0.20000000000000004' => [0.1, 0.3, 0.20000000000000004],
+            '0.0 to 1.0 step 1.0000000000000002' => [0.0, 1.0, 1.0000000000000002],
+            // Within half a float spacing of the operands, but beyond half a unit in the last digit of the shortest
+            // decimals they are written as
+            '1.7235207201277944 to 739.4286550878337 step 737.705134367706' => [
+                1.7235207201277944, 739.4286550878337, 737.705134367706,
+            ],
+            '-387.62386526512876 to -356.9597689773017 step 30.664096287827093' => [
+                -387.62386526512876, -356.9597689773017, 30.664096287827093,
+            ],
+            // The operands' half float spacings would cover the shortfall, but their shortest decimals fall short as
+            // the floats do: 0.10000000000000002 > 0.2 - 0.1
+            '0.1 to 0.2 step 0.10000000000000002' => [0.1, 0.2, 0.10000000000000002],
+            '0.2 to 0.1 step -0.10000000000000002' => [0.2, 0.1, -0.10000000000000002],
+            '1.1 to 1.3 step 0.20000000000000004' => [1.1, 1.3, 0.20000000000000004],
+        ];
+    }
+
+    /**
+     * @test         a step computed in float as ($end - $start) / $n still ends on $end after $n steps
+     * @dataProvider dataProviderForLinspaceStep
+     * @param        float $start
+     * @param        float $end
+     * @param        int   $n
+     */
+    public function testLinspaceStepEndsOnEnd(float $start, float $end, int $n): void
+    {
+        // Given
+        $step = ($end - $start) / $n;
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount($n + 1, $result);
+        $this->assertSame($start, $result[0]);
+        $this->assertSame($end, $result[$n]);
+    }
+
+    /**
+     * The step carries the rounding of the float subtraction, which neither the floats' exact span nor their shortest
+     * decimals make a whole number of steps.
+     *
+     * Test data generated with (tools/oracles/range_landing_within_operand_rounding.py):
+     *   count, first, last = len(ls), ls[0], ls[-1] where ls = numpy.linspace(start, end, n + 1)
+     */
+    public static function dataProviderForLinspaceStep(): array
+    {
+        return [
+            '-104.81949906807756 to 975.2888809333513, n 932' => [-104.81949906807756, 975.2888809333513, 932],
+            '-499.457509919089 to 44.25084769001114, n 40' => [-499.457509919089, 44.25084769001114, 40],
+        ];
+    }
+
+    /**
+     * @test         a range whose exact last value rounds to $end yields $end
+     * @dataProvider dataProviderForExactLastValueRoundingToEnd
+     * @param        float             $start
+     * @param        float             $end
+     * @param        float             $step
+     * @param        int               $count
+     * @param        array<int, float> $expected values at chosen indices
+     */
+    public function testExactLastValueRoundingToEndYieldsEnd(
+        float $start,
+        float $end,
+        float $step,
+        int $count,
+        array $expected
+    ): void {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount($count, $result);
+        $this->assertSame($expected, \array_intersect_key($result, $expected));
+    }
+
+    /**
+     * Both models agree on every row.
+     *
+     * Test data generated with (tools/oracles/range_landing_within_operand_rounding.py, doubles):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForExactLastValueRoundingToEnd(): array
+    {
+        return [
+            '-9.47 to 1e17 step 1.4285714285714286e16' => [-9.47, 1.0E17, 1.4285714285714286E16, 8, [0 => -9.47, 7 => 1.0E17]],
+            '9.71 to -1e17 step -1.4285714285714286e16' => [
+                9.71, -1.0E17, -1.4285714285714286E16, 8, [0 => 9.71, 7 => -1.0E17],
+            ],
+        ];
+    }
+
+    /**
+     * @test         a fractional step on int operands lands on $end only within the step's rounding
+     * @dataProvider dataProviderForFractionalStepOnIntOperandsLanding
+     * @param        int|float         $start
+     * @param        int|float         $end
+     * @param        float             $step
+     * @param        int               $count
+     * @param        array<int, float> $expected values at chosen indices
+     */
+    public function testFractionalStepOnIntOperandsLandsOnEndOnlyWithinStepRounding(
+        int|float $start,
+        int|float $end,
+        float $step,
+        int $count,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount($count, $result);
+        $this->assertSame($expected, \array_intersect_key($result, $expected));
+    }
+
+    /**
+     * Both models agree on every row.
+     *
+     * Test data generated with (tools/oracles/range_landing_within_operand_rounding.py, doubles):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForFractionalStepOnIntOperandsLanding(): array
+    {
+        return [
+            'PHP_INT_MIN to 0 step 2^52 - 0.5' => [
+                \PHP_INT_MIN, 0, 4503599627370495.5, 2049,
+                [0 => -9.223372036854776E18, 2048 => -1024.0],
+            ],
+            '0 to 2^62 step 2^52 - 0.5' => [
+                0, 4611686018427387904, 4503599627370495.5, 1025,
+                [0 => 0.0, 1 => 4503599627370495.5, 1024 => 4.6116860184273874E18],
+            ],
+            // The exact last value rounds to $end
+            '402792930821199 to 9223372036854774271 step 4346356853875566.5' => [
+                402792930821199, 9223372036854774271, 4346356853875566.5, 2123,
+                [0 => 402792930821199.0, 2122 => 9.223372036854774E18],
+            ],
         ];
     }
 

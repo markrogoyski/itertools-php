@@ -765,6 +765,92 @@ class SourceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         ofRange ends on $end only when the exact span is a whole number of steps within the operands'
+     *               rounding
+     * @dataProvider dataProviderForRangeLandingOnEndOfExactDoubles
+     * @param int|float         $start
+     * @param int|float         $end
+     * @param float             $step
+     * @param int               $count
+     * @param array<int, float> $expected values at chosen indices
+     */
+    public function testOfRangeLandsOnEndOnlyWithinOperandRounding(
+        int|float $start,
+        int|float $end,
+        float $step,
+        int $count,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $stream = Stream::ofRange($start, $end, $step);
+
+        // When
+        $result = $stream->toArray();
+
+        // Then
+        $this->assertCount($count, $result);
+        $this->assertSame($expected, \array_intersect_key($result, $expected));
+    }
+
+    /**
+     * Both models agree on every row: the floats and ints passed, and the decimals they are written as.
+     *
+     * Test data generated with (tools/oracles/range_landing_within_operand_rounding.py, doubles):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForRangeLandingOnEndOfExactDoubles(): array
+    {
+        return [
+            '2.0^53 to -0.1 step -2.0^53' => [
+                9007199254740992.0, -0.1, -9007199254740992.0, 2,
+                [0 => 9007199254740992.0, 1 => 0.0],
+            ],
+            'PHP_INT_MIN to 0 step 2^52 - 0.5' => [
+                \PHP_INT_MIN, 0, 4503599627370495.5, 2049,
+                [0 => -9.223372036854776E18, 2048 => -1024.0],
+            ],
+        ];
+    }
+
+    /**
+     * @test         ofRange accepts a step just above the float span of decimal operands that span it
+     * @dataProvider dataProviderForRangeLandingOnEndOfDecimals
+     * @param float        $start
+     * @param float        $end
+     * @param float        $step
+     * @param array<float> $expected
+     */
+    public function testOfRangeStepAboveFloatSpanOfDecimals(float $start, float $end, float $step, array $expected): void
+    {
+        // Given
+        $stream = Stream::ofRange($start, $end, $step);
+
+        // When
+        $result = $stream->toArray();
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * The floats passed throw (the step exceeds their exact span), but the decimals they are written as don't.
+     *
+     * Test data generated with (tools/oracles/range_landing_within_operand_rounding.py, decimal literals as written):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForRangeLandingOnEndOfDecimals(): array
+    {
+        return [
+            '0.1 to 0.3 step 0.2' => [0.1, 0.3, 0.2, [0.1, 0.3]],
+        ];
+    }
+
+    /**
      * @test         ofRange invalid type arguments
      * @dataProvider dataProviderForRangeInvalidTypeArguments
      * @param mixed $start

@@ -1082,11 +1082,27 @@ final class Single
      * computed from `(float) $start` carries its rounding error. `range(2 ** 53 + 3, 0, -(2.0 ** 52 - 0.5))`
      * yields `[2^53 + 4, 2^52 + 4, 4.0]`, where computing from `(float) $start` ends on 5.0.
      *
-     * A step that equals the span of two float operands computed in float is compared with their exact span,
+     * A float range ends on `$end` when the exact span is a whole number of steps, give or take the rounding the
+     * operands carry from the decimals they are written as: half a float spacing of each non-integral float
+     * operand, and of a non-integral step for each step taken. An int, or an integral float that is its own
+     * shortest decimal (2.0 ** 53, 1e16), counts as exact; 1e23 isn't, and stands for 10^23. So `range(0.0, 1.0,
+     * 0.1)` ends on 1.0, but `range(2.0 ** 53, -0.1, -2.0 ** 53)` yields `[2^53, 0.0]`: its span 2^53 + 0.1
+     * rounds to the step in float, but holds one step and 0.1 more. On int operands, `range(PHP_INT_MIN, 0,
+     * 2.0 ** 52 - 0.5)` ends on -1024.0, as 2048 steps fall 1024 short, beyond the 512 their rounding allows. A
+     * step computed in float, such as `($end - $start) / $n`, also carries the rounding of the subtraction, which
+     * is allowed too, up to twice the operands' own: such a range ends on `$end`, unless the larger operand is
+     * exact and the subtraction absorbed part of the smaller one, as in the 2.0 ** 53 example. A range whose exact
+     * last value rounds to `$end` ends on `$end` too. Past 2^48 steps, with a step below 2^-900 or an operand
+     * beyond 2^995, the float quotient decides instead, to within 2ε of its value plus the operands' half
+     * spacings.
+     *
+     * A step at or above the span of two float operands computed in float is compared with their exact span,
      * which the float span can round up to the step: `range(0.1, 2.0 ** 53, 2.0 ** 53)` throws, as the exact
-     * span is 2^53 - 0.1. The step is accepted while the shortfall is within half a float spacing of the
-     * non-integral operands, which decimal operands rounding to these floats could make up: `range(-10.0,
-     * -3.6, 6.4)` yields `[-10.0, -3.6]`, although the floats' exact span is 6.4 - 4.4e-16.
+     * span is 2^53 - 0.1. The step is also accepted when the decimals the operands are written as span it, each
+     * non-integral float taken as its shortest decimal and an integral float as itself: `range(-10.0, -3.6, 6.4)`
+     * yields `[-10.0, -3.6]`, although the floats' exact span is 6.4 - 4.4e-16, and `range(0.1, 0.3, 0.2)` yields
+     * `[0.1, 0.3]`, although their float span is 0.19999999999999998. `range(0.1, 0.2, 0.10000000000000002)`
+     * throws, as neither span reaches the step.
      *
      * @param int|float $start
      * @param int|float $end
@@ -1184,10 +1200,22 @@ final class Single
                 }
             } else {
                 $magnitude = $magnitudeF;
-                // Unequal, the float span and the step compare as the exact span does, since rounding is
-                // monotonic. Equal, the exact span may be smaller: 2^53 - 0.1 rounds to 2^53.
-                $stepExceedsSpan = $magnitudeF > $spanF || ($magnitudeF === $spanF
-                    && self::stepExceedsExactFloatSpan(\abs($step), \min($startF, $endF), \max($startF, $endF)));
+                // A step below the float span is below the exact span too, since rounding is monotonic. A step at
+                // or above it may still be within the exact span (2^53 - 0.1 rounds to the step 2^53), or within
+                // the span of the decimals the operands are written as (0.3 - 0.1 gives 0.19999999999999998, below
+                // the step 0.2). It exceeds the span when it exceeds both.
+                $stepExceedsSpan = $magnitudeF >= $spanF
+                    && self::stepExceedsExactFloatSpan(\abs($step), \min($startF, $endF), \max($startF, $endF), [])
+                    && (self::stepExceedsDecimalSpan($start, $end, \abs($step), $ascending)
+                        ?? self::stepExceedsExactFloatSpan(
+                            \abs($step),
+                            \min($startF, $endF),
+                            \max($startF, $endF),
+                            [
+                                ...self::roundingAllowances($start, $end, \abs($step), false),
+                                self::roundingAllowance(\abs($step), false),
+                            ]
+                        ));
                 $spanDescription = "({$spanF})";
             }
 
@@ -1222,26 +1250,52 @@ final class Single
                     . "(span={$spanF}, step={$magnitudeF})"
                 );
             }
-            // The quotient is taken as integral when it is within its rounding error of an integer: the
-            // error of the division, the step and the span (about half an epsilon each, relative), plus the
-            // error from storing decimal operands as floats (at most half the float spacing each).
-            // (0.5 - 0.4) / 0.05 evaluates to 1.999... and would otherwise drop the last element. The
-            // operand term only counts while it is under a quarter of a step. Past that, the step is near or
-            // below the float spacing and the decimal intent can't be recovered, so the operands are taken
-            // as exact; int operands always are, since their span is exact. Otherwise an extra trailing
-            // element would be added: range(1e16, 1e16 + 4, 1.5) would yield 4 elements instead of 3, and
-            // range(1e15, 1e15 + 1, 0.278) 5 instead of 4 on a quotient of 3.597.
-            $operandTolerance = $intOperands
-                ? 0.0
-                : (Arithmetic::halfFloatSpacing($startF) + Arithmetic::halfFloatSpacing($endF)) / $magnitudeF;
-            if ($operandTolerance >= 0.25) {
-                $operandTolerance = 0.0;
-            }
-            $quotientTolerance = $operandTolerance + 2.0 * \PHP_FLOAT_EPSILON * $stepsQuotient;
-            $stepsF = (int)\round($stepsQuotient);
-            $landsOnEnd = \abs($stepsQuotient - (float)$stepsF) <= $quotientTolerance;
-            if (!$landsOnEnd) {
-                $stepsF = (int)\floor($stepsQuotient);
+            // The range lands on $end when the exact span is a whole number of steps, give or take the rounding
+            // of decimal operands stored as floats: (0.5 - 0.4) / 0.05 evaluates to 1.999..., which would
+            // otherwise drop the last element. The count and that decision are taken from the exact span and
+            // step (see countFloatSteps()) while the products involved can't overflow or underflow and the
+            // quotient is far enough below 2^53 to tell its whole steps apart.
+            if (
+                $stepsQuotient < 2.0 ** 48.0
+                && $magnitudeF >= 2.0 ** -900.0
+                && \max(\abs($startF), \abs($endF), $magnitudeF) < 2.0 ** 995.0
+            ) {
+                if (\is_int($startExact) && \is_int($endExact)) {
+                    [$low, $high] = $ascending ? [$startExact, $endExact] : [$endExact, $startExact];
+                    $exactSpan = self::exactIntSpan($low, $high);
+                    $operandAllowance = [];
+                } else {
+                    $exactSpan = self::exactFloatDifference(\max($startF, $endF), \min($startF, $endF));
+                    $operandAllowance = self::roundingAllowances($start, $end, \abs($step), true, $exactSpan[1]);
+                }
+                [$stepsF, $landsOnEnd] = self::countFloatSteps(
+                    $exactSpan,
+                    \abs($step),
+                    $stepsQuotient,
+                    $operandAllowance,
+                    self::roundingAllowance(\abs($step), true),
+                    $endF,
+                    \is_int($endExact) ? self::intToFloats($endExact)[1] : 0.0,
+                    $ascending
+                );
+            } else {
+                // Past those limits, the quotient is taken as integral when it is within its rounding error of
+                // an integer: the error of the division, the step and the span (about half an epsilon each,
+                // relative), plus the error from storing decimal operands as floats (at most half the float
+                // spacing each). The operand term only counts while it is under a quarter of a step, as in
+                // roundingAllowances(); int operands are exact, since their span is.
+                $operandTolerance = $intOperands
+                    ? 0.0
+                    : (Arithmetic::halfFloatSpacing($startF) + Arithmetic::halfFloatSpacing($endF)) / $magnitudeF;
+                if ($operandTolerance >= 0.25) {
+                    $operandTolerance = 0.0;
+                }
+                $quotientTolerance = $operandTolerance + 2.0 * \PHP_FLOAT_EPSILON * $stepsQuotient;
+                $stepsF = (int)\round($stepsQuotient);
+                $landsOnEnd = \abs($stepsQuotient - (float)$stepsF) <= $quotientTolerance;
+                if (!$landsOnEnd) {
+                    $stepsF = (int)\floor($stepsQuotient);
+                }
             }
             $signF = $ascending ? 1.0 : -1.0;
             // An integral quotient ends on $end exactly, so its last value is yielded after the loop.
@@ -1418,16 +1472,8 @@ final class Single
      */
     private static function roundIntPlusMultiple(int $start, int $i, float $magnitude, bool $ascending): float
     {
-        // TwoProduct (Dekker, with Veltkamp's split): $product + $error is exactly $i·$magnitude.
-        $x = (float)$i;
-        $product = $x * $magnitude;
-        $split = 134217729.0 * $x;
-        $xHi = $split - ($split - $x);
-        $xLo = $x - $xHi;
-        $split = 134217729.0 * $magnitude;
-        $mHi = $split - ($split - $magnitude);
-        $mLo = $magnitude - $mHi;
-        $error = (($xHi * $mHi - $product) + $xHi * $mLo + $xLo * $mHi) + $xLo * $mLo;
+        // $product + $error is exactly $i·$magnitude.
+        [$product, $error] = self::twoProduct((float)$i, $magnitude);
 
         // Integer parts, truncated toward zero, and the fractions left over, all exact. $product is positive.
         $productInt = \floor($product);
@@ -1500,46 +1546,476 @@ final class Single
     }
 
     /**
-     * Whether a step equal to the float span $high - $low exceeds their exact span by more than decimal
-     * operands that round to these floats can make up.
+     * Whether a step at least the float span $high - $low exceeds their exact span by more than the operands'
+     * rounding.
      *
-     * The float span rounds the exact one, so it can round up to the step: in range(0.1, 2.0 ** 53, 2.0 **
-     * 53), the exact span 2^53 - 0.1 rounds to 2^53. A non-integral operand may stand for a decimal anywhere
-     * within half a float spacing of it, so a deficit within those bounds isn't taken as one: in range(-10.0,
-     * -3.6, 6.4), the exact span of the floats is 6.4 - 4.4e-16, but the decimal span is the step. An
-     * integral float stands for itself, as {@see Single::range()} takes it next to an int operand.
+     * The float span rounds the exact one, so it can round up to the step: in range(0.1, 2.0 ** 53, 2.0 ** 53),
+     * the exact span 2^53 - 0.1 rounds to 2^53. A deficit within $allowance isn't taken as one: the exact span of
+     * the floats is 6.4 - 4.4e-16 in range(-10.0, -3.6, 6.4), and 0.2 - 2.8e-17 in range(0.1, 0.3, 0.2), but the
+     * decimals span the step.
      *
-     * @param int|float $magnitude the step magnitude, equal to $high - $low in float
-     * @param float     $low
-     * @param float     $high
+     * @param int|float   $magnitude the step magnitude, at least $high - $low in float
+     * @param float       $low
+     * @param float       $high
+     * @param list<float> $allowance the rounding of the operands and the step (see roundingAllowances())
      *
      * @return bool
      */
-    private static function stepExceedsExactFloatSpan(int|float $magnitude, float $low, float $high): bool
+    private static function stepExceedsExactFloatSpan(int|float $magnitude, float $low, float $high, array $allowance): bool
     {
-        // TwoSum: $spanF + $error is exactly $high - $low.
-        $spanF = $high - $low;
-        $highPart = $spanF + $low;
-        $error = ($high - $highPart) + (-$low - ($spanF - $highPart));
+        // An int step past 2^53 is the sum of its float and the rest. The float span is at most the step, so it
+        // is finite.
+        $terms = [
+            ...(\is_int($magnitude) ? self::intToFloats($magnitude) : [$magnitude]),
+            ...self::negated(self::exactFloatDifference($high, $low)),
+            ...self::negated($allowance),
+        ];
 
-        // An int step beyond 2^53 can differ from the float span it equals, which is then integral, at most
-        // 2^63.
-        $stepExcess = 0;
-        if (\is_int($magnitude)) {
-            $spanI = Arithmetic::toExactInt($spanF);
-            $stepExcess = $spanI === null ? $magnitude - \PHP_INT_MAX - 1 : $magnitude - $spanI;
-        }
-        $deficit = (float)$stepExcess - $error;
+        return self::expansionSign(self::expansion($terms)) > 0;
+    }
 
-        // Integral floats beyond the int range count as exact too: range(0.1, 2.0 ** 63, 2.0 ** 63) throws.
-        $tolerance = 0.0;
-        foreach (\is_int($magnitude) ? [$low, $high] : [$low, $high, $magnitude] as $operand) {
-            if (\floor($operand) !== $operand) {
-                $tolerance += Arithmetic::halfFloatSpacing($operand);
+    /**
+     * Whether a step exceeds the span of $start and $end taken as the decimals they are written as, or null where
+     * that can't be decided exactly here.
+     *
+     * A non-integral float is taken as its shortest decimal, while roundingAllowances() gives the operands an
+     * allowance, and the step always is; an int or an integral float stands for itself, as in roundingAllowance().
+     * Bounding each decimal's distance from its float, as the fallback does, also accepts a step that the decimals
+     * reject: in range(0.1, 0.2, 0.10000000000000002), each float is within half a spacing of a decimal that
+     * makes the step fit, but 0.10000000000000002 > 0.2 - 0.1. So the decimals are compared exactly, each as a sum
+     * of integers times powers of ten, all scaled by the largest power of ten in their denominators. That is null
+     * when a scaled value would overflow or an operand taken as exact is below 2^-900, where the products aren't
+     * exact.
+     *
+     * @param int|float $start
+     * @param int|float $end
+     * @param int|float $magnitude the step magnitude
+     * @param bool      $ascending whether $end is above $start
+     *
+     * @return bool|null
+     */
+    private static function stepExceedsDecimalSpan(
+        int|float $start,
+        int|float $end,
+        int|float $magnitude,
+        bool $ascending
+    ): ?bool {
+        $operandsAsDecimals = self::roundingAllowances($start, $end, $magnitude, false) !== [];
+        // The step minus the span: + step - high + low, each a list of [integer value, power of ten divided by].
+        $terms = [];
+        $operands = [
+            [$magnitude, 1.0, true],
+            [$ascending ? $end : $start, -1.0, $operandsAsDecimals],
+            [$ascending ? $start : $end, 1.0, $operandsAsDecimals],
+        ];
+        foreach ($operands as [$operand, $sign, $asDecimal]) {
+            if (\is_float($operand) && $asDecimal && \floor($operand) !== $operand) {
+                // Split into parts of at most 9 digits, which floats hold exactly, also where ints have 32 bits.
+                [$significand, $exponent, $digits] = self::shortestDecimal($operand);
+                $integer = \str_replace('.', '', $significand);
+                $scale = $digits - $exponent;
+                $sign = $operand < 0.0 ? -$sign : $sign;
+                $length = \strlen($integer);
+                if ($length > 9) {
+                    $terms[] = [$sign * (float)\substr($integer, 0, $length - 9), $scale - 9];
+                    $integer = \substr($integer, $length - 9);
+                }
+                $terms[] = [$sign * (float)$integer, $scale];
+            } elseif (\is_int($operand)) {
+                foreach (self::intToFloats($operand) as $part) {
+                    $terms[] = [$sign * $part, 0];
+                }
+            } else {
+                if ($operand !== 0.0 && \abs($operand) < 2.0 ** -900.0) {
+                    return null;
+                }
+                $terms[] = [$sign * $operand, 0];
             }
         }
 
-        return $deficit > $tolerance;
+        $maxScale = \max(0, ...\array_column($terms, 1));
+        $scaled = [];
+        foreach ($terms as [$value, $scale]) {
+            $parts = [$value];
+            // Multiply by 10^($maxScale - $scale), in factors of at most 10^22, which floats hold exactly.
+            for ($power = $maxScale - $scale; $power > 0; $power -= 22) {
+                $factor = (float)('1e' . \min($power, 22));
+                $products = [];
+                foreach ($parts as $part) {
+                    [$product, $error] = self::twoProduct($part, $factor);
+                    if (!(\abs($product) < 2.0 ** 990.0) || !\is_finite($error)) {
+                        return null;
+                    }
+                    $products[] = $product;
+                    $products[] = $error;
+                }
+                $parts = self::expansion($products);
+            }
+            \array_push($scaled, ...$parts);
+        }
+
+        return self::expansionSign(self::expansion($scaled)) > 0;
+    }
+
+    /**
+     * The number of steps of $magnitude in $span, and whether the range lands on $end, for {@see Single::range()}.
+     *
+     * The range lands on $end when the exact span is a whole number of steps, give or take the operands'
+     * rounding: the sum of $operandAllowance, and $stepAllowance for each step taken, since a decimal step that
+     * rounds to $magnitude is off by up to that much each time. range(0.0, 1.0, 0.1) lands on 1.0 although 10
+     * steps of the float 0.1 exceed the span by 5.6e-17, as that is within 10 · 6.9e-18. Otherwise the steps are
+     * those that fit exactly: in range(2.0 ** 53, -0.1, -2.0 ** 53), the span 2^53 + 0.1 rounds to the step in
+     * float, but is 0.1 past it, beyond the 6.9e-18 that -0.1 may carry, so the range ends on 0.0. It still ends
+     * on $end when the exact last value rounds to it, as computing that value in float may not.
+     *
+     * $quotient is within 1/8 of the exact quotient, so the nearest whole number of steps is round($quotient),
+     * and the exact remainder decides between it and one fewer. Only it can be within the allowance, which is
+     * under 3/8 of a step: the operands' share is under a quarter, and fewer than 2^48 steps add under 2^-5.
+     *
+     * @param list<float> $span             the exact span, as a sum of floats
+     * @param int|float   $magnitude        at most the span plus $operandAllowance and $stepAllowance
+     * @param float       $quotient         the float quotient of the span and the step, below 2^48
+     * @param list<float> $operandAllowance see roundingAllowances()
+     * @param float       $stepAllowance    see roundingAllowance()
+     * @param float       $end              $end as a float
+     * @param float       $endRest          $end minus that float, exactly
+     * @param bool        $ascending
+     *
+     * @return array{int, bool}
+     */
+    private static function countFloatSteps(
+        array $span,
+        int|float $magnitude,
+        float $quotient,
+        array $operandAllowance,
+        float $stepAllowance,
+        float $end,
+        float $endRest,
+        bool $ascending
+    ): array {
+        // $remainder is exactly $span - $steps·$magnitude (TwoProduct of each part of the step).
+        $steps = (int)\round($quotient);
+        $terms = $span;
+        foreach (\is_int($magnitude) ? self::intToFloats($magnitude) : [$magnitude] as $part) {
+            [$product, $error] = self::twoProduct((float)$steps, $part);
+            $terms[] = -$product;
+            $terms[] = -$error;
+        }
+        $remainder = self::expansion($terms);
+        $remainderSign = self::expansionSign($remainder);
+
+        // |$remainder| - the allowance
+        $terms = $remainderSign < 0 ? self::negated($remainder) : $remainder;
+        $allowance = [...$operandAllowance, (float)$steps * $stepAllowance];
+        foreach ($allowance as $term) {
+            $terms[] = -$term;
+        }
+        if ($steps > 0 && self::expansionSign(self::expansion($terms)) <= 0) {
+            return [$steps, true];
+        }
+        if ($remainderSign < 0) {
+            return [$steps - 1, false];
+        }
+
+        // The last value, $end ∓ $remainder, as an offset from the float $end.
+        $offset = self::expansion([$endRest, ...($ascending ? self::negated($remainder) : $remainder)]);
+
+        return [$steps, self::roundsTo($end, $offset)];
+    }
+
+    /**
+     * Whether $float plus the sum of $offset, an expansion(), rounds to $float (to nearest, ties to even).
+     *
+     * @param float       $float
+     * @param list<float> $offset
+     *
+     * @return bool
+     */
+    private static function roundsTo(float $float, array $offset): bool
+    {
+        $offsetSign = self::expansionSign($offset);
+        if ($offsetSign === 0) {
+            return true;
+        }
+        $halfSpacing = Arithmetic::halfFloatSpacing($float);
+        // Toward 0 from a power of two, the next float is half a spacing closer.
+        $towardZero = ($offsetSign > 0) === ($float < 0.0);
+        $halfGap = $towardZero && \abs($float) === $halfSpacing * 2.0 ** 53.0 ? $halfSpacing / 2.0 : $halfSpacing;
+
+        $terms = $offsetSign > 0 ? $offset : self::negated($offset);
+        $terms[] = -$halfGap;
+        $excess = self::expansionSign(self::expansion($terms));
+
+        return $excess < 0
+            || ($excess === 0 && $halfSpacing > 0.0 && \fmod(\abs($float) / (2.0 * $halfSpacing), 2.0) === 0.0);
+    }
+
+    /**
+     * The rounding an operand of {@see Single::range()} may carry from the decimal it is written as, or 0 where it
+     * is taken as exact.
+     *
+     * An int is exact. For deciding whether the range lands on $end ($forLanding), a non-integral float may carry
+     * half its float spacing, and an integral float is exact while it is its own shortest decimal, as 2^53 + 2,
+     * 1e16 and 1e22 are, or within 2^53: 1e23 is the float 99999999999999991611392, and is written for 10^23. For
+     * deciding whether a step exceeds the span where stepExceedsDecimalSpan() can't, an integral float stands for
+     * itself, as range() takes it next to an int operand, and a non-integral float is taken as its shortest decimal:
+     * it may carry at most half a unit in that decimal's last digit, which bounds its distance to the float more
+     * tightly than half a spacing when the decimal is long, as for 30.664096287827093.
+     *
+     * @param int|float $operand
+     * @param bool      $forLanding
+     *
+     * @return float
+     */
+    private static function roundingAllowance(int|float $operand, bool $forLanding): float
+    {
+        if (\is_int($operand)) {
+            return 0.0;
+        }
+        $halfSpacing = Arithmetic::halfFloatSpacing($operand);
+        if (\floor($operand) === $operand) {
+            $exact = !$forLanding || \abs($operand) <= 2.0 ** 53.0 || self::isShortestDecimal($operand);
+            return $exact ? 0.0 : $halfSpacing;
+        }
+        if ($forLanding) {
+            return $halfSpacing;
+        }
+
+        [, $exponent, $digits] = self::shortestDecimal($operand);
+        return \min($halfSpacing, (float)('5e' . ($exponent - $digits - 1)));
+    }
+
+    /**
+     * The roundingAllowance() of $start and $end, or none when they add up to a quarter of $magnitude or more.
+     *
+     * Past that, the step is near or below the float spacing and the decimal intent can't be recovered, so the
+     * operands are taken as exact: range(1e15 + 0.125, 1e15 + 1.125, 0.3) would otherwise take the span of 1 for 3
+     * steps of 0.3 and end on $end. The cut-off is taken on the allowances for landing either way, the larger
+     * ones, so a step that range() accepts above the span always lands on $end.
+     *
+     * For landing, they come with the rounding of the operands' float difference, $spanError, while the total stays
+     * under a quarter of a step: a step computed from the operands, such as ($end - $start) / $n, carries it. It
+     * counts up to twice the operands' allowance, which bounds it when the larger operand isn't exact; past that,
+     * the difference has absorbed part of an operand that is exact: in range(2.0 ** 53, -0.1, -2.0 ** 53), the
+     * span 2^53 + 0.1 rounds to the step. range(-104.81949906807756, 975.2888809333513, 1.158914570816984), with
+     * the step computed for 932 steps, ends on $end, although the floats' span is 1.1e-13 short of 932 steps.
+     *
+     * @param int|float $start
+     * @param int|float $end
+     * @param int|float $magnitude
+     * @param bool      $forLanding
+     * @param float     $spanError  the float difference of the operands minus their exact difference
+     *
+     * @return list<float>
+     */
+    private static function roundingAllowances(
+        int|float $start,
+        int|float $end,
+        int|float $magnitude,
+        bool $forLanding,
+        float $spanError = 0.0
+    ): array {
+        $startAllowance = self::roundingAllowance($start, true);
+        $endAllowance = self::roundingAllowance($end, true);
+        $sum = $startAllowance + $endAllowance;
+        if ($sum >= 0.25 * (float)$magnitude) {
+            return [];
+        }
+        if (!$forLanding) {
+            return [self::roundingAllowance($start, false), self::roundingAllowance($end, false)];
+        }
+
+        $differenceAllowance = \min(\abs($spanError), 2.0 * $sum);
+        return $sum + $differenceAllowance < 0.25 * (float)$magnitude
+            ? [$startAllowance, $endAllowance, $differenceAllowance]
+            : [$startAllowance, $endAllowance];
+    }
+
+    /**
+     * Whether an integral float past 2^53 is its own shortest decimal: the shortest one that reads back as it.
+     *
+     * The shortest decimal is a few digits D times 10^k. It is exact when 10^k divides the float and D is the
+     * quotient, which needs k <= 22, as 5^23 doesn't divide a 53-bit significand.
+     *
+     * @param float $x integral, past 2^53
+     *
+     * @return bool
+     */
+    private static function isShortestDecimal(float $x): bool
+    {
+        [$significand, $exponent, $digits] = self::shortestDecimal($x);
+        $power = $exponent - $digits;
+        if ($power < 0 || $power > 22) {
+            return false;
+        }
+        $scale = (float)('1e' . $power);
+        $magnitude = \abs($x);
+
+        return \fmod($magnitude, $scale) === 0.0
+            && Arithmetic::compare((int)\str_replace('.', '', $significand), $magnitude / $scale) === 0;
+    }
+
+    /**
+     * The shortest decimal that reads back as |$x|, as its significand d.ddd, its exponent and the number of digits
+     * after the point.
+     *
+     * @param float $x finite and nonzero
+     *
+     * @return array{string, int, int}
+     */
+    private static function shortestDecimal(float $x): array
+    {
+        $magnitude = \abs($x);
+        $digits = 0;
+        $decimal = \sprintf('%.0e', $magnitude);
+        while ((float)$decimal !== $magnitude) {
+            ++$digits;
+            $decimal = \sprintf('%.' . $digits . 'e', $magnitude);
+        }
+        [$significand, $exponent] = \explode('e', $decimal);
+
+        return [$significand, (int)$exponent, $digits];
+    }
+
+    /**
+     * $high - $low, exactly, as the float difference and its rounding error (TwoSum).
+     *
+     * @param float $high
+     * @param float $low
+     *
+     * @return list<float>
+     */
+    private static function exactFloatDifference(float $high, float $low): array
+    {
+        $difference = $high - $low;
+        $highPart = $difference + $low;
+        $error = ($high - $highPart) + (-$low - ($difference - $highPart));
+
+        return [$difference, $error];
+    }
+
+    /**
+     * $high - $low, exactly, as a sum of floats. Past the int range, it is 2^63 plus an excess that is an int.
+     *
+     * @param int $low
+     * @param int $high at least $low
+     *
+     * @return list<float>
+     */
+    private static function exactIntSpan(int $low, int $high): array
+    {
+        // The span fits in an int unless $low is negative and $high - $low passes PHP_INT_MAX.
+        if ($low >= 0 || $high <= \PHP_INT_MAX + $low) {
+            return self::intToFloats($high - $low);
+        }
+
+        return [-(float)\PHP_INT_MIN, ...self::intToFloats($high - ($low - \PHP_INT_MIN))];
+    }
+
+    /**
+     * $n, exactly, as its float and the rest.
+     *
+     * @param int $n
+     *
+     * @return list<float>
+     */
+    private static function intToFloats(int $n): array
+    {
+        $float = (float)$n;
+        // (float) PHP_INT_MAX rounds up to 2^63, which isn't an int.
+        $rest = $float >= -(float)\PHP_INT_MIN ? ($n - \PHP_INT_MAX) - 1 : $n - (int)$float;
+
+        return [$float, (float)$rest];
+    }
+
+    /**
+     * @param list<float> $terms
+     *
+     * @return list<float>
+     */
+    private static function negated(array $terms): array
+    {
+        $negated = [];
+        foreach ($terms as $term) {
+            $negated[] = -$term;
+        }
+
+        return $negated;
+    }
+
+    /**
+     * $a·$b, exactly, as the float product and its rounding error (Dekker's TwoProduct, with Veltkamp's split).
+     *
+     * Exact unless the product overflows or underflows, or a factor is past 2^996, where the split overflows.
+     *
+     * @param float $a
+     * @param float $b
+     *
+     * @return array{float, float}
+     */
+    private static function twoProduct(float $a, float $b): array
+    {
+        $product = $a * $b;
+        $split = 134217729.0 * $a;
+        $aHi = $split - ($split - $a);
+        $aLo = $a - $aHi;
+        $split = 134217729.0 * $b;
+        $bHi = $split - ($split - $b);
+        $bLo = $b - $bHi;
+        $error = (($aHi * $bHi - $product) + $aHi * $bLo + $aLo * $bHi) + $aLo * $bLo;
+
+        return [$product, $error];
+    }
+
+    /**
+     * The exact sum of $terms, which must not overflow, as a nonoverlapping expansion: floats in order of
+     * magnitude, each below the lowest bit of the next (Shewchuk's Grow-Expansion with TwoSum, zeros dropped).
+     *
+     * @param list<float> $terms
+     *
+     * @return list<float>
+     */
+    private static function expansion(array $terms): array
+    {
+        /** @var list<float> $expansion */
+        $expansion = [];
+        foreach ($terms as $sum) {
+            if ($sum === 0.0) {
+                continue;
+            }
+            $grown = [];
+            foreach ($expansion as $component) {
+                $partial = $sum + $component;
+                $componentPart = $partial - $sum;
+                $error = ($sum - ($partial - $componentPart)) + ($component - $componentPart);
+                if ($error !== 0.0) {
+                    $grown[] = $error;
+                }
+                $sum = $partial;
+            }
+            $grown[] = $sum;
+            $expansion = $grown;
+        }
+
+        return $expansion;
+    }
+
+    /**
+     * The sign of the sum of an expansion(): that of its largest nonzero component.
+     *
+     * @param list<float> $expansion
+     *
+     * @return int -1, 0 or 1
+     */
+    private static function expansionSign(array $expansion): int
+    {
+        for ($i = \count($expansion) - 1; $i >= 0; --$i) {
+            if ($expansion[$i] !== 0.0) {
+                return $expansion[$i] > 0.0 ? 1 : -1;
+            }
+        }
+
+        return 0;
     }
 
     /**
