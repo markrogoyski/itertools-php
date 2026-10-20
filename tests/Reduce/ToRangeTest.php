@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools\Tests\Reduce;
 
 use IterTools\Reduce;
+use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\DataProvider;
 use IterTools\Tests\Fixture\GeneratorFixture;
@@ -910,5 +911,309 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
                 9.223372036854778e+18,
             ],
         ];
+    }
+
+    /**
+     * @test         toRange of an array never returns negative zero
+     * @dataProvider dataProviderForNegativeZeroArray
+     * @param        array $data
+     * @param        int|float $expected
+     */
+    public function testNegativeZeroArray(array $data, int|float $expected): void
+    {
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        // -0.0 === 0.0, so compare the exported forms, which differ in the sign.
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with NumPy (Fraction has no signed zero; ptp is max - min in float64 and
+     * keeps the sign of a zero). Generator script: tools/oracles/range_signed_zero.py
+     *   numpy.ptp(numpy.array(data, dtype=float))
+     * The int-vs-float result type is the library's contract, not the oracle's: a range of int
+     * values stays an int, which numpy.ptp(numpy.array(data, dtype=numpy.int64)) confirms is 0.
+     */
+    public static function dataProviderForNegativeZeroArray(): array
+    {
+        return [
+            'negative zero then zero' => [
+                [-0.0, 0.0],
+                0.0,
+            ],
+            'zero then negative zero' => [
+                [0.0, -0.0],
+                0.0,
+            ],
+            'two negative zeros' => [
+                [-0.0, -0.0],
+                0.0,
+            ],
+            'two zeros' => [
+                [0.0, 0.0],
+                0.0,
+            ],
+            'single negative zero' => [
+                [-0.0],
+                0.0,
+            ],
+            'negative zero, zero, negative zero' => [
+                [-0.0, 0.0, -0.0],
+                0.0,
+            ],
+            'negative zero then int zero' => [
+                [-0.0, 0],
+                0.0,
+            ],
+            'int zero then negative zero' => [
+                [0, -0.0],
+                0.0,
+            ],
+            'signed zeros around a nonzero range' => [
+                [-0.0, 0.0, 1.5],
+                1.5,
+            ],
+            'int zero range stays int' => [
+                [5, 5],
+                0,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toRange of a generator never returns negative zero
+     * @dataProvider dataProviderForNegativeZeroGenerators
+     * @param        \Generator $data
+     * @param        int|float $expected
+     */
+    public function testNegativeZeroGenerators(\Generator $data, int|float $expected): void
+    {
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        // -0.0 === 0.0, so compare the exported forms, which differ in the sign.
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with NumPy (Fraction has no signed zero; ptp is max - min in float64 and
+     * keeps the sign of a zero). Generator script: tools/oracles/range_signed_zero.py
+     *   numpy.ptp(numpy.array(data, dtype=float))
+     * The int-vs-float result type is the library's contract, not the oracle's: a range of int
+     * values stays an int, which numpy.ptp(numpy.array(data, dtype=numpy.int64)) confirms is 0.
+     */
+    public static function dataProviderForNegativeZeroGenerators(): array
+    {
+        $gen = static function (array $data) {
+            return GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            'negative zero then zero' => [
+                $gen([-0.0, 0.0]),
+                0.0,
+            ],
+            'zero then negative zero' => [
+                $gen([0.0, -0.0]),
+                0.0,
+            ],
+            'two negative zeros' => [
+                $gen([-0.0, -0.0]),
+                0.0,
+            ],
+            'two zeros' => [
+                $gen([0.0, 0.0]),
+                0.0,
+            ],
+            'single negative zero' => [
+                $gen([-0.0]),
+                0.0,
+            ],
+            'negative zero, zero, negative zero' => [
+                $gen([-0.0, 0.0, -0.0]),
+                0.0,
+            ],
+            'negative zero then int zero' => [
+                $gen([-0.0, 0]),
+                0.0,
+            ],
+            'int zero then negative zero' => [
+                $gen([0, -0.0]),
+                0.0,
+            ],
+            'signed zeros around a nonzero range' => [
+                $gen([-0.0, 0.0, 1.5]),
+                1.5,
+            ],
+            'int zero range stays int' => [
+                $gen([5, 5]),
+                0,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toRange of an iterator never returns negative zero
+     * @dataProvider dataProviderForNegativeZeroIterators
+     * @param        \Iterator $data
+     * @param        int|float $expected
+     */
+    public function testNegativeZeroIterators(\Iterator $data, int|float $expected): void
+    {
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        // -0.0 === 0.0, so compare the exported forms, which differ in the sign.
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with NumPy (Fraction has no signed zero; ptp is max - min in float64 and
+     * keeps the sign of a zero). Generator script: tools/oracles/range_signed_zero.py
+     *   numpy.ptp(numpy.array(data, dtype=float))
+     * The int-vs-float result type is the library's contract, not the oracle's: a range of int
+     * values stays an int, which numpy.ptp(numpy.array(data, dtype=numpy.int64)) confirms is 0.
+     */
+    public static function dataProviderForNegativeZeroIterators(): array
+    {
+        $iter = static function (array $data) {
+            return new ArrayIteratorFixture($data);
+        };
+
+        return [
+            'negative zero then zero' => [
+                $iter([-0.0, 0.0]),
+                0.0,
+            ],
+            'zero then negative zero' => [
+                $iter([0.0, -0.0]),
+                0.0,
+            ],
+            'two negative zeros' => [
+                $iter([-0.0, -0.0]),
+                0.0,
+            ],
+            'two zeros' => [
+                $iter([0.0, 0.0]),
+                0.0,
+            ],
+            'single negative zero' => [
+                $iter([-0.0]),
+                0.0,
+            ],
+            'negative zero, zero, negative zero' => [
+                $iter([-0.0, 0.0, -0.0]),
+                0.0,
+            ],
+            'negative zero then int zero' => [
+                $iter([-0.0, 0]),
+                0.0,
+            ],
+            'int zero then negative zero' => [
+                $iter([0, -0.0]),
+                0.0,
+            ],
+            'signed zeros around a nonzero range' => [
+                $iter([-0.0, 0.0, 1.5]),
+                1.5,
+            ],
+            'int zero range stays int' => [
+                $iter([5, 5]),
+                0,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toRange of an iterator aggregate never returns negative zero
+     * @dataProvider dataProviderForNegativeZeroTraversables
+     * @param        \Traversable $data
+     * @param        int|float $expected
+     */
+    public function testNegativeZeroTraversables(\Traversable $data, int|float $expected): void
+    {
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        // -0.0 === 0.0, so compare the exported forms, which differ in the sign.
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with NumPy (Fraction has no signed zero; ptp is max - min in float64 and
+     * keeps the sign of a zero). Generator script: tools/oracles/range_signed_zero.py
+     *   numpy.ptp(numpy.array(data, dtype=float))
+     * The int-vs-float result type is the library's contract, not the oracle's: a range of int
+     * values stays an int, which numpy.ptp(numpy.array(data, dtype=numpy.int64)) confirms is 0.
+     */
+    public static function dataProviderForNegativeZeroTraversables(): array
+    {
+        $trav = static function (array $data) {
+            return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            'negative zero then zero' => [
+                $trav([-0.0, 0.0]),
+                0.0,
+            ],
+            'zero then negative zero' => [
+                $trav([0.0, -0.0]),
+                0.0,
+            ],
+            'two negative zeros' => [
+                $trav([-0.0, -0.0]),
+                0.0,
+            ],
+            'two zeros' => [
+                $trav([0.0, 0.0]),
+                0.0,
+            ],
+            'single negative zero' => [
+                $trav([-0.0]),
+                0.0,
+            ],
+            'negative zero, zero, negative zero' => [
+                $trav([-0.0, 0.0, -0.0]),
+                0.0,
+            ],
+            'negative zero then int zero' => [
+                $trav([-0.0, 0]),
+                0.0,
+            ],
+            'int zero then negative zero' => [
+                $trav([0, -0.0]),
+                0.0,
+            ],
+            'signed zeros around a nonzero range' => [
+                $trav([-0.0, 0.0, 1.5]),
+                1.5,
+            ],
+            'int zero range stays int' => [
+                $trav([5, 5]),
+                0,
+            ],
+        ];
+    }
+
+    /**
+     * @test         Stream::toRange of an array never returns negative zero
+     * @dataProvider dataProviderForNegativeZeroArray
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testNegativeZeroStream(array $data, int|float $expected): void
+    {
+        // When
+        $result = Stream::of($data)->toRange();
+
+        // Then
+        // -0.0 === 0.0, so compare the exported forms, which differ in the sign.
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
     }
 }

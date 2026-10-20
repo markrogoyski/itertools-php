@@ -962,7 +962,10 @@ final class Reduce
         }
 
         /** @psalm-suppress InvalidOperand */
-        return $max - $min;
+        $range = $max - $min;
+
+        // A range is never negative, but the tie rule can leave -0.0 as the maximum and 0.0 as the minimum.
+        return $range === 0.0 ? 0.0 : $range;
     }
 
     /**
