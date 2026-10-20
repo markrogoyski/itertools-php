@@ -4,14 +4,23 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\Arithmetic;
 use IterTools\Util\SortBoundedHeap;
 
 final class Sort
 {
     /**
+     * 2^53: every int from -2^53 to 2^53 converts to float exactly, so <=> compares it with a float exactly.
+     */
+    private const FLOAT_EXACT_INT_LIMIT = 9007199254740992;
+
+    /**
      * Sorts the given iterable, maintaining index key associations.
      *
-     * If comparator is null, the elements of given iterable must be comparable.
+     * If comparator is null, the elements of given iterable must be comparable. The default comparison
+     * compares an int and a float by exact value, and sorts a float NAN after every other value, keeping
+     * NaNs in input order. A NAN nested inside a composite value is not detected; see README "NaN and
+     * Ordering". A custom comparator is used as given.
      *
      * @param iterable<mixed> $data
      * @param callable(mixed, mixed):int|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
@@ -26,10 +35,12 @@ final class Sort
             $pairs[] = [$key, $value];
         }
 
-        if ($comparator === null) {
-            \usort($pairs, static fn (array $a, array $b) => $a[1] <=> $b[1]);
-        } else {
+        if ($comparator !== null) {
             \usort($pairs, static fn (array $a, array $b) => $comparator($a[1], $b[1]));
+        } elseif (self::needsExactComparison(\array_column($pairs, 1))) {
+            \usort($pairs, static fn (array $a, array $b) => self::compareDefault($a[1], $b[1]));
+        } else {
+            \usort($pairs, static fn (array $a, array $b) => $a[1] <=> $b[1]);
         }
 
         foreach ($pairs as [$key, $value]) {
@@ -40,7 +51,10 @@ final class Sort
     /**
      * Sorts the given iterable
      *
-     * If comparator is null, the elements of given iterable must be comparable.
+     * If comparator is null, the elements of given iterable must be comparable. The default comparison
+     * compares an int and a float by exact value, and sorts a float NAN after every other value. A NAN
+     * nested inside a composite value is not detected; see README "NaN and Ordering". A custom comparator
+     * is used as given.
      *
      * @param iterable<mixed> $data
      * @param callable(mixed, mixed):int|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
@@ -51,10 +65,12 @@ final class Sort
     {
         $array = \iterator_to_array(Transform::toIterator($data), false);
 
-        if ($comparator === null) {
-            \sort($array);
-        } else {
+        if ($comparator !== null) {
             \usort($array, $comparator);
+        } elseif (self::needsExactComparison($array)) {
+            \usort($array, self::compareDefault(...));
+        } else {
+            \sort($array);
         }
 
         foreach ($array as $datum) {
@@ -70,6 +86,10 @@ final class Sort
      *
      * Stable: elements with equal extracted keys preserve their original relative order.
      *
+     * An int and a float key compare by exact value, and an element whose key is a float NAN sorts after
+     * every other element. A NAN nested inside a composite key is not detected; see README "NaN and
+     * Ordering".
+     *
      * @param iterable<mixed>           $data
      * @param callable(mixed):mixed     $keyFn function used to extract the comparison key from each element.
      *
@@ -83,7 +103,11 @@ final class Sort
             $decorated[] = [$keyFn($value), $value];
         }
 
-        \usort($decorated, static fn (array $a, array $b) => $a[0] <=> $b[0]);
+        if (self::needsExactComparison(\array_column($decorated, 0))) {
+            \usort($decorated, static fn (array $a, array $b) => self::compareDefault($a[0], $b[0]));
+        } else {
+            \usort($decorated, static fn (array $a, array $b) => $a[0] <=> $b[0]);
+        }
 
         foreach ($decorated as [, $value]) {
             yield $value;
@@ -99,6 +123,10 @@ final class Sort
      *
      * Stable: elements with equal extracted keys preserve their original relative order.
      *
+     * An int and a float key compare by exact value, and an element whose key is a float NAN sorts after
+     * every other element. A NAN nested inside a composite key is not detected; see README "NaN and
+     * Ordering".
+     *
      * @param iterable<mixed>           $data
      * @param callable(mixed):mixed     $keyFn function used to extract the comparison key from each element.
      *
@@ -112,7 +140,11 @@ final class Sort
             $decorated[] = [$keyFn($value), $key, $value];
         }
 
-        \usort($decorated, static fn (array $a, array $b) => $a[0] <=> $b[0]);
+        if (self::needsExactComparison(\array_column($decorated, 0))) {
+            \usort($decorated, static fn (array $a, array $b) => self::compareDefault($a[0], $b[0]));
+        } else {
+            \usort($decorated, static fn (array $a, array $b) => $a[0] <=> $b[0]);
+        }
 
         foreach ($decorated as [, $key, $value]) {
             yield $key => $value;
@@ -280,5 +312,56 @@ final class Sort
         foreach ($shuffled as $value) {
             yield $value;
         }
+    }
+
+    /**
+     * The default comparison of sort, asort, sortBy and asortBy: a float NAN sorts after every other value
+     * and ties with another NAN, so the stable sort keeps NaNs in input order; every other pair is compared
+     * by {@see Arithmetic::compareValues()}, which is <=> except that an int and a float compare exactly.
+     *
+     * @param mixed $a
+     * @param mixed $b
+     *
+     * @return int
+     */
+    private static function compareDefault(mixed $a, mixed $b): int
+    {
+        $aIsNan = \is_float($a) && \is_nan($a);
+        $bIsNan = \is_float($b) && \is_nan($b);
+        if ($aIsNan || $bIsNan) {
+            return $aIsNan <=> $bIsNan;
+        }
+
+        return Arithmetic::compareValues($a, $b);
+    }
+
+    /**
+     * Whether {@see compareDefault()} can order the values differently from <=>: only if one is a float NAN,
+     * or there are a float and an int beyond ±2^53, which <=> compares as floats. Otherwise callers keep <=>
+     * and \sort(), which give the same order much faster than a comparator written in PHP.
+     *
+     * @param array<mixed> $values
+     *
+     * @return bool
+     */
+    private static function needsExactComparison(array $values): bool
+    {
+        $hasFloat = false;
+        $hasLargeInt = false;
+        foreach ($values as $value) {
+            if (\is_float($value)) {
+                if (\is_nan($value)) {
+                    return true;
+                }
+                $hasFloat = true;
+            } elseif (
+                \is_int($value)
+                && ($value > self::FLOAT_EXACT_INT_LIMIT || $value < -self::FLOAT_EXACT_INT_LIMIT)
+            ) {
+                $hasLargeInt = true;
+            }
+        }
+
+        return $hasFloat && $hasLargeInt;
     }
 }

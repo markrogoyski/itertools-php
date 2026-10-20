@@ -266,4 +266,257 @@ class AsortByTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertInstanceOf(\Generator::class, $result);
     }
+
+    /**
+     * @test         asortBy (Array) with NAN keys sorted last
+     * @dataProvider dataProviderForNanKeySortsLast
+     * @param        array<mixed> $data
+     * @param        callable     $keyFn
+     * @param        array<mixed> $expected
+     */
+    public function testNanKeySortsLastArray(array $data, callable $keyFn, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Sort::asortBy($data, $keyFn) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         asortBy (Generator) with NAN keys sorted last
+     * @dataProvider dataProviderForNanKeySortsLast
+     * @param        array<mixed> $data
+     * @param        callable     $keyFn
+     * @param        array<mixed> $expected
+     */
+    public function testNanKeySortsLastGenerator(array $data, callable $keyFn, array $expected): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+        $result = [];
+
+        // When
+        foreach (Sort::asortBy($generator, $keyFn) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         asortBy (Iterator) with NAN keys sorted last
+     * @dataProvider dataProviderForNanKeySortsLast
+     * @param        array<mixed> $data
+     * @param        callable     $keyFn
+     * @param        array<mixed> $expected
+     */
+    public function testNanKeySortsLastIterator(array $data, callable $keyFn, array $expected): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture($data);
+        $result = [];
+
+        // When
+        foreach (Sort::asortBy($iterator, $keyFn) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         asortBy (IteratorAggregate) with NAN keys sorted last
+     * @dataProvider dataProviderForNanKeySortsLast
+     * @param        array<mixed> $data
+     * @param        callable     $keyFn
+     * @param        array<mixed> $expected
+     */
+    public function testNanKeySortsLastIteratorAggregate(array $data, callable $keyFn, array $expected): void
+    {
+        // Given
+        $traversable = new IteratorAggregateFixture($data);
+        $result = [];
+
+        // When
+        foreach (Sort::asortBy($traversable, $keyFn) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort, which compares int and float by exact value, with
+     * NAN placed last by the key, since Python's own ordering misplaces NAN:
+     *   sorted(enumerate(rows), key=lambda kv: (isnan(kv[1]['v']), 0 if isnan(kv[1]['v']) else kv[1]['v']))
+     */
+    public static function dataProviderForNanKeySortsLast(): array
+    {
+        return [
+            'NAN keys last in input order' => [
+                [['id' => 'a', 'v' => 2], ['id' => 'b', 'v' => \NAN], ['id' => 'c', 'v' => 1], ['id' => 'd', 'v' => \NAN], ['id' => 'e', 'v' => 3]],
+                fn (array $row) => $row['v'],
+                [2 => ['id' => 'c', 'v' => 1], 0 => ['id' => 'a', 'v' => 2], 4 => ['id' => 'e', 'v' => 3], 1 => ['id' => 'b', 'v' => \NAN], 3 => ['id' => 'd', 'v' => \NAN]],
+            ],
+            'NAN key in the middle' => [
+                [['id' => 'a', 'v' => 2], ['id' => 'b', 'v' => 4], ['id' => 'c', 'v' => \NAN], ['id' => 'd', 'v' => 5], ['id' => 'e', 'v' => 6], ['id' => 'f', 'v' => 1], ['id' => 'g', 'v' => 3]],
+                fn (array $row) => $row['v'],
+                [5 => ['id' => 'f', 'v' => 1], 0 => ['id' => 'a', 'v' => 2], 6 => ['id' => 'g', 'v' => 3], 1 => ['id' => 'b', 'v' => 4], 3 => ['id' => 'd', 'v' => 5], 4 => ['id' => 'e', 'v' => 6], 2 => ['id' => 'c', 'v' => \NAN]],
+            ],
+            'only NAN keys' => [
+                [['id' => 'a', 'v' => \NAN], ['id' => 'b', 'v' => \NAN]],
+                fn (array $row) => $row['v'],
+                [['id' => 'a', 'v' => \NAN], ['id' => 'b', 'v' => \NAN]],
+            ],
+            'NAN key after INF' => [
+                [['id' => 'a', 'v' => \INF], ['id' => 'b', 'v' => \NAN], ['id' => 'c', 'v' => -\INF]],
+                fn (array $row) => $row['v'],
+                [2 => ['id' => 'c', 'v' => -\INF], 0 => ['id' => 'a', 'v' => \INF], 1 => ['id' => 'b', 'v' => \NAN]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         asortBy (Array) of int and float keys beyond 2^53, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatKeyBeyondFloatPrecision
+     * @param        array<mixed> $data
+     * @param        callable     $keyFn
+     * @param        array<mixed> $expected
+     */
+    public function testIntAndFloatKeyBeyondFloatPrecisionArray(array $data, callable $keyFn, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Sort::asortBy($data, $keyFn) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         asortBy (Generator) of int and float keys beyond 2^53, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatKeyBeyondFloatPrecision
+     * @param        array<mixed> $data
+     * @param        callable     $keyFn
+     * @param        array<mixed> $expected
+     */
+    public function testIntAndFloatKeyBeyondFloatPrecisionGenerator(array $data, callable $keyFn, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $generator = GeneratorFixture::getGenerator($data);
+        $result = [];
+
+        // When
+        foreach (Sort::asortBy($generator, $keyFn) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         asortBy (Iterator) of int and float keys beyond 2^53, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatKeyBeyondFloatPrecision
+     * @param        array<mixed> $data
+     * @param        callable     $keyFn
+     * @param        array<mixed> $expected
+     */
+    public function testIntAndFloatKeyBeyondFloatPrecisionIterator(array $data, callable $keyFn, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $iterator = new ArrayIteratorFixture($data);
+        $result = [];
+
+        // When
+        foreach (Sort::asortBy($iterator, $keyFn) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         asortBy (IteratorAggregate) of int and float keys beyond 2^53, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatKeyBeyondFloatPrecision
+     * @param        array<mixed> $data
+     * @param        callable     $keyFn
+     * @param        array<mixed> $expected
+     */
+    public function testIntAndFloatKeyBeyondFloatPrecisionIteratorAggregate(array $data, callable $keyFn, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $traversable = new IteratorAggregateFixture($data);
+        $result = [];
+
+        // When
+        foreach (Sort::asortBy($traversable, $keyFn) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort, which compares int and float by exact value, with
+     * NAN placed last by the key, since Python's own ordering misplaces NAN:
+     *   sorted(enumerate(rows), key=lambda kv: (isnan(kv[1]['v']), 0 if isnan(kv[1]['v']) else kv[1]['v']))
+     */
+    public static function dataProviderForIntAndFloatKeyBeyondFloatPrecision(): array
+    {
+        return [
+            'int key 2^53 + 1 before float key 2.0^53, equal as floats' => [
+                [['id' => 'a', 'v' => 9007199254740993], ['id' => 'b', 'v' => 9007199254740992.0]],
+                fn (array $row) => $row['v'],
+                [1 => ['id' => 'b', 'v' => 9007199254740992.0], 0 => ['id' => 'a', 'v' => 9007199254740993]],
+            ],
+            'float key 2.0^53 after int keys that equal it as floats' => [
+                [['id' => 'a', 'v' => 9007199254740994], ['id' => 'b', 'v' => 9007199254740993], ['id' => 'c', 'v' => 9007199254740992.0]],
+                fn (array $row) => $row['v'],
+                [2 => ['id' => 'c', 'v' => 9007199254740992.0], 1 => ['id' => 'b', 'v' => 9007199254740993], 0 => ['id' => 'a', 'v' => 9007199254740994]],
+            ],
+            'negative float key -2.0^53 before int key -(2^53 + 1)' => [
+                [['id' => 'a', 'v' => -9007199254740992.0], ['id' => 'b', 'v' => -9007199254740993]],
+                fn (array $row) => $row['v'],
+                [1 => ['id' => 'b', 'v' => -9007199254740993], 0 => ['id' => 'a', 'v' => -9007199254740992.0]],
+            ],
+            'float key 2.0^63 before int key PHP_INT_MAX' => [
+                [['id' => 'a', 'v' => 9.223372036854776e+18], ['id' => 'b', 'v' => 9223372036854775807]],
+                fn (array $row) => $row['v'],
+                [1 => ['id' => 'b', 'v' => 9223372036854775807], 0 => ['id' => 'a', 'v' => 9.223372036854776e+18]],
+            ],
+            'NAN key after an int key beyond 2^53 and a float key' => [
+                [['id' => 'a', 'v' => 9007199254740993], ['id' => 'b', 'v' => \NAN], ['id' => 'c', 'v' => 9007199254740992.0]],
+                fn (array $row) => $row['v'],
+                [2 => ['id' => 'c', 'v' => 9007199254740992.0], 0 => ['id' => 'a', 'v' => 9007199254740993], 1 => ['id' => 'b', 'v' => \NAN]],
+            ],
+        ];
+    }
 }

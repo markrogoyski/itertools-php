@@ -813,13 +813,15 @@ final class Stream implements \IteratorAggregate
     /**
      * Sorts the stream.
      *
-     * If comparator is null, then elements of the iterable source must be comparable.
+     * If comparator is null, then elements of the iterable source must be comparable. The default comparison
+     * compares an int and a float by exact value, and sorts a float NAN after every other value, keeping NaNs
+     * in input order; see README "NaN and Ordering". A custom comparator is used as given.
      *
      * @param (callable(mixed, mixed):int)|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
      * @return Stream
      *
-     * @see Single::sort()
+     * @see Sort::sort()
      */
     public function sort(?callable $comparator = null): self
     {
@@ -830,7 +832,9 @@ final class Stream implements \IteratorAggregate
     /**
      * Sorts the stream, maintaining index key associations
      *
-     * If comparator is null, then elements of the iterable source must be comparable.
+     * If comparator is null, then elements of the iterable source must be comparable. The default comparison
+     * compares an int and a float by exact value, and sorts a float NAN after every other value, keeping NaNs
+     * in input order; see README "NaN and Ordering". A custom comparator is used as given.
      *
      * @param (callable(mixed, mixed):int)|null $comparator (optional) function to determine how to sort elements if default sort is not appropriate.
      *
@@ -849,6 +853,9 @@ final class Stream implements \IteratorAggregate
      *
      * The key function is called exactly once per element. Source keys are discarded.
      *
+     * An int and a float key compare by exact value, and an element whose key is a float NAN sorts after every
+     * other element, in input order; see README "NaN and Ordering".
+     *
      * @param callable(mixed):mixed $keyFn function used to extract the comparison key from each element.
      *
      * @return Stream
@@ -865,6 +872,9 @@ final class Stream implements \IteratorAggregate
      * Sorts the stream using a key-extraction function (Schwartzian transform), preserving key associations.
      *
      * The key function is called exactly once per element. Source keys are preserved.
+     *
+     * An int and a float key compare by exact value, and an element whose key is a float NAN sorts after every
+     * other element, in input order; see README "NaN and Ordering".
      *
      * @param callable(mixed):mixed $keyFn function used to extract the comparison key from each element.
      *

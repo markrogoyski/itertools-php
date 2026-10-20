@@ -644,6 +644,10 @@ foreach (Multi::chain(Single::string($letters), Single::string($numbers)) as $ch
 или `$keyFunc`.
 
 * `toMin`, `toMax`, `toMinMax`, `Sort::largest` и `Sort::smallest` пропускают элемент.
+* `Sort::sort`, `asort`, `sortBy` и `asortBy` при сравнении по умолчанию помещают элемент после
+  всех остальных значений. Элементы с ключом `NAN` сохраняют исходный порядок, а остальные
+  правильно сортируются между собой. `isSorted` для такого результата всё равно возвращает
+  `false`. Пользовательский `$comparator` используется как есть, поэтому место `NAN` определяет он.
 * `isSorted`, `isReversed`, `isSortedBy` и `isReversedBy` возвращают `false`. Проверка идёт по
   соседним парам, поэтому коллекция из одного элемента считается отсортированной, даже если её
   ключ — `NAN`.

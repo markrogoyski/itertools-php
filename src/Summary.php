@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\Arithmetic;
 use IterTools\Util\UniqueExtractor;
 use IterTools\Util\UsageMap;
 use IterTools\Util\ValueCounter;
@@ -210,7 +211,9 @@ final class Summary
             if ((\is_float($lhs) && \is_nan($lhs)) || (\is_float($rhs) && \is_nan($rhs))) {
                 return false;
             }
-            if ($rhs < $lhs) {
+            // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when they
+            // are not.
+            if (Arithmetic::compareValues($rhs, $lhs) < 0) {
                 return false;
             }
         }
@@ -235,7 +238,8 @@ final class Summary
             if ((\is_float($lhs) && \is_nan($lhs)) || (\is_float($rhs) && \is_nan($rhs))) {
                 return false;
             }
-            if ($rhs > $lhs) {
+            // Compare exactly, as in isSorted(). $rhs > $lhs, written as PHP evaluates it: $lhs < $rhs.
+            if (Arithmetic::compareValues($lhs, $rhs) < 0) {
                 return false;
             }
         }

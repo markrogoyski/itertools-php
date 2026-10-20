@@ -12,6 +12,9 @@ Iterate the collection sorted while maintaining the associative key index relati
 ```Sort::asort(iterable $data, ?callable $comparator = null)```
 
 Uses default sorting if optional comparator function not provided.
+The default comparison compares an integer and a float by exact value, and sorts a float
+`NAN` after every other value, keeping `NAN`s in input order; see
+[NaN and Ordering](../README.md#nan-and-ordering). A custom comparator is used as given.
 
 ```php
 use IterTools\Sort;
@@ -40,6 +43,9 @@ Iterate the collection sorted.
 ```Sort::sort(iterable $data, ?callable $comparator = null)```
 
 Uses default sorting if optional comparator function not provided.
+The default comparison compares an integer and a float by exact value, and sorts a float
+`NAN` after every other value, keeping `NAN`s in input order; see
+[NaN and Ordering](../README.md#nan-and-ordering). A custom comparator is used as given.
 
 ```php
 use IterTools\Sort;
@@ -60,6 +66,9 @@ Iterate the collection sorted by a key extracted from each element (Schwartzian 
 The key function is called exactly once per element. Source keys are discarded
 (matching `Sort::sort`). The sort is stable: elements with equal extracted keys
 preserve their original relative order.
+Keys compare as in the default comparison of `Sort::sort`: an integer and a float by exact
+value, and an element whose key is a float `NAN` after every other element, in input order;
+see [NaN and Ordering](../README.md#nan-and-ordering).
 
 Stream equivalent: [`Stream::sortBy()`](stream.md#sort-by).
 
@@ -103,6 +112,9 @@ transform), maintaining the associative key index relations.
 The key function is called exactly once per element. Source keys are preserved
 (matching `Sort::asort`). The sort is stable: elements with equal extracted keys
 preserve their original relative order.
+Keys compare as in the default comparison of `Sort::sort`: an integer and a float by exact
+value, and an element whose key is a float `NAN` after every other element, in input order;
+see [NaN and Ordering](../README.md#nan-and-ordering).
 
 Stream equivalent: [`Stream::asortBy()`](stream.md#asort-by).
 

@@ -664,6 +664,10 @@ Functions that order values guard against `NAN` only when the comparison key is 
 float `NAN`. The key is the element, or what `$compareBy`, `$keyFn` or `$keyFunc` returns.
 
 * `toMin`, `toMax`, `toMinMax`, `Sort::largest` and `Sort::smallest` skip the element.
+* `Sort::sort`, `asort`, `sortBy` and `asortBy`, with the default comparison, sort the element
+  after every other value. Elements with a `NAN` key keep their input order, and the others are
+  sorted correctly among themselves. `isSorted` still returns `false` for the result. A custom
+  `$comparator` is used as given, so it decides where `NAN` goes.
 * `isSorted`, `isReversed`, `isSortedBy` and `isReversedBy` return `false`. The check runs on
   adjacent pairs, so a collection with a single element is sorted even if its key is `NAN`.
 * `mergeSorted` and `mergeSortedBy` throw `\InvalidArgumentException`.

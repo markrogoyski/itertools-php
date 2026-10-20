@@ -210,4 +210,121 @@ class IsReversedByTest extends \PHPUnit\Framework\TestCase
             [[3, 2, 1], fn ($x) => $x === 2 ? \NAN : $x],
         ];
     }
+
+    /**
+     * @test         isReversedBy array of int and float keys beyond 2^53, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array    $data
+     * @param        callable $keyFunc
+     * @param        bool     $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionArray(array $data, callable $keyFunc, bool $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Summary::isReversedBy($data, $keyFunc);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         isReversedBy generator of int and float keys beyond 2^53, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array    $data
+     * @param        callable $keyFunc
+     * @param        bool     $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionGenerator(array $data, callable $keyFunc, bool $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $generator = Fixture\GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Summary::isReversedBy($generator, $keyFunc);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         isReversedBy iterator of int and float keys beyond 2^53, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array    $data
+     * @param        callable $keyFunc
+     * @param        bool     $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionIterator(array $data, callable $keyFunc, bool $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $iterator = new Fixture\ArrayIteratorFixture($data);
+
+        // When
+        $result = Summary::isReversedBy($iterator, $keyFunc);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         isReversedBy traversable of int and float keys beyond 2^53, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array    $data
+     * @param        callable $keyFunc
+     * @param        bool     $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionTraversable(array $data, callable $keyFunc, bool $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $traversable = new Fixture\IteratorAggregateFixture($data);
+
+        // When
+        $result = Summary::isReversedBy($traversable, $keyFunc);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   all(a >= b for a, b in pairwise(r['v'] for r in rows))
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecision(): array
+    {
+        return [
+            'float key 2.0^53 then int key 2^53 + 1' => [
+                [['v' => 9007199254740992.0], ['v' => 9007199254740993]],
+                fn (array $row) => $row['v'],
+                false,
+            ],
+            'int key 2^53 + 1 then float key 2.0^53' => [
+                [['v' => 9007199254740993], ['v' => 9007199254740992.0]],
+                fn (array $row) => $row['v'],
+                true,
+            ],
+            'int key PHP_INT_MAX then float key 2.0^63' => [
+                [['v' => 9223372036854775807], ['v' => 9.223372036854776e+18]],
+                fn (array $row) => $row['v'],
+                false,
+            ],
+            'float key 2.0^63 then int key PHP_INT_MAX' => [
+                [['v' => 9.223372036854776e+18], ['v' => 9223372036854775807]],
+                fn (array $row) => $row['v'],
+                true,
+            ],
+        ];
+    }
 }

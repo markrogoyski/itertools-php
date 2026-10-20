@@ -2076,4 +2076,378 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertTrue($result);
     }
+
+    /**
+     * @test         Stream isSorted/isReversed array of an int beyond 2^53 and a float, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionArray
+     * @param        array $input
+     * @param        callable $summaryStreamFactoryFunc
+     * @param        bool $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionArray(array $input, callable $summaryStreamFactoryFunc, bool $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = $summaryStreamFactoryFunc($input);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   all(a <= b for a, b in pairwise(data))
+     *   all(a >= b for a, b in pairwise(data))
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionArray(): array
+    {
+        return [
+            'isSorted: float 2.0^53 then int 2^53 + 1' => [
+                [9007199254740992.0, 9007199254740993],
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                true,
+            ],
+            'isSorted: int 2^53 + 1 then float 2.0^53' => [
+                [9007199254740993, 9007199254740992.0],
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                false,
+            ],
+            'isSorted: int PHP_INT_MAX then float 2.0^63' => [
+                [9223372036854775807, 9.223372036854776e+18],
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                true,
+            ],
+            'isSorted: float 2.0^63 then int PHP_INT_MAX' => [
+                [9.223372036854776e+18, 9223372036854775807],
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                false,
+            ],
+            'isReversed: float 2.0^53 then int 2^53 + 1' => [
+                [9007199254740992.0, 9007199254740993],
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                false,
+            ],
+            'isReversed: int 2^53 + 1 then float 2.0^53' => [
+                [9007199254740993, 9007199254740992.0],
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                true,
+            ],
+            'isReversed: int PHP_INT_MAX then float 2.0^63' => [
+                [9223372036854775807, 9.223372036854776e+18],
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                false,
+            ],
+            'isReversed: float 2.0^63 then int PHP_INT_MAX' => [
+                [9.223372036854776e+18, 9223372036854775807],
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                true,
+            ],
+            'isSortedBy: float 2.0^53 then int 2^53 + 1' => [
+                [['v' => 9007199254740992.0], ['v' => 9007199254740993]],
+                fn (iterable $iterable) => Stream::of($iterable)->isSortedBy(fn (array $row) => $row['v']),
+                true,
+            ],
+            'isReversedBy: float 2.0^53 then int 2^53 + 1' => [
+                [['v' => 9007199254740992.0], ['v' => 9007199254740993]],
+                fn (iterable $iterable) => Stream::of($iterable)->isReversedBy(fn (array $row) => $row['v']),
+                false,
+            ],
+            'isSortedBy: int 2^53 + 1 then float 2.0^53' => [
+                [['v' => 9007199254740993], ['v' => 9007199254740992.0]],
+                fn (iterable $iterable) => Stream::of($iterable)->isSortedBy(fn (array $row) => $row['v']),
+                false,
+            ],
+            'isReversedBy: int 2^53 + 1 then float 2.0^53' => [
+                [['v' => 9007199254740993], ['v' => 9007199254740992.0]],
+                fn (iterable $iterable) => Stream::of($iterable)->isReversedBy(fn (array $row) => $row['v']),
+                true,
+            ],
+        ];
+    }
+
+    /**
+     * @test         Stream isSorted/isReversed generator of an int beyond 2^53 and a float, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionGenerator
+     * @param        \Generator $input
+     * @param        callable $summaryStreamFactoryFunc
+     * @param        bool $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionGenerator(\Generator $input, callable $summaryStreamFactoryFunc, bool $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = $summaryStreamFactoryFunc($input);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   all(a <= b for a, b in pairwise(data))
+     *   all(a >= b for a, b in pairwise(data))
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionGenerator(): array
+    {
+        $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
+
+        return [
+            'isSorted: float 2.0^53 then int 2^53 + 1' => [
+                $gen([9007199254740992.0, 9007199254740993]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                true,
+            ],
+            'isSorted: int 2^53 + 1 then float 2.0^53' => [
+                $gen([9007199254740993, 9007199254740992.0]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                false,
+            ],
+            'isSorted: int PHP_INT_MAX then float 2.0^63' => [
+                $gen([9223372036854775807, 9.223372036854776e+18]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                true,
+            ],
+            'isSorted: float 2.0^63 then int PHP_INT_MAX' => [
+                $gen([9.223372036854776e+18, 9223372036854775807]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                false,
+            ],
+            'isReversed: float 2.0^53 then int 2^53 + 1' => [
+                $gen([9007199254740992.0, 9007199254740993]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                false,
+            ],
+            'isReversed: int 2^53 + 1 then float 2.0^53' => [
+                $gen([9007199254740993, 9007199254740992.0]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                true,
+            ],
+            'isReversed: int PHP_INT_MAX then float 2.0^63' => [
+                $gen([9223372036854775807, 9.223372036854776e+18]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                false,
+            ],
+            'isReversed: float 2.0^63 then int PHP_INT_MAX' => [
+                $gen([9.223372036854776e+18, 9223372036854775807]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                true,
+            ],
+            'isSortedBy: float 2.0^53 then int 2^53 + 1' => [
+                $gen([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSortedBy(fn (array $row) => $row['v']),
+                true,
+            ],
+            'isReversedBy: float 2.0^53 then int 2^53 + 1' => [
+                $gen([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversedBy(fn (array $row) => $row['v']),
+                false,
+            ],
+            'isSortedBy: int 2^53 + 1 then float 2.0^53' => [
+                $gen([['v' => 9007199254740993], ['v' => 9007199254740992.0]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSortedBy(fn (array $row) => $row['v']),
+                false,
+            ],
+            'isReversedBy: int 2^53 + 1 then float 2.0^53' => [
+                $gen([['v' => 9007199254740993], ['v' => 9007199254740992.0]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversedBy(fn (array $row) => $row['v']),
+                true,
+            ],
+        ];
+    }
+
+    /**
+     * @test         Stream isSorted/isReversed iterator of an int beyond 2^53 and a float, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionIterator
+     * @param        \Iterator $input
+     * @param        callable $summaryStreamFactoryFunc
+     * @param        bool $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionIterator(\Iterator $input, callable $summaryStreamFactoryFunc, bool $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = $summaryStreamFactoryFunc($input);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   all(a <= b for a, b in pairwise(data))
+     *   all(a >= b for a, b in pairwise(data))
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionIterator(): array
+    {
+        $iter = fn (array $data) => new ArrayIteratorFixture($data);
+
+        return [
+            'isSorted: float 2.0^53 then int 2^53 + 1' => [
+                $iter([9007199254740992.0, 9007199254740993]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                true,
+            ],
+            'isSorted: int 2^53 + 1 then float 2.0^53' => [
+                $iter([9007199254740993, 9007199254740992.0]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                false,
+            ],
+            'isSorted: int PHP_INT_MAX then float 2.0^63' => [
+                $iter([9223372036854775807, 9.223372036854776e+18]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                true,
+            ],
+            'isSorted: float 2.0^63 then int PHP_INT_MAX' => [
+                $iter([9.223372036854776e+18, 9223372036854775807]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                false,
+            ],
+            'isReversed: float 2.0^53 then int 2^53 + 1' => [
+                $iter([9007199254740992.0, 9007199254740993]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                false,
+            ],
+            'isReversed: int 2^53 + 1 then float 2.0^53' => [
+                $iter([9007199254740993, 9007199254740992.0]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                true,
+            ],
+            'isReversed: int PHP_INT_MAX then float 2.0^63' => [
+                $iter([9223372036854775807, 9.223372036854776e+18]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                false,
+            ],
+            'isReversed: float 2.0^63 then int PHP_INT_MAX' => [
+                $iter([9.223372036854776e+18, 9223372036854775807]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                true,
+            ],
+            'isSortedBy: float 2.0^53 then int 2^53 + 1' => [
+                $iter([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSortedBy(fn (array $row) => $row['v']),
+                true,
+            ],
+            'isReversedBy: float 2.0^53 then int 2^53 + 1' => [
+                $iter([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversedBy(fn (array $row) => $row['v']),
+                false,
+            ],
+            'isSortedBy: int 2^53 + 1 then float 2.0^53' => [
+                $iter([['v' => 9007199254740993], ['v' => 9007199254740992.0]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSortedBy(fn (array $row) => $row['v']),
+                false,
+            ],
+            'isReversedBy: int 2^53 + 1 then float 2.0^53' => [
+                $iter([['v' => 9007199254740993], ['v' => 9007199254740992.0]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversedBy(fn (array $row) => $row['v']),
+                true,
+            ],
+        ];
+    }
+
+    /**
+     * @test         Stream isSorted/isReversed traversable of an int beyond 2^53 and a float, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionTraversable
+     * @param        \Traversable $input
+     * @param        callable $summaryStreamFactoryFunc
+     * @param        bool $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionTraversable(\Traversable $input, callable $summaryStreamFactoryFunc, bool $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = $summaryStreamFactoryFunc($input);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value:
+     *   all(a <= b for a, b in pairwise(data))
+     *   all(a >= b for a, b in pairwise(data))
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionTraversable(): array
+    {
+        $trav = fn (array $data) => new IteratorAggregateFixture($data);
+
+        return [
+            'isSorted: float 2.0^53 then int 2^53 + 1' => [
+                $trav([9007199254740992.0, 9007199254740993]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                true,
+            ],
+            'isSorted: int 2^53 + 1 then float 2.0^53' => [
+                $trav([9007199254740993, 9007199254740992.0]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                false,
+            ],
+            'isSorted: int PHP_INT_MAX then float 2.0^63' => [
+                $trav([9223372036854775807, 9.223372036854776e+18]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                true,
+            ],
+            'isSorted: float 2.0^63 then int PHP_INT_MAX' => [
+                $trav([9.223372036854776e+18, 9223372036854775807]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSorted(),
+                false,
+            ],
+            'isReversed: float 2.0^53 then int 2^53 + 1' => [
+                $trav([9007199254740992.0, 9007199254740993]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                false,
+            ],
+            'isReversed: int 2^53 + 1 then float 2.0^53' => [
+                $trav([9007199254740993, 9007199254740992.0]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                true,
+            ],
+            'isReversed: int PHP_INT_MAX then float 2.0^63' => [
+                $trav([9223372036854775807, 9.223372036854776e+18]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                false,
+            ],
+            'isReversed: float 2.0^63 then int PHP_INT_MAX' => [
+                $trav([9.223372036854776e+18, 9223372036854775807]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversed(),
+                true,
+            ],
+            'isSortedBy: float 2.0^53 then int 2^53 + 1' => [
+                $trav([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSortedBy(fn (array $row) => $row['v']),
+                true,
+            ],
+            'isReversedBy: float 2.0^53 then int 2^53 + 1' => [
+                $trav([['v' => 9007199254740992.0], ['v' => 9007199254740993]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversedBy(fn (array $row) => $row['v']),
+                false,
+            ],
+            'isSortedBy: int 2^53 + 1 then float 2.0^53' => [
+                $trav([['v' => 9007199254740993], ['v' => 9007199254740992.0]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isSortedBy(fn (array $row) => $row['v']),
+                false,
+            ],
+            'isReversedBy: int 2^53 + 1 then float 2.0^53' => [
+                $trav([['v' => 9007199254740993], ['v' => 9007199254740992.0]]),
+                fn (iterable $iterable) => Stream::of($iterable)->isReversedBy(fn (array $row) => $row['v']),
+                true,
+            ],
+        ];
+    }
 }

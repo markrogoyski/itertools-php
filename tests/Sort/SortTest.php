@@ -999,4 +999,864 @@ class SortTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(4, $result);
         $this->assertEquals(['z', 'c', 'b', 'a'], $result);
     }
+
+    /**
+     * @test         sort array with NAN sorted last by the default comparison
+     * @dataProvider dataProviderForNanSortsLastArray
+     * @param        array $data
+     * @param        array $expected
+     */
+    public function testNanSortsLastArray(array $data, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort, which compares int and float by exact value, with
+     * NAN placed last by the key, since Python's own ordering misplaces NAN:
+     *   sorted(data, key=lambda x: (isnan(x), 0 if isnan(x) else x))
+     */
+    public static function dataProviderForNanSortsLastArray(): array
+    {
+        return [
+            'NAN in the middle' => [
+                [2, 4, \NAN, 5, 6, 1, 3],
+                [1, 2, 3, 4, 5, 6, \NAN],
+            ],
+            'NAN first' => [
+                [\NAN, 3, 1, 2],
+                [1, 2, 3, \NAN],
+            ],
+            'NAN already last' => [
+                [3, 1, 2, \NAN],
+                [1, 2, 3, \NAN],
+            ],
+            'several NANs' => [
+                [\NAN, 3, \NAN, 1, \NAN, 2],
+                [1, 2, 3, \NAN, \NAN, \NAN],
+            ],
+            'only NANs' => [
+                [\NAN, \NAN],
+                [\NAN, \NAN],
+            ],
+            'single NAN' => [
+                [\NAN],
+                [\NAN],
+            ],
+            'NAN after INF' => [
+                [\INF, \NAN, -\INF, 0.5, -1.5],
+                [-\INF, -1.5, 0.5, \INF, \NAN],
+            ],
+            'NAN among ints and floats, int/float tie kept in input order' => [
+                [2.5, \NAN, 1.0, -0.5, 1, 2],
+                [-0.5, 1.0, 1, 2, 2.5, \NAN],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort generators with NAN sorted last by the default comparison
+     * @dataProvider dataProviderForNanSortsLastGenerators
+     * @param        \Generator $data
+     * @param        array $expected
+     */
+    public function testNanSortsLastGenerators(\Generator $data, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort, which compares int and float by exact value, with
+     * NAN placed last by the key, since Python's own ordering misplaces NAN:
+     *   sorted(data, key=lambda x: (isnan(x), 0 if isnan(x) else x))
+     */
+    public static function dataProviderForNanSortsLastGenerators(): array
+    {
+        $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
+
+        return [
+            'NAN in the middle' => [
+                $gen([2, 4, \NAN, 5, 6, 1, 3]),
+                [1, 2, 3, 4, 5, 6, \NAN],
+            ],
+            'NAN first' => [
+                $gen([\NAN, 3, 1, 2]),
+                [1, 2, 3, \NAN],
+            ],
+            'NAN already last' => [
+                $gen([3, 1, 2, \NAN]),
+                [1, 2, 3, \NAN],
+            ],
+            'several NANs' => [
+                $gen([\NAN, 3, \NAN, 1, \NAN, 2]),
+                [1, 2, 3, \NAN, \NAN, \NAN],
+            ],
+            'only NANs' => [
+                $gen([\NAN, \NAN]),
+                [\NAN, \NAN],
+            ],
+            'single NAN' => [
+                $gen([\NAN]),
+                [\NAN],
+            ],
+            'NAN after INF' => [
+                $gen([\INF, \NAN, -\INF, 0.5, -1.5]),
+                [-\INF, -1.5, 0.5, \INF, \NAN],
+            ],
+            'NAN among ints and floats, int/float tie kept in input order' => [
+                $gen([2.5, \NAN, 1.0, -0.5, 1, 2]),
+                [-0.5, 1.0, 1, 2, 2.5, \NAN],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort iterators with NAN sorted last by the default comparison
+     * @dataProvider dataProviderForNanSortsLastIterators
+     * @param        \Iterator $data
+     * @param        array $expected
+     */
+    public function testNanSortsLastIterators(\Iterator $data, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort, which compares int and float by exact value, with
+     * NAN placed last by the key, since Python's own ordering misplaces NAN:
+     *   sorted(data, key=lambda x: (isnan(x), 0 if isnan(x) else x))
+     */
+    public static function dataProviderForNanSortsLastIterators(): array
+    {
+        $iter = fn (array $data) => new ArrayIteratorFixture($data);
+
+        return [
+            'NAN in the middle' => [
+                $iter([2, 4, \NAN, 5, 6, 1, 3]),
+                [1, 2, 3, 4, 5, 6, \NAN],
+            ],
+            'NAN first' => [
+                $iter([\NAN, 3, 1, 2]),
+                [1, 2, 3, \NAN],
+            ],
+            'NAN already last' => [
+                $iter([3, 1, 2, \NAN]),
+                [1, 2, 3, \NAN],
+            ],
+            'several NANs' => [
+                $iter([\NAN, 3, \NAN, 1, \NAN, 2]),
+                [1, 2, 3, \NAN, \NAN, \NAN],
+            ],
+            'only NANs' => [
+                $iter([\NAN, \NAN]),
+                [\NAN, \NAN],
+            ],
+            'single NAN' => [
+                $iter([\NAN]),
+                [\NAN],
+            ],
+            'NAN after INF' => [
+                $iter([\INF, \NAN, -\INF, 0.5, -1.5]),
+                [-\INF, -1.5, 0.5, \INF, \NAN],
+            ],
+            'NAN among ints and floats, int/float tie kept in input order' => [
+                $iter([2.5, \NAN, 1.0, -0.5, 1, 2]),
+                [-0.5, 1.0, 1, 2, 2.5, \NAN],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort traversables with NAN sorted last by the default comparison
+     * @dataProvider dataProviderForNanSortsLastTraversables
+     * @param        \Traversable $data
+     * @param        array $expected
+     */
+    public function testNanSortsLastTraversables(\Traversable $data, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort, which compares int and float by exact value, with
+     * NAN placed last by the key, since Python's own ordering misplaces NAN:
+     *   sorted(data, key=lambda x: (isnan(x), 0 if isnan(x) else x))
+     */
+    public static function dataProviderForNanSortsLastTraversables(): array
+    {
+        $trav = fn (array $data) => new IteratorAggregateFixture($data);
+
+        return [
+            'NAN in the middle' => [
+                $trav([2, 4, \NAN, 5, 6, 1, 3]),
+                [1, 2, 3, 4, 5, 6, \NAN],
+            ],
+            'NAN first' => [
+                $trav([\NAN, 3, 1, 2]),
+                [1, 2, 3, \NAN],
+            ],
+            'NAN already last' => [
+                $trav([3, 1, 2, \NAN]),
+                [1, 2, 3, \NAN],
+            ],
+            'several NANs' => [
+                $trav([\NAN, 3, \NAN, 1, \NAN, 2]),
+                [1, 2, 3, \NAN, \NAN, \NAN],
+            ],
+            'only NANs' => [
+                $trav([\NAN, \NAN]),
+                [\NAN, \NAN],
+            ],
+            'single NAN' => [
+                $trav([\NAN]),
+                [\NAN],
+            ],
+            'NAN after INF' => [
+                $trav([\INF, \NAN, -\INF, 0.5, -1.5]),
+                [-\INF, -1.5, 0.5, \INF, \NAN],
+            ],
+            'NAN among ints and floats, int/float tie kept in input order' => [
+                $trav([2.5, \NAN, 1.0, -0.5, 1, 2]),
+                [-0.5, 1.0, 1, 2, 2.5, \NAN],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort array of an int beyond 2^53 and a float, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionArray
+     * @param        array $data
+     * @param        array $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionArray(array $data, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort, which compares int and float by exact value, with
+     * NAN placed last by the key, since Python's own ordering misplaces NAN:
+     *   sorted(data, key=lambda x: (isnan(x), 0 if isnan(x) else x))
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionArray(): array
+    {
+        return [
+            'int 2^53 + 1 before float 2.0^53, equal as floats' => [
+                [9007199254740993, 9007199254740992.0],
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'float 2.0^53 after ints that equal it as floats' => [
+                [9007199254740994, 9007199254740993, 9007199254740992.0],
+                [9007199254740992.0, 9007199254740993, 9007199254740994],
+            ],
+            'float 2.0^53 + 2 after int 2^53 + 1' => [
+                [9007199254740994.0, 9007199254740993],
+                [9007199254740993, 9007199254740994.0],
+            ],
+            'negative float -2.0^53 before int -(2^53 + 1)' => [
+                [-9007199254740992.0, -9007199254740993],
+                [-9007199254740993, -9007199254740992.0],
+            ],
+            'float 2.0^63 before int PHP_INT_MAX' => [
+                [9.223372036854776e+18, 9223372036854775807],
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+            'exact tie 2^53 and 2.0^53 kept in input order' => [
+                [9007199254740992, 9007199254740992.0, 9007199254740991],
+                [9007199254740991, 9007199254740992, 9007199254740992.0],
+            ],
+            'NAN after an int beyond 2^53 and a float' => [
+                [9007199254740993, \NAN, 9007199254740992.0],
+                [9007199254740992.0, 9007199254740993, \NAN],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort generators of an int beyond 2^53 and a float, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionGenerators
+     * @param        \Generator $data
+     * @param        array $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionGenerators(\Generator $data, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort, which compares int and float by exact value, with
+     * NAN placed last by the key, since Python's own ordering misplaces NAN:
+     *   sorted(data, key=lambda x: (isnan(x), 0 if isnan(x) else x))
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionGenerators(): array
+    {
+        $gen = fn (array $data) => GeneratorFixture::getGenerator($data);
+
+        return [
+            'int 2^53 + 1 before float 2.0^53, equal as floats' => [
+                $gen([9007199254740993, 9007199254740992.0]),
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'float 2.0^53 after ints that equal it as floats' => [
+                $gen([9007199254740994, 9007199254740993, 9007199254740992.0]),
+                [9007199254740992.0, 9007199254740993, 9007199254740994],
+            ],
+            'float 2.0^53 + 2 after int 2^53 + 1' => [
+                $gen([9007199254740994.0, 9007199254740993]),
+                [9007199254740993, 9007199254740994.0],
+            ],
+            'negative float -2.0^53 before int -(2^53 + 1)' => [
+                $gen([-9007199254740992.0, -9007199254740993]),
+                [-9007199254740993, -9007199254740992.0],
+            ],
+            'float 2.0^63 before int PHP_INT_MAX' => [
+                $gen([9.223372036854776e+18, 9223372036854775807]),
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+            'exact tie 2^53 and 2.0^53 kept in input order' => [
+                $gen([9007199254740992, 9007199254740992.0, 9007199254740991]),
+                [9007199254740991, 9007199254740992, 9007199254740992.0],
+            ],
+            'NAN after an int beyond 2^53 and a float' => [
+                $gen([9007199254740993, \NAN, 9007199254740992.0]),
+                [9007199254740992.0, 9007199254740993, \NAN],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort iterators of an int beyond 2^53 and a float, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionIterators
+     * @param        \Iterator $data
+     * @param        array $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionIterators(\Iterator $data, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort, which compares int and float by exact value, with
+     * NAN placed last by the key, since Python's own ordering misplaces NAN:
+     *   sorted(data, key=lambda x: (isnan(x), 0 if isnan(x) else x))
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionIterators(): array
+    {
+        $iter = fn (array $data) => new ArrayIteratorFixture($data);
+
+        return [
+            'int 2^53 + 1 before float 2.0^53, equal as floats' => [
+                $iter([9007199254740993, 9007199254740992.0]),
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'float 2.0^53 after ints that equal it as floats' => [
+                $iter([9007199254740994, 9007199254740993, 9007199254740992.0]),
+                [9007199254740992.0, 9007199254740993, 9007199254740994],
+            ],
+            'float 2.0^53 + 2 after int 2^53 + 1' => [
+                $iter([9007199254740994.0, 9007199254740993]),
+                [9007199254740993, 9007199254740994.0],
+            ],
+            'negative float -2.0^53 before int -(2^53 + 1)' => [
+                $iter([-9007199254740992.0, -9007199254740993]),
+                [-9007199254740993, -9007199254740992.0],
+            ],
+            'float 2.0^63 before int PHP_INT_MAX' => [
+                $iter([9.223372036854776e+18, 9223372036854775807]),
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+            'exact tie 2^53 and 2.0^53 kept in input order' => [
+                $iter([9007199254740992, 9007199254740992.0, 9007199254740991]),
+                [9007199254740991, 9007199254740992, 9007199254740992.0],
+            ],
+            'NAN after an int beyond 2^53 and a float' => [
+                $iter([9007199254740993, \NAN, 9007199254740992.0]),
+                [9007199254740992.0, 9007199254740993, \NAN],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort traversables of an int beyond 2^53 and a float, which may compare equal as floats
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecisionTraversables
+     * @param        \Traversable $data
+     * @param        array $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionTraversables(\Traversable $data, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort, which compares int and float by exact value, with
+     * NAN placed last by the key, since Python's own ordering misplaces NAN:
+     *   sorted(data, key=lambda x: (isnan(x), 0 if isnan(x) else x))
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecisionTraversables(): array
+    {
+        $trav = fn (array $data) => new IteratorAggregateFixture($data);
+
+        return [
+            'int 2^53 + 1 before float 2.0^53, equal as floats' => [
+                $trav([9007199254740993, 9007199254740992.0]),
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'float 2.0^53 after ints that equal it as floats' => [
+                $trav([9007199254740994, 9007199254740993, 9007199254740992.0]),
+                [9007199254740992.0, 9007199254740993, 9007199254740994],
+            ],
+            'float 2.0^53 + 2 after int 2^53 + 1' => [
+                $trav([9007199254740994.0, 9007199254740993]),
+                [9007199254740993, 9007199254740994.0],
+            ],
+            'negative float -2.0^53 before int -(2^53 + 1)' => [
+                $trav([-9007199254740992.0, -9007199254740993]),
+                [-9007199254740993, -9007199254740992.0],
+            ],
+            'float 2.0^63 before int PHP_INT_MAX' => [
+                $trav([9.223372036854776e+18, 9223372036854775807]),
+                [9223372036854775807, 9.223372036854776e+18],
+            ],
+            'exact tie 2^53 and 2.0^53 kept in input order' => [
+                $trav([9007199254740992, 9007199254740992.0, 9007199254740991]),
+                [9007199254740991, 9007199254740992, 9007199254740992.0],
+            ],
+            'NAN after an int beyond 2^53 and a float' => [
+                $trav([9007199254740993, \NAN, 9007199254740992.0]),
+                [9007199254740992.0, 9007199254740993, \NAN],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort array with a custom comparator, which is used as given when a value is NAN
+     * @dataProvider dataProviderForCustomComparatorWithNanArray
+     * @param        array $data
+     * @param        callable $comparator
+     * @param        array $expected
+     */
+    public function testCustomComparatorWithNanArray(array $data, callable $comparator, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data, $comparator) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort and the same NAN-first comparator:
+     *   sorted(data, key=cmp_to_key(nan_first))
+     * where nan_first(a, b) puts a NAN before every other value and compares other values with a <=> b.
+     */
+    public static function dataProviderForCustomComparatorWithNanArray(): array
+    {
+        return [
+            'NAN-first comparator' => [
+                [2, \NAN, 1],
+                fn ($lhs, $rhs): int => (\is_nan($lhs) || \is_nan($rhs)) ? \is_nan($rhs) <=> \is_nan($lhs) : $lhs <=> $rhs,
+                [\NAN, 1, 2],
+            ],
+            'NAN-first comparator, several NANs' => [
+                [\NAN, 3, \NAN, 1],
+                fn ($lhs, $rhs): int => (\is_nan($lhs) || \is_nan($rhs)) ? \is_nan($rhs) <=> \is_nan($lhs) : $lhs <=> $rhs,
+                [\NAN, \NAN, 1, 3],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort array with a custom comparator, which is used as given for an int beyond 2^53 and a float
+     * @dataProvider dataProviderForCustomComparatorWithIntAndFloatBeyondFloatPrecisionArray
+     * @param        array $data
+     * @param        callable $comparator
+     * @param        array $expected
+     */
+    public function testCustomComparatorWithIntAndFloatBeyondFloatPrecisionArray(array $data, callable $comparator, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data, $comparator) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python's stable sort and the comparison PHP's <=> makes, which compares two
+     * ints exactly and an int and a float as floats, so it ties 2^53 + 1 with 2.0^53:
+     *   sorted(data, key=cmp_to_key(php_spaceship))
+     */
+    public static function dataProviderForCustomComparatorWithIntAndFloatBeyondFloatPrecisionArray(): array
+    {
+        return [
+            '<=> ties int 2^53 + 1 with float 2.0^53, kept in input order' => [
+                [9007199254740993, 9007199254740992.0],
+                fn ($lhs, $rhs): int => $lhs <=> $rhs,
+                [9007199254740993, 9007199254740992.0],
+            ],
+            '<=> ties int 2^53 + 1 with float 2.0^53, both before int 2^53 + 2' => [
+                [9007199254740994, 9007199254740993, 9007199254740992.0],
+                fn ($lhs, $rhs): int => $lhs <=> $rhs,
+                [9007199254740993, 9007199254740992.0, 9007199254740994],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort generators with a custom comparator, which is used as given when a value is NAN
+     * @dataProvider dataProviderForCustomComparatorWithNanGenerators
+     * @param        \Generator $data
+     * @param        callable $comparator
+     * @param        array $expected
+     */
+    public function testCustomComparatorWithNanGenerators(\Generator $data, callable $comparator, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data, $comparator) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort and the same NAN-first comparator:
+     *   sorted(data, key=cmp_to_key(nan_first))
+     * where nan_first(a, b) puts a NAN before every other value and compares other values with a <=> b.
+     */
+    public static function dataProviderForCustomComparatorWithNanGenerators(): array
+    {
+        return [
+            'NAN-first comparator' => [
+                GeneratorFixture::getGenerator([2, \NAN, 1]),
+                fn ($lhs, $rhs): int => (\is_nan($lhs) || \is_nan($rhs)) ? \is_nan($rhs) <=> \is_nan($lhs) : $lhs <=> $rhs,
+                [\NAN, 1, 2],
+            ],
+            'NAN-first comparator, several NANs' => [
+                GeneratorFixture::getGenerator([\NAN, 3, \NAN, 1]),
+                fn ($lhs, $rhs): int => (\is_nan($lhs) || \is_nan($rhs)) ? \is_nan($rhs) <=> \is_nan($lhs) : $lhs <=> $rhs,
+                [\NAN, \NAN, 1, 3],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort generators with a custom comparator, which is used as given for an int beyond 2^53 and a float
+     * @dataProvider dataProviderForCustomComparatorWithIntAndFloatBeyondFloatPrecisionGenerators
+     * @param        \Generator $data
+     * @param        callable $comparator
+     * @param        array $expected
+     */
+    public function testCustomComparatorWithIntAndFloatBeyondFloatPrecisionGenerators(\Generator $data, callable $comparator, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data, $comparator) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python's stable sort and the comparison PHP's <=> makes, which compares two
+     * ints exactly and an int and a float as floats, so it ties 2^53 + 1 with 2.0^53:
+     *   sorted(data, key=cmp_to_key(php_spaceship))
+     */
+    public static function dataProviderForCustomComparatorWithIntAndFloatBeyondFloatPrecisionGenerators(): array
+    {
+        return [
+            '<=> ties int 2^53 + 1 with float 2.0^53, kept in input order' => [
+                GeneratorFixture::getGenerator([9007199254740993, 9007199254740992.0]),
+                fn ($lhs, $rhs): int => $lhs <=> $rhs,
+                [9007199254740993, 9007199254740992.0],
+            ],
+            '<=> ties int 2^53 + 1 with float 2.0^53, both before int 2^53 + 2' => [
+                GeneratorFixture::getGenerator([9007199254740994, 9007199254740993, 9007199254740992.0]),
+                fn ($lhs, $rhs): int => $lhs <=> $rhs,
+                [9007199254740993, 9007199254740992.0, 9007199254740994],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort iterators with a custom comparator, which is used as given when a value is NAN
+     * @dataProvider dataProviderForCustomComparatorWithNanIterators
+     * @param        \Iterator $data
+     * @param        callable $comparator
+     * @param        array $expected
+     */
+    public function testCustomComparatorWithNanIterators(\Iterator $data, callable $comparator, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data, $comparator) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort and the same NAN-first comparator:
+     *   sorted(data, key=cmp_to_key(nan_first))
+     * where nan_first(a, b) puts a NAN before every other value and compares other values with a <=> b.
+     */
+    public static function dataProviderForCustomComparatorWithNanIterators(): array
+    {
+        return [
+            'NAN-first comparator' => [
+                new ArrayIteratorFixture([2, \NAN, 1]),
+                fn ($lhs, $rhs): int => (\is_nan($lhs) || \is_nan($rhs)) ? \is_nan($rhs) <=> \is_nan($lhs) : $lhs <=> $rhs,
+                [\NAN, 1, 2],
+            ],
+            'NAN-first comparator, several NANs' => [
+                new ArrayIteratorFixture([\NAN, 3, \NAN, 1]),
+                fn ($lhs, $rhs): int => (\is_nan($lhs) || \is_nan($rhs)) ? \is_nan($rhs) <=> \is_nan($lhs) : $lhs <=> $rhs,
+                [\NAN, \NAN, 1, 3],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort iterators with a custom comparator, which is used as given for an int beyond 2^53 and a float
+     * @dataProvider dataProviderForCustomComparatorWithIntAndFloatBeyondFloatPrecisionIterators
+     * @param        \Iterator $data
+     * @param        callable $comparator
+     * @param        array $expected
+     */
+    public function testCustomComparatorWithIntAndFloatBeyondFloatPrecisionIterators(\Iterator $data, callable $comparator, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data, $comparator) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python's stable sort and the comparison PHP's <=> makes, which compares two
+     * ints exactly and an int and a float as floats, so it ties 2^53 + 1 with 2.0^53:
+     *   sorted(data, key=cmp_to_key(php_spaceship))
+     */
+    public static function dataProviderForCustomComparatorWithIntAndFloatBeyondFloatPrecisionIterators(): array
+    {
+        return [
+            '<=> ties int 2^53 + 1 with float 2.0^53, kept in input order' => [
+                new ArrayIteratorFixture([9007199254740993, 9007199254740992.0]),
+                fn ($lhs, $rhs): int => $lhs <=> $rhs,
+                [9007199254740993, 9007199254740992.0],
+            ],
+            '<=> ties int 2^53 + 1 with float 2.0^53, both before int 2^53 + 2' => [
+                new ArrayIteratorFixture([9007199254740994, 9007199254740993, 9007199254740992.0]),
+                fn ($lhs, $rhs): int => $lhs <=> $rhs,
+                [9007199254740993, 9007199254740992.0, 9007199254740994],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort traversables with a custom comparator, which is used as given when a value is NAN
+     * @dataProvider dataProviderForCustomComparatorWithNanTraversables
+     * @param        \Traversable $data
+     * @param        callable $comparator
+     * @param        array $expected
+     */
+    public function testCustomComparatorWithNanTraversables(\Traversable $data, callable $comparator, array $expected): void
+    {
+        // Given
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data, $comparator) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then (compared through var_export, since NAN !== NAN makes assertSame fail on equal arrays)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python's stable sort and the same NAN-first comparator:
+     *   sorted(data, key=cmp_to_key(nan_first))
+     * where nan_first(a, b) puts a NAN before every other value and compares other values with a <=> b.
+     */
+    public static function dataProviderForCustomComparatorWithNanTraversables(): array
+    {
+        return [
+            'NAN-first comparator' => [
+                new IteratorAggregateFixture([2, \NAN, 1]),
+                fn ($lhs, $rhs): int => (\is_nan($lhs) || \is_nan($rhs)) ? \is_nan($rhs) <=> \is_nan($lhs) : $lhs <=> $rhs,
+                [\NAN, 1, 2],
+            ],
+            'NAN-first comparator, several NANs' => [
+                new IteratorAggregateFixture([\NAN, 3, \NAN, 1]),
+                fn ($lhs, $rhs): int => (\is_nan($lhs) || \is_nan($rhs)) ? \is_nan($rhs) <=> \is_nan($lhs) : $lhs <=> $rhs,
+                [\NAN, \NAN, 1, 3],
+            ],
+        ];
+    }
+
+    /**
+     * @test         sort traversables with a custom comparator, which is used as given for an int beyond 2^53 and a float
+     * @dataProvider dataProviderForCustomComparatorWithIntAndFloatBeyondFloatPrecisionTraversables
+     * @param        \Traversable $data
+     * @param        callable $comparator
+     * @param        array $expected
+     */
+    public function testCustomComparatorWithIntAndFloatBeyondFloatPrecisionTraversables(\Traversable $data, callable $comparator, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Sort::sort($data, $comparator) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python's stable sort and the comparison PHP's <=> makes, which compares two
+     * ints exactly and an int and a float as floats, so it ties 2^53 + 1 with 2.0^53:
+     *   sorted(data, key=cmp_to_key(php_spaceship))
+     */
+    public static function dataProviderForCustomComparatorWithIntAndFloatBeyondFloatPrecisionTraversables(): array
+    {
+        return [
+            '<=> ties int 2^53 + 1 with float 2.0^53, kept in input order' => [
+                new IteratorAggregateFixture([9007199254740993, 9007199254740992.0]),
+                fn ($lhs, $rhs): int => $lhs <=> $rhs,
+                [9007199254740993, 9007199254740992.0],
+            ],
+            '<=> ties int 2^53 + 1 with float 2.0^53, both before int 2^53 + 2' => [
+                new IteratorAggregateFixture([9007199254740994, 9007199254740993, 9007199254740992.0]),
+                fn ($lhs, $rhs): int => $lhs <=> $rhs,
+                [9007199254740993, 9007199254740992.0, 9007199254740994],
+            ],
+        ];
+    }
 }

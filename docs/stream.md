@@ -243,6 +243,9 @@ Sorts the stream, maintaining keys.
 ```$stream->asort(?callable $comparator = null)```
 
 If comparator is not provided, the elements of the iterable source must be comparable.
+The default comparison compares an integer and a float by exact value, and sorts a float
+`NAN` after every other value, keeping `NAN`s in input order; see
+[NaN and Ordering](../README.md#nan-and-ordering). A custom comparator is used as given.
 
 ```php
 use IterTools\Stream;
@@ -1389,6 +1392,9 @@ Sorts the stream.
 ```$stream->sort(callable $comparator = null)```
 
 If comparator is not provided, the elements of the iterable source must be comparable.
+The default comparison compares an integer and a float by exact value, and sorts a float
+`NAN` after every other value, keeping `NAN`s in input order; see
+[NaN and Ordering](../README.md#nan-and-ordering). A custom comparator is used as given.
 
 ```php
 use IterTools\Stream;
@@ -1409,6 +1415,9 @@ Sorts the stream using a key-extraction function (Schwartzian transform).
 The key function is called exactly once per element. Source keys are discarded.
 The sort is stable: elements with equal extracted keys preserve their original
 relative order.
+Keys compare as in the default comparison of `Sort::sort`: an integer and a float by exact
+value, and an element whose key is a float `NAN` after every other element, in input order;
+see [NaN and Ordering](../README.md#nan-and-ordering).
 
 See also [`Sort::sortBy()`](sort-iteration.md#sortby).
 
@@ -1447,6 +1456,9 @@ Sorts the stream using a key-extraction function (Schwartzian transform), mainta
 The key function is called exactly once per element. Source keys are preserved.
 The sort is stable: elements with equal extracted keys preserve their original
 relative order.
+Keys compare as in the default comparison of `Sort::sort`: an integer and a float by exact
+value, and an element whose key is a float `NAN` after every other element, in input order;
+see [NaN and Ordering](../README.md#nan-and-ordering).
 
 See also [`Sort::asortBy()`](sort-iteration.md#asortby).
 
