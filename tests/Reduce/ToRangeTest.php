@@ -603,4 +603,312 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         toRange array whose exact int difference is beyond the int range, correctly rounded to a float
+     * @dataProvider dataProviderForIntDifferenceBeyondIntRangeArray
+     * @param        array        $data
+     * @param        float        $expected
+     */
+    public function testIntDifferenceBeyondIntRangeArray(array $data, float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact comparison and rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     */
+    public static function dataProviderForIntDifferenceBeyondIntRangeArray(): array
+    {
+        return [
+            'both odd, operands round to a tie' => [
+                [4611686018427388929, -4611686018427387905],
+                9.223372036854778e+18,
+            ],
+            'even maximum, odd minimum' => [
+                [4611686018427388928, -4611686018427387905],
+                9.223372036854778e+18,
+            ],
+            'odd maximum, even minimum' => [
+                [4611686018427388929, -4611686018427387904],
+                9.223372036854778e+18,
+            ],
+            'operands round up past the true difference' => [
+                [4611686018427390975, -4611686018427387904],
+                9.223372036854778e+18,
+            ],
+            'minimum first, both odd' => [
+                [-4611686018427388929, 4611686018427387905],
+                9.223372036854778e+18,
+            ],
+            'exact tie rounds to even' => [
+                [4611686018427388928, -4611686018427387904],
+                9.223372036854776e+18,
+            ],
+            'PHP_INT_MIN and PHP_INT_MAX' => [
+                [\PHP_INT_MIN, \PHP_INT_MAX],
+                1.8446744073709552e+19,
+            ],
+            'PHP_INT_MIN and 2^53 + 1, just past the int range' => [
+                [\PHP_INT_MIN, 9007199254740993],
+                9.232379236109517e+18,
+            ],
+            'int minimum, integral float maximum' => [
+                [-4611686018427387905, 4611686018427388928.0],
+                9.223372036854778e+18,
+            ],
+            'integral float minimum, int maximum' => [
+                [-4611686018427387904.0, 4611686018427388929],
+                9.223372036854778e+18,
+            ],
+            'three values, extremes in the middle' => [
+                [0, 4611686018427388929, -4611686018427387905, 1],
+                9.223372036854778e+18,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toRange generators whose exact int difference is beyond the int range, correctly rounded to a float
+     * @dataProvider dataProviderForIntDifferenceBeyondIntRangeGenerators
+     * @param        \Generator   $data
+     * @param        float        $expected
+     */
+    public function testIntDifferenceBeyondIntRangeGenerators(\Generator $data, float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact comparison and rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     */
+    public static function dataProviderForIntDifferenceBeyondIntRangeGenerators(): array
+    {
+        $gen = static function (array $data) {
+            return GeneratorFixture::getGenerator($data);
+        };
+
+        return [
+            'both odd, operands round to a tie' => [
+                $gen([4611686018427388929, -4611686018427387905]),
+                9.223372036854778e+18,
+            ],
+            'even maximum, odd minimum' => [
+                $gen([4611686018427388928, -4611686018427387905]),
+                9.223372036854778e+18,
+            ],
+            'odd maximum, even minimum' => [
+                $gen([4611686018427388929, -4611686018427387904]),
+                9.223372036854778e+18,
+            ],
+            'operands round up past the true difference' => [
+                $gen([4611686018427390975, -4611686018427387904]),
+                9.223372036854778e+18,
+            ],
+            'minimum first, both odd' => [
+                $gen([-4611686018427388929, 4611686018427387905]),
+                9.223372036854778e+18,
+            ],
+            'exact tie rounds to even' => [
+                $gen([4611686018427388928, -4611686018427387904]),
+                9.223372036854776e+18,
+            ],
+            'PHP_INT_MIN and PHP_INT_MAX' => [
+                $gen([\PHP_INT_MIN, \PHP_INT_MAX]),
+                1.8446744073709552e+19,
+            ],
+            'PHP_INT_MIN and 2^53 + 1, just past the int range' => [
+                $gen([\PHP_INT_MIN, 9007199254740993]),
+                9.232379236109517e+18,
+            ],
+            'int minimum, integral float maximum' => [
+                $gen([-4611686018427387905, 4611686018427388928.0]),
+                9.223372036854778e+18,
+            ],
+            'integral float minimum, int maximum' => [
+                $gen([-4611686018427387904.0, 4611686018427388929]),
+                9.223372036854778e+18,
+            ],
+            'three values, extremes in the middle' => [
+                $gen([0, 4611686018427388929, -4611686018427387905, 1]),
+                9.223372036854778e+18,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toRange iterators whose exact int difference is beyond the int range, correctly rounded to a float
+     * @dataProvider dataProviderForIntDifferenceBeyondIntRangeIterators
+     * @param        \Iterator    $data
+     * @param        float        $expected
+     */
+    public function testIntDifferenceBeyondIntRangeIterators(\Iterator $data, float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact comparison and rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     */
+    public static function dataProviderForIntDifferenceBeyondIntRangeIterators(): array
+    {
+        $iter = static function (array $data) {
+            return new ArrayIteratorFixture($data);
+        };
+
+        return [
+            'both odd, operands round to a tie' => [
+                $iter([4611686018427388929, -4611686018427387905]),
+                9.223372036854778e+18,
+            ],
+            'even maximum, odd minimum' => [
+                $iter([4611686018427388928, -4611686018427387905]),
+                9.223372036854778e+18,
+            ],
+            'odd maximum, even minimum' => [
+                $iter([4611686018427388929, -4611686018427387904]),
+                9.223372036854778e+18,
+            ],
+            'operands round up past the true difference' => [
+                $iter([4611686018427390975, -4611686018427387904]),
+                9.223372036854778e+18,
+            ],
+            'minimum first, both odd' => [
+                $iter([-4611686018427388929, 4611686018427387905]),
+                9.223372036854778e+18,
+            ],
+            'exact tie rounds to even' => [
+                $iter([4611686018427388928, -4611686018427387904]),
+                9.223372036854776e+18,
+            ],
+            'PHP_INT_MIN and PHP_INT_MAX' => [
+                $iter([\PHP_INT_MIN, \PHP_INT_MAX]),
+                1.8446744073709552e+19,
+            ],
+            'PHP_INT_MIN and 2^53 + 1, just past the int range' => [
+                $iter([\PHP_INT_MIN, 9007199254740993]),
+                9.232379236109517e+18,
+            ],
+            'int minimum, integral float maximum' => [
+                $iter([-4611686018427387905, 4611686018427388928.0]),
+                9.223372036854778e+18,
+            ],
+            'integral float minimum, int maximum' => [
+                $iter([-4611686018427387904.0, 4611686018427388929]),
+                9.223372036854778e+18,
+            ],
+            'three values, extremes in the middle' => [
+                $iter([0, 4611686018427388929, -4611686018427387905, 1]),
+                9.223372036854778e+18,
+            ],
+        ];
+    }
+
+    /**
+     * @test         toRange traversables whose exact int difference is beyond the int range, correctly rounded to a float
+     * @dataProvider dataProviderForIntDifferenceBeyondIntRangeTraversables
+     * @param        \Traversable $data
+     * @param        float        $expected
+     */
+    public function testIntDifferenceBeyondIntRangeTraversables(\Traversable $data, float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact comparison and rational difference, correctly rounded to a float):
+     *   float(max(map(Fraction, data)) - min(map(Fraction, data)))
+     */
+    public static function dataProviderForIntDifferenceBeyondIntRangeTraversables(): array
+    {
+        $trav = static function (array $data) {
+            return new IteratorAggregateFixture($data);
+        };
+
+        return [
+            'both odd, operands round to a tie' => [
+                $trav([4611686018427388929, -4611686018427387905]),
+                9.223372036854778e+18,
+            ],
+            'even maximum, odd minimum' => [
+                $trav([4611686018427388928, -4611686018427387905]),
+                9.223372036854778e+18,
+            ],
+            'odd maximum, even minimum' => [
+                $trav([4611686018427388929, -4611686018427387904]),
+                9.223372036854778e+18,
+            ],
+            'operands round up past the true difference' => [
+                $trav([4611686018427390975, -4611686018427387904]),
+                9.223372036854778e+18,
+            ],
+            'minimum first, both odd' => [
+                $trav([-4611686018427388929, 4611686018427387905]),
+                9.223372036854778e+18,
+            ],
+            'exact tie rounds to even' => [
+                $trav([4611686018427388928, -4611686018427387904]),
+                9.223372036854776e+18,
+            ],
+            'PHP_INT_MIN and PHP_INT_MAX' => [
+                $trav([\PHP_INT_MIN, \PHP_INT_MAX]),
+                1.8446744073709552e+19,
+            ],
+            'PHP_INT_MIN and 2^53 + 1, just past the int range' => [
+                $trav([\PHP_INT_MIN, 9007199254740993]),
+                9.232379236109517e+18,
+            ],
+            'int minimum, integral float maximum' => [
+                $trav([-4611686018427387905, 4611686018427388928.0]),
+                9.223372036854778e+18,
+            ],
+            'integral float minimum, int maximum' => [
+                $trav([-4611686018427387904.0, 4611686018427388929]),
+                9.223372036854778e+18,
+            ],
+            'three values, extremes in the middle' => [
+                $trav([0, 4611686018427388929, -4611686018427387905, 1]),
+                9.223372036854778e+18,
+            ],
+        ];
+    }
 }

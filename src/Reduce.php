@@ -805,6 +805,47 @@ final class Reduce
     }
 
     /**
+     * Computes the difference of two integers: exact when it is within the integer range, and
+     * otherwise correctly rounded to a float.
+     *
+     * PHP's overflowing int subtraction converts each operand to a float and subtracts the floats.
+     * Operands within ±2^53 convert exactly, so only the subtraction rounds. Otherwise (64-bit
+     * integers) the difference d is at least 2^63 in magnitude. It is 2q + r, with
+     * q = (a >> 1) - (b >> 1), which cannot overflow, and r = (a & 1) - (b & 1) in {-1, 0, 1}, so
+     * |q| >= 2^62, where floats are at least 1024 apart and the midway points between them are even.
+     * d / 2 is q, or for odd d halfway between two integers, which is never one of those midway
+     * points, so it rounds like whichever of the two is odd, as in {@see integerMidpoint()}. That
+     * integer converts with a single rounding, and doubling it is exact.
+     *
+     * @param int $a
+     * @param int $b
+     *
+     * @return int|float
+     */
+    private static function integerDifference(int $a, int $b): int|float
+    {
+        $overflows = ($b < 0 && $a > \PHP_INT_MAX + $b) || ($b > 0 && $a < \PHP_INT_MIN + $b);
+        if (!$overflows) {
+            return $a - $b;
+        }
+
+        if (\abs($a) <= 9007199254740992 && \abs($b) <= 9007199254740992) {
+            return (float) $a - (float) $b;
+        }
+
+        $half      = ($a >> 1) - ($b >> 1);
+        $remainder = ($a & 1) - ($b & 1);
+        if ($remainder === 0) {
+            return 2.0 * (float) $half;
+        }
+
+        // d / 2 is $half + 0.5, or $half - 0.5 = ($half - 1) + 0.5.
+        $below = $remainder > 0 ? $half : $half - 1;
+
+        return 2.0 * (float) ($below | 1);
+    }
+
+    /**
      * Linearly interpolates between two numbers without overflowing on extreme magnitudes.
      *
      * The direct form $lo + $fraction * ($hi - $lo) is preferred: it returns $lo exactly when the
@@ -871,10 +912,10 @@ final class Reduce
      *
      * Returns 0 if given collection is empty.
      *
-     * Values are compared exactly, and an int beyond ±2^53 and an integral float within the int range are
-     * subtracted exactly when their difference fits in an int: `toRange([2 ** 53 + 1, 2.0 ** 53])` is `1.0`.
-     * A difference beyond the int range is taken in float arithmetic and can misround:
-     * `toRange([-(2 ** 62 + 1), 2.0 ** 62 + 1024])` is 2^63, where the correctly rounded range is 2^63 + 2048.
+     * Values are compared exactly, and two ints, or an int beyond ±2^53 and an integral float within the int
+     * range, are subtracted exactly when their difference fits in an int: `toRange([2 ** 53 + 1, 2.0 ** 53])`
+     * is `1.0`. A larger difference is correctly rounded to a float, where PHP's `max - min` rounds the
+     * operands first: `toRange([-(2 ** 62 + 1), 2.0 ** 62 + 1024])` is 2^63 + 2048, not 2^63.
      * Paired with a non-integral float or a float beyond the int range, the int is converted to float in the
      * subtraction and the range can be off: `toRange([PHP_INT_MAX, 2.0 ** 63])` is `0.0`, where the true range is 1.
      *
@@ -906,12 +947,17 @@ final class Reduce
             return 0;
         }
 
+        // PHP's overflowing int subtraction rounds each operand to float before subtracting.
+        if (\is_int($min) && \is_int($max)) {
+            return static::integerDifference($max, $min);
+        }
+
         // Subtract an int and an integral float in the int domain: 2^53 + 1 - 2.0^53 is 1, not 0.0.
         if (\is_int($min) !== \is_int($max)) {
             $minInt = Arithmetic::toExactInt($min);
             $maxInt = Arithmetic::toExactInt($max);
             if ($minInt !== null && $maxInt !== null) {
-                return (float) ($maxInt - $minInt);
+                return (float) static::integerDifference($maxInt, $minInt);
             }
         }
 
