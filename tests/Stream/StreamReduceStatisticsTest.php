@@ -206,6 +206,20 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         Stream::toStandardDeviation is finite when a deviation step overflows
+     * @dataProvider dataProviderForIterableTypesStraddlingFloatMax
+     * @param        iterable $data
+     */
+    public function testToStandardDeviationOfOverflowingDeviation(iterable $data): void
+    {
+        // When
+        $result = Stream::of($data)->toStandardDeviation();
+
+        // Then (the exact population variance of [-x, x] is x², so the correctly rounded square root is x)
+        $this->assertSame(\PHP_FLOAT_MAX, $result);
+    }
+
+    /**
      * @test Stream::toStandardDeviation on empty stream is null
      */
     public function testToStandardDeviationEmpty(): void
@@ -375,6 +389,19 @@ class StreamReduceStatisticsTest extends \PHPUnit\Framework\TestCase
             'generator'         => [Fixture\GeneratorFixture::getGenerator([1, 2, 2, 3, 4])],
             'iterator'          => [new Fixture\ArrayIteratorFixture([1, 2, 2, 3, 4])],
             'iteratorAggregate' => [new Fixture\IteratorAggregateFixture([1, 2, 2, 3, 4])],
+        ];
+    }
+
+    /**
+     * The same data, [-PHP_FLOAT_MAX, PHP_FLOAT_MAX], as each iterable type.
+     */
+    public static function dataProviderForIterableTypesStraddlingFloatMax(): array
+    {
+        return [
+            'array'             => [[-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX]],
+            'generator'         => [Fixture\GeneratorFixture::getGenerator([-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX])],
+            'iterator'          => [new Fixture\ArrayIteratorFixture([-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX])],
+            'iteratorAggregate' => [new Fixture\IteratorAggregateFixture([-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX])],
         ];
     }
 

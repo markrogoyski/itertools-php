@@ -306,6 +306,13 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
             // The mean also overflows during accumulation
             [[-1e308, 1e308, 1e308], false, \INF],
             [[-1e308, 1e308, 1e308], true, \INF],
+            // A deviation step overflows, so the variance is at least about PHP_FLOAT_MAX ** 2 / n
+            [[1e308, 1e308, 1e308, -1e308], false, \INF],
+            [[1e308, 1e308, 1e308, -1e308], true, \INF],
+            [[-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], false, \INF],
+            [[-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], true, \INF],
+            [[-\PHP_FLOAT_MAX, 0, \PHP_FLOAT_MAX], false, \INF],
+            [[-\PHP_FLOAT_MAX, 0, \PHP_FLOAT_MAX], true, \INF],
         ];
     }
 

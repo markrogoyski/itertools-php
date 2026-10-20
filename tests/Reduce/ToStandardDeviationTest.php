@@ -405,6 +405,324 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toStandardDeviation array is finite when a deviation step overflows
+     * @dataProvider dataProviderForDeviationOverflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testDeviationOverflowArray(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toStandardDeviation($data, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toStandardDeviation generator is finite when a deviation step overflows
+     * @dataProvider dataProviderForDeviationOverflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testDeviationOverflowGenerator(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($generator, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toStandardDeviation iterator is finite when a deviation step overflows
+     * @dataProvider dataProviderForDeviationOverflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testDeviationOverflowIterator(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($iterator, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toStandardDeviation traversable is finite when a deviation step overflows
+     * @dataProvider dataProviderForDeviationOverflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testDeviationOverflowTraversable(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $traversable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($traversable, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * The difference between a value and the running mean exceeds PHP_FLOAT_MAX at some step, although
+     * no deviation from the true mean does. The rows marked INF have a standard deviation that is itself
+     * beyond PHP_FLOAT_MAX.
+     *
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof)
+     *   then sqrt(v) correctly rounded: math.isqrt of v scaled by an even power of two to ~128 bits,
+     *   a sticky bit for an inexact root, and one correctly rounded int / int division to a float,
+     *   which is INF at or beyond 2 ** 1024 - 2 ** 970
+     */
+    public static function dataProviderForDeviationOverflow(): array
+    {
+        return [
+            // The second value is 2e308 from the first
+            [[-1e308, 1e308], false, 1.0E+308],
+            [[-1e308, 1e308], true, 1.4142135623730951E+308],
+            [[1e308, -1e308], false, 1.0E+308],
+            [[1e308, -1e308], true, 1.4142135623730951E+308],
+            // The same overflowing step, followed by a value that shifts the mean
+            [[-1e308, 1e308, 1e308], false, 9.428090415820633E+307],
+            [[-1e308, 1e308, 1e308], true, 1.1547005383792515E+308],
+            // The overflow comes on the last value, after the running mean has settled at 1e308
+            [[1e308, 1e308, 1e308, -1e308], false, 8.660254037844386E+307],
+            [[1e308, 1e308, 1e308, -1e308], true, 1.0E+308],
+            // A small value after the overflowing step
+            [[-1e308, 1e308, 5], false, 8.16496580927726E+307],
+            [[-1e308, 1e308, 5], true, 1.0E+308],
+            [[-1e308, 1e308, 1], false, 8.16496580927726E+307],
+            [[-1e308, 1e308, 1], true, 1.0E+308],
+            // The second value is 2.5e308 from the first, and the third sits between them
+            [[-1.5e308, 1e308, 2.5e307], false, 1.0474837574980445E+308],
+            // Values straddling zero at PHP_FLOAT_MAX
+            [[-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], false, \PHP_FLOAT_MAX],
+            [[\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX], false, \PHP_FLOAT_MAX],
+            [[-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 0], false, 1.4678102981723262E+308],
+            [[-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 0], true, \PHP_FLOAT_MAX],
+            [[-\PHP_FLOAT_MAX, 0, \PHP_FLOAT_MAX], false, 1.4678102981723262E+308],
+            [[-\PHP_FLOAT_MAX, 0, \PHP_FLOAT_MAX], true, \PHP_FLOAT_MAX],
+            [[0, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], false, 1.4678102981723262E+308],
+            [[0, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], true, \PHP_FLOAT_MAX],
+            [[-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], false, \PHP_FLOAT_MAX],
+            [[\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], false, 1.6948813415381948E+308],
+            // The standard deviation itself is beyond PHP_FLOAT_MAX (PHP_FLOAT_MAX * sqrt(2) and the like)
+            [[-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], true, \INF],
+            [[\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX], true, \INF],
+            [[-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], true, \INF],
+            [[\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX], true, \INF],
+        ];
+    }
+
+    /**
+     * @test         toStandardDeviation array is finite, to within rounding, when a deviation step overflows
+     * @dataProvider dataProviderForDeviationOverflowWithinRounding
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testDeviationOverflowWithinRoundingArray(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toStandardDeviation($data, $sample);
+
+        // Then (not correctly rounded: the result passes through a handful of rounded steps — the
+        // per-value updates, Bessel's ratio, the square root and the unscaling — so it may sit a
+        // few ulps from the oracle)
+        $this->assertEqualsWithDelta($expected, $result, 4 * \PHP_FLOAT_EPSILON * \abs($expected));
+    }
+
+    /**
+     * @test         toStandardDeviation generator is finite, to within rounding, when a deviation step overflows
+     * @dataProvider dataProviderForDeviationOverflowWithinRounding
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testDeviationOverflowWithinRoundingGenerator(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($generator, $sample);
+
+        // Then (not correctly rounded: the result passes through a handful of rounded steps — the
+        // per-value updates, Bessel's ratio, the square root and the unscaling — so it may sit a
+        // few ulps from the oracle)
+        $this->assertEqualsWithDelta($expected, $result, 4 * \PHP_FLOAT_EPSILON * \abs($expected));
+    }
+
+    /**
+     * @test         toStandardDeviation iterator is finite, to within rounding, when a deviation step overflows
+     * @dataProvider dataProviderForDeviationOverflowWithinRounding
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testDeviationOverflowWithinRoundingIterator(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($iterator, $sample);
+
+        // Then (not correctly rounded: the result passes through a handful of rounded steps — the
+        // per-value updates, Bessel's ratio, the square root and the unscaling — so it may sit a
+        // few ulps from the oracle)
+        $this->assertEqualsWithDelta($expected, $result, 4 * \PHP_FLOAT_EPSILON * \abs($expected));
+    }
+
+    /**
+     * @test         toStandardDeviation traversable is finite, to within rounding, when a deviation step overflows
+     * @dataProvider dataProviderForDeviationOverflowWithinRounding
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testDeviationOverflowWithinRoundingTraversable(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $traversable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($traversable, $sample);
+
+        // Then (not correctly rounded: the result passes through a handful of rounded steps — the
+        // per-value updates, Bessel's ratio, the square root and the unscaling — so it may sit a
+        // few ulps from the oracle)
+        $this->assertEqualsWithDelta($expected, $result, 4 * \PHP_FLOAT_EPSILON * \abs($expected));
+    }
+
+    /**
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof)
+     *   then sqrt(v) correctly rounded: math.isqrt of v scaled by an even power of two to ~128 bits,
+     *   a sticky bit for an inexact root, and one correctly rounded int / int division to a float
+     */
+    public static function dataProviderForDeviationOverflowWithinRounding(): array
+    {
+        return [
+            // The sample row of [-1.5e308, 1e308, 2.5e307]; IterTools gives 1.2829003598617208E+308, 1 ulp low
+            [[-1.5e308, 1e308, 2.5e307], true, 1.282900359861721E+308],
+        ];
+    }
+
+    /**
+     * @test         toStandardDeviation array of subnormal values keeps their low bit when no step overflows
+     * @dataProvider dataProviderForSubnormalWithoutOverflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testSubnormalWithoutOverflowArray(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toStandardDeviation($data, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toStandardDeviation generator of subnormal values keeps their low bit when no step overflows
+     * @dataProvider dataProviderForSubnormalWithoutOverflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testSubnormalWithoutOverflowGenerator(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($generator, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toStandardDeviation iterator of subnormal values keeps their low bit when no step overflows
+     * @dataProvider dataProviderForSubnormalWithoutOverflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testSubnormalWithoutOverflowIterator(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($iterator, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toStandardDeviation traversable of subnormal values keeps their low bit when no step overflows
+     * @dataProvider dataProviderForSubnormalWithoutOverflow
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testSubnormalWithoutOverflowTraversable(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $traversable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toStandardDeviation($traversable, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * No deviation step overflows here, so the halved-operand branch for an overflowing step must not
+     * run: halving an odd multiple of the smallest subnormal rounds its low bit away, which would turn
+     * 5e-324 into 0.0 and 1.5e-323 into 2e-323.
+     *
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof)
+     *   then sqrt(v) correctly rounded: math.isqrt of v scaled by an even power of two to ~128 bits,
+     *   a sticky bit for an inexact root, and one correctly rounded int / int division to a float
+     */
+    public static function dataProviderForSubnormalWithoutOverflow(): array
+    {
+        return [
+            [[-5e-324, 5e-324], false, 5.0E-324],
+            [[-5e-324, 5e-324], true, 5.0E-324],
+            [[5e-324, -5e-324], false, 5.0E-324],
+            [[5e-324, -5e-324], true, 5.0E-324],
+            [[1.5e-323, -1.5e-323], false, 1.5E-323],
+            [[1.5e-323, -1.5e-323], true, 2.0E-323],
+            [[-5e-324, 0, 5e-324], false, 5.0E-324],
+        ];
+    }
+
+    /**
      * @test toStandardDeviation is invariant to input order
      */
     public function testOrderInvariance(): void

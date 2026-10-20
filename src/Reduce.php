@@ -474,8 +474,11 @@ final class Reduce
      * but is not computed through the variance itself, so a representable standard deviation is not
      * lost when its square is out of range. toStandardDeviation([-1e200, 1e200]) is 1e200 although
      * the variance 1e400 is reported as INF, and toStandardDeviation([-1e-200, 1e-200]) is 1e-200
-     * although the variance 1e-400 underflows to 0.0. A deviation from the mean that itself overflows
-     * still yields INF: toStandardDeviation([-PHP_FLOAT_MAX, PHP_FLOAT_MAX]) is INF.
+     * although the variance 1e-400 underflows to 0.0. Values further apart than PHP_FLOAT_MAX are no
+     * obstacle either: toStandardDeviation([-PHP_FLOAT_MAX, PHP_FLOAT_MAX]) is PHP_FLOAT_MAX. Only a
+     * standard deviation that is itself beyond PHP_FLOAT_MAX yields INF, as for the sample standard
+     * deviation of that pair, PHP_FLOAT_MAX * sqrt(2). The result is not correctly rounded, so one
+     * within a few ulps of PHP_FLOAT_MAX may also come out as INF.
      *
      * The null cases likewise take precedence over NAN: toStandardDeviation([INF], true)
      * is null, while toStandardDeviation([INF]) is NAN.
@@ -561,6 +564,20 @@ final class Reduce
             $delta = ($value - $meanHi) - $meanLo;
             /** @psalm-suppress InvalidOperand */
             $step = $delta / $count;
+
+            if (!\is_finite($delta) && !$hasNonFinite) {
+                // The gap between a finite value and the running mean can exceed PHP_FLOAT_MAX, as for
+                // [-1e308, 1e308], although no deviation from the true mean does. Redo the step on halved
+                // operands: for the gap to overflow, $value and $meanHi must both exceed 2^970 in
+                // magnitude, so halving them is exact (halving $meanLo can drop only a subnormal bit, far
+                // below the rounding of a gap this large), and the step rounds as it would with an
+                // unbounded exponent. It is at most PHP_FLOAT_MAX, since $count >= 2 here. Only an
+                // overflow takes this branch, so every other result is unchanged.
+                /** @psalm-suppress InvalidOperand */
+                $halfDelta = ($value * 0.5 - $meanHi * 0.5) - $meanLo * 0.5;
+                /** @psalm-suppress InvalidOperand */
+                $step = ($halfDelta / $count) * 2.0;
+            }
 
             // $meanHi + $step in double-double: 2Sum recovers the low bits the addition rounds off.
             $sum     = $meanHi + $step;
