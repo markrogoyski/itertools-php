@@ -977,6 +977,449 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         a whole step on int operands takes its element count from the exact span and each value from the
+     *               exact sum, not from the span or the operands converted to float
+     * @dataProvider dataProviderForWholeStepOnIntOperandsBeyondFloatPrecision
+     * @param        int|float    $start
+     * @param        int|float    $end
+     * @param        int|float    $step
+     * @param        array<float> $expected
+     */
+    public function testWholeStepOnIntOperandsBeyondFloatPrecision(
+        int|float $start,
+        int|float $end,
+        int|float $step,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_exact_span_count_and_step_tie.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForWholeStepOnIntOperandsBeyondFloatPrecision(): array
+    {
+        return [
+            'PHP_INT_MIN to PHP_INT_MAX step 2.0^63' => [
+                \PHP_INT_MIN, \PHP_INT_MAX, 9.223372036854776E18,
+                [-9.223372036854776E18, 0.0],
+            ],
+            'PHP_INT_MAX to PHP_INT_MIN step -2.0^63' => [
+                \PHP_INT_MAX, \PHP_INT_MIN, -9.223372036854776E18,
+                [9.223372036854776E18, -1.0],
+            ],
+            '0.0 to PHP_INT_MAX step 2^62' => [
+                0.0, \PHP_INT_MAX, 4611686018427387904,
+                [0.0, 4.611686018427388E18],
+            ],
+            'PHP_INT_MAX to 0.0 step -2^62' => [
+                \PHP_INT_MAX, 0.0, -4611686018427387904,
+                [9.223372036854776E18, 4.611686018427388E18],
+            ],
+            'PHP_INT_MAX to 0.0 step -(PHP_INT_MAX - 1)' => [
+                \PHP_INT_MAX, 0.0, -(\PHP_INT_MAX - 1),
+                [9.223372036854776E18, 1.0],
+            ],
+            'PHP_INT_MIN to PHP_INT_MAX step 2.0^64 - 2048' => [
+                \PHP_INT_MIN, \PHP_INT_MAX, 1.844674407370955E19,
+                [-9.223372036854776E18, 9.223372036854774E18],
+            ],
+            'PHP_INT_MAX to PHP_INT_MIN step -(2.0^64 - 2048)' => [
+                \PHP_INT_MAX, \PHP_INT_MIN, -1.844674407370955E19,
+                [9.223372036854776E18, -9.223372036854774E18],
+            ],
+            '0.0 to 2^52 + 1 step 2^51' => [
+                0.0, 4503599627370497, 2251799813685248,
+                [0.0, 2251799813685248.0, 4503599627370496.0],
+            ],
+            '2^52 + 1 to 0.0 step -2^51' => [
+                4503599627370497, 0.0, -2251799813685248,
+                [4503599627370497.0, 2251799813685249.0, 1.0],
+            ],
+            '2^53 + 1 to 2.0^53 + 6 step 2' => [
+                9007199254740993, 9007199254740998.0, 2,
+                [9007199254740992.0, 9007199254740996.0, 9007199254740996.0],
+            ],
+            '2.0^53 + 6 to 2^53 + 1 step -2' => [
+                9007199254740998.0, 9007199254740993, -2,
+                [9007199254740998.0, 9007199254740996.0, 9007199254740994.0],
+            ],
+        ];
+    }
+
+    /**
+     * @test a whole step on int operands is limited by the exact element count, not by the span converted to float:
+     *       PHP_INT_MAX elements are accepted
+     */
+    public function testWholeStepOnIntOperandsAcceptsPhpIntMaxElements(): void
+    {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $result = [];
+
+        // When
+        foreach (Single::range(0.0, \PHP_INT_MAX - 1, 1) as $value) {
+            $result[] = $value;
+            if (\count($result) === 3) {
+                break;
+            }
+        }
+
+        // Then (oracle: tools/oracles/range_exact_span_count_and_step_tie.py, count 9223372036854775807)
+        $this->assertSame([0.0, 1.0, 2.0], $result);
+    }
+
+    /**
+     * @test a whole step on int operands that would give more than PHP_INT_MAX elements is rejected
+     */
+    public function testWholeStepOnIntOperandsRejectsMoreThanPhpIntMaxElements(): void
+    {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('exceeds representable iteration count');
+
+        // When
+        foreach (Single::range(\PHP_INT_MIN, 0.0, 1) as $_) {
+            break;
+        }
+    }
+
+    /**
+     * @test         a fractional step on int operands whose start a float can't hold gives each value from the exact
+     *               start, not from the start converted to float
+     * @dataProvider dataProviderForFractionalStepOnIntStartBeyondFloatPrecision
+     * @param        int          $start
+     * @param        int          $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testFractionalStepOnIntStartBeyondFloatPrecision(
+        int $start,
+        int $end,
+        float $step,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_exact_span_count_and_step_tie.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForFractionalStepOnIntStartBeyondFloatPrecision(): array
+    {
+        return [
+            '2^53 + 1 to 2^53 + 3 step 0.5' => [
+                9007199254740993, 9007199254740995, 0.5,
+                [9007199254740992.0, 9007199254740994.0, 9007199254740994.0, 9007199254740994.0, 9007199254740996.0],
+            ],
+            '2^53 + 3 to 2^53 + 1 step -0.5' => [
+                9007199254740995, 9007199254740993, -0.5,
+                [9007199254740996.0, 9007199254740994.0, 9007199254740994.0, 9007199254740994.0, 9007199254740992.0],
+            ],
+            '2^53 + 1 to 2^53 + 2 step 0.3' => [
+                9007199254740993, 9007199254740994, 0.3,
+                [9007199254740992.0, 9007199254740994.0, 9007199254740994.0, 9007199254740994.0],
+            ],
+            '2^53 + 3 to 0 step -(2^52 - 0.5)' => [
+                9007199254740995, 0, -4503599627370495.5,
+                [9007199254740996.0, 4503599627370500.0, 4.0],
+            ],
+            '-(2^53 + 3) to 0 step 2^52 - 0.5' => [
+                -9007199254740995, 0, 4503599627370495.5,
+                [-9007199254740996.0, -4503599627370500.0, -4.0],
+            ],
+            '2^53 + 1 to 2^53 - 2 step -0.3' => [
+                9007199254740993, 9007199254740990, -0.3,
+                [
+                    9007199254740992.0, 9007199254740992.0, 9007199254740992.0, 9007199254740992.0,
+                    9007199254740992.0, 9007199254740992.0, 9007199254740991.0, 9007199254740991.0,
+                    9007199254740991.0, 9007199254740990.0, 9007199254740990.0,
+                ],
+            ],
+            '2^63 - 512 to 2^63 - 514 step -0.5' => [
+                9223372036854775296, 9223372036854775294, -0.5,
+                [
+                    9.223372036854776E18, 9.223372036854775E18, 9.223372036854775E18, 9.223372036854775E18,
+                    9.223372036854775E18,
+                ],
+            ],
+            'PHP_INT_MIN + 512 to PHP_INT_MIN + 514 step 0.5' => [
+                -9223372036854775296, -9223372036854775294, 0.5,
+                [
+                    -9.223372036854776E18, -9.223372036854775E18, -9.223372036854775E18, -9.223372036854775E18,
+                    -9.223372036854775E18,
+                ],
+            ],
+            '2^53 + 1 to 2^53 - 5 step -0.3888888888888889' => [
+                9007199254740993, 9007199254740987, -0.3888888888888889,
+                [
+                    9007199254740992.0, 9007199254740992.0, 9007199254740992.0, 9007199254740992.0,
+                    9007199254740991.0, 9007199254740991.0, 9007199254740991.0, 9007199254740990.0,
+                    9007199254740990.0, 9007199254740989.0, 9007199254740989.0, 9007199254740989.0,
+                    9007199254740988.0, 9007199254740988.0, 9007199254740988.0, 9007199254740987.0,
+                ],
+            ],
+            '-(2^53 + 1) to -(2^53 - 5) step 0.3888888888888889' => [
+                -9007199254740993, -9007199254740987, 0.3888888888888889,
+                [
+                    -9007199254740992.0, -9007199254740992.0, -9007199254740992.0, -9007199254740992.0,
+                    -9007199254740991.0, -9007199254740991.0, -9007199254740991.0, -9007199254740990.0,
+                    -9007199254740990.0, -9007199254740989.0, -9007199254740989.0, -9007199254740989.0,
+                    -9007199254740988.0, -9007199254740988.0, -9007199254740988.0, -9007199254740987.0,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @test         a fractional step on int operands whose start a float can't hold, over a span beyond the int range,
+     *               gives each value from the exact start
+     * @dataProvider dataProviderForFractionalStepOnIntStartBeyondFloatPrecisionLongRange
+     * @param        int               $start
+     * @param        int               $end
+     * @param        float             $step
+     * @param        int               $count
+     * @param        array<int, float> $expected values at chosen indices
+     */
+    public function testFractionalStepOnIntStartBeyondFloatPrecisionLongRange(
+        int $start,
+        int $end,
+        float $step,
+        int $count,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount($count, $result);
+        $this->assertSame($expected, \array_intersect_key($result, $expected));
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_exact_span_count_and_step_tie.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForFractionalStepOnIntStartBeyondFloatPrecisionLongRange(): array
+    {
+        return [
+            'PHP_INT_MIN + 512 to PHP_INT_MAX step 2^52 - 0.5' => [
+                -9223372036854775296, \PHP_INT_MAX, 4503599627370495.5, 4097,
+                [
+                    0 => -9.223372036854776E18,
+                    1 => -9.218868437227405E18,
+                    2047 => -4503599627371008.0,
+                    2048 => -512.0,
+                    2049 => 4503599627369983.5,
+                    3000 => 4.287426845256711E18,
+                    4095 => 9.218868437227404E18,
+                ],
+            ],
+            'PHP_INT_MAX - 511 to PHP_INT_MIN step -(2^52 - 0.5)' => [
+                9223372036854775296, \PHP_INT_MIN, -4503599627370495.5, 4097,
+                [
+                    0 => 9.223372036854776E18,
+                    1 => 9.218868437227405E18,
+                    2047 => 4503599627371008.0,
+                    2048 => 512.0,
+                    2049 => -4503599627369983.5,
+                    3000 => -4.287426845256711E18,
+                    4095 => -9.218868437227404E18,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @test         a step equal to the float span of float operands throws when the exact span is smaller
+     * @dataProvider dataProviderForStepEqualToFloatSpanExceedingExactSpan
+     * @param        float $start
+     * @param        float $end
+     * @param        float $step
+     */
+    public function testStepEqualToFloatSpanExceedingExactSpanThrows(float $start, float $end, float $step): void
+    {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must not exceed span');
+
+        // When
+        foreach (Single::range($start, $end, $step) as $_) {
+            break;
+        }
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_exact_span_count_and_step_tie.py):
+     *   Fraction(abs(step)) > abs(Fraction(end) - Fraction(start)), where abs(end - start) == abs(step) in float
+     */
+    public static function dataProviderForStepEqualToFloatSpanExceedingExactSpan(): array
+    {
+        return [
+            '0.1 to 2.0^53 step 2.0^53' => [0.1, 9007199254740992.0, 9007199254740992.0],
+            '2.0^53 to 0.1 step -2.0^53' => [9007199254740992.0, 0.1, -9007199254740992.0],
+            '-2.0^53 to -0.1 step 2.0^53' => [-9007199254740992.0, -0.1, 9007199254740992.0],
+            '2.5 to 2.0^53 + 2 step 2.0^53' => [2.5, 9007199254740994.0, 9007199254740992.0],
+            '0.3 to 1e16 step 1e16' => [0.3, 1.0E16, 1.0E16],
+            '0.1 to 2.0^63 step 2.0^63' => [0.1, 9.223372036854776E18, 9.223372036854776E18],
+            '2.0^63 to 0.1 step -2.0^63' => [9.223372036854776E18, 0.1, -9.223372036854776E18],
+            '-2.0^64 to -0.5 step 2.0^64' => [-1.8446744073709552E19, -0.5, 1.8446744073709552E19],
+        ];
+    }
+
+    /**
+     * @test         an int step equal to the float span of float operands throws when the exact span is smaller
+     * @dataProvider dataProviderForIntStepEqualToFloatSpanExceedingExactSpan
+     * @param        float $start
+     * @param        float $end
+     * @param        int   $step
+     */
+    public function testIntStepEqualToFloatSpanExceedingExactSpanThrows(float $start, float $end, int $step): void
+    {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must not exceed span');
+
+        // When
+        foreach (Single::range($start, $end, $step) as $_) {
+            break;
+        }
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_exact_span_count_and_step_tie.py):
+     *   Fraction(abs(step)) > abs(Fraction(end) - Fraction(start)), where abs(end - start) == float(abs(step))
+     */
+    public static function dataProviderForIntStepEqualToFloatSpanExceedingExactSpan(): array
+    {
+        return [
+            '2.0 to 2.0^60 step 2^60 - 1' => [2.0, 1.152921504606847E18, 1152921504606846975],
+            '1.0 to 2.0^60 step 2^60' => [1.0, 1.152921504606847E18, 1152921504606846976],
+        ];
+    }
+
+    /**
+     * @test         a step equal to the float span of float operands doesn't throw when it is within the exact span
+     * @dataProvider dataProviderForStepEqualToFloatSpanWithinExactSpan
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testStepEqualToFloatSpanWithinExactSpan(float $start, float $end, float $step, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_exact_span_count_and_step_tie.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForStepEqualToFloatSpanWithinExactSpan(): array
+    {
+        return [
+            '-0.1 to 2.0^53 step 2.0^53' => [-0.1, 9007199254740992.0, 9007199254740992.0, [-0.1, 9007199254740992.0]],
+            '-0.1 to 2.0^63 step 2.0^63' => [
+                -0.1, 9.223372036854776E18, 9.223372036854776E18, [-0.1, 9.223372036854776E18],
+            ],
+        ];
+    }
+
+    /**
+     * @test an int step equal to the float span of float operands doesn't throw when it equals the exact span
+     */
+    public function testIntStepEqualToFloatSpanAndExactSpan(): void
+    {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range(1.0, 1.152921504606847E18, 1152921504606846975), false);
+
+        // Then (oracle: tools/oracles/range_exact_span_count_and_step_tie.py, '1.0 to 2.0^60 step 2^60 - 1')
+        $this->assertSame([1.0, 1.152921504606847E18], $result);
+    }
+
+    /**
+     * @test         a decimal step equal to the decimal span is accepted, although the exact span of the floats the
+     *               operands round to is slightly smaller than the step
+     * @dataProvider dataProviderForStepEqualToDecimalSpan
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testStepEqualToDecimalSpanIsValid(float $start, float $end, float $step, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_exact_span_count_and_step_tie.py, decimal literals as written):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForStepEqualToDecimalSpan(): array
+    {
+        return [
+            '-10.0 to -3.6 step 6.4' => [-10.0, -3.6, 6.4, [-10.0, -3.6]],
+            '0.1 to 0.7 step 0.6' => [0.1, 0.7, 0.6, [0.1, 0.7]],
+            '0.7 to 0.1 step -0.6' => [0.7, 0.1, -0.6, [0.7, 0.1]],
+        ];
+    }
+
+    /**
      * @test an int operand beyond 2^53 and an integral float operand that are equal as floats still reject a step
      *       against their direction
      */

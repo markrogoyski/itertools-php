@@ -1074,6 +1074,20 @@ final class Single
      * converted to float first and the span can be off: `range(PHP_INT_MAX, 2.0 ** 63, 0.5)` sees a span of 0
      * and yields one element, where the true span of 1 gives three.
      *
+     * With such exact int operands and a whole step (an int or an integral float), the element count comes
+     * from the exact span and each value is `$start ± i·|$step|` computed exactly and correctly rounded to
+     * float: `range(PHP_INT_MIN, PHP_INT_MAX, 2.0 ** 63)` yields `[-2^63, 0.0]`. With a fractional step, the
+     * values are computed in float, as for float operands, except from an int `$start` past 2^53 that a float
+     * can't hold: those are `$start ± i·|$step|` computed exactly and correctly rounded, since a value
+     * computed from `(float) $start` carries its rounding error. `range(2 ** 53 + 3, 0, -(2.0 ** 52 - 0.5))`
+     * yields `[2^53 + 4, 2^52 + 4, 4.0]`, where computing from `(float) $start` ends on 5.0.
+     *
+     * A step that equals the span of two float operands computed in float is compared with their exact span,
+     * which the float span can round up to the step: `range(0.1, 2.0 ** 53, 2.0 ** 53)` throws, as the exact
+     * span is 2^53 - 0.1. The step is accepted while the shortfall is within half a float spacing of the
+     * non-integral operands, which decimal operands rounding to these floats could make up: `range(-10.0,
+     * -3.6, 6.4)` yields `[-10.0, -3.6]`, although the floats' exact span is 6.4 - 4.4e-16.
+     *
      * @param int|float $start
      * @param int|float $end
      * @param int|float $step (optional) Step magnitude. Defaults to 1.
@@ -1170,7 +1184,10 @@ final class Single
                 }
             } else {
                 $magnitude = $magnitudeF;
-                $stepExceedsSpan = $magnitudeF > $spanF;
+                // Unequal, the float span and the step compare as the exact span does, since rounding is
+                // monotonic. Equal, the exact span may be smaller: 2^53 - 0.1 rounds to 2^53.
+                $stepExceedsSpan = $magnitudeF > $spanF || ($magnitudeF === $spanF
+                    && self::stepExceedsExactFloatSpan(\abs($step), \min($startF, $endF), \max($startF, $endF)));
                 $spanDescription = "({$spanF})";
             }
 
@@ -1178,6 +1195,15 @@ final class Single
                 throw new \InvalidArgumentException(
                     "Single::range: step magnitude ({$magnitude}) must not exceed span {$spanDescription}"
                 );
+            }
+
+            // A whole step on int operands is counted and applied in the int domain, exactly. Converted to
+            // float, a span past 2^53 rounds, and the count with it: range(0.0, PHP_INT_MAX, 2**62) would take
+            // the span 2^63 - 1 as 2^63, two steps, and end on 2^63.
+            $wholeStep = \is_int($magnitude) || \floor($magnitude) === $magnitude;
+            if (\is_int($startExact) && \is_int($endExact) && $wholeStep) {
+                yield from self::rangeOfWholeStepOnInts($startExact, $endExact, $magnitude, $ascending);
+                return;
             }
 
             // Compute element count up front and derive each value from $start to avoid
@@ -1223,9 +1249,18 @@ final class Single
             // range(2^53 + 1, 2^53 + 3, 0.5) starts from 2^53.
             $lastIndex = $landsOnEnd ? $stepsF - 1 : $stepsF;
 
+            // An int $start that a float can't hold (past 2^53) is off by up to half the float spacing there
+            // once converted, and every value computed from it would carry that error: range(2^53 + 3, 0,
+            // -(2^52 - 0.5)) would end on 5.0, not 4.0. Its values are computed from the exact $start instead.
+            // A $start that a float holds keeps the computation below, so its values are unchanged.
+            $exactStart = \is_int($startExact) && \is_int($endExact) && Arithmetic::toExactInt($startF) !== $startExact;
+
             for ($i = 0; $i <= $lastIndex; ++$i) {
                 $offsetF = (float)$i * $magnitudeF;
-                $valF = $startF + $signF * $offsetF;
+                // (float) $i is exact up to 2^53, which iteration never reaches.
+                $valF = $exactStart && $i > 0 && $i <= 2 ** 53
+                    ? self::roundIntPlusMultiple($startExact, $i, $magnitudeF, $ascending)
+                    : $startF + $signF * $offsetF;
                 // A value can pass $end through rounding: of $startF (int operands past 2^53), of the offset
                 // or of the addition. It passes by less than a float spacing, so it lands on $end.
                 if ($ascending ? $valF > $endF : $valF < $endF) {
@@ -1283,6 +1318,228 @@ final class Single
                 }
             }
         }
+    }
+
+    /**
+     * The float range of int operands by a whole step, which {@see Single::range()} has checked against the
+     * span.
+     *
+     * The element count is taken from the exact span, and each value is the exact int $start ± i·$magnitude,
+     * converted to float once, so it is correctly rounded. A step of at least 2^63 is a float, and fits only a
+     * span beyond the int range, which is below 2^64, so it fits once.
+     *
+     * @param int       $start
+     * @param int       $end
+     * @param int|float $magnitude whole and positive
+     * @param bool      $ascending
+     *
+     * @return \Generator<int, float>
+     *
+     * @throws \InvalidArgumentException when the range has more than PHP_INT_MAX elements
+     */
+    private static function rangeOfWholeStepOnInts(
+        int $start,
+        int $end,
+        int|float $magnitude,
+        bool $ascending
+    ): \Generator {
+        [$low, $high] = $ascending ? [$start, $end] : [$end, $start];
+
+        $magnitudeI = Arithmetic::toExactInt($magnitude);
+        if ($magnitudeI === null) {
+            // The span is at least 2^63, so $low < 0 <= $high, and $low + 2^63, $high - 2^63 and the step's
+            // excess over 2^63 are exact ints.
+            $magnitudeExcess = (int)((float)$magnitude + (float)\PHP_INT_MIN);
+            yield (float)$start;
+            yield (float)($ascending
+                ? ($low - \PHP_INT_MIN) + $magnitudeExcess
+                : ($high + \PHP_INT_MIN) - $magnitudeExcess);
+            return;
+        }
+
+        // The span fits in an int unless $low is negative and $high - $low passes PHP_INT_MAX.
+        $spanFitsInt = $low >= 0 || $high <= \PHP_INT_MAX + $low;
+        if ($spanFitsInt) {
+            $steps = \intdiv($high - $low, $magnitudeI);
+        } elseif ($magnitudeI === 1) {
+            $steps = null;
+        } else {
+            // The span is 2^63 + $excess, which overflowed. With 2^63 = $magnitudeI·$quotient + $remainder, 0
+            // < $remainder <= $magnitudeI, the remainders of 2^63 and of $excess add up to one more step when
+            // their sum reaches $magnitudeI. At most PHP_INT_MAX steps fit, as $magnitudeI >= 2.
+            $excess = $high - ($low - \PHP_INT_MIN);
+            $quotient = \intdiv(\PHP_INT_MAX, $magnitudeI);
+            $remainder = \PHP_INT_MAX % $magnitudeI + 1;
+            $steps = $quotient + \intdiv($excess, $magnitudeI)
+                + ($excess % $magnitudeI >= $magnitudeI - $remainder ? 1 : 0);
+        }
+
+        if ($steps === null || $steps >= \PHP_INT_MAX) {
+            $spanDescription = $spanFitsInt ? 'span=' . ($high - $low) : "span between {$start} and {$end}";
+            throw new \InvalidArgumentException(
+                'Single::range: span / step exceeds representable iteration count '
+                . "({$spanDescription}, step={$magnitudeI})"
+            );
+        }
+
+        // The values stay between $start and $end, so the int arithmetic doesn't overflow.
+        $value = $start;
+        yield (float)$value;
+        if ($ascending) {
+            for ($i = 0; $i < $steps; ++$i) {
+                $value += $magnitudeI;
+                yield (float)$value;
+            }
+        } else {
+            for ($i = 0; $i < $steps; ++$i) {
+                $value -= $magnitudeI;
+                yield (float)$value;
+            }
+        }
+    }
+
+    /**
+     * $start ± $i·$magnitude, correctly rounded to float, for an int $start past 2^53 that a float can't hold
+     * and a fractional $magnitude, as {@see Single::range()} yields it.
+     *
+     * $i·$magnitude is split exactly (TwoProduct, then TwoSum) into an int and a fraction in (-1, 1), so the
+     * value is an exact int $base plus a fraction. Past 2^53 the fraction only decides a tie, as a sticky bit
+     * does. Within 2^53, $base converts to float exactly and the fraction is added with one rounding; its low
+     * part is rounded to odd first, so it can't make or break a tie.
+     *
+     * The value lies between $start and $end, and so does $base, which is within 1 of it.
+     *
+     * @param int   $start
+     * @param int   $i         positive and at most 2^53, so (float) $i is exact
+     * @param float $magnitude fractional and positive, so below 2^52
+     * @param bool  $ascending
+     *
+     * @return float
+     */
+    private static function roundIntPlusMultiple(int $start, int $i, float $magnitude, bool $ascending): float
+    {
+        // TwoProduct (Dekker, with Veltkamp's split): $product + $error is exactly $i·$magnitude.
+        $x = (float)$i;
+        $product = $x * $magnitude;
+        $split = 134217729.0 * $x;
+        $xHi = $split - ($split - $x);
+        $xLo = $x - $xHi;
+        $split = 134217729.0 * $magnitude;
+        $mHi = $split - ($split - $magnitude);
+        $mLo = $magnitude - $mHi;
+        $error = (($xHi * $mHi - $product) + $xHi * $mLo + $xLo * $mHi) + $xLo * $mLo;
+
+        // Integer parts, truncated toward zero, and the fractions left over, all exact. $product is positive.
+        $productInt = \floor($product);
+        $errorInt = $error < 0.0 ? \ceil($error) : \floor($error);
+        $productFrac = $product - $productInt;
+        $errorFrac = $error - $errorInt;
+
+        // TwoSum (Knuth): $fracHi + $fracLo is exactly $productFrac + $errorFrac, in (-1, 2). Its integer part
+        // moves to $small, which leaves |$fracHi + $fracLo| < 1, with the sign of $fracHi unless it is 0.
+        $fracHi = $productFrac + $errorFrac;
+        $errorPart = $fracHi - $productFrac;
+        $fracLo = ($productFrac - ($fracHi - $errorPart)) + ($errorFrac - $errorPart);
+        $carry = $fracHi < 0.0 ? \ceil($fracHi) : \floor($fracHi);
+        $fracHi -= $carry;
+        $small = (int)$errorInt + (int)$carry;
+
+        // $base = $start ± ($productInt + $small), added in an order that stays within the int range. Past
+        // 2^63, $i·$magnitude spans 0, from a $start on the other side of it, so $start ± 2^63 is an int.
+        $sign = $ascending ? 1 : -1;
+        $from = $start;
+        $productIntRange = $productInt;
+        if ($productInt >= -(float)\PHP_INT_MIN) {
+            $from = $ascending ? $start - \PHP_INT_MIN : $start + \PHP_INT_MIN;
+            $productIntRange = $productInt + (float)\PHP_INT_MIN;
+        }
+        $whole = (int)$productIntRange;
+        $base = $small >= 0
+            ? ($from + $sign * $small) + $sign * $whole
+            : $from + $sign * ($whole + $small);
+
+        $hi = $ascending ? $fracHi : -$fracHi;
+        $lo = $ascending ? $fracLo : -$fracLo;
+        if ($hi === 0.0 && $lo === 0.0) {
+            return (float)$base;
+        }
+
+        if ($base > 2 ** 53 || $base < -(2 ** 53)) {
+            // The float spacing is at least 2 there, so only the side of $base the fraction is on matters. Within
+            // 2^62, 2·$base ± 1 rounds as $base ± the fraction does; past it, the spacing is at least 512, and so
+            // does $base with its lowest bit set ($base ± 1 when it is even), which can't be a tie.
+            $towards = ($hi !== 0.0 ? $hi : $lo) > 0.0 ? 1 : -1;
+            if ($base > -(2 ** 62) && $base < 2 ** 62) {
+                return (float)(2 * $base + $towards) * 0.5;
+            }
+            return (float)($towards > 0 ? $base | 1 : ($base - 1) | 1);
+        }
+
+        // TwoSum: $sum + $sumError is exactly $base + $hi, where $base is exact as a float.
+        $baseF = (float)$base;
+        $sum = $baseF + $hi;
+        $hiPart = $sum - $baseF;
+        $sumError = ($baseF - ($sum - $hiPart)) + ($hi - $hiPart);
+
+        // TwoSum: $rest + $restError is exactly $sumError + $lo. Rounded to odd, $rest keeps the sign of
+        // $restError as a sticky bit far below the spacing at $sum, so $sum + $rest rounds as the exact value.
+        $rest = $sumError + $lo;
+        $loPart = $rest - $sumError;
+        $restError = ($sumError - ($rest - $loPart)) + ($lo - $loPart);
+        if ($restError !== 0.0) {
+            $spacing = 2.0 * Arithmetic::halfFloatSpacing($rest);
+            if ($spacing > 0.0 && \fmod($rest / $spacing, 2.0) === 0.0) {
+                // Toward 0 from a power of two, the next float down is half a spacing away.
+                $towardZero = ($rest > 0.0) !== ($restError > 0.0);
+                $nudge = $towardZero && \abs($rest) === $spacing * 4503599627370496.0 ? $spacing / 2.0 : $spacing;
+                $rest += $restError > 0.0 ? $nudge : -$nudge;
+            }
+        }
+
+        return $sum + $rest;
+    }
+
+    /**
+     * Whether a step equal to the float span $high - $low exceeds their exact span by more than decimal
+     * operands that round to these floats can make up.
+     *
+     * The float span rounds the exact one, so it can round up to the step: in range(0.1, 2.0 ** 53, 2.0 **
+     * 53), the exact span 2^53 - 0.1 rounds to 2^53. A non-integral operand may stand for a decimal anywhere
+     * within half a float spacing of it, so a deficit within those bounds isn't taken as one: in range(-10.0,
+     * -3.6, 6.4), the exact span of the floats is 6.4 - 4.4e-16, but the decimal span is the step. An
+     * integral float stands for itself, as {@see Single::range()} takes it next to an int operand.
+     *
+     * @param int|float $magnitude the step magnitude, equal to $high - $low in float
+     * @param float     $low
+     * @param float     $high
+     *
+     * @return bool
+     */
+    private static function stepExceedsExactFloatSpan(int|float $magnitude, float $low, float $high): bool
+    {
+        // TwoSum: $spanF + $error is exactly $high - $low.
+        $spanF = $high - $low;
+        $highPart = $spanF + $low;
+        $error = ($high - $highPart) + (-$low - ($spanF - $highPart));
+
+        // An int step beyond 2^53 can differ from the float span it equals, which is then integral, at most
+        // 2^63.
+        $stepExcess = 0;
+        if (\is_int($magnitude)) {
+            $spanI = Arithmetic::toExactInt($spanF);
+            $stepExcess = $spanI === null ? $magnitude - \PHP_INT_MAX - 1 : $magnitude - $spanI;
+        }
+        $deficit = (float)$stepExcess - $error;
+
+        // Integral floats beyond the int range count as exact too: range(0.1, 2.0 ** 63, 2.0 ** 63) throws.
+        $tolerance = 0.0;
+        foreach (\is_int($magnitude) ? [$low, $high] : [$low, $high, $magnitude] as $operand) {
+            if (\floor($operand) !== $operand) {
+                $tolerance += Arithmetic::halfFloatSpacing($operand);
+            }
+        }
+
+        return $deficit > $tolerance;
     }
 
     /**

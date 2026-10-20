@@ -714,6 +714,57 @@ class SourceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         ofRange on int operands beyond float precision counts the exact span by a whole step, and takes the
+     *               values of a fractional step from an exact start a float can't hold
+     * @dataProvider dataProviderForRangeIntOperandsBeyondFloatPrecision
+     * @param int|float    $start
+     * @param int|float    $end
+     * @param int|float    $step
+     * @param array<float> $expected
+     */
+    public function testOfRangeIntOperandsBeyondFloatPrecision(
+        int|float $start,
+        int|float $end,
+        int|float $step,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $stream = Stream::ofRange($start, $end, $step);
+
+        // When
+        $result = $stream->toArray();
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with (tools/oracles/range_exact_span_count_and_step_tie.py):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForRangeIntOperandsBeyondFloatPrecision(): array
+    {
+        return [
+            'PHP_INT_MIN to PHP_INT_MAX step 2.0^63' => [
+                \PHP_INT_MIN, \PHP_INT_MAX, 9.223372036854776E18,
+                [-9.223372036854776E18, 0.0],
+            ],
+            'PHP_INT_MAX to 0.0 step -(PHP_INT_MAX - 1)' => [
+                \PHP_INT_MAX, 0.0, -(\PHP_INT_MAX - 1),
+                [9.223372036854776E18, 1.0],
+            ],
+            '2^53 + 3 to 0 step -(2^52 - 0.5)' => [
+                9007199254740995, 0, -4503599627370495.5,
+                [9007199254740996.0, 4503599627370500.0, 4.0],
+            ],
+        ];
+    }
+
+    /**
      * @test         ofRange invalid type arguments
      * @dataProvider dataProviderForRangeInvalidTypeArguments
      * @param mixed $start
@@ -785,6 +836,14 @@ class SourceTest extends \PHPUnit\Framework\TestCase
                 1,
                 5,
                 10,
+            ],
+            // Step equal to the float span 2^53 but greater than the exact span 2^53 - 0.1
+            // (Fraction(abs(step)) > abs(Fraction(end) - Fraction(start)),
+            // tools/oracles/range_exact_span_count_and_step_tie.py)
+            [
+                0.1,
+                9007199254740992.0,
+                9007199254740992.0,
             ],
             // Zero step
             [
