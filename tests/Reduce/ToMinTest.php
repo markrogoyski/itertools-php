@@ -2467,4 +2467,27 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test toMin converts a Stringable compared with a string once, as \min() does
+     */
+    public function testStringableIsConvertedOncePerComparison(): void
+    {
+        // Given
+        $stringable = new class () {
+            public int $conversions = 0;
+
+            public function __toString(): string
+            {
+                ++$this->conversions;
+                return 'b';
+            }
+        };
+
+        // When
+        Reduce::toMin(['b', $stringable]);
+
+        // Then
+        $this->assertSame(1, $stringable->conversions);
+    }
 }

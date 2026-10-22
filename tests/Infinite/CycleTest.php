@@ -678,4 +678,33 @@ class CycleTest extends \PHPUnit\Framework\TestCase
         }
         return $result;
     }
+
+    /**
+     * @test cycle caches a one-pass source in a few dozen bytes per element, not an array per element
+     */
+    public function testCacheOfAOnePassSourceIsCompact(): void
+    {
+        // Given
+        $n = 200_000;
+        $source = (static function () use ($n): \Generator {
+            for ($i = 0; $i < $n; ++$i) {
+                yield $i;
+            }
+        })();
+        $before = \memory_get_usage();
+        $cycle = Infinite::cycle($source);
+
+        // When one and a half passes are read
+        $read = 0;
+        foreach ($cycle as $value) {
+            if (++$read === $n + $n / 2) {
+                break;
+            }
+        }
+        $retained = \memory_get_usage() - $before;
+
+        // Then
+        $this->assertSame($n / 2 - 1, $value);
+        $this->assertLessThan(64 * $n, $retained);
+    }
 }

@@ -246,7 +246,16 @@ final class Math
                 yield $max ?? \NAN;
                 continue;
             }
-            $max = $max === null ? $number : Arithmetic::max($max, $number);
+            if ($max === null) {
+                $max = $number;
+            } elseif ($max == $number && \is_int($max) !== \is_int($number)) {
+                // \max() compares an int and a float as floats, which only goes wrong for a pair it finds equal:
+                // an int beyond ±2^53 and a float. Arithmetic::max() compares that pair exactly. The numbers are
+                // compared first, as that is cheaper than testing their types.
+                $max = Arithmetic::max($max, $number);
+            } else {
+                $max = \max($max, $number);
+            }
             yield $max;
         }
     }
@@ -271,7 +280,16 @@ final class Math
                 yield $min ?? \NAN;
                 continue;
             }
-            $min = $min === null ? $number : Arithmetic::min($min, $number);
+            if ($min === null) {
+                $min = $number;
+            } elseif ($min == $number && \is_int($min) !== \is_int($number)) {
+                // \min() compares an int and a float as floats, which only goes wrong for a pair it finds equal:
+                // an int beyond ±2^53 and a float. Arithmetic::min() compares that pair exactly. The numbers are
+                // compared first, as that is cheaper than testing their types.
+                $min = Arithmetic::min($min, $number);
+            } else {
+                $min = \min($min, $number);
+            }
             yield $min;
         }
     }
@@ -289,13 +307,33 @@ final class Math
      */
     public static function runningAverage(iterable $numbers, int|float|null $initialValue = null): \Generator
     {
-        $mean = new MeanAccumulator($initialValue);
+        // The sum is kept here, as MeanAccumulator keeps it, until it overflows; the accumulator then takes over
+        // from the sum so far. Calling it for every number would take twice as long.
+        $count = 0;
+        $sum = 0;
+        $mean = null;
 
         if ($initialValue !== null) {
-            yield $mean->mean();
+            $count = 1;
+            $sum = $initialValue;
+            /** @psalm-suppress InvalidOperand */
+            yield $sum / $count;
         }
 
         foreach ($numbers as $number) {
+            if ($mean === null) {
+                /** @psalm-suppress InvalidOperand */
+                $next = $sum + $number;
+                if (!\is_float($next) || !\is_infinite($next) || !\is_finite($sum)) {
+                    $sum = $next;
+                    ++$count;
+                    /** @psalm-suppress InvalidOperand */
+                    yield $sum / $count;
+                    continue;
+                }
+                $mean = MeanAccumulator::resume($sum, $count);
+            }
+
             $mean->add($number);
             yield $mean->mean();
         }

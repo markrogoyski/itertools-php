@@ -53,4 +53,25 @@ class StreamMemoizeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(10, $sum);
         $this->assertSame(3, $mapped);
     }
+
+    public function testCacheIsCompact(): void
+    {
+        // Given
+        $n = 200_000;
+        $source = (static function () use ($n): \Generator {
+            for ($i = 0; $i < $n; ++$i) {
+                yield $i;
+            }
+        })();
+        $before = \memory_get_usage();
+        $stream = Stream::of($source)->memoize();
+
+        // When
+        $count = $stream->toCount();
+        $retained = \memory_get_usage() - $before;
+
+        // Then
+        $this->assertSame($n, $count);
+        $this->assertLessThan(64 * $n, $retained);
+    }
 }

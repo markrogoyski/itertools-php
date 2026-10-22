@@ -44,6 +44,24 @@ final class MeanAccumulator
     }
 
     /**
+     * An accumulator that continues from $sum, the plain sum of $count values, as a caller that sums directly
+     * hands it over once the sum would overflow.
+     *
+     * @param int|float $sum   finite
+     * @param int       $count
+     *
+     * @return self
+     */
+    public static function resume(int|float $sum, int $count): self
+    {
+        $accumulator        = new self();
+        $accumulator->sum   = $sum;
+        $accumulator->count = $count;
+
+        return $accumulator;
+    }
+
+    /**
      * @param mixed $value a number, or a value PHP arithmetic coerces to one (null, bool, numeric string)
      */
     public function add(mixed $value): void

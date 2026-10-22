@@ -1301,6 +1301,8 @@ class RangeTest extends \PHPUnit\Framework\TestCase
             '0.1 to 2.0^63 step 2.0^63' => [0.1, 9.223372036854776E18, 9.223372036854776E18],
             '2.0^63 to 0.1 step -2.0^63' => [9.223372036854776E18, 0.1, -9.223372036854776E18],
             '-2.0^64 to -0.5 step 2.0^64' => [-1.8446744073709552E19, -0.5, 1.8446744073709552E19],
+            '1e22 to 3e23 step 3e23 - 1e22' => [1.0E22, 3.0E23, 2.9E23],
+            '-154.0 to 0.3381942395764377 step their difference' => [-154.0, 0.3381942395764377, 154.33819423957644],
         ];
     }
 
@@ -1418,6 +1420,90 @@ class RangeTest extends \PHPUnit\Framework\TestCase
             '-10.0 to -3.6 step 6.4' => [-10.0, -3.6, 6.4, [-10.0, -3.6]],
             '0.1 to 0.7 step 0.6' => [0.1, 0.7, 0.6, [0.1, 0.7]],
             '0.7 to 0.1 step -0.6' => [0.7, 0.1, -0.6, [0.7, 0.1]],
+        ];
+    }
+
+    /**
+     * @test         a step computed in float as $end - $start is accepted, although the subtraction rounded it above
+     *               the exact span of the floats, and the range lands on $end, as for ($end - $start) / $n
+     * @dataProvider dataProviderForStepComputedAsFloatSpan
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testStepComputedAsFloatSpanIsValid(float $start, float $end, float $step, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Each step is the float $end - $start, written out.
+     *
+     * Test data generated with (tools/oracles/range_step_is_float_difference.py, decimal literals as written, the step
+     * standing for their difference):
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(end) - Fraction(start))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(end) - Fraction(start)))
+     */
+    public static function dataProviderForStepComputedAsFloatSpan(): array
+    {
+        return [
+            '10.19 to 33.0 step 33.0 - 10.19' => [10.19, 33.0, 22.810000000000002, [10.19, 33.0]],
+            '7.1 to -17.6 step -17.6 - 7.1' => [7.1, -17.6, -24.700000000000003, [7.1, -17.6]],
+            '-42.18 to 33.03 step 33.03 + 42.18' => [-42.18, 33.03, 75.21000000000001, [-42.18, 33.03]],
+            '5.41 to -42.57 step -42.57 - 5.41' => [5.41, -42.57, -47.980000000000004, [5.41, -42.57]],
+            '36.7 to -37.79 step -37.79 - 36.7' => [36.7, -37.79, -74.49000000000001, [36.7, -37.79]],
+            'full-precision operands' => [
+                -176.76226570120195,
+                969.2439921057057,
+                1146.0062578069078,
+                [-176.76226570120195, 969.2439921057057],
+            ],
+        ];
+    }
+
+    /**
+     * @test         a step that exceeds the span is reported with enough digits to tell it from the span, or against
+     *               the exact span when the float span equals it
+     * @dataProvider dataProviderForStepExceedingSpanMessage
+     * @param        float  $start
+     * @param        float  $end
+     * @param        float  $step
+     * @param        string $message
+     */
+    public function testStepExceedingSpanMessageDistinguishesStepAndSpan(
+        float $start,
+        float $end,
+        float $step,
+        string $message
+    ): void {
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($message);
+
+        // When
+        foreach (Single::range($start, $end, $step) as $_) {
+            break;
+        }
+    }
+
+    public static function dataProviderForStepExceedingSpanMessage(): array
+    {
+        return [
+            '0.1 to 0.2 step 0.10000000000000002' => [
+                0.1, 0.2, 0.10000000000000002,
+                'Single::range: step magnitude (0.10000000000000002) must not exceed span (0.1)',
+            ],
+            '0.1 to 2.0^53 step 2.0^53' => [
+                0.1, 9007199254740992.0, 9007199254740992.0,
+                'Single::range: step magnitude (9007199254740992.0) must not exceed span (the exact span between 0.1 '
+                . 'and 9007199254740992.0, which rounds to the step in float)',
+            ],
+            '0.0 to 1.0 step 1.5' => [0.0, 1.0, 1.5, 'Single::range: step magnitude (1.5) must not exceed span (1)'],
         ];
     }
 
@@ -2048,6 +2134,59 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(0.0, $result[0] + 0.0);
         $this->assertSame(1.0, $result[1]);
         $this->assertSame(2.0, $result[2]);
+    }
+
+    /**
+     * @test         a -0.0 start gives the first value -0.0 ± 0.0, as the float values $start ± i·|$step| do: -0.0
+     *               descending and 0.0 ascending, with an int or a float end
+     * @dataProvider dataProviderForNegativeZeroStart
+     * @param        float        $start
+     * @param        int|float    $end
+     * @param        int|float    $step
+     * @param        array<float> $expected
+     * @param        float        $expectedReciprocalOfFirst
+     */
+    public function testNegativeZeroStartFirstValueSign(
+        float $start,
+        int|float $end,
+        int|float $step,
+        array $expected,
+        float $expectedReciprocalOfFirst
+    ): void {
+        // Given (on 32-bit PHP the int literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then (assertSame() takes -0.0 and 0.0 as the same, so the sign is checked through 1 / ±0.0 = ±INF)
+        $this->assertSame($expected, $result);
+        $this->assertSame($expectedReciprocalOfFirst, \fdiv(1.0, $result[0]));
+    }
+
+    /**
+     * The first value is -0.0 + sign * 0.0 in IEEE 754 arithmetic. The others are generated with Python:
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForNegativeZeroStart(): array
+    {
+        return [
+            '-0.0 to -3 step -1' => [-0.0, -3, -1, [-0.0, -1.0, -2.0, -3.0], -\INF],
+            '-0.0 to -3.0 step -1' => [-0.0, -3.0, -1, [-0.0, -1.0, -2.0, -3.0], -\INF],
+            '-0.0 to -2.5 step -0.5' => [-0.0, -2.5, -0.5, [-0.0, -0.5, -1.0, -1.5, -2.0, -2.5], -\INF],
+            '-0.0 to 3 step 1' => [-0.0, 3, 1, [0.0, 1.0, 2.0, 3.0], \INF],
+            '-0.0 to 2.0 step 1.0' => [-0.0, 2.0, 1.0, [0.0, 1.0, 2.0], \INF],
+            // Stepped exactly in the int domain: the 4th value is -27021597764222979, not 3 * (float) -(2^53 + 1)
+            '-0.0 to -4(2^53 + 1) step -(2^53 + 1)' => [
+                -0.0,
+                -36028797018963972,
+                -9007199254740993,
+                [-0.0, -9007199254740992.0, -1.8014398509481984E+16, -2.702159776422298E+16, -3.602879701896397E+16],
+                -\INF,
+            ],
+        ];
     }
 
     /**

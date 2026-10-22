@@ -38,6 +38,8 @@ $count = 3;
 // Each $week contains iterator containing ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
 ```
 
+A copy can be rewound as long as it has not advanced. Once it has, `rewind()` throws `\LogicException`, so the pairwise idiom of advancing one copy and zipping the copies throws when `zip` rewinds them. Use [`Single::pairwise()`](single-iteration.md#pairwise) for adjacent pairs.
+
 ### To Array
 Transforms any iterable to an array.
 

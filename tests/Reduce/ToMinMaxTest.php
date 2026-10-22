@@ -2039,4 +2039,27 @@ class ToMinMaxTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test toMinMax converts a Stringable compared with a string once for each bound, as \min() and \max() do
+     */
+    public function testStringableIsConvertedOncePerComparison(): void
+    {
+        // Given
+        $stringable = new class () {
+            public int $conversions = 0;
+
+            public function __toString(): string
+            {
+                ++$this->conversions;
+                return 'b';
+            }
+        };
+
+        // When
+        Reduce::toMinMax(['b', $stringable]);
+
+        // Then
+        $this->assertSame(2, $stringable->conversions);
+    }
 }

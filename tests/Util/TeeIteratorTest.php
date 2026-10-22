@@ -205,4 +205,90 @@ class TeeIteratorTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($refs[1]->get());
         $this->assertNull($refs[2]->get());
     }
+
+    public function testCopyDroppedByFreeingABufferedKeyLeavesTheNextValue(): void
+    {
+        // Given a key object that is the only holder of a copy which has moved past it
+        $source = (static function (): \Generator {
+            yield new \stdClass() => 'first';
+            yield 'k2' => 'second';
+        })();
+        [$kept, $dropped] = Transform::tee($source, 2);
+        $dropped->key()->copy = $dropped;
+        $dropped->next();
+        $dropped->valid();
+        unset($dropped);
+
+        // When the remaining copy moves past the key, which frees it and the copy it holds
+        $kept->next();
+
+        // Then
+        $this->assertSame('k2', $kept->key());
+        $this->assertSame('second', $kept->current());
+    }
+
+    public function testCopyDroppedByFreeingABufferedValueLeavesNothingRetained(): void
+    {
+        // Given a value object that is the only holder of a copy which has moved past it
+        $refs = [];
+        $source = (static function () use (&$refs): \Generator {
+            for ($i = 0; $i < 4; ++$i) {
+                $item = new \stdClass();
+                $refs[$i] = \WeakReference::create($item);
+                yield $i => $item;
+            }
+        })();
+        [$kept, $dropped] = Transform::tee($source, 2);
+        $dropped->next();
+        $dropped->valid();
+        $kept->current()->copy = $dropped;
+        unset($dropped);
+
+        // When the remaining copy moves past the value, which frees it and the copy it holds, then past the next
+        $kept->next();
+        $kept->next();
+
+        // Then
+        $this->assertSame(2, $kept->key());
+        $this->assertNull($refs[0]->get());
+        $this->assertNull($refs[1]->get());
+    }
+
+    public function testBufferOfALaggingCopyIsCompact(): void
+    {
+        // Given
+        $n = 200_000;
+        $source = (static function () use ($n): \Generator {
+            for ($i = 0; $i < $n; ++$i) {
+                yield $i;
+            }
+        })();
+        [$drained, $lagging] = Transform::tee($source, 2);
+
+        // When
+        $before = \memory_get_usage();
+        foreach ($drained as $_) {
+        }
+        $retained = \memory_get_usage() - $before;
+
+        // Then
+        $this->assertLessThan(64 * $n, $retained);
+        $this->assertSame(0, $lagging->current());
+    }
+
+    public function testPeekStreamOfALargeGeneratorFitsInA128MLimit(): void
+    {
+        // Given
+        $autoload = \dirname(__DIR__, 2) . '/vendor/autoload.php';
+        $code = 'require ' . \var_export($autoload, true) . ';'
+            . '$gen = (static function () { for ($i = 1; $i <= 600000; ++$i) { yield $i; } })();'
+            . 'echo IterTools\\Stream::of($gen)->peekStream(fn ($s) => $s->toCount())->toSum();';
+        $command = \escapeshellarg(\PHP_BINARY) . ' -d memory_limit=128M -r ' . \escapeshellarg($code) . ' 2>&1';
+
+        // When
+        $output = \shell_exec($command);
+
+        // Then
+        $this->assertSame('180000300000', $output);
+    }
 }

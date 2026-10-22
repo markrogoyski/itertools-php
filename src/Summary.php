@@ -28,7 +28,8 @@ final class Summary
     public static function allMatch(iterable $data, callable $predicate): bool
     {
         foreach ($data as $datum) {
-            if (!Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? !Truthiness::of($verdict) : !$verdict) {
                 return false;
             }
         }
@@ -45,7 +46,8 @@ final class Summary
     public static function allMatchWithKeys(iterable $data, callable $predicate): bool
     {
         foreach ($data as $key => $datum) {
-            if (!Truthiness::of($predicate($datum, $key))) {
+            $verdict = $predicate($datum, $key);
+            if (\is_float($verdict) ? !Truthiness::of($verdict) : !$verdict) {
                 return false;
             }
         }
@@ -66,7 +68,8 @@ final class Summary
     public static function anyMatch(iterable $data, callable $predicate): bool
     {
         foreach ($data as $datum) {
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 return true;
             }
         }
@@ -82,7 +85,8 @@ final class Summary
     public static function anyMatchWithKeys(iterable $data, callable $predicate): bool
     {
         foreach ($data as $key => $datum) {
-            if (Truthiness::of($predicate($datum, $key))) {
+            $verdict = $predicate($datum, $key);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 return true;
             }
         }
@@ -103,7 +107,8 @@ final class Summary
     public static function noneMatch(iterable $data, callable $predicate): bool
     {
         foreach ($data as $datum) {
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 return false;
             }
         }
@@ -119,7 +124,8 @@ final class Summary
     public static function noneMatchWithKeys(iterable $data, callable $predicate): bool
     {
         foreach ($data as $key => $datum) {
-            if (Truthiness::of($predicate($datum, $key))) {
+            $verdict = $predicate($datum, $key);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 return false;
             }
         }
@@ -213,8 +219,12 @@ final class Summary
                 return false;
             }
             // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when they
-            // are not.
-            if (Arithmetic::compareValues($rhs, $lhs) < 0) {
+            // are not. Rounding to float is monotonic, so only an int and a float that <=> finds equal need it.
+            $order = $rhs <=> $lhs;
+            if ($order === 0 && \is_int($rhs) !== \is_int($lhs)) {
+                $order = Arithmetic::compareValues($rhs, $lhs);
+            }
+            if ($order < 0) {
                 return false;
             }
         }
@@ -240,7 +250,11 @@ final class Summary
                 return false;
             }
             // Compare exactly, as in isSorted(). $rhs > $lhs, written as PHP evaluates it: $lhs < $rhs.
-            if (Arithmetic::compareValues($lhs, $rhs) < 0) {
+            $order = $lhs <=> $rhs;
+            if ($order === 0 && \is_int($lhs) !== \is_int($rhs)) {
+                $order = Arithmetic::compareValues($lhs, $rhs);
+            }
+            if ($order < 0) {
                 return false;
             }
         }
@@ -349,7 +363,8 @@ final class Summary
 
         $count = 0;
         foreach ($data as $datum) {
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 $count++;
                 if ($count > $n) {
                     return false;
@@ -386,7 +401,8 @@ final class Summary
 
         $count = 0;
         foreach ($data as $datum) {
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 $count++;
                 if ($count >= $n) {
                     return true;
@@ -424,7 +440,8 @@ final class Summary
 
         $count = 0;
         foreach ($data as $datum) {
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 $count++;
                 if ($count > $n) {
                     return false;
@@ -796,7 +813,8 @@ final class Summary
         $allTrueSoFar = true;
 
         foreach ($data as $datum) {
-            $currentItemTrue = Truthiness::of($predicate($datum));
+            $verdict = $predicate($datum);
+            $currentItemTrue = \is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict;
 
             if ($allTrueSoFar && !$currentItemTrue) {
                 $allTrueSoFar = false;

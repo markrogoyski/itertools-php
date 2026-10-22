@@ -3398,6 +3398,8 @@ $count = 3;
 // Each $weekStream contains ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun']
 ```
 
+A copy can be rewound as long as it has not advanced. Once it has, rewinding it throws `\LogicException`, so the pairwise idiom of advancing one copy and zipping the copies throws when the zip rewinds them. Use [`pairwise()`](#pairwise) for adjacent pairs.
+
 #### Side Effect Terminal Operations
 
 ##### Call For Each

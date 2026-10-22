@@ -21,8 +21,14 @@ final class MemoizedIterable implements \IteratorAggregate
     /** @var \Iterator<mixed, mixed>|null */
     private ?\Iterator $source = null;
 
-    /** @var list<array{0: TKey, 1: TValue}> */
-    private array $cache = [];
+    /** @var list<TKey> */
+    private array $keys = [];
+
+    /** @var list<TValue> */
+    private array $values = [];
+
+    /** Number of cached elements; a cached null value is not a gap, so occupancy is not read with isset. */
+    private int $cached = 0;
 
     private bool $initialized = false;
     private bool $exhausted = false;
@@ -41,8 +47,9 @@ final class MemoizedIterable implements \IteratorAggregate
     {
         $position = 0;
         while (true) {
-            if (isset($this->cache[$position])) {
-                [$key, $value] = $this->cache[$position];
+            if ($position < $this->cached) {
+                $key = $this->keys[$position];
+                $value = $this->values[$position];
                 ++$position;
                 yield $key => $value;
                 continue;
@@ -74,7 +81,7 @@ final class MemoizedIterable implements \IteratorAggregate
             }
         } catch (\Throwable $exception) {
             $this->failure = $exception;
-            $this->failureIndex = \count($this->cache);
+            $this->failureIndex = $this->cached;
         } finally {
             $this->advancing = false;
         }
@@ -114,6 +121,10 @@ final class MemoizedIterable implements \IteratorAggregate
             return;
         }
 
-        $this->cache[] = [$this->source->key(), $this->source->current()];
+        $key = $this->source->key();
+        $value = $this->source->current();
+        $this->keys[] = $key;
+        $this->values[] = $value;
+        ++$this->cached;
     }
 }

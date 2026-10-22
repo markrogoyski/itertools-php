@@ -343,6 +343,42 @@ class WriteCsvTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->readBack($file));
     }
 
+    /**
+     * @test writeCsv formats a NAN field that is a reference without changing the variable it refers to
+     */
+    public function testWriteCsvNanReferenceIsUnchanged(): void
+    {
+        // Given
+        $file  = $this->writableFile();
+        $value = \NAN;
+
+        // When
+        File::writeCsv($file, [[1, &$value]]);
+
+        // Then
+        $this->assertNan($value);
+        $this->assertSame("1,NAN\n", $this->readBack($file));
+    }
+
+    /**
+     * @test writeCsv formats a NAN field that is a reference to a typed float property
+     */
+    public function testWriteCsvNanReferenceToTypedPropertyIsWritten(): void
+    {
+        // Given
+        $file   = $this->writableFile();
+        $holder = new class () {
+            public float $value = \NAN;
+        };
+
+        // When
+        File::writeCsv($file, [[&$holder->value, 2]]);
+
+        // Then
+        $this->assertNan($holder->value);
+        $this->assertSame("NAN,2\n", $this->readBack($file));
+    }
+
     public static function dataProviderForNan(): array
     {
         return [

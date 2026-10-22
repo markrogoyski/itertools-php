@@ -103,6 +103,8 @@ foreach (Multi::zip($names, $countries, $signatureMoves) as [$name, $country, $s
 ```
 Note: For uneven lengths, iteration stops when the shortest iterable is exhausted.
 
+Note: After each tuple, zip advances every iterable, including the ones that are not the shortest. An iterable that throws when advanced past its last useful value therefore throws here too: `Multi::zip(['a'], Infinite::count(PHP_INT_MAX))` yields `['a', PHP_INT_MAX]` and then throws `\OverflowException`.
+
 ### ZipEqual
 Iterate multiple iterable collections with equal lengths simultaneously.
 

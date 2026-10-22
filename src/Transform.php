@@ -113,7 +113,8 @@ final class Transform
         $truthy = [];
         $falsy  = [];
         foreach ($data as $datum) {
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 $truthy[] = $datum;
             } else {
                 $falsy[] = $datum;

@@ -144,4 +144,51 @@ class MemoizeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([1, 2, 3], $second);
         $this->assertSame(1, $aggregate->getIteratorCallCount());
     }
+
+    public function testCacheIsCompact(): void
+    {
+        // Given
+        $n = 200_000;
+        $source = (static function () use ($n): \Generator {
+            for ($i = 0; $i < $n; ++$i) {
+                yield $i;
+            }
+        })();
+        $before = \memory_get_usage();
+        $memoized = Transform::memoize($source);
+
+        // When
+        foreach ($memoized as $_) {
+        }
+        $retained = \memory_get_usage() - $before;
+
+        // Then
+        $this->assertLessThan(64 * $n, $retained);
+    }
+
+    public function testNullKeysAndValuesAreReplayed(): void
+    {
+        // Given
+        $source = (static function (): \Generator {
+            yield null => null;
+            yield 1 => null;
+            yield null => 2;
+        })();
+        $memoized = Transform::memoize($source);
+        $expected = [[null, null], [1, null], [null, 2]];
+
+        // When
+        $first = [];
+        foreach ($memoized as $key => $value) {
+            $first[] = [$key, $value];
+        }
+        $second = [];
+        foreach ($memoized as $key => $value) {
+            $second[] = [$key, $value];
+        }
+
+        // Then
+        $this->assertSame($expected, $first);
+        $this->assertSame($expected, $second);
+    }
 }

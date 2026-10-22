@@ -8,7 +8,7 @@ namespace IterTools\Util\Iterators;
  * Shared, lazily filled buffer behind a set of RelatedIterators.
  *
  * - The source is read only when a related iterator first needs an element it has not been given yet.
- * - Each element is buffered as a key/value pair until every live related iterator has moved past it.
+ * - Each element's key and value are buffered until every live related iterator has moved past it.
  * - Related iterators are not retained here, so dropping them frees everything without the cycle collector.
  *
  * @internal
@@ -31,11 +31,18 @@ final class TeeIterator
     private array $positions = [];
 
     /**
-     * Buffered key/value pairs, by absolute position.
+     * Buffered keys, by absolute position.
      *
-     * @var array<int, array{TKey, TValue}>
+     * @var array<int, TKey>
      */
-    private array $buffer = [];
+    private array $keys = [];
+
+    /**
+     * Buffered values, by absolute position. Kept apart from the keys so an element costs no array of its own.
+     *
+     * @var array<int, TValue>
+     */
+    private array $values = [];
 
     /**
      * Lowest position still held in the buffer.
@@ -125,7 +132,7 @@ final class TeeIterator
 
         $position = $this->positions[$related->getId()];
 
-        return $this->hasElementAt($position) ? $this->buffer[$position][1] : null;
+        return $this->hasElementAt($position) ? $this->values[$position] : null;
     }
 
     /**
@@ -141,7 +148,7 @@ final class TeeIterator
 
         $position = $this->positions[$related->getId()];
 
-        return $this->hasElementAt($position) ? $this->buffer[$position][0] : null;
+        return $this->hasElementAt($position) ? $this->keys[$position] : null;
     }
 
     /**
@@ -205,7 +212,7 @@ final class TeeIterator
     /**
      * Read one element from the source.
      *
-     * The pair is buffered only once both its key and its value were read, so they cannot get out of step.
+     * The key and value are buffered only once both were read, so they cannot get out of step.
      */
     private function fetch(): void
     {
@@ -226,7 +233,9 @@ final class TeeIterator
         $value = $this->source->current();
         $key = $this->source->key();
 
-        $this->buffer[$this->fetched++] = [$key, $value];
+        $this->keys[$this->fetched] = $key;
+        $this->values[$this->fetched] = $value;
+        ++$this->fetched;
         $this->needsAdvance = true;
     }
 
@@ -238,7 +247,10 @@ final class TeeIterator
         $lowest = $this->positions === [] ? $this->fetched : \min($this->positions);
 
         while ($this->bufferStart < $lowest) {
-            unset($this->buffer[$this->bufferStart++]);
+            // Moved past before either entry is freed: freeing one can drop a related iterator, whose detach()
+            // releases from $bufferStart on.
+            $position = $this->bufferStart++;
+            unset($this->keys[$position], $this->values[$position]);
         }
     }
 }

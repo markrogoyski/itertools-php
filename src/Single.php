@@ -111,7 +111,7 @@ final class Single
     public static function compress(iterable $data, iterable $selectors): \Generator
     {
         foreach (Multi::zip($data, $selectors) as [$datum, $selector]) {
-            if (Truthiness::of($selector)) {
+            if (\is_float($selector) ? Truthiness::of($selector) : (bool) $selector) {
                 yield $datum;
             }
         }
@@ -229,7 +229,8 @@ final class Single
     public static function filter(iterable $data, callable $predicate): \Generator
     {
         foreach ($data as $key => $datum) {
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 yield $key => $datum;
             }
         }
@@ -250,7 +251,8 @@ final class Single
         $predicate ??= static fn (mixed $datum): mixed => $datum;
 
         foreach ($data as $key => $datum) {
-            if (!Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? !Truthiness::of($verdict) : !$verdict) {
                 yield $key => $datum;
             }
         }
@@ -271,7 +273,8 @@ final class Single
         $predicate ??= static fn (mixed $datum): mixed => $datum;
 
         foreach ($data as $key => $datum) {
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 yield $key => $datum;
             }
         }
@@ -288,7 +291,8 @@ final class Single
     public static function filterKeys(iterable $data, callable $predicate): \Generator
     {
         foreach ($data as $key => $datum) {
-            if (Truthiness::of($predicate($key))) {
+            $verdict = $predicate($key);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 yield $key => $datum;
             }
         }
@@ -309,7 +313,8 @@ final class Single
     public static function filterWithKeys(iterable $data, callable $predicate): \Generator
     {
         foreach ($data as $key => $datum) {
-            if (Truthiness::of($predicate($datum, $key))) {
+            $verdict = $predicate($datum, $key);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 yield $key => $datum;
             }
         }
@@ -331,11 +336,27 @@ final class Single
             return yield from $data;
         }
 
+        // The keys are renumbered once, here. The nested levels pass each element up by yield from, which
+        // hands it straight to this loop, rather than yielding it again at every level.
+        foreach (self::flattenElements($data, $dimensions) as $datum) {
+            yield $datum;
+        }
+    }
+
+    /**
+     * The elements of $data, with each iterable among them flattened by $dimensions - 1 dimensions. Keys are
+     * not meaningful: {@see Single::flatten()} renumbers them.
+     *
+     * @param iterable<mixed> $data
+     * @param int             $dimensions
+     *
+     * @return \Generator<mixed>
+     */
+    private static function flattenElements(iterable $data, int $dimensions): \Generator
+    {
         foreach ($data as $datum) {
-            if (\is_iterable($datum)) {
-                foreach (self::flatten($datum, $dimensions - 1) as $item) {
-                    yield $item;
-                }
+            if ($dimensions > 0 && \is_iterable($datum)) {
+                yield from self::flattenElements($datum, $dimensions - 1);
             } else {
                 yield $datum;
             }
@@ -414,7 +435,8 @@ final class Single
     public static function takeWhile(iterable $data, callable $predicate): \Generator
     {
         foreach ($data as $key => $datum) {
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 yield $key => $datum;
             } else {
                 break;
@@ -433,7 +455,8 @@ final class Single
     public static function takeWhileWithKeys(iterable $data, callable $predicate): \Generator
     {
         foreach ($data as $key => $datum) {
-            if (!Truthiness::of($predicate($datum, $key))) {
+            $verdict = $predicate($datum, $key);
+            if (\is_float($verdict) ? !Truthiness::of($verdict) : !$verdict) {
                 return;
             }
             yield $key => $datum;
@@ -924,7 +947,8 @@ final class Single
         $started = false;
 
         foreach ($data as $datum) {
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 if ($started) {
                     yield $current;
                 }
@@ -1102,7 +1126,9 @@ final class Single
      * non-integral float taken as its shortest decimal and an integral float as itself: `range(-10.0, -3.6, 6.4)`
      * yields `[-10.0, -3.6]`, although the floats' exact span is 6.4 - 4.4e-16, and `range(0.1, 0.3, 0.2)` yields
      * `[0.1, 0.3]`, although their float span is 0.19999999999999998. `range(0.1, 0.2, 0.10000000000000002)`
-     * throws, as neither span reaches the step.
+     * throws, as neither span reaches the step. A step computed as `$end - $start` is allowed the rounding of the
+     * subtraction, capped as for landing: `range(10.19, 33.0, 33.0 - 10.19)` yields `[10.19, 33.0]`, although the
+     * step 22.810000000000002 exceeds the exact span.
      *
      * @param int|float $start
      * @param int|float $end
@@ -1188,6 +1214,7 @@ final class Single
                 // exceeds 2^63 by $high - ($low - PHP_INT_MIN), which fits int; a step at least 2^63 is a float,
                 // and its excess over 2^63 is exact.
                 $magnitude = \abs($step);
+                $magnitudeDescription = "{$magnitude}";
                 [$low, $high] = $ascending ? [$startExact, $endExact] : [$endExact, $startExact];
                 $span = $high - $low;
                 if (\is_int($span)) {
@@ -1204,9 +1231,30 @@ final class Single
                 // or above it may still be within the exact span (2^53 - 0.1 rounds to the step 2^53), or within
                 // the span of the decimals the operands are written as (0.3 - 0.1 gives 0.19999999999999998, below
                 // the step 0.2). It exceeds the span when it exceeds both.
-                $stepExceedsSpan = $magnitudeF >= $spanF
-                    && self::stepExceedsExactFloatSpan(\abs($step), \min($startF, $endF), \max($startF, $endF), [])
-                    && (self::stepExceedsDecimalSpan($start, $end, \abs($step), $ascending)
+                // A step computed as $end - $start carries the rounding of the subtraction, which the exact span is
+                // allowed, as for landing, so it is accepted as ($end - $start) / $n is: 33.0 - 10.19 rounds up to
+                // 22.810000000000002. As for landing, the allowance is capped at twice the operands' half float
+                // spacings, which bound that rounding when the larger operand isn't integral; an integral float is
+                // taken as exact, so range(0.1, 2.0 ** 53, 2.0 ** 53) still throws. It is worked out only for a
+                // step at least the float span, which a step below it can't exceed.
+                $stepExceedsSpan = false;
+                if ($magnitudeF >= $spanF) {
+                    $spanError = self::exactFloatDifference(\max($startF, $endF), \min($startF, $endF))[1];
+                    $operandAllowance = 0.0;
+                    if (self::roundingAllowances($start, $end, \abs($step), false) !== []) {
+                        foreach ([$start, $end] as $operand) {
+                            if (\is_float($operand) && \floor($operand) !== $operand) {
+                                $operandAllowance += Arithmetic::halfFloatSpacing($operand);
+                            }
+                        }
+                    }
+                    $differenceAllowance = [\min(\abs($spanError), 2.0 * $operandAllowance)];
+                    $stepExceedsSpan = self::stepExceedsExactFloatSpan(
+                        \abs($step),
+                        \min($startF, $endF),
+                        \max($startF, $endF),
+                        $differenceAllowance
+                    ) && (self::stepExceedsDecimalSpan($start, $end, \abs($step), $ascending)
                         ?? self::stepExceedsExactFloatSpan(
                             \abs($step),
                             \min($startF, $endF),
@@ -1216,12 +1264,23 @@ final class Single
                                 self::roundingAllowance(\abs($step), false),
                             ]
                         ));
+                }
+                $magnitudeDescription = "{$magnitude}";
                 $spanDescription = "({$spanF})";
+                if ("{$magnitudeF}" === "{$spanF}") {
+                    // Printed to 14 digits, the step and the span can look equal. Print as many as tell them
+                    // apart, or name the exact span when the float span is the step.
+                    $magnitudeDescription = \var_export($magnitudeF, true);
+                    $spanDescription = $magnitudeF === $spanF
+                        ? '(the exact span between ' . \var_export($start, true) . ' and ' . \var_export($end, true)
+                            . ', which rounds to the step in float)'
+                        : '(' . \var_export($spanF, true) . ')';
+                }
             }
 
             if ($stepExceedsSpan) {
                 throw new \InvalidArgumentException(
-                    "Single::range: step magnitude ({$magnitude}) must not exceed span {$spanDescription}"
+                    "Single::range: step magnitude ({$magnitudeDescription}) must not exceed span {$spanDescription}"
                 );
             }
 
@@ -1230,7 +1289,10 @@ final class Single
             // the span 2^63 - 1 as 2^63, two steps, and end on 2^63.
             $wholeStep = \is_int($magnitude) || \floor($magnitude) === $magnitude;
             if (\is_int($startExact) && \is_int($endExact) && $wholeStep) {
-                yield from self::rangeOfWholeStepOnInts($startExact, $endExact, $magnitude, $ascending);
+                // The first value is taken as the float path takes it, $startF ± 0.0, which keeps a -0.0 start
+                // that toExactInt() made 0 when descending.
+                $first = $startF + ($ascending ? 0.0 : -0.0);
+                yield from self::rangeOfWholeStepOnInts($startExact, $endExact, $magnitude, $ascending, $first);
                 return;
             }
 
@@ -1309,18 +1371,28 @@ final class Single
             // A $start that a float holds keeps the computation below, so its values are unchanged.
             $exactStart = \is_int($startExact) && \is_int($endExact) && Arithmetic::toExactInt($startF) !== $startExact;
 
-            for ($i = 0; $i <= $lastIndex; ++$i) {
-                $offsetF = (float)$i * $magnitudeF;
-                // (float) $i is exact up to 2^53, which iteration never reaches.
-                $valF = $exactStart && $i > 0 && $i <= 2 ** 53
-                    ? self::roundIntPlusMultiple($startExact, $i, $magnitudeF, $ascending)
-                    : $startF + $signF * $offsetF;
-                // A value can pass $end through rounding: of $startF (int operands past 2^53), of the offset
-                // or of the addition. It passes by less than a float spacing, so it lands on $end.
-                if ($ascending ? $valF > $endF : $valF < $endF) {
-                    $valF = $endF;
+            // A value can pass $end through rounding: of $startF (int operands past 2^53), of the offset or of
+            // the addition. It passes by less than a float spacing, so it lands on $end. The common case has a
+            // loop of its own, which keeps the cost per value down.
+            if (!$exactStart) {
+                for ($i = 0; $i <= $lastIndex; ++$i) {
+                    $valF = $startF + $signF * ((float)$i * $magnitudeF);
+                    if ($ascending ? $valF > $endF : $valF < $endF) {
+                        $valF = $endF;
+                    }
+                    yield $valF;
                 }
-                yield $valF;
+            } else {
+                for ($i = 0; $i <= $lastIndex; ++$i) {
+                    // (float) $i is exact up to 2^53, which iteration never reaches.
+                    $valF = $i > 0 && $i <= 2 ** 53
+                        ? self::roundIntPlusMultiple($startExact, $i, $magnitudeF, $ascending)
+                        : $startF + $signF * ((float)$i * $magnitudeF);
+                    if ($ascending ? $valF > $endF : $valF < $endF) {
+                        $valF = $endF;
+                    }
+                    yield $valF;
+                }
             }
 
             if ($landsOnEnd) {
@@ -1386,6 +1458,7 @@ final class Single
      * @param int       $end
      * @param int|float $magnitude whole and positive
      * @param bool      $ascending
+     * @param float     $first     $start as a float, which is -0.0 for a -0.0 start descending
      *
      * @return \Generator<int, float>
      *
@@ -1395,7 +1468,8 @@ final class Single
         int $start,
         int $end,
         int|float $magnitude,
-        bool $ascending
+        bool $ascending,
+        float $first
     ): \Generator {
         [$low, $high] = $ascending ? [$start, $end] : [$end, $start];
 
@@ -1404,7 +1478,7 @@ final class Single
             // The span is at least 2^63, so $low < 0 <= $high, and $low + 2^63, $high - 2^63 and the step's
             // excess over 2^63 are exact ints.
             $magnitudeExcess = (int)((float)$magnitude + (float)\PHP_INT_MIN);
-            yield (float)$start;
+            yield $first;
             yield (float)($ascending
                 ? ($low - \PHP_INT_MIN) + $magnitudeExcess
                 : ($high + \PHP_INT_MIN) - $magnitudeExcess);
@@ -1438,7 +1512,7 @@ final class Single
 
         // The values stay between $start and $end, so the int arithmetic doesn't overflow.
         $value = $start;
-        yield (float)$value;
+        yield $first;
         if ($ascending) {
             for ($i = 0; $i < $steps; ++$i) {
                 $value += $magnitudeI;

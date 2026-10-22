@@ -72,27 +72,41 @@ final class Reduce
                     if (\is_float($comparableValue) && \is_nan($comparableValue)) {
                         return $carry;
                     }
-                    // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when
-                    // they are not. Arithmetic::min() and max() do the same below.
-                    return ($carry instanceof NoValueMonad
-                        || Arithmetic::compareValues($comparableValue, $compareBy($carry)) < 0)
-                        ? $datum
-                        : $carry;
+                    if ($carry instanceof NoValueMonad) {
+                        return $datum;
+                    }
+                    // The operator compares an int and a float as floats, which only goes wrong for a pair it finds
+                    // equal: an int beyond ±2^53 and a float. Arithmetic compares that pair exactly. The types are
+                    // tested first, as == on a projection such as an array would compare it twice.
+                    $carryValue = $compareBy($carry);
+                    $exact = \is_int($comparableValue) !== \is_int($carryValue)
+                        && \is_float($comparableValue) !== \is_float($carryValue)
+                        && $comparableValue == $carryValue;
+                    $smaller = $exact
+                        ? Arithmetic::compareValues($comparableValue, $carryValue) < 0
+                        : $comparableValue < $carryValue;
+                    return $smaller ? $datum : $carry;
                 },
                 NoValueMonad::getInstance()
             );
         } else {
-            /** @var mixed|NoValueMonad $result */
-            $result = static::toValue(
-                $data,
-                static function (mixed $carry, mixed $datum): mixed {
-                    if (\is_float($datum) && \is_nan($datum)) {
-                        return $carry;
-                    }
-                    return ($carry instanceof NoValueMonad) ? $datum : Arithmetic::min($carry, $datum);
-                },
-                NoValueMonad::getInstance()
-            );
+            // A loop rather than toValue(), which would call a closure for each element.
+            $result = NoValueMonad::getInstance();
+            foreach ($data as $datum) {
+                if (\is_float($datum) && \is_nan($datum)) {
+                    continue;
+                }
+                if ($result instanceof NoValueMonad) {
+                    $result = $datum;
+                } elseif (\is_int($result) !== \is_int($datum) && \is_float($result) !== \is_float($datum) && $result == $datum) {
+                    // \min() compares an int and a float as floats, which only goes wrong for a pair it finds equal:
+                    // an int beyond ±2^53 and a float. Arithmetic::min() compares that pair exactly. The types are
+                    // tested first, as == on other values, such as arrays or Stringables, would compare them twice.
+                    $result = Arithmetic::min($result, $datum);
+                } else {
+                    $result = \min($result, $datum);
+                }
+            }
         }
 
         return ($result instanceof NoValueMonad) ? null : $result;
@@ -124,27 +138,36 @@ final class Reduce
                     if (\is_float($comparableValue) && \is_nan($comparableValue)) {
                         return $carry;
                     }
-                    // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when
-                    // they are not. Arithmetic::min() and max() do the same below.
-                    return ($carry instanceof NoValueMonad
-                        || Arithmetic::compareValues($compareBy($carry), $comparableValue) < 0)
-                        ? $datum
-                        : $carry;
+                    if ($carry instanceof NoValueMonad) {
+                        return $datum;
+                    }
+                    // Compare an int and a float exactly, as in toMin().
+                    $carryValue = $compareBy($carry);
+                    $exact = \is_int($comparableValue) !== \is_int($carryValue)
+                        && \is_float($comparableValue) !== \is_float($carryValue)
+                        && $comparableValue == $carryValue;
+                    $larger = $exact
+                        ? Arithmetic::compareValues($carryValue, $comparableValue) < 0
+                        : $carryValue < $comparableValue;
+                    return $larger ? $datum : $carry;
                 },
                 NoValueMonad::getInstance()
             );
         } else {
-            /** @var mixed|NoValueMonad $result */
-            $result = static::toValue(
-                $data,
-                static function (mixed $carry, mixed $datum): mixed {
-                    if (\is_float($datum) && \is_nan($datum)) {
-                        return $carry;
-                    }
-                    return ($carry instanceof NoValueMonad) ? $datum : Arithmetic::max($carry, $datum);
-                },
-                NoValueMonad::getInstance()
-            );
+            // A loop, and an exact comparison only for an int and a float that compare equal, as in toMin().
+            $result = NoValueMonad::getInstance();
+            foreach ($data as $datum) {
+                if (\is_float($datum) && \is_nan($datum)) {
+                    continue;
+                }
+                if ($result instanceof NoValueMonad) {
+                    $result = $datum;
+                } elseif (\is_int($result) !== \is_int($datum) && \is_float($result) !== \is_float($datum) && $result == $datum) {
+                    $result = Arithmetic::max($result, $datum);
+                } else {
+                    $result = \max($result, $datum);
+                }
+            }
         }
 
         return ($result instanceof NoValueMonad) ? null : $result;
@@ -176,36 +199,50 @@ final class Reduce
                 if (\is_float($comparableValue) && \is_nan($comparableValue)) {
                     return $carry;
                 }
-                // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when
-                // they are not. Arithmetic::min() and max() do the same below. Only a strictly smaller
-                // or larger value replaces the carried one, so the first of tied elements wins, as in
-                // toMin() and toMax().
-                return [
-                    ($carry[0] instanceof NoValueMonad
-                        || Arithmetic::compareValues($comparableValue, $compareBy($carry[0])) < 0)
-                        ? $datum
-                        : $carry[0],
-                    ($carry[1] instanceof NoValueMonad
-                        || Arithmetic::compareValues($compareBy($carry[1]), $comparableValue) < 0)
-                        ? $datum
-                        : $carry[1],
-                ];
+                if ($carry[0] instanceof NoValueMonad) {
+                    return [$datum, $datum];
+                }
+                // Compare an int and a float exactly, as in toMin(). Only a strictly smaller or larger value
+                // replaces the carried one, so the first of tied elements wins, as in toMin() and toMax().
+                $minValue = $compareBy($carry[0]);
+                $exact = \is_int($comparableValue) !== \is_int($minValue)
+                    && \is_float($comparableValue) !== \is_float($minValue)
+                    && $comparableValue == $minValue;
+                $smaller = $exact
+                    ? Arithmetic::compareValues($comparableValue, $minValue) < 0
+                    : $comparableValue < $minValue;
+                $maxValue = $compareBy($carry[1]);
+                $exact = \is_int($comparableValue) !== \is_int($maxValue)
+                    && \is_float($comparableValue) !== \is_float($maxValue)
+                    && $comparableValue == $maxValue;
+                $larger = $exact
+                    ? Arithmetic::compareValues($maxValue, $comparableValue) < 0
+                    : $maxValue < $comparableValue;
+                return [$smaller ? $datum : $carry[0], $larger ? $datum : $carry[1]];
             }, [NoValueMonad::getInstance(), NoValueMonad::getInstance()]);
         } else {
-            /** @var array{mixed|NoValueMonad, mixed|NoValueMonad} $result */
-            $result = static::toValue(
-                $numbers,
-                static function (array $carry, mixed $datum): array {
-                    if (\is_float($datum) && \is_nan($datum)) {
-                        return $carry;
-                    }
-                    return [
-                        ($carry[0] instanceof NoValueMonad) ? $datum : Arithmetic::min($carry[0], $datum),
-                        ($carry[1] instanceof NoValueMonad) ? $datum : Arithmetic::max($carry[1], $datum),
-                    ];
-                },
-                [NoValueMonad::getInstance(), NoValueMonad::getInstance()]
-            );
+            // A loop, and an exact comparison only for an int and a float that compare equal, as in toMin().
+            $min = $max = NoValueMonad::getInstance();
+            foreach ($numbers as $datum) {
+                if (\is_float($datum) && \is_nan($datum)) {
+                    continue;
+                }
+                if ($min instanceof NoValueMonad) {
+                    $min = $max = $datum;
+                    continue;
+                }
+                if (\is_int($min) !== \is_int($datum) && \is_float($min) !== \is_float($datum) && $min == $datum) {
+                    $min = Arithmetic::min($min, $datum);
+                } else {
+                    $min = \min($min, $datum);
+                }
+                if (\is_int($max) !== \is_int($datum) && \is_float($max) !== \is_float($datum) && $max == $datum) {
+                    $max = Arithmetic::max($max, $datum);
+                } else {
+                    $max = \max($max, $datum);
+                }
+            }
+            $result = [$min, $max];
         }
 
         /** @var array{numeric, numeric}|array{null, null} */
@@ -484,15 +521,15 @@ final class Reduce
      * Square root of the variance. Population standard deviation by default; pass
      * $sample = true for the sample standard deviation (Bessel's correction).
      *
-     * Inherits the single-pass, O(1)-memory and overflow behavior of {@see Reduce::toVariance()},
-     * but is not computed through the variance itself, so a representable standard deviation is not
-     * lost when its square is out of range. toStandardDeviation([-1e200, 1e200]) is 1e200 although
-     * the variance 1e400 is reported as INF, and toStandardDeviation([-1e-200, 1e-200]) is 1e-200
-     * although the variance 1e-400 underflows to 0.0. Values further apart than PHP_FLOAT_MAX are no
-     * obstacle either: toStandardDeviation([-PHP_FLOAT_MAX, PHP_FLOAT_MAX]) is PHP_FLOAT_MAX. Only a
-     * standard deviation that is itself beyond PHP_FLOAT_MAX yields INF, as for the sample standard
-     * deviation of that pair, PHP_FLOAT_MAX * sqrt(2). The result is not correctly rounded, so one
-     * within a few ulps of PHP_FLOAT_MAX may also come out as INF.
+     * Inherits the single-pass, O(1)-memory and overflow behavior of {@see Reduce::toVariance()}. It is the
+     * square root of the variance where that is finite and normal, and is otherwise computed without forming
+     * the variance, so a representable standard deviation is not lost when its square is out of range.
+     * toStandardDeviation([-1e200, 1e200]) is 1e200 although the variance 1e400 is reported as INF, and
+     * toStandardDeviation([-1e-200, 1e-200]) is 1e-200 although the variance 1e-400 underflows to 0.0.
+     * Values further apart than PHP_FLOAT_MAX are no obstacle either: toStandardDeviation([-PHP_FLOAT_MAX,
+     * PHP_FLOAT_MAX]) is PHP_FLOAT_MAX. Only a standard deviation that is itself beyond PHP_FLOAT_MAX yields
+     * INF, as for the sample standard deviation of that pair, PHP_FLOAT_MAX * sqrt(2). The result is not
+     * correctly rounded, so one within a few ulps of PHP_FLOAT_MAX may also come out as INF.
      *
      * Subnormal values keep their resolution: a step of the running mean that would fall below
      * PHP_FLOAT_MIN is taken on values rescaled by an exact power of two, so
@@ -523,6 +560,20 @@ final class Reduce
 
         if ($hasNonFinite) {
             return \NAN;
+        }
+
+        if (!$rescaled) {
+            // The square root of the variance, formed exactly as toVariance() forms it, wherever that is
+            // finite and normal: one rounding fewer than $scale * sqrt($weight), so it is correctly rounded
+            // whenever the variance is.
+            $variance = ($scale * $weight) * $scale;
+            if ($sample) {
+                /** @psalm-suppress InvalidOperand */
+                $variance = $variance * ($count / ($count - 1));
+            }
+            if (\is_finite($variance) && $variance >= \PHP_FLOAT_MIN) {
+                return \sqrt($variance);
+            }
         }
 
         // Bessel's correction goes into $weight, which is at most about $count, so it cannot overflow.
@@ -1064,10 +1115,19 @@ final class Reduce
                 continue;
             }
 
-            // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when
-            // they are not.
-            $min = $min === null ? $number : Arithmetic::min($min, $number);
-            $max = $max === null ? $number : Arithmetic::max($max, $number);
+            if ($min === null || $max === null) {
+                $min = $max = $number;
+                continue;
+            }
+            // \min() and \max() compare an int and a float as floats, which only goes wrong for a pair they find
+            // equal: an int beyond ±2^53 and a float. Arithmetic::min() and max() compare that pair exactly. The
+            // numbers are compared first, as that is cheaper than testing their types.
+            $min = $min == $number && \is_int($min) !== \is_int($number)
+                ? Arithmetic::min($min, $number)
+                : \min($min, $number);
+            $max = $max == $number && \is_int($max) !== \is_int($number)
+                ? Arithmetic::max($max, $number)
+                : \max($max, $number);
         }
 
         if ($min === null || $max === null) {
@@ -1225,7 +1285,8 @@ final class Reduce
     {
         foreach ($data as $datum) {
             /** @var mixed $datum */
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 return $datum;
             }
         }
@@ -1253,7 +1314,8 @@ final class Reduce
         $index = 0;
         foreach ($data as $datum) {
             /** @var mixed $datum */
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 return $index;
             }
             ++$index;
@@ -1281,7 +1343,8 @@ final class Reduce
     {
         foreach ($data as $key => $datum) {
             /** @var mixed $datum */
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 return $key;
             }
         }
@@ -1310,7 +1373,8 @@ final class Reduce
         $result = $default;
         foreach ($data as $datum) {
             /** @var mixed $datum */
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 $result = $datum;
             }
         }
@@ -1340,7 +1404,8 @@ final class Reduce
         $index  = 0;
         foreach ($data as $datum) {
             /** @var mixed $datum */
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 $result = $index;
             }
             ++$index;
@@ -1370,7 +1435,8 @@ final class Reduce
         $result = $default;
         foreach ($data as $key => $datum) {
             /** @var mixed $datum */
-            if (Truthiness::of($predicate($datum))) {
+            $verdict = $predicate($datum);
+            if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
                 /** @var mixed $result */
                 $result = $key;
             }

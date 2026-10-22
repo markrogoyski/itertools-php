@@ -2523,4 +2523,27 @@ class ToMaxTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test toMax converts a Stringable compared with a string once, as \max() does
+     */
+    public function testStringableIsConvertedOncePerComparison(): void
+    {
+        // Given
+        $stringable = new class () {
+            public int $conversions = 0;
+
+            public function __toString(): string
+            {
+                ++$this->conversions;
+                return 'b';
+            }
+        };
+
+        // When
+        Reduce::toMax(['b', $stringable]);
+
+        // Then
+        $this->assertSame(1, $stringable->conversions);
+    }
 }

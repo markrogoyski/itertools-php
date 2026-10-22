@@ -43,20 +43,29 @@ final class ResourceWriter
      */
     public function writeCsvRow(array $row, string $separator, string $enclosure, string $escape): void
     {
+        // A row with a NAN is copied with it replaced, not changed in place: a field may be a reference, which
+        // writing through would change the caller's variable, or fail for a typed float property.
+        foreach ($row as $field) {
+            if (\is_float($field) && \is_nan($field)) {
+                $row = \array_map(
+                    static fn (mixed $field): mixed => \is_float($field) && \is_nan($field) ? 'NAN' : $field,
+                    $row
+                );
+                break;
+            }
+        }
+
+        // The row is formatted in a scratch stream first, as fputcsv() doesn't report the length of a line it
+        // wrote short. The scratch stream is overwritten from the start and read only to the length written.
         $scratch = $this->scratch();
-        \ftruncate($scratch, 0);
         \rewind($scratch);
-
-        $row = \array_map(
-            static fn (mixed $field): mixed => \is_float($field) && \is_nan($field) ? 'NAN' : $field,
-            $row
-        );
-
         /** @var array<scalar|null> $row */
-        \fputcsv($scratch, $row, $separator, $enclosure, $escape);
-        \rewind($scratch);
+        $length = \fputcsv($scratch, $row, $separator, $enclosure, $escape);
+        if ($length === false) {
+            throw new \RuntimeException('Failed to format CSV row');
+        }
 
-        $this->write((string) \stream_get_contents($scratch));
+        $this->write((string) \stream_get_contents($scratch, $length, 0));
     }
 
     /**

@@ -127,6 +127,46 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toStandardDeviation of ordinary values is the square root of the variance, correctly rounded
+     *               where the variance is
+     * @dataProvider dataProviderForOrdinaryValues
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testOrdinaryValuesAreCorrectlyRounded(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toStandardDeviation($data, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Rows whose variance toVariance gives correctly rounded, where the square root of the variance was 1 ulp off.
+     *
+     * Test data generated with (tools/oracles/std_dev_ordinary.py, cross-checked against math.isqrt):
+     *   statistics.stdev(map(Fraction, data)) if sample else statistics.pstdev(map(Fraction, data))
+     */
+    public static function dataProviderForOrdinaryValues(): array
+    {
+        return [
+            [[0, 3, 3], false, 1.4142135623730951],
+            [[0, 3, 3], true, 1.7320508075688772],
+            [[5, 15, 3], false, 5.2493385826745405],
+            [[20, 7], true, 9.192388155425117],
+            [[16, 11, 10, 7], false, 3.24037034920393],
+            [[16, 11, 10, 7], true, 3.7416573867739413],
+            [[5, 6, 13, 16, 7, 7], true, 4.427188724235731],
+            [[20, 0, 19, 9, 7, 12], false, 6.91415617089718],
+            [[20, 10, 10, 8, 6], false, 4.833218389437829],
+            [[20, 10, 10, 8, 6], true, 5.403702434442518],
+            [[10, 9, 17], true, 4.358898943540674],
+        ];
+    }
+
+    /**
      * @test         toStandardDeviation returns null on empty (population)
      * @dataProvider dataProviderForEmptyIterable
      * @param        iterable $data
@@ -329,7 +369,7 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
     {
         return [
             // The variance of the leading pair is ~1.96e308, beyond PHP_FLOAT_MAX
-            [[-1.4e154, 1.4e154, 0], 1.1430952132988164E+154],
+            [[-1.4e154, 1.4e154, 0, 0], 9.899494936611666E+153],
         ];
     }
 
@@ -362,6 +402,8 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
         return [
             // The variance of the leading pair is ~2.25e308, beyond PHP_FLOAT_MAX
             [[-1.5e154, 1.5e154, 0, 0], 1.0606601717798214E+154],
+            // The variance of the leading pair is ~1.96e308, beyond PHP_FLOAT_MAX; the variance is 1 ulp low
+            [[-1.4e154, 1.4e154, 0], 1.1430952132988164E+154],
         ];
     }
 

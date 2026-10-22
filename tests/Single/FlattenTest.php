@@ -316,6 +316,43 @@ class FlattenTest extends \PHPUnit\Framework\TestCase
                 1,
                 [[1, 2], [3], [4]],
             ],
+            'associative keys at every level' => [
+                ['x' => ['p' => ['m' => 1, 'n' => 2], 'q' => 3], 'y' => 4, 'z' => ['r' => ['s' => [5]]]],
+                3,
+                [1, 2, 3, 4, 5],
+            ],
+        ];
+    }
+
+    /**
+     * @test         flatten by no dimensions, or fewer, yields the source as is, keys included
+     * @dataProvider dataProviderForNonPositiveDimensions
+     * @param        iterable $iterable
+     * @param        int      $dimensions
+     * @param        array    $expected
+     */
+    public function testNonPositiveDimensionsKeepSourceKeys(iterable $iterable, int $dimensions, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::flatten($iterable, $dimensions));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForNonPositiveDimensions(): array
+    {
+        return [
+            'zero dimensions' => [
+                ['left' => [1, 2], 'right' => 3],
+                0,
+                ['left' => [1, 2], 'right' => 3],
+            ],
+            'negative dimensions' => [
+                ['left' => [1, 2], 'right' => 3],
+                -1,
+                ['left' => [1, 2], 'right' => 3],
+            ],
         ];
     }
 
