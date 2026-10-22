@@ -213,4 +213,95 @@ class ResourceWriterTest extends \PHPUnit\Framework\TestCase
         // When
         $writer->writeCsvRow(['x'], ',', '"', '\\');
     }
+
+    /**
+     * @test writeCsvRows() writes each row with the given separator, enclosure and escape, an earlier, longer row
+     *       not leaking into a later, shorter one
+     */
+    public function testWriteCsvRows(): void
+    {
+        // Given
+        $file   = $this->writableFile();
+        $writer = new ResourceWriter($file);
+
+        // When
+        $writer->writeCsvRows([['aaaaaaaaaa', 'b c'], ['d;e'], ['f"g', 1]], ';', '"', '\\');
+
+        // Then
+        $this->assertSame("aaaaaaaaaa;\"b c\"\n\"d;e\"\n\"f\"\"g\";1\n", $this->readBack($file));
+    }
+
+    /**
+     * @test writeCsvRows() writes nothing for no rows
+     */
+    public function testWriteCsvRowsEmpty(): void
+    {
+        // Given
+        $file   = $this->writableFile();
+        $writer = new ResourceWriter($file);
+
+        // When
+        $writer->writeCsvRows([], ',', '"', '\\');
+
+        // Then
+        $this->assertSame('', $this->readBack($file));
+    }
+
+    /**
+     * @test writeCsvRows() writes each row before it takes the next one
+     */
+    public function testWriteCsvRowsWritesEachRowBeforeTheNext(): void
+    {
+        // Given
+        $file   = $this->writableFile();
+        $uri    = \stream_get_meta_data($file)['uri'];
+        $writer = new ResourceWriter($file);
+        $seen   = [];
+        $rows   = (static function () use ($uri, &$seen): \Generator {
+            yield ['a', 1];
+            $seen[] = \file_get_contents($uri);
+            yield ['b', 2];
+            $seen[] = \file_get_contents($uri);
+        })();
+
+        // When
+        $writer->writeCsvRows($rows, ',', '"', '\\');
+
+        // Then
+        $this->assertSame(["a,1\n", "a,1\nb,2\n"], $seen);
+    }
+
+    /**
+     * @test writeCsvRows() writes a NAN field as 'NAN'
+     */
+    public function testWriteCsvRowsNan(): void
+    {
+        // Given
+        $file   = $this->writableFile();
+        $writer = new ResourceWriter($file);
+
+        // When
+        $writer->writeCsvRows([[1, \NAN], [\NAN, 'a', \INF]], ',', '"', '\\');
+
+        // Then
+        $this->assertSame("1,NAN\nNAN,a,INF\n", $this->readBack($file));
+    }
+
+    /**
+     * @test writeCsvRows() throws when a later row write is truncated
+     */
+    public function testWriteCsvRowsTruncatedThrows(): void
+    {
+        // Given
+        $file   = $this->writableFile();
+        $writer = new ResourceWriter($file);
+        vfsStream::setQuota(6);
+
+        // Then
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('wrote 2 of 5 bytes');
+
+        // When
+        $writer->writeCsvRows([['abc'], ['de', 'f']], ',', '"', '\\');
+    }
 }

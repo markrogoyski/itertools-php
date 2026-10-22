@@ -2375,10 +2375,9 @@ final class Stream implements \IteratorAggregate
             $writer->writeCsvRow($header, $separator, $enclosure, $escape);
         }
 
-        /** @var array<scalar> $row */
-        foreach ($this->iterable as $row) {
-            $writer->writeCsvRow($row, $separator, $enclosure, $escape);
-        }
+        /** @var iterable<array<scalar>> $rows */
+        $rows = $this->iterable;
+        $writer->writeCsvRows($rows, $separator, $enclosure, $escape);
     }
 
     /**

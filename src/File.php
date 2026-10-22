@@ -216,9 +216,7 @@ final class File
             $writer->writeCsvRow($header, $separator, $enclosure, $escape);
         }
 
-        foreach ($rows as $row) {
-            $writer->writeCsvRow($row, $separator, $enclosure, $escape);
-        }
+        $writer->writeCsvRows($rows, $separator, $enclosure, $escape);
     }
 
     /**
