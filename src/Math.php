@@ -321,21 +321,30 @@ final class Math
         }
 
         foreach ($numbers as $number) {
-            if ($mean === null) {
-                /** @psalm-suppress InvalidOperand */
-                $next = $sum + $number;
-                if (!\is_float($next) || !\is_infinite($next) || !\is_finite($sum)) {
-                    $sum = $next;
-                    ++$count;
-                    /** @psalm-suppress InvalidOperand */
-                    yield $sum / $count;
-                    continue;
-                }
-                $mean = MeanAccumulator::resume($sum, $count);
+            if ($mean !== null) {
+                $mean->add($number);
+                yield $mean->mean();
+                continue;
             }
 
-            $mean->add($number);
-            yield $mean->mean();
+            $previous = $sum;
+            /** @psalm-suppress InvalidOperand */
+            $sum += $number;
+            ++$count;
+
+            // $sum - $sum is 0 for any finite int or float and NAN for INF or NAN, so only an INF or NAN sum
+            // gets past it; the != is loose on purpose, as an int sum gives int 0, which !== 0.0 would not
+            // match. A finite sum that turned infinite hands over to the accumulator from before this number.
+            /** @psalm-suppress InvalidOperand */
+            if ($sum - $sum != 0 && \is_infinite($sum) && \is_finite($previous)) {
+                $mean = MeanAccumulator::resume($previous, $count - 1);
+                $mean->add($number);
+                yield $mean->mean();
+                continue;
+            }
+
+            /** @psalm-suppress InvalidOperand */
+            yield $sum / $count;
         }
     }
 }

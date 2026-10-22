@@ -1040,6 +1040,516 @@ class RunningAverageTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         runningAverage array with INF, -INF or NAN values
+     * @dataProvider dataProviderForNonFiniteArray
+     * @param        array $numbers
+     * @param        array $expected
+     */
+    public function testNonFiniteArray(array $numbers, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningAverage($numbers));
+
+        // Then
+        $this->assertSameOrNan($expected, $result);
+    }
+
+    /**
+     * Test data generated with NumPy float64:
+     *   numpy.cumsum(numpy.array(x, dtype=float)) / numpy.arange(1, len(x) + 1)
+     * The int-vs-float result type is the library's contract, not the oracle's: an average is an
+     * int when the int running total divides evenly by the count, otherwise a float.
+     */
+    public static function dataProviderForNonFiniteArray(): array
+    {
+        return [
+            [
+                [\INF, 1],
+                [\INF, \INF],
+            ],
+            [
+                [1, \INF],
+                [1, \INF],
+            ],
+            [
+                [-\INF, 1],
+                [-\INF, -\INF],
+            ],
+            [
+                [\INF, -\INF],
+                [\INF, \NAN],
+            ],
+            [
+                [\NAN, 1],
+                [\NAN, \NAN],
+            ],
+            [
+                [1, \NAN],
+                [1, \NAN],
+            ],
+            [
+                [1.5, 2.5, \INF, 4.0],
+                [1.5, 2.0, \INF, \INF],
+            ],
+            [
+                [1.5, 2.5, -\INF, \NAN],
+                [1.5, 2.0, -\INF, \NAN],
+            ],
+            [
+                [\INF, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+                [\INF, \INF, \INF],
+            ],
+            [
+                [-\INF, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX],
+                [-\INF, -\INF, -\INF],
+            ],
+            [
+                [1.0, \INF, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX],
+                [1.0, \INF, \INF, \INF],
+            ],
+            [
+                [2, 4, 1.5, 3],
+                [2, 3, 2.5, 2.625],
+            ],
+            [
+                [1, 2, 3.5, 4, -\INF, 5],
+                [1, 1.5, 2.1666666666666665, 2.625, -\INF, -\INF],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage generators with INF, -INF or NAN values
+     * @dataProvider dataProviderForNonFiniteGenerators
+     * @param        \Generator $numbers
+     * @param        array $expected
+     */
+    public function testNonFiniteGenerators(\Generator $numbers, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningAverage($numbers));
+
+        // Then
+        $this->assertSameOrNan($expected, $result);
+    }
+
+    /**
+     * Test data generated with NumPy float64:
+     *   numpy.cumsum(numpy.array(x, dtype=float)) / numpy.arange(1, len(x) + 1)
+     * The int-vs-float result type is the library's contract, not the oracle's: an average is an
+     * int when the int running total divides evenly by the count, otherwise a float.
+     */
+    public static function dataProviderForNonFiniteGenerators(): array
+    {
+        return [
+            [
+                Fixture\GeneratorFixture::getGenerator([\INF, 1]),
+                [\INF, \INF],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, \INF]),
+                [1, \INF],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([-\INF, 1]),
+                [-\INF, -\INF],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([\INF, -\INF]),
+                [\INF, \NAN],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([\NAN, 1]),
+                [\NAN, \NAN],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, \NAN]),
+                [1, \NAN],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1.5, 2.5, \INF, 4.0]),
+                [1.5, 2.0, \INF, \INF],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1.5, 2.5, -\INF, \NAN]),
+                [1.5, 2.0, -\INF, \NAN],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([\INF, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [\INF, \INF, \INF],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([-\INF, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [-\INF, -\INF, -\INF],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1.0, \INF, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [1.0, \INF, \INF, \INF],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([2, 4, 1.5, 3]),
+                [2, 3, 2.5, 2.625],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3.5, 4, -\INF, 5]),
+                [1, 1.5, 2.1666666666666665, 2.625, -\INF, -\INF],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage iterators with INF, -INF or NAN values
+     * @dataProvider dataProviderForNonFiniteIterators
+     * @param        \Iterator $numbers
+     * @param        array $expected
+     */
+    public function testNonFiniteIterators(\Iterator $numbers, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningAverage($numbers));
+
+        // Then
+        $this->assertSameOrNan($expected, $result);
+    }
+
+    /**
+     * Test data generated with NumPy float64:
+     *   numpy.cumsum(numpy.array(x, dtype=float)) / numpy.arange(1, len(x) + 1)
+     * The int-vs-float result type is the library's contract, not the oracle's: an average is an
+     * int when the int running total divides evenly by the count, otherwise a float.
+     */
+    public static function dataProviderForNonFiniteIterators(): array
+    {
+        return [
+            [
+                new Fixture\ArrayIteratorFixture([\INF, 1]),
+                [\INF, \INF],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, \INF]),
+                [1, \INF],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([-\INF, 1]),
+                [-\INF, -\INF],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([\INF, -\INF]),
+                [\INF, \NAN],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([\NAN, 1]),
+                [\NAN, \NAN],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, \NAN]),
+                [1, \NAN],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1.5, 2.5, \INF, 4.0]),
+                [1.5, 2.0, \INF, \INF],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1.5, 2.5, -\INF, \NAN]),
+                [1.5, 2.0, -\INF, \NAN],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([\INF, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [\INF, \INF, \INF],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([-\INF, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [-\INF, -\INF, -\INF],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1.0, \INF, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [1.0, \INF, \INF, \INF],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([2, 4, 1.5, 3]),
+                [2, 3, 2.5, 2.625],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([1, 2, 3.5, 4, -\INF, 5]),
+                [1, 1.5, 2.1666666666666665, 2.625, -\INF, -\INF],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage traversables with INF, -INF or NAN values
+     * @dataProvider dataProviderForNonFiniteTraversables
+     * @param        \Traversable $numbers
+     * @param        array $expected
+     */
+    public function testNonFiniteTraversables(\Traversable $numbers, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningAverage($numbers));
+
+        // Then
+        $this->assertSameOrNan($expected, $result);
+    }
+
+    /**
+     * Test data generated with NumPy float64:
+     *   numpy.cumsum(numpy.array(x, dtype=float)) / numpy.arange(1, len(x) + 1)
+     * The int-vs-float result type is the library's contract, not the oracle's: an average is an
+     * int when the int running total divides evenly by the count, otherwise a float.
+     */
+    public static function dataProviderForNonFiniteTraversables(): array
+    {
+        return [
+            [
+                new Fixture\IteratorAggregateFixture([\INF, 1]),
+                [\INF, \INF],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, \INF]),
+                [1, \INF],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([-\INF, 1]),
+                [-\INF, -\INF],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([\INF, -\INF]),
+                [\INF, \NAN],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([\NAN, 1]),
+                [\NAN, \NAN],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, \NAN]),
+                [1, \NAN],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1.5, 2.5, \INF, 4.0]),
+                [1.5, 2.0, \INF, \INF],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1.5, 2.5, -\INF, \NAN]),
+                [1.5, 2.0, -\INF, \NAN],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([\INF, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [\INF, \INF, \INF],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([-\INF, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX]),
+                [-\INF, -\INF, -\INF],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1.0, \INF, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX]),
+                [1.0, \INF, \INF, \INF],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([2, 4, 1.5, 3]),
+                [2, 3, 2.5, 2.625],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([1, 2, 3.5, 4, -\INF, 5]),
+                [1, 1.5, 2.1666666666666665, 2.625, -\INF, -\INF],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage array with an INF or NAN after the float running total has overflowed
+     * @dataProvider dataProviderForNonFiniteAfterSumOverflowArray
+     * @param        array $numbers
+     * @param        array $expected
+     */
+    public function testNonFiniteAfterSumOverflowArray(array $numbers, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningAverage($numbers));
+
+        // Then
+        $this->assertSameOrNan($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python mpmath (NumPy's float64 cumsum overflows to INF where
+     * runningAverage rescales, and Fraction can't hold an infinity or NAN), with mpmath.mp.prec = 2000:
+     *   [float(mpmath.fsum(map(mpmath.mpf, x[:k])) / k) for k in range(1, len(x) + 1)]
+     */
+    public static function dataProviderForNonFiniteAfterSumOverflowArray(): array
+    {
+        return [
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF, 1.0],
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF, \INF],
+            ],
+            [
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \NAN],
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \NAN],
+            ],
+            [
+                [-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\INF, 1.0],
+                [-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\INF, -\INF],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage generators with an INF or NAN after the float running total has overflowed
+     * @dataProvider dataProviderForNonFiniteAfterSumOverflowGenerators
+     * @param        \Generator $numbers
+     * @param        array $expected
+     */
+    public function testNonFiniteAfterSumOverflowGenerators(\Generator $numbers, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningAverage($numbers));
+
+        // Then
+        $this->assertSameOrNan($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python mpmath (NumPy's float64 cumsum overflows to INF where
+     * runningAverage rescales, and Fraction can't hold an infinity or NAN), with mpmath.mp.prec = 2000:
+     *   [float(mpmath.fsum(map(mpmath.mpf, x[:k])) / k) for k in range(1, len(x) + 1)]
+     */
+    public static function dataProviderForNonFiniteAfterSumOverflowGenerators(): array
+    {
+        return [
+            [
+                Fixture\GeneratorFixture::getGenerator([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF, 1.0]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF, \INF],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \NAN]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \NAN],
+            ],
+            [
+                Fixture\GeneratorFixture::getGenerator([-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\INF, 1.0]),
+                [-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\INF, -\INF],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage iterators with an INF or NAN after the float running total has overflowed
+     * @dataProvider dataProviderForNonFiniteAfterSumOverflowIterators
+     * @param        \Iterator $numbers
+     * @param        array $expected
+     */
+    public function testNonFiniteAfterSumOverflowIterators(\Iterator $numbers, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningAverage($numbers));
+
+        // Then
+        $this->assertSameOrNan($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python mpmath (NumPy's float64 cumsum overflows to INF where
+     * runningAverage rescales, and Fraction can't hold an infinity or NAN), with mpmath.mp.prec = 2000:
+     *   [float(mpmath.fsum(map(mpmath.mpf, x[:k])) / k) for k in range(1, len(x) + 1)]
+     */
+    public static function dataProviderForNonFiniteAfterSumOverflowIterators(): array
+    {
+        return [
+            [
+                new Fixture\ArrayIteratorFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF, 1.0]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF, \INF],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \NAN]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \NAN],
+            ],
+            [
+                new Fixture\ArrayIteratorFixture([-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\INF, 1.0]),
+                [-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\INF, -\INF],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage traversables with an INF or NAN after the float running total has overflowed
+     * @dataProvider dataProviderForNonFiniteAfterSumOverflowTraversables
+     * @param        \Traversable $numbers
+     * @param        array $expected
+     */
+    public function testNonFiniteAfterSumOverflowTraversables(\Traversable $numbers, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningAverage($numbers));
+
+        // Then
+        $this->assertSameOrNan($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python mpmath (NumPy's float64 cumsum overflows to INF where
+     * runningAverage rescales, and Fraction can't hold an infinity or NAN), with mpmath.mp.prec = 2000:
+     *   [float(mpmath.fsum(map(mpmath.mpf, x[:k])) / k) for k in range(1, len(x) + 1)]
+     */
+    public static function dataProviderForNonFiniteAfterSumOverflowTraversables(): array
+    {
+        return [
+            [
+                new Fixture\IteratorAggregateFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF, 1.0]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \INF, \INF],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \NAN]),
+                [\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \NAN],
+            ],
+            [
+                new Fixture\IteratorAggregateFixture([-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\INF, 1.0]),
+                [-\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\INF, -\INF],
+            ],
+        ];
+    }
+
+    /**
+     * @test         runningAverage with an initial value and INF, -INF or NAN values
+     * @dataProvider dataProviderForNonFiniteWithInitialValue
+     * @param        array     $numbers
+     * @param        int|float $initialValue
+     * @param        array     $expected
+     */
+    public function testNonFiniteWithInitialValue(array $numbers, int|float $initialValue, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningAverage($numbers, $initialValue));
+
+        // Then
+        $this->assertSameOrNan($expected, $result);
+    }
+
+    /**
+     * Test data generated with NumPy float64:
+     *   x = [initial] + data
+     *   numpy.cumsum(numpy.array(x, dtype=float)) / numpy.arange(1, len(x) + 1)
+     */
+    public static function dataProviderForNonFiniteWithInitialValue(): array
+    {
+        return [
+            [
+                [1],
+                \INF,
+                [\INF, \INF],
+            ],
+            [
+                [\INF],
+                1.0,
+                [1.0, \INF],
+            ],
+            [
+                [1],
+                \NAN,
+                [\NAN, \NAN],
+            ],
+        ];
+    }
+
+    /**
      * @test         runningAverage iterator_to_array
      * @dataProvider dataProviderForArray
      * @param        array $numbers
@@ -1055,5 +1565,20 @@ class RunningAverageTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertSame($expected, $result);
+    }
+
+    /**
+     * assertSame for each element, but assertNan where NAN is expected, since NAN !== NAN.
+     */
+    private function assertSameOrNan(array $expected, array $result): void
+    {
+        $this->assertCount(\count($expected), $result);
+        foreach ($expected as $i => $value) {
+            if (\is_float($value) && \is_nan($value)) {
+                $this->assertNan($result[$i]);
+            } else {
+                $this->assertSame($value, $result[$i]);
+            }
+        }
     }
 }
