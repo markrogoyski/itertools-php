@@ -1364,6 +1364,9 @@ final class Single
             // Reconstructing it can miss either way: 50 * 1.1 = 55.000000000000007, and
             // range(2^53 + 1, 2^53 + 3, 0.5) starts from 2^53.
             $lastIndex = $landsOnEnd ? $stepsF - 1 : $stepsF;
+            // The end is yielded as the float values $start ± i·|$step| reach it: a -0.0 end as 0.0, since
+            // x + (-x) is 0.0 (and the exact int path yields (float) 0).
+            $lastF = $endF + 0.0;
 
             // An int $start that a float can't hold (past 2^53) is off by up to half the float spacing there
             // once converted, and every value computed from it would carry that error: range(2^53 + 3, 0,
@@ -1378,7 +1381,7 @@ final class Single
                 for ($i = 0; $i <= $lastIndex; ++$i) {
                     $valF = $startF + $signF * ((float)$i * $magnitudeF);
                     if ($ascending ? $valF > $endF : $valF < $endF) {
-                        $valF = $endF;
+                        $valF = $lastF;
                     }
                     yield $valF;
                 }
@@ -1389,14 +1392,14 @@ final class Single
                         ? self::roundIntPlusMultiple($startExact, $i, $magnitudeF, $ascending)
                         : $startF + $signF * ((float)$i * $magnitudeF);
                     if ($ascending ? $valF > $endF : $valF < $endF) {
-                        $valF = $endF;
+                        $valF = $lastF;
                     }
                     yield $valF;
                 }
             }
 
             if ($landsOnEnd) {
-                yield $endF;
+                yield $lastF;
             }
         } else {
             $startI = (int)$start;

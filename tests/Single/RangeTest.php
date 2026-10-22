@@ -2190,6 +2190,59 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         a range that lands on a -0.0 end ends on 0.0, as the float value $start ± n·|$step| does, for a
+     *               float or an int start in either direction
+     * @dataProvider dataProviderForNegativeZeroEnd
+     * @param        int|float    $start
+     * @param        float        $end
+     * @param        int|float    $step
+     * @param        array<float> $expected
+     * @param        float        $expectedReciprocalOfLast
+     */
+    public function testNegativeZeroEndLastValueSign(
+        int|float $start,
+        float $end,
+        int|float $step,
+        array $expected,
+        float $expectedReciprocalOfLast
+    ): void {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then (assertSame() takes -0.0 and 0.0 as the same, so the sign is checked through 1 / ±0.0 = ±INF)
+        $this->assertSame($expected, $result);
+        $this->assertSame($expectedReciprocalOfLast, \fdiv(1.0, $result[\count($result) - 1]));
+    }
+
+    /**
+     * Test data generated with IEEE 754 binary64 arithmetic in Python:
+     *   value_i = float(start) + i * float(step)
+     * The last value is x + (-x), which is +0.0 under round-to-nearest. A range to a -0.0 end can only end there
+     * by landing on it: a value short of the end isn't zero, and none passes it, since the span is |$start| exactly.
+     */
+    public static function dataProviderForNegativeZeroEnd(): array
+    {
+        return [
+            // Float operands, counted exactly
+            '3.0 to -0.0 step -1.0' => [3.0, -0.0, -1.0, [3.0, 2.0, 1.0, 0.0], \INF],
+            '-3.0 to -0.0 step 1.0' => [-3.0, -0.0, 1.0, [-3.0, -2.0, -1.0, 0.0], \INF],
+            '0.5 to -0.0 step -0.5' => [0.5, -0.0, -0.5, [0.5, 0.0], \INF],
+            '-0.5 to -0.0 step 0.5' => [-0.5, -0.0, 0.5, [-0.5, 0.0], \INF],
+            '3.0 to -0.0 step -1' => [3.0, -0.0, -1, [3.0, 2.0, 1.0, 0.0], \INF],
+            '-3.0 to -0.0 step 1' => [-3.0, -0.0, 1, [-3.0, -2.0, -1.0, 0.0], \INF],
+            // Int start with a fractional step, counted exactly
+            '3 to -0.0 step -0.5' => [3, -0.0, -0.5, [3.0, 2.5, 2.0, 1.5, 1.0, 0.5, 0.0], \INF],
+            '-3 to -0.0 step 0.5' => [-3, -0.0, 0.5, [-3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0], \INF],
+            // Int start with a whole step, stepped in the int domain
+            '3 to -0.0 step -1' => [3, -0.0, -1, [3.0, 2.0, 1.0, 0.0], \INF],
+            '-3 to -0.0 step 1' => [-3, -0.0, 1, [-3.0, -2.0, -1.0, 0.0], \INF],
+            // Operands past 2^995, counted from the float quotient
+            '2^1000 to -0.0 step -2^999' => [2.0 ** 1000, -0.0, -(2.0 ** 999), [2.0 ** 1000, 2.0 ** 999, 0.0], \INF],
+            '-2^1000 to -0.0 step 2^999' => [-(2.0 ** 1000), -0.0, 2.0 ** 999, [-(2.0 ** 1000), -(2.0 ** 999), 0.0], \INF],
+        ];
+    }
+
+    /**
      * @test float range whose quotient exactly equals (float)PHP_INT_MAX is rejected
      */
     public function testFloatRangeWithQuotientAtPhpIntMaxBoundaryRejects(): void
