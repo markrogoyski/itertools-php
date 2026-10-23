@@ -141,7 +141,8 @@ final class Multi
     /**
      * Lazily merge sorted iterables, preserving source order for equal values.
      *
-     * Inputs must be sorted in non-decreasing order. Source keys are discarded.
+     * Inputs must be sorted in non-decreasing order. An int and a float compare by exact value. Source keys
+     * are discarded.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -159,7 +160,8 @@ final class Multi
     /**
      * Lazily merge iterables sorted by a projected key.
      *
-     * Inputs must be sorted in non-decreasing projected-key order. Source keys are discarded.
+     * Inputs must be sorted in non-decreasing projected-key order. An int and a float key compare by exact
+     * value. Source keys are discarded.
      *
      * @param callable(mixed): mixed $keyFunc
      * @param iterable<mixed> ...$iterables

@@ -300,6 +300,7 @@ Reduces to the median value.
 ```Reduce::toMedian(iterable $data): int|float|null```
 
 - For an even number of elements, the median is the mean of the two middle values, computed so that it neither overflows when the two middle values sum beyond `PHP_FLOAT_MAX` nor loses precision when their span exceeds the integer range (`toMedian([PHP_INT_MIN, PHP_INT_MAX])` is `-0.5`, not `0.0`). The mean is correctly rounded: it is the float nearest the exact mean (`toMedian([2**53 + 1, 2**53 + 2])` is `2**53 + 2`, not `2**53`), with one exception: when an integer beyond ±2^53 is paired with a non-integral float or a float beyond PHP's integer range, the integer is converted to a float before averaging. This can lose precision, and cancellation can amplify the error substantially: on 64-bit PHP, `toMedian([PHP_INT_MIN + 1, -(float) PHP_INT_MIN])` is `0.0` instead of `0.5`. Two identical middle values return that value, including `INF`. An infinity paired with a finite value returns that infinity (`toMedian([-INF, -1])` is `-INF`), and opposite infinities return `NAN`.
+- Values are ordered by exact value, so an integer beyond ±2^53 and a float take their true places: `toMedian([2**62 + 500, 2.0**62, 2**62 + 1])` is `2**62 + 1`.
 - If any element is `NAN`, returns `NAN`, wherever it sits in the input. Sorting cannot place `NAN`, so the median is not defined; statistics propagate `NAN`, whereas the selection functions `toMin` and `toMax` skip it (see [NaN and Ordering](../README.md#nan-and-ordering)).
 - Returns null if collection is empty.
 
@@ -482,6 +483,7 @@ Reduces to its value at the given percentile.
 - `$percentile` must be in the inclusive range `[0, 100]`; otherwise throws `\InvalidArgumentException`.
 - The interpolation does not overflow when the two neighbouring values span more than `PHP_FLOAT_MAX`.
 - Percentile `50` returns exactly what `toMedian` returns, for every input.
+- Values are ordered by exact value, as in `toMin` and `toMax`: `toPercentile([2**62 + 500, 2.0**62, 2**62 + 1], 0)` is `2.0**62`, the minimum, where PHP's `sort()` puts `2**62 + 500` first.
 - If any element is `NAN`, returns `NAN` for every percentile, wherever the `NAN` sits in the input (see `toMedian`). An out-of-range `$percentile` still throws.
 - Returns null if collection is empty.
 
@@ -515,7 +517,7 @@ Reduces to its value at the given quantile.
 
 ```Reduce::toQuantile(iterable $data, float $quantile): int|float|null```
 
-- Thin wrapper over `toPercentile` that accepts a quantile in the inclusive range `[0, 1]` (e.g. `0.25` is the first quartile / 25th percentile).
+- Thin wrapper over `toPercentile` that accepts a quantile in the inclusive range `[0, 1]` (e.g. `0.25` is the first quartile / 25th percentile). Values are ordered by exact value, as there.
 - `$quantile` must be in the inclusive range `[0, 1]`; otherwise throws `\InvalidArgumentException`.
 - If any element is `NAN`, returns `NAN` for every quantile, wherever the `NAN` sits in the input (see `toMedian`).
 - Returns null if collection is empty.

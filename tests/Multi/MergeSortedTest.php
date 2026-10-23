@@ -6,6 +6,7 @@ namespace IterTools\Tests\Multi;
 
 use IterTools\Multi;
 use IterTools\Single;
+use IterTools\Summary;
 use IterTools\Infinite;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\CountingIteratorAggregateFixture;
@@ -200,5 +201,72 @@ class MergeSortedTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertSame([1, 2, 3, 4], $result);
+    }
+
+    /**
+     * @test         mergeSorted arrays of ints beyond 2^53 and floats, merged by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array<array<mixed>> $sources
+     * @param        array<mixed>        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionArray(array $sources, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Multi::mergeSorted(...$sources), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+        $this->assertTrue(Summary::isSorted($result));
+    }
+
+    /**
+     * @test         mergeSorted generators of ints beyond 2^53 and floats, merged by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array<array<mixed>> $sources
+     * @param        array<mixed>        $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionGenerator(array $sources, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $generators = \array_map(static fn (array $source) => GeneratorFixture::getGenerator($source), $sources);
+
+        // When
+        $result = \iterator_to_array(Multi::mergeSorted(...$generators), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+        $this->assertTrue(Summary::isSorted($result));
+    }
+
+    /**
+     * Test data generated with Python, which compares an int and a float by exact value
+     * (tools/oracles/exact_order_heaps.py):
+     *   list(heapq.merge(*sources))
+     * Each int compares equal as a float to a float it is not equal to, so <=> orders them wrongly.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecision(): array
+    {
+        return [
+            'int 2^53 + 1 in the first source, above float 2.0^53 in the second' => [
+                [[9007199254740993], [9007199254740992.0]],
+                [9007199254740992.0, 9007199254740993],
+            ],
+            'negative float -2.0^53 in the first source, above int -(2^53 + 1) in the second' => [
+                [[-9007199254740992.0], [-9007199254740993]],
+                [-9007199254740993, -9007199254740992.0],
+            ],
+            'interleaved ints and floats around 2^53' => [
+                [[9007199254740993, 9007199254740995], [9007199254740992.0, 9007199254740994.0]],
+                [9007199254740992.0, 9007199254740993, 9007199254740994.0, 9007199254740995],
+            ],
+        ];
     }
 }

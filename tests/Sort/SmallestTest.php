@@ -381,4 +381,137 @@ class SmallestTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame([], $result);
     }
+
+    /**
+     * @test         smallest (array) of ints beyond 2^53 and floats, compared by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array<mixed>  $data
+     * @param        int           $n
+     * @param        callable|null $keyFn
+     * @param        array<mixed>  $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionArray(array $data, int $n, ?callable $keyFn, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Sort::smallest($data, $n, $keyFn), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         smallest (Generator) of ints beyond 2^53 and floats, compared by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array<mixed>  $data
+     * @param        int           $n
+     * @param        callable|null $keyFn
+     * @param        array<mixed>  $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionGenerator(array $data, int $n, ?callable $keyFn, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $iterable = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = \iterator_to_array(Sort::smallest($iterable, $n, $keyFn), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         smallest (Iterator) of ints beyond 2^53 and floats, compared by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array<mixed>  $data
+     * @param        int           $n
+     * @param        callable|null $keyFn
+     * @param        array<mixed>  $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionIterator(array $data, int $n, ?callable $keyFn, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $iterable = new ArrayIteratorFixture($data);
+
+        // When
+        $result = \iterator_to_array(Sort::smallest($iterable, $n, $keyFn), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         smallest (IteratorAggregate) of ints beyond 2^53 and floats, compared by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array<mixed>  $data
+     * @param        int           $n
+     * @param        callable|null $keyFn
+     * @param        array<mixed>  $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionIteratorAggregate(array $data, int $n, ?callable $keyFn, array $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $iterable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = \iterator_to_array(Sort::smallest($iterable, $n, $keyFn), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which compares an int and a float by exact value
+     * (tools/oracles/exact_order_heaps.py):
+     *   heapq.nsmallest(n, data, key=keyFn)
+     * Each int compares equal as a float to a float it is not equal to, so <=> orders them wrongly.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecision(): array
+    {
+        return [
+            'int 2^53 + 1 first, above float 2.0^53' => [
+                [9007199254740993, 9007199254740992.0],
+                1,
+                null,
+                [9007199254740992.0],
+            ],
+            '2^62 + 500, 2.0^62, 2^62 + 1: two smallest are the float and 2^62 + 1' => [
+                [4611686018427388404, 4611686018427387904.0, 4611686018427387905],
+                2,
+                null,
+                [4611686018427387904.0, 4611686018427387905],
+            ],
+            '2^62 + 500, 2.0^62, 2^62 + 1: all three, ascending' => [
+                [4611686018427388404, 4611686018427387904.0, 4611686018427387905],
+                3,
+                null,
+                [4611686018427387904.0, 4611686018427387905, 4611686018427388404],
+            ],
+            'negative float -2.0^53 first, above int -(2^53 + 1)' => [
+                [-9007199254740992.0, -9007199254740993],
+                1,
+                null,
+                [-9007199254740993],
+            ],
+            'keyFn: int 2^53 + 1 first, above float 2.0^53' => [
+                [['v' => 9007199254740993], ['v' => 9007199254740992.0]],
+                1,
+                fn (array $item) => $item['v'],
+                [['v' => 9007199254740992.0]],
+            ],
+        ];
+    }
 }

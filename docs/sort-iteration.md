@@ -165,6 +165,7 @@ this efficient for large inputs when only a few extremes are needed (`O(N log n)
 - `$n` greater than the input size returns the entire input sorted descending.
 - Stable: elements with equal extracted keys are retained in original input order
   when ties exceed available slots, and emitted in insertion order among ties.
+- Keys compare as in the default comparison of `Sort::sort`: an integer and a float by exact value.
 - NaN policy: elements whose comparison key is NaN are skipped. A NaN nested inside a composite
   key is not detected; see [NaN and Ordering](../README.md#nan-and-ordering).
 
@@ -215,6 +216,7 @@ this efficient for large inputs when only a few extremes are needed (`O(N log n)
 - `$n` greater than the input size returns the entire input sorted ascending.
 - Stable: elements with equal extracted keys are retained in original input order
   when ties exceed available slots, and emitted in insertion order among ties.
+- Keys compare as in the default comparison of `Sort::sort`: an integer and a float by exact value.
 - NaN policy: elements whose comparison key is NaN are skipped. A NaN nested inside a composite
   key is not detected; see [NaN and Ordering](../README.md#nan-and-ordering).
 

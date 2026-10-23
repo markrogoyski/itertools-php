@@ -173,6 +173,7 @@ Yield `[index, value]` pairs from the iterable.
 
 * The index is sequential starting from `$start`, independent of the source iterable's keys.
 * Negative `$start` is allowed.
+* Every index is an `int`. An element whose index would go past `PHP_INT_MAX` throws `\OverflowException` instead of taking a float index; a source whose last element takes `PHP_INT_MAX` ends normally.
 
 ```php
 use IterTools\Single;
@@ -361,6 +362,7 @@ Group data by a common data element.
 * The `$groupKeyFunction` determines the key to group elements by.
 * The optional `$itemKeyFunction` allows custom indexes within each group member.
 * A group name must be an `int`, a `string` or a `bool`, whether `$groupKeyFunction` returns it alone or inside a list of names. A `bool` becomes the key `0` (`false`) or `1` (`true`), so it merges with those ints. Any other name (a float, including `4.0`, `null`, an array or an object) throws a `\TypeError`. This differs from [`Reduce::toCountBy`](reduce.md#to-count-by), which rejects `bool` too.
+* An item key from `$itemKeyFunction` follows the same rule, except that `null` appends the item to its groups, as with no `$itemKeyFunction`. Any other item key throws a `\TypeError`, where an array key would merge `4.5` and `4.7` into `4` and keep only the last item.
 
 ```php
 use IterTools\Single;

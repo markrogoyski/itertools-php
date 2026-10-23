@@ -262,4 +262,182 @@ class EnumerateTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame([1 => 'apple', 2 => 'banana', 3 => 'cherry'], $result);
     }
+
+    /**
+     * @test         enumerate (array) throws OverflowException for an element whose index would pass PHP_INT_MAX
+     * @dataProvider dataProviderForIndexPastIntegerRange
+     * @param        array<mixed>             $data
+     * @param        int                      $start
+     * @param        array<array{int, mixed}> $expected the pairs yielded before the exception
+     */
+    public function testIndexPastIntegerRangeThrowsArray(array $data, int $start, array $expected): void
+    {
+        // When
+        $result = [];
+        try {
+            foreach (Single::enumerate($data, $start) as $pair) {
+                $result[] = $pair;
+            }
+            $this->fail('Expected \OverflowException');
+        } catch (\OverflowException) {
+            // Then
+            $this->assertSame($expected, $result);
+        }
+    }
+
+    /**
+     * @test         enumerate (Generator) throws OverflowException for an element whose index would pass PHP_INT_MAX
+     * @dataProvider dataProviderForIndexPastIntegerRange
+     * @param        array<mixed>             $data
+     * @param        int                      $start
+     * @param        array<array{int, mixed}> $expected the pairs yielded before the exception
+     */
+    public function testIndexPastIntegerRangeThrowsGenerator(array $data, int $start, array $expected): void
+    {
+        // Given
+        $iterable = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = [];
+        try {
+            foreach (Single::enumerate($iterable, $start) as $pair) {
+                $result[] = $pair;
+            }
+            $this->fail('Expected \OverflowException');
+        } catch (\OverflowException) {
+            // Then
+            $this->assertSame($expected, $result);
+        }
+    }
+
+    /**
+     * @test         enumerate (Iterator) throws OverflowException for an element whose index would pass PHP_INT_MAX
+     * @dataProvider dataProviderForIndexPastIntegerRange
+     * @param        array<mixed>             $data
+     * @param        int                      $start
+     * @param        array<array{int, mixed}> $expected the pairs yielded before the exception
+     */
+    public function testIndexPastIntegerRangeThrowsIterator(array $data, int $start, array $expected): void
+    {
+        // Given
+        $iterable = new ArrayIteratorFixture($data);
+
+        // When
+        $result = [];
+        try {
+            foreach (Single::enumerate($iterable, $start) as $pair) {
+                $result[] = $pair;
+            }
+            $this->fail('Expected \OverflowException');
+        } catch (\OverflowException) {
+            // Then
+            $this->assertSame($expected, $result);
+        }
+    }
+
+    /**
+     * @test         enumerate (IteratorAggregate) throws OverflowException for an element whose index would pass PHP_INT_MAX
+     * @dataProvider dataProviderForIndexPastIntegerRange
+     * @param        array<mixed>             $data
+     * @param        int                      $start
+     * @param        array<array{int, mixed}> $expected the pairs yielded before the exception
+     */
+    public function testIndexPastIntegerRangeThrowsIteratorAggregate(array $data, int $start, array $expected): void
+    {
+        // Given
+        $iterable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = [];
+        try {
+            foreach (Single::enumerate($iterable, $start) as $pair) {
+                $result[] = $pair;
+            }
+            $this->fail('Expected \OverflowException');
+        } catch (\OverflowException) {
+            // Then
+            $this->assertSame($expected, $result);
+        }
+    }
+
+    public static function dataProviderForIndexPastIntegerRange(): array
+    {
+        return [
+            'start at PHP_INT_MAX, two elements' => [
+                ['a', 'b'],
+                \PHP_INT_MAX,
+                [[\PHP_INT_MAX, 'a']],
+            ],
+            'start just below PHP_INT_MAX, three elements' => [
+                ['a', 'b', 'c'],
+                \PHP_INT_MAX - 1,
+                [[\PHP_INT_MAX - 1, 'a'], [\PHP_INT_MAX, 'b']],
+            ],
+        ];
+    }
+
+    /**
+     * @test         enumerate ends normally when its last element takes the index PHP_INT_MAX
+     * @dataProvider dataProviderForIndexReachingIntegerRangeEdge
+     * @param        array<mixed>             $data
+     * @param        int                      $start
+     * @param        array<array{int, mixed}> $expected
+     */
+    public function testIndexReachingIntegerRangeEdge(array $data, int $start, array $expected): void
+    {
+        // When
+        $result = [];
+        foreach (Single::enumerate($data, $start) as $pair) {
+            $result[] = $pair;
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForIndexReachingIntegerRangeEdge(): array
+    {
+        return [
+            'one element at PHP_INT_MAX' => [
+                ['a'],
+                \PHP_INT_MAX,
+                [[\PHP_INT_MAX, 'a']],
+            ],
+            'last of two elements at PHP_INT_MAX' => [
+                ['a', 'b'],
+                \PHP_INT_MAX - 1,
+                [[\PHP_INT_MAX - 1, 'a'], [\PHP_INT_MAX, 'b']],
+            ],
+            'start at PHP_INT_MIN' => [
+                ['a', 'b'],
+                \PHP_INT_MIN,
+                [[\PHP_INT_MIN, 'a'], [\PHP_INT_MIN + 1, 'b']],
+            ],
+        ];
+    }
+
+    /**
+     * @test enumerate starting at PHP_INT_MAX reads only the element that overflows, not the rest
+     */
+    public function testIndexPastIntegerRangeStopsReading(): void
+    {
+        // Given
+        $pulls = 0;
+        $source = (static function () use (&$pulls): \Generator {
+            foreach (['a', 'b', 'c', 'd'] as $value) {
+                ++$pulls;
+                yield $value;
+            }
+        })();
+
+        // When
+        try {
+            foreach (Single::enumerate($source, \PHP_INT_MAX) as $_pair) {
+            }
+            $this->fail('Expected \OverflowException');
+        } catch (\OverflowException) {
+            // Then
+            $this->assertSame(2, $pulls);
+        }
+    }
 }

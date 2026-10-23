@@ -475,4 +475,110 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
             [[\NAN, 7, 7]],
         ];
     }
+
+    /**
+     * @test         toMedian array of ints beyond 2^53 and floats, ordered by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionArray(array $data, int|float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMedian($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toMedian generator of ints beyond 2^53 and floats, ordered by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionGenerator(array $data, int|float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $iterable = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toMedian($iterable);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toMedian iterator of ints beyond 2^53 and floats, ordered by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionIterator(array $data, int|float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $iterable = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toMedian($iterable);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toMedian traversable of ints beyond 2^53 and floats, ordered by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionTraversable(array $data, int|float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $iterable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toMedian($iterable);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which orders an int and a float by exact value
+     * (tools/oracles/exact_order_percentile.py):
+     *   s = sorted(data), n = len(s)
+     *   a, b = s[n // 2 - 1], s[n // 2]
+     *   s[n // 2] if n % 2 else (a if a == b else float((Fraction(a) + Fraction(b)) / 2))
+     * The identical-middles branch is the library's contract (two identical middle values return that value).
+     * Each int compares equal as a float to a float it is not equal to, so <=> orders them wrongly.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecision(): array
+    {
+        return [
+            'odd: 2^62 + 500, 2.0^62, 2^62 + 1' => [
+                [4611686018427388404, 4611686018427387904.0, 4611686018427387905],
+                4611686018427387905,
+            ],
+            'even: identical int middles 2^53 + 1 around the float 2.0^53' => [
+                [9007199254740993, 9007199254740992.0, 9007199254740993, 9007199254740995],
+                9007199254740993,
+            ],
+        ];
+    }
 }

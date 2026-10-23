@@ -11,6 +11,47 @@ namespace IterTools\Util;
 final class Arithmetic
 {
     /**
+     * 2^53: every int from -2^53 to 2^53 converts to float exactly, so <=> compares it with a float exactly.
+     */
+    public const FLOAT_EXACT_INT_LIMIT = 9007199254740992;
+
+    /**
+     * Whether <=> can order the values differently from {@see compare()}: only if there are a float and an
+     * int beyond ±2^53, which it compares as floats. Otherwise callers keep <=> and \sort(), which give the
+     * same order much faster than a comparator written in PHP. NAN is unordered; callers exclude it.
+     *
+     * Two checks in C settle most lists before the loop in PHP: an int sum means there is no float (a float,
+     * or an overflow, makes it a float), and bounds within ±2^53 mean there is no large int. \max() and \min()
+     * compare an int and a float as floats, but rounding is monotonic, so an int beyond ±2^53 still puts its
+     * bound at or past ±2^53.
+     *
+     * @param list<int|float> $values
+     *
+     * @return bool
+     */
+    public static function mixesFloatAndLargeInt(array $values): bool
+    {
+        if ($values === [] || \is_int(\array_sum($values))) {
+            return false;
+        }
+        if (\max($values) < self::FLOAT_EXACT_INT_LIMIT && \min($values) > -self::FLOAT_EXACT_INT_LIMIT) {
+            return false;
+        }
+
+        $hasFloat = false;
+        $hasLargeInt = false;
+        foreach ($values as $value) {
+            if (\is_float($value)) {
+                $hasFloat = true;
+            } elseif ($value > self::FLOAT_EXACT_INT_LIMIT || $value < -self::FLOAT_EXACT_INT_LIMIT) {
+                $hasLargeInt = true;
+            }
+        }
+
+        return $hasFloat && $hasLargeInt;
+    }
+
+    /**
      * Returns the number as an integer if it is one, or a float that converts to an integer exactly.
      *
      * @param int|float $number

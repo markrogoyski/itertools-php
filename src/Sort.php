@@ -10,11 +10,6 @@ use IterTools\Util\SortBoundedHeap;
 final class Sort
 {
     /**
-     * 2^53: every int from -2^53 to 2^53 converts to float exactly, so <=> compares it with a float exactly.
-     */
-    private const FLOAT_EXACT_INT_LIMIT = 9007199254740992;
-
-    /**
      * Sorts the given iterable, maintaining index key associations.
      *
      * If comparator is null, the elements of given iterable must be comparable. The default comparison
@@ -159,6 +154,8 @@ final class Sort
      * Stable: elements with equal comparison keys are retained in original input order
      * when ties exceed available slots, and emitted in insertion order among ties.
      *
+     * An int and a float key compare by exact value, as in the default comparison of sort.
+     *
      * NaN policy: elements whose comparison key is NaN are skipped. A NaN nested inside a composite
      * key (e.g. [NAN, $id]) is not detected; see README "NaN and Ordering".
      *
@@ -197,9 +194,13 @@ final class Sort
                 $heap->insert($entry);
             } else {
                 $root = $heap->top();
-                if (($key <=> $root[0]) > 0) {
-                    $heap->extract();
-                    $heap->insert($entry);
+                // <=> is exact except that it can find an int beyond ±2^53 and a float equal when they are
+                // not (rounding to float is monotonic). Most keys fall below the root, so test that first.
+                if (($key <=> $root[0]) >= 0) {
+                    if (($key <=> $root[0]) > 0 || Arithmetic::compareValues($key, $root[0]) > 0) {
+                        $heap->extract();
+                        $heap->insert($entry);
+                    }
                 }
             }
 
@@ -213,7 +214,9 @@ final class Sort
         }
         \usort(
             $out,
-            static fn (array $a, array $b) => ($b[0] <=> $a[0]) ?: ($a[1] <=> $b[1])
+            static fn (array $a, array $b) => ($b[0] <=> $a[0])
+                ?: ((\is_int($a[0]) !== \is_int($b[0]) ? Arithmetic::compareValues($b[0], $a[0]) : 0)
+                    ?: ($a[1] <=> $b[1]))
         );
 
         foreach ($out as $item) {
@@ -228,6 +231,8 @@ final class Sort
      *
      * Stable: elements with equal comparison keys are retained in original input order
      * when ties exceed available slots, and emitted in insertion order among ties.
+     *
+     * An int and a float key compare by exact value, as in the default comparison of sort.
      *
      * NaN policy: elements whose comparison key is NaN are skipped. A NaN nested inside a composite
      * key (e.g. [NAN, $id]) is not detected; see README "NaN and Ordering".
@@ -267,9 +272,13 @@ final class Sort
                 $heap->insert($entry);
             } else {
                 $root = $heap->top();
-                if (($key <=> $root[0]) < 0) {
-                    $heap->extract();
-                    $heap->insert($entry);
+                // <=> is exact except that it can find an int beyond ±2^53 and a float equal when they are
+                // not (rounding to float is monotonic). Most keys fall above the root, so test that first.
+                if (($key <=> $root[0]) <= 0) {
+                    if (($key <=> $root[0]) < 0 || Arithmetic::compareValues($key, $root[0]) < 0) {
+                        $heap->extract();
+                        $heap->insert($entry);
+                    }
                 }
             }
 
@@ -283,7 +292,9 @@ final class Sort
         }
         \usort(
             $out,
-            static fn (array $a, array $b) => ($a[0] <=> $b[0]) ?: ($a[1] <=> $b[1])
+            static fn (array $a, array $b) => ($a[0] <=> $b[0])
+                ?: ((\is_int($a[0]) !== \is_int($b[0]) ? Arithmetic::compareValues($a[0], $b[0]) : 0)
+                    ?: ($a[1] <=> $b[1]))
         );
 
         foreach ($out as $item) {
@@ -356,7 +367,7 @@ final class Sort
                 $hasFloat = true;
             } elseif (
                 \is_int($value)
-                && ($value > self::FLOAT_EXACT_INT_LIMIT || $value < -self::FLOAT_EXACT_INT_LIMIT)
+                && ($value > Arithmetic::FLOAT_EXACT_INT_LIMIT || $value < -Arithmetic::FLOAT_EXACT_INT_LIMIT)
             ) {
                 $hasLargeInt = true;
             }

@@ -34,6 +34,14 @@ final class SortBoundedHeap extends \SplHeap
         if ($cmp !== 0) {
             return $cmp;
         }
+        // An int beyond ±2^53 and a float compare as floats, so <=> can find them equal when they are not.
+        // Rounding to float is monotonic, so only such a tie needs the exact comparison.
+        if (\is_int($value1[0]) !== \is_int($value2[0])) {
+            $cmp = Arithmetic::compareValues($value1[0], $value2[0]) * $this->direction;
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+        }
         return $value1[1] <=> $value2[1];
     }
 }

@@ -529,4 +529,141 @@ class ToPercentileTest extends \PHPUnit\Framework\TestCase
         // When
         Reduce::toPercentile([1, \NAN, 3], 150);
     }
+
+    /**
+     * @test         toPercentile array of ints beyond 2^53 and floats, ordered by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array     $data
+     * @param        float     $percentile
+     * @param        int|float $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionArray(array $data, float $percentile, int|float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Reduce::toPercentile($data, $percentile);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toPercentile generator of ints beyond 2^53 and floats, ordered by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array     $data
+     * @param        float     $percentile
+     * @param        int|float $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionGenerator(array $data, float $percentile, int|float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $iterable = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toPercentile($iterable, $percentile);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toPercentile iterator of ints beyond 2^53 and floats, ordered by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array     $data
+     * @param        float     $percentile
+     * @param        int|float $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionIterator(array $data, float $percentile, int|float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $iterable = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toPercentile($iterable, $percentile);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toPercentile traversable of ints beyond 2^53 and floats, ordered by exact value
+     * @dataProvider dataProviderForIntAndFloatBeyondFloatPrecision
+     * @param        array     $data
+     * @param        float     $percentile
+     * @param        int|float $expected
+     */
+    public function testIntAndFloatBeyondFloatPrecisionTraversable(array $data, float $percentile, int|float $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $iterable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toPercentile($iterable, $percentile);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python, which orders an int and a float by exact value
+     * (tools/oracles/exact_order_percentile.py):
+     *   s = sorted(data), h = (len(s) - 1) * Fraction(p) / 100, j = floor(h)
+     *   s[j] if h == j else float(Fraction(s[j]) + (h - j) * (Fraction(s[j + 1]) - Fraction(s[j])))
+     * Every rank lands on an element, so the result is that element.
+     * NumPy is not the oracle here: it converts the ints to float64, which can't tell them from the floats.
+     * Each int compares equal as a float to a float it is not equal to, so <=> orders them wrongly.
+     */
+    public static function dataProviderForIntAndFloatBeyondFloatPrecision(): array
+    {
+        return [
+            '2^62 + 500, 2.0^62, 2^62 + 1 at 0: the float is the minimum' => [
+                [4611686018427388404, 4611686018427387904.0, 4611686018427387905],
+                0,
+                4611686018427387904.0,
+            ],
+            '2^62 + 500, 2.0^62, 2^62 + 1 at 50: the int 2^62 + 1 is the middle' => [
+                [4611686018427388404, 4611686018427387904.0, 4611686018427387905],
+                50,
+                4611686018427387905,
+            ],
+            '2^62 + 500, 2.0^62, 2^62 + 1 at 100: the int 2^62 + 500 is the maximum' => [
+                [4611686018427388404, 4611686018427387904.0, 4611686018427387905],
+                100,
+                4611686018427388404,
+            ],
+            '2^53 + 1, 2.0^53 at 0' => [
+                [9007199254740993, 9007199254740992.0],
+                0,
+                9007199254740992.0,
+            ],
+            '2^53 + 1, 2.0^53 at 100' => [
+                [9007199254740993, 9007199254740992.0],
+                100,
+                9007199254740993,
+            ],
+            '-2.0^53, -(2^53 + 1) at 0' => [
+                [-9007199254740992.0, -9007199254740993],
+                0,
+                -9007199254740993,
+            ],
+            '-2.0^53, -(2^53 + 1) at 100' => [
+                [-9007199254740992.0, -9007199254740993],
+                100,
+                -9007199254740992.0,
+            ],
+        ];
+    }
 }

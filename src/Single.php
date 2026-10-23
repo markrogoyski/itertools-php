@@ -204,17 +204,28 @@ final class Single
      *
      * Negative $start is allowed.
      *
+     * Every index is an int. An element whose index would go past PHP_INT_MAX throws \OverflowException
+     * instead of taking a float index; a source that ends at PHP_INT_MAX ends normally.
+     *
      * @param iterable<mixed> $data
      * @param int             $start
      *
      * @return \Generator<array{int, mixed}>
+     *
+     * @throws \OverflowException if an element's index would go past PHP_INT_MAX
      */
     public static function enumerate(iterable $data, int $start = 0): \Generator
     {
         $index = $start;
         foreach ($data as $datum) {
+            // Incrementing PHP_INT_MAX gives a float, which is never yielded (PHPStan doesn't model it).
+            if (\is_float($index)) { // @phpstan-ignore function.impossibleType
+                throw new \OverflowException(
+                    'Enumerate index overflowed the integer range: ' . \PHP_INT_MAX . ' + 1 is out of range.'
+                );
+            }
             yield [$index, $datum];
-            $index++;
+            ++$index;
         }
     }
 
@@ -379,13 +390,17 @@ final class Single
      * merges with those ints. Any other name (float, null, array, object, ...) throws a \TypeError, whether
      * the groupKeyFunction returns it alone or inside a list of names. Reduce::toCountBy rejects bool too.
      *
+     * An item key follows the same rule, except that null appends the item to its groups (as with no
+     * itemKeyFunction). Any other item key throws a \TypeError, where an array key would merge 4.5 and 4.7
+     * into 4 and keep only the last item.
+     *
      * @param iterable<mixed> $data
      * @param callable        $groupKeyFunction
      * @param callable|null   $itemKeyFunction
      *
      * @return \Generator<mixed>
      *
-     * @throws \TypeError if a group name is not an int, string or bool
+     * @throws \TypeError if a group name is not an int, string or bool, or an item key is not one or null
      */
     public static function groupBy(
         iterable $data,
@@ -398,6 +413,11 @@ final class Single
         foreach ($data as $item) {
             $group = $groupKeyFunction($item);
             $itemKey = $itemKeyFunction($item);
+            if ($itemKey !== null && !\is_int($itemKey) && !\is_string($itemKey) && !\is_bool($itemKey)) {
+                throw new \TypeError(
+                    \sprintf('Item key must be int|string|bool|null, got %s', \gettype($itemKey))
+                );
+            }
             $itemGroups = \is_iterable($group)
                 ? $group
                 : [$group];
@@ -418,8 +438,7 @@ final class Single
                 if ($itemKey === null) {
                     $groups[$itemGroup][] = $item;
                 } else {
-                    /** @var int|string $itemKey */
-                    $groups[$itemGroup][$itemKey] = $item;
+                    $groups[$itemGroup][\is_bool($itemKey) ? (int) $itemKey : $itemKey] = $item;
                 }
             }
         }

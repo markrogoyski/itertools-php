@@ -21,6 +21,14 @@ final class MergeSortedHeap extends \SplHeap
         if ($comparison !== 0) {
             return $comparison;
         }
+        // An int beyond ±2^53 and a float compare as floats, so <=> can find them equal when they are not.
+        // Rounding to float is monotonic, so only such a tie needs the exact comparison.
+        if (\is_int($value2[0]) !== \is_int($value1[0])) {
+            $comparison = Arithmetic::compareValues($value2[0], $value1[0]);
+            if ($comparison !== 0) {
+                return $comparison;
+            }
+        }
 
         return $value2[1] <=> $value1[1];
     }

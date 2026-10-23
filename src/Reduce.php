@@ -367,6 +367,8 @@ final class Reduce
     /**
      * Reduces given collection to its median value.
      *
+     * Values are ordered by exact value, so an int beyond ±2^53 and a float take their true places.
+     *
      * For an even number of elements the median is the linear interpolation
      * (mean) of the two middle values, computed so that it does not overflow
      * for middle values whose sum exceeds PHP_FLOAT_MAX.
@@ -386,7 +388,7 @@ final class Reduce
         if (static::containsNan($values)) {
             return \NAN;
         }
-        \sort($values);
+        static::sortNumbers($values);
 
         $count = \count($values);
         if ($count === 0) {
@@ -757,7 +759,8 @@ final class Reduce
      *
      * Uses the R-7 / linear-interpolation method (the NumPy default): the
      * percentile rank is mapped onto the sorted values and interpolated between
-     * the two nearest ranks. Percentile 0 is the minimum, 100 is the maximum.
+     * the two nearest ranks. Percentile 0 is the minimum, 100 is the maximum. Values are ordered by exact
+     * value, so an int beyond ±2^53 and a float take their true places, as for toMin and toMax.
      *
      * The interpolation does not overflow when the two neighbouring values span more
      * than PHP_FLOAT_MAX (for example straddling zero at extreme magnitudes).
@@ -784,7 +787,7 @@ final class Reduce
         if (static::containsNan($values)) {
             return \NAN;
         }
-        \sort($values);
+        static::sortNumbers($values);
 
         $count = \count($values);
         if ($count === 0) {
@@ -869,6 +872,24 @@ final class Reduce
         }
 
         return false;
+    }
+
+    /**
+     * Sorts a list of numbers holding no NAN in ascending order of exact value.
+     *
+     * \sort() compares an int and a float as floats, so an int beyond ±2^53 can sort on the wrong side of a
+     * float it rounds to: [2^62 + 500, 2.0^62] stays in that order. Only such a mix needs the exact
+     * comparison, which is much slower than \sort().
+     *
+     * @param list<int|float> $values
+     */
+    private static function sortNumbers(array &$values): void
+    {
+        if (Arithmetic::mixesFloatAndLargeInt($values)) {
+            \usort($values, Arithmetic::compare(...));
+        } else {
+            \sort($values);
+        }
     }
 
     /**

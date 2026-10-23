@@ -648,6 +648,7 @@ Yield `[index, value]` pairs from the stream.
 
 * The index is sequential starting from `$start`, independent of the source iterable's keys.
 * Negative `$start` is allowed.
+* Every index is an `int`. An element whose index would go past `PHP_INT_MAX` throws `\OverflowException` instead of taking a float index; a source whose last element takes `PHP_INT_MAX` ends normally.
 
 ```php
 use IterTools\Stream;
@@ -866,6 +867,7 @@ Return a stream grouping by a common data element.
 * The `$groupKeyFunction` determines the key to group elements by.
 * The optional `$itemKeyFunction` allows custom indexes within each group member.
 * A group name must be an `int`, a `string` or a `bool`, whether `$groupKeyFunction` returns it alone or inside a list of names. A `bool` becomes the key `0` (`false`) or `1` (`true`), so it merges with those ints. Any other name (a float, including `4.0`, `null`, an array or an object) throws a `\TypeError`. This differs from [`toCountBy`](#to-count-by), which rejects `bool` too.
+* An item key from `$itemKeyFunction` follows the same rule, except that `null` appends the item to its groups, as with no `$itemKeyFunction`. Any other item key throws a `\TypeError`, where an array key would merge `4.5` and `4.7` into `4` and keep only the last item.
 
 ```php
 use IterTools\Stream;
@@ -1507,8 +1509,9 @@ Reduces the stream to the n largest elements (descending order).
 ```$stream->largest(int $n, callable $keyFn = null)```
 
 Uses a bounded heap of size `n` internally — the full stream is never sorted.
-Stable under ties; skips NaN keys (not a NaN nested in a composite key; see
-[NaN and Ordering](../README.md#nan-and-ordering)); throws `\InvalidArgumentException` for negative `$n`.
+Stable under ties; compares an integer and a float key by exact value; skips NaN keys (not a NaN nested in a
+composite key; see [NaN and Ordering](../README.md#nan-and-ordering)); throws `\InvalidArgumentException` for
+negative `$n`.
 
 See also [`Sort::largest()`](sort-iteration.md#largest).
 
@@ -1547,8 +1550,9 @@ Reduces the stream to the n smallest elements (ascending order).
 ```$stream->smallest(int $n, callable $keyFn = null)```
 
 Uses a bounded heap of size `n` internally — the full stream is never sorted.
-Stable under ties; skips NaN keys (not a NaN nested in a composite key; see
-[NaN and Ordering](../README.md#nan-and-ordering)); throws `\InvalidArgumentException` for negative `$n`.
+Stable under ties; compares an integer and a float key by exact value; skips NaN keys (not a NaN nested in a
+composite key; see [NaN and Ordering](../README.md#nan-and-ordering)); throws `\InvalidArgumentException` for
+negative `$n`.
 
 See also [`Sort::smallest()`](sort-iteration.md#smallest).
 
@@ -2270,11 +2274,11 @@ $result = Stream::of(['a', 'b', 'c'])
 
 #### Merge Sorted With
 
-`$stream->mergeSortedWith(iterable ...$iterables): Stream` lazily and stably merges the already-sorted stream with additional sorted sources. The current stream is the first source, source keys are discarded, and ties from it take precedence.
+`$stream->mergeSortedWith(iterable ...$iterables): Stream` lazily and stably merges the already-sorted stream with additional sorted sources. The current stream is the first source, source keys are discarded, and ties from it take precedence. An integer and a float compare by exact value.
 
 #### Merge Sorted By With
 
-`$stream->mergeSortedByWith(callable $keyFunc, iterable ...$iterables): Stream` performs the same merge using a projection computed once per queued value.
+`$stream->mergeSortedByWith(callable $keyFunc, iterable ...$iterables): Stream` performs the same merge using a projection computed once per queued value; an integer and a float key compare by exact value.
 
 #### Take While With Keys
 
@@ -3007,6 +3011,7 @@ Reduces iterable source to its median value.
 ```$stream->toMedian(): int|float|null```
 
 - For an even number of elements, the median is the mean of the two middle values, computed so that it neither overflows when the two middle values sum beyond `PHP_FLOAT_MAX` nor loses precision when their span exceeds the integer range. Two identical middle values return that value, including `INF`. An infinity paired with a finite value returns that infinity, and opposite infinities return `NAN`.
+- Values are ordered by exact value, so an integer beyond ±2^53 and a float take their true places.
 - If any item is `NAN`, returns `NAN`, wherever it sits in the source. Sorting cannot place `NAN`, so the median is not defined; statistics propagate `NAN`, whereas the selection functions `toMin` and `toMax` skip it (see [NaN and Ordering](../README.md#nan-and-ordering)).
 - Returns null if iterable source is empty.
 
@@ -3121,6 +3126,7 @@ Reduces iterable source to its value at the given percentile.
 - `$percentile` must be in the inclusive range `[0, 100]`; otherwise throws `\InvalidArgumentException`.
 - The interpolation does not overflow when the two neighbouring values span more than `PHP_FLOAT_MAX`.
 - Percentile `50` returns exactly what `toMedian` returns, for every source.
+- Values are ordered by exact value, as in `toMin` and `toMax`.
 - If any item is `NAN`, returns `NAN` for every percentile, wherever the `NAN` sits in the source (see `toMedian`). An out-of-range `$percentile` still throws.
 - Returns null if iterable source is empty.
 
@@ -3156,7 +3162,7 @@ Reduces iterable source to its value at the given quantile.
 
 ```$stream->toQuantile(float $quantile): int|float|null```
 
-- Accepts a quantile in the inclusive range `[0, 1]` (e.g. `0.25` is the first quartile / 25th percentile).
+- Accepts a quantile in the inclusive range `[0, 1]` (e.g. `0.25` is the first quartile / 25th percentile). Values are ordered by exact value, as for `toPercentile`.
 - `$quantile` must be in the inclusive range `[0, 1]`; otherwise throws `\InvalidArgumentException`.
 - If any item is `NAN`, returns `NAN` for every quantile, wherever the `NAN` sits in the source (see `toMedian`).
 - Returns null if iterable source is empty.

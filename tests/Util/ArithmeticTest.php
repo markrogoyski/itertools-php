@@ -363,4 +363,49 @@ class ArithmeticTest extends \PHPUnit\Framework\TestCase
             [null, 0],
         ];
     }
+
+    /**
+     * @test mixesFloatAndLargeInt finds a float and an int beyond ±2^53 together, which <=> can misorder
+     * @dataProvider dataProviderForMixesFloatAndLargeInt
+     * @param list<int|float> $values
+     * @param bool            $expected
+     */
+    public function testMixesFloatAndLargeInt(array $values, bool $expected): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = Arithmetic::mixesFloatAndLargeInt($values);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with (tools/oracles/mixes_float_and_large_int.py):
+     *   any(isinstance(v, float) for v in x) and any(isinstance(v, int) and abs(v) > 2**53 for v in x)
+     * The rows reach each early return: an int sum, bounds within ±2^53, and the full scan.
+     *
+     * @return array<string, array{list<int|float>, bool}>
+     */
+    public static function dataProviderForMixesFloatAndLargeInt(): array
+    {
+        return [
+            'empty' => [[], false],
+            'small ints' => [[1, -2, 3], false],
+            'large ints, no float' => [[4611686018427387904, -4611686018427387904, 9007199254740993], false],
+            'ints whose sum overflows, no float' => [[4611686018427387904, 4611686018427387904, 4611686018427387904], false],
+            'floats only' => [[0.5, 1e300, -1e300], false],
+            'small ints and floats' => [[1, 0.5, 9007199254740992, -9007199254740992], false],
+            'int 2^53 + 1 and a float' => [[9007199254740993, 0.5], true],
+            'int -(2^53 + 1) and a float' => [[-9007199254740993, 0.5], true],
+            'int PHP_INT_MAX and a float' => [[\PHP_INT_MAX, 0.5], true],
+            'large int and INF' => [[4611686018427387904, \INF], true],
+            'float 2.0^53 and small ints' => [[9007199254740992.0, 1, 2], false],
+            'float beyond 2^53 and small ints' => [[1e300, 1, 2], false],
+        ];
+    }
 }

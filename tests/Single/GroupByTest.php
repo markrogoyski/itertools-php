@@ -1604,4 +1604,376 @@ class GroupByTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         groupBy array throws TypeError for an item key that isn't int|string|bool|null
+     * @dataProvider dataProviderForInvalidItemKeysArray
+     * @param        array $iterable
+     * @param        callable $itemKeyFunction
+     * @param        string $expectedType
+     */
+    public function testInvalidItemKeysArray(array $iterable, callable $itemKeyFunction, string $expectedType): void
+    {
+        // Given
+        $groups = Single::groupBy($iterable, fn ($x) => 'g', $itemKeyFunction);
+
+        // Then
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('Item key must be int|string|bool|null, got %s', $expectedType));
+
+        // When
+        \iterator_to_array($groups);
+    }
+
+    public static function dataProviderForInvalidItemKeysArray(): array
+    {
+        return [
+            'float' => [
+                [1, 2, 3],
+                fn ($x) => 4.5,
+                'double',
+            ],
+            'integral float' => [
+                [1, 2, 3],
+                fn ($x) => 4.0,
+                'double',
+            ],
+            'array' => [
+                [1, 2, 3],
+                fn ($x) => [$x],
+                'array',
+            ],
+            'object' => [
+                [1, 2, 3],
+                fn ($x) => (object)['v' => $x],
+                'object',
+            ],
+            'float for a later item only' => [
+                [1, 2, 3],
+                fn ($x) => $x === 1 ? 'a' : 4.5,
+                'double',
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy array accepts int, string, bool and null item keys
+     * @dataProvider dataProviderForValidItemKeysArray
+     * @param        array $iterable
+     * @param        callable $itemKeyFunction
+     * @param        array $expected
+     */
+    public function testValidItemKeysArray(array $iterable, callable $itemKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, fn ($x) => 'g', $itemKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForValidItemKeysArray(): array
+    {
+        return [
+            'int' => [
+                [1, 2, 3],
+                fn ($x) => $x * 10,
+                ['g' => [10 => 1, 20 => 2, 30 => 3]],
+            ],
+            'string' => [
+                [1, 2, 3],
+                fn ($x) => "k{$x}",
+                ['g' => ['k1' => 1, 'k2' => 2, 'k3' => 3]],
+            ],
+            'bool, becoming the key 0 or 1' => [
+                [1, 2, 3],
+                fn ($x) => $x > 1,
+                ['g' => [0 => 1, 1 => 3]],
+            ],
+            'null appends the item' => [
+                [1, 2, 3],
+                fn ($x) => $x === 2 ? null : "k{$x}",
+                ['g' => ['k1' => 1, 0 => 2, 'k3' => 3]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy generator throws TypeError for an item key that isn't int|string|bool|null
+     * @dataProvider dataProviderForInvalidItemKeysGenerator
+     * @param        \Generator $iterable
+     * @param        callable $itemKeyFunction
+     * @param        string $expectedType
+     */
+    public function testInvalidItemKeysGenerator(\Generator $iterable, callable $itemKeyFunction, string $expectedType): void
+    {
+        // Given
+        $groups = Single::groupBy($iterable, fn ($x) => 'g', $itemKeyFunction);
+
+        // Then
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('Item key must be int|string|bool|null, got %s', $expectedType));
+
+        // When
+        \iterator_to_array($groups);
+    }
+
+    public static function dataProviderForInvalidItemKeysGenerator(): array
+    {
+        return [
+            'float' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => 4.5,
+                'double',
+            ],
+            'integral float' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => 4.0,
+                'double',
+            ],
+            'array' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => [$x],
+                'array',
+            ],
+            'object' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => (object)['v' => $x],
+                'object',
+            ],
+            'float for a later item only' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => $x === 1 ? 'a' : 4.5,
+                'double',
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy generator accepts int, string, bool and null item keys
+     * @dataProvider dataProviderForValidItemKeysGenerator
+     * @param        \Generator $iterable
+     * @param        callable $itemKeyFunction
+     * @param        array $expected
+     */
+    public function testValidItemKeysGenerator(\Generator $iterable, callable $itemKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, fn ($x) => 'g', $itemKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForValidItemKeysGenerator(): array
+    {
+        return [
+            'int' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => $x * 10,
+                ['g' => [10 => 1, 20 => 2, 30 => 3]],
+            ],
+            'string' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => "k{$x}",
+                ['g' => ['k1' => 1, 'k2' => 2, 'k3' => 3]],
+            ],
+            'bool, becoming the key 0 or 1' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => $x > 1,
+                ['g' => [0 => 1, 1 => 3]],
+            ],
+            'null appends the item' => [
+                Fixture\GeneratorFixture::getGenerator([1, 2, 3]),
+                fn ($x) => $x === 2 ? null : "k{$x}",
+                ['g' => ['k1' => 1, 0 => 2, 'k3' => 3]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy iterator throws TypeError for an item key that isn't int|string|bool|null
+     * @dataProvider dataProviderForInvalidItemKeysIterator
+     * @param        \Iterator $iterable
+     * @param        callable $itemKeyFunction
+     * @param        string $expectedType
+     */
+    public function testInvalidItemKeysIterator(\Iterator $iterable, callable $itemKeyFunction, string $expectedType): void
+    {
+        // Given
+        $groups = Single::groupBy($iterable, fn ($x) => 'g', $itemKeyFunction);
+
+        // Then
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('Item key must be int|string|bool|null, got %s', $expectedType));
+
+        // When
+        \iterator_to_array($groups);
+    }
+
+    public static function dataProviderForInvalidItemKeysIterator(): array
+    {
+        return [
+            'float' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => 4.5,
+                'double',
+            ],
+            'integral float' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => 4.0,
+                'double',
+            ],
+            'array' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => [$x],
+                'array',
+            ],
+            'object' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => (object)['v' => $x],
+                'object',
+            ],
+            'float for a later item only' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => $x === 1 ? 'a' : 4.5,
+                'double',
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy iterator accepts int, string, bool and null item keys
+     * @dataProvider dataProviderForValidItemKeysIterator
+     * @param        \Iterator $iterable
+     * @param        callable $itemKeyFunction
+     * @param        array $expected
+     */
+    public function testValidItemKeysIterator(\Iterator $iterable, callable $itemKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, fn ($x) => 'g', $itemKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForValidItemKeysIterator(): array
+    {
+        return [
+            'int' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => $x * 10,
+                ['g' => [10 => 1, 20 => 2, 30 => 3]],
+            ],
+            'string' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => "k{$x}",
+                ['g' => ['k1' => 1, 'k2' => 2, 'k3' => 3]],
+            ],
+            'bool, becoming the key 0 or 1' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => $x > 1,
+                ['g' => [0 => 1, 1 => 3]],
+            ],
+            'null appends the item' => [
+                new Fixture\ArrayIteratorFixture([1, 2, 3]),
+                fn ($x) => $x === 2 ? null : "k{$x}",
+                ['g' => ['k1' => 1, 0 => 2, 'k3' => 3]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy traversable throws TypeError for an item key that isn't int|string|bool|null
+     * @dataProvider dataProviderForInvalidItemKeysTraversable
+     * @param        \Traversable $iterable
+     * @param        callable $itemKeyFunction
+     * @param        string $expectedType
+     */
+    public function testInvalidItemKeysTraversable(\Traversable $iterable, callable $itemKeyFunction, string $expectedType): void
+    {
+        // Given
+        $groups = Single::groupBy($iterable, fn ($x) => 'g', $itemKeyFunction);
+
+        // Then
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('Item key must be int|string|bool|null, got %s', $expectedType));
+
+        // When
+        \iterator_to_array($groups);
+    }
+
+    public static function dataProviderForInvalidItemKeysTraversable(): array
+    {
+        return [
+            'float' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => 4.5,
+                'double',
+            ],
+            'integral float' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => 4.0,
+                'double',
+            ],
+            'array' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => [$x],
+                'array',
+            ],
+            'object' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => (object)['v' => $x],
+                'object',
+            ],
+            'float for a later item only' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => $x === 1 ? 'a' : 4.5,
+                'double',
+            ],
+        ];
+    }
+
+    /**
+     * @test         groupBy traversable accepts int, string, bool and null item keys
+     * @dataProvider dataProviderForValidItemKeysTraversable
+     * @param        \Traversable $iterable
+     * @param        callable $itemKeyFunction
+     * @param        array $expected
+     */
+    public function testValidItemKeysTraversable(\Traversable $iterable, callable $itemKeyFunction, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::groupBy($iterable, fn ($x) => 'g', $itemKeyFunction));
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForValidItemKeysTraversable(): array
+    {
+        return [
+            'int' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => $x * 10,
+                ['g' => [10 => 1, 20 => 2, 30 => 3]],
+            ],
+            'string' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => "k{$x}",
+                ['g' => ['k1' => 1, 'k2' => 2, 'k3' => 3]],
+            ],
+            'bool, becoming the key 0 or 1' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => $x > 1,
+                ['g' => [0 => 1, 1 => 3]],
+            ],
+            'null appends the item' => [
+                new Fixture\IteratorAggregateFixture([1, 2, 3]),
+                fn ($x) => $x === 2 ? null : "k{$x}",
+                ['g' => ['k1' => 1, 0 => 2, 'k3' => 3]],
+            ],
+        ];
+    }
 }
