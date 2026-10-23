@@ -374,6 +374,35 @@ END_OF_EXPECTED;
         $this->assertEquals($expected, $fileContents);
     }
 
+    /**
+     * @test toCsvFile throws TypeError for a row that isn't an array, without a warning first
+     */
+    public function testToCsvFileRowNotArray(): void
+    {
+        // Given
+        $stream   = Stream::of([[1, 2], 5]);
+        $file     = \fopen($this->root->url() . '/' . \uniqid(), 'w');
+        $raised   = [];
+        $previous = \set_error_handler(static function (int $errno, string $errstr) use (&$raised): bool {
+            $raised[] = $errstr;
+            return true;
+        });
+
+        // When
+        $thrown = null;
+        try {
+            $stream->toCsvFile($file);
+        } catch (\TypeError $e) {
+            $thrown = $e;
+        } finally {
+            \set_error_handler($previous);
+        }
+
+        // Then
+        $this->assertInstanceOf(\TypeError::class, $thrown);
+        $this->assertSame([], $raised);
+    }
+
     public static function dataProviderForToCsvFileWithDefaultConfig(): array
     {
         return [

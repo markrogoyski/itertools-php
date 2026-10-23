@@ -26,6 +26,7 @@
   * Dropped the endpoint of a float range spanning a whole number of steps when rounding put the last value just past `$end` (`range(0, 55, 1.1)` stopped at 53.9).
   * Ended on `-0.0` when landing on a `-0.0` end; it now ends on `0.0`, as `$start + n·$step` gives.
   * An integer paired with a non-integral float or a float beyond the integer range is still converted to float first (`range(PHP_INT_MAX, 2.0**63, 0.5)` gives 1 element instead of 3).
+  * Starting a range with a float step takes about 3 µs longer, for the exact span and endpoint checks above; each element costs the same as before.
 * Math: `relativeFrequencies` and `relativeFrequenciesBy` (and their Stream wrappers) yielded `int(1)` instead of `1.0` for a single distinct value or group; they now always yield floats.
 * Reduce: `toStandardDeviation` (and `Stream::toStandardDeviation`) returned `INF` or `0.0` when the variance overflowed or underflowed (`[-1e200, 1e200]` gave `INF` instead of `1e200`), returned `INF` when a value was more than `PHP_FLOAT_MAX` from the running mean (`[-1e308, 1e308]`), and was off by whole subnormal steps (the sample standard deviation of `[0, 5e-324]` gave `0.0` instead of `5.0E-324`). Results that did not hit these cases are unchanged.
 * Set: `partialIntersection` and `partialIntersectionCoercive` (and the Stream wrappers) silently yielded nothing for a `$minIntersectionCount` below 1; they now throw `\InvalidArgumentException`.

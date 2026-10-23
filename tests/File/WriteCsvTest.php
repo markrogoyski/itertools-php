@@ -379,6 +379,47 @@ class WriteCsvTest extends \PHPUnit\Framework\TestCase
         $this->assertSame("NAN,2\n", $this->readBack($file));
     }
 
+    /**
+     * @test         writeCsv throws TypeError for a row that isn't an array, without a warning first
+     * @dataProvider dataProviderForRowNotArray
+     * @param        iterable<mixed> $rows
+     */
+    public function testWriteCsvRowNotArray(iterable $rows): void
+    {
+        // Given
+        $file     = $this->writableFile();
+        $raised   = [];
+        $previous = \set_error_handler(static function (int $errno, string $errstr) use (&$raised): bool {
+            $raised[] = $errstr;
+            return true;
+        });
+
+        // When
+        $thrown = null;
+        try {
+            File::writeCsv($file, $rows);
+        } catch (\TypeError $e) {
+            $thrown = $e;
+        } finally {
+            \set_error_handler($previous);
+        }
+
+        // Then
+        $this->assertInstanceOf(\TypeError::class, $thrown);
+        $this->assertSame([], $raised);
+    }
+
+    public static function dataProviderForRowNotArray(): array
+    {
+        return [
+            'int'         => [[[1, 2], 5]],
+            'string'      => [[[1, 2], 'a,b']],
+            'null'        => [[[1, 2], null]],
+            'traversable' => [[[1, 2], new \ArrayIterator([1, \NAN])]],
+            'generator'   => [GeneratorFixture::getGenerator([[1, 2], 5])],
+        ];
+    }
+
     public static function dataProviderForNan(): array
     {
         return [

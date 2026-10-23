@@ -47,7 +47,7 @@ final class ResourceWriter
     /**
      * Writes each row before it takes the next one from $rows.
      *
-     * @param iterable<array<mixed>> $rows
+     * @param iterable<mixed> $rows arrays; a row that isn't one throws the \TypeError fputcsv() throws for it
      *
      * @throws \RuntimeException if a row could not be written in full
      */
@@ -61,13 +61,16 @@ final class ResourceWriter
         foreach ($rows as $row) {
             // A row with a NAN is copied with it replaced, not changed in place: a field may be a reference, which
             // writing through would change the caller's variable, or fail for a typed float property.
-            foreach ($row as $field) {
-                if (\is_float($field) && \is_nan($field)) {
-                    $row = \array_map(
-                        static fn (mixed $field): mixed => \is_float($field) && \is_nan($field) ? 'NAN' : $field,
-                        $row
-                    );
-                    break;
+            // A row that isn't an array is left to fputcsv(), which throws the TypeError, with no warning first.
+            if (\is_array($row)) {
+                foreach ($row as $field) {
+                    if (\is_float($field) && \is_nan($field)) {
+                        $row = \array_map(
+                            static fn (mixed $field): mixed => \is_float($field) && \is_nan($field) ? 'NAN' : $field,
+                            $row
+                        );
+                        break;
+                    }
                 }
             }
 

@@ -347,18 +347,23 @@ final class Single
      * The elements of $data, with each iterable among them flattened by $dimensions - 1 dimensions. Keys are
      * not meaningful: {@see Single::flatten()} renumbers them.
      *
+     * An iterable at the last dimension is passed on by yield from, not foreach, as foreach rewinds: a generator
+     * that was already advanced (a header read off it) would throw.
+     *
      * @param iterable<mixed> $data
-     * @param int             $dimensions
+     * @param int             $dimensions at least 1
      *
      * @return \Generator<mixed>
      */
     private static function flattenElements(iterable $data, int $dimensions): \Generator
     {
         foreach ($data as $datum) {
-            if ($dimensions > 0 && \is_iterable($datum)) {
+            if (!\is_iterable($datum)) {
+                yield $datum;
+            } elseif ($dimensions > 1) {
                 yield from self::flattenElements($datum, $dimensions - 1);
             } else {
-                yield $datum;
+                yield from $datum;
             }
         }
     }
@@ -1113,12 +1118,13 @@ final class Single
      * 0.1)` ends on 1.0, but `range(2.0 ** 53, -0.1, -2.0 ** 53)` yields `[2^53, 0.0]`: its span 2^53 + 0.1
      * rounds to the step in float, but holds one step and 0.1 more. On int operands, `range(PHP_INT_MIN, 0,
      * 2.0 ** 52 - 0.5)` ends on -1024.0, as 2048 steps fall 1024 short, beyond the 512 their rounding allows. A
-     * step computed in float, such as `($end - $start) / $n`, also carries the rounding of the subtraction, which
-     * is allowed too, up to twice the operands' own: such a range ends on `$end`, unless the larger operand is
-     * exact and the subtraction absorbed part of the smaller one, as in the 2.0 ** 53 example. A range whose exact
-     * last value rounds to `$end` ends on `$end` too. Past 2^48 steps, with a step below 2^-900 or an operand
-     * beyond 2^995, the float quotient decides instead, to within 2ε of its value plus the operands' half
-     * spacings.
+     * non-integral step that is `($end - $start) / $n` computed in float also carries the rounding of the
+     * subtraction, which is allowed too, so such a range ends on `$end`: `range(0.1, 5.0, (5.0 - 0.1) / 10)` ends
+     * on 5.0, although 5.0 - 0.1 rounds up by 3.6e-16. Any other step is allowed that rounding up to twice the
+     * operands' own, which leaves out an exact operand that absorbed part of the other in the subtraction, as in
+     * the 2.0 ** 53 example. A range whose exact last value rounds to `$end` ends on `$end` too. Past 2^48 steps,
+     * with a step below 2^-900 or an operand beyond 2^995, the float quotient decides instead, to within 2ε of its
+     * value plus the operands' half spacings.
      *
      * A step at or above the span of two float operands computed in float is compared with their exact span,
      * which the float span can round up to the step: `range(0.1, 2.0 ** 53, 2.0 ** 53)` throws, as the exact
@@ -1126,9 +1132,10 @@ final class Single
      * non-integral float taken as its shortest decimal and an integral float as itself: `range(-10.0, -3.6, 6.4)`
      * yields `[-10.0, -3.6]`, although the floats' exact span is 6.4 - 4.4e-16, and `range(0.1, 0.3, 0.2)` yields
      * `[0.1, 0.3]`, although their float span is 0.19999999999999998. `range(0.1, 0.2, 0.10000000000000002)`
-     * throws, as neither span reaches the step. A step computed as `$end - $start` is allowed the rounding of the
-     * subtraction, capped as for landing: `range(10.19, 33.0, 33.0 - 10.19)` yields `[10.19, 33.0]`, although the
-     * step 22.810000000000002 exceeds the exact span.
+     * throws, as neither span reaches the step. A non-integral step computed as `$end - $start` is allowed the
+     * rounding of the subtraction, as for landing: `range(10.19, 33.0, 33.0 - 10.19)` yields `[10.19, 33.0]`, and
+     * `range(-0.97, -4.0, -4.0 + 0.97)` yields `[-0.97, -4.0]`, although the steps 22.810000000000002 and
+     * 3.0300000000000002 exceed the exact spans.
      *
      * @param int|float $start
      * @param int|float $end
@@ -1214,74 +1221,81 @@ final class Single
                 // exceeds 2^63 by $high - ($low - PHP_INT_MIN), which fits int; a step at least 2^63 is a float,
                 // and its excess over 2^63 is exact.
                 $magnitude = \abs($step);
-                $magnitudeDescription = "{$magnitude}";
                 [$low, $high] = $ascending ? [$startExact, $endExact] : [$endExact, $startExact];
                 $span = $high - $low;
+                $spanDescription = null;
                 if (\is_int($span)) {
-                    $stepExceedsSpan = Arithmetic::compare($magnitude, $span) > 0;
-                    $spanDescription = "({$span})";
-                } else {
-                    $excess = $high - ($low - \PHP_INT_MIN);
-                    $stepExceedsSpan = Arithmetic::compare((float)$magnitude + (float)\PHP_INT_MIN, $excess) > 0;
+                    if (Arithmetic::compare($magnitude, $span) > 0) {
+                        $spanDescription = "({$span})";
+                    }
+                } elseif (
+                    Arithmetic::compare((float)$magnitude + (float)\PHP_INT_MIN, $high - ($low - \PHP_INT_MIN)) > 0
+                ) {
                     $spanDescription = "between {$startExact} and {$endExact}";
+                }
+                if ($spanDescription !== null) {
+                    throw new \InvalidArgumentException(
+                        "Single::range: step magnitude ({$magnitude}) must not exceed span {$spanDescription}"
+                    );
                 }
             } else {
                 $magnitude = $magnitudeF;
-                // A step below the float span is below the exact span too, since rounding is monotonic. A step at
-                // or above it may still be within the exact span (2^53 - 0.1 rounds to the step 2^53), or within
-                // the span of the decimals the operands are written as (0.3 - 0.1 gives 0.19999999999999998, below
-                // the step 0.2). It exceeds the span when it exceeds both.
-                // A step computed as $end - $start carries the rounding of the subtraction, which the exact span is
-                // allowed, as for landing, so it is accepted as ($end - $start) / $n is: 33.0 - 10.19 rounds up to
-                // 22.810000000000002. As for landing, the allowance is capped at twice the operands' half float
-                // spacings, which bound that rounding when the larger operand isn't integral; an integral float is
-                // taken as exact, so range(0.1, 2.0 ** 53, 2.0 ** 53) still throws. It is worked out only for a
-                // step at least the float span, which a step below it can't exceed.
-                $stepExceedsSpan = false;
-                if ($magnitudeF >= $spanF) {
-                    $spanError = self::exactFloatDifference(\max($startF, $endF), \min($startF, $endF))[1];
+            }
+
+            // A step below the float span of float operands is below the exact span too, since rounding is
+            // monotonic. A step at or above it may still be within the exact span (2^53 - 0.1 rounds to the step
+            // 2^53), or within the span of the decimals the operands are written as (0.3 - 0.1 gives
+            // 0.19999999999999998, below the step 0.2). It exceeds the span when it exceeds both.
+            // A step computed as $end - $start carries the rounding of the subtraction, which the exact span is
+            // allowed, as for landing (see differenceAllowance()), so it is accepted as ($end - $start) / $n is:
+            // 33.0 - 10.19 rounds up to 22.810000000000002, and -4.0 + 0.97 to 3.0300000000000002. An integral
+            // float step is taken as exact, so range(0.1, 2.0 ** 53, 2.0 ** 53) still throws.
+            if (!$intOperands && $magnitudeF >= $spanF) {
+                $floatDifference = self::exactFloatDifference(\max($startF, $endF), \min($startF, $endF));
+                $differenceAllowance = [0.0];
+                if (self::roundingAllowances($start, $end, \abs($step), false) !== []) {
                     $operandAllowance = 0.0;
-                    if (self::roundingAllowances($start, $end, \abs($step), false) !== []) {
-                        foreach ([$start, $end] as $operand) {
-                            if (\is_float($operand) && \floor($operand) !== $operand) {
-                                $operandAllowance += Arithmetic::halfFloatSpacing($operand);
-                            }
+                    foreach ([$start, $end] as $operand) {
+                        if (\is_float($operand) && \floor($operand) !== $operand) {
+                            $operandAllowance += Arithmetic::halfFloatSpacing($operand);
                         }
                     }
-                    $differenceAllowance = [\min(\abs($spanError), 2.0 * $operandAllowance)];
-                    $stepExceedsSpan = self::stepExceedsExactFloatSpan(
+                    $differenceAllowance = [
+                        self::differenceAllowance($floatDifference, $operandAllowance, \abs($step), false),
+                    ];
+                }
+                $stepExceedsSpan = self::stepExceedsExactFloatSpan(
+                    \abs($step),
+                    \min($startF, $endF),
+                    \max($startF, $endF),
+                    $differenceAllowance
+                ) && (self::stepExceedsDecimalSpan($start, $end, \abs($step), $ascending)
+                    ?? self::stepExceedsExactFloatSpan(
                         \abs($step),
                         \min($startF, $endF),
                         \max($startF, $endF),
-                        $differenceAllowance
-                    ) && (self::stepExceedsDecimalSpan($start, $end, \abs($step), $ascending)
-                        ?? self::stepExceedsExactFloatSpan(
-                            \abs($step),
-                            \min($startF, $endF),
-                            \max($startF, $endF),
-                            [
-                                ...self::roundingAllowances($start, $end, \abs($step), false),
-                                self::roundingAllowance(\abs($step), false),
-                            ]
-                        ));
+                        [
+                            ...self::roundingAllowances($start, $end, \abs($step), false),
+                            self::roundingAllowance(\abs($step), false),
+                        ]
+                    ));
+                if ($stepExceedsSpan) {
+                    $magnitudeDescription = "{$magnitudeF}";
+                    $spanDescription = "({$spanF})";
+                    if ("{$magnitudeF}" === "{$spanF}") {
+                        // Printed to 14 digits, the step and the span can look equal. Print as many as tell them
+                        // apart, or name the exact span when the float span is the step.
+                        $magnitudeDescription = \var_export($magnitudeF, true);
+                        $spanDescription = $magnitudeF === $spanF
+                            ? '(the exact span between ' . \var_export($start, true) . ' and '
+                                . \var_export($end, true) . ', which rounds to the step in float)'
+                            : '(' . \var_export($spanF, true) . ')';
+                    }
+                    throw new \InvalidArgumentException(
+                        "Single::range: step magnitude ({$magnitudeDescription}) must not exceed span "
+                            . $spanDescription
+                    );
                 }
-                $magnitudeDescription = "{$magnitude}";
-                $spanDescription = "({$spanF})";
-                if ("{$magnitudeF}" === "{$spanF}") {
-                    // Printed to 14 digits, the step and the span can look equal. Print as many as tell them
-                    // apart, or name the exact span when the float span is the step.
-                    $magnitudeDescription = \var_export($magnitudeF, true);
-                    $spanDescription = $magnitudeF === $spanF
-                        ? '(the exact span between ' . \var_export($start, true) . ' and ' . \var_export($end, true)
-                            . ', which rounds to the step in float)'
-                        : '(' . \var_export($spanF, true) . ')';
-                }
-            }
-
-            if ($stepExceedsSpan) {
-                throw new \InvalidArgumentException(
-                    "Single::range: step magnitude ({$magnitudeDescription}) must not exceed span {$spanDescription}"
-                );
             }
 
             // A whole step on int operands is counted and applied in the int domain, exactly. Converted to
@@ -1322,13 +1336,18 @@ final class Single
                 && $magnitudeF >= 2.0 ** -900.0
                 && \max(\abs($startF), \abs($endF), $magnitudeF) < 2.0 ** 995.0
             ) {
+                // $end is the float $endF plus $endRest. The span of an int operand paired with a float is taken
+                // from the int converted to float, which leaves out the rest: in range(2.5, 2 ** 53 + 1, …), $end is
+                // 2^53 here.
+                $endRest = 0.0;
                 if (\is_int($startExact) && \is_int($endExact)) {
                     [$low, $high] = $ascending ? [$startExact, $endExact] : [$endExact, $startExact];
                     $exactSpan = self::exactIntSpan($low, $high);
                     $operandAllowance = [];
+                    $endRest = self::intToFloats($endExact)[1];
                 } else {
                     $exactSpan = self::exactFloatDifference(\max($startF, $endF), \min($startF, $endF));
-                    $operandAllowance = self::roundingAllowances($start, $end, \abs($step), true, $exactSpan[1]);
+                    $operandAllowance = self::roundingAllowances($start, $end, \abs($step), true, $exactSpan);
                 }
                 [$stepsF, $landsOnEnd] = self::countFloatSteps(
                     $exactSpan,
@@ -1337,7 +1356,7 @@ final class Single
                     $operandAllowance,
                     self::roundingAllowance(\abs($step), true),
                     $endF,
-                    \is_int($endExact) ? self::intToFloats($endExact)[1] : 0.0,
+                    $endRest,
                     $ascending
                 );
             } else {
@@ -1870,18 +1889,17 @@ final class Single
      * steps of 0.3 and end on $end. The cut-off is taken on the allowances for landing either way, the larger
      * ones, so a step that range() accepts above the span always lands on $end.
      *
-     * For landing, they come with the rounding of the operands' float difference, $spanError, while the total stays
-     * under a quarter of a step: a step computed from the operands, such as ($end - $start) / $n, carries it. It
-     * counts up to twice the operands' allowance, which bounds it when the larger operand isn't exact; past that,
-     * the difference has absorbed part of an operand that is exact: in range(2.0 ** 53, -0.1, -2.0 ** 53), the
-     * span 2^53 + 0.1 rounds to the step. range(-104.81949906807756, 975.2888809333513, 1.158914570816984), with
-     * the step computed for 932 steps, ends on $end, although the floats' span is 1.1e-13 short of 932 steps.
+     * For landing, they come with the differenceAllowance() for the rounding of the operands' float difference,
+     * while the total stays under a quarter of a step: a step computed from the operands, such as ($end - $start) /
+     * $n, carries it. range(-104.81949906807756, 975.2888809333513, 1.158914570816984), with the step computed for
+     * 932 steps, ends on $end, although the floats' span is 1.1e-13 short of 932 steps.
      *
-     * @param int|float $start
-     * @param int|float $end
-     * @param int|float $magnitude
-     * @param bool      $forLanding
-     * @param float     $spanError  the float difference of the operands minus their exact difference
+     * @param int|float           $start
+     * @param int|float           $end
+     * @param int|float           $magnitude
+     * @param bool                $forLanding
+     * @param array{float, float} $floatDifference the operands' float difference and its rounding error (see
+     *                                             exactFloatDifference()), for landing
      *
      * @return list<float>
      */
@@ -1890,7 +1908,7 @@ final class Single
         int|float $end,
         int|float $magnitude,
         bool $forLanding,
-        float $spanError = 0.0
+        array $floatDifference = [0.0, 0.0]
     ): array {
         $startAllowance = self::roundingAllowance($start, true);
         $endAllowance = self::roundingAllowance($end, true);
@@ -1902,10 +1920,50 @@ final class Single
             return [self::roundingAllowance($start, false), self::roundingAllowance($end, false)];
         }
 
-        $differenceAllowance = \min(\abs($spanError), 2.0 * $sum);
+        $differenceAllowance = self::differenceAllowance($floatDifference, $sum, $magnitude, true);
         return $sum + $differenceAllowance < 0.25 * (float)$magnitude
             ? [$startAllowance, $endAllowance, $differenceAllowance]
             : [$startAllowance, $endAllowance];
+    }
+
+    /**
+     * The rounding of the operands' float difference that the exact span is allowed, as a step computed from that
+     * difference, such as ($end - $start) / $n, carries it.
+     *
+     * A step that is that quotient in float, for the nearest whole $n, and that roundingAllowance() doesn't take as
+     * exact, is allowed all of it: range(0.1, 5.0, (5.0 - 0.1) / 10) ends on 5.0, and range(-0.97, -4.0, -4.0 + 0.97)
+     * yields [-0.97, -4.0], although 5.0 - 0.1 and -4.0 + 0.97 round by 3.6e-16 and 4.4e-16, far more than the
+     * operands' own rounding. Any other step is allowed it up to twice the operands' allowance, $operandAllowance,
+     * which bounds it when the larger operand isn't exact. Past that, the difference has absorbed part of an operand
+     * that is exact, which a step that wasn't computed from it doesn't carry: range(2.5, 2.0 ** 53,
+     * 3002399751580329.5) doesn't end on 2^53, as its 3 steps fall 1.0 short, beyond their rounding, and 2^53 - 2.5
+     * rounds to 9007199254740990.0, which gives the step 3002399751580330.0, not this one. An exact step is taken as
+     * written, even when it is that quotient: in range(2.0 ** 53, -0.1, -2.0 ** 53), the span 2^53 + 0.1 rounds to
+     * the step.
+     *
+     * @param array{float, float} $floatDifference  the operands' float difference and its rounding error (see
+     *                                              exactFloatDifference())
+     * @param float               $operandAllowance the sum of the operands' half float spacings
+     * @param int|float           $magnitude        the step magnitude
+     * @param bool                $forLanding       as for roundingAllowance(), which decides whether the step is
+     *                                              exact
+     *
+     * @return float
+     */
+    private static function differenceAllowance(
+        array $floatDifference,
+        float $operandAllowance,
+        int|float $magnitude,
+        bool $forLanding
+    ): float {
+        [$span, $spanError] = $floatDifference;
+        $spanError = \abs($spanError);
+        $steps = \round($span / (float)$magnitude);
+        $isQuotient = $steps >= 1.0 && $span / $steps === (float)$magnitude;
+
+        return $isQuotient && self::roundingAllowance($magnitude, $forLanding) > 0.0
+            ? $spanError
+            : \min($spanError, 2.0 * $operandAllowance);
     }
 
     /**
@@ -1960,7 +2018,7 @@ final class Single
      * @param float $high
      * @param float $low
      *
-     * @return list<float>
+     * @return array{float, float}
      */
     private static function exactFloatDifference(float $high, float $low): array
     {

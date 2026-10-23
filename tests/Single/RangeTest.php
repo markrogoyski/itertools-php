@@ -801,6 +801,55 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         an int $end beyond 2^53 with a non-integral float $start doesn't land on $end by the int's part
+     *               past its float, which the span, taken from the operands converted to float, doesn't include
+     * @dataProvider dataProviderForIntEndBeyondFloatPrecisionWithNonIntegralStart
+     * @param        float        $start
+     * @param        int          $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testIntEndBeyondFloatPrecisionWithNonIntegralStart(
+        float $start,
+        int $end,
+        float $step,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * The count follows the exact span; the values are $start + i·|$step| in float arithmetic, as for float operands,
+     * so the last is 9007199254740990.0, where the exact value is 9007199254740991.0.
+     *
+     * Test data generated with Python's fractions.Fraction and IEEE 754 binary64 arithmetic:
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(start) + sign * (float(i) * abs(float(step)))
+     */
+    public static function dataProviderForIntEndBeyondFloatPrecisionWithNonIntegralStart(): array
+    {
+        return [
+            'ascending 2.5 to 2^53 + 1' => [
+                2.5, 9007199254740993, 3002399751580329.5,
+                [2.5, 3002399751580332.0, 6004799503160662.0, 9007199254740990.0],
+            ],
+            'descending -2.5 to -(2^53 + 1)' => [
+                -2.5, -9007199254740993, -3002399751580329.5,
+                [-2.5, -3002399751580332.0, -6004799503160662.0, -9007199254740990.0],
+            ],
+        ];
+    }
+
+    /**
      * @test         an int operand beyond 2^53 with an integral float operand rejects a step that exceeds their exact span
      * @dataProvider dataProviderForStepExceedingExactIntAndIntegralFloatSpan
      * @param        int|float $start
@@ -1302,7 +1351,6 @@ class RangeTest extends \PHPUnit\Framework\TestCase
             '2.0^63 to 0.1 step -2.0^63' => [9.223372036854776E18, 0.1, -9.223372036854776E18],
             '-2.0^64 to -0.5 step 2.0^64' => [-1.8446744073709552E19, -0.5, 1.8446744073709552E19],
             '1e22 to 3e23 step 3e23 - 1e22' => [1.0E22, 3.0E23, 2.9E23],
-            '-154.0 to 0.3381942395764377 step their difference' => [-154.0, 0.3381942395764377, 154.33819423957644],
         ];
     }
 
@@ -1463,6 +1511,16 @@ class RangeTest extends \PHPUnit\Framework\TestCase
                 1146.0062578069078,
                 [-176.76226570120195, 969.2439921057057],
             ],
+            // The larger operand is an exact integral float, and the subtraction rounds by more than twice the other
+            // operand's half float spacing
+            '-154.0 to 0.3381942395764377 step 0.3381942395764377 + 154.0' => [
+                -154.0,
+                0.3381942395764377,
+                154.33819423957644,
+                [-154.0, 0.3381942395764377],
+            ],
+            '-0.97 to -4.0 step -4.0 + 0.97' => [-0.97, -4.0, -3.0300000000000002, [-0.97, -4.0]],
+            '-0.28 to 2.0 step 2.0 + 0.28' => [-0.28, 2.0, 2.2800000000000002, [-0.28, 2.0]],
         ];
     }
 
@@ -1687,6 +1745,11 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         return [
             '-104.81949906807756 to 975.2888809333513, n 932' => [-104.81949906807756, 975.2888809333513, 932],
             '-499.457509919089 to 44.25084769001114, n 40' => [-499.457509919089, 44.25084769001114, 40],
+            // The larger operand is an exact integral float, and the subtraction rounds by more than twice the other
+            // operand's half float spacing
+            '0.1 to 5.0, n 10' => [0.1, 5.0, 10],
+            '-0.01 to -3.0, n 10' => [-0.01, -3.0, 10],
+            '5.0 to 0.1, n 10' => [5.0, 0.1, 10],
         ];
     }
 

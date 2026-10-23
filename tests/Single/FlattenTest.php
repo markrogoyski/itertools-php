@@ -357,6 +357,40 @@ class FlattenTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test flatten yields the rest of an inner generator that was already advanced, as yield from does
+     */
+    public function testAdvancedInnerGeneratorAtLastDimension(): void
+    {
+        // Given
+        $rows   = GeneratorFixture::getGenerator(['header', 'r1', 'r2']);
+        $header = $rows->current();
+        $rows->next();
+
+        // When
+        $result = \iterator_to_array(Single::flatten([[$header], $rows]));
+
+        // Then
+        $this->assertSame(['header', 'r1', 'r2'], $result);
+    }
+
+    /**
+     * @test flatten by two dimensions yields the rest of an inner generator that was already advanced
+     */
+    public function testAdvancedInnerGeneratorAtLastOfTwoDimensions(): void
+    {
+        // Given
+        $rows   = GeneratorFixture::getGenerator(['header', 'r1', 'r2']);
+        $header = $rows->current();
+        $rows->next();
+
+        // When
+        $result = \iterator_to_array(Single::flatten([[[$header]], [$rows]], 2));
+
+        // Then
+        $this->assertSame(['header', 'r1', 'r2'], $result);
+    }
+
+    /**
      * @test flatten with default dimensions
      */
     public function testFlattenWithDefaultDimensions(): void
