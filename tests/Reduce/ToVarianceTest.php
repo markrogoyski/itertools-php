@@ -356,6 +356,109 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toVariance array with a subnormal variance applies Bessel's correction before rounding
+     * @dataProvider dataProviderForSubnormalVariance
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testSubnormalVarianceArray(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toVariance($data, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toVariance generator with a subnormal variance applies Bessel's correction before rounding
+     * @dataProvider dataProviderForSubnormalVariance
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testSubnormalVarianceGenerator(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toVariance($generator, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toVariance iterator with a subnormal variance applies Bessel's correction before rounding
+     * @dataProvider dataProviderForSubnormalVariance
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testSubnormalVarianceIterator(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toVariance($iterator, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toVariance traversable with a subnormal variance applies Bessel's correction before rounding
+     * @dataProvider dataProviderForSubnormalVariance
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testSubnormalVarianceTraversable(array $data, bool $sample, float $expected): void
+    {
+        // Given
+        $traversable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toVariance($traversable, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * The variance is subnormal, so rounding the population variance to the subnormal grid before the
+     * sample correction loses resolution: for [0, 3e-162] it rounds 2.25e-324 to 0.0, which no correction
+     * brings back, though the sample variance 4.5e-324 is 5e-324. [0, 5e-324, …] takes the path where a
+     * step underflowed and the values were rescaled.
+     *
+     * Test data generated with Python (exact rational variance, correctly rounded to a float):
+     *   mean = sum(map(Fraction, data)) / n
+     *   float(sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof))
+     */
+    public static function dataProviderForSubnormalVariance(): array
+    {
+        return [
+            [[0, 3e-162], false, 0.0],
+            [[0, 3e-162], true, 5e-324],
+            [[-3e-162, 3e-162], false, 1e-323],
+            [[-3e-162, 3e-162], true, 2e-323],
+            [[0, 1e-161], false, 2.5e-323],
+            [[0, 1e-161], true, 5e-323],
+            [[0, 3e-161, 6e-161], false, 6e-322],
+            [[0, 3e-161, 6e-161], true, 9e-322],
+            [[1e-161, 2e-161, 3e-161, 4e-161], false, 1.24e-322],
+            [[1e-161, 2e-161, 3e-161, 4e-161], true, 1.7e-322],
+            [[0, 5e-324, 3e-162], false, 0.0],
+            [[0, 5e-324, 3e-162], true, 5e-324],
+            [[0, 5e-324, 2e-161], false, 9e-323],
+            [[0, 5e-324, 2e-161], true, 1.33e-322],
+        ];
+    }
+
+    /**
      * @test toVariance over a large lazy iterable does not materialize the input
      */
     public function testLargeIterableMemoryBounded(): void

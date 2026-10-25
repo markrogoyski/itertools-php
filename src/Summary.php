@@ -519,8 +519,12 @@ final class Summary
             return false;
         }
 
+        // MultipleIterator attaches an Iterator once however many times it is passed, and an iterator is a
+        // permutation of itself, so a value is owned by every attached iterator: fewer than the inputs when
+        // one repeats.
+        $owners = $iterator->countIterators();
         foreach ($usageMap->getHashes() as $hash) {
-            if (!$usageMap->hasSameOwnerCount($hash, \count($iterables))) {
+            if (!$usageMap->hasSameOwnerCount($hash, $owners)) {
                 return false;
             }
         }

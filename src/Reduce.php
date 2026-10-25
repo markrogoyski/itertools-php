@@ -467,6 +467,9 @@ final class Reduce
      * It is not bit-reproducible: floating-point addition is not associative, so different
      * orderings may differ in the last ulp.
      *
+     * A subnormal variance takes Bessel's correction before it is rounded to the subnormal grid, so
+     * toVariance([0, 3e-162], true) is 5e-324, not 0.0. It is still not correctly rounded.
+     *
      * A non-finite value anywhere in the input yields NAN, since deviations from an infinite
      * mean are INF - INF. A variance that is itself too large to represent (for example values
      * straddling zero at PHP_FLOAT_MAX, whose true variance approaches 1e616) is reported as
@@ -500,21 +503,37 @@ final class Reduce
             return \NAN;
         }
 
-        if ($rescaled) {
-            // Undo the rescaling first. It is exact unless $scale lands below PHP_FLOAT_MIN, and then the
-            // variance, at most about $scale ** 2 * $count, is far below the smallest subnormal anyway.
-            $scale *= self::VARIANCE_DOWNSCALE;
-        }
+        // Undo the rescaling first. It is exact unless $scale lands below PHP_FLOAT_MIN, and then the
+        // variance, at most about $scale ** 2 * $count, is subnormal and taken below.
+        $unscaled = $rescaled ? $scale * self::VARIANCE_DOWNSCALE : $scale;
 
         // Unscale by interleaving the two multiplications. ($scale * $scale) * $weight would reach
         // INF for a representable variance whenever $weight < 1, which is exactly the prefix-overflow
         // case; multiplying $weight in first keeps every intermediate within range.
-        $variance = ($scale * $weight) * $scale;
+        $variance = ($unscaled * $weight) * $unscaled;
 
         // Bessel's correction, applied as a single ratio so that a large population variance is not
         // pushed to INF by an intermediate multiplication.
-        /** @psalm-suppress InvalidOperand */
-        return $sample ? $variance * ($count / ($count - 1)) : $variance;
+        if ($sample) {
+            /** @psalm-suppress InvalidOperand */
+            $variance *= $count / ($count - 1);
+        }
+        if ($variance >= \PHP_FLOAT_MIN) {
+            return $variance;
+        }
+
+        // A subnormal variance has lost resolution to each rounding onto the subnormal grid, and a
+        // population variance that rounded to 0.0 stays 0.0 whatever the correction: the sample variance
+        // of [0, 3e-162], 4.5e-324, would come out 0.0, not 5e-324. So Bessel's correction goes into
+        // $weight, which is at most about $count, and the variance, now far from overflow, is rounded
+        // onto the grid once, by the last multiplication.
+        if ($sample) {
+            /** @psalm-suppress InvalidOperand */
+            $weight *= $count / ($count - 1);
+        }
+        $variance = ($scale * $weight) * $scale;
+
+        return $rescaled ? $variance * (self::VARIANCE_DOWNSCALE * self::VARIANCE_DOWNSCALE) : $variance;
     }
 
     /**

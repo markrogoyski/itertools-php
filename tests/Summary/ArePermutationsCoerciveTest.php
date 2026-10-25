@@ -796,4 +796,79 @@ class ArePermutationsCoerciveTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertTrue($result);
     }
+
+    /**
+     * @test arePermutationsCoercive the same iterator twice is a permutation of itself
+     */
+    public function testIteratorTwice(): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::arePermutationsCoercive($iterator, $iterator);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test arePermutationsCoercive the same generator twice is a permutation of itself
+     */
+    public function testGeneratorTwice(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Summary::arePermutationsCoercive($generator, $generator);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test arePermutationsCoercive the same iterator twice and a permutation of it are permutations
+     */
+    public function testIteratorTwiceAndPermutation(): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::arePermutationsCoercive($iterator, $iterator, ['3', '1', '2']);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test arePermutationsCoercive the same iterator twice and a non-permutation of it are not permutations
+     */
+    public function testIteratorTwiceAndNonPermutation(): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::arePermutationsCoercive($iterator, $iterator, ['3', '1', '1']);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test arePermutationsCoercive the same iterator twice and a longer collection are not permutations
+     */
+    public function testIteratorTwiceAndLongerCollection(): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::arePermutationsCoercive($iterator, [3, 2, 1, 1], $iterator);
+
+        // Then
+        $this->assertFalse($result);
+    }
 }
