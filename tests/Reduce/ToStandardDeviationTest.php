@@ -894,6 +894,94 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toStandardDeviation of ints beyond ±2^53 keeps the differences their conversion to float would
+     *               round away
+     * @dataProvider dataProviderForLargeInts
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testLargeIntsAreExact(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toStandardDeviation($data, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof)
+     *   float(Fraction(math.isqrt(v.numerator * 4 ** 200 // v.denominator), 2 ** 200)), checked to equal
+     *   the same with the root's last bit incremented, so the truncation cannot change the rounding
+     */
+    public static function dataProviderForLargeInts(): array
+    {
+        return [
+            [[2 ** 53, 2 ** 53 + 1], false, 0.5],
+            [[2 ** 53, 2 ** 53 + 1], true, 0.7071067811865476],
+            [[2 ** 53 + 1, 2 ** 53 + 2, 2 ** 53 + 4], true, 1.5275252316519468],
+            [[2 ** 62, 2 ** 62 + 1, 2 ** 62 + 2], false, 0.816496580927726],
+            [[2 ** 62, 2 ** 62 + 1, 2 ** 62 + 2], true, 1.0],
+            [[2 ** 62 + 3000, 2 ** 62], false, 1500.0],
+            [[2 ** 62 + 3000, 2 ** 62], true, 2121.3203435596424],
+            [[-(2 ** 53) - 1, -(2 ** 53) - 2, -(2 ** 53) - 4], true, 1.5275252316519468],
+            [[\PHP_INT_MAX, \PHP_INT_MAX - 1, \PHP_INT_MAX - 3], true, 1.5275252316519468],
+            [[\PHP_INT_MIN, \PHP_INT_MIN + 1], false, 0.5],
+            [[\PHP_INT_MIN, \PHP_INT_MIN + 1], true, 0.7071067811865476],
+            // Low 11 bits near 2047, which leave the compensation term little room beside them
+            [[2 ** 53 + 2044, 2 ** 53 + 2044, 2 ** 53 + 2046, 2 ** 53 + 2046], false, 1.0],
+            [[2 ** 53 + 2044, 2 ** 53 + 2044, 2 ** 53 + 2046, 2 ** 53 + 2046], true, 1.1547005383792515],
+            [[-(2 ** 53) - 2044, -(2 ** 53) - 2044, -(2 ** 53) - 2046, -(2 ** 53) - 2046], false, 1.0],
+            [[-(2 ** 53) - 2044, -(2 ** 53) - 2044, -(2 ** 53) - 2046, -(2 ** 53) - 2046], true, 1.1547005383792515],
+            [[2 ** 62 + 2047, 2 ** 62 + 2046, 2 ** 62 + 2047, 2 ** 62 + 2046], false, 0.5],
+            [[2 ** 62 + 2047, 2 ** 62 + 2046, 2 ** 62 + 2047, 2 ** 62 + 2046], true, 0.5773502691896257],
+            // Mixed with floats
+            [[2.0 ** 53, 2 ** 53 + 1], false, 0.5],
+            [[2.0 ** 53, 2 ** 53 + 1], true, 0.7071067811865476],
+            [[2 ** 53 + 1, 9007199254740994.0, 2 ** 53 + 3], false, 0.816496580927726],
+            [[2 ** 53 + 1, 9007199254740994.0, 2 ** 53 + 3], true, 1.0],
+        ];
+    }
+
+    /**
+     * @test         toStandardDeviation of ints beyond ±2^53 keeps their differences, to within rounding
+     * @dataProvider dataProviderForLargeIntsWithinRounding
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testLargeIntsWithinRounding(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toStandardDeviation($data, $sample);
+
+        // Then (the result is not correctly rounded: the per-value updates round as they do for any spread,
+        // and toStandardDeviation([1, 2, 4]) is likewise 1.2472191289246473, an ulp from the oracle)
+        $this->assertEqualsWithDelta($expected, $result, 4 * \PHP_FLOAT_EPSILON * \abs($expected));
+    }
+
+    /**
+     * Test data generated with Python (exact rational variance, then its correctly rounded square root):
+     *   mean = sum(map(Fraction, data)) / n
+     *   v    = sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof)
+     *   float(Fraction(math.isqrt(v.numerator * 4 ** 200 // v.denominator), 2 ** 200)), checked to equal
+     *   the same with the root's last bit incremented, so the truncation cannot change the rounding
+     */
+    public static function dataProviderForLargeIntsWithinRounding(): array
+    {
+        return [
+            [[2 ** 53 + 1, 2 ** 53 + 2, 2 ** 53 + 4], false, 1.247219128924647],
+            [[-(2 ** 53) - 1, -(2 ** 53) - 2, -(2 ** 53) - 4], false, 1.247219128924647],
+            [[\PHP_INT_MAX, \PHP_INT_MAX - 1, \PHP_INT_MAX - 3], false, 1.247219128924647],
+            [[2 ** 53 + 2047, 2 ** 53 + 2045, 2 ** 53 + 2047, 2 ** 53 + 2045, 2 ** 53 + 2047], false, 0.9797958971132712],
+            [[2 ** 53 + 2047, 2 ** 53 + 2045, 2 ** 53 + 2047, 2 ** 53 + 2045, 2 ** 53 + 2047], true, 1.0954451150103321],
+        ];
+    }
+
+    /**
      * @test toStandardDeviation is invariant to input order
      */
     public function testOrderInvariance(): void

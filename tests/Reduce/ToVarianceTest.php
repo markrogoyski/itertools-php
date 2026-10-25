@@ -573,6 +573,89 @@ class ToVarianceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toVariance of ints beyond ±2^53 keeps the differences their conversion to float would round away
+     * @dataProvider dataProviderForLargeInts
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testLargeIntsAreExact(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toVariance($data, $sample);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python (exact rational variance, correctly rounded to a float):
+     *   mean = sum(map(Fraction, data)) / n
+     *   float(sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof))
+     */
+    public static function dataProviderForLargeInts(): array
+    {
+        return [
+            [[2 ** 53, 2 ** 53 + 1], false, 0.25],
+            [[2 ** 53, 2 ** 53 + 1], true, 0.5],
+            [[2 ** 62, 2 ** 62 + 1, 2 ** 62 + 2], false, 0.6666666666666666],
+            [[2 ** 62, 2 ** 62 + 1, 2 ** 62 + 2], true, 1.0],
+            [[2 ** 62 + 3000, 2 ** 62], false, 2250000.0],
+            [[2 ** 62 + 3000, 2 ** 62], true, 4500000.0],
+            [[\PHP_INT_MIN, \PHP_INT_MIN + 1], false, 0.25],
+            [[\PHP_INT_MIN, \PHP_INT_MIN + 1], true, 0.5],
+            // Low 11 bits near 2047, which leave the compensation term little room beside them
+            [[2 ** 53 + 2044, 2 ** 53 + 2044, 2 ** 53 + 2046, 2 ** 53 + 2046], false, 1.0],
+            [[2 ** 53 + 2044, 2 ** 53 + 2044, 2 ** 53 + 2046, 2 ** 53 + 2046], true, 1.3333333333333333],
+            [[-(2 ** 53) - 2044, -(2 ** 53) - 2044, -(2 ** 53) - 2046, -(2 ** 53) - 2046], false, 1.0],
+            [[-(2 ** 53) - 2044, -(2 ** 53) - 2044, -(2 ** 53) - 2046, -(2 ** 53) - 2046], true, 1.3333333333333333],
+            [[2 ** 62 + 2047, 2 ** 62 + 2046, 2 ** 62 + 2047, 2 ** 62 + 2046], false, 0.25],
+            [[2 ** 62 + 2047, 2 ** 62 + 2046, 2 ** 62 + 2047, 2 ** 62 + 2046], true, 0.3333333333333333],
+            // Mixed with floats
+            [[2.0 ** 53, 2 ** 53 + 1], false, 0.25],
+            [[2.0 ** 53, 2 ** 53 + 1], true, 0.5],
+            [[2 ** 53 + 1, 9007199254740994.0, 2 ** 53 + 3], false, 0.6666666666666666],
+            [[2 ** 53 + 1, 9007199254740994.0, 2 ** 53 + 3], true, 1.0],
+        ];
+    }
+
+    /**
+     * @test         toVariance of ints beyond ±2^53 keeps their differences, to within rounding
+     * @dataProvider dataProviderForLargeIntsWithinRounding
+     * @param        array $data
+     * @param        bool  $sample
+     * @param        float $expected
+     */
+    public function testLargeIntsWithinRounding(array $data, bool $sample, float $expected): void
+    {
+        // When
+        $result = Reduce::toVariance($data, $sample);
+
+        // Then (the result is not correctly rounded: the per-value updates round as they do for any spread,
+        // and toVariance([1, 2, 4]) is likewise 1.5555555555555558, an ulp from the oracle)
+        $this->assertEqualsWithDelta($expected, $result, 4 * \PHP_FLOAT_EPSILON * \abs($expected));
+    }
+
+    /**
+     * Test data generated with Python (exact rational variance, correctly rounded to a float):
+     *   mean = sum(map(Fraction, data)) / n
+     *   float(sum((Fraction(x) - mean) ** 2 for x in data) / (n - ddof))
+     */
+    public static function dataProviderForLargeIntsWithinRounding(): array
+    {
+        return [
+            [[2 ** 53 + 1, 2 ** 53 + 2, 2 ** 53 + 4], false, 1.5555555555555556],
+            [[2 ** 53 + 1, 2 ** 53 + 2, 2 ** 53 + 4], true, 2.3333333333333335],
+            [[-(2 ** 53) - 1, -(2 ** 53) - 2, -(2 ** 53) - 4], false, 1.5555555555555556],
+            [[-(2 ** 53) - 1, -(2 ** 53) - 2, -(2 ** 53) - 4], true, 2.3333333333333335],
+            [[\PHP_INT_MAX, \PHP_INT_MAX - 1, \PHP_INT_MAX - 3], false, 1.5555555555555556],
+            [[\PHP_INT_MAX, \PHP_INT_MAX - 1, \PHP_INT_MAX - 3], true, 2.3333333333333335],
+            [[2 ** 53 + 2047, 2 ** 53 + 2045, 2 ** 53 + 2047, 2 ** 53 + 2045, 2 ** 53 + 2047], false, 0.96],
+            [[2 ** 53 + 2047, 2 ** 53 + 2045, 2 ** 53 + 2047, 2 ** 53 + 2045, 2 ** 53 + 2047], true, 1.2],
+        ];
+    }
+
+    /**
      * @test toVariance propagates NAN when the input contains NAN
      */
     public function testNanInputPropagates(): void

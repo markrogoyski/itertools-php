@@ -664,8 +664,30 @@ final class Reduce
                 }
             }
 
-            /** @psalm-suppress InvalidOperand */
-            $delta = ($value - $meanHi) - $meanLo;
+            if (
+                \is_int($value)
+                && ($value > Arithmetic::FLOAT_EXACT_INT_LIMIT || $value < -Arithmetic::FLOAT_EXACT_INT_LIMIT)
+            ) {
+                // Converting an int beyond ±2^53 to float rounds off its low bits, which for [2^53, 2^53 + 1]
+                // are the whole spread. Split it into two parts that each convert exactly: the int with its low
+                // 11 bits cleared (at most 52 significant bits, even at PHP_INT_MIN and PHP_INT_MAX) and those
+                // bits. The first less $meanHi is exact once the mean is close, an integer as $meanHi is beyond
+                // 2^53, and adding the low bits to it then is exact too. $meanLo goes last, as in the float path
+                // below: subtracted from the low bits first, it would round to the resolution of up to 2047, and
+                // lose the bits the spread is made of. The sum of the two parts can still round, as the first
+                // value's delta, the value itself, does: 2Sum recovers that rounding, and its share of the step
+                // goes into $meanLo, so the mean of [2^53 + 1] is exact.
+                $lowBits  = (float) ($value & 0x7FF);
+                $high     = (float) ($value - ($value & 0x7FF)) - $meanHi;
+                $integral = $high + $lowBits;
+                $shifted  = $integral - $high;
+                $delta    = $integral - $meanLo;
+                /** @psalm-suppress InvalidOperand */
+                $meanLo  += (($high - ($integral - $shifted)) + ($lowBits - $shifted)) / $count;
+            } else {
+                /** @psalm-suppress InvalidOperand */
+                $delta = ($value - $meanHi) - $meanLo;
+            }
             /** @psalm-suppress InvalidOperand */
             $step = $delta / $count;
 
