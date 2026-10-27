@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace IterTools\Util\Iterators;
 
-use IterTools\Transform;
-
 /**
+ * Every iterator replays the shared cache from the start. A clone is another handle on the same
+ * memoized sequence: it shares the source and the cache with the original.
+ *
  * @internal
  *
  * @template TKey
@@ -15,116 +16,18 @@ use IterTools\Transform;
  */
 final class MemoizedIterable implements \IteratorAggregate
 {
-    /** @var iterable<mixed, mixed>|null */
-    private ?iterable $iterable;
-
-    /** @var \Iterator<mixed, mixed>|null */
-    private ?\Iterator $source = null;
-
-    /** @var list<TKey> */
-    private array $keys = [];
-
-    /** @var list<TValue> */
-    private array $values = [];
-
-    /** Number of cached elements; a cached null value is not a gap, so occupancy is not read with isset. */
-    private int $cached = 0;
-
-    private bool $initialized = false;
-    private bool $exhausted = false;
-    private ?\Throwable $failure = null;
-    private ?int $failureIndex = null;
-    private bool $advancing = false;
+    /** @var MemoCache<TKey, TValue> */
+    private readonly MemoCache $cache;
 
     /** @param iterable<TKey, TValue> $iterable */
     public function __construct(iterable $iterable)
     {
-        $this->iterable = $iterable;
+        $this->cache = new MemoCache($iterable);
     }
 
     /** @return \Generator<TKey, TValue> */
     public function getIterator(): \Generator
     {
-        $position = 0;
-        while (true) {
-            if ($position < $this->cached) {
-                $key = $this->keys[$position];
-                $value = $this->values[$position];
-                ++$position;
-                yield $key => $value;
-                continue;
-            }
-
-            if ($this->failure !== null && $position === $this->failureIndex) {
-                throw $this->failure;
-            }
-            if ($this->exhausted) {
-                return;
-            }
-
-            $this->advanceFrontier();
-        }
-    }
-
-    private function advanceFrontier(): void
-    {
-        if ($this->advancing) {
-            throw new \LogicException('Memoized iterable cannot advance its source re-entrantly');
-        }
-
-        $this->advancing = true;
-        try {
-            if (!$this->initialized) {
-                $this->initializeSource();
-            } else {
-                $this->advanceSource();
-            }
-        } catch (\Throwable $exception) {
-            $this->failure = $exception;
-            $this->failureIndex = $this->cached;
-        } finally {
-            $this->advancing = false;
-        }
-    }
-
-    private function initializeSource(): void
-    {
-        $this->initialized = true;
-        $iterable = $this->iterable;
-        $this->iterable = null;
-        if ($iterable === null) {
-            throw new \LogicException('Memoized iterable source is unavailable');
-        }
-
-        $this->source = Transform::toIterator($iterable);
-        $this->source->rewind();
-        $this->cacheCurrentSourceValue();
-    }
-
-    private function advanceSource(): void
-    {
-        if ($this->source === null) {
-            throw new \LogicException('Memoized iterable source is unavailable');
-        }
-
-        $this->source->next();
-        $this->cacheCurrentSourceValue();
-    }
-
-    private function cacheCurrentSourceValue(): void
-    {
-        if ($this->source === null) {
-            throw new \LogicException('Memoized iterable source is unavailable');
-        }
-        if (!$this->source->valid()) {
-            $this->exhausted = true;
-            return;
-        }
-
-        $key = $this->source->key();
-        $value = $this->source->current();
-        $this->keys[] = $key;
-        $this->values[] = $value;
-        ++$this->cached;
+        return $this->cache->replay();
     }
 }

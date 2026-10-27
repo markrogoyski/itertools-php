@@ -81,6 +81,9 @@ final class Transform
     /**
      * Lazily cache an iterable so current and future consumers can replay it.
      *
+     * A clone of the result is another handle on the same memoized sequence: it shares the source and
+     * the cache with the original.
+     *
      * @template TKey
      * @template TValue
      *
