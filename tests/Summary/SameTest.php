@@ -8,6 +8,7 @@ use IterTools\Summary;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Tests\Fixture\RecordingIteratorFixture;
 
 class SameTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,6 +19,76 @@ class SameTest extends \PHPUnit\Framework\TestCase
     {
         // When
         $result = Summary::same();
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test A single iterable is the same as itself without being read.
+     */
+    public function testSingleIterableIsNotRead(): void
+    {
+        // Given
+        $pulled = [];
+        $iterator = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Summary::same($iterator);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test A single throwing iterable is the same as itself without its exception being raised.
+     */
+    public function testSingleThrowingIterable(): void
+    {
+        // Given
+        $throwing = (static function (): \Generator {
+            throw new \RuntimeException('must not be pulled');
+            yield; // unreachable
+        })();
+
+        // When
+        $result = Summary::same($throwing);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test The same iterator passed twice is the same as itself without being read.
+     */
+    public function testRepeatedIteratorIsNotRead(): void
+    {
+        // Given
+        $pulled = [];
+        $iterator = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Summary::same($iterator, $iterator);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test The same throwing generator passed twice is the same as itself without its exception being raised.
+     */
+    public function testRepeatedThrowingIterable(): void
+    {
+        // Given
+        $throwing = (static function (): \Generator {
+            throw new \RuntimeException('must not be pulled');
+            yield; // unreachable
+        })();
+
+        // When
+        $result = Summary::same($throwing, $throwing);
 
         // Then
         $this->assertTrue($result);

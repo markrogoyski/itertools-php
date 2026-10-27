@@ -2762,7 +2762,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if iterable source and all given collections are the same.
      *
-     * For single iterable or empty iterables list returns true.
+     * For empty iterables list returns true without reading the stream. So does the stream's own source
+     * iterator or generator passed as the only collection: Stream::of($it)->sameWith($it).
      *
      * @param iterable<mixed> ...$iterables
      *

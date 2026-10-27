@@ -446,4 +446,55 @@ class StreamSummaryTier3Test extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
         $this->assertSame([1, 2], $pulled);
     }
+
+    /**
+     * @test sameWith - does not read an iterator stream compared with no collections
+     */
+    public function testSameWithNoCollectionsDoesNotReadIterator(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Stream::of($data)->sameWith();
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test sameWith - does not read an IteratorAggregate stream compared with no collections
+     */
+    public function testSameWithNoCollectionsDoesNotReadIteratorAggregate(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new RecordingIteratorAggregateFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Stream::of($data)->sameWith();
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test sameWith - does not read an iterator stream compared with its own source
+     */
+    public function testSameWithOwnSourceDoesNotReadIterator(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Stream::of($data)->sameWith($data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
 }

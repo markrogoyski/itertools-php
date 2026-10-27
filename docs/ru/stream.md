@@ -2660,7 +2660,7 @@ $boolean = Stream::of($grades)->noneMatch($isPassingGrade);
 
 ```$stream->sameWith(iterable ...$iterables): bool```
 
-Если в метод не передать ни одной коллекции, он вернет истину.
+Если в метод не передать ни одной коллекции, он вернет истину, не читая поток. Так же и если передать единственной коллекцией итератор или генератор, из которого создан поток: `Stream::of($it)->sameWith($it)`.
 
 ```php
 use IterTools\Stream;

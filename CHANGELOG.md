@@ -44,6 +44,7 @@
 * Transform: `memoize` split the source's elements between a cloned result and the original, each caching only the elements it pulled, and a clone made before the first element was read could rewind or re-read the source. A clone now shares the source and the cache with the original.
 * Reduce: `toNth` (and `Stream::toNth`) threw `\LengthException` for an existing position when a `Countable` under-reported its size; it now reads the elements. `toCount` still trusts `Countable::count()`, and `toRandomValue` a nonzero one, which is now documented.
 * Single, Summary, Reduce, Transform: functions that coerce an element or a predicate's return value to bool (`filter`, `takeWhile`, `dropWhile`, `allMatch`, `anyMatch`, `exactlyN`, `isPartitioned`, `partition`, `compress`, and others, with their Stream wrappers) raised PHP 8.5's "unexpected NAN value was coerced to bool" warning for a `NAN`; it is still `true`, and no longer warns. A `NAN` coerced inside a user's own predicate still warns.
+* Summary: `same` (and `Stream::sameWith`) read a single source in full, or the same iterator or generator passed more than once (`same($it, $it)`), which never returned for an infinite source and raised a throwing source's exception; such a source is now not read.
 
 ### Changes
 * Single: a float `range` (and `Stream::ofRange`) spanning a whole number of steps, to within the rounding its operands carry, now ends exactly on `$end`; `range(0.3, 0.9, 0.2)` yields `[0.3, 0.5, 0.7, 0.9]` where native `\range()` drops `0.9`.

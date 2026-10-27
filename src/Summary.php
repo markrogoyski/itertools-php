@@ -301,7 +301,8 @@ final class Summary
     /**
      * Returns true if all given collections are the same.
      *
-     * For single iterable or empty iterables list returns true.
+     * For single iterable or empty iterables list returns true without reading the iterable. So does one
+     * iterator or generator passed more than once: same($it, $it) returns true without reading $it.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -309,7 +310,18 @@ final class Summary
      */
     public static function same(iterable ...$iterables): bool
     {
+        if (\count($iterables) < 2) {
+            return true;
+        }
+
         $iterator = self::comparisonIterator(...$iterables);
+
+        // MultipleIterator attaches an Iterator once however many times it is passed, and an iterator is the
+        // same as itself, so with one attached iterator there is nothing to compare.
+        if ($iterator->countIterators() < 2) {
+            return true;
+        }
+
         foreach ($iterator as $values) {
             foreach (Single::pairwise($values) as [$lhs, $rhs]) {
                 if ($lhs !== $rhs) {

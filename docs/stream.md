@@ -2669,7 +2669,7 @@ Returns true if iterable source and all given collections are the same.
 
 ```$stream->sameWith(iterable ...$iterables): bool```
 
-For empty iterables list returns true.
+For empty iterables list returns true without reading the stream. So does the stream's own source iterator or generator passed as the only collection: `Stream::of($it)->sameWith($it)`.
 
 ```php
 use IterTools\Stream;
