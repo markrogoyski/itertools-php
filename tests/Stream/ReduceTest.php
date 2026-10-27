@@ -10,6 +10,7 @@ use IterTools\Tests\Fixture\DataProvider;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 use IterTools\Tests\Fixture\MisreportingCountableFixture;
+use IterTools\Tests\Fixture\SinglePassMisreportingCountableFixture;
 
 class ReduceTest extends \PHPUnit\Framework\TestCase
 {
@@ -3269,6 +3270,59 @@ class ReduceTest extends \PHPUnit\Framework\TestCase
 
         // When
         Stream::of($data)->toRandomValue();
+    }
+
+    /**
+     * @test Stream::toRandomValue reads a Countable that misreports its size, once
+     * @dataProvider dataProviderForToRandomValueMisreportingCountable
+     * @param \Countable&\Traversable $data
+     * @param array $expected
+     */
+    public function testToRandomValueMisreportingCountable(\Countable&\Traversable $data, array $expected): void
+    {
+        // When
+        $result = Stream::of($data)->toRandomValue();
+
+        // Then
+        $this->assertContains($result, $expected);
+    }
+
+    /**
+     * A count of PHP_INT_MAX puts the chosen index past the end in all but 3 in 2^63 calls.
+     */
+    public static function dataProviderForToRandomValueMisreportingCountable(): array
+    {
+        return [
+            [
+                new SinglePassMisreportingCountableFixture([1, 2, 3], 0),
+                [1, 2, 3],
+            ],
+            [
+                new \CachingIterator(new \ArrayIterator([1, 2, 3]), \CachingIterator::FULL_CACHE),
+                [1, 2, 3],
+            ],
+            [
+                new SinglePassMisreportingCountableFixture([1, 2, 3], \PHP_INT_MAX),
+                [1, 2, 3],
+            ],
+            [
+                new SinglePassMisreportingCountableFixture(['a' => 'aa', 'b' => 'bb', 'c' => 'cc'], \PHP_INT_MAX),
+                ['aa', 'bb', 'cc'],
+            ],
+        ];
+    }
+
+    /**
+     * @test Stream::toRandomValue throws LengthException for an empty Countable that over-reports its size
+     */
+    public function testToRandomValueErrorOnEmptyOverReportingCountable(): void
+    {
+        // Then
+        $this->expectException(\LengthException::class);
+        $this->expectExceptionMessage('Given iterable must be non-empty');
+
+        // When
+        Stream::of(new SinglePassMisreportingCountableFixture([], 5))->toRandomValue();
     }
 
     /**

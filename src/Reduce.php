@@ -1290,8 +1290,11 @@ final class Reduce
     /**
      * Reduces given collection random value in from within it.
      *
-     * Uses Countable::count() when the iterable is countable to choose the index, so a Countable that
-     * misreports its size (such as a CachingIterator over a source it has not read yet) gives a wrong index.
+     * Uses Countable::count() when the iterable is countable and reports a nonzero size to choose the index,
+     * so a Countable that under-reports its size picks from only its first count() elements. One that
+     * reports 0 (such as a CachingIterator over a source it has not read yet) is read in full. One that
+     * over-reports is read once, up to the chosen index or, when that index is past its end, in full, and
+     * each of its elements is equally likely.
      *
      * @param iterable<mixed> $data
      *
@@ -1301,12 +1304,15 @@ final class Reduce
      */
     public static function toRandomValue(iterable $data): mixed
     {
-        if (\is_countable($data)) {
-            if (\count($data) === 0) {
-                throw new \LengthException('Given iterable must be non-empty');
-            }
-
+        if (\is_countable($data) && \count($data) > 0) {
             $targetIndex = \mt_rand(0, \count($data) - 1);
+
+            // If count() over-reports, the source runs out before the target index, and a single-pass source
+            // can't be read again: keep one element read, sampled uniformly (reservoir sampling), to fall back
+            // on. An array's count is exact, so it needs no fallback.
+            $sampleFallback = !\is_array($data);
+            /** @var mixed $fallback */
+            $fallback = null;
 
             $index = 0;
             foreach ($data as $datum) {
@@ -1315,8 +1321,18 @@ final class Reduce
                     return $datum;
                 }
 
+                if ($sampleFallback && \mt_rand(0, $index) === 0) {
+                    $fallback = $datum;
+                }
+
                 ++$index;
             }
+
+            if ($index > 0) {
+                return $fallback;
+            }
+
+            throw new \LengthException('Given iterable must be non-empty');
         }
 
         $data = Transform::toArray($data);

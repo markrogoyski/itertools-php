@@ -536,7 +536,7 @@ Reduces given collection to a random value within it.
 
 ```Reduce::toRandomValue(iterable $data): mixed```
 
-Uses `Countable::count()` when the collection is countable to choose the index. A `Countable` that misreports its size, such as a `\CachingIterator` with `FULL_CACHE` over a source it has not read yet, gives a wrong index.
+Uses `Countable::count()` when the collection is countable and reports a nonzero size to choose the index. A `Countable` that under-reports its size picks from only its first `count()` elements. One that reports `0`, such as a `\CachingIterator` with `FULL_CACHE` over a source it has not read yet, is read in full. One that over-reports is read once, up to the chosen index or, when that index is past its end, in full, and each of its elements is equally likely.
 
 ```php
 use IterTools\Reduce;

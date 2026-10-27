@@ -3186,8 +3186,11 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns a random element of stream.
      *
-     * Uses Countable::count() when the source is countable to choose the index, so a Countable that
-     * misreports its size (such as a CachingIterator) gives a wrong index.
+     * Uses Countable::count() when the source is countable and reports a nonzero size to choose the index,
+     * so a Countable that under-reports its size picks from only its first count() elements. One that
+     * reports 0 (such as a CachingIterator over a source it has not read yet) is read in full. One that
+     * over-reports is read once, up to the chosen index or, when that index is past its end, in full, and
+     * each of its elements is equally likely.
      *
      * @return mixed
      *
