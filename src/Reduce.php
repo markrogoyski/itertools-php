@@ -348,6 +348,8 @@ final class Reduce
      * The mean of finite values is finite even when their sum overflows, as for
      * [PHP_FLOAT_MAX, PHP_FLOAT_MAX], whose mean is PHP_FLOAT_MAX.
      *
+     * An int sum that overflows continues as a float, as PHP arithmetic does, so it may lose precision.
+     *
      * Returns null if given collection is empty.
      *
      * @param iterable<numeric> $data
