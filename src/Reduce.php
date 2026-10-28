@@ -965,8 +965,11 @@ final class Reduce
     {
         // The midpoint of a value and itself is that value. Taken first so that two identical
         // infinities return that infinity rather than the NAN that INF - INF would give below.
+        // -0.0 === 0.0 holds too, so zeros are summed instead: -0.0 + 0.0 is 0.0 in either order,
+        // and only two -0.0 give -0.0, as ($lo + $hi) / 2 does.
         if ($lo === $hi) {
-            return $lo;
+            /** @psalm-suppress InvalidOperand */
+            return $lo == 0 ? $lo + $hi : $lo;
         }
 
         // An infinity paired with a finite value is that infinity, and opposite infinities are NAN;

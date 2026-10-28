@@ -251,6 +251,41 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toQuantile(0.5) of middle values -0.0 and 0.0 is 0.0 in either order, and -0.0 only when both are -0.0
+     * @dataProvider dataProviderForSignedZeroMiddleValues
+     * @param        array $data
+     * @param        float $expectedReciprocal
+     */
+    public function testHalfQuantileOfSignedZeros(array $data, float $expectedReciprocal): void
+    {
+        // When
+        $result = Reduce::toQuantile($data, 0.5);
+
+        // Then (assertSame() takes -0.0 and 0.0 as the same, so the sign is checked through 1 / ±0.0 = ±INF)
+        $this->assertSame(0.0, $result);
+        $this->assertSame($expectedReciprocal, \fdiv(1.0, $result));
+    }
+
+    /**
+     * Test data generated with NumPy (the sign of the zero result, as the reciprocal ±INF):
+     *   math.copysign(math.inf, numpy.quantile(data, 0.5, method='linear'))
+     */
+    public static function dataProviderForSignedZeroMiddleValues(): array
+    {
+        return [
+            [[-0.0, 0.0], \INF],
+            [[0.0, -0.0], \INF],
+            [[-0.0, -0.0], -\INF],
+            [[0.0, 0.0], \INF],
+            [[-0.0, 0], \INF],
+            [[0, -0.0], \INF],
+            [[1.0, -0.0, 0.0, -1.0], \INF],
+            [[-1.0, 0.0, -0.0, 1.0], \INF],
+            [[-0.0, -0.0, 1.0, -1.0], -\INF],
+        ];
+    }
+
+    /**
      * Test data generated with Python (exact R-7 interpolation at p = 100q, correctly rounded to a float):
      *   h = (len(x) - 1) * Fraction(q), j = floor(h)
      *   float(Fraction(x[j]) + (h - j) * (Fraction(x[j + 1]) - Fraction(x[j])))
