@@ -129,6 +129,13 @@ class EndsWithCoerciveTest extends \PHPUnit\Framework\TestCase
             [[0, 1], [false, true]],
             // float/int coercion
             [[1.0], [1]],
+            // source one longer than suffix
+            [[1, 2, 3, 4], ['2', '3', '4']],
+            // source length not a multiple of suffix length
+            [[1, 2, 3, 4, 5, 6, 7], ['5', 6, '7']],
+            [[1, 2, 3, 4, 5, 6, 7, 8], [6, '7', 8.0]],
+            // source length a multiple of suffix length
+            [[1, 2, 3, 4, 5, 6, 7, 8, 9], ['7', '8', '9']],
         ];
     }
 
@@ -213,6 +220,16 @@ class EndsWithCoerciveTest extends \PHPUnit\Framework\TestCase
             [[1, 2], [1, 2, 3]],
             // distinct values
             [[1, 2], ['a', 2]],
+            // source one longer than suffix
+            [[1, 2, 3, 4], ['1', '2', '3']],
+            // mismatch at the oldest window element, source length not a multiple of suffix length
+            [[1, 2, 3, 4, 5, 6, 7], ['4', 6, 7]],
+            [[1, 2, 3, 4, 5, 6, 7, 8], ['5', 7, 8]],
+            // mismatch at the newest window element
+            [[1, 2, 3, 4, 5, 6, 7], [5, 6, '8']],
+            // suffix matches a window rotated from the end
+            [[1, 2, 3, 4, 5, 6, 7], ['7', 5, 6]],
+            [[1, 2, 3, 4, 5, 6, 7], [6, '7', 5]],
         ];
     }
 
@@ -417,6 +434,40 @@ class EndsWithCoerciveTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertFalse($result);
+    }
+
+    /**
+     * @test endsWithCoercive - a non-serializable object after the first mismatch does not throw when the
+     *       window has wrapped past its oldest element
+     */
+    public function testNonSerializableObjectAfterMismatchInWrappedWindowDoesNotThrow(): void
+    {
+        // Given
+        $data = [0, 1, new Fixture\NonSerializableFixture(1)];
+        $suffix = [2, new Fixture\NonSerializableFixture(1)];
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test endsWithCoercive - a non-serializable object in a wrapped window is reached during comparison
+     *       and throws
+     */
+    public function testNonSerializableObjectInWrappedWindowThrows(): void
+    {
+        // Given
+        $data = [0, 1, new Fixture\NonSerializableFixture(1), 3];
+        $suffix = [1, 2, 3];
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Summary::endsWithCoercive($data, $suffix);
     }
 
     /**

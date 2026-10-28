@@ -148,6 +148,15 @@ class EndsWithTest extends \PHPUnit\Framework\TestCase
             [['a', 'b', 'c'], ['b', 'c']],
             // mixed types — strict matches identical types
             [[1, 'a', 2.5], ['a', 2.5]],
+            // source one longer than suffix
+            [[1, 2, 3, 4], [2, 3, 4]],
+            // source length not a multiple of suffix length
+            [[1, 2, 3, 4, 5, 6, 7], [5, 6, 7]],
+            [[1, 2, 3, 4, 5, 6, 7, 8], [6, 7, 8]],
+            // source length a multiple of suffix length
+            [[1, 2, 3, 4, 5, 6, 7, 8, 9], [7, 8, 9]],
+            // repeated values across the source
+            [[1, 2, 1, 2, 1, 2, 1], [2, 1, 2, 1]],
         ];
     }
 
@@ -236,6 +245,16 @@ class EndsWithTest extends \PHPUnit\Framework\TestCase
             [[1, 2], ['1', '2']],
             [[0, 1], [false, true]],
             [[1.0], [1]],
+            // source one longer than suffix
+            [[1, 2, 3, 4], [1, 2, 3]],
+            // mismatch at the oldest window element, source length not a multiple of suffix length
+            [[1, 2, 3, 4, 5, 6, 7], [4, 6, 7]],
+            [[1, 2, 3, 4, 5, 6, 7, 8], [5, 7, 8]],
+            // mismatch at the newest window element
+            [[1, 2, 3, 4, 5, 6, 7], [5, 6, 8]],
+            // suffix matches a window rotated from the end
+            [[1, 2, 3, 4, 5, 6, 7], [7, 5, 6]],
+            [[1, 2, 3, 4, 5, 6, 7], [6, 7, 5]],
         ];
     }
 

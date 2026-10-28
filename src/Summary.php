@@ -769,52 +769,52 @@ final class Summary
             return true;
         }
 
+        // The window is a ring buffer of the last $suffixLen elements: element $count goes in slot
+        // $count % $suffixLen, so evicting the oldest is an overwrite rather than a reindex.
         $window = [];
+        $count = 0;
         if ($strict) {
             foreach ($data as $value) {
-                $window[] = \is_array($value) ? Snapshot::of($value) : $value;
-                if (\count($window) > $suffixLen) {
-                    \array_shift($window);
-                }
+                $window[$count++ % $suffixLen] = \is_array($value) ? Snapshot::of($value) : $value;
             }
         } else {
             foreach ($data as $value) {
+                $entry = $value;
                 if (\is_array($value) || \is_object($value)) {
                     // Wrapped in an array, which no other window entry is, to tell the key from a string
                     // element.
                     try {
-                        $window[] = [UniqueExtractor::getString($value, false)];
+                        $entry = [UniqueExtractor::getString($value, false)];
                     } catch (\InvalidArgumentException $e) {
-                        $window[] = $e;
+                        $entry = $e;
                     }
-                } else {
-                    $window[] = $value;
                 }
-                if (\count($window) > $suffixLen) {
-                    \array_shift($window);
-                }
+                $window[$count++ % $suffixLen] = $entry;
             }
         }
 
-        if (\count($window) !== $suffixLen) {
+        if ($count < $suffixLen) {
             return false;
         }
 
-        for ($i = 0; $i < $suffixLen; $i++) {
+        // Once full, the oldest element is in the slot the next one would have been written to.
+        for ($i = 0, $slot = $count % $suffixLen; $i < $suffixLen; $i++, $slot = ($slot + 1) % $suffixLen) {
             if ($strict) {
-                if ($window[$i] !== $suffixArr[$i]) {
+                if ($window[$slot] !== $suffixArr[$i]) {
                     return false;
                 }
                 continue;
             }
             // Thrown in the order the elements would have been hashed: the source's, then the suffix's.
-            if ($window[$i] instanceof \InvalidArgumentException) {
-                throw $window[$i];
+            if ($window[$slot] instanceof \InvalidArgumentException) {
+                throw $window[$slot];
             }
             if ($suffixArr[$i] instanceof \InvalidArgumentException) {
                 throw $suffixArr[$i];
             }
-            $actual = \is_array($window[$i]) ? $window[$i][0] : UniqueExtractor::getString($window[$i], false);
+            $actual = \is_array($window[$slot])
+                ? $window[$slot][0]
+                : UniqueExtractor::getString($window[$slot], false);
             /** @var Identity $expected */
             $expected = $suffixArr[$i];
             if ($actual !== $expected->key) {
