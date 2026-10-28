@@ -101,7 +101,7 @@ foreach (Single::compress($movies, $goodMovies) as $goodMovie) {
 ### Compress Associative
 Compress an iterable by filtering out keys that are not selected.
 
-```Single::compressAssociative(iterable $data, array $selectorKeys)```
+```Single::compressAssociative(iterable $data, array $keys)```
 
 * Standard PHP array/iterator keys only (string, integer).
 
@@ -461,7 +461,7 @@ foreach (Single::limit($matrixMovies, $limit) as $goodMovie) {
 ### Map
 Map a function onto each element.
 
-```Single::map(iterable $data, callable $function)```
+```Single::map(iterable $data, callable $func)```
 
 ```php
 use IterTools\Single;
@@ -569,7 +569,7 @@ Yield a finite arithmetic progression of numbers, lazily.
 * With such exact int operands and a whole step (an int or an integral float), the element count comes from the exact span and each value is `$start ± i·|$step|` computed exactly and correctly rounded to float: `Single::range(PHP_INT_MIN, PHP_INT_MAX, 2.0**63)` yields `[-2^63, 0.0]`, and `Single::range(0.0, PHP_INT_MAX, 2**62)` yields 2 elements. With a fractional step, the values are computed in float, as for float operands, except from an int `$start` beyond ±2^53 that a float can't hold: those are `$start ± i·|$step|` computed exactly and correctly rounded, since a value computed from `$start` converted to float carries its rounding error. `Single::range(2**53 + 3, 0, -(2.0**52 - 0.5))` yields `[2^53 + 4, 2^52 + 4, 4.0]`, where computing from the converted `$start` ends on 5.0.
 * The rounding its operands carry is that of the decimals they are written as: half a float spacing of each non-integral float operand, and of a non-integral step for each step taken. An int, or an integral float that is its own shortest decimal (`2.0**53`, `1e16`), counts as exact; `1e23` isn't, and stands for 10^23. Beyond that, the element count follows the exact span: `Single::range(0.0, 1.0, 0.1)` ends on 1.0, but `Single::range(2.0**53, -0.1, -2.0**53)` yields `[2^53, 0.0]`, as its span 2^53 + 0.1 rounds to the step in float but holds one step and 0.1 more, and `Single::range(PHP_INT_MIN, 0, 2.0**52 - 0.5)` ends on -1024.0, as 2048 steps fall 1024 short, beyond the 512 their rounding allows. A non-integral step that is `($end - $start) / $n` computed in float also carries the rounding of the subtraction, which is allowed too, so such a range ends on `$end`: `Single::range(0.1, 5.0, (5.0 - 0.1) / 10)` ends on 5.0, although `5.0 - 0.1` rounds up by 3.6e-16. Any other step is allowed that rounding up to twice the operands' own, which leaves out an exact operand that absorbed part of the other in the subtraction, as in the `2.0**53` example. A range whose exact last value rounds to `$end` ends on `$end` too. Past 2^48 steps, with a step below 2^-900 or an operand beyond 2^995, the float quotient of span and step decides instead, to within 2ε of its value plus the operands' half spacings.
 * A step at or above the span of two float operands computed in float is compared with their exact span, which the float span can round up to the step: `Single::range(0.1, 2.0**53, 2.0**53)` throws, as the exact span is 2^53 − 0.1. The step is also accepted when the decimals the operands are written as span it, each non-integral float taken as its shortest decimal and an integral float as itself: `Single::range(-10.0, -3.6, 6.4)` yields `[-10.0, -3.6]`, although the floats' exact span is 6.4 − 4.4e-16, and `Single::range(0.1, 0.3, 0.2)` yields `[0.1, 0.3]`, although their float span is 0.19999999999999998. `Single::range(0.1, 0.2, 0.10000000000000002)` throws, as neither span reaches the step. A non-integral step computed as `$end - $start` is allowed the rounding of the subtraction, as for landing: `Single::range(-0.97, -4.0, -4.0 + 0.97)` yields `[-0.97, -4.0]`, although the step 3.0300000000000002 exceeds the exact span.
-* Throws `\InvalidArgumentException` when any operand is non-finite (`INF`/`-INF`/`NAN`), when `$step == 0`, when the step sign conflicts with the operand direction, or when `abs($step) > abs($end - $start)` (strictly greater than).
+* Throws `\InvalidArgumentException` when any operand is non-finite (`INF`/`-INF`/`NAN`), when `$step == 0`, when the step sign conflicts with the operand direction, or when `abs($step) > abs($end - $start)` (strictly greater than) and `$start != $end`.
 * Lazy: safely usable with large bounds when composed with downstream limiters.
 
 ```php
@@ -611,7 +611,7 @@ foreach (Single::repeat($data, $repetitions) as $repeated) {
 ### Reindex
 Reindex keys of key-value iterable using indexer function.
 
-```Single::reindex(iterable $data, callable $indexer)```
+```Single::reindex(iterable $data, callable $reindexer)```
 
 ```php
 use IterTools\Single;

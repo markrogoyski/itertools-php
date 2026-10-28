@@ -11,7 +11,7 @@
 
 Для пустой коллекции возвращает `null`.
 
-```Reduce::toAverage(iterable $data): float```
+```Reduce::toAverage(iterable $data): int|float|null```
 
 ```php
 use IterTools\Reduce;
@@ -251,7 +251,7 @@ $lastAdultName = Reduce::toLastMatchKey($users, fn (int $age) => $age >= 18);
 ### To Max
 Возвращает максимальный элемент коллекции.
 
-```Reduce::toMax(iterable $data, callable $compareBy = null): mixed|null```
+```Reduce::toMax(iterable $data, ?callable $compareBy = null): mixed```
 
 - Функция `$compareBy` должна возвращать сравнимое значение.
 - Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
@@ -309,7 +309,7 @@ $median = Reduce::toMedian($grades);
 ### To Min
 Возвращает минимальный элемент коллекции.
 
-```Reduce::toMin(iterable $data, callable $compareBy = null): mixed|null```
+```Reduce::toMin(iterable $data, ?callable $compareBy = null): mixed```
 
 - Функция `$compareBy` должна возвращать сравнимое значение.
 - Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
@@ -353,7 +353,7 @@ $lowestRatedMovie = Reduce::toMin($movieRatings, $compareBy);
 ### To Min Max
 Возвращает минимальный и максимальный элементы коллекции.
 
-```Reduce::toMinMax(iterable $numbers, callable $compareBy = null): array```
+```Reduce::toMinMax(iterable $numbers, ?callable $compareBy = null): array```
 
 - Функция `$compareBy` должна возвращать сравнимое значение.
 - Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
@@ -436,7 +436,7 @@ use IterTools\Reduce;
 $lotrMovies = ['The Fellowship of the Ring', 'The Two Towers', 'The Return of the King'];
 
 $rotk = Reduce::toNth($lotrMovies, 2);
-// 20
+// 'The Return of the King'
 ```
 
 ### To Only
@@ -490,7 +490,7 @@ $p75 = Reduce::toPercentile($scores, 75);
 
 Для пустой коллекции возвращает `null`.
 
-```Reduce::toProduct(iterable $data): number|null```
+```Reduce::toProduct(iterable $data): int|float|null```
 
 ```php
 use IterTools\Reduce;
@@ -605,7 +605,7 @@ $string = Reduce::toString($words, '-', 'Library: ', '!');
 ### To Sum
 Возвращает сумму элементов коллекции.
 
-```Reduce::toSum(iterable $data): number```
+```Reduce::toSum(iterable $data): int|float```
 
 ```php
 use IterTools\Reduce;

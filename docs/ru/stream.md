@@ -65,21 +65,21 @@ $result = Stream::ofCoinFlips(10)
 #### Of CSV File
 Создает поток из строк CSV-файла.
 
-```Stream::ofCsvFile(resource $fileHandle, string $separator = ',', string $enclosure = '"', string = $escape = '\\'): Stream```
+```Stream::ofCsvFile(resource $file, string $separator = ',', string $enclosure = '"', string $escape = '\\'): Stream```
 
 Значение по умолчанию `$escape = '\\'` не гарантирует точное чтение записанных данных: поле, оканчивающееся обратной косой чертой, например `C:\Users\`, записывается как `"C:\Users\"`, а при чтении последние `\"` принимаются за экранированную кавычку, поэтому поле не закрывается и поглощает следующие строки. Передавайте `$escape = ''` и при записи, и при чтении, чтобы отключить символ экранирования, как рекомендует PHP, и читайте файл с тем `$escape`, с которым он был записан. Значение по умолчанию остаётся `'\\'`, чтобы уже записанные файлы не изменились.
 
 ```php
 use IterTools\Stream;
 $fileHandle = \fopen('path/to/file.csv', 'r');
-$result = Stream::of($fileHandle)
+$result = Stream::ofCsvFile($fileHandle)
     ->toArray();
 ```
 
 #### Of CSV File Assoc
 Создает поток из строк CSV-файла как ассоциативных массивов с ключами из заголовков.
 
-```Stream::ofCsvFileAssoc(resource $fileHandle, ?array $headers = null, string $separator = ',', string $enclosure = '"', string $escape = '\\'): Stream```
+```Stream::ofCsvFileAssoc(resource $fileResource, ?array $headers = null, string $separator = ',', string $enclosure = '"', string $escape = '\\'): Stream```
 
 Значение по умолчанию `$escape = '\\'` не гарантирует точное чтение записанных данных: поле, оканчивающееся обратной косой чертой, например `C:\Users\`, записывается как `"C:\Users\"`, а при чтении последние `\"` принимаются за экранированную кавычку, поэтому поле не закрывается и поглощает следующие строки. `ofCsvFileAssoc` не выдаёт ошибку, если объединённая строка по-прежнему содержит столько полей, сколько заголовков (например, в файле с одним столбцом), и строки теряются молча. Передавайте `$escape = ''` и при записи, и при чтении, чтобы отключить символ экранирования, как рекомендует PHP, и читайте файл с тем `$escape`, с которым он был записан. Значение по умолчанию остаётся `'\\'`, чтобы уже записанные файлы не изменились.
 
@@ -110,11 +110,11 @@ $result = Stream::ofEmpty()
 #### Of File Lines
 Создает поток из строк файла.
 
-```Stream::ofFileLines(resource $fileHandle): Stream```
+```Stream::ofFileLines(resource $file): Stream```
 ```php
 use IterTools\Stream;
 $fileHandle = \fopen('path/to/file.txt', 'r');
-$result = Stream::of($fileHandle)
+$result = Stream::ofFileLines($fileHandle)
     ->map('strtoupper')
     ->toArray();
 ```
@@ -171,7 +171,7 @@ $stream = Stream::ofRandomPercentage(3)
 
 * Числовые строки (например, `"1"`, `"1.5"`, `"1e3"`, `"01"`) допустимы и приводятся к `int`/`float` перед итерацией. Не-числовые строки (например, `"a"`) приводят к `\InvalidArgumentException`.
 * Направление выводится из соотношения `$start` и `$end`. Отрицательный `$step` допустим только при убывающем направлении.
-* Выбрасывает `\InvalidArgumentException`, если какой-либо операнд не является конечным (в том числе числовые строки вроде `"1e309"`, переполняющиеся в `INF`), если `$step == 0`, если знак шага конфликтует с направлением операндов или если `abs($step) > abs($end - $start)`.
+* Выбрасывает `\InvalidArgumentException`, если какой-либо операнд не является конечным (в том числе числовые строки вроде `"1e309"`, переполняющиеся в `INF`), если `$step == 0`, если знак шага конфликтует с направлением операндов или если `abs($step) > abs($end - $start)` и `$start != $end`.
 * Ленивый поток — безопасно работает с большими границами совместно с downstream-операциями вроде `limit`.
 
 ```php
@@ -709,7 +709,7 @@ $result = Stream::of($input)
 #### Filter Keys
 Возвращает из потока только те элементы, для ключей которых предикат возвращает истину.
 
-```$stream->filterKeys(callable $filter): Stream```
+```$stream->filterKeys(callable $predicate): Stream```
 
 ```php
 use IterTools\Stream;
@@ -763,7 +763,7 @@ $result = Stream::of($inventory)
 #### Flat Map
 Отображение коллекции из потока с уплощением результата на 1 уровень вложенности.
 
-```$stream->flatMap(callable $mapper): Stream```
+```$stream->flatMap(callable $func): Stream```
 
 ```php
 use IterTools\Stream;
@@ -977,7 +977,7 @@ $goodMovies = Stream::of($matrixMovies)
 #### Map
 Отображение хранимой в потоке коллекции с использованием callback-функции.
 
-```$stream->map(callable $function): Stream```
+```$stream->map(callable $func): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1367,7 +1367,7 @@ $onlyTheBest = Stream::of($movies)
 
 Ленивая операция: вышестоящий поток никогда не продвигается дальше последнего возвращённого элемента. При `$count`, равном 0, вышестоящий поток не затрагивается вовсе. Элементы, пропускаемые из-за `$start` или `$step`, всё же должны быть вычитаны, чтобы быть пропущенными.
 
-```$stream->slice(int $start = 0, int $count = null, int $step = 1)```
+```$stream->slice(int $start = 0, ?int $count = null, int $step = 1)```
 
 ```php
 use IterTools\Stream;
@@ -1381,7 +1381,7 @@ $summerOlympics = Stream::of($olympics)
 #### Sort
 Сортирует хранимую в потоке коллекцию.
 
-```$stream->sort(callable $comparator = null)```
+```$stream->sort(?callable $comparator = null)```
 
 Если `$comparator` не передан, элементы хранимой коллекции должны быть сравнимы.
 Сравнение по умолчанию сравнивает целое число и float по точному значению и помещает float
@@ -1490,7 +1490,7 @@ $result = Stream::of($people)
 #### Largest
 Сводит поток к n наибольшим элементам (порядок убывания).
 
-```$stream->largest(int $n, callable $keyFn = null)```
+```$stream->largest(int $n, ?callable $keyFn = null)```
 
 Использует ограниченную кучу размера `n` — полная сортировка потока не выполняется.
 Устойчивая при равных ключах; пропускает NaN-ключи (но не NaN, вложенный в составной ключ; см.
@@ -1531,7 +1531,7 @@ $result = Stream::of($leaderboard)
 #### Smallest
 Сводит поток к n наименьшим элементам (порядок возрастания).
 
-```$stream->smallest(int $n, callable $keyFn = null)```
+```$stream->smallest(int $n, ?callable $keyFn = null)```
 
 Использует ограниченную кучу размера `n` — полная сортировка потока не выполняется.
 Устойчивая при равных ключах; пропускает NaN-ключи (но не NaN, вложенный в составной ключ; см.
@@ -1961,7 +1961,7 @@ $stream = Stream::of($input)
 
 Для закончившихся итераторов подставляет заданный филлер в кортеж значений итерации.
 
-```$stream->zipFilledWith(mixed $default, iterable ...$iterables): Stream```
+```$stream->zipFilledWith(mixed $filler, iterable ...$iterables): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1973,6 +1973,27 @@ $stream = Stream::of($input)
 
 foreach ($stream as $zipped) {
     // [1, A], [2, B], [3, ?]
+}
+```
+
+#### Zip Equal With
+Параллельно итерирует элементы из потока вместе с элементами переданных коллекций (все коллекции должны быть одной длины).
+
+```$stream->zipEqualWith(iterable ...$iterables): Stream```
+
+Работает как `Multi::zip()`, но бросает `\LengthException`, когда выясняется, что длины коллекций разные
+(когда закончился самая короткая коллекция).
+
+```php
+use IterTools\Stream;
+
+$input = [1, 2, 3];
+
+$result = Stream::of($input)
+    ->zipEqualWith([4, 5, 6], [7, 8, 9]);
+
+foreach ($result as $item) {
+    // [1, 4, 7], [2, 5, 8], [3, 6, 9]
 }
 ```
 
@@ -1992,33 +2013,10 @@ use IterTools\Stream;
 $input = [1, 2, 3, 4, 5];
 
 $result = Stream::of($input)
-    ->zipLongestWith([4, 5, 6])
-    ->zipLongestWith([7, 8, 9, 10]);
+    ->zipLongestWith([4, 5, 6], [7, 8, 9, 10]);
 
 foreach ($result as $item) {
-    // [1, 4, 7], [2, 5, 8], [3, 6, 9], [4, null, 10], [null, null, 5]
-}
-```
-
-#### Zip Equal With
-Параллельно итерирует элементы из потока вместе с элементами переданных коллекций (все коллекции должны быть одной длины).
-
-```$stream->zipEqualWith(iterable ...$iterables): Stream```
-
-Работает как `Multi::zip()`, но бросает `\LengthException`, когда выясняется, что длины коллекций разные
-(когда закончился самая короткая коллекция).
-
-```php
-use IterTools\Stream;
-
-$input = [1, 2, 3];
-
-$result = Stream::of($input)
-    ->zipEqualWith([4, 5, 6])
-    ->zipEqualWith([7, 8, 9]);
-
-foreach ($result as $item) {
-    // [1, 4, 7], [2, 5, 8], [3, 6, 9]
+    // [1, 4, 7], [2, 5, 8], [3, 6, 9], [4, null, 10], [5, null, null]
 }
 ```
 
@@ -2346,7 +2344,7 @@ $boolean = Stream::of($answers)
 - Прерывает итерацию сразу после того, как количество совпадений достигнет n.
 - При `n <= 0` всегда возвращает истину.
 
-```$stream->atLeastN(int $n, callable $predicate = null): bool```
+```$stream->atLeastN(int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Stream;
@@ -2366,7 +2364,7 @@ $boolean = Stream::of($grades)->atLeastN(2, $isPassingGrade);
 - Прерывает итерацию сразу после того, как количество совпадений превысит n.
 - При `n < 0` всегда возвращает ложь.
 
-```$stream->atMostN(int $n, callable $predicate = null): bool```
+```$stream->atMostN(int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Stream;
@@ -2497,7 +2495,7 @@ $boolean = Stream::of($digits)->endsWithCoercive(['2', '3']);
 - Предикат является необязательным аргументом.
 - По умолчанию (если не передан) предикат приводит элементы коллекции к `bool`.
 
-```$stream->exactlyN(int $n, callable $predicate = null): bool```
+```$stream->exactlyN(int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Stream;
@@ -2533,7 +2531,7 @@ $boolean = Stream::of($numbers)
 - Возвращает истину для пустой коллекции и для коллекции с одним элементом.
 - Если предикат не был передан, истинность элемента получается через приведение его значения к булевому типу.
 
-```$stream->isPartitioned(callable $predicate = null): bool```
+```$stream->isPartitioned(?callable $predicate = null): bool```
 
 ```php
 use IterTools\Stream;
@@ -2763,7 +2761,7 @@ $boolean = Stream::of($digits)->startsWithCoercive(['1', '2']);
 ##### To Average
 Возвращает среднее арифметическое коллекции элементов из потока.
 
-```$stream->toAverage(): mixed```
+```$stream->toAverage(): int|float|null```
 
 Для пустой коллекции вернет `null`.
 
@@ -2780,7 +2778,7 @@ $result = Stream::of($input)
 ##### To Count
 Возвращает длину коллекции элементов из потока.
 
-```$stream->toCount(): mixed```
+```$stream->toCount(): int```
 
 Если источник реализует `Countable`, используется `Countable::count()`, обход не выполняется. `Countable`, который неверно сообщает свой размер, например `\CachingIterator` с `FULL_CACHE` над ещё не прочитанным источником, даёт неверную длину.
 
@@ -2979,7 +2977,7 @@ $result = Stream::of($users)
 ##### To Max
 Возвращает максимальный элемент коллекции из потока.
 
-```$stream->toMax(callable $compareBy = null): mixed```
+```$stream->toMax(?callable $compareBy = null): mixed```
 
 - Функция `$compareBy` должна возвращать сравнимое значение.
 - Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
@@ -3018,7 +3016,7 @@ $median = Stream::of($grades)
 ##### To Min
 Возвращает минимальный элемент коллекции из потока.
 
-```$stream->toMin(callable $compareBy = null): mixed```
+```$stream->toMin(?callable $compareBy = null): mixed```
 
 - Функция `$compareBy` должна возвращать сравнимое значение.
 - Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
@@ -3038,7 +3036,7 @@ $result = Stream::of($input)
 ##### To Min Max
 Возвращает минимальный и максимальный элементы коллекции из потока.
 
-```$stream->toMinMax(callable $compareBy = null): array```
+```$stream->toMinMax(?callable $compareBy = null): array```
 
 - Функция `$compareBy` должна возвращать сравнимое значение.
 - Если аргумент `$compareBy` не передан, элементы коллекции должны быть сравнимы.
@@ -3132,7 +3130,7 @@ $p75 = Stream::of($scores)
 ##### To Product
 Возвращает произведение элементов коллекции из потока.
 
-```$stream->toProduct(): mixed```
+```$stream->toProduct(): int|float|null```
 
 Для пустой коллекции вернет `null`.
 
@@ -3247,7 +3245,7 @@ $string = Stream::of($words)->toString('-', 'Library: ', '!');
 ##### To Sum
 Возвращает сумму элементов коллекции из потока.
 
-```$stream->toSum(): mixed```
+```$stream->toSum(): int|float```
 
 ```php
 use IterTools\Stream;
@@ -3318,7 +3316,7 @@ $array = Stream::of([1, 1, 2, 2, 3, 4, 5])
 ##### To Associative Array
 Возвращает ассоциативный массив всех элементов из потока.
 
-```$stream->toAssociativeArray(callable $keyFunc, callable $valueFunc): array```
+```$stream->toAssociativeArray(?callable $keyFunc = null, ?callable $valueFunc = null): array```
 
 ```php
 use IterTools\Stream;
@@ -3382,7 +3380,7 @@ $count = 3;
 ##### Call For Each
 Вызывает callback-функцию для каждого элемента из потока.
 
-```$stream->callForEach(callable $function): void```
+```$stream->callForEach(callable $func): void```
 
 ```php
 use IterTools\Stream;
@@ -3462,7 +3460,9 @@ Stream::of($words)->printLn();
 ##### To CSV File
 Записывает содержимое потока в CSV файл.
 
-```$stream->toCsvFile(resource $fileHandle, array $header = null, string 'separator = ',', string $enclosure = '"', string $escape = '\\'): void```
+```$stream->toCsvFile(resource $fileResource, ?array $header = null, string $separator = ',', string $enclosure = '"', string $escape = '\\'): void```
+
+Выбрасывает `\RuntimeException`, если запись не удалась или была усечена.
 
 Значение по умолчанию `$escape = '\\'` не гарантирует точное чтение записанных данных: поле, оканчивающееся обратной косой чертой, например `C:\Users\`, записывается как `"C:\Users\"`, а при чтении последние `\"` принимаются за экранированную кавычку, поэтому поле не закрывается и поглощает следующие строки. Передавайте `$escape = ''` и при записи, и при чтении, чтобы отключить символ экранирования, как рекомендует PHP, и читайте файл с тем `$escape`, с которым он был записан. Значение по умолчанию остаётся `'\\'`, чтобы уже записанные файлы не изменились.
 
@@ -3485,7 +3485,9 @@ Stream::of($starWarsMovies)
 ##### To File
 Записывает содержимое потока в файл.
 
-```$stream->toFile(resource $fileHandle, string $newLineSeparator = \PHP_EOL, string $header = null, string $footer = null): void```
+```$stream->toFile(resource $fileResource, string $newlineSeparator = \PHP_EOL, ?string $header = null, ?string $footer = null): void```
+
+Выбрасывает `\RuntimeException`, если запись не удалась или была усечена.
 
 ```php
 use IterTools\Stream;

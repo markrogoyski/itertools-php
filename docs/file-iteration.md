@@ -9,7 +9,7 @@ Tools for iterating over file contents.
 ### Read CSV
 Iterate the lines of a CSV file.
 
-```File::readCsv(resource $fileHandle, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
+```File::readCsv(resource $fileResource, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
 
 The default `$escape = '\\'` does not round-trip every value: a field that ends in a backslash, such as `C:\Users\`, is written as `"C:\Users\"`, and the reader takes the final `\"` for an escaped quote, so the field never closes and swallows the following row(s). Pass `$escape = ''` on both the write and the read side to turn the escape character off, as PHP recommends, and read a file with the `$escape` it was written with. The default stays `'\\'` so that files already written keep their bytes.
 
@@ -27,7 +27,7 @@ foreach (File::readCsv($fileHandle) as $row) {
 ### Read CSV Assoc
 Iterate the rows of a CSV file as associative arrays keyed by header.
 
-```File::readCsvAssoc(resource $fileHandle, ?array $headers = null, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
+```File::readCsvAssoc(resource $fileResource, ?array $headers = null, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
 
 The default `$escape = '\\'` does not round-trip every value: a field that ends in a backslash, such as `C:\Users\`, is written as `"C:\Users\"`, and the reader takes the final `\"` for an escaped quote, so the field never closes and swallows the following row(s). `readCsvAssoc` raises no error when the merged row still has the header count (e.g. in a single-column file), and silently loses the rows. Pass `$escape = ''` on both the write and the read side to turn the escape character off, as PHP recommends, and read a file with the `$escape` it was written with. The default stays `'\\'` so that files already written keep their bytes.
 
@@ -51,7 +51,7 @@ foreach (File::readCsvAssoc($fileHandle) as $row) {
 ### Read Lines
 Iterate the lines of a file.
 
-```File::readLines(resource $fileHandle)```
+```File::readLines(resource $fileResource)```
 
 ```php
 use IterTools\File;
@@ -66,7 +66,9 @@ foreach (File::readLines($fileHandle) as $line) {
 ### Write CSV
 Write an iterable of rows to a file as CSV.
 
-```File::writeCsv(resource $fileHandle, iterable $rows, ?array $header = null, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
+```File::writeCsv(resource $fileResource, iterable $rows, ?array $header = null, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
+
+Throws `\RuntimeException` if a write fails or is truncated.
 
 The default `$escape = '\\'` does not round-trip every value: a field that ends in a backslash, such as `C:\Users\`, is written as `"C:\Users\"`, and the reader takes the final `\"` for an escaped quote, so the field never closes and swallows the following row(s). Pass `$escape = ''` on both the write and the read side to turn the escape character off, as PHP recommends, and read a file with the `$escape` it was written with. The default stays `'\\'` so that files already written keep their bytes.
 
@@ -87,7 +89,9 @@ File::writeCsv($fileHandle, $rows, ['episode', 'title', 'year']);
 ### Write Lines
 Write an iterable of lines to a file.
 
-```File::writeLines(resource $fileHandle, iterable $lines, string $lineSeparator = \PHP_EOL)```
+```File::writeLines(resource $fileResource, iterable $lines, string $lineSeparator = \PHP_EOL)```
+
+Throws `\RuntimeException` if a write fails or is truncated.
 
 The `$lineSeparator` is inserted *between* lines, never after the last line. An empty iterable writes nothing.
 

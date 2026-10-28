@@ -65,7 +65,7 @@ $boolean = Summary::anyMatch($answers, $isUltimateAnswer);
 - Прерывает итерацию сразу после того, как количество совпадений достигнет N.
 - При `n <= 0` всегда возвращает истину.
 
-```Summary::atLeastN(iterable $data, int $n, callable $predicate = null): bool```
+```Summary::atLeastN(iterable $data, int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Summary;
@@ -88,7 +88,7 @@ $boolean = Summary::atLeastN($grades, 3, $isPassingGrade);
 - Прерывает итерацию сразу после того, как количество совпадений превысит N.
 - При `n < 0` всегда возвращает ложь.
 
-```Summary::atMostN(iterable $data, int $n, callable $predicate = null): bool```
+```Summary::atMostN(iterable $data, int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Summary;
@@ -232,7 +232,7 @@ $boolean = Summary::endsWith($digits, ['2', '3']);
 - Предикат является необязательным аргументом.
 - По умолчанию предикат выполняет приведение значения элемента коллекции к типу `bool`.
 
-```Summary::exactlyN(iterable $data, int $n, callable $predicate): bool```
+```Summary::exactlyN(iterable $data, int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Summary;
@@ -257,7 +257,7 @@ $boolean = Summary::isSorted($ages, $n, $predicate);
 - Возвращает истину для пустой коллекции и для коллекции с одним элементом.
 - Если предикат не был передан, истинность элемента получается через приведение его значения к булевому типу.
 
-```Summary::isPartitioned(iterable $data, callable $predicate = null): bool```
+```Summary::isPartitioned(iterable $data, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Summary;

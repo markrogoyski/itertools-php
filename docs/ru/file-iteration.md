@@ -9,7 +9,7 @@
 ### Read CSV
 Итерирует коллекции ячеек CSV-файла построчно.
 
-```File::readCsv(resource $fileHandle, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
+```File::readCsv(resource $fileResource, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
 
 Значение по умолчанию `$escape = '\\'` не гарантирует точное чтение записанных данных: поле, оканчивающееся обратной косой чертой, например `C:\Users\`, записывается как `"C:\Users\"`, а при чтении последние `\"` принимаются за экранированную кавычку, поэтому поле не закрывается и поглощает следующие строки. Передавайте `$escape = ''` и при записи, и при чтении, чтобы отключить символ экранирования, как рекомендует PHP, и читайте файл с тем `$escape`, с которым он был записан. Значение по умолчанию остаётся `'\\'`, чтобы уже записанные файлы не изменились.
 
@@ -25,7 +25,7 @@ foreach (File::readCsv($fileHandle) as $row) {
 ### Read CSV Assoc
 Итерирует строки CSV-файла как ассоциативные массивы с ключами из заголовков.
 
-```File::readCsvAssoc(resource $fileHandle, ?array $headers = null, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
+```File::readCsvAssoc(resource $fileResource, ?array $headers = null, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
 
 Значение по умолчанию `$escape = '\\'` не гарантирует точное чтение записанных данных: поле, оканчивающееся обратной косой чертой, например `C:\Users\`, записывается как `"C:\Users\"`, а при чтении последние `\"` принимаются за экранированную кавычку, поэтому поле не закрывается и поглощает следующие строки. `readCsvAssoc` не выдаёт ошибку, если объединённая строка по-прежнему содержит столько полей, сколько заголовков (например, в файле с одним столбцом), и строки теряются молча. Передавайте `$escape = ''` и при записи, и при чтении, чтобы отключить символ экранирования, как рекомендует PHP, и читайте файл с тем `$escape`, с которым он был записан. Значение по умолчанию остаётся `'\\'`, чтобы уже записанные файлы не изменились.
 
@@ -47,7 +47,7 @@ foreach (File::readCsvAssoc($fileHandle) as $row) {
 ### Read Lines
 Итерирует содержимое файла построчно.
 
-```File::readLines(resource $fileHandle)```
+```File::readLines(resource $fileResource)```
 ```php
 use IterTools\File;
 $fileHandle = \fopen('path/to/file.txt', 'r');
@@ -59,7 +59,9 @@ foreach (File::readLines($fileHandle) as $line) {
 ### Write CSV
 Записывает коллекцию строк в файл в формате CSV.
 
-```File::writeCsv(resource $fileHandle, iterable $rows, ?array $header = null, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
+```File::writeCsv(resource $fileResource, iterable $rows, ?array $header = null, string $separator = ',', string $enclosure = '"', string $escape = '\\')```
+
+Выбрасывает `\RuntimeException`, если запись не удалась или была усечена.
 
 Значение по умолчанию `$escape = '\\'` не гарантирует точное чтение записанных данных: поле, оканчивающееся обратной косой чертой, например `C:\Users\`, записывается как `"C:\Users\"`, а при чтении последние `\"` принимаются за экранированную кавычку, поэтому поле не закрывается и поглощает следующие строки. Передавайте `$escape = ''` и при записи, и при чтении, чтобы отключить символ экранирования, как рекомендует PHP, и читайте файл с тем `$escape`, с которым он был записан. Значение по умолчанию остаётся `'\\'`, чтобы уже записанные файлы не изменились.
 
@@ -78,7 +80,9 @@ File::writeCsv($fileHandle, $rows, ['episode', 'title', 'year']);
 ### Write Lines
 Записывает коллекцию строк в файл.
 
-```File::writeLines(resource $fileHandle, iterable $lines, string $lineSeparator = \PHP_EOL)```
+```File::writeLines(resource $fileResource, iterable $lines, string $lineSeparator = \PHP_EOL)```
+
+Выбрасывает `\RuntimeException`, если запись не удалась или была усечена.
 
 Разделитель `$lineSeparator` вставляется *между* строками, но не после последней строки. Пустая коллекция ничего не записывает.
 

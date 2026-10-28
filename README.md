@@ -93,61 +93,61 @@ Quick Reference
 | [`roundRobin`](docs/multi-iteration.md#roundrobin) | Yield one value at a time from multiple iterables, rotating across sources              | `Multi::roundRobin($list1, $list2)`           |
 | [`zip`](docs/multi-iteration.md#zip)               | Iterate multiple collections simultaneously until the shortest iterator completes       | `Multi::zip($list1, $list2)`                  |
 | [`zipEqual`](docs/multi-iteration.md#zipequal)     | Iterate multiple collections of equal length simultaneously, error if lengths not equal | `Multi::zipEqual($list1, $list2)`             |
-| [`zipFilled`](docs/multi-iteration.md#zipfilled)   | Iterate multiple collections, using a filler value if lengths not equal                 | `Multi::zipFilled($default, $list1, $list2)`  |
+| [`zipFilled`](docs/multi-iteration.md#zipfilled)   | Iterate multiple collections, using a filler value if lengths not equal                 | `Multi::zipFilled($filler, $list1, $list2)`   |
 | [`zipLongest`](docs/multi-iteration.md#ziplongest) | Iterate multiple collections simultaneously until the longest iterator completes        | `Multi::zipLongest($list1, $list2)`           |
 | [`unzip`](docs/multi-iteration.md#unzip)           | Transpose a sequence of rows into columns (inverse of zip)                              | `Multi::unzip($rows)`                         |
 
 #### Single Iteration
-| Iterator                                       | Description                                  | Code Snippet                                                |
-|------------------------------------------------|----------------------------------------------|-------------------------------------------------------------|
-| [`accumulate`](docs/single-iteration.md#accumulate)                    | Running result of a binary operator          | `Single::accumulate($data, $op, [$initial])`                |
-| [`chunkwise`](docs/single-iteration.md#chunkwise)                      | Iterate by chunks                            | `Single::chunkwise($data, $chunkSize)`                      |
-| [`chunkwiseOverlap`](docs/single-iteration.md#chunkwise-overlap)       | Iterate by overlapped chunks                 | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)` |
-| [`compress`](docs/single-iteration.md#compress)                        | Filter out elements not selected             | `Single::compress($data, $selectors)`                       |
-| [`compressAssociative`](docs/single-iteration.md#compress-associative) | Filter out elements by keys not selected     | `Single::compressAssociative($data, $selectorKeys)`         |
-| [`dropLast`](docs/single-iteration.md#drop-last)                       | Iterate all elements except the last N       | `Single::dropLast($data, $count)`                           |
-| [`dropWhile`](docs/single-iteration.md#drop-while)                     | Drop elements while predicate is true        | `Single::dropWhile($data, $predicate)`                      |
-| [`dropWhileWithKeys`](docs/single-iteration.md#drop-while-with-keys)   | Drop while a value/key predicate is true     | `Single::dropWhileWithKeys($data, $predicate)`              |
-| [`enumerate`](docs/single-iteration.md#enumerate)                      | Iterate [index, value] pairs                 | `Single::enumerate($data, [$start])`                        |
-| [`filter`](docs/single-iteration.md#filter)                            | Filter for elements where predicate is true  | `Single::filter($data, $predicate)`                         |
-| [`filterTrue`](docs/single-iteration.md#filter-true)                   | Filter for truthy elements                   | `Single::filterTrue($data)`                                 |
-| [`filterFalse`](docs/single-iteration.md#filter-false)                 | Filter for falsy elements                    | `Single::filterFalse($data)`                                |
-| [`filterKeys`](docs/single-iteration.md#filter-keys)                   | Filter for keys where predicate is true      | `Single::filterKeys($data, $predicate)`                     |
-| [`filterWithKeys`](docs/single-iteration.md#filter-with-keys)          | Filter with value- and key-aware predicate   | `Single::filterWithKeys($data, $predicate)`                 |
-| [`flatMap`](docs/single-iteration.md#flat-map)                         | Map function onto items and flatten result   | `Single::flatMap($data, $mapper)`                           |
-| [`flatMapWithKeys`](docs/single-iteration.md#flat-map-with-keys)       | Key-aware map onto items and flatten result  | `Single::flatMapWithKeys($data, $func)`                     |
-| [`flatten`](docs/single-iteration.md#flatten)                          | Flatten multidimensional iterable            | `Single::flatten($data, [$dimensions])`                     |
-| [`groupAdjacentBy`](docs/single-iteration.md#group-adjacent-by)        | Group adjacent elements sharing an extracted key | `Single::groupAdjacentBy($data, $keyFn)`                |
-| [`groupBy`](docs/single-iteration.md#group-by)                         | Group data by a common element               | `Single::groupBy($data, $groupKeyFunction, [$itemKeyFunc])` |
-| [`intersperse`](docs/single-iteration.md#intersperse)                  | Insert a separator between elements          | `Single::intersperse($data, $separator)`                    |
-| [`limit`](docs/single-iteration.md#limit)                              | Iterate up to a limit                        | `Single::limit($data, $limit)`                              |
-| [`map`](docs/single-iteration.md#map)                                  | Map function onto each item                  | `Single::map($data, $function)`                             |
-| [`mapWithKeys`](docs/single-iteration.md#map-with-keys)                | Map value- and key-aware function onto items | `Single::mapWithKeys($data, $func)`                         |
-| [`mapSpread`](docs/single-iteration.md#map-spread)                     | Map function onto each item, splatting items as positional args | `Single::mapSpread($data, $function)`     |
-| [`padLeft`](docs/single-iteration.md#pad-left)                         | Pad iterable on the left to a minimum length | `Single::padLeft($data, $length, $fill)`                    |
-| [`padRight`](docs/single-iteration.md#pad-right)                       | Pad iterable on the right to a minimum length | `Single::padRight($data, $length, $fill)`                  |
-| [`pairwise`](docs/single-iteration.md#pairwise)                        | Iterate successive overlapping pairs         | `Single::pairwise($data)`                                   |
-| [`range`](docs/single-iteration.md#range)                              | Lazily yield a finite arithmetic progression | `Single::range($start, $end, [$step])`                      |
-| [`reindex`](docs/single-iteration.md#reindex)                          | Reindex keys of key-value iterable           | `Single::reindex($data, $reindexer)`                        |
-| [`repeat`](docs/single-iteration.md#repeat)                            | Repeat an item a number of times             | `Single::repeat($item, $repetitions)`                       |
-| [`reverse`](docs/single-iteration.md#reverse)                          | Iterate elements in reverse order            | `Single::reverse($data)`                                    |
-| [`skip`](docs/single-iteration.md#skip)                                | Iterate after skipping elements              | `Single::skip($data, $count, [$offset])`                    |
-| [`slice`](docs/single-iteration.md#slice)                              | Extract a slice of the iterable              | `Single::slice($data, [$start], [$count], [$step])`         |
-| [`splitWhen`](docs/single-iteration.md#split-when)                     | Split iterable into groups when predicate matches | `Single::splitWhen($data, $predicate)`                  |
-| [`string`](docs/single-iteration.md#string)                            | Iterate the characters of a string           | `Single::string($string)`                                   |
-| [`takeLast`](docs/single-iteration.md#take-last)                       | Iterate the last N elements                  | `Single::takeLast($data, $count)`                           |
-| [`takeWhile`](docs/single-iteration.md#take-while)                     | Iterate elements while predicate is true     | `Single::takeWhile($data, $predicate)`                      |
-| [`takeWhileWithKeys`](docs/single-iteration.md#take-while-with-keys)   | Iterate while a value/key predicate is true  | `Single::takeWhileWithKeys($data, $predicate)`              |
-| [`windowed`](docs/single-iteration.md#windowed)                        | Iterate sliding windows of elements          | `Single::windowed($data, $size, [$step], [$partial])`       |
-| [`withFirst`](docs/single-iteration.md#with-first)                     | Pair each element with an is-first flag      | `Single::withFirst($data)`                                  |
-| [`withFirstAndLast`](docs/single-iteration.md#with-first-and-last)     | Pair each element with is-first/is-last flags | `Single::withFirstAndLast($data)`                          |
-| [`withLast`](docs/single-iteration.md#with-last)                       | Pair each element with an is-last flag       | `Single::withLast($data)`                                   |
+| Iterator                                       | Description                                  | Code Snippet                                                    |
+|------------------------------------------------|----------------------------------------------|-----------------------------------------------------------------|
+| [`accumulate`](docs/single-iteration.md#accumulate)                    | Running result of a binary operator          | `Single::accumulate($data, $op, [$initial])`                    |
+| [`chunkwise`](docs/single-iteration.md#chunkwise)                      | Iterate by chunks                            | `Single::chunkwise($data, $chunkSize)`                          |
+| [`chunkwiseOverlap`](docs/single-iteration.md#chunkwise-overlap)       | Iterate by overlapped chunks                 | `Single::chunkwiseOverlap($data, $chunkSize, $overlapSize)`     |
+| [`compress`](docs/single-iteration.md#compress)                        | Filter out elements not selected             | `Single::compress($data, $selectors)`                           |
+| [`compressAssociative`](docs/single-iteration.md#compress-associative) | Filter out elements by keys not selected     | `Single::compressAssociative($data, $keys)`                     |
+| [`dropLast`](docs/single-iteration.md#drop-last)                       | Iterate all elements except the last N       | `Single::dropLast($data, $count)`                               |
+| [`dropWhile`](docs/single-iteration.md#drop-while)                     | Drop elements while predicate is true        | `Single::dropWhile($data, $predicate)`                          |
+| [`dropWhileWithKeys`](docs/single-iteration.md#drop-while-with-keys)   | Drop while a value/key predicate is true     | `Single::dropWhileWithKeys($data, $predicate)`                  |
+| [`enumerate`](docs/single-iteration.md#enumerate)                      | Iterate [index, value] pairs                 | `Single::enumerate($data, [$start])`                            |
+| [`filter`](docs/single-iteration.md#filter)                            | Filter for elements where predicate is true  | `Single::filter($data, $predicate)`                             |
+| [`filterTrue`](docs/single-iteration.md#filter-true)                   | Filter for truthy elements                   | `Single::filterTrue($data)`                                     |
+| [`filterFalse`](docs/single-iteration.md#filter-false)                 | Filter for falsy elements                    | `Single::filterFalse($data)`                                    |
+| [`filterKeys`](docs/single-iteration.md#filter-keys)                   | Filter for keys where predicate is true      | `Single::filterKeys($data, $predicate)`                         |
+| [`filterWithKeys`](docs/single-iteration.md#filter-with-keys)          | Filter with value- and key-aware predicate   | `Single::filterWithKeys($data, $predicate)`                     |
+| [`flatMap`](docs/single-iteration.md#flat-map)                         | Map function onto items and flatten result   | `Single::flatMap($data, $mapper)`                               |
+| [`flatMapWithKeys`](docs/single-iteration.md#flat-map-with-keys)       | Key-aware map onto items and flatten result  | `Single::flatMapWithKeys($data, $func)`                         |
+| [`flatten`](docs/single-iteration.md#flatten)                          | Flatten multidimensional iterable            | `Single::flatten($data, [$dimensions])`                         |
+| [`groupAdjacentBy`](docs/single-iteration.md#group-adjacent-by)        | Group adjacent elements sharing an extracted key | `Single::groupAdjacentBy($data, $keyFn)`                        |
+| [`groupBy`](docs/single-iteration.md#group-by)                         | Group data by a common element               | `Single::groupBy($data, $groupKeyFunction, [$itemKeyFunction])` |
+| [`intersperse`](docs/single-iteration.md#intersperse)                  | Insert a separator between elements          | `Single::intersperse($data, $separator)`                        |
+| [`limit`](docs/single-iteration.md#limit)                              | Iterate up to a limit                        | `Single::limit($data, $limit)`                                  |
+| [`map`](docs/single-iteration.md#map)                                  | Map function onto each item                  | `Single::map($data, $func)`                                     |
+| [`mapWithKeys`](docs/single-iteration.md#map-with-keys)                | Map value- and key-aware function onto items | `Single::mapWithKeys($data, $func)`                             |
+| [`mapSpread`](docs/single-iteration.md#map-spread)                     | Map function onto each item, splatting items as positional args | `Single::mapSpread($data, $function)`                           |
+| [`padLeft`](docs/single-iteration.md#pad-left)                         | Pad iterable on the left to a minimum length | `Single::padLeft($data, $length, $fill)`                        |
+| [`padRight`](docs/single-iteration.md#pad-right)                       | Pad iterable on the right to a minimum length | `Single::padRight($data, $length, $fill)`                       |
+| [`pairwise`](docs/single-iteration.md#pairwise)                        | Iterate successive overlapping pairs         | `Single::pairwise($data)`                                       |
+| [`range`](docs/single-iteration.md#range)                              | Lazily yield a finite arithmetic progression | `Single::range($start, $end, [$step])`                          |
+| [`reindex`](docs/single-iteration.md#reindex)                          | Reindex keys of key-value iterable           | `Single::reindex($data, $reindexer)`                            |
+| [`repeat`](docs/single-iteration.md#repeat)                            | Repeat an item a number of times             | `Single::repeat($item, $repetitions)`                           |
+| [`reverse`](docs/single-iteration.md#reverse)                          | Iterate elements in reverse order            | `Single::reverse($data)`                                        |
+| [`skip`](docs/single-iteration.md#skip)                                | Iterate after skipping elements              | `Single::skip($data, $count, [$offset])`                        |
+| [`slice`](docs/single-iteration.md#slice)                              | Extract a slice of the iterable              | `Single::slice($data, [$start], [$count], [$step])`             |
+| [`splitWhen`](docs/single-iteration.md#split-when)                     | Split iterable into groups when predicate matches | `Single::splitWhen($data, $predicate)`                          |
+| [`string`](docs/single-iteration.md#string)                            | Iterate the characters of a string           | `Single::string($string)`                                       |
+| [`takeLast`](docs/single-iteration.md#take-last)                       | Iterate the last N elements                  | `Single::takeLast($data, $count)`                               |
+| [`takeWhile`](docs/single-iteration.md#take-while)                     | Iterate elements while predicate is true     | `Single::takeWhile($data, $predicate)`                          |
+| [`takeWhileWithKeys`](docs/single-iteration.md#take-while-with-keys)   | Iterate while a value/key predicate is true  | `Single::takeWhileWithKeys($data, $predicate)`                  |
+| [`windowed`](docs/single-iteration.md#windowed)                        | Iterate sliding windows of elements          | `Single::windowed($data, $size, [$step], [$partial])`           |
+| [`withFirst`](docs/single-iteration.md#with-first)                     | Pair each element with an is-first flag      | `Single::withFirst($data)`                                      |
+| [`withFirstAndLast`](docs/single-iteration.md#with-first-and-last)     | Pair each element with is-first/is-last flags | `Single::withFirstAndLast($data)`                               |
+| [`withLast`](docs/single-iteration.md#with-last)                       | Pair each element with an is-last flag       | `Single::withLast($data)`                                       |
 
 #### Infinite Iteration
 | Iterator                     | Description                | Code Snippet                     |
 |------------------------------|----------------------------|----------------------------------|
 | [`count`](docs/infinite-iteration.md#count)            | Count sequentially forever | `Infinite::count($start, $step)` |
-| [`cycle`](docs/infinite-iteration.md#cycle)            | Cycle through a collection | `Infinite::cycle($collection)`   |
+| [`cycle`](docs/infinite-iteration.md#cycle)            | Cycle through a collection | `Infinite::cycle($iterable)`     |
 | [`generate`](docs/infinite-iteration.md#generate)      | Yield values from a supplier forever | `Infinite::generate($supplier)` |
 | [`iterate`](docs/infinite-iteration.md#iterate)        | Iterate by repeatedly applying a function | `Infinite::iterate($initial, $function)` |
 | [`repeat`](docs/infinite-iteration.md#repeat-infinite) | Repeat an item forever     | `Infinite::repeat($item)`        |
@@ -155,7 +155,7 @@ Quick Reference
 #### Random Iteration
 | Iterator                                  | Description                       | Code Snippet                               |
 |-------------------------------------------|-----------------------------------|--------------------------------------------|
-| [`choice`](docs/random-iteration.md#choice)                       | Random selections from list       | `Random::choice($list, $repetitions)`      |
+| [`choice`](docs/random-iteration.md#choice)                       | Random selections from list       | `Random::choice($items, $repetitions)`     |
 | [`coinFlip`](docs/random-iteration.md#coinflip)                   | Random coin flips (0 or 1)        | `Random::coinFlip($repetitions)`           |
 | [`number`](docs/random-iteration.md#number)                       | Random numbers                    | `Random::number($min, $max, $repetitions)` |
 | [`percentage`](docs/random-iteration.md#percentage)               | Random percentage between 0 and 1 | `Random::percentage($repetitions)`         |
@@ -178,24 +178,24 @@ Quick Reference
 | [`runningTotal`](docs/math-iteration.md#running-total)                | Running total accumulation              | `Math::runningTotal($numbers, $initialValue)`      |
 
 #### Set and multiset Iteration
-| Iterator                                                        | Description                                               | Code Snippet                                                 |
-|-----------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------|
-| [`distinct`](docs/set-iteration.md#distinct)                                         | Iterate only distinct items                               | `Set::distinct($data)`                                       |
-| [`distinctAdjacent`](docs/set-iteration.md#distinct-adjacent)                        | Remove only consecutive duplicates                        | `Set::distinctAdjacent($data)`                               |
-| [`distinctAdjacentBy`](docs/set-iteration.md#distinct-adjacent-by)                   | Remove only consecutive duplicates using custom key       | `Set::distinctAdjacentBy($data, $keyFn)`                     |
-| [`distinctBy`](docs/set-iteration.md#distinct-by)                                    | Iterate only distinct items using custom comparator       | `Set::distinctBy($data, $compareBy)`                         |
-| [`duplicates`](docs/set-iteration.md#duplicates)                                     | Iterate values that appear more than once                 | `Set::duplicates($data, [$strict])`                          |
-| [`duplicatesBy`](docs/set-iteration.md#duplicates-by)                                | Iterate duplicates using a custom key function            | `Set::duplicatesBy($data, $keyFn)`                           |
-| [`intersection`](docs/set-iteration.md#intersection)                                 | Intersection of iterables                                 | `Set::intersection(...$iterables)`                           |
-| [`intersectionCoercive`](docs/set-iteration.md#intersection-coercive)                | Intersection with type coercion                           | `Set::intersectionCoercive(...$iterables)`                   |
-| [`partialIntersection`](docs/set-iteration.md#partial-intersection)                  | Partial intersection of iterables                         | `Set::partialIntersection($minCount, ...$iterables)`         |
-| [`partialIntersectionCoercive`](docs/set-iteration.md#partial-intersection-coercive) | Partial intersection with type coercion                   | `Set::partialIntersectionCoercive($minCount, ...$iterables)` |
-| [`difference`](docs/set-iteration.md#difference)                                     | Difference of iterables                                   | `Set::difference($a, ...$iterables)`                         |
-| [`differenceCoercive`](docs/set-iteration.md#difference-coercive)                    | Difference with type coercion                             | `Set::differenceCoercive($a, ...$iterables)`                 |
-| [`symmetricDifference`](docs/set-iteration.md#symmetric-difference)                  | Symmetric difference of iterables                         | `Set::symmetricDifference(...$iterables)`                    |
-| [`symmetricDifferenceCoercive`](docs/set-iteration.md#symmetric-difference-coercive) | Symmetric difference with type coercion                   | `Set::symmetricDifferenceCoercive(...$iterables)`            |
-| [`union`](docs/set-iteration.md#union)                                               | Union of iterables                                        | `Set::union(...$iterables)`                                  |
-| [`unionCoercive`](docs/set-iteration.md#union-coercive)                              | Union with type coercion                                  | `Set::unionCoercive(...$iterables)`                          |
+| Iterator                                                        | Description                                               | Code Snippet                                                              |
+|-----------------------------------------------------------------|-----------------------------------------------------------|---------------------------------------------------------------------------|
+| [`distinct`](docs/set-iteration.md#distinct)                                         | Iterate only distinct items                               | `Set::distinct($data)`                                                    |
+| [`distinctAdjacent`](docs/set-iteration.md#distinct-adjacent)                        | Remove only consecutive duplicates                        | `Set::distinctAdjacent($data)`                                            |
+| [`distinctAdjacentBy`](docs/set-iteration.md#distinct-adjacent-by)                   | Remove only consecutive duplicates using custom key       | `Set::distinctAdjacentBy($data, $keyFn)`                                  |
+| [`distinctBy`](docs/set-iteration.md#distinct-by)                                    | Iterate only distinct items using custom comparator       | `Set::distinctBy($data, $compareBy)`                                      |
+| [`duplicates`](docs/set-iteration.md#duplicates)                                     | Iterate values that appear more than once                 | `Set::duplicates($data, [$strict])`                                       |
+| [`duplicatesBy`](docs/set-iteration.md#duplicates-by)                                | Iterate duplicates using a custom key function            | `Set::duplicatesBy($data, $keyFn)`                                        |
+| [`intersection`](docs/set-iteration.md#intersection)                                 | Intersection of iterables                                 | `Set::intersection(...$iterables)`                                        |
+| [`intersectionCoercive`](docs/set-iteration.md#intersection-coercive)                | Intersection with type coercion                           | `Set::intersectionCoercive(...$iterables)`                                |
+| [`partialIntersection`](docs/set-iteration.md#partial-intersection)                  | Partial intersection of iterables                         | `Set::partialIntersection($minIntersectionCount, ...$iterables)`          |
+| [`partialIntersectionCoercive`](docs/set-iteration.md#partial-intersection-coercive) | Partial intersection with type coercion                   | `Set::partialIntersectionCoercive($minIntersectionCount, ...$iterables)`  |
+| [`difference`](docs/set-iteration.md#difference)                                     | Difference of iterables                                   | `Set::difference($a, ...$iterables)`                                      |
+| [`differenceCoercive`](docs/set-iteration.md#difference-coercive)                    | Difference with type coercion                             | `Set::differenceCoercive($a, ...$iterables)`                              |
+| [`symmetricDifference`](docs/set-iteration.md#symmetric-difference)                  | Symmetric difference of iterables                         | `Set::symmetricDifference(...$iterables)`                                 |
+| [`symmetricDifferenceCoercive`](docs/set-iteration.md#symmetric-difference-coercive) | Symmetric difference with type coercion                   | `Set::symmetricDifferenceCoercive(...$iterables)`                         |
+| [`union`](docs/set-iteration.md#union)                                               | Union of iterables                                        | `Set::union(...$iterables)`                                               |
+| [`unionCoercive`](docs/set-iteration.md#union-coercive)                              | Union with type coercion                                  | `Set::unionCoercive(...$iterables)`                                       |
 
 #### Combinatorics
 | Iterator                                                            | Description                     | Code Snippet                               |
@@ -220,21 +220,21 @@ Quick Reference
 #### File Iteration
 | Iterator                                                        | Description                                               | Code Snippet                                                 |
 |-----------------------------------------------------------------|-----------------------------------------------------------|--------------------------------------------------------------|
-| [`readCsv`](docs/file-iteration.md#read-csv)                                          | Iterate a CSV file line by line                           | `File::readCsv($fileHandle)`                                 |
-| [`readCsvAssoc`](docs/file-iteration.md#read-csv-assoc)                                | Iterate a CSV file as arrays keyed by header              | `File::readCsvAssoc($fileHandle)`                            |
-| [`readLines`](docs/file-iteration.md#read-lines)                                      | Iterate a file line by line                               | `File::readLines($fileHandle)`                               |
-| [`writeCsv`](docs/file-iteration.md#write-csv)                                        | Write an iterable of rows to a file as CSV                | `File::writeCsv($fileHandle, $rows, $header)`                |
-| [`writeLines`](docs/file-iteration.md#write-lines)                                    | Write an iterable of lines to a file                      | `File::writeLines($fileHandle, $lines)`                      |
+| [`readCsv`](docs/file-iteration.md#read-csv)                                          | Iterate a CSV file line by line                           | `File::readCsv($fileResource)`                               |
+| [`readCsvAssoc`](docs/file-iteration.md#read-csv-assoc)                                | Iterate a CSV file as arrays keyed by header              | `File::readCsvAssoc($fileResource)`                          |
+| [`readLines`](docs/file-iteration.md#read-lines)                                      | Iterate a file line by line                               | `File::readLines($fileResource)`                             |
+| [`writeCsv`](docs/file-iteration.md#write-csv)                                        | Write an iterable of rows to a file as CSV                | `File::writeCsv($fileResource, $rows, $header)`              |
+| [`writeLines`](docs/file-iteration.md#write-lines)                                    | Write an iterable of lines to a file                      | `File::writeLines($fileResource, $lines)`                    |
 
 #### Transform Iteration
-| Iterator                                       | Description                                  | Code Snippet                                                      |
-|------------------------------------------------|----------------------------------------------|-------------------------------------------------------------------|
-| [`partition`](docs/transform-iteration.md#partition)                      | Partition iterable into truthy and falsy lists | `Transform::partition($data, $predicate)`                       |
-| [`memoize`](docs/transform-iteration.md#memoize)                            | Lazily cache an iterable for replay          | `Transform::memoize($data)`                                    |
-| [`tee`](docs/transform-iteration.md#tee)                                  | Iterate duplicate iterators                  | `Transform::tee($data, $count)`                                   |
-| [`toArray`](docs/transform-iteration.md#to-array)                         | Transform iterable to an array               | `Transform::toArray($data)`                                       |
-| [`toAssociativeArray`](docs/transform-iteration.md#to-associative-array)  | Transform iterable to an associative array   | `Transform::toAssociativeArray($data, [$keyFunc], [$valueFunc])`  |
-| [`toIterator`](docs/transform-iteration.md#to-iterator)                   | Transform iterable to an iterator            | `Transform::toIterator($data)`                                    |
+| Iterator                                       | Description                                  | Code Snippet                                                         |
+|------------------------------------------------|----------------------------------------------|----------------------------------------------------------------------|
+| [`partition`](docs/transform-iteration.md#partition)                      | Partition iterable into truthy and falsy lists | `Transform::partition($data, $predicate)`                            |
+| [`memoize`](docs/transform-iteration.md#memoize)                            | Lazily cache an iterable for replay          | `Transform::memoize($iterable)`                                      |
+| [`tee`](docs/transform-iteration.md#tee)                                  | Iterate duplicate iterators                  | `Transform::tee($iterable, $count)`                                  |
+| [`toArray`](docs/transform-iteration.md#to-array)                         | Transform iterable to an array               | `Transform::toArray($iterable)`                                      |
+| [`toAssociativeArray`](docs/transform-iteration.md#to-associative-array)  | Transform iterable to an associative array   | `Transform::toAssociativeArray($iterable, [$keyFunc], [$valueFunc])` |
+| [`toIterator`](docs/transform-iteration.md#to-iterator)                   | Transform iterable to an iterator            | `Transform::toIterator($iterable)`                                   |
 
 #### Summary
 | Summary                                                 | Description                                                              | Code Snippet                                      |
@@ -271,7 +271,7 @@ Quick Reference
 #### Reduce
 | Reducer                                                    | Description                                  | Code Snippet                                                  |
 |------------------------------------------------------------|----------------------------------------------|---------------------------------------------------------------|
-| [`toAverage`](docs/reduce.md#to-average)                   | Mean average of elements                     | `Reduce::toAverage($numbers)`                                 |
+| [`toAverage`](docs/reduce.md#to-average)                   | Mean average of elements                     | `Reduce::toAverage($data)`                                    |
 | [`toCount`](docs/reduce.md#to-count)                       | Reduce to length of iterable                 | `Reduce::toCount($data)`                                      |
 | [`toCountBy`](docs/reduce.md#to-count-by)                  | Reduce to counts keyed by key function       | `Reduce::toCountBy($data, $keyFunc)`                          |
 | [`toFirst`](docs/reduce.md#to-first)                       | Reduce to its first value                    | `Reduce::toFirst($data)`                                      |
@@ -279,28 +279,28 @@ Quick Reference
 | [`toFirstMatch`](docs/reduce.md#to-first-match)            | Reduce to first value matching predicate     | `Reduce::toFirstMatch($data, $predicate, [$default])`         |
 | [`toFirstMatchIndex`](docs/reduce.md#to-first-match-index) | Reduce to position of first matching element | `Reduce::toFirstMatchIndex($data, $predicate, [$default])`    |
 | [`toFirstMatchKey`](docs/reduce.md#to-first-match-key)     | Reduce to key of first matching element      | `Reduce::toFirstMatchKey($data, $predicate, [$default])`      |
-| [`toLast`](docs/reduce.md#to-last)                         | Reduce to its last value                     | `Reduce::toLast()`                                            |
+| [`toLast`](docs/reduce.md#to-last)                         | Reduce to its last value                     | `Reduce::toLast($data)`                                       |
 | [`toLastMatch`](docs/reduce.md#to-last-match)              | Reduce to last value matching predicate      | `Reduce::toLastMatch($data, $predicate, [$default])`          |
 | [`toLastMatchIndex`](docs/reduce.md#to-last-match-index)   | Reduce to position of last matching element  | `Reduce::toLastMatchIndex($data, $predicate, [$default])`     |
 | [`toLastMatchKey`](docs/reduce.md#to-last-match-key)       | Reduce to key of last matching element       | `Reduce::toLastMatchKey($data, $predicate, [$default])`       |
 | [`toOnly`](docs/reduce.md#to-only)                         | Reduce to its sole element                   | `Reduce::toOnly($data)`                                       |
 | [`consume`](docs/reduce.md#consume)                        | Drain iterable, discarding values            | `Reduce::consume($data)`                                      |
-| [`toMax`](docs/reduce.md#to-max)                           | Reduce to its largest element                | `Reduce::toMax($numbers, [$compareBy])`                       |
-| [`toMedian`](docs/reduce.md#to-median)                     | Reduce to its median value                   | `Reduce::toMedian($numbers)`                                  |
-| [`toMin`](docs/reduce.md#to-min)                           | Reduce to its smallest element               | `Reduce::toMin($numbers, [$compareBy])`                       |
+| [`toMax`](docs/reduce.md#to-max)                           | Reduce to its largest element                | `Reduce::toMax($data, [$compareBy])`                          |
+| [`toMedian`](docs/reduce.md#to-median)                     | Reduce to its median value                   | `Reduce::toMedian($data)`                                     |
+| [`toMin`](docs/reduce.md#to-min)                           | Reduce to its smallest element               | `Reduce::toMin($data, [$compareBy])`                          |
 | [`toMinMax`](docs/reduce.md#to-min-max)                    | Reduce to array of upper and lower bounds    | `Reduce::toMinMax($numbers, [$compareBy])`                    |
 | [`toMode`](docs/reduce.md#to-mode)                         | Reduce to a list of its modes (most frequent) | `Reduce::toMode($data)`                                       |
 | [`toNth`](docs/reduce.md#to-nth)                           | Reduce to value at nth position              | `Reduce::toNth($data, $position)`                             |
-| [`toPercentile`](docs/reduce.md#to-percentile)             | Reduce to value at given percentile [0, 100] | `Reduce::toPercentile($numbers, $percentile)`                 |
-| [`toProduct`](docs/reduce.md#to-product)                   | Reduce to the product of its elements        | `Reduce::toProduct($numbers)`                                 |
-| [`toQuantile`](docs/reduce.md#to-quantile)                 | Reduce to value at given quantile [0, 1]     | `Reduce::toQuantile($numbers, $quantile)`                     |
+| [`toPercentile`](docs/reduce.md#to-percentile)             | Reduce to value at given percentile [0, 100] | `Reduce::toPercentile($data, $percentile)`                    |
+| [`toProduct`](docs/reduce.md#to-product)                   | Reduce to the product of its elements        | `Reduce::toProduct($data)`                                    |
+| [`toQuantile`](docs/reduce.md#to-quantile)                 | Reduce to value at given quantile [0, 1]     | `Reduce::toQuantile($data, $quantile)`                        |
 | [`toRandomValue`](docs/reduce.md#to-random-value)          | Reduce to random value from iterable         | `Reduce::toRandomValue($data)`                                |
 | [`toRange`](docs/reduce.md#to-range)                       | Reduce to difference of max and min values   | `Reduce::toRange($numbers)`                                   |
-| [`toStandardDeviation`](docs/reduce.md#to-standard-deviation) | Reduce to standard deviation (population/sample) | `Reduce::toStandardDeviation($numbers, [$sample])`            |
+| [`toStandardDeviation`](docs/reduce.md#to-standard-deviation) | Reduce to standard deviation (population/sample) | `Reduce::toStandardDeviation($data, [$sample])`               |
 | [`toString`](docs/reduce.md#to-string)                     | Reduce to joined string                      | `Reduce::toString($data, [$separator], [$prefix], [$suffix])` |
-| [`toSum`](docs/reduce.md#to-sum)                           | Reduce to the sum of its elements            | `Reduce::toSum($numbers)`                                     |
+| [`toSum`](docs/reduce.md#to-sum)                           | Reduce to the sum of its elements            | `Reduce::toSum($data)`                                        |
 | [`toValue`](docs/reduce.md#to-value)                       | Reduce to value using callable reducer       | `Reduce::toValue($data, $reducer, $initialValue)`             |
-| [`toVariance`](docs/reduce.md#to-variance)                 | Reduce to variance (population/sample)       | `Reduce::toVariance($numbers, [$sample])`                     |
+| [`toVariance`](docs/reduce.md#to-variance)                 | Reduce to variance (population/sample)       | `Reduce::toVariance($data, [$sample])`                        |
 
 ### Stream Iteration Tools
 #### Stream Sources
@@ -308,10 +308,10 @@ Quick Reference
 |--------------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------------|
 | [`of`](docs/stream.md#of)                                      | Create a stream from an iterable                                | `Stream::of($iterable)`                             |
 | [`ofCoinFlips`](docs/stream.md#of-coin-flips)                  | Create a stream of random coin flips                            | `Stream::ofCoinFlips($repetitions)`                 |
-| [`ofCsvFile`](docs/stream.md#of-csv-file)                      | Create a stream from a CSV file                                 | `Stream::ofCsvFile($fileHandle)`                    |
-| [`ofCsvFileAssoc`](docs/stream.md#of-csv-file-assoc)           | Create a stream from a CSV file keyed by header                 | `Stream::ofCsvFileAssoc($fileHandle)`               |
+| [`ofCsvFile`](docs/stream.md#of-csv-file)                      | Create a stream from a CSV file                                 | `Stream::ofCsvFile($file)`                          |
+| [`ofCsvFileAssoc`](docs/stream.md#of-csv-file-assoc)           | Create a stream from a CSV file keyed by header                 | `Stream::ofCsvFileAssoc($fileResource)`             |
 | [`ofEmpty`](docs/stream.md#of-empty)                           | Create an empty stream                                          | `Stream::ofEmpty()`                                 |
-| [`ofFileLines`](docs/stream.md#of-file-lines)                  | Create a stream from lines of a file                            | `Stream::ofFileLines($fileHandle)`                  |
+| [`ofFileLines`](docs/stream.md#of-file-lines)                  | Create a stream from lines of a file                            | `Stream::ofFileLines($file)`                        |
 | [`ofRandomChoice`](docs/stream.md#of-random-choice)            | Create a stream of random selections                            | `Stream::ofRandomChoice($items, $repetitions)`      |
 | [`ofRandomNumbers`](docs/stream.md#of-random-numbers)          | Create a stream of random numbers (integers)                    | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
 | [`ofRandomPercentage`](docs/stream.md#of-random-percentage)    | Create a stream of random percentages between 0 and 1           | `Stream::ofRandomPercentage($repetitions)`          |
@@ -327,9 +327,9 @@ Quick Reference
 | [`asortBy`](docs/stream.md#asort-by)                                                  | Sorts the stream by extracted key, maintaining keys                                       | `$stream->asortBy($keyFn)`                                                        |
 | [`chainWith`](docs/stream.md#chain-with)                                                | Chain iterable source with given iterables together into a single iteration               | `$stream->chainWith(...$iterables)`                                               |
 | [`compress`](docs/stream.md#compress)                                                 | Compress source by filtering out data not selected                                        | `$stream->compress($selectors)`                                                   |
-| [`compressAssociative`](docs/stream.md#compress-associative)                          | Compress source by filtering out keys not selected                                        | `$stream->compressAssociative($selectorKeys)`                                     |
+| [`compressAssociative`](docs/stream.md#compress-associative)                          | Compress source by filtering out keys not selected                                        | `$stream->compressAssociative($keys)`                                             |
 | [`chunkwise`](docs/stream.md#chunkwise)                                               | Iterate by chunks                                                                         | `$stream->chunkwise($chunkSize)`                                                  |
-| [`chunkwiseOverlap`](docs/stream.md#chunkwise-overlap)                                | Iterate by overlapped chunks                                                              | `$stream->chunkwiseOverlap($chunkSize, $overlap)`                                 |
+| [`chunkwiseOverlap`](docs/stream.md#chunkwise-overlap)                                | Iterate by overlapped chunks                                                              | `$stream->chunkwiseOverlap($chunkSize, $overlapSize)`                             |
 | [`distinct`](docs/stream.md#distinct)                                                 | Filter out elements: iterate only unique items                                            | `$stream->distinct([$strict])`                                                    |
 | [`distinctAdjacent`](docs/stream.md#distinct-adjacent)                                | Remove only consecutive duplicates                                                        | `$stream->distinctAdjacent()`                                                     |
 | [`distinctAdjacentBy`](docs/stream.md#distinct-adjacent-by)                           | Remove only consecutive duplicates using custom key                                       | `$stream->distinctAdjacentBy($keyFn)`                                             |
@@ -345,20 +345,20 @@ Quick Reference
 | [`filterFalse`](docs/stream.md#filter-false)                                          | Filter for only falsy elements                                                            | `$stream->filterFalse()`                                                          |
 | [`filterKeys`](docs/stream.md#filter-keys)                                            | Filter for keys where predicate function is true                                          | `$stream->filterKeys($predicate)`                                                 |
 | [`filterWithKeys`](docs/stream.md#filter-with-keys)                                   | Filter with value- and key-aware predicate                                                | `$stream->filterWithKeys($predicate)`                                             |
-| [`flatMap`](docs/stream.md#flat-map)                                                  | Map function onto elements and flatten result                                             | `$stream->flatMap($function)`                                                     |
+| [`flatMap`](docs/stream.md#flat-map)                                                  | Map function onto elements and flatten result                                             | `$stream->flatMap($func)`                                                         |
 | [`flatMapWithKeys`](docs/stream.md#flat-map-with-keys)                                | Key-aware map onto elements and flatten result                                            | `$stream->flatMapWithKeys($func)`                                                 |
 | [`flatten`](docs/stream.md#flatten)                                                   | Flatten multidimensional stream                                                           | `$stream->flatten($dimensions)`                                                   |
 | [`frequencies`](docs/stream.md#frequencies)                                           | Frequency distribution                                                                    | `$stream->frequencies([$strict])`                                                 |
 | [`frequenciesBy`](docs/stream.md#frequencies-by)                                      | Frequency distribution by key function                                                    | `$stream->frequenciesBy($keyFunc, [$strict])`                                     |
 | [`groupAdjacentBy`](docs/stream.md#group-adjacent-by)                                 | Group adjacent elements sharing an extracted key                                          | `$stream->groupAdjacentBy($keyFn)`                                                |
-| [`groupBy`](docs/stream.md#group-by)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction, [$itemKeyFunc])`                             |
+| [`groupBy`](docs/stream.md#group-by)                                                  | Group iterable source by a common data element                                            | `$stream->groupBy($groupKeyFunction, [$itemKeyFunction])`                         |
 | [`infiniteCycle`](docs/stream.md#infinite-cycle)                                        | Cycle through the elements of iterable source sequentially forever                        | `$stream->infiniteCycle()`                                                        |
 | [`intersectionWith`](docs/stream.md#intersection-with)                                  | Intersect iterable source and given iterables                                             | `$stream->intersectionWith(...$iterables)`                                        |
 | [`intersectionCoerciveWith`](docs/stream.md#intersection-coercive-with)                | Intersect iterable source and given iterables with type coercion                          | `$stream->intersectionCoerciveWith(...$iterables)`                                |
 | [`intersperse`](docs/stream.md#intersperse)                                           | Insert a separator between elements of the stream                                         | `$stream->intersperse($separator)`                                                |
 | [`largest`](docs/stream.md#largest)                                                   | Reduce the stream to the n largest elements (descending)                                  | `$stream->largest($n, [$keyFn])`                                                  |
 | [`limit`](docs/stream.md#limit)                                                       | Limit the stream's iteration                                                              | `$stream->limit($limit)`                                                          |
-| [`map`](docs/stream.md#map)                                                           | Map function onto elements                                                                | `$stream->map($function)`                                                         |
+| [`map`](docs/stream.md#map)                                                           | Map function onto elements                                                                | `$stream->map($func)`                                                             |
 | [`mapWithKeys`](docs/stream.md#map-with-keys)                                         | Map value- and key-aware function onto elements                                           | `$stream->mapWithKeys($func)`                                                     |
 | [`mapSpread`](docs/stream.md#map-spread)                                              | Map function onto elements, splatting items as positional args                            | `$stream->mapSpread($function)`                                                   |
 | [`memoize`](docs/stream.md#memoize)                                                   | Lazily cache the stream at this pipeline point for replay                                  | `$stream->memoize()`                                                              |
@@ -375,7 +375,7 @@ Quick Reference
 | [`combinationsWithReplacement`](docs/stream.md#combinations-with-replacement)         | Combinations with replacement of the stream's elements                                    | `$stream->combinationsWithReplacement($r)`                                        |
 | [`powerset`](docs/stream.md#powerset)                                                 | Every subset of the stream's elements                                                     | `$stream->powerset()`                                                             |
 | [`prepend`](docs/stream.md#prepend)                                                   | Prepend values to the front of the stream                                                 | `$stream->prepend(...$values)`                                                    |
-| [`reindex`](docs/stream.md#reindex)                                                   | Reindex keys of key-value stream                                                          | `$stream->reindex($reindexer)`                                                    |
+| [`reindex`](docs/stream.md#reindex)                                                   | Reindex keys of key-value stream                                                          | `$stream->reindex($indexer)`                                                      |
 | [`relativeFrequencies`](docs/stream.md#relative-frequencies)                          | Relative frequency distribution                                                           | `$stream->relativeFrequencies([$strict])`                                         |
 | [`relativeFrequenciesBy`](docs/stream.md#relative-frequencies-by)                     | Relative frequency distribution by key function                                           | `$stream->relativeFrequenciesBy($keyFunc, [$strict])`                             |
 | [`reservoirSample`](docs/stream.md#reservoir-sample)                                  | Single-pass uniform random sample (eager)                                                 | `$stream->reservoirSample($size, [$engine])`                                      |
@@ -415,7 +415,7 @@ Quick Reference
 | [`zipEqual`](docs/stream.md#zip-equal)                                                  | Zip rows of the stream column-wise, throwing if lengths differ                            | `$stream->zipEqual()`                                                             |
 | [`zipWith`](docs/stream.md#zip-with)                                                    | Iterate iterable source with another iterable collection simultaneously                   | `$stream->zipWith(...$iterables)`                                                 |
 | [`zipEqualWith`](docs/stream.md#zip-equal-with)                                         | Iterate iterable source with another iterable collection of equal lengths simultaneously  | `$stream->zipEqualWith(...$iterables)`                                            |
-| [`zipFilledWith`](docs/stream.md#zip-filled-with)                                       | Iterate iterable source with another iterable collection using default filler             | `$stream->zipFilledWith($default, ...$iterables)`                                 |
+| [`zipFilledWith`](docs/stream.md#zip-filled-with)                                       | Iterate iterable source with another iterable collection using default filler             | `$stream->zipFilledWith($filler, ...$iterables)`                                  |
 | [`zipLongestWith`](docs/stream.md#zip-longest-with)                                     | Iterate iterable source with another iterable collection simultaneously                   | `$stream->zipLongestWith(...$iterables)`                                          |
 
 #### Stream Terminal Operations
@@ -438,8 +438,8 @@ Quick Reference
 | [`endsWith`](docs/stream.md#ends-with)                                       | Returns true if stream ends with the given suffix                                | `$stream->endsWith($suffix)`                           |
 | [`endsWithCoercive`](docs/stream.md#ends-with-coercive)                      | Returns true if stream ends with the given suffix with type coercion             | `$stream->endsWithCoercive($suffix)`                   |
 | [`exactlyN`](docs/stream.md#exactly-n)                                       | Returns true if exactly n items are true according to predicate                  | `$stream->exactlyN($n, $predicate)`                    |
-| [`isEmpty`](docs/stream.md#is-empty)                                         | Returns true if stream has no items                                              | `$stream::isEmpty()`                                   |
-| [`isPartitioned`](docs/stream.md#is-partitioned)                             | Returns true if partitioned with items true according to predicate before others | `$stream::isPartitioned($predicate)`                   |
+| [`isEmpty`](docs/stream.md#is-empty)                                         | Returns true if stream has no items                                              | `$stream->isEmpty()`                                   |
+| [`isPartitioned`](docs/stream.md#is-partitioned)                             | Returns true if partitioned with items true according to predicate before others | `$stream->isPartitioned($predicate)`                   |
 | [`isSorted`](docs/stream.md#is-sorted)                                       | Returns true if stream is sorted in ascending order                              | `$stream->isSorted()`                                  |
 | [`isReversed`](docs/stream.md#is-reversed)                                   | Returns true if stream is sorted in reverse descending order                     | `$stream->isReversed()`                                |
 | [`isSortedBy`](docs/stream.md#is-sorted-by)                                  | Returns true if stream is sorted in ascending order by key function              | `$stream->isSortedBy($keyFunc)`                        |
@@ -495,20 +495,20 @@ Quick Reference
 ##### Side Effect Terminal Operations
 | Terminal Operation              | Description                                    | Code Snippet                                         |
 |---------------------------------|------------------------------------------------|------------------------------------------------------|
-| [`callForEach`](docs/stream.md#call-for-each) | Perform action via function on each item       | `$stream->callForEach($function)`                    |
-| [`callForEachWithKeys`](docs/stream.md#call-for-each-with-keys) | Perform an action with each value and key | `$stream->callForEachWithKeys($function)`            |
+| [`callForEach`](docs/stream.md#call-for-each) | Perform action via function on each item       | `$stream->callForEach($func)`                        |
+| [`callForEachWithKeys`](docs/stream.md#call-for-each-with-keys) | Perform an action with each value and key | `$stream->callForEachWithKeys($func)`                |
 | [`consume`](docs/stream.md#consume)           | Drain stream, discarding values                | `$stream->consume()`                                 |
 | [`print`](docs/stream.md#print)               | `print` each item in the stream                | `$stream->print([$separator], [$prefix], [$suffix])` |
 | [`printLn`](docs/stream.md#print-line)        | `print` each item on a new line                | `$stream->printLn()`                                 |
-| [`toCsvFile`](docs/stream.md#to-csv-file)     | Write the contents of the stream to a CSV file | `$stream->toCsvFile($fileHandle, [$headers])`        |
-| [`toFile`](docs/stream.md#to-file)            | Write the contents of the stream to a file     | `$stream->toFile($fileHandle)`                       |
+| [`toCsvFile`](docs/stream.md#to-csv-file)     | Write the contents of the stream to a CSV file | `$stream->toCsvFile($fileResource, [$header])`       |
+| [`toFile`](docs/stream.md#to-file)            | Write the contents of the stream to a file     | `$stream->toFile($fileResource)`                     |
 
 #### Stream Debug Operations
 | Debug Operation              | Description                                              | Code Snippet                     |
 |------------------------------|----------------------------------------------------------|----------------------------------|
-| [`peek`](docs/stream.md#peek)              | Peek at each element between stream operations           | `$stream->peek($peekFunc)`       |
-| [`peekWithKeys`](docs/stream.md#peek-with-keys) | Lazily peek at each value and key                      | `$stream->peekWithKeys($peekFunc)` |
-| [`peekStream`](docs/stream.md#peek-stream) | Peek at the entire stream between operations             | `$stream->peekStream($peekFunc)` |
+| [`peek`](docs/stream.md#peek)              | Peek at each element between stream operations           | `$stream->peek($callback)`       |
+| [`peekWithKeys`](docs/stream.md#peek-with-keys) | Lazily peek at each value and key                      | `$stream->peekWithKeys($callback)` |
+| [`peekStream`](docs/stream.md#peek-stream) | Peek at the entire stream between operations             | `$stream->peekStream($callback)` |
 | [`peekPrint`](docs/stream.md#peek-print)   | Peek at each element by printing between operations      | `$stream->peekPrint()`           |
 | [`peekPrintR`](docs/stream.md#peek-printr) | Peek at each element by doing print-r between operations | `$stream->peekPrintR()`          |
 | [`printR`](docs/stream.md#print-r)         | `print_r` each item                                      | `$stream->printR()`              |

@@ -65,7 +65,7 @@ Returns true if at least n items match the predicate function.
 - Short-circuits as soon as the count reaches n.
 - `n <= 0` always returns true.
 
-```Summary::atLeastN(iterable $data, int $n, callable $predicate = null): bool```
+```Summary::atLeastN(iterable $data, int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Summary;
@@ -88,7 +88,7 @@ Returns true if at most n items match the predicate function.
 - Short-circuits as soon as the count exceeds n.
 - `n < 0` always returns false.
 
-```Summary::atMostN(iterable $data, int $n, callable $predicate = null): bool```
+```Summary::atMostN(iterable $data, int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Summary;
@@ -235,7 +235,7 @@ Returns true if exactly n items are true according to a predicate function.
 - Predicate is optional.
 - Default predicate is boolean value of each item.
 
-```Summary::exactlyN(iterable $data, int $n, callable $predicate): bool```
+```Summary::exactlyN(iterable $data, int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Summary;
@@ -274,7 +274,7 @@ Returns true if all elements of given collection that satisfy the predicate appe
 - Returns true for empty collection or for collection with single item.
 - Default predicate if not provided is the boolean value of each data item.
 
-```Summary::isPartitioned(iterable $data, callable $predicate = null): bool```
+```Summary::isPartitioned(iterable $data, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Summary;

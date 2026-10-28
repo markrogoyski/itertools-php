@@ -54,7 +54,7 @@ $repetitions = 10;
 foreach (Random::number($min, $max, $repetitions) as $number) {
     print($number);
 }
-// 3, 2, 5, 5, 1, 2, ... [random]
+// 3, 2, 4, 4, 1, 2, ... [random]
 ```
 
 ### Percentage

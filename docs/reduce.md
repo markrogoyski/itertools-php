@@ -11,7 +11,7 @@ Reduces to the mean average.
 
 Returns null if collection is empty.
 
-```Reduce::toAverage(iterable $data): float```
+```Reduce::toAverage(iterable $data): int|float|null```
 
 ```php
 use IterTools\Reduce;
@@ -256,7 +256,7 @@ $lastAdultName = Reduce::toLastMatchKey($users, fn (int $age) => $age >= 18);
 ### To Max
 Reduces to the max value.
 
-```Reduce::toMax(iterable $data, callable $compareBy = null): mixed|null```
+```Reduce::toMax(iterable $data, ?callable $compareBy = null): mixed```
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
@@ -316,7 +316,7 @@ $median = Reduce::toMedian($grades);
 ### To Min
 Reduces to the min value.
 
-```Reduce::toMin(iterable $data, callable $compareBy = null): mixed|null```
+```Reduce::toMin(iterable $data, ?callable $compareBy = null): mixed```
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
@@ -362,7 +362,7 @@ $lowestRatedMovie = Reduce::toMin($movieRatings, $compareBy);
 ### To Min Max
 Reduces to array of its upper and lower bounds (max and min).
 
-```Reduce::toMinMax(iterable $numbers, callable $compareBy = null): array```
+```Reduce::toMinMax(iterable $numbers, ?callable $compareBy = null): array```
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
@@ -446,7 +446,7 @@ use IterTools\Reduce;
 $lotrMovies = ['The Fellowship of the Ring', 'The Two Towers', 'The Return of the King'];
 
 $rotk = Reduce::toNth($lotrMovies, 2);
-// 20
+// 'The Return of the King'
 ```
 
 ### To Only
@@ -501,7 +501,7 @@ Reduces to the product of its elements.
 
 Returns null if collection is empty.
 
-```Reduce::toProduct(iterable $data): number|null```
+```Reduce::toProduct(iterable $data): int|float|null```
 
 ```php
 use IterTools\Reduce;
@@ -616,7 +616,7 @@ $string = Reduce::toString($words, '-', 'Library: ', '!');
 ### To Sum
 Reduces to the sum of its elements.
 
-```Reduce::toSum(iterable $data): number```
+```Reduce::toSum(iterable $data): int|float```
 
 ```php
 use IterTools\Reduce;

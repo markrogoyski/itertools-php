@@ -26,7 +26,7 @@ $numbers = [1, 2, 3, 4, 5, 6];
 ### Tee
 Return several independent (duplicated) iterators from a single iterable.
 
-```Transform::tee(iterable $data, int $count): array```
+```Transform::tee(iterable $iterable, int $count): array```
 
 ```php
 use IterTools\Transform;
@@ -43,7 +43,7 @@ A copy can be rewound as long as it has not advanced. Once it has, `rewind()` th
 ### To Array
 Transforms any iterable to an array.
 
-```Transform::toArray(iterable $data): array```
+```Transform::toArray(iterable $iterable): array```
 
 ```php
 use IterTools\Transform;
@@ -56,7 +56,7 @@ $array = Transform::toArray($iterator);
 ### To Associative Array
 Transforms any iterable to an associative array.
 
-```Transform::toAssociativeArray(iterable $data, callable $keyFunc = null, callable $valueFunc = null): array```
+```Transform::toAssociativeArray(iterable $iterable, ?callable $keyFunc = null, ?callable $valueFunc = null): array```
 
 ```php
 use IterTools\Transform;
@@ -77,7 +77,7 @@ $associativeArray = Transform::toAssociativeArray($messages, $keyFunc, $valueFun
 ### To Iterator
 Transforms any iterable to an iterator.
 
-```Transform::toArray(iterable $data): array```
+```Transform::toIterator(iterable $iterable): \Iterator```
 
 ```php
 use IterTools\Transform;

@@ -155,7 +155,7 @@ foreach (Sort::asortBy($people, fn ($p) => $p->age) as $key => $person) {
 ### Largest
 Iterate the n largest elements of the collection in descending order.
 
-```Sort::largest(iterable $data, int $n, callable $keyFn = null)```
+```Sort::largest(iterable $data, int $n, ?callable $keyFn = null)```
 
 Uses a bounded heap of size `n` internally — the full input is never sorted, making
 this efficient for large inputs when only a few extremes are needed (`O(N log n)`).
@@ -206,7 +206,7 @@ foreach (Sort::largest($leaderboard, 3, fn ($p) => $p->score) as $player) {
 ### Smallest
 Iterate the n smallest elements of the collection in ascending order.
 
-```Sort::smallest(iterable $data, int $n, callable $keyFn = null)```
+```Sort::smallest(iterable $data, int $n, ?callable $keyFn = null)```
 
 Uses a bounded heap of size `n` internally — the full input is never sorted, making
 this efficient for large inputs when only a few extremes are needed (`O(N log n)`).

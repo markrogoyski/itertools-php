@@ -85,7 +85,7 @@ foreach (Math::relativeFrequenciesBy($words, fn ($word) => \strlen($word)) as $l
 ### Running Average
 Накопление среднего арифметического элементов коллекции в процессе итерирования.
 
-```Math::runningAverage(iterable $numbers, int|float $initialValue = null)```
+```Math::runningAverage(iterable $numbers, int|float|null $initialValue = null)```
 
 ```php
 use IterTools\Math;
@@ -101,7 +101,7 @@ foreach (Math::runningAverage($grades) as $runningAverage) {
 ### Running Difference
 Накопление разности элементов коллекции в процессе итерирования.
 
-```Math::runningDifference(iterable $numbers, int|float $initialValue = null)```
+```Math::runningDifference(iterable $numbers, int|float|null $initialValue = null)```
 
 ```php
 use IterTools\Math;
@@ -129,7 +129,7 @@ foreach (Math::runningDifference($dartsScores, $startingScore) as $runningScore)
 ### Running Max
 Поиск максимального значения в процессе итерирования.
 
-```Math::runningMax(iterable $numbers, int|float $initialValue = null)```
+```Math::runningMax(iterable $numbers, int|float|null $initialValue = null)```
 
 ```php
 use IterTools\Math;
@@ -145,7 +145,7 @@ foreach (Math::runningMax($numbers) as $runningMax) {
 ### Running Min
 Поиск минимального значения в процессе итерирования.
 
-```Math::runningMin(iterable $numbers, int|float $initialValue = null)```
+```Math::runningMin(iterable $numbers, int|float|null $initialValue = null)```
 
 ```php
 use IterTools\Math;
@@ -161,7 +161,7 @@ foreach (Math::runningMin($numbers) as $runningMin) {
 ### Running Product
 Накопление произведения элементов коллекции в процессе итерирования.
 
-```Math::runningProduct(iterable $numbers, int|float $initialValue = null)```
+```Math::runningProduct(iterable $numbers, int|float|null $initialValue = null)```
 
 ```php
 use IterTools\Math;
@@ -190,7 +190,7 @@ foreach (Math::runningProduct($numbers, $initialValue) as $runningProduct) {
 ### Running Total
 Накопление суммы элементов коллекции в процессе итерирования.
 
-```Math::runningTotal(iterable $numbers, int|float $initialValue = null)```
+```Math::runningTotal(iterable $numbers, int|float|null $initialValue = null)```
 
 ```php
 use IterTools\Math;

@@ -65,7 +65,7 @@ $result = Stream::ofCoinFlips(10)
 #### Of CSV File
 Creates a stream of rows of a CSV file.
 
-```Stream::ofCsvFile(resource $fileHandle, string $separator = ',', string $enclosure = '"', string = $escape = '\\'): Stream```
+```Stream::ofCsvFile(resource $file, string $separator = ',', string $enclosure = '"', string $escape = '\\'): Stream```
 
 The default `$escape = '\\'` does not round-trip every value: a field that ends in a backslash, such as `C:\Users\`, is written as `"C:\Users\"`, and the reader takes the final `\"` for an escaped quote, so the field never closes and swallows the following row(s). Pass `$escape = ''` on both the write and the read side to turn the escape character off, as PHP recommends, and read a file with the `$escape` it was written with. The default stays `'\\'` so that files already written keep their bytes.
 
@@ -74,14 +74,14 @@ use IterTools\Stream;
 
 $fileHandle = \fopen('path/to/file.csv', 'r');
 
-$result = Stream::of($fileHandle)
+$result = Stream::ofCsvFile($fileHandle)
     ->toArray();
 ```
 
 #### Of CSV File Assoc
 Creates a stream of rows of a CSV file as associative arrays keyed by header.
 
-```Stream::ofCsvFileAssoc(resource $fileHandle, ?array $headers = null, string $separator = ',', string $enclosure = '"', string $escape = '\\'): Stream```
+```Stream::ofCsvFileAssoc(resource $fileResource, ?array $headers = null, string $separator = ',', string $enclosure = '"', string $escape = '\\'): Stream```
 
 The default `$escape = '\\'` does not round-trip every value: a field that ends in a backslash, such as `C:\Users\`, is written as `"C:\Users\"`, and the reader takes the final `\"` for an escaped quote, so the field never closes and swallows the following row(s). `ofCsvFileAssoc` raises no error when the merged row still has the header count (e.g. in a single-column file), and silently loses the rows. Pass `$escape = ''` on both the write and the read side to turn the escape character off, as PHP recommends, and read a file with the `$escape` it was written with. The default stays `'\\'` so that files already written keep their bytes.
 
@@ -114,14 +114,14 @@ $result = Stream::ofEmpty()
 #### Of File Lines
 Creates a stream of lines of a file.
 
-```Stream::ofFileLines(resource $fileHandle): Stream```
+```Stream::ofFileLines(resource $file): Stream```
 
 ```php
 use IterTools\Stream;
 
 $fileHandle = \fopen('path/to/file.txt', 'r');
 
-$result = Stream::of($fileHandle)
+$result = Stream::ofFileLines($fileHandle)
     ->map('strtoupper')
     ->toArray();
 ```
@@ -178,7 +178,7 @@ Creates a lazy stream of a finite arithmetic progression of numbers.
 
 * Numeric strings (e.g. `"1"`, `"1.5"`, `"1e3"`, `"01"`) are accepted and coerced to `int`/`float` before iteration. Non-numeric strings (e.g. `"a"`) throw `\InvalidArgumentException`.
 * Direction is inferred from `$start` vs `$end`. A negative `$step` is accepted only when the direction is descending.
-* Throws `\InvalidArgumentException` when any operand is non-finite (including numeric strings such as `"1e309"` that overflow to `INF`), when `$step == 0`, when the step sign conflicts with the operand direction, or when `abs($step) > abs($end - $start)`.
+* Throws `\InvalidArgumentException` when any operand is non-finite (including numeric strings such as `"1e309"` that overflow to `INF`), when `$step == 0`, when the step sign conflicts with the operand direction, or when `abs($step) > abs($end - $start)` and `$start != $end`.
 * Lazy — safe to use with large bounds combined with downstream operations such as `limit`.
 
 ```php
@@ -718,7 +718,7 @@ $result = Stream::of($input)
 #### Filter Keys
 Filter out elements from the stream only keeping elements where the predicate function on the keys is true.
 
-```$stream->filterKeys(callable $filter): Stream```
+```$stream->filterKeys(callable $predicate): Stream```
 
 ```php
 use IterTools\Stream;
@@ -774,7 +774,7 @@ $result = Stream::of($inventory)
 #### Flat Map
 Map a function onto the elements of the stream and flatten the results.
 
-```$stream->flatMap(callable $mapper): Stream```
+```$stream->flatMap(callable $func): Stream```
 
 ```php
 use IterTools\Stream;
@@ -862,7 +862,7 @@ $result = Stream::of($words)
 #### Group By
 Return a stream grouping by a common data element.
 
-```$stream->groupBy(callable $groupKeyFunction, callable $itemKeyFunction = null): Stream```
+```$stream->groupBy(callable $groupKeyFunction, ?callable $itemKeyFunction = null): Stream```
 
 * The `$groupKeyFunction` determines the key to group elements by.
 * The optional `$itemKeyFunction` allows custom indexes within each group member.
@@ -992,7 +992,7 @@ $goodMovies = Stream::of($matrixMovies)
 #### Map
 Return a stream containing the result of mapping a function onto each element of the stream.
 
-```$stream->map(callable $function): Stream```
+```$stream->map(callable $func): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1384,7 +1384,7 @@ Extract a slice of the stream.
 
 Lazy: the upstream is never advanced beyond the last element that is yielded. A count of 0 does not touch the upstream at all. Elements skipped by `$start` or `$step` must still be pulled in order to be skipped over.
 
-```$stream->slice(int $start = 0, int $count = null, int $step = 1)```
+```$stream->slice(int $start = 0, ?int $count = null, int $step = 1)```
 
 ```php
 use IterTools\Stream;
@@ -1400,7 +1400,7 @@ $summerOlympics = Stream::of($olympics)
 #### Sort
 Sorts the stream.
 
-```$stream->sort(callable $comparator = null)```
+```$stream->sort(?callable $comparator = null)```
 
 If comparator is not provided, the elements of the iterable source must be comparable.
 The default comparison compares an integer and a float by exact value, and sorts a float
@@ -1506,7 +1506,7 @@ $result = Stream::of($people)
 #### Largest
 Reduces the stream to the n largest elements (descending order).
 
-```$stream->largest(int $n, callable $keyFn = null)```
+```$stream->largest(int $n, ?callable $keyFn = null)```
 
 Uses a bounded heap of size `n` internally — the full stream is never sorted.
 Stable under ties; compares an integer and a float key by exact value; skips NaN keys (not a NaN nested in a
@@ -1547,7 +1547,7 @@ $result = Stream::of($leaderboard)
 #### Smallest
 Reduces the stream to the n smallest elements (ascending order).
 
-```$stream->smallest(int $n, callable $keyFn = null)```
+```$stream->smallest(int $n, ?callable $keyFn = null)```
 
 Uses a bounded heap of size `n` internally — the full stream is never sorted.
 Stable under ties; compares an integer and a float key by exact value; skips NaN keys (not a NaN nested in a
@@ -1969,7 +1969,7 @@ $stream = Stream::of($input)
 #### Zip Filled With
 Return a stream consisting of multiple iterable collections, using a default filler value if lengths no equal.
 
-```$stream->zipFilledWith(mixed $default, iterable ...$iterables): Stream```
+```$stream->zipFilledWith(mixed $filler, iterable ...$iterables): Stream```
 
 ```php
 use IterTools\Stream;
@@ -1998,8 +1998,7 @@ use IterTools\Stream;
 $input = [1, 2, 3];
 
 $stream = Stream::of($input)
-    ->zipEqualWith([4, 5, 6])
-    ->zipEqualWith([7, 8, 9]);
+    ->zipEqualWith([4, 5, 6], [7, 8, 9]);
 
 foreach ($stream as $zipped) {
     // [1, 4, 7], [2, 5, 8], [3, 6, 9]
@@ -2020,11 +2019,10 @@ use IterTools\Stream;
 $input = [1, 2, 3, 4, 5];
 
 $stream = Stream::of($input)
-    ->zipLongestWith([4, 5, 6])
-    ->zipLongestWith([7, 8, 9, 10]);
+    ->zipLongestWith([4, 5, 6], [7, 8, 9, 10]);
 
 foreach ($stream as $zipped) {
-    // [1, 4, 7], [2, 5, 8], [3, 6, 9], [4, null, 10], [null, null, 5]
+    // [1, 4, 7], [2, 5, 8], [3, 6, 9], [4, null, 10], [5, null, null]
 }
 ```
 
@@ -2371,7 +2369,7 @@ Returns true if at least n items in the stream match the predicate function.
 - Short-circuits as soon as the count reaches n.
 - `n <= 0` always returns true.
 
-```$stream->atLeastN(int $n, callable $predicate = null): bool```
+```$stream->atLeastN(int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Stream;
@@ -2391,7 +2389,7 @@ Returns true if at most n items in the stream match the predicate function.
 - Short-circuits as soon as the count exceeds n.
 - `n < 0` always returns false.
 
-```$stream->atMostN(int $n, callable $predicate = null): bool```
+```$stream->atMostN(int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Stream;
@@ -2505,7 +2503,7 @@ Returns true if exactly n items are true according to a predicate function.
 - Predicate is optional.
 - Default predicate is boolean value of each item.
 
-```$stream->exactlyN(int $n, callable $predicate = null): bool```
+```$stream->exactlyN(int $n, ?callable $predicate = null): bool```
 
 ```php
 use IterTools\Stream;
@@ -2540,7 +2538,7 @@ Returns true if all elements of given collection that satisfy the predicate appe
 - Returns true for empty collection or for collection with single item.
 - Default predicate if not provided is the boolean value of each data item.
 
-```$stream->isPartitioned(callable $predicate = null): bool```
+```$stream->isPartitioned(?callable $predicate = null): bool```
 
 ```php
 use IterTools\Stream;
@@ -2772,7 +2770,7 @@ $boolean = Stream::of($digits)->startsWithCoercive(['1', '2']);
 ##### To Average
 Reduces iterable source to the mean average of its items.
 
-```$stream->toAverage(): mixed```
+```$stream->toAverage(): int|float|null```
 
 Returns null if iterable source is empty.
 
@@ -2789,7 +2787,7 @@ $result = Stream::of($input)
 ##### To Count
 Reduces iterable source to its length.
 
-```$stream->toCount(): mixed```
+```$stream->toCount(): int```
 
 Uses `Countable::count()` when the source is countable, without traversing it. A `Countable` that misreports its size, such as a `\CachingIterator` with `FULL_CACHE` over a source it has not read yet, gives a wrong length.
 
@@ -2988,7 +2986,7 @@ $result = Stream::of($users)
 ##### To Max
 Reduces iterable source to its max value.
 
-```$stream->toMax(callable $compareBy = null): mixed```
+```$stream->toMax(?callable $compareBy = null): mixed```
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
@@ -3028,7 +3026,7 @@ $median = Stream::of($grades)
 ##### To Min
 Reduces iterable source to its min value.
 
-```$stream->toMin(callable $compareBy = null): mixed```
+```$stream->toMin(?callable $compareBy = null): mixed```
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
@@ -3048,7 +3046,7 @@ $result = Stream::of($input)
 ##### To Min Max
 Reduces stream to array of its upper and lower bounds (max and min).
 
-```$stream->toMinMax(callable $compareBy = null): array```
+```$stream->toMinMax(?callable $compareBy = null): array```
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
@@ -3143,7 +3141,7 @@ $p75 = Stream::of($scores)
 ##### To Product
 Reduces stream to the product of its items.
 
-```$stream->toProduct(): mixed```
+```$stream->toProduct(): int|float|null```
 
 Returns null if iterable source is empty.
 
@@ -3258,7 +3256,7 @@ $string = Stream::of($words)->toString('-', 'Library: ', '!');
 ##### To Sum
 Reduces iterable source to the sum of its items.
 
-```$stream->toSum(): mixed```
+```$stream->toSum(): int|float```
 
 ```php
 use IterTools\Stream;
@@ -3329,7 +3327,7 @@ $array = Stream::of([1, 1, 2, 2, 3, 4, 5])
 ##### To Associative Array
 Returns a key-value map of stream elements.
 
-```$stream->toAssociativeArray(callable $keyFunc, callable $valueFunc): array```
+```$stream->toAssociativeArray(?callable $keyFunc = null, ?callable $valueFunc = null): array```
 
 ```php
 use IterTools\Stream;
@@ -3411,7 +3409,7 @@ A copy can be rewound as long as it has not advanced. Once it has, rewinding it 
 ##### Call For Each
 Perform an action via a callable on each item in the stream.
 
-```$stream->callForEach(callable $function): void```
+```$stream->callForEach(callable $func): void```
 
 ```php
 use IterTools\Stream;
@@ -3491,7 +3489,9 @@ Stream::of($words)->printLn();
 ##### To CSV File
 Write the contents of the stream to a CSV file.
 
-```$stream->toCsvFile(resource $fileHandle, array $header = null, string 'separator = ',', string $enclosure = '"', string $escape = '\\'): void```
+```$stream->toCsvFile(resource $fileResource, ?array $header = null, string $separator = ',', string $enclosure = '"', string $escape = '\\'): void```
+
+Throws `\RuntimeException` if a write fails or is truncated.
 
 The default `$escape = '\\'` does not round-trip every value: a field that ends in a backslash, such as `C:\Users\`, is written as `"C:\Users\"`, and the reader takes the final `\"` for an escaped quote, so the field never closes and swallows the following row(s). Pass `$escape = ''` on both the write and the read side to turn the escape character off, as PHP recommends, and read a file with the `$escape` it was written with. The default stays `'\\'` so that files already written keep their bytes.
 
@@ -3516,7 +3516,9 @@ Stream::of($starWarsMovies)
 ##### To File
 Write the contents of the stream to a file.
 
-```$stream->toFile(resource $fileHandle, string $newLineSeparator = \PHP_EOL, string $header = null, string $footer = null): void```
+```$stream->toFile(resource $fileResource, string $newlineSeparator = \PHP_EOL, ?string $header = null, ?string $footer = null): void```
+
+Throws `\RuntimeException` if a write fails or is truncated.
 
 ```php
 use IterTools\Stream;

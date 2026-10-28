@@ -26,7 +26,7 @@ $numbers = [1, 2, 3, 4, 5, 6];
 ### Tee
 Создает несколько одинаковых независимых итераторов из данной коллекции.
 
-```Transform::tee(iterable $data, int $count): array```
+```Transform::tee(iterable $iterable, int $count): array```
 
 ```php
 use IterTools\Transform;
@@ -41,7 +41,7 @@ $count = 3;
 ### To Array
 Преобразует итерируемую коллекцию в массив.
 
-```Transform::toArray(iterable $data): array```
+```Transform::toArray(iterable $iterable): array```
 
 ```php
 use IterTools\Transform;
@@ -52,7 +52,7 @@ $array = Transform::toArray($iterator);
 ### To Associative Array
 Преобразует итерируемую коллекцию в ассоциативный массив.
 
-```Transform::toAssociativeArray(iterable $data, callable $keyFunc = null, callable $valueFunc = null): array```
+```Transform::toAssociativeArray(iterable $iterable, ?callable $keyFunc = null, ?callable $valueFunc = null): array```
 
 ```php
 use IterTools\Transform;
@@ -70,7 +70,7 @@ $associativeArray = Transform::toAssociativeArray($messages, $keyFunc, $valueFun
 ### To Iterator
 Преобразует итерируемую коллекцию в итератор.
 
-```Transform::toArray(iterable $data): array```
+```Transform::toIterator(iterable $iterable): \Iterator```
 ```php
 use IterTools\Transform;
 $array = [1, 2, 3, 4, 5];

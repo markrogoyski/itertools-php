@@ -155,7 +155,7 @@ foreach (Sort::asortBy($people, fn ($p) => $p->age) as $key => $person) {
 ### Largest
 Возвращает n наибольших элементов коллекции в порядке убывания.
 
-```Sort::largest(iterable $data, int $n, callable $keyFn = null)```
+```Sort::largest(iterable $data, int $n, ?callable $keyFn = null)```
 
 Использует ограниченную кучу размера `n` — полная сортировка входа не выполняется,
 что эффективно для больших входов, когда нужны только несколько крайних значений
@@ -207,7 +207,7 @@ foreach (Sort::largest($leaderboard, 3, fn ($p) => $p->score) as $player) {
 ### Smallest
 Возвращает n наименьших элементов коллекции в порядке возрастания.
 
-```Sort::smallest(iterable $data, int $n, callable $keyFn = null)```
+```Sort::smallest(iterable $data, int $n, ?callable $keyFn = null)```
 
 Использует ограниченную кучу размера `n` — полная сортировка входа не выполняется,
 что эффективно для больших входов, когда нужны только несколько крайних значений
