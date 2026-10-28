@@ -197,4 +197,67 @@ class GroupAdjacentByTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame([0, 1], $keys);
     }
+
+    /**
+     * Regression: a key that shares a reference slot with later keys (here the row itself, filled
+     * the PDO bindColumn way) is compared, and yielded, as it was when it was projected.
+     *
+     * @test groupAdjacentBy splits rows whose reference-slot keys differ when projected
+     */
+    public function testReferenceSlotKeys(): void
+    {
+        // Given
+        $data = self::referenceSlotRows(1, 1, 2, 2, 1);
+        $keyFn = fn (array $row): array => $row;
+
+        // When
+        $keys = [];
+        foreach (Single::groupAdjacentBy($data, $keyFn) as [$key, $group]) {
+            $keys[] = $key;
+        }
+
+        // Then
+        $this->assertSame([['id' => 1], ['id' => 2], ['id' => 1]], $keys);
+    }
+
+    /**
+     * Regression: the next group's key is captured before the previous group is yielded, so a
+     * consumer that writes through the shared slot does not change it.
+     *
+     * @test groupAdjacentBy compares and yields reference-slot keys as projected, whatever the consumer writes
+     */
+    public function testReferenceSlotKeysWrittenByConsumer(): void
+    {
+        // Given
+        $data = self::referenceSlotRows(1, 1, 2, 2, 1);
+        $keyFn = fn (array $row): array => $row;
+
+        // When
+        $keys = [];
+        foreach (Single::groupAdjacentBy($data, $keyFn) as [$key, $group]) {
+            $keys[] = $key;
+            $group[0]['id'] = 100;
+        }
+
+        // Then
+        $this->assertSame([['id' => 1], ['id' => 2], ['id' => 1]], $keys);
+    }
+
+    /**
+     * Yields rows that all share one reference slot, as PDOStatement::bindColumn() fills them:
+     * each yielded ['id' => &$id] follows the next assignment to $id.
+     *
+     * @return \Generator<int, array{id: int}>
+     */
+    private static function referenceSlotRows(int ...$ids): \Generator
+    {
+        $id = null;
+        $row = ['id' => &$id];
+
+        foreach ($ids as $value) {
+            $id = $value;
+
+            yield $row;
+        }
+    }
 }

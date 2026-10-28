@@ -7,6 +7,7 @@ namespace IterTools;
 use IterTools\Util\Identity;
 use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\NoValueMonad;
+use IterTools\Util\Snapshot;
 use IterTools\Util\UsageMap;
 use IterTools\Util\ValueCounter;
 
@@ -127,8 +128,9 @@ final class Set
     /**
      * Remove only consecutive duplicates from the iterable (Unix `uniq` behavior).
      *
-     * Each element is compared strictly (===) to the previous element yielded.
-     * Non-adjacent duplicates are kept. Runs in O(1) memory.
+     * Each element is compared strictly (===) to the previous element yielded, as that element was when
+     * it was read: an array is retained as a {@see Snapshot}, so rows filled through a shared reference
+     * are compared by the values they held. Non-adjacent duplicates are kept. Runs in O(1) memory.
      *
      * Source keys are discarded; output is a sequentially re-indexed list.
      *
@@ -145,9 +147,10 @@ final class Set
 
         foreach ($data as $datum) {
             if (!$hasPrevious || $datum !== $previous) {
-                yield $datum;
-                $previous = $datum;
+                // Before the yield, so that a consumer writing through a shared slot cannot change it.
+                $previous = \is_array($datum) ? Snapshot::of($datum) : $datum;
                 $hasPrevious = true;
+                yield $datum;
             }
         }
     }
@@ -155,7 +158,8 @@ final class Set
     /**
      * Remove only consecutive duplicates from the iterable, comparing values returned by $keyFn.
      *
-     * Each element's extracted key is compared strictly (===) to the previous element's key.
+     * Each element's extracted key is compared strictly (===) to the previous element's key, as that key
+     * was when it was projected (see {@see Set::distinctAdjacent()}).
      * Non-adjacent duplicates are kept. Runs in O(1) memory and calls $keyFn once per element.
      *
      * Source keys are discarded; output is a sequentially re-indexed list.
@@ -175,9 +179,10 @@ final class Set
         foreach ($data as $datum) {
             $currentKey = $keyFn($datum);
             if (!$hasPrevious || $currentKey !== $previousKey) {
-                yield $datum;
-                $previousKey = $currentKey;
+                // Before the yield, as in distinctAdjacent().
+                $previousKey = \is_array($currentKey) ? Snapshot::of($currentKey) : $currentKey;
                 $hasPrevious = true;
+                yield $datum;
             }
         }
     }

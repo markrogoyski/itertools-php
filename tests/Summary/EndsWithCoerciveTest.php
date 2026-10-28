@@ -319,4 +319,161 @@ class EndsWithCoerciveTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
         $this->assertSame(0, $consumed);
     }
+
+    /**
+     * Regression: a source that yields one object, mutated between reads, is compared as the
+     * object was when each element was read, not as it is after later reads.
+     *
+     * @test endsWithCoercive - mutated-object source ending with the suffix
+     */
+    public function testMutatedObjectSourceTrue(): void
+    {
+        // Given
+        $data = self::mutatedObject(1, 2);
+        $suffix = [self::object(1), self::object(2)];
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - mutated-object source not ending with the suffix
+     */
+    public function testMutatedObjectSourceFalse(): void
+    {
+        // Given
+        $data = self::mutatedObject(1, 2);
+        $suffix = [self::object(2), self::object(2)];
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test endsWithCoercive - mutated-object suffix is compared as read
+     */
+    public function testMutatedObjectSuffix(): void
+    {
+        // Given
+        $data = [self::object(1), self::object(2)];
+        $suffix = self::mutatedObject(1, 2);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - reference-slot source rows are compared as read
+     */
+    public function testReferenceSlotSource(): void
+    {
+        // Given
+        $data = self::referenceSlotRows(1, 2);
+        $suffix = [['id' => '1'], ['id' => 2.0]];
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - a non-serializable object before the compared elements does not throw
+     */
+    public function testNonSerializableObjectBeforeSuffixDoesNotThrow(): void
+    {
+        // Given
+        $data = [new Fixture\NonSerializableFixture(1), 1, 2];
+        $suffix = [1, 2];
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - a non-serializable object after the first mismatch does not throw
+     */
+    public function testNonSerializableObjectAfterMismatchDoesNotThrow(): void
+    {
+        // Given
+        $data = [1, new Fixture\NonSerializableFixture(1)];
+        $suffix = [2, new Fixture\NonSerializableFixture(1)];
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test endsWithCoercive - a non-serializable suffix object is reached during comparison and throws
+     */
+    public function testNonSerializableSuffixObjectThrows(): void
+    {
+        // Given
+        $data = [1, 2];
+        $suffix = [1, new Fixture\NonSerializableFixture(1)];
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Summary::endsWithCoercive($data, $suffix);
+    }
+
+    private static function object(int $value): \stdClass
+    {
+        $object = new \stdClass();
+        $object->value = $value;
+
+        return $object;
+    }
+
+    /**
+     * Yields one object, setting its value before each yield.
+     *
+     * @return \Generator<int, \stdClass>
+     */
+    private static function mutatedObject(int ...$values): \Generator
+    {
+        $object = new \stdClass();
+
+        foreach ($values as $value) {
+            $object->value = $value;
+
+            yield $object;
+        }
+    }
+
+    /**
+     * Yields rows that all share one reference slot, as PDOStatement::bindColumn() fills them:
+     * each yielded ['id' => &$id] follows the next assignment to $id.
+     *
+     * @return \Generator<int, array{id: int}>
+     */
+    private static function referenceSlotRows(int ...$ids): \Generator
+    {
+        $id = null;
+        $row = ['id' => &$id];
+
+        foreach ($ids as $value) {
+            $id = $value;
+
+            yield $row;
+        }
+    }
 }

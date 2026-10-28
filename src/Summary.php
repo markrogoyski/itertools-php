@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Arithmetic;
+use IterTools\Util\Identity;
+use IterTools\Util\Snapshot;
 use IterTools\Util\Truthiness;
 use IterTools\Util\UniqueExtractor;
 use IterTools\Util\UsageMap;
@@ -204,7 +206,8 @@ final class Summary
     /**
      * Returns true if given collection is sorted in ascending order; otherwise false.
      *
-     * Items of given collection must be comparable.
+     * Items of given collection must be comparable. Each item is compared as it was when read; see README
+     * "Strict and Coercive Types" > Values compared after later reads.
      *
      * Returns true if given collection is empty or has only one element.
      *
@@ -214,19 +217,28 @@ final class Summary
      */
     public static function isSorted(iterable $data): bool
     {
-        foreach (Single::pairwise($data) as [$lhs, $rhs]) {
-            if ((\is_float($lhs) && \is_nan($lhs)) || (\is_float($rhs) && \is_nan($rhs))) {
-                return false;
+        $hasPrevious = false;
+        $lhs = null;
+
+        foreach ($data as $rhs) {
+            if ($hasPrevious) {
+                if ((\is_float($lhs) && \is_nan($lhs)) || (\is_float($rhs) && \is_nan($rhs))) {
+                    return false;
+                }
+                // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when
+                // they are not. Rounding to float is monotonic, so only an int and a float that <=> finds
+                // equal need it.
+                $order = $rhs <=> $lhs;
+                if ($order === 0 && \is_int($rhs) !== \is_int($lhs)) {
+                    $order = Arithmetic::compareValues($rhs, $lhs);
+                }
+                if ($order < 0) {
+                    return false;
+                }
             }
-            // Compare exactly, since an int beyond ±2^53 and a float can compare equal as floats when they
-            // are not. Rounding to float is monotonic, so only an int and a float that <=> finds equal need it.
-            $order = $rhs <=> $lhs;
-            if ($order === 0 && \is_int($rhs) !== \is_int($lhs)) {
-                $order = Arithmetic::compareValues($rhs, $lhs);
-            }
-            if ($order < 0) {
-                return false;
-            }
+            // The previous element is compared as it was when read; see Snapshot.
+            $lhs = \is_array($rhs) ? Snapshot::of($rhs) : $rhs;
+            $hasPrevious = true;
         }
 
         return true;
@@ -235,7 +247,8 @@ final class Summary
     /**
      * Returns true if given collection is sorted in reverse descending order; otherwise false.
      *
-     * Items of given collection must be comparable.
+     * Items of given collection must be comparable. Each item is compared as it was when read; see README
+     * "Strict and Coercive Types" > Values compared after later reads.
      *
      * Returns true if given collection is empty or has only one element.
      *
@@ -245,18 +258,26 @@ final class Summary
      */
     public static function isReversed(iterable $data): bool
     {
-        foreach (Single::pairwise($data) as [$lhs, $rhs]) {
-            if ((\is_float($lhs) && \is_nan($lhs)) || (\is_float($rhs) && \is_nan($rhs))) {
-                return false;
+        $hasPrevious = false;
+        $lhs = null;
+
+        foreach ($data as $rhs) {
+            if ($hasPrevious) {
+                if ((\is_float($lhs) && \is_nan($lhs)) || (\is_float($rhs) && \is_nan($rhs))) {
+                    return false;
+                }
+                // Compare exactly, as in isSorted(). $rhs > $lhs, written as PHP evaluates it: $lhs < $rhs.
+                $order = $lhs <=> $rhs;
+                if ($order === 0 && \is_int($lhs) !== \is_int($rhs)) {
+                    $order = Arithmetic::compareValues($lhs, $rhs);
+                }
+                if ($order < 0) {
+                    return false;
+                }
             }
-            // Compare exactly, as in isSorted(). $rhs > $lhs, written as PHP evaluates it: $lhs < $rhs.
-            $order = $lhs <=> $rhs;
-            if ($order === 0 && \is_int($lhs) !== \is_int($rhs)) {
-                $order = Arithmetic::compareValues($lhs, $rhs);
-            }
-            if ($order < 0) {
-                return false;
-            }
+            // The previous element is compared as it was when read; see Snapshot.
+            $lhs = \is_array($rhs) ? Snapshot::of($rhs) : $rhs;
+            $hasPrevious = true;
         }
 
         return true;
@@ -621,6 +642,8 @@ final class Summary
      * Empty suffix → true without consuming the source.
      *
      * Both source and suffix must be finite. Buffers up to count($suffix) elements via a sliding window.
+     * Each element is compared as it was when read; see README "Strict and Coercive Types" > Values
+     * compared after later reads.
      *
      * Strict-type comparison uses ===; see README "Strict and Coercive Types".
      *
@@ -642,6 +665,8 @@ final class Summary
      * Empty suffix → true without consuming the source.
      *
      * Both source and suffix must be finite. Buffers up to count($suffix) elements via a sliding window.
+     * Each array or object element is hashed when read, so it is compared as it was then; see README
+     * "Strict and Coercive Types" > Values compared after later reads.
      *
      * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
@@ -703,9 +728,26 @@ final class Summary
      */
     private static function endsWithInternal(iterable $data, iterable $suffix, bool $strict): bool
     {
+        // The suffix and the window are kept while later elements are read, so each element is captured
+        // as it is when read. Strict: an array as a Snapshot, so a row filled through a shared reference
+        // keeps the values it held. Coercive: an array or object as its key, since an object is compared
+        // by serialized state, which a source yielding one mutated object changes on every read; any other
+        // value cannot change and is hashed when compared. An element that cannot be hashed is kept as the
+        // exception, thrown only if comparison reaches it, as before.
         $suffixArr = [];
         foreach ($suffix as $value) {
-            $suffixArr[] = $value;
+            if ($strict) {
+                $suffixArr[] = \is_array($value) ? Snapshot::of($value) : $value;
+                continue;
+            }
+            // A suffix key is kept as its Identity, which pins the objects and resources it was
+            // derived from. A source key needs no anchors: it was computed while its element was
+            // alive, so it can only match a suffix identity if it is that same, still pinned, value.
+            try {
+                $suffixArr[] = UniqueExtractor::identify($value, false);
+            } catch (\InvalidArgumentException $e) {
+                $suffixArr[] = $e;
+            }
         }
         $suffixLen = \count($suffixArr);
 
@@ -714,10 +756,29 @@ final class Summary
         }
 
         $window = [];
-        foreach ($data as $value) {
-            $window[] = $value;
-            if (\count($window) > $suffixLen) {
-                \array_shift($window);
+        if ($strict) {
+            foreach ($data as $value) {
+                $window[] = \is_array($value) ? Snapshot::of($value) : $value;
+                if (\count($window) > $suffixLen) {
+                    \array_shift($window);
+                }
+            }
+        } else {
+            foreach ($data as $value) {
+                if (\is_array($value) || \is_object($value)) {
+                    // Wrapped in an array, which no other window entry is, to tell the key from a string
+                    // element.
+                    try {
+                        $window[] = [UniqueExtractor::getString($value, false)];
+                    } catch (\InvalidArgumentException $e) {
+                        $window[] = $e;
+                    }
+                } else {
+                    $window[] = $value;
+                }
+                if (\count($window) > $suffixLen) {
+                    \array_shift($window);
+                }
             }
         }
 
@@ -726,7 +787,23 @@ final class Summary
         }
 
         for ($i = 0; $i < $suffixLen; $i++) {
-            if (!self::valuesEqual($window[$i], $suffixArr[$i], $strict)) {
+            if ($strict) {
+                if ($window[$i] !== $suffixArr[$i]) {
+                    return false;
+                }
+                continue;
+            }
+            // Thrown in the order the elements would have been hashed: the source's, then the suffix's.
+            if ($window[$i] instanceof \InvalidArgumentException) {
+                throw $window[$i];
+            }
+            if ($suffixArr[$i] instanceof \InvalidArgumentException) {
+                throw $suffixArr[$i];
+            }
+            $actual = \is_array($window[$i]) ? $window[$i][0] : UniqueExtractor::getString($window[$i], false);
+            /** @var Identity $expected */
+            $expected = $suffixArr[$i];
+            if ($actual !== $expected->key) {
                 return false;
             }
         }
@@ -735,7 +812,7 @@ final class Summary
     }
 
     /**
-     * Pairwise equality used by startsWith and endsWith (strict and coercive variants).
+     * Pairwise equality used by startsWith and startsWithCoercive.
      *
      * Equality follows the strict or coercive rules in README "Strict and Coercive Types".
      *

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Arithmetic;
+use IterTools\Util\Snapshot;
 use IterTools\Util\Truthiness;
 use IterTools\Util\UniqueExtractor;
 
@@ -998,6 +999,9 @@ final class Single
      *
      * Example: [1,1,2,2,1,3] keyed by identity yields [[1,[1,1]],[2,[2,2]],[1,[1]],[3,[3]]].
      *
+     * Each key is compared, and yielded, as it was when projected: an array key is retained as a
+     * {@see Snapshot}. See README "Strict and Coercive Types" > Values compared after later reads.
+     *
      * @param iterable<mixed>      $data
      * @param callable(mixed):mixed $keyFn
      *
@@ -1014,7 +1018,7 @@ final class Single
             /** @var mixed $key */
             $key = $keyFn($datum);
             if (!$hasPrevious) {
-                $previousKey = $key;
+                $previousKey = \is_array($key) ? Snapshot::of($key) : $key;
                 $current = [$datum];
                 $hasPrevious = true;
                 continue;
@@ -1023,9 +1027,12 @@ final class Single
             if ($key === $previousKey) {
                 $current[] = $datum;
             } else {
-                yield [$previousKey, $current];
-                $previousKey = $key;
+                // The next key is captured before the yield, so that a consumer writing through a shared
+                // slot cannot change it.
+                $group = [$previousKey, $current];
+                $previousKey = \is_array($key) ? Snapshot::of($key) : $key;
                 $current = [$datum];
+                yield $group;
             }
         }
 

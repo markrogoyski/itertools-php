@@ -228,4 +228,102 @@ class DistinctAdjacentTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([1, 2, 3], $result);
         $this->assertSame([0, 1, 2], \array_keys($result));
     }
+
+    /**
+     * Regression: rows that share one reference slot (the PDO bindColumn pattern) are compared as
+     * each row was when it was read, not as the slot holds after the next row.
+     *
+     * @test distinctAdjacent keeps reference-slot rows that differ when read
+     */
+    public function testReferenceSlotRows(): void
+    {
+        // Given
+        $data = self::referenceSlotRows(1, 1, 2, 2, 1);
+
+        // When
+        $ids = [];
+        foreach (Set::distinctAdjacent($data) as $row) {
+            $ids[] = $row['id'];
+        }
+
+        // Then
+        $this->assertSame([1, 2, 1], $ids);
+    }
+
+    /**
+     * Regression: arrays that share one reference slot holding a fresh object each time are
+     * distinct, since retaining the array does not retain the object it held when it was read.
+     *
+     * @test distinctAdjacent keeps reference-slot arrays of distinct objects
+     */
+    public function testReferenceSlotObjectArrays(): void
+    {
+        // Given
+        $data = self::referenceSlotObjectArrays(3);
+
+        // When
+        $result = [];
+        foreach (Set::distinctAdjacent($data) as $datum) {
+            $result[] = $datum;
+        }
+
+        // Then
+        $this->assertCount(3, $result);
+    }
+
+    /**
+     * Regression: each row is captured for comparison before it is yielded, so a consumer that
+     * writes through the shared slot does not change what the next row is compared with.
+     *
+     * @test distinctAdjacent compares reference-slot rows as read, whatever the consumer writes
+     */
+    public function testReferenceSlotRowsWrittenByConsumer(): void
+    {
+        // Given
+        $data = self::referenceSlotRows(1, 1, 2, 2, 1);
+
+        // When
+        $ids = [];
+        foreach (Set::distinctAdjacent($data) as $row) {
+            $ids[] = $row['id'];
+            $row['id'] = 100;
+        }
+
+        // Then
+        $this->assertSame([1, 2, 1], $ids);
+    }
+
+    /**
+     * Yields rows that all share one reference slot, as PDOStatement::bindColumn() fills them:
+     * each yielded ['id' => &$id] follows the next assignment to $id.
+     *
+     * @return \Generator<int, array{id: int}>
+     */
+    private static function referenceSlotRows(int ...$ids): \Generator
+    {
+        $id = null;
+        $row = ['id' => &$id];
+
+        foreach ($ids as $value) {
+            $id = $value;
+
+            yield $row;
+        }
+    }
+
+    /**
+     * Yields arrays that all share one reference slot, assigning a new object to it before each yield.
+     *
+     * @return \Generator<int, array{0: \stdClass}>
+     */
+    private static function referenceSlotObjectArrays(int $count): \Generator
+    {
+        $slot = null;
+
+        for ($i = 0; $i < $count; $i++) {
+            $slot = new \stdClass();
+
+            yield [&$slot];
+        }
+    }
 }

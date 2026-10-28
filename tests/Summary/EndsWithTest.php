@@ -260,4 +260,106 @@ class EndsWithTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
         $this->assertSame(0, $consumed);
     }
+
+    /**
+     * Regression: a source whose rows share one reference slot (the PDO bindColumn pattern) is
+     * compared as each row was when it was read, not as the slot holds after later rows.
+     *
+     * @test endsWith - reference-slot source rows ending with the suffix
+     */
+    public function testReferenceSlotSourceTrue(): void
+    {
+        // Given
+        $data = self::referenceSlotRows(1, 2);
+        $suffix = [['id' => 1], ['id' => 2]];
+
+        // When
+        $result = Summary::endsWith($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWith - reference-slot source rows not ending with the suffix
+     */
+    public function testReferenceSlotSourceFalse(): void
+    {
+        // Given
+        $data = self::referenceSlotRows(1, 2);
+        $suffix = [['id' => 2], ['id' => 2]];
+
+        // When
+        $result = Summary::endsWith($data, $suffix);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test endsWith - reference-slot suffix rows are compared as read
+     */
+    public function testReferenceSlotSuffix(): void
+    {
+        // Given
+        $data = [['id' => 1], ['id' => 2]];
+        $suffix = self::referenceSlotRows(1, 2);
+
+        // When
+        $result = Summary::endsWith($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWith - a reference slot nested inside a row is compared as read
+     */
+    public function testNestedReferenceSlotSource(): void
+    {
+        // Given
+        $data = self::nestedReferenceSlotRows(1, 2);
+        $suffix = [['row' => ['id' => 1]], ['row' => ['id' => 2]]];
+
+        // When
+        $result = Summary::endsWith($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * Yields rows that all share one reference slot, as PDOStatement::bindColumn() fills them:
+     * each yielded ['id' => &$id] follows the next assignment to $id.
+     *
+     * @return \Generator<int, array{id: int}>
+     */
+    private static function referenceSlotRows(int ...$ids): \Generator
+    {
+        $id = null;
+        $row = ['id' => &$id];
+
+        foreach ($ids as $value) {
+            $id = $value;
+
+            yield $row;
+        }
+    }
+
+    /**
+     * Yields rows holding a nested array that shares one reference slot.
+     *
+     * @return \Generator<int, array{row: array{id: int}}>
+     */
+    private static function nestedReferenceSlotRows(int ...$ids): \Generator
+    {
+        $id = null;
+        $row = ['row' => ['id' => &$id]];
+
+        foreach ($ids as $value) {
+            $id = $value;
+
+            yield $row;
+        }
+    }
 }

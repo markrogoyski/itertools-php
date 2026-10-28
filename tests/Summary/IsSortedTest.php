@@ -838,4 +838,55 @@ class IsSortedTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * Regression: rows that share one reference slot (the PDO bindColumn pattern) are compared as
+     * each row was when it was read, not as the slot holds after the next row.
+     *
+     * @test isSorted - reference-slot rows out of order
+     */
+    public function testReferenceSlotRowsFalse(): void
+    {
+        // Given
+        $data = self::referenceSlotRows(2, 1);
+
+        // When
+        $result = Summary::isSorted($data);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test isSorted - reference-slot rows in order
+     */
+    public function testReferenceSlotRowsTrue(): void
+    {
+        // Given
+        $data = self::referenceSlotRows(1, 2);
+
+        // When
+        $result = Summary::isSorted($data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * Yields rows that all share one reference slot, as PDOStatement::bindColumn() fills them:
+     * each yielded ['id' => &$id] follows the next assignment to $id.
+     *
+     * @return \Generator<int, array{id: int}>
+     */
+    private static function referenceSlotRows(int ...$ids): \Generator
+    {
+        $id = null;
+        $row = ['id' => &$id];
+
+        foreach ($ids as $value) {
+            $id = $value;
+
+            yield $row;
+        }
+    }
 }

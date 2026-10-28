@@ -658,6 +658,36 @@ value while the comparison is still running.
 * `symmetricDifference*` additionally retains the last-seen representative per distinct
   value, since it is part of the output.
 
+### Values compared after later reads
+
+PHP keeps an array's reference slots when the array is copied. A source that fills its rows
+through one shared reference, as `PDOStatement::bindColumn()` with `PDO::FETCH_BOUND` does or
+a generator yielding `['id' => &$id]`, yields arrays that all follow its latest assignment. A
+source can likewise yield one object that it mutates between reads.
+
+Functions that keep an element while they read the next one compare it as it was when read:
+
+* `endsWith`, `isSorted`, `isReversed`, `isSortedBy`, `isReversedBy`, `distinctAdjacent`,
+  `distinctAdjacentBy` and `groupAdjacentBy` keep a copy of an array element or key without
+  its reference slots, taken before anything is yielded. Only arrays that hold a reference slot
+  are copied, each once however often it recurs, but every nested array is read to find them,
+  so the time this takes grows with an array's logical size, as hashing does: subarrays
+  without reference slots that share storage are read once per occurrence. An object is kept as the same instance, so strict comparison and `<=>` find one
+  mutated object equal to itself: `isSorted` of one object whose value goes from 2 to 1 is
+  `true`.
+* `endsWithCoercive` hashes each array and object element as it is read, so an object is
+  compared by its state at that time. It therefore hashes every such element of the source,
+  not only the last `count($suffix)`.
+
+Functions that compare each element as soon as they read it, such as `startsWith`, `same`,
+`distinct` and `allEqual`, are not affected.
+
+Elements that a function returns or yields are not copied. `toArray`, `toMax`, `sort`,
+`pairwise`, the groups of `groupAdjacentBy`, and every other function that keeps elements return
+them as the shared reference or object holds them when they are read later: for rows filled
+through `bindColumn()`, every row shows the last one. Fetch a new array per row instead, such as
+with `PDO::FETCH_ASSOC`. Spreading a row (`[...$row]`) keeps its reference slots.
+
 ## NaN and Ordering
 
 Functions that order values guard against `NAN` only when the comparison key is itself a
