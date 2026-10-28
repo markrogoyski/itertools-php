@@ -1340,16 +1340,24 @@ final class Single
             // (a) accumulator non-termination when the step is smaller than float
             // spacing at the operand magnitude (e.g. range(1e16, 1e16 + 10, 1.0)),
             // and (b) drift from accumulated rounding error over long ranges.
-            $stepsQuotient = $spanF / $magnitudeF;
+            // A span of float operands that overflows to INF is taken from their halves and the quotient doubled.
+            // Its exact span is at least 2^1024 - 2^970, so each operand is at least 2^970 in magnitude, and a
+            // step it holds fewer than 2^63 times exceeds 2^960: halving them is exact, and the quotient and the
+            // values computed from the halves, doubled, round as the float span would without the overflow.
+            $spanOverflows = \is_infinite($spanF);
+            $stepsQuotient = $spanOverflows
+                ? \abs($endF * 0.5 - $startF * 0.5) / $magnitudeF * 2.0
+                : $spanF / $magnitudeF;
             // Reject quotients that aren't representable as int. INF / NAN fail
             // is_finite(); finite-but-too-large floats (e.g. 1.0e20) exceed PHP_INT_MAX
             // and casting them to int produces a wrong bound plus a PHP 8.5 deprecation.
             // Use `>=` not `>`: (float)PHP_INT_MAX rounds to 2^63 (one past PHP_INT_MAX),
             // so a quotient *equal* to that float is already in the unrepresentable region.
             if (!\is_finite($stepsQuotient) || $stepsQuotient >= (float)\PHP_INT_MAX) {
+                $spanDescription = $spanOverflows ? "span between {$startF} and {$endF}" : "span={$spanF}";
                 throw new \InvalidArgumentException(
                     'Single::range: span / step exceeds representable iteration count '
-                    . "(span={$spanF}, step={$magnitudeF})"
+                    . "({$spanDescription}, step={$magnitudeF})"
                 );
             }
             // The range lands on $end when the exact span is a whole number of steps, give or take the rounding
@@ -1422,7 +1430,18 @@ final class Single
             // A value can pass $end through rounding: of $startF (int operands past 2^53), of the offset or of
             // the addition. It passes by less than a float spacing, so it lands on $end. The common case has a
             // loop of its own, which keeps the cost per value down.
-            if (!$exactStart) {
+            if ($spanOverflows) {
+                // From the halves, as counted: $i·|$step| can overflow where the value it gives doesn't.
+                $halfStartF = $startF * 0.5;
+                $halfMagnitudeF = $magnitudeF * 0.5;
+                for ($i = 0; $i <= $lastIndex; ++$i) {
+                    $valF = 2.0 * ($halfStartF + $signF * ((float)$i * $halfMagnitudeF));
+                    if ($ascending ? $valF > $endF : $valF < $endF) {
+                        $valF = $lastF;
+                    }
+                    yield $valF;
+                }
+            } elseif (!$exactStart) {
                 for ($i = 0; $i <= $lastIndex; ++$i) {
                     $valF = $startF + $signF * ((float)$i * $magnitudeF);
                     if ($ascending ? $valF > $endF : $valF < $endF) {

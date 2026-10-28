@@ -27,6 +27,7 @@
   * Computed values from `$start` converted to float, carrying its rounding error; values are now computed from the exact `$start` and correctly rounded.
   * Dropped the endpoint of a float range spanning a whole number of steps when rounding put the last value just past `$end` (`range(0, 55, 1.1)` stopped at 53.9).
   * Ended on `-0.0` when landing on a `-0.0` end; it now ends on `0.0`, as `$start + n·$step` gives.
+  * Threw "span / step exceeds representable iteration count (span=INF, …)" when the span of float operands overflowed float, however few steps it held; `range(-1e308, 1e308, 1e308)` now yields `[-1e308, 0.0, 1e308]`. A span too large to count now names its operands rather than `INF`.
   * An integer paired with a non-integral float or a float beyond the integer range is still converted to float first (`range(PHP_INT_MAX, 2.0**63, 0.5)` gives 1 element instead of 3).
   * Starting a range with a float step takes about 3 µs longer, for the exact span and endpoint checks above; each element costs the same as before.
 * Math: `relativeFrequencies` and `relativeFrequenciesBy` (and their Stream wrappers) yielded `int(1)` instead of `1.0` for a single distinct value or group; they now always yield floats.

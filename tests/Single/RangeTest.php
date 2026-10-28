@@ -655,6 +655,79 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         float range whose span overflows float is counted and stepped from the exact span
+     * @dataProvider dataProviderForFloatSpanOverflow
+     * @param        float        $start
+     * @param        float        $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testFloatRangeWhoseSpanOverflowsFloat(float $start, float $end, float $step, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * |end - start| computed in float overflows to INF, but the step divides the exact span into a few steps.
+     * The values are computed in float, as for any float range, and |i * step| can overflow where they don't.
+     *
+     * Test data generated with (tools/oracles/range_float_span_overflow.py), the count from the operands as
+     * written and each value in IEEE 754 binary64 arithmetic with an unbounded exponent:
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = rnd(float(start) ± rnd(i * abs(float(step)))), the last being end when count - 1 steps reach it
+     */
+    public static function dataProviderForFloatSpanOverflow(): array
+    {
+        return [
+            'ascending -1e308 to 1e308 step 1e308' => [-1e308, 1e308, 1e308, [-1e308, 0.0, 1e308]],
+            'descending 1e308 to -1e308 step 1e308' => [1e308, -1e308, -1e308, [1e308, 0.0, -1e308]],
+            'ascending -PHP_FLOAT_MAX to PHP_FLOAT_MAX' => [
+                -\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, \PHP_FLOAT_MAX,
+                [-\PHP_FLOAT_MAX, 0.0, \PHP_FLOAT_MAX],
+            ],
+            'descending PHP_FLOAT_MAX to -PHP_FLOAT_MAX' => [
+                \PHP_FLOAT_MAX, -\PHP_FLOAT_MAX, -\PHP_FLOAT_MAX,
+                [\PHP_FLOAT_MAX, 0.0, -\PHP_FLOAT_MAX],
+            ],
+            'ascending -1e308 to 1e308 step 6e307, last step short of end' => [
+                -1e308, 1e308, 6e307,
+                [-1e308, -4.0000000000000004e307, 1.9999999999999992e307, 7.999999999999997e307],
+            ],
+            'descending 1e308 to -1e308 step 6e307, last step short of end' => [
+                1e308, -1e308, -6e307,
+                [1e308, 4.0000000000000004e307, -1.9999999999999992e307, -7.999999999999997e307],
+            ],
+            'ascending -PHP_FLOAT_MAX to 2^971, the smallest end that overflows' => [
+                -\PHP_FLOAT_MAX, 2.0 ** 971, 2.0 ** 1023,
+                [-\PHP_FLOAT_MAX, -8.988465674311578e307, 2.0 ** 971],
+            ],
+        ];
+    }
+
+    /**
+     * @test float range whose span overflows float, over many steps, lands on its end
+     */
+    public function testFloatRangeWhoseSpanOverflowsFloatOverManySteps(): void
+    {
+        // Given (tools/oracles/range_float_span_overflow.py, as dataProviderForFloatSpanOverflow)
+        $start = -1e308;
+        $end = 1.5e308;
+        $step = 1e305;
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertCount(2501, $result);
+        $this->assertSame([-1e308, -9.99e307, -9.98e307], \array_slice($result, 0, 3));
+        $this->assertSame([1.4979999999999998e308, 1.4989999999999997e308, 1.5e308], \array_slice($result, -3));
+    }
+
+    /**
      * @test         distinct int operands beyond 2^53 with a fractional step use the exact int span, not the collapsed float span
      * @dataProvider dataProviderForDistinctIntsBeyondFloatPrecision
      * @param        int          $start
@@ -1983,13 +2056,13 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     public function testFloatRangeWithInfiniteSpanRejects(): void
     {
         // Given
-        // (PHP_FLOAT_MAX - (-PHP_FLOAT_MAX)) overflows to INF; the resulting quotient
-        // (INF / 1.0) is also INF and cannot be cast to int. Reject with a clear
-        // InvalidArgumentException instead of emitting a PHP deprecation/warning
-        // and yielding only the start value.
+        // (PHP_FLOAT_MAX - (-PHP_FLOAT_MAX)) overflows to INF, but the exact span, about 2^1025, is still
+        // counted: 2^1025 steps of 1.0 can't be cast to int. Reject with a clear InvalidArgumentException
+        // naming the operands instead of emitting a PHP deprecation/warning and yielding only the start value.
 
         // Then
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('span between -1.7976931348623E+308 and 1.7976931348623E+308, step=1)');
 
         // When
         \iterator_to_array(Single::range(-\PHP_FLOAT_MAX, \PHP_FLOAT_MAX, 1.0), false);
