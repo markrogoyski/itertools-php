@@ -12,9 +12,17 @@ use IterTools\Util\NoValueMonad;
 final class JustifyMultipleIterator implements \Iterator
 {
     /**
+     * Each distinct iterator once, however many times it was passed.
+     *
      * @var array<\Iterator<mixed>>
      */
     protected array $iterators = [];
+    /**
+     * For each position passed, the index in $iterators of its iterator.
+     *
+     * @var array<int>
+     */
+    protected array $iteratorIndexes = [];
     /**
      * @var int
      */
@@ -32,8 +40,19 @@ final class JustifyMultipleIterator implements \Iterator
     {
         $this->filler = $filler;
 
+        // An iterator passed more than once is advanced once per step and its value given to each of its
+        // positions, so it reads as independent copies of itself; advancing it once per position would hand
+        // each position a different element and skip values.
+        $indexesById = [];
         foreach ($iterables as $iterable) {
-            $this->iterators[] = Transform::toIterator($iterable);
+            $iterator = Transform::toIterator($iterable);
+            $id       = \spl_object_id($iterator);
+
+            if (!isset($indexesById[$id])) {
+                $indexesById[$id] = \count($this->iterators);
+                $this->iterators[] = $iterator;
+            }
+            $this->iteratorIndexes[] = $indexesById[$id];
         }
     }
 
@@ -44,10 +63,12 @@ final class JustifyMultipleIterator implements \Iterator
      */
     public function current(): array
     {
-        return \array_map(
+        $values = \array_map(
             fn(\Iterator $iterator): mixed => $iterator->valid() ? $iterator->current() : $this->filler,
             $this->iterators,
         );
+
+        return \array_map(static fn (int $index): mixed => $values[$index], $this->iteratorIndexes);
     }
 
     /**

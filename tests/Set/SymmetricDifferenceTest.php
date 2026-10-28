@@ -972,4 +972,49 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame([1, 4], $result);
     }
+
+    /**
+     * @test symmetricDifference reads an iterator passed more than once as independent copies of it
+     */
+    public function testIteratorPassedTwice(): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture([1, 2, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(Set::symmetricDifference($iterator, $iterator), false);
+
+        // Then
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * @test symmetricDifference reads a generator passed more than once as independent copies of it
+     */
+    public function testGeneratorPassedTwice(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(Set::symmetricDifference($generator, $generator), false);
+
+        // Then
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * @test symmetricDifference reads an iterator passed around another iterable as independent copies of it
+     */
+    public function testIteratorPassedTwiceAroundAnotherIterable(): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture([1, 2, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(Set::symmetricDifference($iterator, [2, 3, 4], $iterator), false);
+
+        // Then
+        $this->assertSame([4], $result);
+    }
 }

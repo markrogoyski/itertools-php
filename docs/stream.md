@@ -1909,7 +1909,7 @@ $byQuarter = Stream::of($salesByTeam)
 // [[120, 95, 140], [150, 110, 160], [180, 0, 175], [210, 0, 0]]
 ```
 
-The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. Passing the same iterator instance more than once is not supported and may not behave as expected.
+The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. A row iterator or generator passed more than once is read as independent copies of itself: each step reads it once and gives its value to every position it was passed in.
 
 #### Zip Equal
 Treat the stream itself as a sequence of iterables of equal lengths and zip them column-wise (transpose).

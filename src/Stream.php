@@ -1402,8 +1402,8 @@ final class Stream implements \IteratorAggregate
      * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
      * is thrown at iteration time (not at call time).
      *
-     * Note: Passing the same iterator instance more than once is not supported and may
-     * not behave as expected.
+     * A row iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in.
      *
      * @param mixed $filler
      *
@@ -1569,8 +1569,8 @@ final class Stream implements \IteratorAggregate
      * Iteration continues until the longest iterable is exhausted.
      * For uneven lengths, the exhausted iterables will produce $filler value for the remaining iterations.
      *
-     * Note: Passing the same iterator instance more than once will not work as expected
-     * because PHP's MultipleIterator silently ignores duplicate attachments.
+     * An iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in.
      *
      * @param mixed $filler
      * @param iterable<mixed> ...$iterables

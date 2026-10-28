@@ -76,8 +76,8 @@ final class Multi
      * Iteration continues until the longest iterable is exhausted.
      * For uneven lengths, the exhausted iterables will produce the $filler value for the remaining iterations.
      *
-     * Note: Passing the same iterator instance more than once will not work as expected
-     * because PHP's MultipleIterator silently ignores duplicate attachments.
+     * An iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in.
      *
      * @param mixed $filler
      * @param iterable<mixed> ...$iterables
