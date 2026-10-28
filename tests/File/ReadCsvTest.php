@@ -384,4 +384,21 @@ CSV_END;
             break;
         }
     }
+
+    /**
+     * @test readCsv rejects a resource that is not a stream, such as a stream context
+     */
+    public function testReadCsvStreamContextThrows(): void
+    {
+        // Given
+        $context = \stream_context_create();
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        foreach (File::readCsv($context) as $_) {
+            break;
+        }
+    }
 }

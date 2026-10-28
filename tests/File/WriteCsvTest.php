@@ -441,4 +441,19 @@ class WriteCsvTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test writeCsv rejects a resource that is not a stream, such as a stream context, even with nothing to write
+     */
+    public function testWriteCsvStreamContextThrows(): void
+    {
+        // Given
+        $context = \stream_context_create();
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        File::writeCsv($context, []);
+    }
 }

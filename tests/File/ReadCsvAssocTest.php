@@ -348,4 +348,21 @@ CSV_END;
             // drive the generator
         }
     }
+
+    /**
+     * @test readCsvAssoc rejects a resource that is not a stream, such as a stream context
+     */
+    public function testReadCsvAssocStreamContextThrows(): void
+    {
+        // Given
+        $context = \stream_context_create();
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        foreach (File::readCsvAssoc($context) as $_) {
+            break;
+        }
+    }
 }

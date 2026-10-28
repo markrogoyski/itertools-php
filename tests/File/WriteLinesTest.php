@@ -259,4 +259,19 @@ class WriteLinesTest extends \PHPUnit\Framework\TestCase
         // When
         File::writeLines($file, ['abcdef']);
     }
+
+    /**
+     * @test writeLines rejects a resource that is not a stream, such as a stream context, even with nothing to write
+     */
+    public function testWriteLinesStreamContextThrows(): void
+    {
+        // Given
+        $context = \stream_context_create();
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        File::writeLines($context, []);
+    }
 }

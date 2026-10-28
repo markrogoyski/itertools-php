@@ -958,4 +958,34 @@ END_OF_EXPECTED;
             ],
         ];
     }
+
+    /**
+     * @test toFile rejects a resource that is not a stream, such as a stream context, even with nothing to write
+     */
+    public function testToFileStreamContextThrows(): void
+    {
+        // Given
+        $context = \stream_context_create();
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Stream::of([])->toFile($context);
+    }
+
+    /**
+     * @test toCsvFile rejects a resource that is not a stream, such as a stream context, even with nothing to write
+     */
+    public function testToCsvFileStreamContextThrows(): void
+    {
+        // Given
+        $context = \stream_context_create();
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Stream::of([])->toCsvFile($context);
+    }
 }

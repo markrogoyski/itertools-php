@@ -2309,6 +2309,7 @@ final class Stream implements \IteratorAggregate
      *
      * @return void
      *
+     * @throws \InvalidArgumentException if file handle stream resource is invalid resource
      * @throws \RuntimeException if a write fails or is truncated
      */
     public function toFile(mixed $fileResource, string $newlineSeparator = \PHP_EOL, ?string $header = null, ?string $footer = null): void
@@ -2358,6 +2359,7 @@ final class Stream implements \IteratorAggregate
      *
      * @return void
      *
+     * @throws \InvalidArgumentException if file handle stream resource is invalid resource
      * @throws \RuntimeException if a write fails or is truncated
      */
     public function toCsvFile(
