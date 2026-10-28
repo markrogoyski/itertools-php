@@ -313,4 +313,16 @@ class ArrayTest extends \PHPUnit\Framework\TestCase
         $expected = [0 => ['a', 1], 1 => ['b', 2], 2 => ['c', 3], 3 => [null, 4], 4 => [null, 5]];
         $this->assertEquals($expected, $result);
     }
+
+    /**
+     * @test zipLongest with iterables passed by a name such as filler
+     */
+    public function testZipLongestNamedIterables(): void
+    {
+        // When
+        $result = \iterator_to_array(Multi::zipLongest(filler: [1, 2], iterables: [3]), false);
+
+        // Then
+        $this->assertSame([[1, 3], [2, null]], $result);
+    }
 }

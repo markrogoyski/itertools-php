@@ -1835,7 +1835,7 @@ $columns = Stream::of($rows)
 // [['Alice', 'Bob', 'Carol'], [30, 25, 41], ['NYC', 'LA', 'Austin']]
 ```
 
-The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. Passing the same iterator instance more than once is not supported and may not behave as expected.
+The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. A row iterator or generator passed more than once is read as independent copies of itself: each step reads it once and gives its value to every position it was passed in.
 
 #### Zip Longest
 Treat the stream itself as a sequence of iterables and zip them column-wise (transpose), continuing until the longest row is exhausted.
@@ -1872,7 +1872,7 @@ $byMonth = Stream::of($rainfallByYear)
 // [[3.2, 2.8, 3.5], [4.1, 3.9, 4.3], [5.0, 4.7, 5.2], [6.2, null, 6.8], [null, null, 7.1]]
 ```
 
-The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. Passing the same iterator instance more than once is not supported and may not behave as expected.
+The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. A row iterator or generator passed more than once is read as independent copies of itself: each step reads it once and gives its value to every position it was passed in.
 
 #### Zip Filled
 Treat the stream itself as a sequence of iterables and zip them column-wise (transpose), continuing until the longest row is exhausted, using a filler value for missing entries.
@@ -1946,7 +1946,7 @@ $byField = Stream::of($records)
 // [['id', 1, 2], ['name', 'Alice', 'Bob'], ['email', 'alice@example.com', 'bob@example.com']]
 ```
 
-The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. Passing the same iterator instance more than once is not supported and may not behave as expected.
+The outer stream must be finite; it is consumed when the zipped stream is iterated, before the first tuple is yielded. Inner rows are advanced lazily after that. A row iterator or generator passed more than once is read as independent copies of itself: each step reads it once and gives its value to every position it was passed in.
 
 #### Zip With
 Return a stream consisting of multiple iterable collections streamed simultaneously.

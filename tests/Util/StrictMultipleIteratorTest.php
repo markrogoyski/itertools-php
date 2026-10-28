@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Util;
 
-use IterTools\Transform;
+use IterTools\Tests\Fixture;
 use IterTools\Util\Iterators\StrictMultipleIterator;
 
 class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
@@ -30,10 +30,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidOneEmptyArray(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([]));
+        $iterator = new StrictMultipleIterator([]);
 
         // When
         $isValid = $iterator->valid();
@@ -48,10 +45,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidOneArraySingleElement(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([0]));
+        $iterator = new StrictMultipleIterator([0]);
 
         // When
         $isValid = $iterator->valid();
@@ -66,10 +60,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidOneArray(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([1, 2, 3]));
+        $iterator = new StrictMultipleIterator([1, 2, 3]);
 
         // When
         $isValid = $iterator->valid();
@@ -84,11 +75,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidTwoEqualArraysSingleElements(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([1]));
-        $iterator->attachIterator(Transform::toIterator([0]));
+        $iterator = new StrictMultipleIterator([1], [0]);
 
         // When
         $isValid = $iterator->valid();
@@ -103,11 +90,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidTwoEqualArrays(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([1, 2, 3]));
-        $iterator->attachIterator(Transform::toIterator([3, 4, 5]));
+        $iterator = new StrictMultipleIterator([1, 2, 3], [3, 4, 5]);
 
         // When
         $isValid = $iterator->valid();
@@ -122,12 +105,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidThreeEqualArraysSingleElements(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([1]));
-        $iterator->attachIterator(Transform::toIterator([3]));
-        $iterator->attachIterator(Transform::toIterator([5]));
+        $iterator = new StrictMultipleIterator([1], [3], [5]);
 
         // When
         $isValid = $iterator->valid();
@@ -142,12 +120,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidThreeEqualArrays(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([1, 2, 3]));
-        $iterator->attachIterator(Transform::toIterator([3, 4, 5]));
-        $iterator->attachIterator(Transform::toIterator([5, 6, 7]));
+        $iterator = new StrictMultipleIterator([1, 2, 3], [3, 4, 5], [5, 6, 7]);
 
         // When
         $isValid = $iterator->valid();
@@ -162,11 +135,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidTwoUnequalArraysFirstSmaller(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([1, 2]));
-        $iterator->attachIterator(Transform::toIterator([3, 4, 5]));
+        $iterator = new StrictMultipleIterator([1, 2], [3, 4, 5]);
 
         // And
         $iterator->next();
@@ -185,11 +154,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidTwoUnequalArraysSecondSmaller(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([1, 2, 3]));
-        $iterator->attachIterator(Transform::toIterator([3, 4]));
+        $iterator = new StrictMultipleIterator([1, 2, 3], [3, 4]);
 
         // And
         $iterator->next();
@@ -208,12 +173,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidThreeUnequalArraysFirstSmaller(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([0, 1, 2]));
-        $iterator->attachIterator(Transform::toIterator([0, 3, 4, 5]));
-        $iterator->attachIterator(Transform::toIterator([0, 5, 6, 7]));
+        $iterator = new StrictMultipleIterator([0, 1, 2], [0, 3, 4, 5], [0, 5, 6, 7]);
 
         // And
         $iterator->next();
@@ -233,12 +193,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidThreeUnequalArraysSecondSmaller(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([0, 1, 2, 3]));
-        $iterator->attachIterator(Transform::toIterator([0, 3, 4]));
-        $iterator->attachIterator(Transform::toIterator([0, 5, 6, 7]));
+        $iterator = new StrictMultipleIterator([0, 1, 2, 3], [0, 3, 4], [0, 5, 6, 7]);
 
         // And
         $iterator->next();
@@ -258,12 +213,7 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
     public function testValidThreeUnequalArraysThirdSmaller(): void
     {
         // Given
-        $iterator = new StrictMultipleIterator();
-
-        // And
-        $iterator->attachIterator(Transform::toIterator([0, 1, 2, 3]));
-        $iterator->attachIterator(Transform::toIterator([0, 3, 4, 5]));
-        $iterator->attachIterator(Transform::toIterator([0, 5, 6]));
+        $iterator = new StrictMultipleIterator([0, 1, 2, 3], [0, 3, 4, 5], [0, 5, 6]);
 
         // And
         $iterator->next();
@@ -275,5 +225,183 @@ class StrictMultipleIteratorTest extends \PHPUnit\Framework\TestCase
 
         // When
         $iterator->valid();
+    }
+
+    /**
+     * @test         iteration over iterables of equal lengths, keyed by step
+     * @dataProvider dataProviderForIterationEqualLengths
+     * @param        array $iterables
+     * @param        array $expected
+     */
+    public function testIterationEqualLengths(array $iterables, array $expected): void
+    {
+        // Given
+        $iterator = new StrictMultipleIterator(...$iterables);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public static function dataProviderForIterationEqualLengths(): array
+    {
+        return [
+            [
+                [[], []],
+                [],
+            ],
+            [
+                [[1, 2, 3]],
+                [[1], [2], [3]],
+            ],
+            [
+                [[1, 2, 3], [4, 5, 6]],
+                [[1, 4], [2, 5], [3, 6]],
+            ],
+            [
+                [
+                    new Fixture\ArrayIteratorFixture([1, 2]),
+                    Fixture\GeneratorFixture::getGenerator([4, 5]),
+                    new Fixture\IteratorAggregateFixture(['a', 'b']),
+                ],
+                [[1, 4, 'a'], [2, 5, 'b']],
+            ],
+        ];
+    }
+
+    /**
+     * @test an iterator passed more than once is read as independent copies of it
+     */
+    public function testIteratorPassedTwice(): void
+    {
+        // Given
+        $source   = new Fixture\ArrayIteratorFixture([1, 2, 3]);
+        $iterator = new StrictMultipleIterator($source, $source);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [3, 3]], $result);
+    }
+
+    /**
+     * @test a generator passed more than once is read as independent copies of it
+     */
+    public function testGeneratorPassedTwice(): void
+    {
+        // Given
+        $source   = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        $iterator = new StrictMultipleIterator($source, $source);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [3, 3]], $result);
+    }
+
+    /**
+     * @test an iterator passed more than once around an iterable of equal length
+     */
+    public function testIteratorPassedTwiceAroundIterableOfEqualLength(): void
+    {
+        // Given
+        $source   = new Fixture\ArrayIteratorFixture([1, 2]);
+        $iterator = new StrictMultipleIterator($source, ['a', 'b'], $source);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertSame([[1, 'a', 1], [2, 'b', 2]], $result);
+    }
+
+    /**
+     * @test         an iterator passed more than once around an iterable of different length throws after the common steps
+     * @dataProvider dataProviderForIteratorPassedTwiceAroundIterableOfDifferentLength
+     * @param        array $other
+     * @param        array $expected
+     */
+    public function testIteratorPassedTwiceAroundIterableOfDifferentLength(array $other, array $expected): void
+    {
+        // Given
+        $source   = new Fixture\ArrayIteratorFixture([1, 2]);
+        $iterator = new StrictMultipleIterator($source, $other, $source);
+        $result   = [];
+
+        // When
+        try {
+            foreach ($iterator as $values) {
+                $result[] = $values;
+            }
+
+            $this->fail();
+        } catch (\LengthException $e) {
+            // Then
+            $this->assertSame($expected, $result);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public static function dataProviderForIteratorPassedTwiceAroundIterableOfDifferentLength(): array
+    {
+        return [
+            [
+                [],
+                [],
+            ],
+            [
+                ['a'],
+                [[1, 'a', 1]],
+            ],
+            [
+                ['a', 'b', 'c'],
+                [[1, 'a', 1], [2, 'b', 2]],
+            ],
+        ];
+    }
+
+    /**
+     * @test an iterator passed more than once is advanced once per step
+     */
+    public function testIteratorPassedTwiceIsAdvancedOncePerStep(): void
+    {
+        // Given
+        $pulled   = [];
+        $source   = new Fixture\RecordingIteratorFixture([1, 2, 3], $pulled);
+        $iterator = new StrictMultipleIterator($source, ['a', 'b', 'c'], $source);
+
+        // When
+        \iterator_to_array($iterator);
+
+        // Then
+        $this->assertSame([1, 2, 3], $pulled);
+    }
+
+    /**
+     * @test rewind restarts iteration from the first step
+     */
+    public function testRewind(): void
+    {
+        // Given
+        $source   = new Fixture\ArrayIteratorFixture([1, 2]);
+        $iterator = new StrictMultipleIterator($source, ['a', 'b'], $source);
+
+        // And
+        \iterator_to_array($iterator);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertSame([[1, 'a', 1], [2, 'b', 2]], $result);
     }
 }

@@ -150,4 +150,76 @@ class IteratorTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test zipEqual reads an iterator passed more than once as independent copies of it
+     */
+    public function testZipEqualIteratorPassedTwice(): void
+    {
+        // Given
+        $iterator = new Fixture\ArrayIteratorFixture([1, 2, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(Multi::zipEqual($iterator, $iterator), false);
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [2, 2], [3, 3]], $result);
+    }
+
+    /**
+     * @test zipEqual reads an iterator passed around an equal-length iterable as independent copies of it
+     */
+    public function testZipEqualIteratorPassedTwiceAroundEqualLengthIterable(): void
+    {
+        // Given
+        $iterator = new Fixture\ArrayIteratorFixture([1, 2]);
+
+        // When
+        $result = \iterator_to_array(Multi::zipEqual($iterator, [4, 5], $iterator), false);
+
+        // Then
+        $this->assertSame([[1, 4, 1], [2, 5, 2]], $result);
+    }
+
+    /**
+     * @test         zipEqual throws when an iterator passed more than once and another iterable differ in length
+     * @dataProvider dataProviderForZipEqualIteratorPassedTwiceAroundIterableOfDifferentLength
+     * @param        array $other
+     * @param        array $expected
+     */
+    public function testZipEqualIteratorPassedTwiceAroundIterableOfDifferentLength(array $other, array $expected): void
+    {
+        // Given
+        $iterator = new Fixture\ArrayIteratorFixture([1, 2]);
+        $result   = [];
+
+        // When
+        try {
+            foreach (Multi::zipEqual($iterator, $other, $iterator) as $values) {
+                $result[] = $values;
+            }
+
+            $this->fail();
+        } catch (\LengthException $e) {
+            // Then
+            $this->assertSame($expected, $result);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public static function dataProviderForZipEqualIteratorPassedTwiceAroundIterableOfDifferentLength(): array
+    {
+        return [
+            [
+                [4],
+                [[1, 4, 1]],
+            ],
+            [
+                [4, 5, 6],
+                [[1, 4, 1], [2, 5, 2]],
+            ],
+        ];
+    }
 }

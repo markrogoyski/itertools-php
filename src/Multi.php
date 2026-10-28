@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Iterators\JustifyMultipleIterator;
+use IterTools\Util\Iterators\ShortestMultipleIterator;
 use IterTools\Util\Iterators\StrictMultipleIterator;
 use IterTools\Util\MergeSortedHeap;
 
@@ -18,9 +19,9 @@ final class Multi
      *
      * For uneven lengths, iterations stops when the shortest iterable is exhausted.
      *
-     * Note: Passing the same iterator instance more than once (e.g., zip($it, $it)) will not work
-     * as expected because PHP's MultipleIterator silently ignores duplicate attachments.
-     * To chunk a stream, use Single::chunkwise() instead.
+     * An iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in. To chunk an iterable, as
+     * Python's zip(it, it) does, use Single::chunkwise() instead.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -28,12 +29,9 @@ final class Multi
      */
     public static function zip(iterable ...$iterables): \Generator
     {
-        $zippedIterator = new \MultipleIterator();
-        foreach ($iterables as $iterable) {
-            $zippedIterator->attachIterator(Transform::toIterator($iterable));
-        }
+        $iterator = new ShortestMultipleIterator(...$iterables);
 
-        foreach ($zippedIterator as $values) {
+        foreach ($iterator as $values) {
             yield $values;
         }
     }
@@ -47,8 +45,8 @@ final class Multi
      * Iteration continues until the longest iterable is exhausted.
      * For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
      *
-     * Note: Passing the same iterator instance more than once will not work as expected
-     * because PHP's MultipleIterator silently ignores duplicate attachments.
+     * An iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -56,13 +54,9 @@ final class Multi
      */
     public static function zipLongest(iterable ...$iterables): \Generator
     {
-        $zippedIterator = new \MultipleIterator();
-        foreach ($iterables as $iterable) {
-            $zippedIterator->attachIterator(Transform::toIterator($iterable));
-        }
-        $zippedIterator->setFlags(\MultipleIterator::MIT_NEED_ANY);
+        $iterator = new JustifyMultipleIterator(null, ...\array_values($iterables));
 
-        foreach ($zippedIterator as $values) {
+        foreach ($iterator as $values) {
             yield $values;
         }
     }
@@ -99,8 +93,8 @@ final class Multi
      * Works like Multi::zip() method but throws \LengthException if lengths not equal,
      * i.e., at least one iterator ends before the others.
      *
-     * Note: Passing the same iterator instance more than once will not work as expected
-     * because PHP's MultipleIterator silently ignores duplicate attachments.
+     * An iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -109,12 +103,9 @@ final class Multi
      */
     public static function zipEqual(iterable ...$iterables): \Generator
     {
-        $zippedIterator = new StrictMultipleIterator(\MultipleIterator::MIT_NEED_ALL);
-        foreach ($iterables as $iterable) {
-            /** @psalm-suppress MixedArgumentTypeCoercion */
-            $zippedIterator->attachIterator(Transform::toIterator($iterable));
-        }
-        foreach ($zippedIterator as $values) {
+        $iterator = new StrictMultipleIterator(...$iterables);
+
+        foreach ($iterator as $values) {
             yield $values;
         }
     }

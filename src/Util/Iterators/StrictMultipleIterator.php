@@ -4,50 +4,31 @@ namespace IterTools\Util\Iterators;
 
 /**
  * @internal
- * Works like \MultipleIterator
- * but throws \LengthException if at least one iterator ends before the others while iteration process.
- *
- * {@inheritDoc}
- *
- * @psalm-suppress MissingTemplateParam
+ * Iterates until the iterables are exhausted, which must happen at the same step.
  */
-final class StrictMultipleIterator extends \MultipleIterator
+final class StrictMultipleIterator extends AbstractMultipleIterator
 {
     /**
-     * Throws \LengthException if at least one iterator ends before the others.
-     *
      * {@inheritDoc}
      *
-     * @throws \LengthException
+     * @throws \LengthException if at least one iterable is exhausted before the others
      */
     public function valid(): bool
     {
-        // If is valid by default:
-        if (parent::valid() === true) {
-            // No extra checks required.
-            return true;
-        }
-
-        // So we know that the iterator is invalid.
-        // And this has two possible reasons:
-        // 1) all iterators ended (regular situation);
-        // 2) at least one iterator ended and at least one iterator don't ended (irregular situation).
-
-        // If flag MIT_NEED_ALL has been set:
-        if (($flags = $this->getFlags()) & \MultipleIterator::MIT_NEED_ALL) {
-            // We are backing up current flags and replacing them with MIT_NEED_ANY to do an extra check
-            $this->setFlags(\MultipleIterator::MIT_NEED_ANY);
-
-            /** So do we have non-ended iterators? @phpstan-ignore identical.alwaysFalse */
-            if (parent::valid() === true) {
-                // This is situation (2)
-                throw new \LengthException('Iterables of unequal sizes');
+        $anyValid = false;
+        $allValid = true;
+        foreach ($this->iterators as $iterator) {
+            if ($iterator->valid()) {
+                $anyValid = true;
+            } else {
+                $allValid = false;
             }
-
-            // Restoring flags.
-            $this->setFlags($flags);
         }
 
-        return false;
+        if ($anyValid && !$allValid) {
+            throw new \LengthException('Iterables of unequal sizes');
+        }
+
+        return $anyValid;
     }
 }

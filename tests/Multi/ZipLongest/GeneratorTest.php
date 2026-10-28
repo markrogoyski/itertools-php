@@ -63,4 +63,19 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test zipLongest reads a generator passed more than once as independent copies of it
+     */
+    public function testZipLongestGeneratorPassedTwice(): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(Multi::zipLongest($generator, $generator), false);
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [3, 3]], $result);
+    }
 }

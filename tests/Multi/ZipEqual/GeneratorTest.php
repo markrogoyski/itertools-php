@@ -223,4 +223,19 @@ class GeneratorTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test zipEqual reads a generator passed more than once as independent copies of it
+     */
+    public function testZipEqualGeneratorPassedTwice(): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(Multi::zipEqual($generator, $generator), false);
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [3, 3]], $result);
+    }
 }

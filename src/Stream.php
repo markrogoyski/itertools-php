@@ -1337,8 +1337,8 @@ final class Stream implements \IteratorAggregate
      * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
      * is thrown at iteration time (not at call time).
      *
-     * Note: Passing the same iterator instance more than once is not supported and may
-     * not behave as expected.
+     * A row iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in.
      *
      * @return Stream
      *
@@ -1370,8 +1370,8 @@ final class Stream implements \IteratorAggregate
      * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
      * is thrown at iteration time (not at call time).
      *
-     * Note: Passing the same iterator instance more than once is not supported and may
-     * not behave as expected.
+     * A row iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in.
      *
      * @return Stream
      *
@@ -1436,8 +1436,8 @@ final class Stream implements \IteratorAggregate
      * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
      * is thrown at iteration time (not at call time).
      *
-     * Note: Passing the same iterator instance more than once is not supported and may
-     * not behave as expected.
+     * A row iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in.
      *
      * @return Stream
      *
@@ -1521,8 +1521,8 @@ final class Stream implements \IteratorAggregate
      *
      * For uneven lengths, iterations stops when the shortest iterable is exhausted.
      *
-     * Note: Passing the same iterator instance more than once will not work as expected
-     * because PHP's MultipleIterator silently ignores duplicate attachments.
+     * An iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -1545,8 +1545,8 @@ final class Stream implements \IteratorAggregate
      * Iteration continues until the longest iterable is exhausted.
      * For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
      *
-     * Note: Passing the same iterator instance more than once will not work as expected
-     * because PHP's MultipleIterator silently ignores duplicate attachments.
+     * An iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -1591,8 +1591,8 @@ final class Stream implements \IteratorAggregate
      * Works like Multi::zip() method but throws \LengthException if lengths not equal,
      * i.e., at least one iterator ends before the others.
      *
-     * Note: Passing the same iterator instance more than once will not work as expected
-     * because PHP's MultipleIterator silently ignores duplicate attachments.
+     * An iterator or generator passed more than once is read as independent copies of itself: each step
+     * reads it once and gives its value to every position it was passed in.
      *
      * @param iterable<mixed> ...$iterables
      *

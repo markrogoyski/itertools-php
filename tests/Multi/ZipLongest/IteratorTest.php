@@ -132,4 +132,34 @@ class IteratorTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test zipLongest reads an iterator passed more than once as independent copies of it
+     */
+    public function testZipLongestIteratorPassedTwice(): void
+    {
+        // Given
+        $iterator = new Fixture\ArrayIteratorFixture([1, 2, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(Multi::zipLongest($iterator, $iterator), false);
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [2, 2], [3, 3]], $result);
+    }
+
+    /**
+     * @test zipLongest reads an iterator passed around a longer iterable as independent copies of it
+     */
+    public function testZipLongestIteratorPassedTwiceAroundLongerIterable(): void
+    {
+        // Given
+        $iterator = new Fixture\ArrayIteratorFixture([1, 2]);
+
+        // When
+        $result = \iterator_to_array(Multi::zipLongest($iterator, [4, 5, 6], $iterator), false);
+
+        // Then
+        $this->assertSame([[1, 4, 1], [2, 5, 2], [null, 6, null]], $result);
+    }
 }
