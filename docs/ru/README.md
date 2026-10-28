@@ -570,8 +570,10 @@ foreach (Multi::chain(Single::string($letters), Single::string($numbers)) as $ch
 Некоторые функции сравнивают напрямую через `===`, поэтому исключение для `NAN` на них не
 распространяется: `NAN` никогда не совпадает с `NAN` в `contains`, `startsWith`, `endsWith`,
 `same`, `distinctAdjacent`, `distinctAdjacentBy` и `groupAdjacentBy`, а также в их аналогах
-в `Stream` (`sameWith` для `same`). Варианты `Coercive` функций `contains`, `startsWith` и
-`endsWith` следуют правилам режима приведения типов, описанным ниже.
+в `Stream` (`sameWith` для `same`). Исключение — итератор или генератор, сравниваемый сам с
+собой, как в `same($it, $it)`, `startsWith($it, $it)` или `endsWith($it, $it)`: он не читается, и
+результат — истина, даже если в нём есть `NAN`. Варианты `Coercive` функций `contains`,
+`startsWith` и `endsWith` следуют правилам режима приведения типов, описанным ниже.
 
 ### Режим приведения типов (числовая эквивалентность)
 

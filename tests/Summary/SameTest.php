@@ -752,4 +752,35 @@ class SameTest extends \PHPUnit\Framework\TestCase
             [$trav([1, null]), [1], [1, null], [1]],
         ];
     }
+
+    /**
+     * @test The same iterator holding NAN passed twice is true, though NAN never matches NAN.
+     */
+    public function testRepeatedIteratorWithNanIsTrue(): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture([NAN]);
+
+        // When
+        $result = Summary::same($iterator, $iterator);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test Separate iterators holding NAN are not the same, since NAN never matches NAN.
+     */
+    public function testSeparateIteratorsWithNanAreNotSame(): void
+    {
+        // Given
+        $lhs = new ArrayIteratorFixture([NAN]);
+        $rhs = new ArrayIteratorFixture([NAN]);
+
+        // When
+        $result = Summary::same($lhs, $rhs);
+
+        // Then
+        $this->assertFalse($result);
+    }
 }

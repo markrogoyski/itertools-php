@@ -2460,7 +2460,7 @@ $boolean = Stream::of($primes)->containsCoercive('7');
 Returns true if the stream ends with the given suffix using [strict-type comparison](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty suffix returns true without consuming the stream.
+- Empty suffix returns true without consuming the stream. So does the stream's own source iterator or generator passed as the suffix: `Stream::of($it)->endsWith($it)`.
 - The stream must be finite.
 
 ```$stream->endsWith(iterable $suffix): bool```
@@ -2481,7 +2481,7 @@ $boolean = Stream::of($path)->endsWith(['error.log']);
 Returns true if the stream ends with the given suffix using [type coercion](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty suffix returns true without consuming the stream.
+- Empty suffix returns true without consuming the stream. So does the stream's own source iterator or generator passed as the suffix: `Stream::of($it)->endsWith($it)`.
 - The stream must be finite.
 - Equality follows the [coercive rules](../README.md#strict-and-coercive-types).
 - Throws `\InvalidArgumentException` if a non-serializable object is reached during comparison.
@@ -2708,7 +2708,7 @@ $result = Stream::of($input)
 Returns true if the stream starts with the given prefix using [strict-type comparison](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty prefix returns true without consuming the stream.
+- Empty prefix returns true without consuming the stream. So does the stream's own source iterator or generator passed as the prefix: `Stream::of($it)->startsWith($it)`.
 - Lazy: the stream is never advanced beyond the last element compared.
 
 ```$stream->startsWith(iterable $prefix): bool```
@@ -2729,7 +2729,7 @@ $boolean = Stream::of($path)->startsWith(['etc']);
 Returns true if the stream starts with the given prefix using [type coercion](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty prefix returns true without consuming the stream.
+- Empty prefix returns true without consuming the stream. So does the stream's own source iterator or generator passed as the prefix: `Stream::of($it)->startsWith($it)`.
 - Lazy: the stream is never advanced beyond the last element compared.
 - Equality follows the [coercive rules](../README.md#strict-and-coercive-types).
 - Throws `\InvalidArgumentException` if a non-serializable object is reached during comparison.

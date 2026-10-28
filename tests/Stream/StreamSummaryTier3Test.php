@@ -497,4 +497,132 @@ class StreamSummaryTier3Test extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
         $this->assertSame([], $pulled);
     }
+
+    /**
+     * @test startsWith - does not read an iterator stream compared with its own source
+     */
+    public function testStartsWithOwnSourceDoesNotReadIterator(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Stream::of($data)->startsWith($data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test startsWith - a generator stream compared with its own source is true
+     */
+    public function testStartsWithOwnSourceGenerator(): void
+    {
+        // Given
+        $data = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Stream::of($data)->startsWith($data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWithCoercive - does not read an iterator stream compared with its own source
+     */
+    public function testStartsWithCoerciveOwnSourceDoesNotReadIterator(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Stream::of($data)->startsWithCoercive($data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test startsWithCoercive - a generator stream compared with its own source is true
+     */
+    public function testStartsWithCoerciveOwnSourceGenerator(): void
+    {
+        // Given
+        $data = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Stream::of($data)->startsWithCoercive($data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWith - does not read an iterator stream compared with its own source
+     */
+    public function testEndsWithOwnSourceDoesNotReadIterator(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Stream::of($data)->endsWith($data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test endsWith - a generator stream compared with its own source is true
+     */
+    public function testEndsWithOwnSourceGenerator(): void
+    {
+        // Given
+        $data = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Stream::of($data)->endsWith($data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - does not read an iterator stream compared with its own source
+     */
+    public function testEndsWithCoerciveOwnSourceDoesNotReadIterator(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Stream::of($data)->endsWithCoercive($data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test endsWithCoercive - a generator stream compared with its own source is true
+     */
+    public function testEndsWithCoerciveOwnSourceGenerator(): void
+    {
+        // Given
+        $data = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Stream::of($data)->endsWithCoercive($data);
+
+        // Then
+        $this->assertTrue($result);
+    }
 }

@@ -2527,7 +2527,8 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty prefix → true without consuming the stream.
+     * Empty prefix → true without consuming the stream. So is the stream's own source iterator or
+     * generator passed as the prefix: Stream::of($it)->startsWith($it).
      *
      * Lazy: the stream is never advanced beyond the last element compared.
      *
@@ -2547,7 +2548,8 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty prefix → true without consuming the stream.
+     * Empty prefix → true without consuming the stream. So is the stream's own source iterator or
+     * generator passed as the prefix: Stream::of($it)->startsWith($it).
      *
      * Lazy: the stream is never advanced beyond the last element compared.
      *
@@ -2567,7 +2569,8 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty suffix → true without consuming the stream. The stream must be finite.
+     * Empty suffix → true without consuming the stream. So is the stream's own source iterator or
+     * generator passed as the suffix: Stream::of($it)->endsWith($it). The stream must be finite.
      *
      * @param iterable<mixed> $suffix
      *
@@ -2585,7 +2588,8 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty suffix → true without consuming the stream. The stream must be finite.
+     * Empty suffix → true without consuming the stream. So is the stream's own source iterator or
+     * generator passed as the suffix: Stream::of($it)->endsWith($it). The stream must be finite.
      *
      * @param iterable<mixed> $suffix
      *

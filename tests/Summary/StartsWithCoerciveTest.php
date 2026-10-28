@@ -515,4 +515,69 @@ class StartsWithCoerciveTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
         $this->assertFalse($data->valid());
     }
+
+    /**
+     * @test startsWithCoercive - a generator passed as its own prefix is true
+     */
+    public function testOwnSourceGenerator(): void
+    {
+        // Given
+        $data = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Summary::startsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWithCoercive - an iterator passed as its own prefix is true without being read
+     */
+    public function testOwnSourceIteratorIsNotRead(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new Fixture\RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Summary::startsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test startsWithCoercive - a throwing generator passed as its own prefix is true without its exception being raised
+     */
+    public function testOwnSourceThrowingGenerator(): void
+    {
+        // Given
+        $data = (static function (): \Generator {
+            throw new \RuntimeException('must not be pulled');
+            yield; // unreachable
+        })();
+
+        // When
+        $result = Summary::startsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWithCoercive - an IteratorAggregate passed as its own prefix is compared through separate iterators
+     */
+    public function testOwnSourceIteratorAggregate(): void
+    {
+        // Given
+        $data = new Fixture\IteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::startsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
 }

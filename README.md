@@ -597,8 +597,10 @@ Two values are equal iff `$a === $b`, with one exception: `NAN` equals `NAN`, at
 Some functions compare with `===` directly and so do not have the `NAN` exception: `NAN`
 never matches `NAN` in `contains`, `startsWith`, `endsWith`, `same`, `distinctAdjacent`,
 `distinctAdjacentBy`, and `groupAdjacentBy`, nor in their `Stream` counterparts (`sameWith`
-for `same`). The `Coercive` variants of `contains`, `startsWith`, and `endsWith` follow the
-coercive rules below.
+for `same`). The exception is one iterator or generator compared with itself, as in
+`same($it, $it)`, `startsWith($it, $it)` or `endsWith($it, $it)`: it is not read, and is `true`
+even if it holds `NAN`. The `Coercive` variants of `contains`, `startsWith`, and `endsWith` follow
+the coercive rules below.
 
 ### Coercive mode (numeric equivalence)
 

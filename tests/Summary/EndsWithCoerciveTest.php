@@ -476,4 +476,69 @@ class EndsWithCoerciveTest extends \PHPUnit\Framework\TestCase
             yield $row;
         }
     }
+
+    /**
+     * @test endsWithCoercive - a generator passed as its own suffix is true
+     */
+    public function testOwnSourceGenerator(): void
+    {
+        // Given
+        $data = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - an iterator passed as its own suffix is true without being read
+     */
+    public function testOwnSourceIteratorIsNotRead(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new Fixture\RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test endsWithCoercive - a throwing generator passed as its own suffix is true without its exception being raised
+     */
+    public function testOwnSourceThrowingGenerator(): void
+    {
+        // Given
+        $data = (static function (): \Generator {
+            throw new \RuntimeException('must not be pulled');
+            yield; // unreachable
+        })();
+
+        // When
+        $result = Summary::endsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - an IteratorAggregate passed as its own suffix is compared through separate iterators
+     */
+    public function testOwnSourceIteratorAggregate(): void
+    {
+        // Given
+        $data = new Fixture\IteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
 }

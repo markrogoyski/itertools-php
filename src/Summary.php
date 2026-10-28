@@ -589,7 +589,8 @@ final class Summary
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty prefix → true without consuming the source.
+     * Empty prefix → true without consuming the source. So is an iterator or generator passed as its
+     * own prefix: startsWith($it, $it).
      *
      * Lazy: the source is never advanced beyond the last element compared. On a match it is
      * left on the last prefix element; on a mismatch, on the mismatching element; if it is
@@ -613,7 +614,8 @@ final class Summary
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty prefix → true without consuming the source.
+     * Empty prefix → true without consuming the source. So is an iterator or generator passed as its
+     * own prefix: startsWith($it, $it).
      *
      * Lazy: the source is never advanced beyond the last element compared. On a match it is
      * left on the last prefix element; on a mismatch, on the mismatching element; if it is
@@ -639,7 +641,8 @@ final class Summary
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty suffix → true without consuming the source.
+     * Empty suffix → true without consuming the source. So is an iterator or generator passed as its
+     * own suffix: endsWith($it, $it).
      *
      * Both source and suffix must be finite. Buffers up to count($suffix) elements via a sliding window.
      * Each element is compared as it was when read; see README "Strict and Coercive Types" > Values
@@ -662,7 +665,8 @@ final class Summary
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty suffix → true without consuming the source.
+     * Empty suffix → true without consuming the source. So is an iterator or generator passed as its
+     * own suffix: endsWith($it, $it).
      *
      * Both source and suffix must be finite. Buffers up to count($suffix) elements via a sliding window.
      * Each array or object element is hashed when read, so it is compared as it was then; see README
@@ -693,6 +697,11 @@ final class Summary
      */
     private static function startsWithInternal(iterable $data, iterable $prefix, bool $strict): bool
     {
+        // An iterator starts with itself, and reading the prefix would advance the source with it.
+        if ($data instanceof \Iterator && $data === $prefix) {
+            return true;
+        }
+
         $dataIt = null;
         foreach ($prefix as $expected) {
             if ($dataIt === null) {
@@ -728,6 +737,11 @@ final class Summary
      */
     private static function endsWithInternal(iterable $data, iterable $suffix, bool $strict): bool
     {
+        // An iterator ends with itself, and reading the suffix would exhaust the source first.
+        if ($data instanceof \Iterator && $data === $suffix) {
+            return true;
+        }
+
         // The suffix and the window are kept while later elements are read, so each element is captured
         // as it is when read. Strict: an array as a Snapshot, so a row filled through a shared reference
         // keeps the values it held. Coercive: an array or object as its key, since an object is compared

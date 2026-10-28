@@ -188,7 +188,7 @@ $boolean = Summary::containsCoercive([100, 200, 300], '1e2');
 Returns true if the iterable ends with the given suffix (using strict-type comparison).
 
 - Compares values pairwise; keys are ignored.
-- Empty suffix returns true without consuming the source.
+- Empty suffix returns true without consuming the source. So does an iterator or generator passed as its own suffix: `endsWith($it, $it)`.
 - Both source and suffix must be finite.
 
 ```Summary::endsWith(iterable $data, iterable $suffix): bool```
@@ -212,7 +212,7 @@ $boolean = Summary::endsWith($path, ['error.log']);
 Returns true if the iterable ends with the given suffix using [type coercion](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty suffix returns true without consuming the source.
+- Empty suffix returns true without consuming the source. So does an iterator or generator passed as its own suffix: `endsWith($it, $it)`.
 - Both source and suffix must be finite.
 
 ```Summary::endsWithCoercive(iterable $data, iterable $suffix): bool```
@@ -437,7 +437,7 @@ $result = Summary::sameCount($batmanMovies, $matrixMovies);
 Returns true if the iterable starts with the given prefix (using strict-type comparison).
 
 - Compares values pairwise; keys are ignored.
-- Empty prefix returns true without consuming the source.
+- Empty prefix returns true without consuming the source. So does an iterator or generator passed as its own prefix: `startsWith($it, $it)`.
 - Lazy: the source is never advanced beyond the last element compared, so a side-effecting source (file handle, HTTP pagination, database cursor) is not over-read. On a match the source is left on the last prefix element; on a mismatch, on the mismatching element; if it is shorter than the prefix, exhausted.
 
 ```Summary::startsWith(iterable $data, iterable $prefix): bool```
@@ -461,7 +461,7 @@ $boolean = Summary::startsWith($path, ['etc']);
 Returns true if the iterable starts with the given prefix using [type coercion](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty prefix returns true without consuming the source.
+- Empty prefix returns true without consuming the source. So does an iterator or generator passed as its own prefix: `startsWith($it, $it)`.
 - Lazy: the source is never advanced beyond the last element compared, so a side-effecting source (file handle, HTTP pagination, database cursor) is not over-read. On a match the source is left on the last prefix element; on a mismatch, on the mismatching element; if it is shorter than the prefix, exhausted.
 
 ```Summary::startsWithCoercive(iterable $data, iterable $prefix): bool```

@@ -362,4 +362,100 @@ class EndsWithTest extends \PHPUnit\Framework\TestCase
             yield $row;
         }
     }
+
+    /**
+     * @test endsWith - a generator passed as its own suffix is true
+     */
+    public function testOwnSourceGenerator(): void
+    {
+        // Given
+        $data = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Summary::endsWith($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWith - an iterator passed as its own suffix is true without being read
+     */
+    public function testOwnSourceIteratorIsNotRead(): void
+    {
+        // Given
+        $pulled = [];
+        $data = new Fixture\RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Summary::endsWith($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test endsWith - a throwing generator passed as its own suffix is true without its exception being raised
+     */
+    public function testOwnSourceThrowingGenerator(): void
+    {
+        // Given
+        $data = (static function (): \Generator {
+            throw new \RuntimeException('must not be pulled');
+            yield; // unreachable
+        })();
+
+        // When
+        $result = Summary::endsWith($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWith - an IteratorAggregate passed as its own suffix is compared through separate iterators
+     */
+    public function testOwnSourceIteratorAggregate(): void
+    {
+        // Given
+        $data = new Fixture\IteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::endsWith($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWith - an iterator holding NAN passed as its own suffix is true, though NAN never matches NAN
+     */
+    public function testOwnSourceIteratorWithNanIsTrue(): void
+    {
+        // Given
+        $data = new Fixture\ArrayIteratorFixture([NAN]);
+
+        // When
+        $result = Summary::endsWith($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWith - a separate iterator holding NAN as the suffix is false, since NAN never matches NAN
+     */
+    public function testSeparateIteratorWithNanIsFalse(): void
+    {
+        // Given
+        $data  = new Fixture\ArrayIteratorFixture([NAN]);
+        $suffix = new Fixture\ArrayIteratorFixture([NAN]);
+
+        // When
+        $result = Summary::endsWith($data, $suffix);
+
+        // Then
+        $this->assertFalse($result);
+    }
 }
