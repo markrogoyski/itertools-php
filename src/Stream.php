@@ -3175,7 +3175,7 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
-     * Returns the first element of iterable source.
+     * Reduces iterable source to its first and last elements.
      *
      * @return array{mixed, mixed}
      *
