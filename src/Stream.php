@@ -100,7 +100,7 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
-     * Creates iterable instance with fluent interface of random percentages between 0 and 1.
+     * Creates iterable instance with fluent interface of random percentages in [0, 1): 0 inclusive, 1 exclusive.
      *
      * @param int $repetitions
      * @param \Random\Engine|null $engine
@@ -254,7 +254,7 @@ final class Stream implements \IteratorAggregate
      *
      * @return Stream
      *
-     * @throws \InvalidArgumentException if more than one initial value is passed.
+     * @throws \InvalidArgumentException if more than one initial value is passed, or one is named other than initial.
      *
      * @see Single::accumulate()
      */
@@ -2249,6 +2249,8 @@ final class Stream implements \IteratorAggregate
      * @param (callable(mixed, mixed):mixed)|null $valueFunc fn ($value, $key) => Custom logic
      *
      * @return array<mixed>
+     *
+     * @throws \InvalidArgumentException if a key is not an int or string; PHP would convert or reject it.
      *
      * @see Transform::toAssociativeArray()
      */

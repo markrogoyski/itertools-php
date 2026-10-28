@@ -158,7 +158,7 @@ Quick Reference
 | [`choice`](docs/random-iteration.md#choice)                       | Random selections from list       | `Random::choice($items, $repetitions)`     |
 | [`coinFlip`](docs/random-iteration.md#coinflip)                   | Random coin flips (0 or 1)        | `Random::coinFlip($repetitions)`           |
 | [`number`](docs/random-iteration.md#number)                       | Random numbers                    | `Random::number($min, $max, $repetitions)` |
-| [`percentage`](docs/random-iteration.md#percentage)               | Random percentage between 0 and 1 | `Random::percentage($repetitions)`         |
+| [`percentage`](docs/random-iteration.md#percentage)               | Random percentage in [0, 1)      | `Random::percentage($repetitions)`         |
 | [`reservoirSample`](docs/random-iteration.md#reservoir-sample)    | Single-pass uniform random sample | `Random::reservoirSample($data, $size, [$engine])` |
 | [`rockPaperScissors`](docs/random-iteration.md#rockpaperscissors) | Random rock-paper-scissors hands  | `Random::rockPaperScissors($repetitions)`  |
 | [`sample`](docs/random-iteration.md#sample)                       | Random sample without replacement | `Random::sample($data, $size, [$engine])`  |
@@ -314,7 +314,7 @@ Quick Reference
 | [`ofFileLines`](docs/stream.md#of-file-lines)                  | Create a stream from lines of a file                            | `Stream::ofFileLines($file)`                        |
 | [`ofRandomChoice`](docs/stream.md#of-random-choice)            | Create a stream of random selections                            | `Stream::ofRandomChoice($items, $repetitions)`      |
 | [`ofRandomNumbers`](docs/stream.md#of-random-numbers)          | Create a stream of random numbers (integers)                    | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
-| [`ofRandomPercentage`](docs/stream.md#of-random-percentage)    | Create a stream of random percentages between 0 and 1           | `Stream::ofRandomPercentage($repetitions)`          |
+| [`ofRandomPercentage`](docs/stream.md#of-random-percentage)    | Create a stream of random percentages in [0, 1)                 | `Stream::ofRandomPercentage($repetitions)`          |
 | [`ofRange`](docs/stream.md#of-range)                           | Create a lazy stream of an arithmetic progression of numbers    | `Stream::ofRange($start, $end, $step)`              |
 | [`ofRockPaperScissors`](docs/stream.md#of-rock-paper-scissors) | Create a stream of rock-paper-scissors hands                    | `Stream::ofRockPaperScissors($repetitions)`         |
 

@@ -30,7 +30,7 @@ class PercentageTest extends \PHPUnit\Framework\TestCase
         foreach ($result as $percentage) {
             $this->assertIsFloat($percentage);
             $this->assertTrue($percentage >= 0);
-            $this->assertTrue($percentage <= 1);
+            $this->assertTrue($percentage < 1);
         }
     }
 
@@ -78,10 +78,9 @@ class PercentageTest extends \PHPUnit\Framework\TestCase
         $result = \iterator_to_array(Random::percentage(3, $engine));
 
         // Then
-        $this->assertCount(3, $result);
-        $this->assertEqualsWithDelta(0.59308596857569, $result[0], 1e-10);
-        $this->assertEqualsWithDelta(0.36686957578674, $result[1], 1e-10);
-        $this->assertEqualsWithDelta(0.55938199522532, $result[2], 1e-10);
+        // Generated with: $r = new \Random\Randomizer(new \Random\Engine\Mt19937(42)); per value,
+        //   ($r->getInt(0, 2 ** 26 - 1) * 2 ** 27 + $r->getInt(0, 2 ** 27 - 1)) / 2 ** 53
+        $this->assertSame([0.9705673231091424, 0.8457159529613436, 0.8476120673136699], $result);
     }
 
     /**
@@ -117,7 +116,48 @@ class PercentageTest extends \PHPUnit\Framework\TestCase
         foreach ($result as $percentage) {
             $this->assertIsFloat($percentage);
             $this->assertTrue($percentage >= 0);
-            $this->assertTrue($percentage <= 1);
+            $this->assertTrue($percentage < 1);
         }
+    }
+
+    /**
+     * @test percentage never reaches 1: the largest value an engine can produce is the largest float below 1
+     *       on the 2^-53 grid
+     */
+    public function testPercentageUpperBoundIsExclusive(): void
+    {
+        // Given
+        $engine = new class implements \Random\Engine {
+            public function generate(): string
+            {
+                return \str_repeat("\xFF", 8);
+            }
+        };
+
+        // When
+        $result = \iterator_to_array(Random::percentage(3, $engine));
+
+        // Then
+        $this->assertSame([1 - 2 ** -53, 1 - 2 ** -53, 1 - 2 ** -53], $result);
+    }
+
+    /**
+     * @test percentage lower bound is 0, inclusive
+     */
+    public function testPercentageLowerBoundIsInclusive(): void
+    {
+        // Given
+        $engine = new class implements \Random\Engine {
+            public function generate(): string
+            {
+                return \str_repeat("\x00", 8);
+            }
+        };
+
+        // When
+        $result = \iterator_to_array(Random::percentage(3, $engine));
+
+        // Then
+        $this->assertSame([0.0, 0.0, 0.0], $result);
     }
 }

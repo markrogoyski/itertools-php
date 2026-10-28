@@ -360,4 +360,19 @@ class TransformationTest extends \PHPUnit\Framework\TestCase
             [-10],
         ];
     }
+
+    /**
+     * @test Stream::toAssociativeArray throws InvalidArgumentException when a key is not int|string
+     */
+    public function testToAssociativeArrayInvalidKeyThrows(): void
+    {
+        // Given
+        $stream = Stream::of([1.5, 2.5]);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        $stream->toAssociativeArray(fn ($value) => $value);
+    }
 }

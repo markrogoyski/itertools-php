@@ -336,7 +336,7 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         foreach ($actual as $percentage) {
             $this->assertIsFloat($percentage);
             $this->assertTrue($percentage >= 0);
-            $this->assertTrue($percentage <= 1);
+            $this->assertTrue($percentage < 1);
         }
     }
 
@@ -465,10 +465,9 @@ class SourceTest extends \PHPUnit\Framework\TestCase
         $actual = $stream->toArray();
 
         // Then
-        $this->assertCount(3, $actual);
-        $this->assertEqualsWithDelta(0.59308596857569, $actual[0], 1e-10);
-        $this->assertEqualsWithDelta(0.36686957578674, $actual[1], 1e-10);
-        $this->assertEqualsWithDelta(0.55938199522532, $actual[2], 1e-10);
+        // Generated with: $r = new \Random\Randomizer(new \Random\Engine\Mt19937(42)); per value,
+        //   ($r->getInt(0, 2 ** 26 - 1) * 2 ** 27 + $r->getInt(0, 2 ** 27 - 1)) / 2 ** 53
+        $this->assertSame([0.9705673231091424, 0.8457159529613436, 0.8476120673136699], $actual);
     }
 
     /**

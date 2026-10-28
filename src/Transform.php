@@ -31,6 +31,9 @@ final class Transform
     /**
      * Converts given iterable to an associative array.
      *
+     * Keys follow PHP array semantics: a repeated key keeps its first position and its last value, and a decimal
+     * integer string such as '1' is stored as the int 1.
+     *
      * @template TKey
      * @template TValue
      *
@@ -39,6 +42,8 @@ final class Transform
      * @param callable(mixed, mixed): mixed|null $valueFunc
      *
      * @return array<TKey|int|string, TValue|mixed>
+     *
+     * @throws \InvalidArgumentException if a key is not an int or string; PHP would convert or reject it.
      */
     public static function toAssociativeArray(
         iterable $iterable,
@@ -50,8 +55,12 @@ final class Transform
 
         $result = [];
         foreach ($iterable as $key => $item) {
-            /** @var int|string $computedKey */
             $computedKey = $keyFunc($item, $key);
+            if (!\is_int($computedKey) && !\is_string($computedKey)) {
+                throw new \InvalidArgumentException(
+                    'Associative array key must be int or string, got ' . \get_debug_type($computedKey)
+                );
+            }
             $result[$computedKey] = $valueFunc($item, $key);
         }
         return $result;

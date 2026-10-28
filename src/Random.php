@@ -72,8 +72,12 @@ final class Random
         }
     }
 
+    // A percentage's 53 random bits are drawn as 26 high and 27 low, so each draw fits a 32-bit PHP int.
+    private const PERCENTAGE_HIGH_STEPS = 2 ** 26;
+    private const PERCENTAGE_LOW_STEPS  = 2 ** 27;
+
     /**
-     * Generate a random percentage between 0 and 1
+     * Generate a random percentage in [0, 1): 0 inclusive, 1 exclusive
      *
      * @param int $repetitions
      * @param \Random\Engine|null $engine
@@ -87,7 +91,13 @@ final class Random
         }
         $randomizer = new \Random\Randomizer($engine);
         for ($i = $repetitions; $i > 0; $i--) {
-            yield (float) $randomizer->getInt(0, \PHP_INT_MAX) / (float) \PHP_INT_MAX;
+            // 53 random bits over 2^53, as Randomizer::nextFloat() (PHP 8.3+) does: every value is exact, evenly
+            // spaced, and below 1. Dividing a 63-bit int rounds the top ones up to 1.0. Dividing by powers of 2 is
+            // exact, and the same two draws give the same values on 32- and 64-bit builds.
+            $high = $randomizer->getInt(0, self::PERCENTAGE_HIGH_STEPS - 1);
+            $low  = $randomizer->getInt(0, self::PERCENTAGE_LOW_STEPS - 1);
+            yield ((float) $high + (float) $low / (float) self::PERCENTAGE_LOW_STEPS)
+                / (float) self::PERCENTAGE_HIGH_STEPS;
         }
     }
 

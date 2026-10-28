@@ -362,6 +362,36 @@ class AccumulateTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test accumulate throws InvalidArgumentException for a named initial value with any name but initial
+     * @dataProvider dataProviderForMisnamedInitial
+     * @param array<string, mixed> $named
+     */
+    public function testMisnamedInitialThrows(array $named): void
+    {
+        // Given
+        $data = [1, 2, 3];
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        $generator = Single::accumulate($data, fn ($a, $b) => $a + $b, ...$named);
+        foreach ($generator as $_) {
+            // no-op
+        }
+    }
+
+    public static function dataProviderForMisnamedInitial(): array
+    {
+        return [
+            [['inital' => 100]],
+            [['init' => 100]],
+            [['Initial' => 100]],
+            [['initialValue' => null]],
+        ];
+    }
+
+    /**
      * @test accumulate is lazy — does not consume more of the iterator than requested
      */
     public function testLazyEvaluation(): void

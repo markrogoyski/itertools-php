@@ -9,7 +9,14 @@ namespace IterTools\Util\Iterators;
  *
  * - The source is read only when a related iterator first needs an element it has not been given yet.
  * - Each element's key and value are buffered until every live related iterator has moved past it.
+ * - A source failure is kept: every related iterator that reaches it gets the same exception, and the source is
+ *   not read again.
  * - Related iterators are not retained here, so dropping them frees everything without the cycle collector.
+ *   One exception: with zend.exception_ignore_args off, a kept source failure's trace holds the arguments of the
+ *   calls that read the source, which can include related iterators. Those form a cycle through this object, so
+ *   dropping one does not free it, or the elements it holds back, while another related iterator is alive. Once
+ *   none is, the cycle collector frees them all. The failure is kept regardless: without it, a related iterator
+ *   reaching it would end early with no exception.
  *
  * @internal
  *
@@ -58,6 +65,11 @@ final class TeeIterator
     private bool $needsAdvance = false;
     private bool $exhausted = false;
     private bool $handedOut = false;
+
+    /**
+     * What the source threw, at position $fetched. Nothing is read from the source after it.
+     */
+    private ?\Throwable $failure = null;
 
     /**
      * Id for the next cloned related iterator.
@@ -199,11 +211,22 @@ final class TeeIterator
 
     /**
      * Read from the source until the element at $position is buffered, if the source has one.
+     *
+     * @throws \Throwable what the source threw, to every related iterator that reaches the position it failed at
      */
     private function hasElementAt(int $position): bool
     {
         while ($this->fetched <= $position && !$this->exhausted) {
-            $this->fetch();
+            if ($this->failure !== null) {
+                throw $this->failure;
+            }
+            try {
+                $this->fetch();
+            } catch (\Throwable $exception) {
+                $this->failure = $exception;
+                $this->source = new \EmptyIterator();
+                throw $exception;
+            }
         }
 
         return $position < $this->fetched;

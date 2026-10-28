@@ -153,7 +153,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`choice`](random-iteration.md#choice)                            | Случайные выборы вариантов из списка     | `Random::choice($items, $repetitions)`     |
 | [`coinFlip`](random-iteration.md#coinflip)                        | Случайные броски монеты (0 или 1)        | `Random::coinFlip($repetitions)`           |
 | [`number`](random-iteration.md#number)                            | Случайные целые числа                    | `Random::number($min, $max, $repetitions)` |
-| [`percentage`](random-iteration.md#percentage)                    | Случайные вещественные числа между 0 и 1 | `Random::percentage($repetitions)`         |
+| [`percentage`](random-iteration.md#percentage)                    | Случайные вещественные числа в [0, 1)    | `Random::percentage($repetitions)`         |
 | [`reservoirSample`](random-iteration.md#reservoir-sample)         | Однопроходная равномерная случайная выборка | `Random::reservoirSample($data, $size, [$engine])` |
 | [`rockPaperScissors`](random-iteration.md#rockpaperscissors)      | Случайный выбор "камень-ножницы-бумага"  | `Random::rockPaperScissors($repetitions)`  |
 | [`sample`](random-iteration.md#sample)                            | Случайная выборка без повторений         | `Random::sample($data, $size, [$engine])`  |
@@ -309,7 +309,7 @@ $ composer require markrogoyski/itertools-php:2.*
 | [`ofEmpty`](stream.md#of-empty)                                      | Создает поток для цепочечных вызовов из пустой коллекции                                             | `Stream::ofEmpty()`                                 |
 | [`ofRandomChoice`](stream.md#of-random-choice)                       | Создает поток для цепочечных вызовов из бесконечных случайных выборов элемента из списка             | `Stream::ofRandomChoice($items, $repetitions)`      |
 | [`ofRandomNumbers`](stream.md#of-random-numbers)                     | Создает поток для цепочечных вызовов из бесконечного набора случайных целых чисел                    | `Stream::ofRandomNumbers($min, $max, $repetitions)` |
-| [`ofRandomPercentage`](stream.md#of-random-percentage)               | Создает поток для цепочечных вызовов из бесконечного набора случайных вещественных чисел между 0 и 1 | `Stream::ofRandomPercentage($repetitions)`          |
+| [`ofRandomPercentage`](stream.md#of-random-percentage)               | Создает поток для цепочечных вызовов из бесконечного набора случайных вещественных чисел в [0, 1)    | `Stream::ofRandomPercentage($repetitions)`          |
 | [`ofRange`](stream.md#of-range)                                      | Создает ленивый поток конечной арифметической прогрессии чисел                                       | `Stream::ofRange($start, $end, $step)`              |
 | [`ofRockPaperScissors`](stream.md#of-rock-paper-scissors)            | Создает поток для цепочечных вызовов из бесконечных случайных выборов "камень-ножницы-бумага"        | `Stream::ofRockPaperScissors($repetitions)`         |
 

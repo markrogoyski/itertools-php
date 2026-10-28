@@ -241,4 +241,20 @@ class StreamAccumulateTest extends \PHPUnit\Framework\TestCase
         // When
         $stream->toArray();
     }
+
+    /**
+     * @test Stream::accumulate throws InvalidArgumentException for a named initial value with any name but initial
+     */
+    public function testMisnamedInitialThrows(): void
+    {
+        // Given
+        $stream = Stream::of([1, 2, 3])
+            ->accumulate(fn ($a, $b) => $a + $b, inital: 100);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        $stream->toArray();
+    }
 }

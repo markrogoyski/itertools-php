@@ -33,7 +33,7 @@ final class Single
      *
      * @return \Generator<mixed>
      *
-     * @throws \InvalidArgumentException if more than one initial value is passed.
+     * @throws \InvalidArgumentException if more than one initial value is passed, or one is named other than initial.
      */
     public static function accumulate(iterable $data, callable $op, mixed ...$initial): \Generator
     {
@@ -41,6 +41,12 @@ final class Single
             throw new \InvalidArgumentException(
                 'accumulate expects at most one initial value, got ' . \count($initial)
             );
+        }
+        foreach (\array_keys($initial) as $name) {
+            // A misspelled named argument lands in the variadic under its own name instead of failing.
+            if (\is_string($name) && $name !== 'initial') {
+                throw new \InvalidArgumentException("accumulate has no parameter named \${$name}");
+            }
         }
 
         $hasInitial = \count($initial) === 1;

@@ -1076,4 +1076,207 @@ class TeeTest extends \PHPUnit\Framework\TestCase
             $this->assertContains($pair, [['k1', 'v1'], ['k2', 'v2'], ['k3', 'v3']]);
         }
     }
+
+    /**
+     * @test every tee copy that reaches a source failure receives the same exception, after the elements before it
+     */
+    public function testSourceExceptionReachesEveryCopy(): void
+    {
+        // Given
+        $exception = new \RuntimeException('boom');
+        $source = (function () use ($exception) {
+            yield 1;
+            yield 2;
+            throw $exception;
+        })();
+        [$a, $b, $c] = Transform::tee($source, 3);
+
+        foreach ([$a, $b, $c] as $copy) {
+            // When
+            $values = [];
+            $caught = null;
+            try {
+                foreach ($copy as $value) {
+                    $values[] = $value;
+                }
+            } catch (\RuntimeException $e) {
+                $caught = $e;
+            }
+
+            // Then
+            $this->assertSame([1, 2], $values);
+            $this->assertSame($exception, $caught);
+        }
+    }
+
+    /**
+     * @test a tee copy lagging behind the one that hit a source failure still gets the elements before it, then the failure
+     */
+    public function testSourceExceptionReachesLaggingCopyAfterBufferedElements(): void
+    {
+        // Given
+        $source = (function () {
+            yield 1;
+            yield 2;
+            throw new \RuntimeException('boom');
+        })();
+        [$a, $b] = Transform::tee($source, 2);
+        $a->rewind();
+        $a->next();
+        $a->next();
+        try {
+            $a->valid();
+            $this->fail('Expected \RuntimeException');
+        } catch (\RuntimeException $first) {
+        }
+
+        // When
+        $values = [];
+        $caught = null;
+        try {
+            foreach ($b as $value) {
+                $values[] = $value;
+            }
+        } catch (\RuntimeException $e) {
+            $caught = $e;
+        }
+
+        // Then
+        $this->assertSame([1, 2], $values);
+        $this->assertSame($first, $caught);
+    }
+
+    /**
+     * @test a tee copy that hit a source failure keeps throwing it rather than reading the source again
+     */
+    public function testSourceExceptionIsStickyForTheCopyThatHitIt(): void
+    {
+        // Given
+        $reads = 0;
+        $source = (function () use (&$reads) {
+            ++$reads;
+            yield 1;
+            ++$reads;
+            throw new \RuntimeException('boom');
+        })();
+        [$a] = Transform::tee($source, 1);
+        $a->rewind();
+        $a->next();
+        try {
+            $a->valid();
+            $this->fail('Expected \RuntimeException');
+        } catch (\RuntimeException $first) {
+        }
+
+        // When
+        $caught = [];
+        foreach ([fn () => $a->valid(), fn () => $a->current(), fn () => $a->key(), fn () => $a->next()] as $call) {
+            try {
+                $call();
+            } catch (\RuntimeException $e) {
+                $caught[] = $e;
+            }
+        }
+
+        // Then
+        $this->assertSame([$first, $first, $first, $first], $caught);
+        $this->assertSame(2, $reads);
+    }
+
+    /**
+     * @test a source whose current() fails once is not retried: the failure ends every tee copy at that element
+     */
+    public function testTransientSourceFailureIsNotRetried(): void
+    {
+        // Given
+        $source = new class implements \Iterator {
+            private int $i = 0;
+            private bool $thrown = false;
+
+            public function rewind(): void
+            {
+                $this->i = 0;
+            }
+
+            public function valid(): bool
+            {
+                return $this->i < 3;
+            }
+
+            public function key(): int
+            {
+                return $this->i;
+            }
+
+            public function current(): int
+            {
+                if ($this->i === 1 && !$this->thrown) {
+                    $this->thrown = true;
+                    throw new \RuntimeException('boom');
+                }
+                return $this->i;
+            }
+
+            public function next(): void
+            {
+                ++$this->i;
+            }
+        };
+        [$a, $b] = Transform::tee($source, 2);
+
+        foreach ([$a, $b] as $copy) {
+            // When
+            $values = [];
+            try {
+                foreach ($copy as $value) {
+                    $values[] = $value;
+                }
+                $completed = true;
+            } catch (\RuntimeException) {
+                $completed = false;
+            }
+
+            // Then
+            $this->assertSame([0], $values);
+            $this->assertFalse($completed);
+        }
+    }
+
+    /**
+     * @test after a source failure whose trace holds tee copies, dropping every copy frees them all once the cycle
+     *       collector runs
+     */
+    public function testCopiesHeldBySourceFailureTraceAreCollectedOnceAllAreDropped(): void
+    {
+        // Given
+        $ignoreArgs = \ini_set('zend.exception_ignore_args', '0');
+        $source = (function () {
+            yield 1;
+            yield 2;
+            throw new \RuntimeException('boom');
+        })();
+        [$a, $b, $c] = Transform::tee($source, 3);
+        $copies = [\WeakReference::create($a), \WeakReference::create($b), \WeakReference::create($c)];
+        $consumeFirst = function (\Iterator $first, \Iterator $_lagging): void {
+            foreach ($first as $_) {
+                // no-op
+            }
+        };
+        try {
+            $consumeFirst($a, $b);
+        } catch (\RuntimeException) {
+        }
+
+        // When
+        unset($a, $b, $c);
+        \gc_collect_cycles();
+        if ($ignoreArgs !== false) {
+            \ini_set('zend.exception_ignore_args', $ignoreArgs);
+        }
+
+        // Then
+        foreach ($copies as $copy) {
+            $this->assertNull($copy->get());
+        }
+    }
 }

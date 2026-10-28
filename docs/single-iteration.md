@@ -14,7 +14,7 @@ Accumulate the running result of applying a binary operator across an iterable.
 * Without an initial value: the first yielded element is the first datum unchanged, and each subsequent element is `$op(accumulator, nextDatum)`.
 * With an initial value: the first yielded element is the initial value, and each subsequent element is `$op(accumulator, nextDatum)`.
 * Explicit `null` is a legitimate initial value (the variadic sentinel distinguishes "no initial" from "null initial"; this diverges from `Math::running*`, where `null` means "no initial").
-* Throws `\InvalidArgumentException` if more than one initial value is passed.
+* Throws `\InvalidArgumentException` if more than one initial value is passed, or if it is passed as a named argument other than `initial:` (a typo such as `inital: 100` is not silently accepted).
 
 ```php
 use IterTools\Single;

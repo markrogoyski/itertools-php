@@ -40,6 +40,8 @@ $count = 3;
 
 A copy can be rewound as long as it has not advanced. Once it has, `rewind()` throws `\LogicException`, so the pairwise idiom of advancing one copy and zipping the copies throws when `zip` rewinds them. Use [`Single::pairwise()`](single-iteration.md#pairwise) for adjacent pairs.
 
+If the source throws, every copy still yields the elements before the failure, then throws the same exception object when it reaches it. The source is not read again after it fails, so a copy never ends early without an exception.
+
 ### To Array
 Transforms any iterable to an array.
 
@@ -73,6 +75,8 @@ $associativeArray = Transform::toAssociativeArray($messages, $keyFunc, $valueFun
 //     '037805d3ad7b10c5b8425427b516b5ce' => 'MESSAGE 3',
 // ]
 ```
+
+Keys follow PHP array semantics: a repeated key keeps its first position and its last value, and a decimal integer string such as `'1'` is stored as the int `1`. A key that is not an int or string (a float, `null`, `bool`, array or object) throws `\InvalidArgumentException` rather than being converted or dropped.
 
 ### To Iterator
 Transforms any iterable to an iterator.

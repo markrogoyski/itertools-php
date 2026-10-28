@@ -674,4 +674,145 @@ class ToAssociativeArrayTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         toAssociativeArray throws InvalidArgumentException when keyFunc returns a key that is not int|string
+     * @dataProvider dataProviderForInvalidKeys
+     * @param        mixed $key
+     */
+    public function testInvalidComputedKeyThrowsArray(mixed $key): void
+    {
+        // Given
+        $data = [1, 2, 3];
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Transform::toAssociativeArray($data, fn ($value) => $value === 2 ? $key : $value);
+    }
+
+    /**
+     * @test         toAssociativeArray throws InvalidArgumentException when keyFunc returns a key that is not int|string
+     * @dataProvider dataProviderForInvalidKeys
+     * @param        mixed $key
+     */
+    public function testInvalidComputedKeyThrowsGenerator(mixed $key): void
+    {
+        // Given
+        $data = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Transform::toAssociativeArray($data, fn ($value) => $value === 2 ? $key : $value);
+    }
+
+    /**
+     * @test         toAssociativeArray throws InvalidArgumentException when keyFunc returns a key that is not int|string
+     * @dataProvider dataProviderForInvalidKeys
+     * @param        mixed $key
+     */
+    public function testInvalidComputedKeyThrowsIterator(mixed $key): void
+    {
+        // Given
+        $data = new Fixture\ArrayIteratorFixture([1, 2, 3]);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Transform::toAssociativeArray($data, fn ($value) => $value === 2 ? $key : $value);
+    }
+
+    /**
+     * @test         toAssociativeArray throws InvalidArgumentException when keyFunc returns a key that is not int|string
+     * @dataProvider dataProviderForInvalidKeys
+     * @param        mixed $key
+     */
+    public function testInvalidComputedKeyThrowsIteratorAggregate(mixed $key): void
+    {
+        // Given
+        $data = new Fixture\IteratorAggregateFixture([1, 2, 3]);
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Transform::toAssociativeArray($data, fn ($value) => $value === 2 ? $key : $value);
+    }
+
+    /**
+     * @test         toAssociativeArray throws InvalidArgumentException when a source key is not int|string and no
+     *               keyFunc is given
+     * @dataProvider dataProviderForInvalidKeys
+     * @param        mixed $key
+     */
+    public function testInvalidSourceKeyThrows(mixed $key): void
+    {
+        // Given
+        $data = (function () use ($key) {
+            yield 'a' => 1;
+            yield $key => 2;
+        })();
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+
+        // When
+        Transform::toAssociativeArray($data);
+    }
+
+    public static function dataProviderForInvalidKeys(): array
+    {
+        return [
+            'fractional float' => [1.5],
+            'integral float'   => [2.0],
+            'negative zero'    => [-0.0],
+            'INF'              => [\INF],
+            'NAN'              => [\NAN],
+            'null'             => [null],
+            'true'             => [true],
+            'false'            => [false],
+            'array'            => [[1]],
+            'object'           => [new \stdClass()],
+            'Stringable'       => [new class implements \Stringable {
+                public function __toString(): string
+                {
+                    return 'key';
+                }
+            }],
+        ];
+    }
+
+    /**
+     * @test toAssociativeArray keeps the last value for a repeated key, at the position of its first occurrence
+     */
+    public function testRepeatedKeyKeepsLastValue(): void
+    {
+        // Given
+        $data = ['apple', 'avocado', 'banana', 'apricot'];
+
+        // When
+        $result = Transform::toAssociativeArray($data, fn (string $fruit) => $fruit[0]);
+
+        // Then
+        $this->assertSame(['a' => 'apricot', 'b' => 'banana'], $result);
+    }
+
+    /**
+     * @test toAssociativeArray stores a decimal integer string key as an int, as PHP arrays do, so '1' and 1 collide
+     */
+    public function testIntegerStringKeyBecomesInt(): void
+    {
+        // Given
+        $data = [['1', 'string'], [1, 'int'], ['01', 'padded']];
+
+        // When
+        $result = Transform::toAssociativeArray($data, fn (array $pair) => $pair[0], fn (array $pair) => $pair[1]);
+
+        // Then
+        $this->assertSame([1 => 'int', '01' => 'padded'], $result);
+    }
 }

@@ -58,7 +58,7 @@ foreach (Random::number($min, $max, $repetitions) as $number) {
 ```
 
 ### Percentage
-Генерирует случайные вещественные числа между 0 и 1.
+Генерирует случайные вещественные числа в [0, 1): 0 — возможное значение, 1 — нет.
 
 ```Random::percentage(int $repetitions)```
 

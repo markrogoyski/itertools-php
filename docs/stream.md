@@ -159,7 +159,7 @@ $result = Stream::ofRandomNumbers($min, $max, $reps)
 ```
 
 #### Of Random Percentage
-Creates stream of random percentages between 0 and 1.
+Creates stream of random percentages in [0, 1): 0 is a possible value, 1 is not.
 
 ```Stream::ofRandomPercentage(int $repetitions): Stream```
 
@@ -223,7 +223,7 @@ Accumulate the running result of applying a binary operator across the stream.
 * Without an initial value: the first yielded element is the first datum unchanged, and each subsequent element is `$op(accumulator, nextDatum)`.
 * With an initial value: the first yielded element is the initial value, and each subsequent element is `$op(accumulator, nextDatum)`.
 * Explicit `null` is a legitimate initial value.
-* Throws `\InvalidArgumentException` if more than one initial value is passed.
+* Throws `\InvalidArgumentException` if more than one initial value is passed, or if it is passed as a named argument other than `initial:` (a typo such as `inital: 100` is not silently accepted).
 
 ```php
 use IterTools\Stream;
@@ -3341,6 +3341,8 @@ $array = Stream::of(['message 1', 'message 2', 'message 3'])
 // [3b3f2272b3b904d342b2d0df2bf31ed4 => MESSAGE 1, 43638d919cfb8ea31979880f1a2bb146 => MESSAGE 2, ... ]
 ```
 
+Keys follow PHP array semantics: a repeated key keeps its first position and its last value, and a decimal integer string such as `'1'` is stored as the int `1`. A key that is not an int or string (a float, `null`, `bool`, array or object) throws `\InvalidArgumentException` rather than being converted or dropped.
+
 ##### To Partition
 Partitions the stream into two lists based on a predicate.
 
@@ -3403,6 +3405,8 @@ $count = 3;
 ```
 
 A copy can be rewound as long as it has not advanced. Once it has, rewinding it throws `\LogicException`, so the pairwise idiom of advancing one copy and zipping the copies throws when the zip rewinds them. Use [`pairwise()`](#pairwise) for adjacent pairs.
+
+If the source throws, every copy still yields the elements before the failure, then throws the same exception object when it reaches it. The source is not read again after it fails, so a copy never ends early without an exception.
 
 #### Side Effect Terminal Operations
 

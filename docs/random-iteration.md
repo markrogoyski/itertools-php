@@ -58,7 +58,7 @@ foreach (Random::number($min, $max, $repetitions) as $number) {
 ```
 
 ### Percentage
-Generate a random percentage between 0 and 1.
+Generate a random percentage in [0, 1): 0 is a possible value, 1 is not.
 
 ```Random::percentage(int $repetitions)```
 
