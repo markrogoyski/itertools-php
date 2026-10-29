@@ -414,6 +414,8 @@ Returns true if all given collections have the same lengths.
 
 For single iterable or empty iterables list returns true.
 
+An array or `Countable` is counted with `count()`, without being traversed. One iterator or generator passed more than once, directly or through a Stream or other `IteratorAggregate` that returns it, is read as independent copies of itself: it is traversed once and that count is used for every position, so `sameCount($it, $it)` returns true.
+
 ```Summary::sameCount(iterable ...$iterables): bool```
 
 ```php

@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Summary;
 
+use IterTools\Stream;
 use IterTools\Summary;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Tests\Fixture\MisreportingCountableFixture;
+use IterTools\Tests\Fixture\RecordingIteratorFixture;
+use IterTools\Tests\Fixture\SinglePassMisreportingCountableFixture;
 
 class SameCountTest extends \PHPUnit\Framework\TestCase
 {
@@ -565,5 +569,219 @@ class SameCountTest extends \PHPUnit\Framework\TestCase
             [$trav([1]), $iter([1, 2, 3])],
             [$trav([1]), $trav([1, 2, 3])],
         ];
+    }
+
+    /**
+     * @test A generator passed twice has the same count as itself.
+     */
+    public function testRepeatedGenerator(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Summary::sameCount($generator, $generator);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test An iterator passed twice has the same count as itself and is read once.
+     */
+    public function testRepeatedIteratorIsReadOnce(): void
+    {
+        // Given
+        $pulled   = [];
+        $iterator = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Summary::sameCount($iterator, $iterator);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([1, 2, 3], $pulled);
+    }
+
+    /**
+     * @test A stream of a generator passed twice has the same count as itself.
+     */
+    public function testRepeatedStream(): void
+    {
+        // Given
+        $stream = Stream::of(GeneratorFixture::getGenerator([1, 2, 3]));
+
+        // When
+        $result = Summary::sameCount($stream, $stream);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test A stream of an iterator and that iterator have the same count and the iterator is read once.
+     */
+    public function testStreamAndItsIteratorAreReadOnce(): void
+    {
+        // Given
+        $pulled   = [];
+        $iterator = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Summary::sameCount(Stream::of($iterator), $iterator);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([1, 2, 3], $pulled);
+    }
+
+    /**
+     * @test         A generator passed more than once compared with iterables of its count
+     * @dataProvider dataProviderForRepeatedGeneratorTrue
+     * @param        \Generator $generator
+     * @param        iterable   $other
+     */
+    public function testRepeatedGeneratorWithOtherTrue(\Generator $generator, iterable $other): void
+    {
+        // When
+        $result = Summary::sameCount($generator, $other, $generator);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    public static function dataProviderForRepeatedGeneratorTrue(): array
+    {
+        return [
+            [GeneratorFixture::getGenerator([]), []],
+            [GeneratorFixture::getGenerator([]), GeneratorFixture::getGenerator([])],
+            [GeneratorFixture::getGenerator([1, 2, 3]), [4, 5, 6]],
+            [GeneratorFixture::getGenerator([1, 2, 3]), GeneratorFixture::getGenerator([4, 5, 6])],
+            [GeneratorFixture::getGenerator([1, 2, 3]), new ArrayIteratorFixture([4, 5, 6])],
+            [GeneratorFixture::getGenerator([1, 2, 3]), new IteratorAggregateFixture([4, 5, 6])],
+        ];
+    }
+
+    /**
+     * @test         A generator passed more than once compared with an iterable of a different count
+     * @dataProvider dataProviderForRepeatedGeneratorFalse
+     * @param        \Generator $generator
+     * @param        iterable   $other
+     */
+    public function testRepeatedGeneratorWithOtherFalse(\Generator $generator, iterable $other): void
+    {
+        // When
+        $result = Summary::sameCount($generator, $other, $generator);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    public static function dataProviderForRepeatedGeneratorFalse(): array
+    {
+        return [
+            [GeneratorFixture::getGenerator([]), [1]],
+            [GeneratorFixture::getGenerator([1, 2, 3]), []],
+            [GeneratorFixture::getGenerator([1, 2, 3]), [4, 5]],
+            [GeneratorFixture::getGenerator([1, 2, 3]), [4, 5, 6, 7]],
+            [GeneratorFixture::getGenerator([1, 2, 3]), GeneratorFixture::getGenerator([4, 5])],
+            [GeneratorFixture::getGenerator([1, 2, 3]), new ArrayIteratorFixture([4, 5, 6, 7])],
+            [GeneratorFixture::getGenerator([1, 2, 3]), new IteratorAggregateFixture([4, 5])],
+        ];
+    }
+
+    /**
+     * @test Arrays and generators each passed more than once, interleaved, have the same count.
+     */
+    public function testRepeatedArrayAndGeneratorInterleaved(): void
+    {
+        // Given
+        $array     = [1, 2, 3];
+        $generator = GeneratorFixture::getGenerator([4, 5, 6]);
+
+        // When
+        $result = Summary::sameCount($array, $generator, $array, $generator, [7, 8, 9]);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test A Countable is counted by count() without being traversed, passed once or more than once.
+     */
+    public function testCountableIsNotTraversed(): void
+    {
+        // Given
+        $countable = new MisreportingCountableFixture([1, 2], 3);
+
+        // When
+        $result = Summary::sameCount($countable, [1, 2, 3], $countable);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test A single-pass Countable passed twice beside a repeated generator is counted, not traversed.
+     */
+    public function testRepeatedSinglePassCountableAndRepeatedGenerator(): void
+    {
+        // Given
+        $countable = new SinglePassMisreportingCountableFixture([1, 2], 3);
+        $generator = GeneratorFixture::getGenerator([4, 5, 6]);
+
+        // When
+        $result = Summary::sameCount($countable, $generator, $countable, $generator);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test A file object, which reads its lines only when its current line is read, is counted by its lines.
+     */
+    public function testSplFileObjectTrue(): void
+    {
+        // Given
+        $file = new \SplTempFileObject();
+        $file->fwrite("a\nb\nc");
+
+        // When
+        $result = Summary::sameCount($file, [1, 2, 3]);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test A file object compared with an iterable of a different count
+     */
+    public function testSplFileObjectFalse(): void
+    {
+        // Given
+        $file = new \SplTempFileObject();
+        $file->fwrite("a\nb\nc");
+
+        // When
+        $result = Summary::sameCount($file, [1, 2]);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test A file object passed twice has the same count as itself and as an iterable of its line count.
+     */
+    public function testRepeatedSplFileObject(): void
+    {
+        // Given
+        $file = new \SplTempFileObject();
+        $file->fwrite("a\nb\nc");
+
+        // When
+        $result = Summary::sameCount($file, [1, 2, 3], $file);
+
+        // Then
+        $this->assertTrue($result);
     }
 }

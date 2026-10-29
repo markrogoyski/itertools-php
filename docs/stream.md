@@ -2688,7 +2688,7 @@ Returns true if iterable source and all given collections have the same lengths.
 
 ```$stream->sameCountWith(iterable ...$iterables): bool```
 
-For empty iterables list returns true.
+For empty iterables list returns true. An iterator or generator passed more than once, including the one the stream was created from or the stream itself, is traversed once: `Stream::of($it)->sameCountWith($it)` returns true.
 
 ```php
 use IterTools\Stream;

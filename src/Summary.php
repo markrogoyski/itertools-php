@@ -362,6 +362,10 @@ final class Summary
      *
      * For single iterable or empty iterables list returns true.
      *
+     * An array or \Countable is counted with count(), without being traversed. One iterator or generator
+     * passed more than once, directly or through a Stream or other \IteratorAggregate that returns it, is
+     * read as independent copies of itself: it is traversed once and that count is used for every position.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return bool
@@ -372,7 +376,29 @@ final class Summary
             return true;
         }
 
-        $counts = \array_map([Reduce::class, 'toCount'], $iterables);
+        // Counts of the iterators traversed so far. The storage holds each iterator, so its identity cannot
+        // pass to a later, unrelated iterator.
+        /** @var \SplObjectStorage<\Iterator<mixed>, int> $traversedCounts */
+        $traversedCounts = new \SplObjectStorage();
+
+        $counts = [];
+        foreach ($iterables as $iterable) {
+            if (\is_countable($iterable)) {
+                $counts[] = \count($iterable);
+                continue;
+            }
+
+            $iterator = Transform::toIterator($iterable);
+            if (!isset($traversedCounts[$iterator])) {
+                // Traversed with foreach rather than iterator_count(), which skips current(): an
+                // \SplFileObject reads its lines in current() and would never reach EOF. Not
+                // Reduce::toCount(), which would take count() of an unwrapped Countable that misreports
+                // its size.
+                $traversedCounts[$iterator] = Reduce::toValue($iterator, static fn (int $carry): int => $carry + 1, 0);
+            }
+            $counts[] = $traversedCounts[$iterator];
+        }
+
         return \count(\array_unique($counts)) === 1;
     }
 

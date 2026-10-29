@@ -2795,7 +2795,9 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if iterable source and all given collections have the same lengths.
      *
-     * For single iterable or empty iterables list returns true.
+     * For single iterable or empty iterables list returns true. An iterator or generator passed more than
+     * once, including the stream's own source or the stream itself, is traversed once:
+     * Stream::of($it)->sameCountWith($it).
      *
      * @param iterable<mixed> ...$iterables
      *

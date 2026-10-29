@@ -8,6 +8,7 @@ use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Tests\Fixture\RecordingIteratorFixture;
 
 class SummaryTest extends \PHPUnit\Framework\TestCase
 {
@@ -2449,5 +2450,67 @@ class SummaryTest extends \PHPUnit\Framework\TestCase
                 true,
             ],
         ];
+    }
+
+    /**
+     * @test sameCountWith counts the generator a stream holds when it is passed again
+     */
+    public function testSameCountWithItsGenerator(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Stream::of($generator)->sameCountWith($generator);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test sameCountWith counts a stream of the generator it holds
+     */
+    public function testSameCountWithStreamOfSameGenerator(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Stream::of($generator)->sameCountWith(Stream::of($generator), [4, 5, 6]);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test sameCountWith of a stream with itself reads its iterator once
+     */
+    public function testSameCountWithItself(): void
+    {
+        // Given
+        $pulled = [];
+        $stream = Stream::of(new RecordingIteratorFixture([1, 2, 3], $pulled));
+
+        // When
+        $result = $stream->sameCountWith($stream);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([1, 2, 3], $pulled);
+    }
+
+    /**
+     * @test sameCountWith of a stream with itself and an iterable of a different count
+     */
+    public function testSameCountWithItselfAndDifferentCount(): void
+    {
+        // Given
+        $stream = Stream::of(GeneratorFixture::getGenerator([1, 2, 3]));
+
+        // When
+        $result = $stream->sameCountWith($stream, [4, 5]);
+
+        // Then
+        $this->assertFalse($result);
     }
 }
