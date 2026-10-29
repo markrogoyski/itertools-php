@@ -1592,6 +1592,8 @@ Return a stream of the difference of the stream and the given iterables. Element
 
 Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
 
+An iterator or generator passed more than once, directly or through a Stream or other `IteratorAggregate` that returns it, is read as independent copies of itself: it is traversed once and its values are subtracted once per position it was passed in. Every given iterable's iterator is obtained before any of them is read, as in `unionWith` and `zipWith`.
+
 ```php
 use IterTools\Stream;
 
@@ -1611,6 +1613,8 @@ Return a stream of the difference of the stream and the given iterables using [t
 ```$stream->differenceCoerciveWith(iterable ...$iterables): Stream```
 
 Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
+
+An iterator or generator passed more than once, directly or through a Stream or other `IteratorAggregate` that returns it, is read as independent copies of itself: it is traversed once and its values are subtracted once per position it was passed in. Every given iterable's iterator is obtained before any of them is read, as in `unionWith` and `zipWith`.
 
 ```php
 use IterTools\Stream;

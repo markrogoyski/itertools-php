@@ -2406,4 +2406,72 @@ class SetTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame([1, 2, 2, 3], $result);
     }
+
+    /**
+     * @test differenceWith subtracts a generator passed twice once per position
+     */
+    public function testDifferenceWithGeneratorPassedTwice(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2]);
+
+        // When
+        $result = Stream::of([1, 1, 1, 2, 2, 3])
+            ->differenceWith($generator, $generator)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1, 3], $result);
+    }
+
+    /**
+     * @test differenceWith subtracts a stream passed twice once per position
+     */
+    public function testDifferenceWithStreamPassedTwice(): void
+    {
+        // Given
+        $stream = Stream::of(GeneratorFixture::getGenerator([1, 2]));
+
+        // When
+        $result = Stream::of([1, 1, 1, 2, 2, 3])
+            ->differenceWith($stream, $stream)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1, 3], $result);
+    }
+
+    /**
+     * @test differenceCoerciveWith subtracts a generator passed twice once per position
+     */
+    public function testDifferenceCoerciveWithGeneratorPassedTwice(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, '2']);
+
+        // When
+        $result = Stream::of([1, '1', 1.0, 2, '2', 3])
+            ->differenceCoerciveWith($generator, $generator)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1.0, 3], $result);
+    }
+
+    /**
+     * @test differenceCoerciveWith subtracts a stream passed twice once per position
+     */
+    public function testDifferenceCoerciveWithStreamPassedTwice(): void
+    {
+        // Given
+        $stream = Stream::of(GeneratorFixture::getGenerator([1, '2']));
+
+        // When
+        $result = Stream::of([1, '1', 1.0, 2, '2', 3])
+            ->differenceCoerciveWith($stream, $stream)
+            ->toArray();
+
+        // Then
+        $this->assertSame([1.0, 3], $result);
+    }
 }

@@ -305,6 +305,12 @@ final class Set
      * objects, closures, generators, and resources it has compared by instance, including
      * the identities of the subtracted values, for the generator's lifetime.
      *
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: it is traversed once and its values are
+     * subtracted once per position it was passed in. Every subtracted iterable's iterator is obtained before any
+     * of them is read, as in union and zip. If $a is also among the subtracted iterables, the result is empty:
+     * the subtracted iterables are still traversed, so their exceptions propagate, but $a is not read again.
+     *
      * @param iterable<mixed> $a
      * @param iterable<mixed> ...$iterables
      *
@@ -324,6 +330,12 @@ final class Set
      * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
      * closures, generators, and resources it has compared by instance, including
      * those nested in the subtracted values, for the generator's lifetime.
+     *
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: it is traversed once and its values are
+     * subtracted once per position it was passed in. Every subtracted iterable's iterator is obtained before any
+     * of them is read, as in union and zip. If $a is also among the subtracted iterables, the result is empty:
+     * the subtracted iterables are still traversed, so their exceptions propagate, but $a is not read again.
      *
      * @param iterable<mixed> $a
      * @param iterable<mixed> ...$iterables
@@ -483,9 +495,48 @@ final class Set
         // lifetime; see {@see ValueCounter} and {@see Identity}.
         $counter = new ValueCounter($strict);
 
+        // Each distinct subtracted iterator, with the number of positions it was passed in, so one passed more
+        // than once is traversed once and its values counted once per position. The storage holds each
+        // iterator, so its identity cannot pass to a later, unrelated iterator. Every iterator is obtained
+        // before any is traversed, as in union and zip: a repeat is only known once all are resolved.
+        /** @var \SplObjectStorage<\Iterator<mixed>, int<1, max>> $positions */
+        $positions = new \SplObjectStorage();
+        // What to traverse, in argument order: each array, and each iterator at its first position. An array is
+        // read directly, not resolved: it can be read again, and an \ArrayIterator would copy it. It is still
+        // read in turn, as an earlier iterable can change a value it holds by reference.
+        /** @var list<array<mixed>|\Iterator<mixed>> $sources */
+        $sources = [];
         foreach ($iterables as $iterable) {
-            foreach ($iterable as $value) {
-                $counter->add($value);
+            if (\is_array($iterable)) {
+                $sources[] = $iterable;
+                continue;
+            }
+
+            $iterator = Transform::toIterator($iterable);
+            if (isset($positions[$iterator])) {
+                $positions[$iterator] += 1;
+            } else {
+                $positions[$iterator] = 1;
+                $sources[] = $iterator;
+            }
+        }
+
+        foreach ($sources as $source) {
+            $count = \is_array($source) ? 1 : $positions[$source];
+            foreach ($source as $value) {
+                for ($i = 0; $i < $count; ++$i) {
+                    $counter->add($value);
+                }
+            }
+        }
+
+        if ($a instanceof \Traversable) {
+            $a = Transform::toIterator($a);
+
+            // $a was also subtracted, so every one of its values has been counted at least once per
+            // occurrence and the difference is empty. Not traversed again: a generator cannot be.
+            if (isset($positions[$a])) {
+                return;
             }
         }
 

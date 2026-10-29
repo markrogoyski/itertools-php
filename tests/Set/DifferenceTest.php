@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools\Tests\Set;
 
 use IterTools\Set;
+use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -623,5 +624,276 @@ class DifferenceTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertSame([1, 4], $result);
+    }
+
+    /**
+     * @test difference of a generator and itself is empty
+     */
+    public function testGeneratorMinusItself(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(Set::difference($generator, $generator), false);
+
+        // Then
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * @test difference of an iterator and itself is empty
+     */
+    public function testIteratorMinusItself(): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture([1, 2, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(Set::difference($iterator, $iterator), false);
+
+        // Then
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * @test difference of a stream and itself is empty
+     */
+    public function testStreamMinusItself(): void
+    {
+        // Given
+        $stream = Stream::of(GeneratorFixture::getGenerator([1, 2, 2, 3]));
+
+        // When
+        $result = \iterator_to_array(Set::difference($stream, $stream), false);
+
+        // Then
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * @test difference of a generator and itself is empty for a NAN element
+     */
+    public function testGeneratorMinusItselfWithNan(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([\NAN, 1, \NAN]);
+
+        // When
+        $result = \iterator_to_array(Set::difference($generator, $generator), false);
+
+        // Then
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * @test difference of a generator passed again among other iterables is empty
+     */
+    public function testGeneratorMinusItselfAmongOtherIterables(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(Set::difference($generator, [9], $generator, [1]), false);
+
+        // Then
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * @test difference of a generator and itself still traverses the other iterables
+     */
+    public function testGeneratorMinusItselfTraversesOtherIterables(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 2, 3]);
+        $traversed = [];
+        $other = (static function () use (&$traversed): \Generator {
+            foreach ([7, 8, 9] as $value) {
+                $traversed[] = $value;
+                yield $value;
+            }
+        })();
+
+        // When
+        $result = \iterator_to_array(Set::difference($generator, $generator, $other), false);
+
+        // Then
+        $this->assertSame([], $result);
+        $this->assertSame([7, 8, 9], $traversed);
+    }
+
+    /**
+     * @test difference of a generator and itself propagates the generator's exception
+     */
+    public function testGeneratorMinusItselfPropagatesException(): void
+    {
+        // Given
+        $generator = (static function (): \Generator {
+            yield 1;
+            throw new \RuntimeException('source failed');
+        })();
+
+        // Then
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('source failed');
+
+        // When
+        \iterator_to_array(Set::difference($generator, $generator), false);
+    }
+
+    /**
+     * @test difference of a generator and itself propagates another iterable's exception
+     */
+    public function testGeneratorMinusItselfPropagatesOtherIterableException(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 2, 3]);
+        $other = (static function (): \Generator {
+            yield 1;
+            throw new \RuntimeException('other failed');
+        })();
+
+        // Then
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('other failed');
+
+        // When
+        \iterator_to_array(Set::difference($generator, $generator, $other), false);
+    }
+
+    /**
+     * @test difference subtracts a generator passed twice once per position
+     */
+    public function testGeneratorSubtractedTwice(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2]);
+
+        // When
+        $result = \iterator_to_array(Set::difference([1, 1, 1, 2, 2, 3], $generator, $generator), false);
+
+        // Then
+        $this->assertSame([1, 3], $result);
+    }
+
+    /**
+     * @test difference subtracts an iterator passed twice once per position
+     */
+    public function testIteratorSubtractedTwice(): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture([1, 2]);
+
+        // When
+        $result = \iterator_to_array(Set::difference([1, 1, 1, 2, 2, 3], $iterator, $iterator), false);
+
+        // Then
+        $this->assertSame([1, 3], $result);
+    }
+
+    /**
+     * @test difference subtracts a stream passed twice once per position
+     */
+    public function testStreamSubtractedTwice(): void
+    {
+        // Given
+        $stream = Stream::of(GeneratorFixture::getGenerator([1, 2]));
+
+        // When
+        $result = \iterator_to_array(Set::difference([1, 1, 1, 2, 2, 3], $stream, $stream), false);
+
+        // Then
+        $this->assertSame([1, 3], $result);
+    }
+
+    /**
+     * @test difference subtracts a generator and a stream of it once per position
+     */
+    public function testGeneratorAndStreamOfItSubtracted(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2]);
+
+        // When
+        $result = \iterator_to_array(Set::difference([1, 1, 1, 2, 2, 3], $generator, Stream::of($generator)), false);
+
+        // Then
+        $this->assertSame([1, 3], $result);
+    }
+
+    /**
+     * @test difference subtracts a generator passed around another iterable once per position
+     */
+    public function testGeneratorSubtractedTwiceAroundAnotherIterable(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2]);
+
+        // When
+        $result = \iterator_to_array(Set::difference([1, 1, 1, 2, 2, 3], $generator, [3], $generator), false);
+
+        // Then
+        $this->assertSame([1], $result);
+    }
+
+    /**
+     * @test difference subtracts an array passed twice once per position
+     */
+    public function testArraySubtractedTwice(): void
+    {
+        // Given
+        $array = [1, 2];
+
+        // When
+        $result = \iterator_to_array(Set::difference([1, 1, 1, 2, 2, 3], $array, $array), false);
+
+        // Then
+        $this->assertSame([1, 3], $result);
+    }
+
+    /**
+     * Each copy of the array would take about 2 MiB, so the bound fails if a subtracted array is copied.
+     *
+     * @test difference traverses a subtracted array without copying it
+     */
+    public function testSubtractedArrayIsNotCopied(): void
+    {
+        // Given
+        $array = \array_fill(0, 100_000, 1);
+
+        // When
+        \memory_reset_peak_usage();
+        $before = \memory_get_usage();
+        $result = \iterator_to_array(Set::difference([], $array, $array, $array), false);
+        $peakIncrease = \memory_get_peak_usage() - $before;
+
+        // Then
+        $this->assertSame([], $result);
+        $this->assertLessThan(1024 * 1024, $peakIncrease);
+    }
+
+    /**
+     * An array is read in argument order, after the iterables before it: an earlier generator can change the
+     * value a later array holds by reference.
+     *
+     * @test difference reads a subtracted array after the iterables passed before it
+     */
+    public function testSubtractedArrayReadInArgumentOrder(): void
+    {
+        // Given
+        $slot = 1;
+        $later = [&$slot];
+        $first = (static function () use (&$slot): \Generator {
+            $slot = 2;
+            yield 9;
+        })();
+
+        // When
+        $result = \iterator_to_array(Set::difference([1, 2], $first, $later), false);
+
+        // Then
+        $this->assertSame([1], $result);
     }
 }

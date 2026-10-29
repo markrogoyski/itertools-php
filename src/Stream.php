@@ -1918,6 +1918,11 @@ final class Stream implements \IteratorAggregate
      * Returns elements from the source not present in any given iterables. Equality follows
      * the strict rules in README "Strict and Coercive Types".
      *
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: it is traversed once and its values are
+     * subtracted once per position it was passed in. Every given iterable's iterator is obtained before any of
+     * them is read, as in unionWith and zipWith.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return Stream
@@ -1935,6 +1940,11 @@ final class Stream implements \IteratorAggregate
      *
      * Returns elements from the source not present in any given iterables. Equality follows
      * the coercive rules in README "Strict and Coercive Types".
+     *
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: it is traversed once and its values are
+     * subtracted once per position it was passed in. Every given iterable's iterator is obtained before any of
+     * them is read, as in unionWith and zipWith.
      *
      * @param iterable<mixed> ...$iterables
      *
