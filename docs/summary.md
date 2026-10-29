@@ -389,7 +389,7 @@ $boolean = Summary::noneMatch($grades, $isPassingGrade);
 ### Same
 Returns true if all given collections are the same.
 
-For single iterable or empty iterables list returns true without reading the iterable. So does one iterator or generator passed more than once: `same($it, $it)` returns true without reading `$it`.
+For single iterable or empty iterables list returns true without reading the iterable. So does one iterator or generator passed more than once, directly or through a Stream or other `IteratorAggregate` that returns it: `same($it, $it)` returns true without reading `$it`.
 
 ```Summary::same(iterable ...$iterables): bool```
 

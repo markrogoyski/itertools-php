@@ -323,7 +323,8 @@ final class Summary
      * Returns true if all given collections are the same.
      *
      * For single iterable or empty iterables list returns true without reading the iterable. So does one
-     * iterator or generator passed more than once: same($it, $it) returns true without reading $it.
+     * iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it: same($it, $it) returns true without reading $it.
      *
      * @param iterable<mixed> ...$iterables
      *

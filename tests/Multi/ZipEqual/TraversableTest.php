@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace IterTools\Tests\Multi\ZipEqual;
 
 use IterTools\Multi;
+use IterTools\Stream;
 use IterTools\Tests\Fixture;
+use IterTools\Transform;
 
 class TraversableTest extends \PHPUnit\Framework\TestCase
 {
@@ -151,6 +153,136 @@ class TraversableTest extends \PHPUnit\Framework\TestCase
                 $trav([4, 5, 6]),
                 [[1, 4]],
             ],
+        ];
+    }
+
+    /**
+     * @test zipEqual reads a stream passed more than once as independent copies of it
+     */
+    public function testZipEqualStreamPassedTwice(): void
+    {
+        // Given
+        $stream = Stream::of(Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4]));
+
+        // When
+        $result = \iterator_to_array(Multi::zipEqual($stream, $stream), false);
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [3, 3], [4, 4]], $result);
+    }
+
+    /**
+     * @test zipEqual reads a stream passed around an equal-length iterable as independent copies of it
+     */
+    public function testZipEqualStreamPassedTwiceAroundEqualLengthIterable(): void
+    {
+        // Given
+        $stream = Stream::of(Fixture\GeneratorFixture::getGenerator([1, 2]));
+
+        // When
+        $result = \iterator_to_array(Multi::zipEqual($stream, [4, 5], $stream), false);
+
+        // Then
+        $this->assertSame([[1, 4, 1], [2, 5, 2]], $result);
+    }
+
+    /**
+     * @test zipEqual throws when a stream passed more than once and another iterable differ in length
+     */
+    public function testZipEqualStreamPassedTwiceAroundIterableOfDifferentLength(): void
+    {
+        // Given
+        $stream = Stream::of(Fixture\GeneratorFixture::getGenerator([1, 2]));
+        $result = [];
+
+        // When
+        try {
+            foreach (Multi::zipEqual($stream, [4, 5, 6], $stream) as $values) {
+                $result[] = $values;
+            }
+
+            $this->fail();
+        } catch (\LengthException $e) {
+            // Then
+            $this->assertSame([[1, 4, 1], [2, 5, 2]], $result);
+        }
+    }
+
+    /**
+     * @test zipEqual reads nested aggregates of one generator passed more than once as independent copies of it
+     */
+    public function testZipEqualNestedAggregatePassedTwice(): void
+    {
+        // Given
+        $aggregate = new Fixture\WrappingIteratorAggregateFixture(
+            new Fixture\WrappingIteratorAggregateFixture(Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4]))
+        );
+
+        // When
+        $result = \iterator_to_array(Multi::zipEqual($aggregate, $aggregate), false);
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [3, 3], [4, 4]], $result);
+    }
+
+    /**
+     * @test zipEqual reads two aggregates that return the same generator as independent copies of it
+     */
+    public function testZipEqualAggregatesReturningSameGenerator(): void
+    {
+        // Given
+        $generator  = Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4]);
+        $aggregate1 = new Fixture\WrappingIteratorAggregateFixture($generator);
+        $aggregate2 = new Fixture\WrappingIteratorAggregateFixture(new Fixture\WrappingIteratorAggregateFixture($generator));
+
+        // When
+        $result = \iterator_to_array(Multi::zipEqual($aggregate1, $aggregate2), false);
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [3, 3], [4, 4]], $result);
+    }
+
+    /**
+     * @test zipEqual reads a stream and the generator it holds as independent copies of the generator
+     */
+    public function testZipEqualStreamAndItsGenerator(): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4]);
+        $stream    = Stream::of($generator);
+
+        // When
+        $result = \iterator_to_array(Multi::zipEqual($stream, $generator), false);
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [3, 3], [4, 4]], $result);
+    }
+
+    /**
+     * @test         zipEqual reads an aggregate that gives a fresh iterator per call, passed twice, independently
+     * @dataProvider dataProviderForZipEqualReiterableAggregatePassedTwice
+     * @param        \IteratorAggregate $aggregate
+     */
+    public function testZipEqualReiterableAggregatePassedTwice(\IteratorAggregate $aggregate): void
+    {
+        // When
+        $result = \iterator_to_array(Multi::zipEqual($aggregate, $aggregate), false);
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [3, 3], [4, 4]], $result);
+    }
+
+    /**
+     * @return array
+     */
+    public static function dataProviderForZipEqualReiterableAggregatePassedTwice(): array
+    {
+        return [
+            [new \ArrayObject([1, 2, 3, 4])],
+            [new Fixture\IteratorAggregateFixture([1, 2, 3, 4])],
+            [Transform::memoize([1, 2, 3, 4])],
+            [Transform::memoize(Fixture\GeneratorFixture::getGenerator([1, 2, 3, 4]))],
+            [Stream::of([1, 2, 3, 4])],
         ];
     }
 }

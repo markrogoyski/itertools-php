@@ -19,9 +19,10 @@ final class Multi
      *
      * For uneven lengths, iterations stops when the shortest iterable is exhausted.
      *
-     * An iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in. To chunk an iterable, as
-     * Python's zip(it, it) does, use Single::chunkwise() instead.
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: each step reads it once and gives its value to
+     * every position it was passed in. To chunk an iterable, as Python's zip(it, it) does, use
+     * Single::chunkwise() instead.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -45,8 +46,9 @@ final class Multi
      * Iteration continues until the longest iterable is exhausted.
      * For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
      *
-     * An iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in.
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: each step reads it once and gives its value to
+     * every position it was passed in.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -70,8 +72,9 @@ final class Multi
      * Iteration continues until the longest iterable is exhausted.
      * For uneven lengths, the exhausted iterables will produce the $filler value for the remaining iterations.
      *
-     * An iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in.
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: each step reads it once and gives its value to
+     * every position it was passed in.
      *
      * @param mixed $filler
      * @param iterable<mixed> ...$iterables
@@ -93,8 +96,9 @@ final class Multi
      * Works like Multi::zip() method but throws \LengthException if lengths not equal,
      * i.e., at least one iterator ends before the others.
      *
-     * An iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in.
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: each step reads it once and gives its value to
+     * every position it was passed in.
      *
      * @param iterable<mixed> ...$iterables
      *

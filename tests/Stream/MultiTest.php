@@ -592,4 +592,72 @@ class MultiTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test zipWith reads a stream of the generator it holds as independent copies of the generator
+     */
+    public function testZipWithStreamOfSameGenerator(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Stream::of($generator)
+            ->zipWith(Stream::of($generator))
+            ->toArray();
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [3, 3]], $result);
+    }
+
+    /**
+     * @test zipLongestWith reads a stream of the generator it holds as independent copies of the generator
+     */
+    public function testZipLongestWithStreamOfSameGenerator(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Stream::of($generator)
+            ->zipLongestWith(Stream::of($generator), [4, 5, 6, 7])
+            ->toArray();
+
+        // Then
+        $this->assertSame([[1, 1, 4], [2, 2, 5], [3, 3, 6], [null, null, 7]], $result);
+    }
+
+    /**
+     * @test zip reads a stream row passed more than once as independent copies of it
+     */
+    public function testZipStreamRowPassedTwice(): void
+    {
+        // Given
+        $row = Stream::of(GeneratorFixture::getGenerator([1, 2, 3]));
+
+        // When
+        $result = Stream::of([$row, $row])
+            ->zip()
+            ->toArray();
+
+        // Then
+        $this->assertSame([[1, 1], [2, 2], [3, 3]], $result);
+    }
+
+    /**
+     * @test zipEqual reads a stream row passed more than once as independent copies of it
+     */
+    public function testZipEqualStreamRowPassedTwice(): void
+    {
+        // Given
+        $row = Stream::of(GeneratorFixture::getGenerator([1, 2, 3]));
+
+        // When
+        $result = Stream::of([$row, [4, 5, 6], $row])
+            ->zipEqual()
+            ->toArray();
+
+        // Then
+        $this->assertSame([[1, 4, 1], [2, 5, 2], [3, 6, 3]], $result);
+    }
 }

@@ -2372,4 +2372,38 @@ class SetTest extends \PHPUnit\Framework\TestCase
             [0, []],
         ];
     }
+
+    /**
+     * @test intersectionWith reads a stream of the generator it holds as independent copies of the generator
+     */
+    public function testIntersectionWithStreamOfSameGenerator(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 2, 3]);
+
+        // When
+        $result = Stream::of($generator)
+            ->intersectionWith(Stream::of($generator))
+            ->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 2, 3], $result);
+    }
+
+    /**
+     * @test unionWith reads a stream of the generator it holds as independent copies of the generator
+     */
+    public function testUnionWithStreamOfSameGenerator(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 2, 3]);
+
+        // When
+        $result = Stream::of($generator)
+            ->unionWith(Stream::of($generator))
+            ->toArray();
+
+        // Then
+        $this->assertSame([1, 2, 2, 3], $result);
+    }
 }

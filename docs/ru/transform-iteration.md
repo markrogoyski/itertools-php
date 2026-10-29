@@ -74,6 +74,8 @@ $associativeArray = Transform::toAssociativeArray($messages, $keyFunc, $valueFun
 ### To Iterator
 Преобразует итерируемую коллекцию в итератор.
 
+`IteratorAggregate`, например `Stream`, даёт итератор, который возвращает его `getIterator()`, проходя вложенные агрегаты до первого итератора, а не обёртку вокруг него. Поэтому агрегат над итератором или генератором даёт тот же самый объект, а агрегат, возвращающий новый итератор при каждом вызове, например `ArrayObject` или результат `memoize()`, каждый раз даёт новый. Выбрасывает `\LogicException`, если `getIterator()` возвращает значение, не реализующее `Traversable`, или если агрегаты образуют цикл, например агрегат, чей `getIterator()` возвращает сам себя.
+
 ```Transform::toIterator(iterable $iterable): \Iterator```
 ```php
 use IterTools\Transform;

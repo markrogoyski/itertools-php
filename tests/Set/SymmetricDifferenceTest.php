@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools\Tests\Set;
 
 use IterTools\Set;
+use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
@@ -1013,6 +1014,36 @@ class SymmetricDifferenceTest extends \PHPUnit\Framework\TestCase
 
         // When
         $result = \iterator_to_array(Set::symmetricDifference($iterator, [2, 3, 4], $iterator), false);
+
+        // Then
+        $this->assertSame([4], $result);
+    }
+
+    /**
+     * @test symmetricDifference reads a stream passed more than once as independent copies of it
+     */
+    public function testStreamPassedTwice(): void
+    {
+        // Given
+        $stream = Stream::of(GeneratorFixture::getGenerator([1, 2, 2, 3]));
+
+        // When
+        $result = \iterator_to_array(Set::symmetricDifference($stream, $stream), false);
+
+        // Then
+        $this->assertSame([], $result);
+    }
+
+    /**
+     * @test symmetricDifference reads a stream passed around another iterable as independent copies of it
+     */
+    public function testStreamPassedTwiceAroundAnotherIterable(): void
+    {
+        // Given
+        $stream = Stream::of(GeneratorFixture::getGenerator([1, 2, 2, 3]));
+
+        // When
+        $result = \iterator_to_array(Set::symmetricDifference($stream, [2, 3, 4], $stream), false);
 
         // Then
         $this->assertSame([4], $result);

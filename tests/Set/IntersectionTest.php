@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace IterTools\Tests\Set;
 
 use IterTools\Set;
+use IterTools\Stream;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Tests\Fixture\WrappingIteratorAggregateFixture;
+use IterTools\Transform;
 
 class IntersectionTest extends \PHPUnit\Framework\TestCase
 {
@@ -857,5 +860,96 @@ class IntersectionTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertSame([2, 3], $result);
+    }
+
+    /**
+     * @test intersection reads a stream passed more than once as independent copies of it
+     */
+    public function testStreamPassedTwice(): void
+    {
+        // Given
+        $stream = Stream::of(GeneratorFixture::getGenerator([1, 2, 2, 3]));
+
+        // When
+        $result = \iterator_to_array(Set::intersection($stream, $stream), false);
+
+        // Then
+        $this->assertSame([1, 2, 2, 3], $result);
+    }
+
+    /**
+     * @test intersection reads a stream passed around another iterable as independent copies of it
+     */
+    public function testStreamPassedTwiceAroundAnotherIterable(): void
+    {
+        // Given
+        $stream = Stream::of(GeneratorFixture::getGenerator([1, 2, 2, 3]));
+
+        // When
+        $result = \iterator_to_array(Set::intersection($stream, [2, 3, 4], $stream), false);
+
+        // Then
+        $this->assertSame([2, 3], $result);
+    }
+
+    /**
+     * @test intersection reads nested aggregates of one generator passed more than once as independent copies of it
+     */
+    public function testNestedAggregatePassedTwice(): void
+    {
+        // Given
+        $aggregate = new WrappingIteratorAggregateFixture(
+            new WrappingIteratorAggregateFixture(GeneratorFixture::getGenerator([1, 2, 2, 3]))
+        );
+
+        // When
+        $result = \iterator_to_array(Set::intersection($aggregate, $aggregate), false);
+
+        // Then
+        $this->assertSame([1, 2, 2, 3], $result);
+    }
+
+    /**
+     * @test intersection reads a stream and the generator it holds as independent copies of the generator
+     */
+    public function testStreamAndItsGenerator(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 2, 3]);
+        $stream    = Stream::of($generator);
+
+        // When
+        $result = \iterator_to_array(Set::intersection($stream, $generator), false);
+
+        // Then
+        $this->assertSame([1, 2, 2, 3], $result);
+    }
+
+    /**
+     * @test         intersection reads an aggregate that gives a fresh iterator per call, passed twice, independently
+     * @dataProvider dataProviderForReiterableAggregatePassedTwice
+     * @param        \IteratorAggregate $aggregate
+     */
+    public function testReiterableAggregatePassedTwice(\IteratorAggregate $aggregate): void
+    {
+        // When
+        $result = \iterator_to_array(Set::intersection($aggregate, $aggregate), false);
+
+        // Then
+        $this->assertSame([1, 2, 2, 3], $result);
+    }
+
+    /**
+     * @return array
+     */
+    public static function dataProviderForReiterableAggregatePassedTwice(): array
+    {
+        return [
+            [new \ArrayObject([1, 2, 2, 3])],
+            [new IteratorAggregateFixture([1, 2, 2, 3])],
+            [Transform::memoize([1, 2, 2, 3])],
+            [Transform::memoize(GeneratorFixture::getGenerator([1, 2, 2, 3]))],
+            [Stream::of([1, 2, 2, 3])],
+        ];
     }
 }

@@ -1337,8 +1337,9 @@ final class Stream implements \IteratorAggregate
      * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
      * is thrown at iteration time (not at call time).
      *
-     * A row iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in.
+     * A row iterator or generator passed more than once, directly or through a Stream or other
+     * \IteratorAggregate that returns it, is read as independent copies of itself: each step reads it once and
+     * gives its value to every position it was passed in.
      *
      * @return Stream
      *
@@ -1370,8 +1371,9 @@ final class Stream implements \IteratorAggregate
      * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
      * is thrown at iteration time (not at call time).
      *
-     * A row iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in.
+     * A row iterator or generator passed more than once, directly or through a Stream or other
+     * \IteratorAggregate that returns it, is read as independent copies of itself: each step reads it once and
+     * gives its value to every position it was passed in.
      *
      * @return Stream
      *
@@ -1402,8 +1404,9 @@ final class Stream implements \IteratorAggregate
      * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
      * is thrown at iteration time (not at call time).
      *
-     * A row iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in.
+     * A row iterator or generator passed more than once, directly or through a Stream or other
+     * \IteratorAggregate that returns it, is read as independent copies of itself: each step reads it once and
+     * gives its value to every position it was passed in.
      *
      * @param mixed $filler
      *
@@ -1436,8 +1439,9 @@ final class Stream implements \IteratorAggregate
      * Every element of the outer stream must be iterable; otherwise \InvalidArgumentException
      * is thrown at iteration time (not at call time).
      *
-     * A row iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in.
+     * A row iterator or generator passed more than once, directly or through a Stream or other
+     * \IteratorAggregate that returns it, is read as independent copies of itself: each step reads it once and
+     * gives its value to every position it was passed in.
      *
      * @return Stream
      *
@@ -1521,8 +1525,9 @@ final class Stream implements \IteratorAggregate
      *
      * For uneven lengths, iterations stops when the shortest iterable is exhausted.
      *
-     * An iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in.
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: each step reads it once and gives its value to
+     * every position it was passed in.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -1545,8 +1550,9 @@ final class Stream implements \IteratorAggregate
      * Iteration continues until the longest iterable is exhausted.
      * For uneven lengths, the exhausted iterables will produce null for the remaining iterations.
      *
-     * An iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in.
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: each step reads it once and gives its value to
+     * every position it was passed in.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -1569,8 +1575,9 @@ final class Stream implements \IteratorAggregate
      * Iteration continues until the longest iterable is exhausted.
      * For uneven lengths, the exhausted iterables will produce $filler value for the remaining iterations.
      *
-     * An iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in.
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: each step reads it once and gives its value to
+     * every position it was passed in.
      *
      * @param mixed $filler
      * @param iterable<mixed> ...$iterables
@@ -1591,8 +1598,9 @@ final class Stream implements \IteratorAggregate
      * Works like Multi::zip() method but throws \LengthException if lengths not equal,
      * i.e., at least one iterator ends before the others.
      *
-     * An iterator or generator passed more than once is read as independent copies of itself: each step
-     * reads it once and gives its value to every position it was passed in.
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: each step reads it once and gives its value to
+     * every position it was passed in.
      *
      * @param iterable<mixed> ...$iterables
      *

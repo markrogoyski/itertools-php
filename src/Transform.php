@@ -69,22 +69,70 @@ final class Transform
     /**
      * Converts given iterable to Iterator.
      *
+     * An \IteratorAggregate, such as a Stream, gives the iterator its getIterator() returns, following nested
+     * aggregates to the first iterator; it is not wrapped. So an aggregate over an iterator or generator gives
+     * that same object, and one that returns a fresh iterator per call gives a fresh one each time.
+     *
      * @template TKey
      * @template TValue
      *
      * @param iterable<TKey, TValue> $iterable
      *
      * @return \Iterator<TKey, TValue>
+     *
+     * @throws \LogicException if an aggregate's getIterator() returns a non-Traversable, or aggregates form a
+     *                         cycle, such as one whose getIterator() returns itself.
      */
     public static function toIterator(iterable $iterable): \Iterator
     {
         /** @psalm-suppress DocblockTypeContradiction, MixedArgumentTypeCoercion */
         return match (true) { // @phpstan-ignore return.type
             $iterable instanceof \Iterator => $iterable,
+            $iterable instanceof \IteratorAggregate => self::toIterator(self::unwrapAggregate($iterable)),
             $iterable instanceof \Traversable => new \IteratorIterator($iterable),
             \is_array($iterable) => new \ArrayIterator($iterable), // @phpstan-ignore function.alreadyNarrowedType
             default => throw new \LogicException(\gettype($iterable) . ' type is not an expected iterable type (Iterator|Traversable|array)'),
         };
+    }
+
+    /**
+     * Follows getIterator() through nested aggregates to the first Traversable that is not an aggregate.
+     *
+     * @template TKey
+     * @template TValue
+     *
+     * @param \IteratorAggregate<TKey, TValue> $aggregate
+     *
+     * @return \Traversable<TKey, TValue>
+     *
+     * @throws \LogicException if getIterator() returns a non-Traversable, or the aggregates form a cycle.
+     */
+    private static function unwrapAggregate(\IteratorAggregate $aggregate): \Traversable
+    {
+        // Aggregates seen so far, by object id. Holding them keeps their ids from being reused by a later
+        // aggregate, which would read as a false cycle.
+        $seen        = [];
+        $traversable = $aggregate;
+        while ($traversable instanceof \IteratorAggregate) {
+            $id = \spl_object_id($traversable);
+            if (isset($seen[$id])) {
+                throw new \LogicException(
+                    \get_class($traversable) . '::getIterator() leads back to itself; aggregates form a cycle'
+                );
+            }
+            $seen[$id] = $traversable;
+
+            /** @var mixed $next a getIterator() marked #[\ReturnTypeWillChange] can return anything */
+            $next = $traversable->getIterator();
+            if (!($next instanceof \Traversable)) {
+                throw new \LogicException(
+                    \get_class($traversable) . '::getIterator() must return an object that implements Traversable'
+                );
+            }
+            $traversable = $next;
+        }
+
+        return $traversable;
     }
 
     /**

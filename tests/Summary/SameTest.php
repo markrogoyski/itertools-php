@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Summary;
 
+use IterTools\Stream;
 use IterTools\Summary;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
@@ -70,6 +71,40 @@ class SameTest extends \PHPUnit\Framework\TestCase
 
         // When
         $result = Summary::same($iterator, $iterator);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test A stream of an iterator passed twice is the same as itself without the iterator being read.
+     */
+    public function testRepeatedStreamIsNotRead(): void
+    {
+        // Given
+        $pulled = [];
+        $stream = Stream::of(new RecordingIteratorFixture([1, 2, 3], $pulled));
+
+        // When
+        $result = Summary::same($stream, $stream);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame([], $pulled);
+    }
+
+    /**
+     * @test A stream of an iterator and that iterator are the same without the iterator being read.
+     */
+    public function testStreamAndItsIteratorAreNotRead(): void
+    {
+        // Given
+        $pulled   = [];
+        $iterator = new RecordingIteratorFixture([1, 2, 3], $pulled);
+
+        // When
+        $result = Summary::same(Stream::of($iterator), $iterator);
 
         // Then
         $this->assertTrue($result);

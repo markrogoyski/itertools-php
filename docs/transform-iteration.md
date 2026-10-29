@@ -81,6 +81,8 @@ Keys follow PHP array semantics: a repeated key keeps its first position and its
 ### To Iterator
 Transforms any iterable to an iterator.
 
+An `IteratorAggregate`, such as a `Stream`, gives the iterator its `getIterator()` returns, following nested aggregates to the first iterator, rather than a wrapper around it. So an aggregate over an iterator or generator gives that same object, and one that returns a fresh iterator per call, such as `ArrayObject` or a `memoize()` result, gives a fresh one each time. Throws `\LogicException` if `getIterator()` returns a value that is not `Traversable`, or if aggregates form a cycle, such as one whose `getIterator()` returns itself.
+
 ```Transform::toIterator(iterable $iterable): \Iterator```
 
 ```php
