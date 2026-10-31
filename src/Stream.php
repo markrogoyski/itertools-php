@@ -1093,6 +1093,13 @@ final class Stream implements \IteratorAggregate
     /**
      * Lazily merge this stream with sorted iterables.
      *
+     * An iterator or generator passed more than once, including the one the stream was created from, directly
+     * or through a Stream or other \IteratorAggregate that returns it, is read as independent copies of itself,
+     * one per position it was passed in, each ordered among equal values by its position. Memory is then not
+     * limited to one pending value per source: the copies share a buffer holding the run of equal values
+     * between them. That run can be the whole source, and for an infinite source whose values are all equal the
+     * buffer grows without bound.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return Stream
@@ -1107,6 +1114,13 @@ final class Stream implements \IteratorAggregate
 
     /**
      * Lazily merge this stream with iterables sorted by a projected key.
+     *
+     * An iterator or generator passed more than once, including the one the stream was created from, directly
+     * or through a Stream or other \IteratorAggregate that returns it, is read as independent copies of itself,
+     * one per position it was passed in, each ordered among equal keys by its position, and each projecting its
+     * own values. Memory is then not limited to one pending value per source: the copies share a buffer holding
+     * the run of equal-key values between them. That run can be the whole source, and for an infinite source
+     * whose keys are all equal the buffer grows without bound.
      *
      * @param callable(mixed): mixed $keyFunc
      * @param iterable<mixed> ...$iterables

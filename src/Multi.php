@@ -139,6 +139,12 @@ final class Multi
      * Inputs must be sorted in non-decreasing order. An int and a float compare by exact value. Source keys
      * are discarded.
      *
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself, one per position it was passed in, each ordered
+     * among equal values by its position. Memory is then not limited to one pending value per source: the
+     * copies share a buffer holding the run of equal values between them. That run can be the whole source, and
+     * for an infinite source whose values are all equal the buffer grows without bound.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return \Generator<mixed>
@@ -157,6 +163,13 @@ final class Multi
      *
      * Inputs must be sorted in non-decreasing projected-key order. An int and a float key compare by exact
      * value. Source keys are discarded.
+     *
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself, one per position it was passed in, each ordered
+     * among equal keys by its position, and each projecting its own values. Memory is then not limited to one
+     * pending value per source: the copies share a buffer holding the run of equal-key values between them. That
+     * run can be the whole source, and for an infinite source whose keys are all equal the buffer grows without
+     * bound.
      *
      * @param callable(mixed): mixed $keyFunc
      * @param iterable<mixed> ...$iterables
@@ -185,12 +198,30 @@ final class Multi
     ): \Generator {
         $heap = new MergeSortedHeap();
 
-        // Ordinals are counted independently of the variadic's own keys: named arguments give
-        // those keys strings, which would collapse to the same heap tie-breaker.
-        $sourceOrdinal = 0;
-
+        // Ordinals are list indexes, counted independently of the variadic's own keys: named arguments give
+        // those keys strings, which would collapse to the same heap tie-breaker. Every source is resolved
+        // before any is read, and the list holds each iterator, so an id cannot be reused by a later one.
+        $iterators = [];
+        $ordinalsById = [];
         foreach ($iterables as $iterable) {
             $iterator = Transform::toIterator($iterable);
+            $ordinalsById[\spl_object_id($iterator)][] = \count($iterators);
+            $iterators[] = $iterator;
+        }
+
+        // An iterator passed more than once is split into one copy per position, each keeping its position's
+        // ordinal, so it reads as independent copies of itself. Sharing one cursor would skip values. The copies
+        // are of its values alone: tee buffers keys too, and the merge never reads a source's keys.
+        foreach ($ordinalsById as $ordinals) {
+            if (\count($ordinals) > 1) {
+                $copies = Transform::tee(self::mergeValues($iterators[$ordinals[0]]), \count($ordinals));
+                foreach ($ordinals as $index => $ordinal) {
+                    $iterators[$ordinal] = $copies[$index];
+                }
+            }
+        }
+
+        foreach ($iterators as $sourceOrdinal => $iterator) {
             $iterator->rewind();
             if ($iterator->valid()) {
                 $value = $iterator->current();
@@ -198,7 +229,6 @@ final class Multi
                 self::assertMergeKeyIsNotNan($key, $nanMessage);
                 $heap->insert([$key, $sourceOrdinal, $value, $iterator]);
             }
-            ++$sourceOrdinal;
         }
 
         while (!$heap->isEmpty()) {
@@ -212,6 +242,18 @@ final class Multi
                 self::assertMergeKeyIsNotNan($nextKey, $nanMessage);
                 $heap->insert([$nextKey, $sourceOrdinal, $nextValue, $iterator]);
             }
+        }
+    }
+
+    /**
+     * @param \Iterator<mixed> $iterator
+     *
+     * @return \Generator<int, mixed>
+     */
+    private static function mergeValues(\Iterator $iterator): \Generator
+    {
+        for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
+            yield $iterator->current();
         }
     }
 

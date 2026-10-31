@@ -77,4 +77,21 @@ class StreamMergeSortedWithTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame([1, 2, 3, 4, 5, 6], $result);
     }
+
+    /**
+     * @test mergeSortedWith reads a stream of the generator it holds as independent copies of the generator
+     */
+    public function testMergeSortedWithStreamOfSameGenerator(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = Stream::of($generator)
+            ->mergeSortedWith([2.0], Stream::of($generator))
+            ->toArray();
+
+        // Then
+        $this->assertSame([1, 1, 2, 2.0, 2, 3, 3], $result);
+    }
 }

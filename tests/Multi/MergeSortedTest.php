@@ -6,6 +6,7 @@ namespace IterTools\Tests\Multi;
 
 use IterTools\Multi;
 use IterTools\Single;
+use IterTools\Stream;
 use IterTools\Summary;
 use IterTools\Infinite;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
@@ -268,5 +269,248 @@ class MergeSortedTest extends \PHPUnit\Framework\TestCase
                 [9007199254740992.0, 9007199254740993, 9007199254740994.0, 9007199254740995],
             ],
         ];
+    }
+
+    /**
+     * @test mergeSorted reads an iterator passed twice as independent copies of it
+     */
+    public function testIteratorPassedTwice(): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture([1, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(Multi::mergeSorted($iterator, $iterator), false);
+
+        // Then
+        $this->assertSame([1, 1, 2, 2, 3, 3], $result);
+    }
+
+    /**
+     * @test mergeSorted reads a generator passed twice as independent copies of it
+     */
+    public function testGeneratorPassedTwice(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 3, 4]);
+
+        // When
+        $result = \iterator_to_array(Multi::mergeSorted($generator, $generator), false);
+
+        // Then
+        $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], $result);
+    }
+
+    /**
+     * @test mergeSorted reads a generator passed three times as independent copies of it
+     */
+    public function testGeneratorPassedThreeTimes(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2]);
+
+        // When
+        $result = \iterator_to_array(Multi::mergeSorted($generator, $generator, $generator), false);
+
+        // Then
+        $this->assertSame([1, 1, 1, 2, 2, 2], $result);
+    }
+
+    /**
+     * @test mergeSorted reads a stream passed twice as independent copies of it
+     */
+    public function testStreamPassedTwice(): void
+    {
+        // Given
+        $stream = Stream::of(GeneratorFixture::getGenerator([1, 2, 3]));
+
+        // When
+        $result = \iterator_to_array(Multi::mergeSorted($stream, $stream), false);
+
+        // Then
+        $this->assertSame([1, 1, 2, 2, 3, 3], $result);
+    }
+
+    /**
+     * @test mergeSorted reads a stream and the generator it holds as independent copies of the generator
+     */
+    public function testStreamAndItsGenerator(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 3]);
+        $stream    = Stream::of($generator);
+
+        // When
+        $result = \iterator_to_array(Multi::mergeSorted($stream, $generator), false);
+
+        // Then
+        $this->assertSame([1, 1, 2, 2, 3, 3], $result);
+    }
+
+    /**
+     * @test mergeSorted gives each copy of a repeated generator its own argument position in ties with other sources
+     */
+    public function testGeneratorPassedTwiceAroundOtherSources(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, 2, 3]);
+
+        // When
+        $result = \iterator_to_array(
+            Multi::mergeSorted($generator, [0.0, 2.0, 5.0], $generator, new ArrayIteratorFixture([2.5])),
+            false,
+        );
+
+        // Then
+        $this->assertSame([0.0, 1, 1, 2, 2.0, 2, 2.5, 3, 3, 5.0], $result);
+    }
+
+    /**
+     * @test mergeSorted propagates the exception of a generator passed twice, after the values before it
+     */
+    public function testGeneratorPassedTwicePropagatesSourceException(): void
+    {
+        // Given
+        $exception = new \RuntimeException('source failed');
+        $failing = (static function () use ($exception): \Generator {
+            yield 1;
+            yield 2;
+            throw $exception;
+        })();
+        $merged = Multi::mergeSorted($failing, [1.5], $failing);
+        $yielded = [];
+
+        // When
+        try {
+            foreach ($merged as $value) {
+                $yielded[] = $value;
+            }
+            $this->fail('Expected source exception to propagate');
+        } catch (\RuntimeException $e) {
+            // Then
+            $this->assertSame($exception, $e);
+            $this->assertNull($e->getPrevious());
+        }
+
+        // Then
+        $this->assertSame([1, 1, 1.5, 2], $yielded);
+    }
+
+    /**
+     * @test mergeSorted stopped early reads a generator passed twice no further than the values it needs
+     */
+    public function testGeneratorPassedTwiceStoppedEarly(): void
+    {
+        // Given
+        $pulls = 0;
+        $generator = (static function () use (&$pulls): \Generator {
+            ++$pulls;
+            yield 1;
+            ++$pulls;
+            yield 2;
+            ++$pulls;
+            yield 3;
+        })();
+        $merged = Multi::mergeSorted($generator, $generator);
+
+        // When
+        $result = \iterator_to_array(Single::limit($merged, 3), false);
+
+        // Then
+        $this->assertSame([1, 1, 2], $result);
+        $this->assertSame(2, $pulls);
+    }
+
+    /**
+     * @test mergeSorted rejects a NAN reached in a generator passed twice, after the values before it
+     */
+    public function testGeneratorPassedTwiceRejectsLaterNan(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([1, \NAN]);
+        $merged = Multi::mergeSorted($generator, $generator);
+        $yielded = [];
+
+        // When
+        try {
+            foreach ($merged as $value) {
+                $yielded[] = $value;
+            }
+            $this->fail('Expected NAN to be rejected');
+        } catch (\InvalidArgumentException $e) {
+            // Then
+            $this->assertSame('Multi::mergeSorted cannot order NAN', $e->getMessage());
+        }
+
+        // Then
+        $this->assertSame([1], $yielded);
+    }
+
+    /**
+     * @test mergeSorted rejects a NAN seeded from a generator passed twice before yielding anything
+     */
+    public function testGeneratorPassedTwiceRejectsSeededNan(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([\NAN]);
+        $merged = Multi::mergeSorted([1], $generator, $generator);
+        $yielded = [];
+
+        // When
+        try {
+            foreach ($merged as $value) {
+                $yielded[] = $value;
+            }
+            $this->fail('Expected NAN to be rejected');
+        } catch (\InvalidArgumentException $e) {
+            // Then
+            $this->assertSame('Multi::mergeSorted cannot order NAN', $e->getMessage());
+        }
+
+        // Then
+        $this->assertSame([], $yielded);
+    }
+
+    /**
+     * @test mergeSorted reads only the values of an iterator passed twice, never its keys
+     */
+    public function testIteratorPassedTwiceKeysNotRead(): void
+    {
+        // Given
+        $iterator = new class implements \Iterator {
+            private int $i = 0;
+            private const VALUES = [1, 2];
+
+            public function rewind(): void
+            {
+                $this->i = 0;
+            }
+
+            public function valid(): bool
+            {
+                return $this->i < \count(self::VALUES);
+            }
+
+            public function key(): never
+            {
+                throw new \LogicException('key() must not be called');
+            }
+
+            public function current(): int
+            {
+                return self::VALUES[$this->i];
+            }
+
+            public function next(): void
+            {
+                ++$this->i;
+            }
+        };
+
+        // When
+        $result = \iterator_to_array(Multi::mergeSorted($iterator, [1.5], $iterator), false);
+
+        // Then
+        $this->assertSame([1, 1, 1.5, 2, 2], $result);
     }
 }

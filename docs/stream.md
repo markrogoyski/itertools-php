@@ -2276,11 +2276,11 @@ $result = Stream::of(['a', 'b', 'c'])
 
 #### Merge Sorted With
 
-`$stream->mergeSortedWith(iterable ...$iterables): Stream` lazily and stably merges the already-sorted stream with additional sorted sources. The current stream is the first source, source keys are discarded, and ties from it take precedence. An integer and a float compare by exact value.
+`$stream->mergeSortedWith(iterable ...$iterables): Stream` lazily and stably merges the already-sorted stream with additional sorted sources. The current stream is the first source, source keys are discarded, and ties from it take precedence. An integer and a float compare by exact value. An iterator or generator passed more than once, including the one the stream was created from, directly or through a Stream or other `IteratorAggregate` that returns it, is read as independent copies of itself, one per position it was passed in, each ordered among equal values by its position. Its copies share a buffer holding the run of equal values between them, beyond the one pending value per source: that run can be the whole source, and for an infinite source whose values are all equal the buffer grows without bound.
 
 #### Merge Sorted By With
 
-`$stream->mergeSortedByWith(callable $keyFunc, iterable ...$iterables): Stream` performs the same merge using a projection computed once per queued value; an integer and a float key compare by exact value.
+`$stream->mergeSortedByWith(callable $keyFunc, iterable ...$iterables): Stream` performs the same merge using a projection computed once per queued value; an integer and a float key compare by exact value. A source passed more than once is read as independent copies, as in `mergeSortedWith`, each projecting its own values; its copies buffer the run of equal-key values between them, which can be the whole source and is unbounded for an infinite source whose keys are all equal.
 
 #### Take While With Keys
 

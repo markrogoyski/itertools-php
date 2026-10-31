@@ -214,6 +214,8 @@ See also: [`Stream::unzip`](stream.md#unzip).
 
 The sources are not touched until iteration starts, and at most one pending value per source is retained. Infinite sorted sources are supported. A direct `NAN` throws `InvalidArgumentException` with `Multi::mergeSorted cannot order NAN` when reached; values already yielded are not rolled back. A `NAN` nested inside a composite value such as `[NAN, $id]` is not detected; see [NaN and Ordering](../README.md#nan-and-ordering).
 
+An iterator or generator passed more than once, directly or through a `Stream` or other `IteratorAggregate` that returns it, is read as independent copies of itself, one per position it was passed in, each ordered among equal values by its position: `mergeSorted($it, $it)` over `[1, 2, 3]` yields `[1, 1, 2, 2, 3, 3]`. This is the exception to the `O(k)` memory and the one pending value per source: the copies share a buffer holding the run of equal values between them. That run can be the whole source, and for an infinite source whose values are all equal the buffer grows without bound.
+
 ```php
 use IterTools\Multi;
 
@@ -251,7 +253,7 @@ $firstTen = \iterator_to_array(Single::limit(Multi::mergeSorted($evens, $odds), 
 
 ### Merge Sorted By
 
-`Multi::mergeSortedBy(callable $keyFunc, iterable ...$iterables)` has the same stable, lazy behavior, comparing cached projections (an integer and a float by exact value) and calling `$keyFunc` exactly once for each value placed in the merge heap. A projected `NAN` throws with `Multi::mergeSortedBy key function returned NAN`; a `NAN` nested inside a composite projection is not detected.
+`Multi::mergeSortedBy(callable $keyFunc, iterable ...$iterables)` has the same stable, lazy behavior, comparing cached projections (an integer and a float by exact value) and calling `$keyFunc` exactly once for each value placed in the merge heap. A projected `NAN` throws with `Multi::mergeSortedBy key function returned NAN`; a `NAN` nested inside a composite projection is not detected. A source passed more than once is read as independent copies, as in `mergeSorted`, each projecting its own values; its copies buffer the run of equal-key values between them, which can be the whole source and is unbounded for an infinite source whose keys are all equal.
 
 ```php
 use IterTools\Multi;

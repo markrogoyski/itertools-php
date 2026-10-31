@@ -6,6 +6,7 @@ namespace IterTools\Tests\Stream;
 
 use IterTools\Stream;
 use IterTools\Tests\Fixture\CountingIteratorAggregateFixture;
+use IterTools\Tests\Fixture\GeneratorFixture;
 
 class StreamMergeSortedByWithTest extends \PHPUnit\Framework\TestCase
 {
@@ -78,5 +79,23 @@ class StreamMergeSortedByWithTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertSame([1, 2, 3, 4], $result);
+    }
+
+    /**
+     * @test mergeSortedByWith keeps the generator it holds, passed again, in argument order around an
+     *       equal-key source
+     */
+    public function testMergeSortedByWithSameGeneratorKeepsStableOrder(): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator([[1, 'a'], [1, 'b']]);
+
+        // When
+        $result = Stream::of($generator)
+            ->mergeSortedByWith(static fn (array $item): int => $item[0], [[1, 'middle']], $generator)
+            ->toArray();
+
+        // Then
+        $this->assertSame(['a', 'b', 'middle', 'a', 'b'], \array_column($result, 1));
     }
 }
