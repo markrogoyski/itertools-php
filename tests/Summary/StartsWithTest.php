@@ -512,12 +512,58 @@ class StartsWithTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test startsWith - an IteratorAggregate passed as its own prefix is compared through separate iterators
+     * @test startsWith - an IteratorAggregate passed as its own prefix is true
      */
     public function testOwnSourceIteratorAggregate(): void
     {
         // Given
         $data = new Fixture\IteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::startsWith($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWith - an IteratorAggregate passed as its own prefix is true without its iterator being obtained
+     */
+    public function testOwnSourceIteratorAggregateIsNotRead(): void
+    {
+        // Given
+        $data = new Fixture\CountingIteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::startsWith($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame(0, $data->getIteratorCallCount());
+    }
+
+    /**
+     * @test startsWith - an IteratorAggregate over a generator passed as its own prefix is true
+     */
+    public function testOwnSourceIteratorAggregateOverGenerator(): void
+    {
+        // Given
+        $data = new Fixture\WrappingIteratorAggregateFixture(Fixture\GeneratorFixture::getGenerator([1, 2, 3]));
+
+        // When
+        $result = Summary::startsWith($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWith - an IteratorAggregate holding NAN passed as its own prefix is true, though NAN never matches NAN
+     */
+    public function testOwnSourceIteratorAggregateWithNanIsTrue(): void
+    {
+        // Given
+        $data = new Fixture\IteratorAggregateFixture([NAN]);
 
         // When
         $result = Summary::startsWith($data, $data);

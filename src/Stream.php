@@ -10,6 +10,10 @@ use IterTools\Util\ResourceWriter;
 /**
  * Provides fluent interface for working with iterables.
  *
+ * A stream passed to its own methods stands for its elements at that point in the pipeline, before the method
+ * is applied, and is read as that source passed more than once: $stream->zipWith($stream). chainWith,
+ * productWith and roundRobinWith do not support passing the stream to itself.
+ *
  * @implements \IteratorAggregate<mixed>
  */
 final class Stream implements \IteratorAggregate
@@ -269,7 +273,7 @@ final class Stream implements \IteratorAggregate
      *
      * Selectors indicate which data. True value selects item. False value filters out data.
      *
-     * @param iterable<bool> $selectors
+     * @param iterable<mixed> $selectors
      *
      * @return Stream
      *
@@ -277,7 +281,7 @@ final class Stream implements \IteratorAggregate
      */
     public function compress(iterable $selectors): self
     {
-        $this->iterable = Single::compress($this->iterable, $selectors);
+        $this->iterable = Single::compress($this->iterable, $this->replaceSelfWithSource([$selectors])[0]);
         return $this;
     }
 
@@ -1108,7 +1112,7 @@ final class Stream implements \IteratorAggregate
      */
     public function mergeSortedWith(iterable ...$iterables): self
     {
-        $this->iterable = Multi::mergeSorted($this->iterable, ...$iterables);
+        $this->iterable = Multi::mergeSorted($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1131,7 +1135,7 @@ final class Stream implements \IteratorAggregate
      */
     public function mergeSortedByWith(callable $keyFunc, iterable ...$iterables): self
     {
-        $this->iterable = Multi::mergeSortedBy($keyFunc, $this->iterable, ...$iterables);
+        $this->iterable = Multi::mergeSortedBy($keyFunc, $this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1503,6 +1507,23 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
+     * Replace each argument that is this stream with the stream's current source, keeping positions and keys.
+     *
+     * A method that reassigns the source would otherwise leave this stream, passed as an argument, reading the
+     * new pipeline step itself: zipWith($this) would zip the zip. With the source in its place, the operation
+     * reads it as a repeated argument, as it would Stream::of($source) passed alongside the stream.
+     *
+     * @param array<array-key, iterable<mixed>> $iterables
+     *
+     * @return array<array-key, iterable<mixed>>
+     */
+    private function replaceSelfWithSource(array $iterables): array
+    {
+        $source = $this->iterable;
+        return \array_map(fn (iterable $iterable): iterable => $iterable === $this ? $source : $iterable, $iterables);
+    }
+
+    /**
      * Materialize an outer iterable of iterables into an array of Iterator instances.
      *
      * Uses an explicit zero-based counter so error messages reference positional row index
@@ -1551,7 +1572,7 @@ final class Stream implements \IteratorAggregate
      */
     public function zipWith(iterable ...$iterables): self
     {
-        $this->iterable = Multi::zip($this->iterable, ...$iterables);
+        $this->iterable = Multi::zip($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1576,7 +1597,7 @@ final class Stream implements \IteratorAggregate
      */
     public function zipLongestWith(iterable ...$iterables): self
     {
-        $this->iterable = Multi::zipLongest($this->iterable, ...$iterables);
+        $this->iterable = Multi::zipLongest($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1602,7 +1623,7 @@ final class Stream implements \IteratorAggregate
      */
     public function zipFilledWith(mixed $filler, iterable ...$iterables): self
     {
-        $this->iterable = Multi::zipFilled($filler, $this->iterable, ...$iterables);
+        $this->iterable = Multi::zipFilled($filler, $this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1624,7 +1645,7 @@ final class Stream implements \IteratorAggregate
      */
     public function zipEqualWith(iterable ...$iterables): self
     {
-        $this->iterable = Multi::zipEqual($this->iterable, ...$iterables);
+        $this->iterable = Multi::zipEqual($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1865,7 +1886,7 @@ final class Stream implements \IteratorAggregate
      */
     public function intersectionWith(iterable ...$iterables): self
     {
-        $this->iterable = Set::intersection($this->iterable, ...$iterables);
+        $this->iterable = Set::intersection($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1882,7 +1903,7 @@ final class Stream implements \IteratorAggregate
      */
     public function intersectionCoerciveWith(iterable ...$iterables): self
     {
-        $this->iterable = Set::intersectionCoercive($this->iterable, ...$iterables);
+        $this->iterable = Set::intersectionCoercive($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1902,7 +1923,7 @@ final class Stream implements \IteratorAggregate
      */
     public function symmetricDifferenceWith(iterable ...$iterables): self
     {
-        $this->iterable = Set::symmetricDifference($this->iterable, ...$iterables);
+        $this->iterable = Set::symmetricDifference($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1922,7 +1943,7 @@ final class Stream implements \IteratorAggregate
      */
     public function symmetricDifferenceCoerciveWith(iterable ...$iterables): self
     {
-        $this->iterable = Set::symmetricDifferenceCoercive($this->iterable, ...$iterables);
+        $this->iterable = Set::symmetricDifferenceCoercive($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1945,7 +1966,7 @@ final class Stream implements \IteratorAggregate
      */
     public function differenceWith(iterable ...$iterables): self
     {
-        $this->iterable = Set::difference($this->iterable, ...\array_values($iterables));
+        $this->iterable = Set::difference($this->iterable, ...\array_values($this->replaceSelfWithSource($iterables)));
         return $this;
     }
 
@@ -1968,7 +1989,7 @@ final class Stream implements \IteratorAggregate
      */
     public function differenceCoerciveWith(iterable ...$iterables): self
     {
-        $this->iterable = Set::differenceCoercive($this->iterable, ...\array_values($iterables));
+        $this->iterable = Set::differenceCoercive($this->iterable, ...\array_values($this->replaceSelfWithSource($iterables)));
         return $this;
     }
 
@@ -1988,7 +2009,7 @@ final class Stream implements \IteratorAggregate
      */
     public function partialIntersectionWith(int $minIntersectionCount, iterable ...$iterables): self
     {
-        $this->iterable = Set::partialIntersection($minIntersectionCount, $this->iterable, ...$iterables);
+        $this->iterable = Set::partialIntersection($minIntersectionCount, $this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -2008,7 +2029,7 @@ final class Stream implements \IteratorAggregate
      */
     public function partialIntersectionCoerciveWith(int $minIntersectionCount, iterable ...$iterables): self
     {
-        $this->iterable = Set::partialIntersectionCoercive($minIntersectionCount, $this->iterable, ...$iterables);
+        $this->iterable = Set::partialIntersectionCoercive($minIntersectionCount, $this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -2025,7 +2046,7 @@ final class Stream implements \IteratorAggregate
      */
     public function unionWith(iterable ...$iterables): self
     {
-        $this->iterable = Set::union($this->iterable, ...$iterables);
+        $this->iterable = Set::union($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -2042,7 +2063,7 @@ final class Stream implements \IteratorAggregate
      */
     public function unionCoerciveWith(iterable ...$iterables): self
     {
-        $this->iterable = Set::unionCoercive($this->iterable, ...$iterables);
+        $this->iterable = Set::unionCoercive($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -2559,8 +2580,8 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty prefix → true without consuming the stream. So is the stream's own source iterator or
-     * generator passed as the prefix: Stream::of($it)->startsWith($it).
+     * Empty prefix → true without consuming the stream. So is the stream itself, or the iterator or generator
+     * it was created from, passed as the prefix: Stream::of($it)->startsWith($it).
      *
      * Lazy: the stream is never advanced beyond the last element compared.
      *
@@ -2572,6 +2593,11 @@ final class Stream implements \IteratorAggregate
      */
     public function startsWith(iterable $prefix): bool
     {
+        // The stream starts with itself. Its source in its place could be compared by value instead, where NAN never
+        // matches and a coercive comparison throws for an object that cannot be serialized.
+        if ($prefix === $this) {
+            return true;
+        }
         return Summary::startsWith($this->iterable, $prefix);
     }
 
@@ -2580,8 +2606,8 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty prefix → true without consuming the stream. So is the stream's own source iterator or
-     * generator passed as the prefix: Stream::of($it)->startsWith($it).
+     * Empty prefix → true without consuming the stream. So is the stream itself, or the iterator or generator
+     * it was created from, passed as the prefix: Stream::of($it)->startsWith($it).
      *
      * Lazy: the stream is never advanced beyond the last element compared.
      *
@@ -2593,6 +2619,11 @@ final class Stream implements \IteratorAggregate
      */
     public function startsWithCoercive(iterable $prefix): bool
     {
+        // The stream starts with itself. Its source in its place could be compared by value instead, where NAN never
+        // matches and a coercive comparison throws for an object that cannot be serialized.
+        if ($prefix === $this) {
+            return true;
+        }
         return Summary::startsWithCoercive($this->iterable, $prefix);
     }
 
@@ -2601,8 +2632,8 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty suffix → true without consuming the stream. So is the stream's own source iterator or
-     * generator passed as the suffix: Stream::of($it)->endsWith($it). The stream must be finite.
+     * Empty suffix → true without consuming the stream. So is the stream itself, or the iterator or generator
+     * it was created from, passed as the suffix: Stream::of($it)->endsWith($it). The stream must be finite.
      *
      * @param iterable<mixed> $suffix
      *
@@ -2612,6 +2643,11 @@ final class Stream implements \IteratorAggregate
      */
     public function endsWith(iterable $suffix): bool
     {
+        // The stream ends with itself. Its source in its place could be compared by value instead, where NAN never
+        // matches and a coercive comparison throws for an object that cannot be serialized.
+        if ($suffix === $this) {
+            return true;
+        }
         return Summary::endsWith($this->iterable, $suffix);
     }
 
@@ -2620,8 +2656,8 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty suffix → true without consuming the stream. So is the stream's own source iterator or
-     * generator passed as the suffix: Stream::of($it)->endsWith($it). The stream must be finite.
+     * Empty suffix → true without consuming the stream. So is the stream itself, or the iterator or generator
+     * it was created from, passed as the suffix: Stream::of($it)->endsWith($it). The stream must be finite.
      *
      * @param iterable<mixed> $suffix
      *
@@ -2631,6 +2667,11 @@ final class Stream implements \IteratorAggregate
      */
     public function endsWithCoercive(iterable $suffix): bool
     {
+        // The stream ends with itself. Its source in its place could be compared by value instead, where NAN never
+        // matches and a coercive comparison throws for an object that cannot be serialized.
+        if ($suffix === $this) {
+            return true;
+        }
         return Summary::endsWithCoercive($this->iterable, $suffix);
     }
 
@@ -2802,8 +2843,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if iterable source and all given collections are the same.
      *
-     * For empty iterables list returns true without reading the stream. So does the stream's own source
-     * iterator or generator passed as the only collection: Stream::of($it)->sameWith($it).
+     * For empty iterables list returns true without reading the stream. So does the stream itself, or the
+     * iterator or generator it was created from, passed as the only collection: Stream::of($it)->sameWith($it).
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -2813,7 +2854,12 @@ final class Stream implements \IteratorAggregate
      */
     public function sameWith(iterable ...$iterables): bool
     {
-        return Summary::same($this->iterable, ...$iterables);
+        // The stream is the same as itself. Its source in its place could be compared by value instead, where NAN
+        // never matches.
+        if (\array_filter($iterables, fn (iterable $iterable): bool => $iterable !== $this) === []) {
+            return true;
+        }
+        return Summary::same($this->iterable, ...$this->replaceSelfWithSource($iterables));
     }
 
     /**
@@ -2831,7 +2877,7 @@ final class Stream implements \IteratorAggregate
      */
     public function sameCountWith(iterable ...$iterables): bool
     {
-        return Summary::sameCount($this->iterable, ...$iterables);
+        return Summary::sameCount($this->iterable, ...$this->replaceSelfWithSource($iterables));
     }
 
     /**
@@ -2849,7 +2895,7 @@ final class Stream implements \IteratorAggregate
      */
     public function arePermutationsWith(iterable ...$iterables): bool
     {
-        return Summary::arePermutations($this->iterable, ...$iterables);
+        return Summary::arePermutations($this->iterable, ...$this->replaceSelfWithSource($iterables));
     }
 
     /**
@@ -2867,7 +2913,7 @@ final class Stream implements \IteratorAggregate
      */
     public function arePermutationsCoerciveWith(iterable ...$iterables): bool
     {
-        return Summary::arePermutationsCoercive($this->iterable, ...$iterables);
+        return Summary::arePermutationsCoercive($this->iterable, ...$this->replaceSelfWithSource($iterables));
     }
 
     /**

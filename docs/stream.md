@@ -29,6 +29,16 @@ Streams are made up of:
    }
    ```
 
+A stream can be passed to its own methods. It stands for its elements at that point in the pipeline, before the method is applied, and is read as that source passed more than once:
+
+```php
+$stream = Stream::of([1, 2, 3]);
+$result = $stream->zipWith($stream, ['a', 'b', 'c'])->toArray();
+// [[1, 1, 'a'], [2, 2, 'b'], [3, 3, 'c']]
+```
+
+`chainWith`, `productWith` and `roundRobinWith` do not support passing the stream to itself.
+
 ### Stream Sources
 
 #### Of
@@ -2464,7 +2474,7 @@ $boolean = Stream::of($primes)->containsCoercive('7');
 Returns true if the stream ends with the given suffix using [strict-type comparison](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty suffix returns true without consuming the stream. So does the stream's own source iterator or generator passed as the suffix: `Stream::of($it)->endsWith($it)`.
+- Empty suffix returns true without consuming the stream. So does the stream itself, or the iterator or generator it was created from, passed as the suffix: `Stream::of($it)->endsWith($it)`.
 - The stream must be finite.
 
 ```$stream->endsWith(iterable $suffix): bool```
@@ -2485,7 +2495,7 @@ $boolean = Stream::of($path)->endsWith(['error.log']);
 Returns true if the stream ends with the given suffix using [type coercion](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty suffix returns true without consuming the stream. So does the stream's own source iterator or generator passed as the suffix: `Stream::of($it)->endsWith($it)`.
+- Empty suffix returns true without consuming the stream. So does the stream itself, or the iterator or generator it was created from, passed as the suffix: `Stream::of($it)->endsWith($it)`.
 - The stream must be finite.
 - Equality follows the [coercive rules](../README.md#strict-and-coercive-types).
 - Throws `\InvalidArgumentException` if a non-serializable object is reached during comparison.
@@ -2671,7 +2681,7 @@ Returns true if iterable source and all given collections are the same.
 
 ```$stream->sameWith(iterable ...$iterables): bool```
 
-For empty iterables list returns true without reading the stream. So does the stream's own source iterator or generator passed as the only collection: `Stream::of($it)->sameWith($it)`.
+For empty iterables list returns true without reading the stream. So does the stream itself, or the iterator or generator it was created from, passed as the only collection: `Stream::of($it)->sameWith($it)`.
 
 ```php
 use IterTools\Stream;
@@ -2712,7 +2722,7 @@ $result = Stream::of($input)
 Returns true if the stream starts with the given prefix using [strict-type comparison](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty prefix returns true without consuming the stream. So does the stream's own source iterator or generator passed as the prefix: `Stream::of($it)->startsWith($it)`.
+- Empty prefix returns true without consuming the stream. So does the stream itself, or the iterator or generator it was created from, passed as the prefix: `Stream::of($it)->startsWith($it)`.
 - Lazy: the stream is never advanced beyond the last element compared.
 
 ```$stream->startsWith(iterable $prefix): bool```
@@ -2733,7 +2743,7 @@ $boolean = Stream::of($path)->startsWith(['etc']);
 Returns true if the stream starts with the given prefix using [type coercion](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty prefix returns true without consuming the stream. So does the stream's own source iterator or generator passed as the prefix: `Stream::of($it)->startsWith($it)`.
+- Empty prefix returns true without consuming the stream. So does the stream itself, or the iterator or generator it was created from, passed as the prefix: `Stream::of($it)->startsWith($it)`.
 - Lazy: the stream is never advanced beyond the last element compared.
 - Equality follows the [coercive rules](../README.md#strict-and-coercive-types).
 - Throws `\InvalidArgumentException` if a non-serializable object is reached during comparison.

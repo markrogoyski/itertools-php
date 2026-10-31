@@ -567,12 +567,43 @@ class StartsWithCoerciveTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test startsWithCoercive - an IteratorAggregate passed as its own prefix is compared through separate iterators
+     * @test startsWithCoercive - an IteratorAggregate passed as its own prefix is true
      */
     public function testOwnSourceIteratorAggregate(): void
     {
         // Given
         $data = new Fixture\IteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::startsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWithCoercive - an IteratorAggregate passed as its own prefix is true without its iterator being obtained
+     */
+    public function testOwnSourceIteratorAggregateIsNotRead(): void
+    {
+        // Given
+        $data = new Fixture\CountingIteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::startsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame(0, $data->getIteratorCallCount());
+    }
+
+    /**
+     * @test startsWithCoercive - an IteratorAggregate over a generator passed as its own prefix is true
+     */
+    public function testOwnSourceIteratorAggregateOverGenerator(): void
+    {
+        // Given
+        $data = new Fixture\WrappingIteratorAggregateFixture(Fixture\GeneratorFixture::getGenerator([1, 2, 3]));
 
         // When
         $result = Summary::startsWithCoercive($data, $data);

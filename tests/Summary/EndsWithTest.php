@@ -433,12 +433,58 @@ class EndsWithTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test endsWith - an IteratorAggregate passed as its own suffix is compared through separate iterators
+     * @test endsWith - an IteratorAggregate passed as its own suffix is true
      */
     public function testOwnSourceIteratorAggregate(): void
     {
         // Given
         $data = new Fixture\IteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::endsWith($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWith - an IteratorAggregate passed as its own suffix is true without its iterator being obtained
+     */
+    public function testOwnSourceIteratorAggregateIsNotRead(): void
+    {
+        // Given
+        $data = new Fixture\CountingIteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::endsWith($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame(0, $data->getIteratorCallCount());
+    }
+
+    /**
+     * @test endsWith - an IteratorAggregate over a generator passed as its own suffix is true
+     */
+    public function testOwnSourceIteratorAggregateOverGenerator(): void
+    {
+        // Given
+        $data = new Fixture\WrappingIteratorAggregateFixture(Fixture\GeneratorFixture::getGenerator([1, 2, 3]));
+
+        // When
+        $result = Summary::endsWith($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWith - an IteratorAggregate holding NAN passed as its own suffix is true, though NAN never matches NAN
+     */
+    public function testOwnSourceIteratorAggregateWithNanIsTrue(): void
+    {
+        // Given
+        $data = new Fixture\IteratorAggregateFixture([NAN]);
 
         // When
         $result = Summary::endsWith($data, $data);

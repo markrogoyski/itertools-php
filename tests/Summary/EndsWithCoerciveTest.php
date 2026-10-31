@@ -579,12 +579,43 @@ class EndsWithCoerciveTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test endsWithCoercive - an IteratorAggregate passed as its own suffix is compared through separate iterators
+     * @test endsWithCoercive - an IteratorAggregate passed as its own suffix is true
      */
     public function testOwnSourceIteratorAggregate(): void
     {
         // Given
         $data = new Fixture\IteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - an IteratorAggregate passed as its own suffix is true without its iterator being obtained
+     */
+    public function testOwnSourceIteratorAggregateIsNotRead(): void
+    {
+        // Given
+        $data = new Fixture\CountingIteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $data);
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame(0, $data->getIteratorCallCount());
+    }
+
+    /**
+     * @test endsWithCoercive - an IteratorAggregate over a generator passed as its own suffix is true
+     */
+    public function testOwnSourceIteratorAggregateOverGenerator(): void
+    {
+        // Given
+        $data = new Fixture\WrappingIteratorAggregateFixture(Fixture\GeneratorFixture::getGenerator([1, 2, 3]));
 
         // When
         $result = Summary::endsWithCoercive($data, $data);

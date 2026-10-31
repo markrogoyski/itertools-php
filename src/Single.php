@@ -111,7 +111,7 @@ final class Single
      * Selectors indicates which data. True value selects item. False value filters out data.
      *
      * @param iterable<mixed> $data
-     * @param iterable<bool> $selectors
+     * @param iterable<mixed> $selectors
      *
      * @return \Generator<mixed>
      */

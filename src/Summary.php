@@ -616,8 +616,8 @@ final class Summary
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty prefix → true without consuming the source. So is an iterator or generator passed as its
-     * own prefix: startsWith($it, $it).
+     * Empty prefix → true without consuming the source. So is an iterator, generator or \IteratorAggregate
+     * passed as its own prefix: startsWith($it, $it).
      *
      * Lazy: the source is never advanced beyond the last element compared. On a match it is
      * left on the last prefix element; on a mismatch, on the mismatching element; if it is
@@ -641,8 +641,8 @@ final class Summary
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty prefix → true without consuming the source. So is an iterator or generator passed as its
-     * own prefix: startsWith($it, $it).
+     * Empty prefix → true without consuming the source. So is an iterator, generator or \IteratorAggregate
+     * passed as its own prefix: startsWith($it, $it).
      *
      * Lazy: the source is never advanced beyond the last element compared. On a match it is
      * left on the last prefix element; on a mismatch, on the mismatching element; if it is
@@ -668,8 +668,8 @@ final class Summary
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty suffix → true without consuming the source. So is an iterator or generator passed as its
-     * own suffix: endsWith($it, $it).
+     * Empty suffix → true without consuming the source. So is an iterator, generator or \IteratorAggregate
+     * passed as its own suffix: endsWith($it, $it).
      *
      * Both source and suffix must be finite. Buffers up to count($suffix) elements via a sliding window.
      * Each element is compared as it was when read; see README "Strict and Coercive Types" > Values
@@ -692,8 +692,8 @@ final class Summary
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty suffix → true without consuming the source. So is an iterator or generator passed as its
-     * own suffix: endsWith($it, $it).
+     * Empty suffix → true without consuming the source. So is an iterator, generator or \IteratorAggregate
+     * passed as its own suffix: endsWith($it, $it).
      *
      * Both source and suffix must be finite. Buffers up to count($suffix) elements via a sliding window.
      * Each array or object element is hashed when read, so it is compared as it was then; see README
@@ -724,8 +724,9 @@ final class Summary
      */
     private static function startsWithInternal(iterable $data, iterable $prefix, bool $strict): bool
     {
-        // An iterator starts with itself, and reading the prefix would advance the source with it.
-        if ($data instanceof \Iterator && $data === $prefix) {
+        // An iterator or aggregate starts with itself, and reading the prefix could advance the source with it:
+        // an aggregate may return one shared iterator, such as a Stream over a generator.
+        if (\is_object($data) && $data === $prefix) {
             return true;
         }
 
@@ -764,8 +765,9 @@ final class Summary
      */
     private static function endsWithInternal(iterable $data, iterable $suffix, bool $strict): bool
     {
-        // An iterator ends with itself, and reading the suffix would exhaust the source first.
-        if ($data instanceof \Iterator && $data === $suffix) {
+        // An iterator or aggregate ends with itself, and reading the suffix could exhaust the source first:
+        // an aggregate may return one shared iterator, such as a Stream over a generator.
+        if (\is_object($data) && $data === $suffix) {
             return true;
         }
 
