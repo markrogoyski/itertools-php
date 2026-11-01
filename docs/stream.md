@@ -37,7 +37,7 @@ $result = $stream->zipWith($stream, ['a', 'b', 'c'])->toArray();
 // [[1, 1, 'a'], [2, 2, 'b'], [3, 3, 'c']]
 ```
 
-`chainWith`, `productWith` and `roundRobinWith` do not support passing the stream to itself.
+`chainWith` does not buffer, so it chains a stream over a generator, as after a step such as `map`, with itself only as far as the first copy, then throws, as `Multi::chain($generator, $generator)` does.
 
 ### Stream Sources
 
@@ -285,6 +285,8 @@ Return a stream chaining additional sources together into a single consecutive s
 
 ```$stream->chainWith(iterable ...$iterables): Stream```
 
+Each iterable is read from its start when its turn comes, and nothing is buffered. An array or rewindable iterator passed more than once, including the stream itself, is read again in full at each of its positions: `Stream::of([1, 2])` chained with itself yields `1, 2, 1, 2`. A generator passed more than once, or a stream over one, as after a step such as `map`, yields its values at its first position and throws at the next, as `Multi::chain($generator, $generator)` does: its second copy starts only after the first is used up, so supporting it would mean holding the whole source.
+
 ```php
 use IterTools\Stream;
 
@@ -304,7 +306,7 @@ Cartesian product of the stream with zero or more additional iterables.
 
 Tuples are list arrays (0-indexed, in input order). With zero extra iterables, each stream element is wrapped in a one-element tuple. If any iterable (stream or extra) is empty, the result is empty.
 
-Note: Passing the same non-rewindable iterator instance more than once is not supported.
+An iterator or generator passed more than once, including the one the stream was created from, directly or through a Stream or other `IteratorAggregate` that returns it, is read as independent copies of itself: it is materialized once and that array is used for every position it was passed in, so `$stream->productWith($stream)` over `[1, 2]` yields `[1, 1], [1, 2], [2, 1], [2, 2]`.
 
 ```php
 use IterTools\Stream;
@@ -1242,8 +1244,13 @@ any source and starts no source whose turn has not come.
 
 Each source is rewound on its first turn: an iterator that was already advanced restarts from its
 first element, and a generator that was already started throws at that point, after the values of
-earlier sources have been yielded. Pass each source once; passing the same iterator or generator
-more than once interleaves reads of one cursor and gives unspecified results.
+earlier sources have been yielded.
+
+An iterator or generator passed more than once, including the one the stream was created from,
+directly or through a `Stream` or other `IteratorAggregate` that returns it, is read as independent
+copies of itself: each round reads it once, at the turn of its first position, and gives that value
+to every position it was passed in, so the copies run out together and only that one value is held.
+`$stream->roundRobinWith($stream)` over `[1, 2, 3]` yields `1, 1, 2, 2, 3, 3`.
 
 ```php
 use IterTools\Stream;

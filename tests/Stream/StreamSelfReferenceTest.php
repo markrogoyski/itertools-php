@@ -32,6 +32,14 @@ class StreamSelfReferenceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * productWith rows generated with:
+     *   [list(t) for t in itertools.product(data, data)], and itertools.product(data, data, ['a', 'b']) for mixed
+     * chainWith rows generated with:
+     *   list(itertools.chain(data, data)), and itertools.chain(data, data, ['a', 'b']) for mixed
+     * roundRobinWith rows from the definition: each round gives the source's next value at each of its positions,
+     * then the next value of each other iterable that still has one.
+     */
     public static function dataProviderForSelfReferenceArray(): array
     {
         return [
@@ -64,6 +72,46 @@ class StreamSelfReferenceTest extends \PHPUnit\Framework\TestCase
                 [1, 2, 3],
                 static fn (Stream $s): array => $s->mergeSortedByWith(static fn (int|float $x): int|float => $x, $s, [2.5])->toArray(),
                 [1, 1, 2, 2, 2.5, 3, 3],
+            ],
+            'productWith' => [
+                [1, 2],
+                static fn (Stream $s): array => $s->productWith($s)->toArray(),
+                [[1, 1], [1, 2], [2, 1], [2, 2]],
+            ],
+            'productWith mixed' => [
+                [1, 2],
+                static fn (Stream $s): array => $s->productWith($s, ['a', 'b'])->toArray(),
+                [[1, 1, 'a'], [1, 1, 'b'], [1, 2, 'a'], [1, 2, 'b'], [2, 1, 'a'], [2, 1, 'b'], [2, 2, 'a'], [2, 2, 'b']],
+            ],
+            'productWith after a step' => [
+                [1, 2],
+                static fn (Stream $s): array => $s->map(static fn (int $x): int => $x * 10)->productWith($s)->toArray(),
+                [[10, 10], [10, 20], [20, 10], [20, 20]],
+            ],
+            'roundRobinWith' => [
+                [1, 2],
+                static fn (Stream $s): array => $s->roundRobinWith($s)->toArray(),
+                [1, 1, 2, 2],
+            ],
+            'roundRobinWith mixed' => [
+                [1, 2],
+                static fn (Stream $s): array => $s->roundRobinWith($s, ['a', 'b', 'c'])->toArray(),
+                [1, 1, 'a', 2, 2, 'b', 'c'],
+            ],
+            'roundRobinWith after a step' => [
+                [1, 2],
+                static fn (Stream $s): array => $s->map(static fn (int $x): int => $x * 10)->roundRobinWith($s)->toArray(),
+                [10, 10, 20, 20],
+            ],
+            'chainWith' => [
+                [1, 2],
+                static fn (Stream $s): array => $s->chainWith($s)->toArray(),
+                [1, 2, 1, 2],
+            ],
+            'chainWith mixed' => [
+                [1, 2],
+                static fn (Stream $s): array => $s->chainWith($s, ['a', 'b'])->toArray(),
+                [1, 2, 1, 2, 'a', 'b'],
             ],
             'zipWith' => [
                 [1, 2, 3],
@@ -372,6 +420,12 @@ class StreamSelfReferenceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * productWith rows generated with:
+     *   [list(t) for t in itertools.product(data, data)], and itertools.product(data, data, ['a', 'b']) for mixed
+     * roundRobinWith rows from the definition: each round gives the source's next value at each of its positions,
+     * then the next value of each other iterable that still has one.
+     */
     public static function dataProviderForSelfReferenceGenerator(): array
     {
         return [
@@ -404,6 +458,36 @@ class StreamSelfReferenceTest extends \PHPUnit\Framework\TestCase
                 GeneratorFixture::getGenerator([1, 2, 3]),
                 static fn (Stream $s): array => $s->mergeSortedByWith(static fn (int|float $x): int|float => $x, $s, [2.5])->toArray(),
                 [1, 1, 2, 2, 2.5, 3, 3],
+            ],
+            'productWith' => [
+                GeneratorFixture::getGenerator([1, 2]),
+                static fn (Stream $s): array => $s->productWith($s)->toArray(),
+                [[1, 1], [1, 2], [2, 1], [2, 2]],
+            ],
+            'productWith mixed' => [
+                GeneratorFixture::getGenerator([1, 2]),
+                static fn (Stream $s): array => $s->productWith($s, ['a', 'b'])->toArray(),
+                [[1, 1, 'a'], [1, 1, 'b'], [1, 2, 'a'], [1, 2, 'b'], [2, 1, 'a'], [2, 1, 'b'], [2, 2, 'a'], [2, 2, 'b']],
+            ],
+            'productWith after a step' => [
+                GeneratorFixture::getGenerator([1, 2]),
+                static fn (Stream $s): array => $s->map(static fn (int $x): int => $x * 10)->productWith($s)->toArray(),
+                [[10, 10], [10, 20], [20, 10], [20, 20]],
+            ],
+            'roundRobinWith' => [
+                GeneratorFixture::getGenerator([1, 2]),
+                static fn (Stream $s): array => $s->roundRobinWith($s)->toArray(),
+                [1, 1, 2, 2],
+            ],
+            'roundRobinWith mixed' => [
+                GeneratorFixture::getGenerator([1, 2]),
+                static fn (Stream $s): array => $s->roundRobinWith($s, ['a', 'b', 'c'])->toArray(),
+                [1, 1, 'a', 2, 2, 'b', 'c'],
+            ],
+            'roundRobinWith after a step' => [
+                GeneratorFixture::getGenerator([1, 2]),
+                static fn (Stream $s): array => $s->map(static fn (int $x): int => $x * 10)->roundRobinWith($s)->toArray(),
+                [10, 10, 20, 20],
             ],
             'zipWith' => [
                 GeneratorFixture::getGenerator([1, 2, 3]),
@@ -712,6 +796,12 @@ class StreamSelfReferenceTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * productWith rows generated with:
+     *   [list(t) for t in itertools.product(data, data)], and itertools.product(data, data, ['a', 'b']) for mixed
+     * roundRobinWith rows from the definition: each round gives the source's next value at each of its positions,
+     * then the next value of each other iterable that still has one.
+     */
     public static function dataProviderForSelfReferenceIteratorAggregate(): array
     {
         return [
@@ -744,6 +834,36 @@ class StreamSelfReferenceTest extends \PHPUnit\Framework\TestCase
                 Stream::of(GeneratorFixture::getGenerator([1, 2, 3])),
                 static fn (Stream $s): array => $s->mergeSortedByWith(static fn (int|float $x): int|float => $x, $s, [2.5])->toArray(),
                 [1, 1, 2, 2, 2.5, 3, 3],
+            ],
+            'productWith' => [
+                Stream::of(GeneratorFixture::getGenerator([1, 2])),
+                static fn (Stream $s): array => $s->productWith($s)->toArray(),
+                [[1, 1], [1, 2], [2, 1], [2, 2]],
+            ],
+            'productWith mixed' => [
+                Stream::of(GeneratorFixture::getGenerator([1, 2])),
+                static fn (Stream $s): array => $s->productWith($s, ['a', 'b'])->toArray(),
+                [[1, 1, 'a'], [1, 1, 'b'], [1, 2, 'a'], [1, 2, 'b'], [2, 1, 'a'], [2, 1, 'b'], [2, 2, 'a'], [2, 2, 'b']],
+            ],
+            'productWith after a step' => [
+                Stream::of(GeneratorFixture::getGenerator([1, 2])),
+                static fn (Stream $s): array => $s->map(static fn (int $x): int => $x * 10)->productWith($s)->toArray(),
+                [[10, 10], [10, 20], [20, 10], [20, 20]],
+            ],
+            'roundRobinWith' => [
+                Stream::of(GeneratorFixture::getGenerator([1, 2])),
+                static fn (Stream $s): array => $s->roundRobinWith($s)->toArray(),
+                [1, 1, 2, 2],
+            ],
+            'roundRobinWith mixed' => [
+                Stream::of(GeneratorFixture::getGenerator([1, 2])),
+                static fn (Stream $s): array => $s->roundRobinWith($s, ['a', 'b', 'c'])->toArray(),
+                [1, 1, 'a', 2, 2, 'b', 'c'],
+            ],
+            'roundRobinWith after a step' => [
+                Stream::of(GeneratorFixture::getGenerator([1, 2])),
+                static fn (Stream $s): array => $s->map(static fn (int $x): int => $x * 10)->roundRobinWith($s)->toArray(),
+                [10, 10, 20, 20],
             ],
             'zipWith' => [
                 Stream::of(GeneratorFixture::getGenerator([1, 2, 3])),
@@ -1029,6 +1149,86 @@ class StreamSelfReferenceTest extends \PHPUnit\Framework\TestCase
                 Stream::of(GeneratorFixture::getGenerator([NAN])),
                 static fn (Stream $s): bool => $s->sameWith($s, [NAN]),
                 false,
+            ],
+        ];
+    }
+
+    /**
+     * @test         chainWith given the stream itself, on a stream over a single-pass source, yields the first copy and
+     *               then throws, as Multi::chain($generator, $generator) does
+     * @dataProvider dataProviderForChainWithSelfSinglePass
+     * @param        iterable<mixed>              $input
+     * @param        callable(Stream): Stream     $operation
+     * @param        array<mixed>                 $expectedBeforeException
+     */
+    public function testChainWithSelfSinglePassThrowsAfterFirstCopy(
+        iterable $input,
+        callable $operation,
+        array $expectedBeforeException
+    ): void {
+        // Given
+        $stream = Stream::of($input);
+
+        // When
+        $result = [];
+        $exception = null;
+        try {
+            foreach ($operation($stream) as $item) {
+                $result[] = $item;
+            }
+        } catch (\Exception $e) {
+            $exception = $e;
+        }
+
+        // Then
+        $this->assertSame($expectedBeforeException, $result);
+        $this->assertInstanceOf(\Exception::class, $exception);
+        $this->assertSame('Cannot traverse an already closed generator', $exception->getMessage());
+    }
+
+    /**
+     * The values yielded before the exception, generated with:
+     *   g = iter(data); list(itertools.chain(g, g)), with ['a', 'b'] unreached in the mixed rows,
+     * which Python ends there, where PHP throws. After a step, g is the stepped source, a generator even over an
+     * array.
+     */
+    public static function dataProviderForChainWithSelfSinglePass(): array
+    {
+        return [
+            'generator' => [
+                GeneratorFixture::getGenerator([1, 2]),
+                static fn (Stream $s): Stream => $s->chainWith($s),
+                [1, 2],
+            ],
+            'generator mixed' => [
+                GeneratorFixture::getGenerator([1, 2]),
+                static fn (Stream $s): Stream => $s->chainWith($s, ['a', 'b']),
+                [1, 2],
+            ],
+            'generator after a step' => [
+                GeneratorFixture::getGenerator([1, 2]),
+                static fn (Stream $s): Stream => $s->map(static fn (int $x): int => $x * 10)->chainWith($s),
+                [10, 20],
+            ],
+            'array after a step' => [
+                [1, 2],
+                static fn (Stream $s): Stream => $s->map(static fn (int $x): int => $x * 10)->chainWith($s),
+                [10, 20],
+            ],
+            'stream over a generator' => [
+                Stream::of(GeneratorFixture::getGenerator([1, 2])),
+                static fn (Stream $s): Stream => $s->chainWith($s),
+                [1, 2],
+            ],
+            'stream over a generator mixed' => [
+                Stream::of(GeneratorFixture::getGenerator([1, 2])),
+                static fn (Stream $s): Stream => $s->chainWith($s, ['a', 'b']),
+                [1, 2],
+            ],
+            'stream over a generator after a step' => [
+                Stream::of(GeneratorFixture::getGenerator([1, 2])),
+                static fn (Stream $s): Stream => $s->map(static fn (int $x): int => $x * 10)->chainWith($s),
+                [10, 20],
             ],
         ];
     }

@@ -39,8 +39,13 @@ HTTP pagination, database cursor) is not over-read.
 
 Each source is rewound on its first turn: an iterator that was already advanced restarts from its
 first element, and a generator that was already started throws at that point, after the values of
-earlier sources have been yielded. Pass each source once; passing the same iterator or generator
-more than once interleaves reads of one cursor and gives unspecified results.
+earlier sources have been yielded.
+
+An iterator or generator passed more than once, directly or through a `Stream` or other
+`IteratorAggregate` that returns it, is read as independent copies of itself: each round reads it
+once, at the turn of its first position, and gives that value to every position it was passed in,
+so the copies run out together and only that one value is held. `roundRobin($it, $it)` over
+`[1, 2, 3]` yields `1, 1, 2, 2, 3, 3`.
 
 ```php
 use IterTools\Multi;

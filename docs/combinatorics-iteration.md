@@ -13,7 +13,7 @@ Output tuples are list arrays (0-indexed, in input order); source keys are disca
 
 Input iterables must be finite. They are consumed once (materialized internally), so generators are supported but cannot be re-iterated afterwards.
 
-Passing the same non-rewindable iterator instance (e.g. a `Generator`) more than once is not supported — the second occurrence will throw because the iterator has already been consumed. Pass distinct instances instead.
+An iterator or generator passed more than once, directly or through a `Stream` or other `IteratorAggregate` that returns it, is read as independent copies of itself: it is materialized once and that array is used for every position it was passed in, so `product($gen, $gen)` over `[1, 2]` yields `[1, 1], [1, 2], [2, 1], [2, 2]`.
 
 Special cases:
 - `product()` of zero iterables yields one empty tuple: `[[]]`

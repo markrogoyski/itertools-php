@@ -280,9 +280,12 @@ final class Multi
      *
      * Each source is rewound on its first turn: an iterator that was already advanced restarts
      * from its first element, and a generator that was already started throws at that point,
-     * after the values of earlier sources have been yielded. Pass each source once; passing the
-     * same iterator or generator more than once interleaves reads of one cursor and gives
-     * unspecified results.
+     * after the values of earlier sources have been yielded.
+     *
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: each round reads it once, at the turn of its
+     * first position, and gives that value to every position it was passed in, so the copies run out together.
+     * Only that one value is held.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -290,24 +293,56 @@ final class Multi
      */
     public static function roundRobin(iterable ...$iterables): \Generator
     {
-        // A source is converted and rewound on its first turn and advanced on every later one;
-        // $iterators holds only the sources that have started.
-        $iterators = [];
+        // A source is converted and rewound on its first turn and advanced on every later one. Started sources
+        // are keyed by the id of their iterator, so an iterator passed more than once is one source: it is
+        // advanced at the first of its positions to take a turn in a round, and every later position in that
+        // round gives the value read there. The entries hold each iterator, so its id cannot be reused by a
+        // later one while sources are still being started, which all happens in the first round. $values holds
+        // a started source's value for the round it was last read in, and loses it when the source runs out;
+        // at the end of each round, the iterators of sources that ran out are released.
+        $iterators   = [];
+        $readInRound = [];
+        $values      = [];
+        $idsByIndex  = [];
+        $round       = 0;
         while (\count($iterables) > 0) {
+            ++$round;
             foreach ($iterables as $index => $iterable) {
-                if (isset($iterators[$index])) {
-                    $iterator = $iterators[$index];
-                    $iterator->next();
+                if (isset($idsByIndex[$index])) {
+                    $id = $idsByIndex[$index];
                 } else {
                     $iterator = Transform::toIterator($iterable);
-                    $iterator->rewind();
-                    $iterators[$index] = $iterator;
+                    $id       = \spl_object_id($iterator);
+                    $idsByIndex[$index] = $id;
+                    if (!isset($iterators[$id])) {
+                        $iterators[$id] = $iterator;
+                        $iterator->rewind();
+                        $readInRound[$id] = $round;
+                        if ($iterator->valid()) {
+                            $values[$id] = [$iterator->current()];
+                        }
+                    }
                 }
-                if (!$iterator->valid()) {
-                    unset($iterables[$index], $iterators[$index]);
+                if ($readInRound[$id] < $round) {
+                    $iterator = $iterators[$id];
+                    $iterator->next();
+                    $readInRound[$id] = $round;
+                    if ($iterator->valid()) {
+                        $values[$id] = [$iterator->current()];
+                    } else {
+                        unset($values[$id]);
+                    }
+                }
+                if (!isset($values[$id])) {
+                    unset($iterables[$index], $idsByIndex[$index]);
                     continue;
                 }
-                yield $iterator->current();
+                yield $values[$id][0];
+            }
+            foreach (\array_keys($iterators) as $id) {
+                if (!isset($values[$id])) {
+                    unset($iterators[$id], $readInRound[$id]);
+                }
             }
         }
     }

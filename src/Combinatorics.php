@@ -16,9 +16,9 @@ final class Combinatorics
      * Input iterables are finite and are consumed once; they are materialized internally,
      * so passing generators is supported (but they cannot be re-iterated afterwards).
      *
-     * Note: Passing the same non-rewindable iterator instance (e.g. a Generator) more than
-     * once is not supported — the second occurrence will throw because the iterator has
-     * already been consumed. Pass distinct instances instead.
+     * An iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
+     * that returns it, is read as independent copies of itself: it is materialized once and that array is used
+     * for every position it was passed in.
      *
      * Special cases:
      *  - product() of zero iterables yields one empty tuple: [[]]
@@ -30,14 +30,34 @@ final class Combinatorics
      */
     public static function product(iterable ...$iterables): \Generator
     {
+        // Pools of the iterators materialized so far. The storage holds each iterator, so its identity cannot
+        // pass to a later, unrelated iterator. An iterator passed more than once reuses its pool, so it reads as
+        // independent copies of itself; materializing it again would find it consumed.
+        /** @var \SplObjectStorage<\Iterator<mixed>, array<mixed>> $poolsByIterator */
+        $poolsByIterator = new \SplObjectStorage();
+
         $pools = [];
         foreach ($iterables as $iterable) {
-            $pool = Transform::toArray($iterable);
+            if (\is_array($iterable)) {
+                // Copied element by element, not with array_values(), which keeps an element that is a
+                // reference as a reference, so a later change to it would reach tuples not yet yielded.
+                $pool = Transform::toArray($iterable);
+            } else {
+                $iterator = Transform::toIterator($iterable);
+                if (!isset($poolsByIterator[$iterator])) {
+                    $poolsByIterator[$iterator] = Transform::toArray($iterator);
+                }
+                $pool = $poolsByIterator[$iterator];
+            }
             if (\count($pool) === 0) {
                 return;
             }
             $pools[] = $pool;
         }
+
+        // The pools hold every value; release the iterators, and any buffers or resources they keep, before
+        // the tuples are generated.
+        unset($poolsByIterator, $iterator);
 
         $poolCount = \count($pools);
 

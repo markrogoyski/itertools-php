@@ -213,4 +213,137 @@ class ChainTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertEquals($expected, $result);
     }
+
+    /**
+     * @test         chain reads a rewindable iterator passed more than once from its start each time
+     * @dataProvider dataProviderForRepeatedRewindableSource
+     * @param        array<mixed> $data
+     * @param        array<mixed> $expected
+     */
+    public function testRepeatedIterator(array $data, array $expected): void
+    {
+        // Given
+        $iterator = new Fixture\ArrayIteratorFixture($data);
+
+        // When
+        $result = \iterator_to_array(Multi::chain($iterator, $iterator), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         chain reads an aggregate over a rewindable iterator, passed more than once, from its start each time
+     * @dataProvider dataProviderForRepeatedRewindableSource
+     * @param        array<mixed> $data
+     * @param        array<mixed> $expected
+     */
+    public function testRepeatedAggregateOverIterator(array $data, array $expected): void
+    {
+        // Given
+        $aggregate = new Fixture\WrappingIteratorAggregateFixture(new Fixture\ArrayIteratorFixture($data));
+
+        // When
+        $result = \iterator_to_array(Multi::chain($aggregate, $aggregate), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with:
+     *   list(itertools.chain(data, data))
+     */
+    public static function dataProviderForRepeatedRewindableSource(): array
+    {
+        return [
+            [
+                [],
+                [],
+            ],
+            [
+                [1, 2],
+                [1, 2, 1, 2],
+            ],
+            [
+                [1, 2, 3],
+                [1, 2, 3, 1, 2, 3],
+            ],
+        ];
+    }
+
+    /**
+     * @test         chain yields a generator passed more than once in full, then throws at its second position
+     * @dataProvider dataProviderForRepeatedSinglePassSource
+     * @param        array<mixed> $data
+     * @param        array<mixed> $expectedBeforeException
+     */
+    public function testRepeatedGeneratorThrowsAfterFirstCopy(array $data, array $expectedBeforeException): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = [];
+        $exception = null;
+        try {
+            foreach (Multi::chain($generator, $generator) as $item) {
+                $result[] = $item;
+            }
+        } catch (\Exception $e) {
+            $exception = $e;
+        }
+
+        // Then
+        $this->assertSame($expectedBeforeException, $result);
+        $this->assertInstanceOf(\Exception::class, $exception);
+        $this->assertSame('Cannot traverse an already closed generator', $exception->getMessage());
+    }
+
+    /**
+     * @test         chain yields an aggregate over a generator, passed more than once, in full, then throws
+     * @dataProvider dataProviderForRepeatedSinglePassSource
+     * @param        array<mixed> $data
+     * @param        array<mixed> $expectedBeforeException
+     */
+    public function testRepeatedAggregateOverGeneratorThrowsAfterFirstCopy(array $data, array $expectedBeforeException): void
+    {
+        // Given
+        $aggregate = new Fixture\WrappingIteratorAggregateFixture(Fixture\GeneratorFixture::getGenerator($data));
+
+        // When
+        $result = [];
+        $exception = null;
+        try {
+            foreach (Multi::chain($aggregate, $aggregate) as $item) {
+                $result[] = $item;
+            }
+        } catch (\Exception $e) {
+            $exception = $e;
+        }
+
+        // Then
+        $this->assertSame($expectedBeforeException, $result);
+        $this->assertInstanceOf(\Exception::class, $exception);
+        $this->assertSame('Cannot traverse an already closed generator', $exception->getMessage());
+    }
+
+    /**
+     * The values yielded before the exception, generated with:
+     *   g = iter(data); list(itertools.chain(g, g))
+     * which Python ends there, where PHP throws.
+     */
+    public static function dataProviderForRepeatedSinglePassSource(): array
+    {
+        return [
+            [
+                [1, 2],
+                [1, 2],
+            ],
+            [
+                [1, 2, 3],
+                [1, 2, 3],
+            ],
+        ];
+    }
 }

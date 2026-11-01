@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Multi;
 
+use IterTools\Infinite;
 use IterTools\Multi;
 use IterTools\Tests\Fixture;
 
@@ -487,5 +488,382 @@ class RoundRobinTest extends \PHPUnit\Framework\TestCase
         $this->assertSame([1, 4], $result);
         $this->assertSame(0, $a->key());
         $this->assertSame(0, $b->key());
+    }
+
+    /**
+     * @test         roundRobin reads a generator passed more than once as independent copies of it
+     * @dataProvider dataProviderForRepeatedSourceTwice
+     * @param        array<mixed> $data
+     * @param        array<mixed> $expected
+     */
+    public function testRepeatedGenerator(array $data, array $expected): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = \iterator_to_array(Multi::roundRobin($generator, $generator), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         roundRobin reads an iterator passed more than once as independent copies of it
+     * @dataProvider dataProviderForRepeatedSourceTwice
+     * @param        array<mixed> $data
+     * @param        array<mixed> $expected
+     */
+    public function testRepeatedIterator(array $data, array $expected): void
+    {
+        // Given
+        $iterator = new Fixture\ArrayIteratorFixture($data);
+
+        // When
+        $result = \iterator_to_array(Multi::roundRobin($iterator, $iterator), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         roundRobin reads an aggregate over one generator, passed more than once, as independent copies of it
+     * @dataProvider dataProviderForRepeatedSourceTwice
+     * @param        array<mixed> $data
+     * @param        array<mixed> $expected
+     */
+    public function testRepeatedAggregateOverGenerator(array $data, array $expected): void
+    {
+        // Given
+        $aggregate = new Fixture\WrappingIteratorAggregateFixture(Fixture\GeneratorFixture::getGenerator($data));
+
+        // When
+        $result = \iterator_to_array(Multi::roundRobin($aggregate, $aggregate), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         roundRobin reads a generator and an aggregate returning it as independent copies of the generator
+     * @dataProvider dataProviderForRepeatedSourceTwice
+     * @param        array<mixed> $data
+     * @param        array<mixed> $expected
+     */
+    public function testGeneratorAndAggregateReturningIt(array $data, array $expected): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator($data);
+        $aggregate = new Fixture\WrappingIteratorAggregateFixture(new Fixture\WrappingIteratorAggregateFixture($generator));
+
+        // When
+        $result = \iterator_to_array(Multi::roundRobin($generator, $aggregate), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Expected order from the definition: each round gives the repeated source's next value once per position it
+     * was passed in, and its copies run out together.
+     */
+    public static function dataProviderForRepeatedSourceTwice(): array
+    {
+        return [
+            [
+                [],
+                [],
+            ],
+            [
+                [1],
+                [1, 1],
+            ],
+            [
+                [1, 2, 3],
+                [1, 1, 2, 2, 3, 3],
+            ],
+        ];
+    }
+
+    /**
+     * @test         roundRobin gives a generator passed around other iterables its value at each of its positions
+     * @dataProvider dataProviderForRepeatedGeneratorAroundOtherIterables
+     * @param        array<mixed> $data
+     * @param        array<mixed> $before
+     * @param        array<mixed> $between
+     * @param        array<mixed> $expected
+     */
+    public function testRepeatedGeneratorAroundOtherIterables(array $data, array $before, array $between, array $expected): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = \iterator_to_array(Multi::roundRobin($before, $generator, $between, $generator), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Expected order from the definition: round by round, each iterable that still has values gives its next one,
+     * the repeated generator once per position with the same value.
+     */
+    public static function dataProviderForRepeatedGeneratorAroundOtherIterables(): array
+    {
+        return [
+            [
+                [1, 2],
+                ['a'],
+                ['x', 'y', 'z'],
+                ['a', 1, 'x', 1, 2, 'y', 2, 'z'],
+            ],
+            [
+                [1, 2, 3],
+                [],
+                ['x'],
+                [1, 'x', 1, 2, 2, 3, 3],
+            ],
+            [
+                [],
+                ['a', 'b'],
+                ['x'],
+                ['a', 'x', 'b'],
+            ],
+        ];
+    }
+
+    /**
+     * @test         roundRobin - taking the first outputs pulls exactly those values from a repeated generator
+     * @dataProvider dataProviderForNoOverReadRepeated
+     * @param        int            $take
+     * @param        array<string>  $expected
+     * @param        array<string>  $expectedPulled
+     */
+    public function testDoesNotPullPastTheLastYieldedValueRepeatedGenerator(int $take, array $expected, array $expectedPulled): void
+    {
+        // Given sources that record every value pulled from them
+        $pulled = [];
+        $a = Fixture\GeneratorFixture::getRecordingGenerator(['a1', 'a2', 'a3'], $pulled);
+        $b = Fixture\GeneratorFixture::getRecordingGenerator(['b1'], $pulled);
+
+        // When
+        $result = [];
+        foreach (Multi::roundRobin($a, $b, $a) as $item) {
+            $result[] = $item;
+            if (\count($result) === $take) {
+                break;
+            }
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+
+        // And the repeated source was read once per round, at its first position's turn
+        $this->assertSame($expectedPulled, $pulled);
+    }
+
+    /**
+     * @test         roundRobin - taking the first outputs pulls exactly those values from a repeated iterator
+     * @dataProvider dataProviderForNoOverReadRepeated
+     * @param        int            $take
+     * @param        array<string>  $expected
+     * @param        array<string>  $expectedPulled
+     */
+    public function testDoesNotPullPastTheLastYieldedValueRepeatedIterator(int $take, array $expected, array $expectedPulled): void
+    {
+        // Given sources that record every value pulled from them
+        $pulled = [];
+        $a = new Fixture\RecordingIteratorFixture(['a1', 'a2', 'a3'], $pulled);
+        $b = new Fixture\RecordingIteratorFixture(['b1'], $pulled);
+
+        // When
+        $result = [];
+        foreach (Multi::roundRobin($a, $b, $a) as $item) {
+            $result[] = $item;
+            if (\count($result) === $take) {
+                break;
+            }
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+
+        // And the repeated source was read once per round, at its first position's turn
+        $this->assertSame($expectedPulled, $pulled);
+    }
+
+    /**
+     * @test         roundRobin - taking the first outputs pulls exactly those values from a repeated IteratorAggregate
+     * @dataProvider dataProviderForNoOverReadRepeated
+     * @param        int            $take
+     * @param        array<string>  $expected
+     * @param        array<string>  $expectedPulled
+     */
+    public function testDoesNotPullPastTheLastYieldedValueRepeatedIteratorAggregate(int $take, array $expected, array $expectedPulled): void
+    {
+        // Given sources that record every value pulled from them
+        $pulled = [];
+        $a = new Fixture\WrappingIteratorAggregateFixture(new Fixture\RecordingIteratorFixture(['a1', 'a2', 'a3'], $pulled));
+        $b = new Fixture\RecordingIteratorAggregateFixture(['b1'], $pulled);
+
+        // When
+        $result = [];
+        foreach (Multi::roundRobin($a, $b, $a) as $item) {
+            $result[] = $item;
+            if (\count($result) === $take) {
+                break;
+            }
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+
+        // And the repeated source was read once per round, at its first position's turn
+        $this->assertSame($expectedPulled, $pulled);
+    }
+
+    public static function dataProviderForNoOverReadRepeated(): array
+    {
+        return [
+            [1, ['a1'], ['a1']],
+            [2, ['a1', 'b1'], ['a1', 'b1']],
+            [3, ['a1', 'b1', 'a1'], ['a1', 'b1']],
+            [4, ['a1', 'b1', 'a1', 'a2'], ['a1', 'b1', 'a2']],
+            [5, ['a1', 'b1', 'a1', 'a2', 'a2'], ['a1', 'b1', 'a2']],
+            [6, ['a1', 'b1', 'a1', 'a2', 'a2', 'a3'], ['a1', 'b1', 'a2', 'a3']],
+            [7, ['a1', 'b1', 'a1', 'a2', 'a2', 'a3', 'a3'], ['a1', 'b1', 'a2', 'a3']],
+            [8, ['a1', 'b1', 'a1', 'a2', 'a2', 'a3', 'a3'], ['a1', 'b1', 'a2', 'a3']],
+        ];
+    }
+
+    /**
+     * @test roundRobin - a repeated generator source is not rewound before its first turn
+     */
+    public function testDoesNotRewindARepeatedSourceBeforeItsTurnGenerator(): void
+    {
+        // Given a repeated source that can no longer be rewound
+        $first = Fixture\GeneratorFixture::getGenerator([1, 2]);
+        $spent = Fixture\GeneratorFixture::getGenerator([10, 20, 30]);
+        $spent->next();
+
+        // When
+        $result = [];
+        foreach (Multi::roundRobin($first, $spent, $spent) as $item) {
+            $result[] = $item;
+            break;
+        }
+
+        // Then
+        $this->assertSame([1], $result);
+    }
+
+    /**
+     * @test roundRobin - a repeated iterator source keeps its position until its first turn
+     */
+    public function testDoesNotRewindARepeatedSourceBeforeItsTurnIterator(): void
+    {
+        // Given a repeated source already advanced past its first value
+        $iterator = new Fixture\ArrayIteratorFixture([10, 20]);
+        $iterator->next();
+
+        // When
+        $result = [];
+        foreach (Multi::roundRobin([1, 2], $iterator, $iterator) as $item) {
+            $result[] = $item;
+            break;
+        }
+
+        // Then
+        $this->assertSame([1], $result);
+        $this->assertSame(1, $iterator->key());
+        $this->assertSame(20, $iterator->current());
+    }
+
+    /**
+     * @test roundRobin - a repeated IteratorAggregate source's getIterator is not called until its first turn
+     */
+    public function testDoesNotRewindARepeatedSourceBeforeItsTurnIteratorAggregate(): void
+    {
+        // Given a repeated source that counts calls to getIterator
+        $aggregate = new Fixture\CountingIteratorAggregateFixture([10, 20]);
+
+        // When
+        $result = [];
+        foreach (Multi::roundRobin([1, 2], $aggregate, $aggregate) as $item) {
+            $result[] = $item;
+            break;
+        }
+
+        // Then
+        $this->assertSame([1], $result);
+        $this->assertSame(0, $aggregate->getIteratorCallCount());
+    }
+
+    /**
+     * @test roundRobin - a started repeated generator source throws at its first turn, after earlier sources have yielded
+     */
+    public function testRewindsARepeatedSourceAtItsFirstTurnGenerator(): void
+    {
+        // Given a repeated source that can no longer be rewound
+        $first = Fixture\GeneratorFixture::getGenerator([1, 2]);
+        $spent = Fixture\GeneratorFixture::getGenerator([10, 20, 30]);
+        $spent->next();
+
+        // When
+        $result = [];
+        $exception = null;
+        try {
+            foreach (Multi::roundRobin($first, $spent, $spent) as $item) {
+                $result[] = $item;
+            }
+        } catch (\Exception $e) {
+            $exception = $e;
+        }
+
+        // Then
+        $this->assertSame([1], $result);
+        $this->assertInstanceOf(\Exception::class, $exception);
+        $this->assertSame('Cannot rewind a generator that was already run', $exception->getMessage());
+    }
+
+    /**
+     * @test roundRobin - an advanced repeated iterator source is rewound once, at its first turn
+     */
+    public function testRewindsARepeatedSourceAtItsFirstTurnIterator(): void
+    {
+        // Given a repeated source already advanced past its first value
+        $iterator = new Fixture\ArrayIteratorFixture([10, 20]);
+        $iterator->next();
+
+        // When
+        $result = \iterator_to_array(Multi::roundRobin([1, 2], $iterator, $iterator), false);
+
+        // Then
+        $this->assertSame([1, 10, 10, 2, 20, 20], $result);
+    }
+
+    /**
+     * @test roundRobin releases a source that has run out while other sources continue
+     */
+    public function testReleasesAnExhaustedSource(): void
+    {
+        // Given a short source whose iterator the aggregate creates, so only roundRobin holds it
+        $short = new Fixture\CountingIteratorAggregateFixture([1]);
+        $roundRobin = Multi::roundRobin($short, Infinite::count());
+
+        // When
+        $result = [];
+        foreach ($roundRobin as $item) {
+            $result[] = $item;
+            if (\count($result) === 4) {
+                break;
+            }
+        }
+
+        // Then
+        $this->assertSame([1, 1, 2, 3], $result);
+        $this->assertSame(1, $short->getIteratorCallCount());
+        $this->assertSame(0, $short->liveIteratorCount());
     }
 }

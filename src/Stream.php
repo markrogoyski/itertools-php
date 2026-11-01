@@ -11,8 +11,9 @@ use IterTools\Util\ResourceWriter;
  * Provides fluent interface for working with iterables.
  *
  * A stream passed to its own methods stands for its elements at that point in the pipeline, before the method
- * is applied, and is read as that source passed more than once: $stream->zipWith($stream). chainWith,
- * productWith and roundRobinWith do not support passing the stream to itself.
+ * is applied, and is read as that source passed more than once: $stream->zipWith($stream). chainWith does
+ * not buffer, so it chains a stream over a generator, as after a step such as map(), with itself only as far as
+ * the first copy, then throws, as Multi::chain($generator, $generator) does.
  *
  * @implements \IteratorAggregate<mixed>
  */
@@ -1082,6 +1083,13 @@ final class Stream implements \IteratorAggregate
      *
      * Makes a single continuous sequence out of multiple sequences.
      *
+     * Each iterable is read from its start when its turn comes, and nothing is buffered. An array or rewindable
+     * iterator passed more than once, including the stream itself, is read again in full at each of its
+     * positions: Stream::of([1, 2]) chained with itself yields 1, 2, 1, 2. A generator passed more than once, or
+     * a stream over one, as after a step such as map(), yields its values at its first position and throws at
+     * the next, as Multi::chain($generator, $generator) does: its second copy starts only after the first is used
+     * up, so supporting it would mean holding the whole source.
+     *
      * @param iterable<mixed> ...$iterables
      *
      * @return Stream
@@ -1090,7 +1098,7 @@ final class Stream implements \IteratorAggregate
      */
     public function chainWith(iterable ...$iterables): self
     {
-        $this->iterable = Multi::chain($this->iterable, ...$iterables);
+        $this->iterable = Multi::chain($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1186,9 +1194,12 @@ final class Stream implements \IteratorAggregate
      *
      * Each source is rewound on its first turn: an iterator that was already advanced restarts
      * from its first element, and a generator that was already started throws at that point,
-     * after the values of earlier sources have been yielded. Pass each source once; passing the
-     * same iterator or generator more than once interleaves reads of one cursor and gives
-     * unspecified results.
+     * after the values of earlier sources have been yielded.
+     *
+     * An iterator or generator passed more than once, including the one the stream was created from, directly
+     * or through a Stream or other \IteratorAggregate that returns it, is read as independent copies of itself:
+     * each round reads it once, at the turn of its first position, and gives that value to every position it was
+     * passed in, so the copies run out together. Only that one value is held.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -1198,7 +1209,7 @@ final class Stream implements \IteratorAggregate
      */
     public function roundRobinWith(iterable ...$iterables): self
     {
-        $this->iterable = Multi::roundRobin($this->iterable, ...$iterables);
+        $this->iterable = Multi::roundRobin($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 
@@ -1212,9 +1223,9 @@ final class Stream implements \IteratorAggregate
      * With zero extra iterables, each stream element is wrapped into a one-element tuple.
      * If any iterable (including the stream itself) is empty, the result is empty.
      *
-     * Note: Passing the same non-rewindable iterator instance more than once is not
-     * supported — the second occurrence will throw because the iterator has already
-     * been consumed. Pass distinct instances instead.
+     * An iterator or generator passed more than once, including the one the stream was created from, directly
+     * or through a Stream or other \IteratorAggregate that returns it, is read as independent copies of itself:
+     * it is materialized once and that array is used for every position it was passed in.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -1224,7 +1235,7 @@ final class Stream implements \IteratorAggregate
      */
     public function productWith(iterable ...$iterables): self
     {
-        $this->iterable = Combinatorics::product($this->iterable, ...$iterables);
+        $this->iterable = Combinatorics::product($this->iterable, ...$this->replaceSelfWithSource($iterables));
         return $this;
     }
 

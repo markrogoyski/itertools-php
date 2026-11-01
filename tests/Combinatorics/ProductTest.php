@@ -6,9 +6,11 @@ namespace IterTools\Tests\Combinatorics;
 
 use IterTools\Combinatorics;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
+use IterTools\Tests\Fixture\CountingIteratorAggregateFixture;
 use IterTools\Tests\Fixture\DataProvider;
 use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
+use IterTools\Tests\Fixture\WrappingIteratorAggregateFixture;
 
 class ProductTest extends \PHPUnit\Framework\TestCase
 {
@@ -284,21 +286,203 @@ class ProductTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test product throws when the same generator instance is passed as multiple arguments
+     * @test         product reads a generator passed more than once as independent copies of it
+     * @dataProvider dataProviderForRepeatedSourceTwice
+     * @param        array<mixed>        $data
+     * @param        array<array<mixed>> $expected
      */
-    public function testSameGeneratorInstancePassedTwiceThrows(): void
+    public function testRepeatedGenerator(array $data, array $expected): void
     {
-        // Given — a non-rewindable generator reused as two distinct dimensions
-        $g = GeneratorFixture::getGenerator([1, 2]);
-
-        // Then
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Cannot traverse an already closed generator');
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
 
         // When
-        foreach (Combinatorics::product($g, $g) as $tuple) {
-            // force iteration
+        $result = \iterator_to_array(Combinatorics::product($generator, $generator), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         product reads an iterator passed more than once as independent copies of it
+     * @dataProvider dataProviderForRepeatedSourceTwice
+     * @param        array<mixed>        $data
+     * @param        array<array<mixed>> $expected
+     */
+    public function testRepeatedIterator(array $data, array $expected): void
+    {
+        // Given
+        $iterator = new ArrayIteratorFixture($data);
+
+        // When
+        $result = \iterator_to_array(Combinatorics::product($iterator, $iterator), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         product reads an aggregate over one generator, passed more than once, as independent copies of it
+     * @dataProvider dataProviderForRepeatedSourceTwice
+     * @param        array<mixed>        $data
+     * @param        array<array<mixed>> $expected
+     */
+    public function testRepeatedAggregateOverGenerator(array $data, array $expected): void
+    {
+        // Given
+        $aggregate = new WrappingIteratorAggregateFixture(GeneratorFixture::getGenerator($data));
+
+        // When
+        $result = \iterator_to_array(Combinatorics::product($aggregate, $aggregate), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         product reads an aggregate and the generator it returns as independent copies of the generator
+     * @dataProvider dataProviderForRepeatedSourceTwice
+     * @param        array<mixed>        $data
+     * @param        array<array<mixed>> $expected
+     */
+    public function testAggregateAndItsGenerator(array $data, array $expected): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+        $aggregate = new WrappingIteratorAggregateFixture($generator);
+
+        // When
+        $result = \iterator_to_array(Combinatorics::product($aggregate, $generator), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with:
+     *   [list(t) for t in itertools.product(data, data)]
+     */
+    public static function dataProviderForRepeatedSourceTwice(): array
+    {
+        return [
+            [
+                [1, 2],
+                [[1, 1], [1, 2], [2, 1], [2, 2]],
+            ],
+            [
+                [1, 2, 3],
+                [[1, 1], [1, 2], [1, 3], [2, 1], [2, 2], [2, 3], [3, 1], [3, 2], [3, 3]],
+            ],
+            [
+                [],
+                [],
+            ],
+        ];
+    }
+
+    /**
+     * @test         product gives a generator passed around another iterable its own position each time
+     * @dataProvider dataProviderForRepeatedGeneratorAroundOtherIterable
+     * @param        array<mixed>        $data
+     * @param        array<mixed>        $other
+     * @param        array<array<mixed>> $expected
+     */
+    public function testRepeatedGeneratorAroundOtherIterable(array $data, array $other, array $expected): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = \iterator_to_array(Combinatorics::product($generator, $other, $generator), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with:
+     *   [list(t) for t in itertools.product(data, other, data)]
+     */
+    public static function dataProviderForRepeatedGeneratorAroundOtherIterable(): array
+    {
+        return [
+            [
+                [1, 2],
+                ['a', 'b'],
+                [[1, 'a', 1], [1, 'a', 2], [1, 'b', 1], [1, 'b', 2], [2, 'a', 1], [2, 'a', 2], [2, 'b', 1], [2, 'b', 2]],
+            ],
+        ];
+    }
+
+    /**
+     * @test         product reads a generator passed three times as independent copies of it
+     * @dataProvider dataProviderForRepeatedGeneratorThreeTimes
+     * @param        array<mixed>        $data
+     * @param        array<array<mixed>> $expected
+     */
+    public function testRepeatedGeneratorThreeTimes(array $data, array $expected): void
+    {
+        // Given
+        $generator = GeneratorFixture::getGenerator($data);
+        $aggregate = new WrappingIteratorAggregateFixture(new WrappingIteratorAggregateFixture($generator));
+
+        // When
+        $result = \iterator_to_array(Combinatorics::product($generator, $aggregate, $generator), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with:
+     *   [list(t) for t in itertools.product(data, data, data)]
+     */
+    public static function dataProviderForRepeatedGeneratorThreeTimes(): array
+    {
+        return [
+            [
+                [1, 2],
+                [[1, 1, 1], [1, 1, 2], [1, 2, 1], [1, 2, 2], [2, 1, 1], [2, 1, 2], [2, 2, 1], [2, 2, 2]],
+            ],
+        ];
+    }
+
+    /**
+     * @test product copies an array's values, so a referenced element changed during iteration does not change later tuples
+     */
+    public function testArrayElementReferenceIsCopied(): void
+    {
+        // Given
+        $x      = 1;
+        $values = [&$x];
+
+        // When
+        $result = [];
+        foreach (Combinatorics::product($values, ['a', 'b']) as $tuple) {
+            $result[] = $tuple;
+            $x        = 99;
         }
+
+        // Then
+        $this->assertSame([[1, 'a'], [1, 'b']], $result);
+    }
+
+    /**
+     * @test product releases the iterators it materialized before yielding tuples
+     */
+    public function testReleasesMaterializedIterators(): void
+    {
+        // Given a source whose iterator the aggregate creates, so only product holds it
+        $aggregate = new CountingIteratorAggregateFixture([1, 2]);
+
+        // When the first tuple is read, with tuples still to come
+        $product = Combinatorics::product($aggregate, ['a', 'b']);
+        $first   = $product->current();
+
+        // Then
+        $this->assertSame([1, 'a'], $first);
+        $this->assertSame(1, $aggregate->getIteratorCallCount());
+        $this->assertSame(0, $aggregate->liveIteratorCount());
     }
 
     /**

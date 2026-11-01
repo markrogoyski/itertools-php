@@ -95,4 +95,26 @@ class CountingIteratorAggregateFixtureTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($first, $second);
         $this->assertSame(2, $fixture->getIteratorCallCount());
     }
+
+    /**
+     * @test counts the iterators it gave that are still held
+     */
+    public function testLiveIteratorCount(): void
+    {
+        // Given
+        $fixture = new CountingIteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $held = $fixture->getIterator();
+        $fixture->getIterator();
+
+        // Then
+        $this->assertSame(1, $fixture->liveIteratorCount());
+
+        // And when the held iterator is released
+        unset($held);
+
+        // Then
+        $this->assertSame(0, $fixture->liveIteratorCount());
+    }
 }
