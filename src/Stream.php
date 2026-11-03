@@ -1159,6 +1159,10 @@ final class Stream implements \IteratorAggregate
      */
     public function prepend(mixed ...$values): self
     {
+        if ($values === []) {
+            return $this;
+        }
+
         $this->iterable = Multi::chain($values, $this->iterable);
         return $this;
     }
@@ -1175,6 +1179,10 @@ final class Stream implements \IteratorAggregate
      */
     public function append(mixed ...$values): self
     {
+        if ($values === []) {
+            return $this;
+        }
+
         $this->iterable = Multi::chain($this->iterable, $values);
         return $this;
     }

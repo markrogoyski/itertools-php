@@ -46,6 +46,64 @@ class StreamPrependAppendTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test prepend with no values keeps the source keys
+     */
+    public function testPrependEmptyKeepsKeys(): void
+    {
+        // When
+        $result = Stream::of(['a' => 1, 'b' => 2])->prepend()->toAssociativeArray();
+
+        // Then
+        $this->assertSame(['a' => 1, 'b' => 2], $result);
+    }
+
+    /**
+     * @test append with no values keeps the source keys
+     */
+    public function testAppendEmptyKeepsKeys(): void
+    {
+        // When
+        $result = Stream::of(['a' => 1, 'b' => 2])->append()->toAssociativeArray();
+
+        // Then
+        $this->assertSame(['a' => 1, 'b' => 2], $result);
+    }
+
+    /**
+     * @test prepend with no values keeps a replayable source replayable
+     */
+    public function testPrependEmptyKeepsStreamReplayable(): void
+    {
+        // Given
+        $stream = Stream::of([1, 2])->prepend();
+
+        // When
+        $first = \iterator_to_array($stream);
+        $second = \iterator_to_array($stream);
+
+        // Then
+        $this->assertSame([1, 2], $first);
+        $this->assertSame([1, 2], $second);
+    }
+
+    /**
+     * @test append with no values keeps a replayable source replayable
+     */
+    public function testAppendEmptyKeepsStreamReplayable(): void
+    {
+        // Given
+        $stream = Stream::of([1, 2])->append();
+
+        // When
+        $first = \iterator_to_array($stream);
+        $second = \iterator_to_array($stream);
+
+        // Then
+        $this->assertSame([1, 2], $first);
+        $this->assertSame([1, 2], $second);
+    }
+
+    /**
      * @test prepend multiple values keeps order
      */
     public function testPrependMultiple(): void
