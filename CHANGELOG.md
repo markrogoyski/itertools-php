@@ -21,11 +21,11 @@ A fix or change to a function also applies to its `Stream` wrapper.
 * Summary: `same` with a single source read it in full, which never returned for an infinite source.
 * Summary: `same` and `arePermutations*` returned `false` when a source threw `\LengthException`; it now propagates.
 * Multi: `roundRobin` read more values than it yielded; it is now lazy.
-* Infinite: `cycle` threw on the second pass for one-pass sources other than a bare generator, and dropped the first row of a `\PDOStatement`. Non-array sources are now read once and replayed from a cache.
+* Infinite: `cycle` threw on the second pass for one-pass sources other than a bare generator, and dropped the first row of a `\PDOStatement`.
 * Transform: `tee` (and `peekStream`, `peekPrint`, `peekPrintR`) replaced a cached `null` value or key with the source's current one, dropped the last line of an `\SplFileObject` with no trailing newline, yielded nothing for `\SplQueue`, `\SplStack` and `\SplDoublyLinkedList`, and an abandoned copy made the others buffer the whole source. Dropped copies now release their buffer.
 * Transform: `memoize` clones split the source's elements between them and could rewind or re-read it; a clone now shares the source and cache with the original.
 * Summary, Set, Single: `endsWith`, `endsWithCoercive`, `isSorted`, `isReversed`, `isSortedBy`, `isReversedBy`, `distinctAdjacent`, `distinctAdjacentBy` and `groupAdjacentBy` compared an array element only after reading later ones, so rows filled through one shared reference (as `PDOStatement::bindColumn()` does) all compared as the last row; `endsWithCoercive` also mishandled an object mutated between reads. Elements are now compared as they were when read. See README "Values compared after later reads". Costs:
-  * Arrays are scanned for reference slots when read and copied only if they hold one. `isSorted` of two-field rows takes ~2x as long; of scalars, ~half as long.
+  * `isSorted` of two-field rows takes ~2x as long; of scalars, ~half as long.
   * Pathological nesting is slow: `$a = [$a, $a]` repeated twenty times takes 0.7 s (was 1 ms), and one element holding 10,000 distinct subarrays with reference slots about 2 s.
   * `endsWithCoercive` hashes every array and object element, not just the last `count($suffix)`; a non-serializable object still throws only if comparison reaches it.
 
@@ -49,19 +49,17 @@ A fix or change to a function also applies to its `Stream` wrapper.
   * A step larger than the exact span now throws `\InvalidArgumentException` (`range(0, PHP_INT_MAX, (float) PHP_INT_MAX)` was accepted).
   * Values are computed from the exact `$start` and correctly rounded; an endpoint lost to rounding is kept (`range(0, 55, 1.1)` stopped at 53.9), and a `-0.0` end yields `0.0`.
   * A float span that overflows no longer throws regardless of step count (`range(-1e308, 1e308, 1e308)` yields `[-1e308, 0.0, 1e308]`); an uncountable span names its operands rather than `INF`.
-  * Starting such a range takes ~3 µs longer; per-element cost is unchanged.
 
 ### Changes
 * **Same source passed more than once.** An iterator or generator passed to one call more than once — directly, through a `Stream` or other `IteratorAggregate` returning it, or as a stream passed to its own methods — skipped values, threw ("Cannot traverse an already closed generator", "Cannot resume an already running generator", …) or gave wrong answers. Now:
   * `zip`, `zipLongest`, `zipEqual`, `zipFilled`, `roundRobin`, `mergeSorted`, `mergeSortedBy`, `union`, `intersection`, `partialIntersection` and `symmetricDifference` (with coercive forms and the row-wise `Stream::zip` family) read it as independent copies: `zip($it, $it)` over `[1, 2, 3]` yields `[[1, 1], [2, 2], [3, 3]]` (was `[[1], [2], [3]]`), and `mergeSorted($it, $it)` yields `[1, 1, 2, 2, 3, 3]`. `mergeSorted*` copies share a buffer of the current run of equal values, unbounded for an infinite source of equal values. `zipEqual` still throws on unequal lengths.
-  * `product` materializes it once and reuses that array.
-  * `difference` traverses a repeated subtrahend once and subtracts its values once per position; when the first iterable is also a subtrahend, the result is empty.
-  * `sameCount` traverses it once and reuses the count.
+  * `product` yields every combination: `product($gen, $gen)` over `[1, 2]` yields `[1, 1], [1, 2], [2, 1], [2, 2]`.
+  * `difference` subtracts a repeated subtrahend once per position it was passed in; when the first iterable is also a subtrahend, the result is empty.
+  * `sameCount` returns `true`.
   * `same`, `arePermutations*`, `startsWith*` and `endsWith*` return `true` without reading it, including an array-backed stream compared with itself that holds `NAN` or a non-serializable object.
   * `chainWith` of a stream with itself yields its elements twice for arrays and rewindable iterators; over a generator (including after a step such as `map`) it throws after the first pass, as `Multi::chain($gen, $gen)` does.
   * A stream passed to its own methods stands for its elements at that point in the pipeline.
   * `Transform::toIterator` returns the iterator an aggregate's `getIterator()` returns, following nested aggregates, instead of wrapping it. An aggregate returning itself, or a cycle of aggregates, throws `\LogicException` (was `\Exception`, or a stack-overflow crash).
-  * `Single::compress` and `Stream::compress` declare their selectors as `iterable<mixed>`.
 * Single: a float `range` spanning a whole number of steps, to within its operands' rounding, now ends exactly on `$end`: `range(0.3, 0.9, 0.2)` yields `[0.3, 0.5, 0.7, 0.9]` where native `\range()` drops `0.9`.
 * Single: `groupBy` accepts only `int`, `string` and `bool` group names and item keys (a `null` item key still appends), and throws `\TypeError` for others, which were coerced (`4.5` and `4.7` merged into `4`). `Reduce::toCountBy` also rejects `bool`.
 * Transform: `tee` reads nothing until a copy is first used. A copy can be rewound until it advances, then `rewind()` throws `\LogicException`. A cloned copy is an independent branch from the original's position.
