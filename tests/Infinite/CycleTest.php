@@ -614,6 +614,29 @@ class CycleTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test cycle keeps the line-number keys of a CSV file whose blank lines are skipped
+     */
+    public function testCycleCsvSkippingEmptyLinesKeepsKeys(): void
+    {
+        // Given
+        $file = new \SplFileObject('php://temp', 'w+');
+        $file->fwrite("a\n\nb\n");
+        $file->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
+        $result = [];
+
+        // When
+        foreach (Infinite::cycle($file) as $key => $value) {
+            $result[] = [$key, $value];
+            if (\count($result) === 2) {
+                break;
+            }
+        }
+
+        // Then
+        $this->assertSame([[0, ['a']], [2, ['b']]], $result);
+    }
+
+    /**
      * @test cycle preserves source keys on every pass
      * @dataProvider dataProviderForKeyedSources
      * @param iterable $source

@@ -64,6 +64,30 @@ class MemoCacheTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test each key is read after its value, as foreach does, so a source whose current() moves its key caches
+     *       the key foreach sees
+     */
+    public function testKeyIsReadAfterValue(): void
+    {
+        // Given
+        $source = self::skippingIterator(['a', '', 'b']);
+        $expected = [];
+        foreach (self::skippingIterator(['a', '', 'b']) as $key => $value) {
+            $expected[] = [$key, $value];
+        }
+        $cache = new MemoCache($source);
+
+        // When
+        $first = self::pairs($cache->replay());
+        $second = self::pairs($cache->replay());
+
+        // Then
+        $this->assertSame([[0, 'a'], [2, 'b']], $expected);
+        $this->assertSame($expected, $first);
+        $this->assertSame($expected, $second);
+    }
+
+    /**
      * @test neither construction nor an unstarted replay touches the source
      */
     public function testConstructionAndUnstartedReplayDoNotTouchSource(): void
@@ -288,6 +312,49 @@ class MemoCacheTest extends \PHPUnit\Framework\TestCase
         }
 
         throw new \LogicException('Expected memoized source to fail');
+    }
+
+    /**
+     * An iterator whose current() skips empty rows and so moves its key, as SplFileObject does with SKIP_EMPTY and
+     * without READ_AHEAD.
+     */
+    private static function skippingIterator(array $rows): \Iterator
+    {
+        return new class ($rows) implements \Iterator {
+            private int $position = 0;
+
+            public function __construct(private array $rows)
+            {
+            }
+
+            public function rewind(): void
+            {
+                $this->position = 0;
+            }
+
+            public function valid(): bool
+            {
+                return $this->position < \count($this->rows);
+            }
+
+            public function key(): int
+            {
+                return $this->position;
+            }
+
+            public function current(): mixed
+            {
+                while ($this->rows[$this->position] === '' && $this->position + 1 < \count($this->rows)) {
+                    ++$this->position;
+                }
+                return $this->rows[$this->position];
+            }
+
+            public function next(): void
+            {
+                ++$this->position;
+            }
+        };
     }
 
     private static function countingIterator(array $values): \Iterator

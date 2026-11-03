@@ -125,8 +125,10 @@ final class MemoCache
             return;
         }
 
-        $key = $this->source->key();
+        // The value is read before its key, as foreach does: reading it can move the key, as SplFileObject
+        // skipping an empty line does.
         $value = $this->source->current();
+        $key = $this->source->key();
         $this->keys[] = $key;
         $this->values[] = $value;
         ++$this->cached;
