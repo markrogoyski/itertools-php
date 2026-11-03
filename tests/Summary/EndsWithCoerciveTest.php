@@ -6,6 +6,7 @@ namespace IterTools\Tests\Summary;
 
 use IterTools\Summary;
 use IterTools\Tests\Fixture;
+use IterTools\Transform;
 
 class EndsWithCoerciveTest extends \PHPUnit\Framework\TestCase
 {
@@ -622,5 +623,198 @@ class EndsWithCoerciveTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - two IteratorAggregates over one generator are true
+     */
+    public function testAggregatesSharingOneGenerator(): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        $data = new Fixture\WrappingIteratorAggregateFixture($generator);
+        $suffix = new Fixture\WrappingIteratorAggregateFixture($generator);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - a generator with an IteratorAggregate over it as its suffix is true
+     */
+    public function testGeneratorWithAggregateOverItAsSuffix(): void
+    {
+        // Given
+        $data = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        $suffix = new Fixture\WrappingIteratorAggregateFixture($data);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - an IteratorAggregate over a generator with that generator as its suffix is true
+     */
+    public function testAggregateOverGeneratorWithItAsSuffix(): void
+    {
+        // Given
+        $suffix = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        $data = new Fixture\WrappingIteratorAggregateFixture($suffix);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - two IteratorAggregates over one partly read generator are true
+     */
+    public function testAggregatesSharingOneAdvancedGenerator(): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        $generator->next();
+        $data = new Fixture\WrappingIteratorAggregateFixture($generator);
+        $suffix = new Fixture\WrappingIteratorAggregateFixture($generator);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - two IteratorAggregates over one exhausted generator are true
+     */
+    public function testAggregatesSharingOneExhaustedGenerator(): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        foreach ($generator as $ignored) {
+        }
+        $data = new Fixture\WrappingIteratorAggregateFixture($generator);
+        $suffix = new Fixture\WrappingIteratorAggregateFixture($generator);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - an empty iterator suffix is true without the source's iterator being obtained
+     */
+    public function testEmptyIteratorSuffixDoesNotInitializeSource(): void
+    {
+        // Given
+        $data = new Fixture\CountingIteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::endsWithCoercive($data, new \EmptyIterator());
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame(0, $data->getIteratorCallCount());
+    }
+
+    /**
+     * @test endsWithCoercive - an empty generator suffix is true without the source's iterator being obtained
+     */
+    public function testEmptyGeneratorSuffixDoesNotInitializeSource(): void
+    {
+        // Given
+        $data = new Fixture\CountingIteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::endsWithCoercive($data, Fixture\GeneratorFixture::getGenerator([]));
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame(0, $data->getIteratorCallCount());
+    }
+
+    /**
+     * @test endsWithCoercive - two IteratorAggregates over one advanced tee copy are true
+     */
+    public function testAggregatesSharingOneAdvancedTeeCopy(): void
+    {
+        // Given
+        [$copy] = Transform::tee([1, 2, 3], 1);
+        $copy->next();
+        $data = new Fixture\WrappingIteratorAggregateFixture($copy);
+        $suffix = new Fixture\WrappingIteratorAggregateFixture($copy);
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test endsWithCoercive - a suffix failing to start keeps its exception when the source also fails to start
+     */
+    public function testFailingSuffixExceptionIsKeptWhenSourceAlsoFails(): void
+    {
+        // Given
+        $data = new class () implements \IteratorAggregate {
+            public function getIterator(): \Traversable
+            {
+                throw new \LogicException('source error');
+            }
+        };
+        $suffix = (static function (): \Generator {
+            throw new \DomainException('suffix error');
+            yield; // unreachable
+        })();
+
+        // Then
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('suffix error');
+
+        // When
+        Summary::endsWithCoercive($data, $suffix);
+    }
+
+    /**
+     * @test endsWithCoercive - the first suffix element is captured before the source is initialized, so a row filled
+     *       through a shared reference that initialization changes keeps the value it held
+     */
+    public function testFirstSuffixElementCapturedBeforeSourceInitialized(): void
+    {
+        // Given
+        $state = new \stdClass();
+        $state->id = 1;
+        $suffix = (static function () use ($state): \Generator {
+            $row = ['id' => &$state->id];
+            yield $row;
+        })();
+        $data = new class ($state) implements \IteratorAggregate {
+            public function __construct(private \stdClass $state)
+            {
+            }
+
+            public function getIterator(): \Iterator
+            {
+                $this->state->id = 2;
+                return new \ArrayIterator([['id' => 2]]);
+            }
+        };
+
+        // When
+        $result = Summary::endsWithCoercive($data, $suffix);
+
+        // Then
+        $this->assertFalse($result);
     }
 }

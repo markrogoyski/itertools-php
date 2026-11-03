@@ -730,10 +730,26 @@ final class Summary
             return true;
         }
 
+        // Two objects can also resolve to one iterator, as two Streams over one generator do. The source is
+        // resolved only once the prefix has an element, so an empty prefix leaves it untouched.
+        //
+        // The prefix is read with valid()/current()/next(), not foreach, because foreach rewinds. Its one
+        // rewind is in rewindOrIsSource(), which catches a rewind that throws because the prefix is the
+        // source's own iterator, already read. A second rewind could also throw (an empty generator, once run).
+        $shareable = \is_object($data) && \is_object($prefix);
+        $prefixIt  = Transform::toIterator($prefix);
+        if (self::rewindOrIsSource($prefixIt, $shareable ? $data : null)) {
+            return true;
+        }
+
         $dataIt = null;
-        foreach ($prefix as $expected) {
+        for (; $prefixIt->valid(); $prefixIt->next()) {
+            $expected = $prefixIt->current();
             if ($dataIt === null) {
                 $dataIt = Transform::toIterator($data);
+                if ($shareable && $dataIt === $prefixIt) {
+                    return true;
+                }
                 if (!($dataIt instanceof \Generator)) {
                     $dataIt->rewind();
                 }
@@ -771,6 +787,18 @@ final class Summary
             return true;
         }
 
+        // Two objects can also resolve to one iterator, as two Streams over one generator do. The source is
+        // resolved only once the suffix has an element, so an empty suffix leaves it untouched.
+        //
+        // The suffix is read with valid()/current()/next(), not foreach, because foreach rewinds. Its one
+        // rewind is in rewindOrIsSource(), which catches a rewind that throws because the suffix is the
+        // source's own iterator, already read. A second rewind could also throw (an empty generator, once run).
+        $shareable = \is_object($data) && \is_object($suffix);
+        $suffixIt  = Transform::toIterator($suffix);
+        if (self::rewindOrIsSource($suffixIt, $shareable ? $data : null)) {
+            return true;
+        }
+
         // The suffix and the window are kept while later elements are read, so each element is captured
         // as it is when read. Strict: an array as a Snapshot, so a row filled through a shared reference
         // keeps the values it held. Coercive: an array or object as its key, since an object is compared
@@ -778,18 +806,28 @@ final class Summary
         // value cannot change and is hashed when compared. An element that cannot be hashed is kept as the
         // exception, thrown only if comparison reaches it, as before.
         $suffixArr = [];
-        foreach ($suffix as $value) {
+        for (; $suffixIt->valid(); $suffixIt->next()) {
+            $value = $suffixIt->current();
             if ($strict) {
                 $suffixArr[] = \is_array($value) ? Snapshot::of($value) : $value;
-                continue;
+            } else {
+                // A suffix key is kept as its Identity, which pins the objects and resources it was
+                // derived from. A source key needs no anchors: it was computed while its element was
+                // alive, so it can only match a suffix identity if it is that same, still pinned, value.
+                try {
+                    $suffixArr[] = UniqueExtractor::identify($value, false);
+                } catch (\InvalidArgumentException $e) {
+                    $suffixArr[] = $e;
+                }
             }
-            // A suffix key is kept as its Identity, which pins the objects and resources it was
-            // derived from. A source key needs no anchors: it was computed while its element was
-            // alive, so it can only match a suffix identity if it is that same, still pinned, value.
-            try {
-                $suffixArr[] = UniqueExtractor::identify($value, false);
-            } catch (\InvalidArgumentException $e) {
-                $suffixArr[] = $e;
+            // Resolved after the first element is captured, which resolving could change, and before the
+            // suffix advances, which would advance a shared source with it.
+            if ($shareable) {
+                $shareable = false;
+                $data      = Transform::toIterator($data);
+                if ($data === $suffixIt) {
+                    return true;
+                }
             }
         }
         $suffixLen = \count($suffixArr);
@@ -852,6 +890,43 @@ final class Summary
         }
 
         return true;
+    }
+
+    /**
+     * Rewinds a prefix or suffix, and tells whether it is the source's own iterator, which the source starts
+     * and ends with.
+     *
+     * Only if the rewind throws, as it does for a generator or tee copy already read, is the source resolved to
+     * tell, so a prefix or suffix that rewinds leaves it untouched. One that is not the source's own keeps its
+     * exception, also when resolving the source fails.
+     *
+     * @param \Iterator<mixed>     $iterator prefix or suffix
+     * @param iterable<mixed>|null $data     source, or null when it cannot share the iterator
+     *
+     * @return bool
+     *
+     * @throws \Throwable the rewind's, if the iterator is not the source's own
+     */
+    private static function rewindOrIsSource(\Iterator $iterator, ?iterable $data): bool
+    {
+        try {
+            $iterator->rewind();
+        } catch (\Throwable $e) {
+            if ($data === null) {
+                throw $e;
+            }
+            try {
+                $isSource = Transform::toIterator($data) === $iterator;
+            } catch (\Throwable) {
+                throw $e;
+            }
+            if ($isSource) {
+                return true;
+            }
+            throw $e;
+        }
+
+        return false;
     }
 
     /**

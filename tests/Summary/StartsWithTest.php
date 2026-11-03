@@ -6,6 +6,7 @@ namespace IterTools\Tests\Summary;
 
 use IterTools\Summary;
 use IterTools\Tests\Fixture;
+use IterTools\Transform;
 
 class StartsWithTest extends \PHPUnit\Framework\TestCase
 {
@@ -601,5 +602,166 @@ class StartsWithTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertFalse($result);
+    }
+
+    /**
+     * @test startsWith - two IteratorAggregates over one generator are true
+     */
+    public function testAggregatesSharingOneGenerator(): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        $data = new Fixture\WrappingIteratorAggregateFixture($generator);
+        $prefix = new Fixture\WrappingIteratorAggregateFixture($generator);
+
+        // When
+        $result = Summary::startsWith($data, $prefix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWith - a generator with an IteratorAggregate over it as its prefix is true
+     */
+    public function testGeneratorWithAggregateOverItAsPrefix(): void
+    {
+        // Given
+        $data = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        $prefix = new Fixture\WrappingIteratorAggregateFixture($data);
+
+        // When
+        $result = Summary::startsWith($data, $prefix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWith - an IteratorAggregate over a generator with that generator as its prefix is true
+     */
+    public function testAggregateOverGeneratorWithItAsPrefix(): void
+    {
+        // Given
+        $prefix = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        $data = new Fixture\WrappingIteratorAggregateFixture($prefix);
+
+        // When
+        $result = Summary::startsWith($data, $prefix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWith - two IteratorAggregates over one partly read generator are true
+     */
+    public function testAggregatesSharingOneAdvancedGenerator(): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        $generator->next();
+        $data = new Fixture\WrappingIteratorAggregateFixture($generator);
+        $prefix = new Fixture\WrappingIteratorAggregateFixture($generator);
+
+        // When
+        $result = Summary::startsWith($data, $prefix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWith - two IteratorAggregates over one exhausted generator are true
+     */
+    public function testAggregatesSharingOneExhaustedGenerator(): void
+    {
+        // Given
+        $generator = Fixture\GeneratorFixture::getGenerator([1, 2, 3]);
+        foreach ($generator as $ignored) {
+        }
+        $data = new Fixture\WrappingIteratorAggregateFixture($generator);
+        $prefix = new Fixture\WrappingIteratorAggregateFixture($generator);
+
+        // When
+        $result = Summary::startsWith($data, $prefix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWith - an empty iterator prefix is true without the source's iterator being obtained
+     */
+    public function testEmptyIteratorPrefixDoesNotInitializeSource(): void
+    {
+        // Given
+        $data = new Fixture\CountingIteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::startsWith($data, new \EmptyIterator());
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame(0, $data->getIteratorCallCount());
+    }
+
+    /**
+     * @test startsWith - an empty generator prefix is true without the source's iterator being obtained
+     */
+    public function testEmptyGeneratorPrefixDoesNotInitializeSource(): void
+    {
+        // Given
+        $data = new Fixture\CountingIteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $result = Summary::startsWith($data, Fixture\GeneratorFixture::getGenerator([]));
+
+        // Then
+        $this->assertTrue($result);
+        $this->assertSame(0, $data->getIteratorCallCount());
+    }
+
+    /**
+     * @test startsWith - two IteratorAggregates over one advanced tee copy are true
+     */
+    public function testAggregatesSharingOneAdvancedTeeCopy(): void
+    {
+        // Given
+        [$copy] = Transform::tee([1, 2, 3], 1);
+        $copy->next();
+        $data = new Fixture\WrappingIteratorAggregateFixture($copy);
+        $prefix = new Fixture\WrappingIteratorAggregateFixture($copy);
+
+        // When
+        $result = Summary::startsWith($data, $prefix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test startsWith - a prefix failing to start keeps its exception when the source also fails to start
+     */
+    public function testFailingPrefixExceptionIsKeptWhenSourceAlsoFails(): void
+    {
+        // Given
+        $data = new class () implements \IteratorAggregate {
+            public function getIterator(): \Traversable
+            {
+                throw new \LogicException('source error');
+            }
+        };
+        $prefix = (static function (): \Generator {
+            throw new \DomainException('prefix error');
+            yield; // unreachable
+        })();
+
+        // Then
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('prefix error');
+
+        // When
+        Summary::startsWith($data, $prefix);
     }
 }

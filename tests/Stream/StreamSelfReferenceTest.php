@@ -684,6 +684,26 @@ class StreamSelfReferenceTest extends \PHPUnit\Framework\TestCase
                 static fn (Stream $s): bool => $s->map(static fn (int $x): int => $x * 10)->endsWithCoercive($s),
                 true,
             ],
+            'startsWith another stream over the same source' => [
+                GeneratorFixture::getGenerator([1, 2, 3]),
+                static fn (Stream $s): bool => $s->startsWith(Stream::of($s)),
+                true,
+            ],
+            'startsWithCoercive another stream over the same source' => [
+                GeneratorFixture::getGenerator([1, 2, 3]),
+                static fn (Stream $s): bool => $s->startsWithCoercive(Stream::of($s)),
+                true,
+            ],
+            'endsWith another stream over the same source' => [
+                GeneratorFixture::getGenerator([1, 2, 3]),
+                static fn (Stream $s): bool => $s->endsWith(Stream::of($s)),
+                true,
+            ],
+            'endsWithCoercive another stream over the same source' => [
+                GeneratorFixture::getGenerator([1, 2, 3]),
+                static fn (Stream $s): bool => $s->endsWithCoercive(Stream::of($s)),
+                true,
+            ],
             'sameWith' => [
                 GeneratorFixture::getGenerator([1, 2, 3]),
                 static fn (Stream $s): bool => $s->sameWith($s),
