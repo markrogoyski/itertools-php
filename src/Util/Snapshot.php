@@ -24,11 +24,14 @@ final class Snapshot
      * Only the arrays that hold a reference slot, and the arrays above them, are rebuilt. The others are
      * kept as they are, so subarrays that share PHP's storage stay shared: an array without reference
      * slots is returned as is, though it is still read in full to find that out. A rebuilt subarray is
-     * reused for every later subarray identical to it (`===`, with the same signs of zero), so one that
-     * occurs many times, sharing PHP's storage, is rebuilt once.
+     * kept in a {@see SnapshotCache} for the call and reused for every later subarray identical to it
+     * (`===`, with the same signs of zero) where its copy fits under the depth limit, wherever its
+     * siblings differ from it, so one that occurs many times, sharing PHP's storage, is rebuilt once.
      *
      * Arrays nested deeper than {@see UniqueExtractor::MAX_DEPTH} are kept as they are, which also ends
-     * the recursion for a self-referential array. A loop that snapshots every element writes
+     * the recursion for a self-referential array. What a walk cut short that way gave for an array held
+     * by a reference slot is reused where the reference recurs at the same depth, so an array that refers
+     * to itself through several slots is walked once per depth. A loop that snapshots every element writes
      * `\is_array($x) ? Snapshot::of($x) : $x`, which skips the call for all but arrays.
      *
      * @param mixed $value
@@ -41,32 +44,34 @@ final class Snapshot
             return $value;
         }
 
-        $copies = [];
-        $truncated = false;
-        $hasZero = false;
+        $cache = null;
+        $height = 0;
+        $zeroKeys = [];
+        $kids = [];
 
-        return self::withoutReferences($value, 1, $copies, $truncated, $hasZero) ?? $value;
+        return self::withoutReferences($value, 1, $cache, $height, $zeroKeys, $kids) ?? $value;
     }
 
     /**
      * @param array<mixed> $array
      * @param int $depth number of arrays enclosing $array's elements, 1 at the top value
-     * @param array<int, list<array{array<mixed>, array<mixed>, bool}>> $copies subarrays rebuilt so far,
-     *        as [original, copy, whether it holds a float zero] by count
-     * @param bool $truncated set to true if the depth limit was reached below $array
-     * @param bool $hasZero set to true if $array holds a float zero at any depth
+     * @param int $height set to the number of levels of arrays nested in $array, as far as the walk went:
+     *        $depth + $height is more than the depth limit if the walk was cut short by it
+     * @param list<array-key> $zeroKeys set to the keys whose element is a float zero or an array holding one
+     * @param array<array-key, int> $kids set to the entry ids of the subarray elements kept, by key
      *
      * @return array<mixed>|null the rebuilt array, or null if $array holds no reference slot at any depth
      */
     private static function withoutReferences(
         array $array,
         int $depth,
-        array &$copies,
-        bool &$truncated,
-        bool &$hasZero
+        ?SnapshotCache &$cache,
+        int &$height,
+        array &$zeroKeys,
+        array &$kids
     ): ?array {
+        $height = 0;
         if ($depth > UniqueExtractor::MAX_DEPTH) {
-            $truncated = true;
             return null;
         }
 
@@ -75,14 +80,35 @@ final class Snapshot
         $hasReference = false;
         foreach ($array as $key => $element) {
             if (\is_array($element)) {
-                $nested = self::nestedWithoutReferences($element, $depth + 1, $copies, $truncated, $hasZero);
+                $nestedHeight = 0;
+                $id = null;
+                $hasZero = false;
+                $nested = self::nestedWithoutReferences(
+                    $array,
+                    $key,
+                    $element,
+                    $depth + 1,
+                    $cache,
+                    $nestedHeight,
+                    $id,
+                    $hasZero
+                );
+                if ($nestedHeight >= $height) {
+                    $height = $nestedHeight + 1;
+                }
+                if ($id !== null) {
+                    $kids[$key] = $id;
+                }
+                if ($hasZero) {
+                    $zeroKeys[] = $key;
+                }
                 if ($nested !== null) {
                     $rebuilt[$key] = $nested;
                     $hasReference = true;
                     continue;
                 }
             } elseif ($element === 0.0) {
-                $hasZero = true;
+                $zeroKeys[] = $key;
             }
             if (!$hasReference && \ReflectionReference::fromArrayElement($array, $key) !== null) {
                 $hasReference = true;
@@ -105,73 +131,72 @@ final class Snapshot
     }
 
     /**
-     * {@see withoutReferences()} for a subarray, reusing the copy of an identical one rebuilt earlier.
+     * {@see withoutReferences()} for the subarray $array at $key in $parent, through the cache.
      *
+     * @param array<mixed> $parent
      * @param array<mixed> $array
-     * @param int $depth
-     * @param array<int, list<array{array<mixed>, array<mixed>, bool}>> $copies
-     * @param bool $truncated
-     * @param bool $hasZero
+     * @param int|null $id set to the id of $array's class in the cache, or null if it is not kept
+     * @param bool $hasZero set to whether $array holds a float zero at any depth
      *
      * @return array<mixed>|null
      */
     private static function nestedWithoutReferences(
+        array $parent,
+        int|string $key,
         array $array,
         int $depth,
-        array &$copies,
-        bool &$truncated,
+        ?SnapshotCache &$cache,
+        int &$height,
+        ?int &$id,
         bool &$hasZero
     ): ?array {
-        $count = \count($array);
-        foreach ($copies[$count] ?? [] as $entry) {
-            // `===` returns at once for the same storage, which is how a shared subarray recurs. An equal
-            // one in other storage matches too, and its copy holds the same values, except that
-            // -0.0 === 0.0, so the signs of any zeros are checked. The original goes first: it is
-            // acyclic, so the comparison ends even if $array refers to itself through a reference.
-            if ($entry[0] === $array && (!$entry[2] || self::sameZeroSigns($entry[0], $array))) {
-                $hasZero = $hasZero || $entry[2];
-                return $entry[1];
+        $reference = null;
+        $referenceRead = false;
+        if ($cache !== null && $cache->hasTruncations()) {
+            $reference = \ReflectionReference::fromArrayElement($parent, $key)?->getId();
+            $referenceRead = true;
+            $truncation = $reference === null ? null : $cache->truncation($depth, $reference);
+            if ($truncation !== null) {
+                // Cut short, so no array above is kept either, and its zeros and class are not needed.
+                [$copy, $height] = $truncation;
+                return $copy;
             }
         }
 
-        $subtreeTruncated = false;
-        $subtreeHasZero = false;
-        $copy = self::withoutReferences($array, $depth, $copies, $subtreeTruncated, $subtreeHasZero);
-        $hasZero = $hasZero || $subtreeHasZero;
-        if ($subtreeTruncated) {
-            // A self-referential array ends here; keeping it out of $copies keeps every original acyclic.
-            $truncated = true;
-        } elseif ($copy !== null) {
-            $copies[$count][] = [$array, $copy, $subtreeHasZero];
+        $fingerprint = null;
+        $id = $cache?->find($array, $depth, $fingerprint);
+        if ($cache !== null && $id !== null) {
+            $entry = $cache->entry($id);
+            $height = $entry->height;
+            $hasZero = $entry->zeroKeys !== [];
+            return $entry->copy;
         }
 
-        return $copy;
-    }
-
-    /**
-     * Whether each float zero in $original has the same sign in $equal, an array `===` to it.
-     *
-     * @param array<mixed> $original acyclic
-     * @param array<mixed> $equal
-     */
-    private static function sameZeroSigns(array $original, array $equal): bool
-    {
-        foreach ($original as $key => $element) {
-            if (\is_array($element)) {
-                /** @var array<mixed> $nested an array, since $equal === $original */
-                $nested = $equal[$key];
-                if (!self::sameZeroSigns($element, $nested)) {
-                    return false;
-                }
-            } elseif ($element === 0.0) {
-                /** @var float $other a zero, since $equal === $original */
-                $other = $equal[$key];
-                if (\fdiv(1, $element) !== \fdiv(1, $other)) {
-                    return false;
-                }
+        $zeroKeys = [];
+        $kids = [];
+        $copy = self::withoutReferences($array, $depth, $cache, $height, $zeroKeys, $kids);
+        $hasZero = $zeroKeys !== [];
+        if ($depth + $height > UniqueExtractor::MAX_DEPTH) {
+            // Cut short by the depth limit, which ends a self-referential array: not kept as a class, which
+            // keeps every original acyclic, but kept by its reference, if it is held by one.
+            if (!$referenceRead) {
+                $reference = \ReflectionReference::fromArrayElement($parent, $key)?->getId();
             }
+            if ($reference !== null) {
+                ($cache ??= new SnapshotCache())->keepTruncation($depth, $reference, $copy, $height);
+            }
+            return $copy;
+        }
+        if ($copy === null) {
+            // Not kept: a later array equal to it may hold reference slots, since `===` reads through them,
+            // and could then not be kept as it is.
+            return null;
         }
 
-        return true;
+        // Created on the first subarray kept: a value without one, the common case, never needs it.
+        $cache ??= new SnapshotCache();
+        $id = $cache->add($array, $copy, $height, $zeroKeys, $kids, $fingerprint);
+
+        return $cache->entry($id)->copy;
     }
 }
