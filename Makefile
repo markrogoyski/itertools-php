@@ -1,4 +1,4 @@
-.PHONY : lint tests style phpstan psalm phpmd coverage composer-unused composer-require-checker composer-audit
+.PHONY : lint tests style phpstan psalm psalm-sandbox phpmd coverage composer-unused composer-require-checker composer-audit
 
 all : lint tests style phpstan psalm composer-unused composer-require-checker
 
@@ -15,7 +15,11 @@ phpstan :
 	vendor/bin/phpstan analyze -c tools/phpstan.neon --memory-limit=256M
 
 psalm :
-	vendor/bin/psalm --config=tools/psalm.xml
+	php -d opcache.lockfile_path=$${TMPDIR:-/tmp} vendor/bin/psalm --config=tools/psalm.xml
+
+# For sandboxed agents: no writable ~/.cache/psalm and no IPC sockets for worker processes.
+psalm-sandbox :
+	php -d opcache.lockfile_path=$${TMPDIR:-/tmp} vendor/bin/psalm --config=tools/psalm.xml --no-cache --threads=1
 
 phpmd :
 	vendor/bin/phpmd src/ ansi tools/phpmd.xml
