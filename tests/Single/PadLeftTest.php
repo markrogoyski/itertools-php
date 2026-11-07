@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Single;
 
+use IterTools\Infinite;
 use IterTools\Single;
 use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\DataProvider;
@@ -171,5 +172,80 @@ class PadLeftTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertSame([0, 1, 2, 3], $keys);
+    }
+
+    /**
+     * @test         padLeft streams an infinite source once it holds $length elements, with nothing to pad
+     * @dataProvider dataProviderForInfiniteSource
+     * @param        int   $length
+     * @param        array $expected
+     */
+    public function testInfiniteSourceStreams(int $length, array $expected): void
+    {
+        // Given
+        $data = Infinite::count(1);
+
+        // When
+        $result = [];
+        foreach (Single::padLeft($data, $length, 0) as $value) {
+            $result[] = $value;
+            if (\count($result) === 5) {
+                break;
+            }
+        }
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    public static function dataProviderForInfiniteSource(): array
+    {
+        return [
+            [0, [1, 2, 3, 4, 5]],
+            [1, [1, 2, 3, 4, 5]],
+            [3, [1, 2, 3, 4, 5]],
+            [7, [1, 2, 3, 4, 5]],
+        ];
+    }
+
+    /**
+     * @test         padLeft reads no more of the source than $length elements before yielding the first
+     * @dataProvider dataProviderForReadsBeforeFirstYield
+     * @param        int $length
+     * @param        int $expectedReads
+     * @param        int $expectedFirst
+     */
+    public function testReadsOnlyLengthBeforeFirstYield(int $length, int $expectedReads, int $expectedFirst): void
+    {
+        // Given
+        $reads = 0;
+        $data  = (static function () use (&$reads): \Generator {
+            for ($i = 1; $i <= 10; ++$i) {
+                ++$reads;
+                yield $i;
+            }
+        })();
+
+        // When
+        $first = null;
+        foreach (Single::padLeft($data, $length, 0) as $value) {
+            $first = $value;
+            break;
+        }
+
+        // Then
+        $this->assertSame($expectedFirst, $first);
+        $this->assertSame($expectedReads, $reads);
+    }
+
+    public static function dataProviderForReadsBeforeFirstYield(): array
+    {
+        return [
+            'length 0 reads nothing ahead'      => [0, 1, 1],
+            'length 1 reads one'                => [1, 1, 1],
+            'length 4 reads four'               => [4, 4, 1],
+            'length 10 reads all ten'           => [10, 10, 1],
+            'length 12 reads all ten, then pads' => [12, 10, 0],
+        ];
     }
 }

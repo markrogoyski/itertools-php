@@ -1067,17 +1067,28 @@ final class Single
             throw new \InvalidArgumentException("Length cannot be negative: {$length}");
         }
 
+        // Buffer only until the source reaches $length: from there no padding is needed, so the buffer is
+        // flushed and the rest streams through, which keeps an infinite or long source lazy.
         /** @var list<mixed> $buffer */
         $buffer = [];
         $count = 0;
 
         foreach ($data as $datum) {
+            if ($count >= $length) {
+                yield $datum;
+                continue;
+            }
             $buffer[] = $datum;
-            ++$count;
+            if (++$count === $length) {
+                foreach ($buffer as $buffered) {
+                    yield $buffered;
+                }
+                $buffer = [];
+            }
         }
 
-        $padding = $length - $count;
-        for ($i = 0; $i < $padding; ++$i) {
+        // Reached only by a source shorter than $length, whose elements are all still buffered.
+        for ($i = $count; $i < $length; ++$i) {
             yield $fill;
         }
 

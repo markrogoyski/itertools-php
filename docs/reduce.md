@@ -482,6 +482,7 @@ Reduces to its value at the given percentile.
 - Uses the R-7 / linear-interpolation method (the NumPy default). Percentile `0` is the minimum, `100` is the maximum.
 - `$percentile` must be in the inclusive range `[0, 100]`; otherwise throws `\InvalidArgumentException`.
 - The interpolation does not overflow when the two neighbouring values span more than `PHP_FLOAT_MAX`.
+- The rank `(n - 1) * p / 100` is located exactly, so a percentile that lands on an element returns that element. Between two integers beyond `±2**53` the interpolation is correctly rounded; otherwise it is accurate to about an ulp, as in NumPy.
 - Percentile `50` returns exactly what `toMedian` returns, for every input.
 - Values are ordered by exact value, as in `toMin` and `toMax`: `toPercentile([2**62 + 500, 2.0**62, 2**62 + 1], 0)` is `2.0**62`, the minimum, where PHP's `sort()` puts `2**62 + 500` first.
 - If any element is `NAN`, returns `NAN` for every percentile, wherever the `NAN` sits in the input (see `toMedian`). An out-of-range `$percentile` still throws.

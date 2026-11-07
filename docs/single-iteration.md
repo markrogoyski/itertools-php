@@ -802,6 +802,7 @@ Pad an iterable on the left so its yielded length is at least `$length`.
 ```Single::padLeft(iterable $data, int $length, mixed $fill)```
 
 * If the source is already `$length` or longer, all elements pass through unchanged (no truncation).
+* Reads at most `$length` elements before yielding the first; from there the rest streams through, so a long or infinite source stays lazy.
 * Source keys are discarded; output keys are sequential 0-indexed.
 * Throws `\InvalidArgumentException` if `$length` is negative.
 
