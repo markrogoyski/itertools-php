@@ -1144,7 +1144,10 @@ final class Single
      * The span of an int operand beyond ±2^53 is exact when the other operand is an int or an integral float
      * within the int range. Paired with a non-integral float or a float beyond the int range, the int is
      * converted to float first and the span can be off: `range(PHP_INT_MAX, 2.0 ** 63, 0.5)` sees a span of 0
-     * and yields one element, where the true span of 1 gives three.
+     * and yields one element, where the true span of 1 gives three. The step is checked against that span too:
+     * `range(0.5, 2 ** 53 + 1, 2.0 ** 53)` throws, as 2^53 exceeds 2^53 - 0.5. Two integral floats within the
+     * int range are taken as ints, as an int partner takes them, so `range(0.0, 27021597764222988.0, 2 ** 53 +
+     * 3)` yields what `range(0, 27021597764222988.0, 2 ** 53 + 3)` does, ending on 27021597764222984.0.
      *
      * With such exact int operands and a whole step (an int or an integral float), the element count comes
      * from the exact span and each value is `$start ± i·|$step|` computed exactly and correctly rounded to
@@ -1153,6 +1156,11 @@ final class Single
      * can't hold: those are `$start ± i·|$step|` computed exactly and correctly rounded, since a value
      * computed from `(float) $start` carries its rounding error. `range(2 ** 53 + 3, 0, -(2.0 ** 52 - 0.5))`
      * yields `[2^53 + 4, 2^52 + 4, 4.0]`, where computing from `(float) $start` ends on 5.0.
+     *
+     * On other operands, an int step beyond 2^53 that a float can't hold is applied as its exact value, the one
+     * the step count uses, and each value is rounded once: `range(0.5, 27021597764222988.0, 2 ** 53 + 3)` ends
+     * on 27021597764222984.0, where the step as the float 2^53 + 4 would end on 27021597764222988.0. An int step
+     * that a float holds is applied there as that float, as the equal float step is.
      *
      * A float range ends on `$end` when the exact span is a whole number of steps, give or take the rounding the
      * operands carry from the decimals they are written as: half a float spacing of each non-integral float
@@ -1224,14 +1232,13 @@ final class Single
 
         // Compare and subtract an int operand and an integral float operand in the int domain. The float converts
         // to int exactly, while the int past 2^53 may not convert to float exactly: 2^53 + 1 and 2.0^53 compare
-        // equal as floats.
-        $startExact = $start;
-        $endExact = $end;
-        if (\is_int($start)) {
-            $endExact = Arithmetic::toExactInt($end) ?? $end;
-        } elseif (\is_int($end)) {
-            $startExact = Arithmetic::toExactInt($start) ?? $start;
-        }
+        // equal as floats. Two integral floats within the int range are compared, subtracted and stepped as ints
+        // too, as an int partner already makes them, so range(0.0, …) yields what range(0, …) does: with
+        // the int step 2^53 + 3 to 27021597764222988.0, both end on 27021597764222984.0. The output stays float.
+        $startInt = Arithmetic::toExactInt($start);
+        $endInt = Arithmetic::toExactInt($end);
+        $startExact = $startInt !== null && $endInt !== null ? $startInt : $start;
+        $endExact = $startInt !== null && $endInt !== null ? $endInt : $end;
 
         if ($startExact == $endExact) {
             yield $useFloat ? (float)$start : $start;
@@ -1329,9 +1336,14 @@ final class Single
                         // Printed to 14 digits, the step and the span can look equal. Print as many as tell them
                         // apart, or name the exact span when the float span is the step.
                         $magnitudeDescription = \var_export($magnitudeF, true);
+                        // An int that a float can't hold is named as the float it is converted to for the span.
+                        $startDescription = \is_int($start) && Arithmetic::toExactInt($startF) !== $start
+                            ? $startF
+                            : $start;
+                        $endDescription = \is_int($end) && Arithmetic::toExactInt($endF) !== $end ? $endF : $end;
                         $spanDescription = $magnitudeF === $spanF
-                            ? '(the exact span between ' . \var_export($start, true) . ' and '
-                                . \var_export($end, true) . ', which rounds to the step in float)'
+                            ? '(the exact span between ' . \var_export($startDescription, true) . ' and '
+                                . \var_export($endDescription, true) . ', which rounds to the step in float)'
                             : '(' . \var_export($spanF, true) . ')';
                     }
                     throw new \InvalidArgumentException(
@@ -1444,6 +1456,13 @@ final class Single
             // A $start that a float holds keeps the computation below, so its values are unchanged.
             $exactStart = \is_int($startExact) && \is_int($endExact) && Arithmetic::toExactInt($startF) !== $startExact;
 
+            // An int step that a float can't hold (past 2^53) is counted with its exact value above, so its values
+            // are computed with it too, each rounded once: as the float 2^53 + 4, the step 2^53 + 3 would take
+            // range(0.5, 27021597764222988.0, 2 ** 53 + 3) to 27021597764222988.0, where its last value is
+            // 27021597764222984.0. Only operands that aren't both ints get here with an int step, a whole one. An
+            // int step that a float holds is applied as that float, as the equal float step is.
+            $exactStep = \is_int($step) && self::intToFloats(\abs($step))[1] !== 0.0;
+
             // A value can pass $end through rounding: of $startF (int operands past 2^53), of the offset or of
             // the addition. It passes by less than a float spacing, so it lands on $end. The common case has a
             // loop of its own, which keeps the cost per value down.
@@ -1453,6 +1472,18 @@ final class Single
                 $halfMagnitudeF = $magnitudeF * 0.5;
                 for ($i = 0; $i <= $lastIndex; ++$i) {
                     $valF = 2.0 * ($halfStartF + $signF * ((float)$i * $halfMagnitudeF));
+                    if ($ascending ? $valF > $endF : $valF < $endF) {
+                        $valF = $lastF;
+                    }
+                    yield $valF;
+                }
+            } elseif ($exactStep) {
+                [$stepHi, $stepLo] = self::intToFloats(\abs($step));
+                for ($i = 0; $i <= $lastIndex; ++$i) {
+                    // (float) $i is exact up to 2^53, which iteration never reaches.
+                    $valF = $i > 0 && $i <= 2 ** 53
+                        ? self::roundFloatPlusMultiple($startF, $i, $stepHi, $stepLo, $ascending)
+                        : $startF + $signF * ((float)$i * $magnitudeF);
                     if ($ascending ? $valF > $endF : $valF < $endF) {
                         $valF = $lastF;
                     }
@@ -1704,6 +1735,61 @@ final class Single
     }
 
     /**
+     * $start ± $i·$step, correctly rounded to float, for an int step past 2^53 that a float can't hold, as
+     * {@see Single::range()} yields it from a float $start.
+     *
+     * The value is summed exactly, as an expansion() of $start and the TwoProducts of $i with each part of the
+     * step. Its components added in float give a float within a spacing or so of it, which is moved to its
+     * neighbour until roundsTo() says the value rounds to it.
+     *
+     * @param float $start
+     * @param int   $i         positive and at most 2^53, so (float) $i is exact
+     * @param float $stepHi    the step magnitude as a float
+     * @param float $stepLo    the step magnitude minus $stepHi, exactly (see intToFloats())
+     * @param bool  $ascending
+     *
+     * @return float
+     */
+    private static function roundFloatPlusMultiple(
+        float $start,
+        int $i,
+        float $stepHi,
+        float $stepLo,
+        bool $ascending
+    ): float {
+        $sign = $ascending ? 1.0 : -1.0;
+        [$hiProduct, $hiError] = self::twoProduct((float)$i, $stepHi);
+        [$loProduct, $loError] = self::twoProduct((float)$i, $stepLo);
+        $value = self::expansion([
+            $start,
+            $sign * $hiProduct,
+            $sign * $hiError,
+            $sign * $loProduct,
+            $sign * $loError,
+        ]);
+
+        $rounded = 0.0;
+        foreach ($value as $component) {
+            $rounded += $component;
+        }
+        // The value is 0 or at least 1 in magnitude: an integer from an integral $start, or more than 2^52 from a
+        // non-integral one, which is below 2^52. So the loop stays clear of the subnormals, where
+        // halfFloatSpacing() is 0.
+        $offset = self::expansion([...$value, -$rounded]);
+        while (\abs($rounded) >= \PHP_FLOAT_MIN && !self::roundsTo($rounded, $offset)) {
+            // To the neighbour on the side of the value. Toward 0 from a power of two, it is half a spacing away.
+            $halfSpacing = Arithmetic::halfFloatSpacing($rounded);
+            $up = self::expansionSign($offset) > 0;
+            $towardZero = $up === ($rounded < 0.0);
+            $rounded += ($up ? 1.0 : -1.0)
+                * ($towardZero && \abs($rounded) === $halfSpacing * 2.0 ** 53.0 ? $halfSpacing : 2.0 * $halfSpacing);
+            $offset = self::expansion([...$value, -$rounded]);
+        }
+
+        return $rounded;
+    }
+
+    /**
      * Whether a step at least the float span $high - $low exceeds their exact span by more than the operands'
      * rounding.
      *
@@ -1737,7 +1823,10 @@ final class Single
      * that can't be decided exactly here.
      *
      * A non-integral float is taken as its shortest decimal, while roundingAllowances() gives the operands an
-     * allowance, and the step always is; an int or an integral float stands for itself, as in roundingAllowance().
+     * allowance, and the step always is; an integral float or an int step stands for itself, as in
+     * roundingAllowance(). An int $start or $end, which reaches here only paired with a non-integral float or a
+     * float beyond the int range, is converted to float, as range() counts the steps in that span: in range(0.5,
+     * 2 ** 53 + 1, 2.0 ** 53), the step exceeds the span 2^53 - 0.5, although it is within the exact span.
      * Bounding each decimal's distance from its float, as the fallback does, also accepts a step that the decimals
      * reject: in range(0.1, 0.2, 0.10000000000000002), each float is within half a spacing of a decimal that
      * makes the step fit, but 0.10000000000000002 > 0.2 - 0.1. So the decimals are compared exactly, each as a sum
@@ -1762,11 +1851,11 @@ final class Single
         // The step minus the span: + step - high + low, each a list of [integer value, power of ten divided by].
         $terms = [];
         $operands = [
-            [$magnitude, 1.0, true],
-            [$ascending ? $end : $start, -1.0, $operandsAsDecimals],
-            [$ascending ? $start : $end, 1.0, $operandsAsDecimals],
+            [$magnitude, 1.0, true, true],
+            [$ascending ? $end : $start, -1.0, $operandsAsDecimals, false],
+            [$ascending ? $start : $end, 1.0, $operandsAsDecimals, false],
         ];
-        foreach ($operands as [$operand, $sign, $asDecimal]) {
+        foreach ($operands as [$operand, $sign, $asDecimal, $isStep]) {
             if (\is_float($operand) && $asDecimal && \floor($operand) !== $operand) {
                 // Split into parts of at most 9 digits, which floats hold exactly, also where ints have 32 bits.
                 [$significand, $exponent, $digits] = self::shortestDecimal($operand);
@@ -1779,10 +1868,15 @@ final class Single
                     $integer = \substr($integer, $length - 9);
                 }
                 $terms[] = [$sign * (float)$integer, $scale];
-            } elseif (\is_int($operand)) {
+            } elseif (\is_int($operand) && $isStep) {
+                // An int step stands for itself, exactly.
                 foreach (self::intToFloats($operand) as $part) {
                     $terms[] = [$sign * $part, 0];
                 }
+            } elseif (\is_int($operand)) {
+                // An int $start or $end is paired here with a non-integral float or a float beyond the int range,
+                // and is converted to float, as for counting: else a step past the span the count sees passes.
+                $terms[] = [$sign * (float)$operand, 0];
             } else {
                 if ($operand !== 0.0 && \abs($operand) < 2.0 ** -900.0) {
                     return null;
@@ -2114,7 +2208,7 @@ final class Single
      *
      * @param int $n
      *
-     * @return list<float>
+     * @return array{float, float}
      */
     private static function intToFloats(int $n): array
     {

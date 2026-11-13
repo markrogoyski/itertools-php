@@ -901,11 +901,13 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * The count follows the exact span; the values are $start + i·|$step| in float arithmetic, as for float operands,
-     * so the last is 9007199254740990.0, where the exact value is 9007199254740991.0.
+     * The count follows the span of the int converted to float. A float step is applied in float arithmetic, as for
+     * float operands, unlike an int step a float can't hold, which is applied exactly: the last value is
+     * 9007199254740990.0, where the exact value is 9007199254740991.0.
      *
-     * Test data generated with Python's fractions.Fraction and IEEE 754 binary64 arithmetic:
-     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     * Test data generated with Python's fractions.Fraction and IEEE 754 binary64 arithmetic, the int $end taken as
+     * float(end):
+     *   count = math.floor(abs(Fraction(float(end)) - Fraction(start)) / abs(Fraction(step))) + 1
      *   value_i = float(start) + sign * (float(i) * abs(float(step)))
      */
     public static function dataProviderForIntEndBeyondFloatPrecisionWithNonIntegralStart(): array
@@ -918,6 +920,231 @@ class RangeTest extends \PHPUnit\Framework\TestCase
             'descending -2.5 to -(2^53 + 1)' => [
                 -2.5, -9007199254740993, -3002399751580329.5,
                 [-2.5, -3002399751580332.0, -6004799503160662.0, -9007199254740990.0],
+            ],
+        ];
+    }
+
+    /**
+     * @test         an int operand beyond 2^53 with a non-integral float operand rejects a step that exceeds their
+     *               span with the int converted to float, although it doesn't exceed their exact span
+     * @dataProvider dataProviderForStepExceedingSpanOfIntConvertedToFloat
+     * @param        float     $start
+     * @param        int|float $end
+     * @param        int|float $step
+     * @param        string    $message
+     */
+    public function testStepExceedingSpanOfIntConvertedToFloatThrows(
+        float $start,
+        int|float $end,
+        int|float $step,
+        string $message
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        try {
+            // When
+            $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+            // Then
+            $this->fail('Expected \InvalidArgumentException, got ' . \var_export($result, true));
+        } catch (\InvalidArgumentException $e) {
+            // Then
+            $this->assertSame($message, $e->getMessage());
+        }
+    }
+
+    /**
+     * Test data generated with Python's fractions.Fraction, the int $end taken as float(end):
+     *   Fraction(abs(step)) > abs(Fraction(float(end)) - Fraction(start))
+     *   span printed as float(abs(Fraction(float(end)) - Fraction(start)))
+     */
+    public static function dataProviderForStepExceedingSpanOfIntConvertedToFloat(): array
+    {
+        return [
+            '0.5 to 2^53 + 1 step 2.0^53' => [
+                0.5, 9007199254740993, 9007199254740992.0,
+                'Single::range: step magnitude (9007199254740992.0) must not exceed span (the exact span between 0.5 '
+                . 'and 9007199254740992.0, which rounds to the step in float)',
+            ],
+            '1.5 to 2^53 + 1 step 2^53 - 1' => [
+                1.5, 9007199254740993, 9007199254740991,
+                'Single::range: step magnitude (9007199254740991.0) must not exceed span (9007199254740990.0)',
+            ],
+            '-0.5 to -(2^53 + 1) step -2.0^53' => [
+                -0.5, -9007199254740993, -9007199254740992.0,
+                'Single::range: step magnitude (9007199254740992.0) must not exceed span (the exact span between -0.5 '
+                . 'and -9007199254740992.0, which rounds to the step in float)',
+            ],
+            '-1.5 to -(2^53 + 1) step -(2^53 - 1)' => [
+                -1.5, -9007199254740993, -9007199254740991,
+                'Single::range: step magnitude (9007199254740991.0) must not exceed span (9007199254740990.0)',
+            ],
+        ];
+    }
+
+    /**
+     * @test         an int operand beyond 2^53 with a non-integral float operand is converted to float, so the range
+     *               holds the start and ends on the converted int when that span is a whole number of steps
+     * @dataProvider dataProviderForIntBeyondFloatPrecisionWithNonIntegralFloat
+     * @param        float        $start
+     * @param        int|float    $end
+     * @param        float        $step
+     * @param        array<float> $expected
+     */
+    public function testIntBeyondFloatPrecisionWithNonIntegralFloatTakesIntAsFloat(
+        float $start,
+        int|float $end,
+        float $step,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * The float steps are applied in float arithmetic, which here gives the correctly rounded values too.
+     *
+     * Test data generated with Python's fractions.Fraction and IEEE 754 binary64 arithmetic, the int $end taken as
+     * float(end):
+     *   count = math.floor(abs(Fraction(float(end)) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   lands on float(end) when abs(Fraction(float(end)) - Fraction(start)) == (count - 1) * abs(Fraction(step))
+     *   value_i = float(start) + sign * (float(i) * abs(float(step)))
+     */
+    public static function dataProviderForIntBeyondFloatPrecisionWithNonIntegralFloat(): array
+    {
+        return [
+            'whole span, ascending 0.5 to 2^53 + 1' => [
+                0.5, 9007199254740993, 3002399751580330.5,
+                [0.5, 3002399751580331.0, 6004799503160662.0, 9007199254740992.0],
+            ],
+            'whole span, descending -0.5 to -(2^53 + 1)' => [
+                -0.5, -9007199254740993, -3002399751580330.5,
+                [-0.5, -3002399751580331.0, -6004799503160662.0, -9007199254740992.0],
+            ],
+            'non-whole span, ascending 0.5 to 2^53 + 1' => [
+                0.5, 9007199254740993, 4503599627370496.0,
+                [0.5, 4503599627370496.0],
+            ],
+            'non-whole span, descending -0.5 to -(2^53 + 1)' => [
+                -0.5, -9007199254740993, -4503599627370496.0,
+                [-0.5, -4503599627370496.0],
+            ],
+        ];
+    }
+
+    /**
+     * @test         integral float operands within the int range give the same range as the equal ints
+     * @dataProvider dataProviderForIntegralFloatOperandsAndInts
+     * @param        int|float    $intStart
+     * @param        int|float    $intEnd
+     * @param        int|float    $floatStart
+     * @param        int|float    $floatEnd
+     * @param        int|float    $step
+     * @param        array<float> $expected
+     */
+    public function testIntegralFloatOperandsGiveSameRangeAsInt(
+        int|float $intStart,
+        int|float $intEnd,
+        int|float $floatStart,
+        int|float $floatEnd,
+        int|float $step,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $withInt = \iterator_to_array(Single::range($intStart, $intEnd, $step), false);
+        $withFloat = \iterator_to_array(Single::range($floatStart, $floatEnd, $step), false);
+
+        // Then
+        $this->assertSame($expected, $withInt);
+        $this->assertSame($expected, $withFloat);
+        $this->assertSame($withInt, $withFloat);
+    }
+
+    /**
+     * Each row is a range with an int operand, then the same range with that operand as an integral float.
+     *
+     * Test data generated with Python's fractions.Fraction, rounded once:
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForIntegralFloatOperandsAndInts(): array
+    {
+        return [
+            'ascending 0 or 0.0 to 3·(2^53 + 4) step 2^53 + 3' => [
+                0, 27021597764222988.0, 0.0, 27021597764222988.0, 9007199254740995,
+                [0.0, 9007199254740996.0, 1.801439850948199E16, 2.7021597764222984E16],
+            ],
+            'descending 0 or 0.0 to -3·(2^53 + 4) step -(2^53 + 3)' => [
+                0, -27021597764222988.0, 0.0, -27021597764222988.0, -9007199254740995,
+                [0.0, -9007199254740996.0, -1.801439850948199E16, -2.7021597764222984E16],
+            ],
+            'descending 3·(2^53 + 4) to 0 or 0.0 step -(2^53 + 3)' => [
+                27021597764222988.0, 0, 27021597764222988.0, 0.0, -9007199254740995,
+                [2.7021597764222988E16, 1.801439850948199E16, 9007199254740998.0, 3.0],
+            ],
+        ];
+    }
+
+    /**
+     * @test         an int step beyond 2^53 that a float can't hold is applied as its exact value, the one the
+     *               step count uses, and each value is rounded once
+     * @dataProvider dataProviderForIntStepBeyondFloatPrecision
+     * @param        float        $start
+     * @param        float        $end
+     * @param        int|float    $step
+     * @param        array<float> $expected
+     */
+    public function testIntStepBeyondFloatPrecisionIsAppliedExactly(
+        float $start,
+        float $end,
+        int|float $step,
+        array $expected
+    ): void {
+        // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $result = \iterator_to_array(Single::range($start, $end, $step), false);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Applied as the float 2^53 + 4, the step would give the last value 27021597764222988.0.
+     *
+     * Test data generated with Python's fractions.Fraction, rounded once:
+     *   count = math.floor(abs(Fraction(end) - Fraction(start)) / abs(Fraction(step))) + 1
+     *   value_i = float(Fraction(start) + sign * i * abs(Fraction(step)))
+     */
+    public static function dataProviderForIntStepBeyondFloatPrecision(): array
+    {
+        return [
+            'ascending 0.5 to 3·(2^53 + 4) step 2^53 + 3' => [
+                0.5, 27021597764222988.0, 9007199254740995,
+                [0.5, 9007199254740996.0, 1.801439850948199E16, 2.7021597764222984E16],
+            ],
+            'descending -0.5 to -3·(2^53 + 4) step -(2^53 + 3)' => [
+                -0.5, -27021597764222988.0, -9007199254740995,
+                [-0.5, -9007199254740996.0, -1.801439850948199E16, -2.7021597764222984E16],
             ],
         ];
     }
