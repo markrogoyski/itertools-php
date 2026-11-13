@@ -265,8 +265,40 @@ final class Stream implements \IteratorAggregate
      */
     public function accumulate(callable $op, mixed ...$initial): self
     {
-        $this->iterable = Single::accumulate($this->iterable, $op, ...$initial);
+        $this->iterable = self::accumulateNamedInitial($this->iterable, $op, $initial);
         return $this;
+    }
+
+    /**
+     * Single::accumulate() of the stream, with its initial values checked before they are unpacked into it.
+     *
+     * Unpacked as they are, a named argument such as data: would collide with a parameter of Single::accumulate()
+     * and fail with an \Error. More than one initial value, or a name other than initial, is rejected as
+     * Single::accumulate() rejects it, when iteration starts.
+     *
+     * @param iterable<mixed>               $data
+     * @param callable(mixed, mixed): mixed $op
+     * @param array<mixed>                  $initial
+     *
+     * @return \Generator<mixed>
+     *
+     * @throws \InvalidArgumentException if more than one initial value is passed, or one is named other than initial.
+     */
+    private static function accumulateNamedInitial(iterable $data, callable $op, array $initial): \Generator
+    {
+        // The count is checked first, as Single::accumulate() checks it.
+        if (\count($initial) > 1) {
+            throw new \InvalidArgumentException(
+                'accumulate expects at most one initial value, got ' . \count($initial)
+            );
+        }
+        foreach (\array_keys($initial) as $name) {
+            if (\is_string($name) && $name !== 'initial') {
+                throw new \InvalidArgumentException("accumulate has no parameter named \${$name}");
+            }
+        }
+
+        yield from Single::accumulate($data, $op, ...$initial);
     }
 
     /**

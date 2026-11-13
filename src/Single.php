@@ -1222,12 +1222,13 @@ final class Single
         }
 
         // Route oversized integer-valued float steps to the float path to avoid PHP 8.5
-        // non-representable int-cast warnings and downstream \intdiv() TypeErrors.
+        // non-representable int-cast warnings and downstream \intdiv() TypeErrors. The bound is -(float) PHP_INT_MIN,
+        // as in Arithmetic::toExactInt(): (float) PHP_INT_MAX is 2^31 - 1 exactly with 32-bit ints, a valid step.
         $useFloat = \is_float($start)
             || \is_float($end)
             || (\is_float($step) && (
                 \fmod($step, 1.0) !== 0.0
-                || \abs($step) >= (float)\PHP_INT_MAX
+                || \abs($step) >= -(float)\PHP_INT_MIN
             ));
 
         // Compare and subtract an int operand and an integral float operand in the int domain. The float converts
@@ -2142,8 +2143,10 @@ final class Single
         $scale = (float)('1e' . $power);
         $magnitude = \abs($x);
 
+        // The digits are compared as strings: they may be more than a 32-bit int holds. The quotient is an integral
+        // float, exact as 10^$power divides $magnitude, which %.0f writes exactly.
         return \fmod($magnitude, $scale) === 0.0
-            && Arithmetic::compare((int)\str_replace('.', '', $significand), $magnitude / $scale) === 0;
+            && \ltrim(\str_replace('.', '', $significand), '0') === \ltrim(\sprintf('%.0f', $magnitude / $scale), '0');
     }
 
     /**
@@ -2158,14 +2161,87 @@ final class Single
     {
         $magnitude = \abs($x);
         $digits = 0;
-        $decimal = \sprintf('%.0e', $magnitude);
-        while ((float)$decimal !== $magnitude) {
+        // 17 digits always read back, so the loop ends by then.
+        while (true) {
+            [$significand, $exponent] = \explode('e', \sprintf('%.' . $digits . 'e', $magnitude));
+            $integer = \str_replace('.', '', $significand);
+            $power = (int)$exponent - $digits;
+            // Just below a power of two, floats are twice as dense as just above it, so the decimal nearest $x can
+            // read back as a neighbour of $x while the next decimal up or down at that length reads back as $x:
+            // 2^-77 is 6.6174449004242214e-24, and 6.617444900424221e-24 reads back as the float below it, while
+            // 6.617444900424222e-24 reads back as 2^-77.
+            $candidates = [$integer, self::incrementDigits($integer), self::decrementDigits($integer)];
+            foreach ($candidates as $candidate) {
+                if ((float)($candidate . 'e' . $power) === $magnitude) {
+                    return self::decimalParts($candidate, $power);
+                }
+            }
             ++$digits;
-            $decimal = \sprintf('%.' . $digits . 'e', $magnitude);
         }
-        [$significand, $exponent] = \explode('e', $decimal);
+    }
 
-        return [$significand, (int)$exponent, $digits];
+    /**
+     * A decimal integer written in digits, plus one, in digits: the operands of shortestDecimal() have up to 17
+     * digits, more than a 32-bit int holds.
+     *
+     * @param string $integer digits
+     *
+     * @return string
+     */
+    private static function incrementDigits(string $integer): string
+    {
+        $length = \strlen($integer);
+        $position = $length - 1;
+        while ($position >= 0 && $integer[$position] === '9') {
+            --$position;
+        }
+        if ($position < 0) {
+            return '1' . \str_repeat('0', $length);
+        }
+
+        return \substr($integer, 0, $position)
+            . (string)((int)$integer[$position] + 1)
+            . \str_repeat('0', $length - $position - 1);
+    }
+
+    /**
+     * A positive decimal integer written in digits, minus one, in digits, which may keep a leading zero.
+     *
+     * @param string $integer digits, not all zeros
+     *
+     * @return string
+     */
+    private static function decrementDigits(string $integer): string
+    {
+        $length = \strlen($integer);
+        $position = $length - 1;
+        while ($position > 0 && $integer[$position] === '0') {
+            --$position;
+        }
+
+        return \substr($integer, 0, $position)
+            . (string)((int)$integer[$position] - 1)
+            . \str_repeat('9', $length - $position - 1);
+    }
+
+    /**
+     * The decimal $integer times 10^$power, as shortestDecimal() returns it: its significand d.ddd without leading
+     * or trailing zeros, its exponent and the number of digits after the point.
+     *
+     * @param string $integer digits, not all zeros
+     * @param int    $power
+     *
+     * @return array{string, int, int}
+     */
+    private static function decimalParts(string $integer, int $power): array
+    {
+        $integer = \ltrim($integer, '0');
+        $trimmed = \rtrim($integer, '0');
+        $power += \strlen($integer) - \strlen($trimmed);
+        $length = \strlen($trimmed);
+        $significand = $length > 1 ? $trimmed[0] . '.' . \substr($trimmed, 1) : $trimmed;
+
+        return [$significand, $power + $length - 1, $length - 1];
     }
 
     /**

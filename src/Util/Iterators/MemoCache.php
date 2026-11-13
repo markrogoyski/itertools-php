@@ -86,6 +86,8 @@ final class MemoCache
         } catch (\Throwable $exception) {
             $this->failure = $exception;
             $this->failureIndex = $this->cached;
+            // Replay rethrows the failure at this index and never reads the source again.
+            $this->source = null;
         } finally {
             $this->advancing = false;
         }
@@ -121,7 +123,10 @@ final class MemoCache
             throw new \LogicException('Memoized iterable source is unavailable');
         }
         if (!$this->source->valid()) {
+            // Replay ends at the cached elements from now on, so the source is released: a tee copy read
+            // through it then detaches, and its siblings stop buffering for it.
             $this->exhausted = true;
+            $this->source = null;
             return;
         }
 

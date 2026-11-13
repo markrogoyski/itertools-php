@@ -10,6 +10,7 @@ A fix or change to a function also applies to its `Stream` wrapper.
 * Combinatorics, Single: `powerset` and `flatten` repeated keys, so `iterator_to_array` lost elements; keys are now sequential.
 * Random: `choice` (and `Stream::ofRandomChoice`) returned `null` for associative or sparse arrays.
 * Single: `accumulate` ignored a named `initial` argument.
+* Stream: `accumulate` threw `\Error` ("Named parameter $data overwrites previous argument") for an initial value named `data`; it now throws `\InvalidArgumentException`, as `Single::accumulate` does for any name other than `initial`.
 * Single: `groupBy` added an item to a group twice when its group names mapped to the same array key (`2020` and `'2020'`).
 * Set, Multi, Summary: the set operations, `mergeSorted`, `mergeSortedBy` and `arePermutations*` threw "Named parameter … overwrites previous argument" when an iterable was passed by a name such as `strict`, `filler`, `keyFunc` or `a`.
 
@@ -23,7 +24,8 @@ A fix or change to a function also applies to its `Stream` wrapper.
 * Multi: `roundRobin` read more values than it yielded; it is now lazy.
 * Single: `padLeft` read the whole source before yielding, so it never yielded for an infinite source; once the source reaches `$length` it now streams the rest.
 * Infinite: `cycle` threw on the second pass for one-pass sources other than a bare generator, and dropped the first row of a `\PDOStatement`.
-* Transform: `tee` (and `peekStream`, `peekPrint`, `peekPrintR`) replaced a cached `null` value or key with the source's current one, dropped the last line of an `\SplFileObject` with no trailing newline, yielded nothing for `\SplQueue`, `\SplStack` and `\SplDoublyLinkedList`, and an abandoned copy made the others buffer the whole source. Dropped copies now release their buffer.
+* Transform: `tee` (and `peekStream`, `peekPrint`, `peekPrintR`) replaced a cached `null` value or key with the source's current one, dropped the last line of an `\SplFileObject` with no trailing newline, yielded nothing for `\SplQueue`, `\SplStack` and `\SplDoublyLinkedList`, and an abandoned copy made the others buffer the whole source. Dropped copies now release their buffer, as does a copy that `memoize` or `cycle` has read to its end.
+* Transform, Infinite: `memoize` and `cycle` kept a non-array source after reading it to its end or after it threw; they now release it and replay their cached elements and the exception. A `tee` copy read through one, as in `cycle(new \LimitIterator($copy, 0, 3))`, no longer makes the other copies buffer the rest of the source.
 * Transform: `memoize` clones split the source's elements between them and could rewind or re-read it; a clone now shares the source and cache with the original.
 * Summary, Set, Single: `endsWith`, `endsWithCoercive`, `isSorted`, `isReversed`, `isSortedBy`, `isReversedBy`, `distinctAdjacent`, `distinctAdjacentBy` and `groupAdjacentBy` compared an array element only after reading later ones, so rows filled through one shared reference (as `PDOStatement::bindColumn()` does) all compared as the last row; `endsWithCoercive` also mishandled an object mutated between reads. Elements are now compared as they were when read. See README "Values compared after later reads". Costs:
   * `isSorted` of two-field rows takes ~2x as long; of scalars, ~half as long.
@@ -48,10 +50,12 @@ A fix or change to a function also applies to its `Stream` wrapper.
 * Math: `relativeFrequencies` and `relativeFrequenciesBy` yielded `int(1)` for a single distinct value; they now always yield floats.
 * Single: `range` with a float step or a float operand:
   * Count and endpoint now follow the exact span, fixing extra or wrong elements for large operands (`range(1e16, 1e16 + 4, 0.5)` gave 10 elements, not 9) and integers beyond `2^53`, and a spurious "must not exceed span (0)" error.
-  * A step larger than the exact span now throws `\InvalidArgumentException` (`range(0, PHP_INT_MAX, (float) PHP_INT_MAX)` was accepted).
+  * A step larger than the exact span now throws `\InvalidArgumentException` (`range(0, PHP_INT_MAX, (float) PHP_INT_MAX)` was accepted with 64-bit ints, where the step rounds up to `2^63`).
   * Values are computed from the exact `$start` and correctly rounded; an endpoint lost to rounding is kept (`range(0, 55, 1.1)` stopped at 53.9), and a `-0.0` end yields `0.0`.
   * A float span that overflows no longer throws regardless of step count (`range(-1e308, 1e308, 1e308)` yields `[-1e308, 0.0, 1e308]`); an uncountable span names its operands rather than `INF`.
   * Integral floats within the integer range are taken as integers, as an integer partner already takes them, so `range(0.0, 27021597764222988.0, 2**53 + 3)` yields what `range(0, 27021597764222988.0, 2**53 + 3)` does, ending on `27021597764222984.0` (was `27021597764222988.0`). On other operands, an integer step beyond `2^53` that a float cannot hold is applied as its exact value, the one the step count uses, with each value rounded once: `range(0.5, 27021597764222988.0, 2**53 + 3)` ends on `27021597764222984.0` (was `27021597764222988.0`). An integer step that a float holds is applied as that float, as the equal float step is.
+  * A non-integral operand that is a power of two could be taken as a decimal one digit longer than the shortest one that reads back as it, so `range(-2e-25, 6.617444900424222e-24, 6.817444900424222e-24)` threw "must not exceed span"; it now yields `[-2e-25, 6.617444900424222e-24]`.
+  * With 32-bit ints, an integral float step of `(float) PHP_INT_MAX`, which is exactly `2^31 - 1` there, yielded floats; it now yields ints, as the equal int step does. An integral float past `2^53` that is its own shortest decimal, such as `2.0 ** 54`, was not recognized as exact, so `range(2.0 ** 54, 0.3, -2.0 ** 53)` also yielded `0.3`.
 
 ### Changes
 * **Same source passed more than once.** An iterator or generator passed to one call more than once — directly, through a `Stream` or other `IteratorAggregate` returning it, or as a stream passed to its own methods — skipped values, threw ("Cannot traverse an already closed generator", "Cannot resume an already running generator", …) or gave wrong answers. Now:
