@@ -6,6 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\Arithmetic;
 use IterTools\Util\Identity;
+use IterTools\Util\Iterators\RelatedIterator;
 use IterTools\Util\Snapshot;
 use IterTools\Util\Truthiness;
 use IterTools\Util\UniqueExtractor;
@@ -730,14 +731,19 @@ final class Summary
             return true;
         }
 
-        // Two objects can also resolve to one iterator, as two Streams over one generator do. The source is
-        // resolved only once the prefix has an element, so an empty prefix leaves it untouched.
+        // Two objects can also resolve to one iterator, as two Streams over one generator do. Seen through
+        // Streams alone, that iterator is recognized before anything is read. Otherwise the source is resolved
+        // only once the prefix has an element, so an empty prefix leaves it untouched, and a source behind
+        // another aggregate is recognized only then, after the prefix has been rewound and read.
         //
         // The prefix is read with valid()/current()/next(), not foreach, because foreach rewinds. Its one
-        // rewind is in rewindOrIsSource(), which catches a rewind that throws because the prefix is the
-        // source's own iterator, already read. A second rewind could also throw (an empty generator, once run).
+        // rewind is in rewindOrIsSource(), which tells a rewind refused because the prefix is the source's own
+        // iterator, already read. A second rewind could also throw (an empty generator, once run).
         $shareable = \is_object($data) && \is_object($prefix);
-        $prefixIt  = Transform::toIterator($prefix);
+        if ($shareable && self::isOneStreamedIterator($data, $prefix)) {
+            return true;
+        }
+        $prefixIt = Transform::toIterator($prefix);
         if (self::rewindOrIsSource($prefixIt, $shareable ? $data : null)) {
             return true;
         }
@@ -787,14 +793,19 @@ final class Summary
             return true;
         }
 
-        // Two objects can also resolve to one iterator, as two Streams over one generator do. The source is
-        // resolved only once the suffix has an element, so an empty suffix leaves it untouched.
+        // Two objects can also resolve to one iterator, as two Streams over one generator do. Seen through
+        // Streams alone, that iterator is recognized before anything is read. Otherwise the source is resolved
+        // only once the suffix has an element, so an empty suffix leaves it untouched, and a source behind
+        // another aggregate is recognized only then, after the suffix has been rewound and read.
         //
         // The suffix is read with valid()/current()/next(), not foreach, because foreach rewinds. Its one
-        // rewind is in rewindOrIsSource(), which catches a rewind that throws because the suffix is the
-        // source's own iterator, already read. A second rewind could also throw (an empty generator, once run).
+        // rewind is in rewindOrIsSource(), which tells a rewind refused because the suffix is the source's own
+        // iterator, already read. A second rewind could also throw (an empty generator, once run).
         $shareable = \is_object($data) && \is_object($suffix);
-        $suffixIt  = Transform::toIterator($suffix);
+        if ($shareable && self::isOneStreamedIterator($data, $suffix)) {
+            return true;
+        }
+        $suffixIt = Transform::toIterator($suffix);
         if (self::rewindOrIsSource($suffixIt, $shareable ? $data : null)) {
             return true;
         }
@@ -893,26 +904,84 @@ final class Summary
     }
 
     /**
+     * Tells whether two objects are, or are Streams (possibly nested) over, one and the same iterator.
+     *
+     * Nothing is read, rewound or resolved: only Streams are looked through, by their source, and no
+     * getIterator() is called. Any other aggregate, an array-backed Stream or a Traversable that is not an
+     * Iterator is unknown, and false.
+     *
+     * @param object $a
+     * @param object $b
+     *
+     * @return bool
+     */
+    private static function isOneStreamedIterator(object $a, object $b): bool
+    {
+        $iterator = self::streamedIterator($a);
+
+        return $iterator !== null && $iterator === self::streamedIterator($b);
+    }
+
+    /**
+     * The iterator an object is, or that the Streams it is (possibly nested) are over, or null if unknown.
+     *
+     * A Stream's source is only ever the iterable it was created from, or a generator a step made over the
+     * previous one, so following sources always ends, at a non-Stream.
+     *
+     * @param object $object
+     *
+     * @return \Iterator<mixed>|null
+     */
+    private static function streamedIterator(object $object): ?\Iterator
+    {
+        /** @var \ReflectionProperty|null $source */
+        static $source = null;
+        $source ??= new \ReflectionProperty(Stream::class, 'iterable');
+
+        while ($object instanceof Stream) {
+            $iterable = $source->getValue($object);
+            if (!\is_object($iterable)) {
+                return null;
+            }
+            $object = $iterable;
+        }
+
+        return $object instanceof \Iterator ? $object : null;
+    }
+
+    /**
      * Rewinds a prefix or suffix, and tells whether it is the source's own iterator, which the source starts
      * and ends with.
      *
-     * Only if the rewind throws, as it does for a generator or tee copy already read, is the source resolved to
-     * tell, so a prefix or suffix that rewinds leaves it untouched. One that is not the source's own keeps its
-     * exception, also when resolving the source fails.
+     * Only if the rewind is refused, as it is for a generator or tee copy already read, is the source resolved
+     * to tell, so a prefix or suffix that rewinds leaves it untouched. One that is not the source's own keeps
+     * the refusal, also when resolving the source fails. Any other exception propagates.
      *
      * @param \Iterator<mixed>     $iterator prefix or suffix
      * @param iterable<mixed>|null $data     source, or null when it cannot share the iterator
      *
      * @return bool
      *
-     * @throws \Throwable the rewind's, if the iterator is not the source's own
+     * @throws \Throwable the rewind's, or the generator body's, if the iterator is not the source's own
      */
     private static function rewindOrIsSource(\Iterator $iterator, ?iterable $data): bool
     {
+        // A generator is started first, outside the catch below: an unstarted one runs its body to its first
+        // yield here, as rewind() would, so whatever the body throws propagates. Once started, rewind() runs
+        // no code of the generator's, only PHP's check that it has not moved past its first yield.
+        if ($iterator instanceof \Generator) {
+            $iterator->valid();
+        }
+
         try {
             $iterator->rewind();
-        } catch (\Throwable $e) {
-            if ($data === null) {
+        } catch (\Exception $e) {
+            // A refused rewind can mean the prefix or suffix is the source's own iterator, already read: a user
+            // aggregate over a shared generator advanced or exhausted before the call, or over an advanced tee
+            // copy, which Streams cannot be looked through to see. Only that refusal, by PHP or by a tee copy,
+            // whose rewind() is a position check, is taken as a sign, and only if the source resolves to the
+            // same iterator.
+            if ($data === null || !self::isRewindRefusal($iterator, $e)) {
                 throw $e;
             }
             try {
@@ -927,6 +996,26 @@ final class Summary
         }
 
         return false;
+    }
+
+    /**
+     * Tells whether an exception from rewinding an iterator is its refusal to rewind after it has advanced.
+     *
+     * @param \Iterator<mixed> $iterator
+     * @param \Exception       $e        thrown by $iterator->rewind()
+     *
+     * @return bool
+     */
+    private static function isRewindRefusal(\Iterator $iterator, \Exception $e): bool
+    {
+        if ($iterator instanceof \Generator) {
+            return \get_class($e) === \Exception::class
+                && $e->getMessage() === 'Cannot rewind a generator that was already run';
+        }
+
+        return $iterator instanceof RelatedIterator
+            && \get_class($e) === \LogicException::class
+            && $e->getMessage() === 'RelatedIterator cannot be rewinded after it has advanced';
     }
 
     /**

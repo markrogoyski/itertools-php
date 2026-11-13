@@ -58,7 +58,7 @@ A fix or change to a function also applies to its `Stream` wrapper.
   * `product` yields every combination: `product($gen, $gen)` over `[1, 2]` yields `[1, 1], [1, 2], [2, 1], [2, 2]`.
   * `difference` subtracts a repeated subtrahend once per position it was passed in; when the first iterable is also a subtrahend, the result is empty.
   * `sameCount` returns `true`.
-  * `same`, `arePermutations*`, `startsWith*` and `endsWith*` return `true` without reading it, including an array-backed stream compared with itself that holds `NAN` or a non-serializable object.
+  * `same`, `arePermutations*`, `startsWith*` and `endsWith*` return `true` without reading it, including an array-backed stream compared with itself that holds `NAN` or a non-serializable object. For `startsWith*` and `endsWith*` this holds when it is passed directly or through a `Stream`; through another `IteratorAggregate` it is read, then recognized, and an exception thrown while reading it propagates.
   * `chainWith` of a stream with itself yields its elements twice for arrays and rewindable iterators; over a generator (including after a step such as `map`) it throws after the first pass, as `Multi::chain($gen, $gen)` does.
   * A stream passed to its own methods stands for its elements at that point in the pipeline.
   * `Transform::toIterator` returns the iterator an aggregate's `getIterator()` returns, following nested aggregates, instead of wrapping it. An aggregate returning itself, or a cycle of aggregates, throws `\LogicException` (was `\Exception`, or a stack-overflow crash).
