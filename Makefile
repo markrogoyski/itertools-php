@@ -1,4 +1,4 @@
-.PHONY : lint tests style phpstan psalm psalm-sandbox phpmd coverage composer-unused composer-require-checker composer-audit
+.PHONY : lint tests style phpstan phpstan-sandbox psalm psalm-sandbox phpmd coverage composer-unused composer-require-checker composer-audit
 
 all : lint tests style phpstan psalm composer-unused composer-require-checker
 
@@ -13,6 +13,11 @@ style :
 
 phpstan :
 	vendor/bin/phpstan analyze -c tools/phpstan.neon --memory-limit=256M
+
+# For sandboxed agents: parallel workers need a local TCP socket, which the sandbox denies (EPERM) whenever
+# the result cache is cold. --debug is the only way to run single-process; it also skips the result cache.
+phpstan-sandbox :
+	vendor/bin/phpstan analyze -c tools/phpstan.neon --memory-limit=256M --debug
 
 psalm :
 	php -d opcache.lockfile_path=$${TMPDIR:-/tmp} vendor/bin/psalm --config=tools/psalm.xml
