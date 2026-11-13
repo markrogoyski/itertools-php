@@ -24,6 +24,12 @@ final class Reduce
     private const FLOAT_EXACT_INT = 9007199254740992;
 
     /**
+     * The most moves of a correctly rounded interpolation's candidate before it is a logic error: it starts
+     * within an ulp or so and moves at most a couple of times.
+     */
+    private const MAX_ROUNDING_MOVES = 8;
+
+    /**
      * Reduces given collection like array_reduce() function.
      *
      * But unlike array_reduce(), it works with all iterable types.
@@ -829,6 +835,24 @@ final class Reduce
             throw new \InvalidArgumentException("Percentile must be between 0 and 100. Got {$shown}.");
         }
 
+        return static::valueAtRank($data, $percentile, 100.0);
+    }
+
+    /**
+     * The R-7 value at the rank $last * $fraction / $scale of the sorted values, for toPercentile ($scale 100)
+     * and toQuantile ($scale 1).
+     *
+     * The rank is located from the exact product of $fraction and the last index, so a quantile is never
+     * first scaled to a percentile, which would round it.
+     *
+     * @param iterable<int|float> $data
+     * @param float               $fraction in the inclusive range [0, $scale]
+     * @param float               $scale    100.0 for a percentile, 1.0 for a quantile
+     *
+     * @return int|float|null
+     */
+    private static function valueAtRank(iterable $data, float $fraction, float $scale): int|float|null
+    {
         $values = static::toNumericList($data);
         if (static::containsNan($values)) {
             return \NAN;
@@ -844,7 +868,7 @@ final class Reduce
             return $values[0];
         }
 
-        [$lowerIndex, $above, $below, $nearWeight, $fromLo] = static::percentileRank($count - 1, $percentile);
+        [$lowerIndex, $above, $below, $nearWeight, $fromLo] = static::percentileRank($count - 1, $fraction, $scale);
 
         if ($above === 0.0) {
             return $values[$lowerIndex];
@@ -856,68 +880,73 @@ final class Reduce
             $above,
             $below,
             $nearWeight,
-            $fromLo
+            $fromLo,
+            $scale
         );
     }
 
     /**
-     * Locates the R-7 rank h = $last * $percentile / 100 between two indices of the sorted values.
+     * Locates the R-7 rank h = $last * $fraction / $scale between two indices of the sorted values.
      *
-     * Rounding (n - 1) * p, or p / 100, can put a rank that is just off an integer onto it, or one that is
-     * an integer just off it, so neither the floor nor the test for an integer can use a rounded rank.
-     * Both come from the exact product $last * $percentile, held as the unevaluated sum $hi + $lo (Dekker's
-     * TwoProduct, exact here even for a subnormal product, as $last is an integer): $hi - 100 * $j is exact
-     * (Sterbenz, or $j = 0), so the remainder's sign and zero are too.
+     * Rounding (n - 1) * p, p / 100, or a quantile scaled to a percentile, can put a rank that is just off
+     * an integer onto it, or one that is an integer just off it, so neither the floor nor the test for an
+     * integer can use a rounded rank. Both come from the exact product $last * $fraction, held as the
+     * unevaluated sum $hi + $lo (Dekker's TwoProduct, exact here even for a subnormal product, as $last is an
+     * integer): $hi - $scale * $j is exact (Sterbenz, or $j = 0), so the remainder's sign and zero are too.
      *
-     * The weights are returned in units of 1/100 of the rank: $above = 100 * (h - j), zero exactly when h
-     * is an integer, and $below = 100 * (j + 1 - h). Each is accurate to a rounding when it is the smaller
-     * one, the one an interpolation from the nearer value multiplies, even when it is far below 1.
+     * The weights are returned in units of 1/S of the rank, for the scale S = $scale (100 for a percentile,
+     * 1 for a quantile): $above = S * (h - j), zero exactly when h is an integer, and $below =
+     * S * (j + 1 - h). Each is accurate to a rounding when it is the smaller one, the one an interpolation
+     * from the nearer value multiplies, even when it is far below 1.
      *
      * For {@see Reduce::interpolateIntegers()}, the smaller weight is also returned exactly, as floats whose
      * unevaluated sum it is, with whether it is $above (so the interpolation is from $lo), decided on the
-     * exact weights: past 2^53 a weight's rounding can decide a tie, and when both round to 50, an offset
+     * exact weights: past 2^53 a weight's rounding can decide a tie, and when both round to S / 2, an offset
      * taken from the wrong end can exceed half a span past PHP_INT_MAX.
      *
-     * @param int   $last       the last index, $count - 1 (below 2^53)
-     * @param float $percentile in the inclusive range [0, 100]
+     * @param int   $last     the last index, $count - 1 (below 2^53)
+     * @param float $fraction in the inclusive range [0, $scale]
+     * @param float $scale    100.0 for a percentile, 1.0 for a quantile
      *
      * @return array{int, float, float, list<float>, bool} [j, $above, $below, exact smaller weight, from $lo]
      */
-    private static function percentileRank(int $last, float $percentile): array
+    private static function percentileRank(int $last, float $fraction, float $scale): array
     {
-        $a  = (float) $last;
-        $hi = $a * $percentile;
+        $a    = (float) $last;
+        $hi   = $a * $fraction;
+        $half = $scale / 2.0;
 
-        $lo = static::twoProductError($a, $percentile, $hi);
+        $lo = static::twoProductError($a, $fraction, $hi);
 
-        // $hi / 100 can round up onto $j + 1 only from below it, never down, so $j is right or one too high.
-        $j = (int) \floor($hi / 100.0);
-        $x = $hi - 100.0 * (float) $j;
+        // $hi / S can round up onto $j + 1 only from below it, never down, so $j is right or one too high.
+        $j = (int) \floor($hi / $scale);
+        $x = $hi - $scale * (float) $j;
         $d = $x + $lo;
         $dError = static::twoSumError($x, $lo, $d);
 
         if ($d < 0) {
-            return [$j - 1, 100.0 + $d, -$d, [-$d, -$dError], false];
+            return [$j - 1, $scale + $d, -$d, [-$d, -$dError], false];
         }
 
-        // 100 - $x is exact when $x >= 50, where $below is the smaller weight.
-        $below = (100.0 - $x) - $lo;
+        // S - $x is exact when $x >= S / 2, where $below is the smaller weight.
+        $below = ($scale - $x) - $lo;
 
-        // $d + $dError is the exact weight, with $dError below half an ulp of $d: it is at most 50 exactly
-        // when $d is below 50, or is 50 with a correction that is not positive.
-        if ($d < 50.0 || ($d === 50.0 && $dError <= 0.0)) {
+        // $d + $dError is the exact weight, with $dError below half an ulp of $d: it is at most S / 2 exactly
+        // when $d is below S / 2, or is S / 2 with a correction that is not positive.
+        if ($d < $half || ($d === $half && $dError <= 0.0)) {
             return [$j, $d, $below, [$d, $dError], true];
         }
-        $b = 100.0 - $d;
+        $b = $scale - $d;
 
-        return [$j, $d, $below, [$b, static::twoSumError(100.0, -$d, $b), -$dError], false];
+        return [$j, $d, $below, [$b, static::twoSumError($scale, -$d, $b), -$dError], false];
     }
 
     /**
      * Reduces given collection to its value at the given quantile.
      *
-     * Thin wrapper over {@see Reduce::toPercentile()} that accepts a quantile in the
-     * inclusive range [0, 1] (e.g. 0.25 is the first quartile / 25th percentile).
+     * Uses the same R-7 / linear-interpolation method as {@see Reduce::toPercentile()}, with a quantile in
+     * the inclusive range [0, 1] (e.g. 0.25 is the first quartile / 25th percentile). The rank is located from
+     * the quantile itself, exactly, not from the quantile scaled to a percentile, which would round it first.
      *
      * A NAN anywhere in the input yields NAN, whatever its position, as for toMedian.
      *
@@ -937,7 +966,7 @@ final class Reduce
             throw new \InvalidArgumentException("Quantile must be between 0 and 1. Got {$shown}.");
         }
 
-        return static::toPercentile($data, $quantile * 100.0);
+        return static::valueAtRank($data, $quantile, 1.0);
     }
 
     /**
@@ -1152,28 +1181,30 @@ final class Reduce
     /**
      * Linearly interpolates between two numbers without overflowing on extreme magnitudes.
      *
-     * The weights are in units of 1/100: $above = 100 * (h - j) and $below = 100 - $above, both positive.
-     * The point is reached from the nearer value, $lo + ($above / 100) * ($hi - $lo) or
-     * $hi - ($below / 100) * ($hi - $lo), whose small weight is the accurate one and keeps its digits
-     * where its complement would round to 1. This direct form returns the value exactly when the two are
-     * equal, which the weighted form does not (0.1 * 0.7 + 0.1 * 0.3 is not 0.1). A weight below
-     * 100 * PHP_FLOAT_MIN multiplies the span before the division by 100, which would otherwise underflow.
+     * The weights are in units of 1/S, for the scale S = $scale (100 for a percentile, 1 for a quantile):
+     * $above = S * (h - j) and $below = S - $above, both positive. The point is reached from the nearer
+     * value, $lo + ($above / S) * ($hi - $lo) or $hi - ($below / S) * ($hi - $lo), whose small weight is the
+     * accurate one and keeps its digits where its complement would round to 1. This direct form returns the
+     * value exactly when the two are equal, which the weighted form does not (0.1 * 0.7 + 0.1 * 0.3 is not
+     * 0.1). A weight below S * PHP_FLOAT_MIN multiplies the span before the division by S, which would
+     * otherwise underflow.
      *
-     * The weighted form $lo * $below / 100 + $hi * $above / 100 is used only when the span $hi - $lo is
+     * The weighted form $lo * $below / S + $hi * $above / S is used only when the span $hi - $lo is
      * unrepresentable. Being a convex combination it lies between $lo and $hi and cannot overflow. A
      * weight that underflows there becomes the smallest positive float, so it still carries an infinite
      * value's infinity; next to a value past PHP_FLOAT_MAX / 2, anything it adds is lost to rounding.
      *
-     * Weights of exactly 50 are delegated to {@see Reduce::midpoint()}: that is the one interpolation
-     * computable exactly for integer bounds, and delegating keeps toPercentile($data, 50) identical to
-     * toMedian($data) rather than merely close to it.
+     * Weights of exactly S / 2 are delegated to {@see Reduce::midpoint()}: that is the one interpolation
+     * computable exactly for integer bounds, and delegating keeps toPercentile($data, 50) and
+     * toQuantile($data, 0.5) identical to toMedian($data) rather than merely close to it.
      *
      * @param int|float   $lo
      * @param int|float   $hi
-     * @param float       $above      100 * the weight on $hi, in (0, 100)
-     * @param float       $below      100 * the weight on $lo, in (0, 100)
+     * @param float       $above      S * the weight on $hi, in (0, S)
+     * @param float       $below      S * the weight on $lo, in (0, S)
      * @param list<float> $nearWeight the smaller of $above and $below exactly, as an unevaluated sum
      * @param bool        $fromLo     whether $nearWeight is $above, from the exact weights
+     * @param float       $scale      S: 100.0 for a percentile, 1.0 for a quantile
      *
      * @return int|float
      */
@@ -1183,22 +1214,25 @@ final class Reduce
         float $above,
         float $below,
         array $nearWeight,
-        bool $fromLo
+        bool $fromLo,
+        float $scale
     ): int|float {
+        $half = $scale / 2.0;
+
         // Past 2^53 an integer endpoint would round on conversion to float before its offset is added, rounding
         // twice: 2^53 + 1 to 2^53, then 2^53 + 1.75 to 2^53. The offset's integer part is added exactly instead.
-        // This takes a weight that merely rounds to 50 too, which can be a tie the midpoint would break wrongly.
+        // This takes a weight that merely rounds to S / 2 too, which can be a tie the midpoint would break wrongly.
         $loInt = Arithmetic::toExactInt($lo);
         $hiInt = Arithmetic::toExactInt($hi);
         if (
             $loInt !== null && $hiInt !== null
             && ($loInt < -self::FLOAT_EXACT_INT || $hiInt > self::FLOAT_EXACT_INT)
-            && $nearWeight !== [50.0, 0.0]
+            && $nearWeight !== [$half, 0.0]
         ) {
-            return static::interpolateIntegers($loInt, $hiInt, $nearWeight, $fromLo);
+            return static::interpolateIntegers($loInt, $hiInt, $nearWeight, $fromLo, $scale);
         }
 
-        if ($above === 50.0) {
+        if ($above === $half) {
             return static::midpoint($lo, $hi);
         }
 
@@ -1208,15 +1242,15 @@ final class Reduce
         if (\is_finite((float) $span)) {
             if ($above <= $below) {
                 /** @psalm-suppress InvalidOperand */
-                return $above < 100 * \PHP_FLOAT_MIN ? $lo + $above * $span / 100 : $lo + $above / 100 * $span;
+                return $above < $scale * \PHP_FLOAT_MIN ? $lo + $above * $span / $scale : $lo + $above / $scale * $span;
             }
 
             /** @psalm-suppress InvalidOperand */
-            return $below < 100 * \PHP_FLOAT_MIN ? $hi - $below * $span / 100 : $hi - $below / 100 * $span;
+            return $below < $scale * \PHP_FLOAT_MIN ? $hi - $below * $span / $scale : $hi - $below / $scale * $span;
         }
 
-        $toHi = \max($above / 100.0, \PHP_FLOAT_MIN * \PHP_FLOAT_EPSILON);
-        $toLo = \max($below / 100.0, \PHP_FLOAT_MIN * \PHP_FLOAT_EPSILON);
+        $toHi = \max($above / $scale, \PHP_FLOAT_MIN * \PHP_FLOAT_EPSILON);
+        $toLo = \max($below / $scale, \PHP_FLOAT_MIN * \PHP_FLOAT_EPSILON);
 
         /** @psalm-suppress InvalidOperand */
         return $lo * $toLo + $hi * $toHi;
@@ -1225,31 +1259,33 @@ final class Reduce
     /**
      * Interpolates between two integers, correctly rounded.
      *
-     * 100 times the result is held exactly, as a nonoverlapping expansion (a list of floats whose unevaluated
-     * sum it is, see {@see Reduce::growExpansion()}): 100 * $lo + w * $hi - w * $lo from $lo, or
-     * 100 * $hi - w * $hi + w * $lo from $hi, for the exact smaller weight w. Each endpoint is split into its
-     * float and integer residual, and each product taken as a float and its error (TwoProduct), which is
-     * exact as one factor is an integer: no span is formed, so none can overflow. The value is then rounded
-     * once, by {@see Reduce::roundExpansionDividedBy100()}, so no intermediate rounding can cancel into the
-     * result (-1 + 0.9 is not -0.1), break a tie or make a false one.
+     * S times the result, for the scale S = $scale (100 for a percentile, 1 for a quantile), is held
+     * exactly, as a nonoverlapping expansion (a list of floats whose unevaluated sum it is, see
+     * {@see Reduce::growExpansion()}): S * $lo + w * $hi - w * $lo from $lo, or S * $hi - w * $hi + w * $lo
+     * from $hi, for the exact smaller weight w. Each endpoint is split into its float and integer residual,
+     * and each product taken as a float and its error (TwoProduct), which is exact as one factor is an
+     * integer: no span is formed, so none can overflow. The value is then rounded once, by
+     * {@see Reduce::roundExpansionDividedBy()}, so no intermediate rounding can cancel into the result
+     * (-1 + 0.9 is not -0.1), break a tie or make a false one.
      *
      * @param int         $lo
      * @param int         $hi
-     * @param list<float> $weight 100 * the weight of the nearer endpoint's partner, at most 50, exactly as
+     * @param list<float> $weight S * the weight of the nearer endpoint's partner, at most S / 2, exactly as
      *                            an unevaluated sum
      * @param bool        $fromLo whether $lo is the nearer endpoint, so $weight is the weight on $hi
+     * @param float       $scale  S: 100.0 for a percentile, 1.0 for a quantile
      *
      * @return float
      */
-    private static function interpolateIntegers(int $lo, int $hi, array $weight, bool $fromLo): float
+    private static function interpolateIntegers(int $lo, int $hi, array $weight, bool $fromLo, float $scale): float
     {
-        // Residuals are at most 2^10 in magnitude, so they and 100 times them convert exactly.
+        // Residuals are at most 2^10 in magnitude, so they and S times them convert exactly.
         [$lo1, $lo2] = static::toFloatWithResidual($lo);
         [$hi1, $hi2] = static::toFloatWithResidual($hi);
         [$near1, $near2, $sign] = $fromLo ? [$lo1, $lo2, 1.0] : [$hi1, $hi2, -1.0];
 
-        $terms   = static::exactProduct(100.0, $near1);
-        $terms[] = 100.0 * (float) $near2;
+        $terms   = static::exactProduct($scale, $near1);
+        $terms[] = $scale * (float) $near2;
         foreach ($weight as $w) {
             foreach ([$hi1, (float) $hi2] as $x) {
                 \array_push($terms, ...static::exactProduct($sign * $w, $x));
@@ -1264,30 +1300,35 @@ final class Reduce
             $scaled = static::growExpansion($scaled, $term);
         }
 
-        return static::roundExpansionDividedBy100($scaled);
+        return static::roundExpansionDividedBy($scaled, $scale);
     }
 
     /**
-     * Rounds the value of a nonoverlapping expansion, divided by 100, to the nearest float (ties to even).
+     * Rounds the value of a nonoverlapping expansion, divided by the scale S = $scale, to the nearest float
+     * (ties to even).
      *
      * The quotient of the expansion's approximate sum is within a few ulps. Each neighbouring midpoint m is
-     * then compared exactly with the value, through the sign of the expansion minus 100 * m (that is,
-     * 50 * the candidate + 50 * its neighbour, as exact products), and the candidate moves one float towards
-     * the value while it lies past one.
+     * then compared exactly with the value, through the sign of the expansion minus S * m (that is,
+     * S / 2 * the candidate + S / 2 * its neighbour, as exact products), and the candidate moves one float
+     * towards the value while it lies past one.
      *
      * The expansion must be nonadjacent, as {@see Reduce::growExpansion()} keeps one built up from empty: no
      * two components are adjacent bit ranges. Then the approximate sum is within an ulp, and the candidate
      * moves at most a couple of times. Merely nonoverlapping components can sum far off
      * ([2^-54, -(1 - 2^-53), 1] sums to 2^-52, not 2^-54 + 2^-53), and the loop would then take
-     * astronomically many steps.
+     * astronomically many steps; so would a midpoint comparison at the wrong scale. The moves are therefore
+     * bounded, and running out of them is a logic error rather than an endless loop.
      *
      * An exact zero gives 0.0, as $x - $x does; a negative value that underflows keeps its sign, -0.0.
      *
      * @param list<float> $expansion nonadjacent, in increasing magnitude, of magnitude below 2^70
+     * @param float       $scale     S: 100.0 for a percentile, 1.0 for a quantile
      *
      * @return float
+     *
+     * @throws \LogicException if the candidate is still moving after the bounded number of moves
      */
-    private static function roundExpansionDividedBy100(array $expansion): float
+    private static function roundExpansionDividedBy(array $expansion, float $scale): float
     {
         $approx = 0.0;
         foreach ($expansion as $component) {
@@ -1295,11 +1336,12 @@ final class Reduce
         }
         // -0.0 === 0.0, so both zeros become 0.0. A nonadjacent expansion with a nonzero value has a nonzero
         // approximate sum, so only an exact zero is replaced.
-        $candidate = $approx === 0.0 ? 0.0 : $approx / 100.0;
+        $candidate = $approx === 0.0 ? 0.0 : $approx / $scale;
 
-        while (true) {
+        // Each pass either returns or moves the candidate one float; a couple of moves suffice.
+        for ($moves = 0; $moves < self::MAX_ROUNDING_MOVES; ++$moves) {
             $up = static::nextFloat($candidate, true);
-            $aboveMidpoint = static::compareWithMidpoint($expansion, $candidate, $up);
+            $aboveMidpoint = static::compareWithMidpoint($expansion, $candidate, $up, $scale);
             if ($aboveMidpoint > 0) {
                 $candidate = $up;
                 continue;
@@ -1309,7 +1351,7 @@ final class Reduce
             }
 
             $down = static::nextFloat($candidate, false);
-            $belowMidpoint = static::compareWithMidpoint($expansion, $candidate, $down);
+            $belowMidpoint = static::compareWithMidpoint($expansion, $candidate, $down, $scale);
             if ($belowMidpoint < 0) {
                 $candidate = $down;
                 continue;
@@ -1320,20 +1362,31 @@ final class Reduce
 
             return $candidate;
         }
+
+        throw new \LogicException('Rounding an interpolated value did not converge.');
     }
 
     /**
-     * The sign of the value of $expansion minus 100 times the midpoint of two adjacent floats, exactly.
+     * The sign of the value of $expansion minus S times the midpoint of two adjacent floats, exactly, for the
+     * scale S = $scale (100 for a percentile, 1 for a quantile).
+     *
+     * S / 2 times a float is exact as a product and its error: 50 is an integer, and 0.5 halves, which is
+     * exact unless the half is subnormal, for a float below 2^-1021 in magnitude, where it is off by at most
+     * 2^-1075. An interpolation between integers past 2^53 is then either exactly zero, whose candidate 0.0
+     * is already its rounding (a false tie with 2^-1074 still gives 0.0), or of magnitude above 2^-1021, so
+     * at least 2^-1074 past any midpoint of such small floats, a margin the error cannot cross.
      *
      * @param list<float> $expansion nonoverlapping, in increasing magnitude
      * @param float       $a
      * @param float       $b
+     * @param float       $scale     S: 100.0 for a percentile, 1.0 for a quantile
      *
      * @return int -1, 0 or 1
      */
-    private static function compareWithMidpoint(array $expansion, float $a, float $b): int
+    private static function compareWithMidpoint(array $expansion, float $a, float $b, float $scale): int
     {
-        foreach ([...static::exactProduct(-50.0, $a), ...static::exactProduct(-50.0, $b)] as $term) {
+        $minusHalf = -$scale / 2.0;
+        foreach ([...static::exactProduct($minusHalf, $a), ...static::exactProduct($minusHalf, $b)] as $term) {
             $expansion = static::growExpansion($expansion, $term);
         }
 
@@ -1353,7 +1406,7 @@ final class Reduce
      * The result is again nonoverlapping, its components in increasing magnitude, so its largest nonzero
      * component carries the sign of the sum. Under round-to-nearest it is also nonadjacent when the input is,
      * as an expansion grown from empty always is (Shewchuk's Grow-Expansion theorem), which
-     * {@see Reduce::roundExpansionDividedBy100()} needs.
+     * {@see Reduce::roundExpansionDividedBy()} needs.
      *
      * @param list<float> $expansion nonoverlapping, in increasing magnitude
      * @param float       $b
@@ -1379,7 +1432,8 @@ final class Reduce
 
     /**
      * A product as the float and its rounding error, whose unevaluated sum it is exactly when one factor is
-     * integer-valued and nothing overflows, as {@see Reduce::twoProductError()} requires.
+     * integer-valued and nothing overflows, as {@see Reduce::twoProductError()} requires, or when one factor
+     * is a power of two and the product is neither subnormal nor overflows (the product is then exact).
      *
      * @param float $a
      * @param float $b
@@ -1484,7 +1538,8 @@ final class Reduce
      * TwoProduct with Veltkamp's split). Exact when one factor is integer-valued and no intermediate product
      * (the split multiplications, the product, the partial products) overflows: the partial products are
      * then multiples of the other factor's ulp, which even a subnormal result can hold. Every call here
-     * multiplies a factor of at most 100 by one below 2^64, one of them integer-valued: far from overflow.
+     * multiplies a factor of at most the scale S (100 for a percentile, 1 for a quantile) by one below 2^64,
+     * one of them integer-valued or 0.5: far from overflow.
      *
      * @param float $a
      * @param float $b

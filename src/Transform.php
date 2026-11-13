@@ -191,6 +191,11 @@ final class Transform
      * Duplicating iterators can use up memory. Consider if tee is the right solution. For example, arrays and most
      * iterators can be rewound and reiterated without need for duplication.
      *
+     * Lazy: the count is checked first, and the iterable is not touched (no element read, no getIterator() call on
+     * an \IteratorAggregate) until a copy is first used; getIterator() is then called once for all copies.
+     * A copy can be rewound until it advances. A clone of a copy is an independent copy from the position it was
+     * cloned at, and can be rewound until it advances from there.
+     *
      * @template TKey
      * @template TValue
      *
@@ -198,10 +203,12 @@ final class Transform
      * @param positive-int $count
      *
      * @return array<\Iterator<TKey, TValue>>
+     *
+     * @throws \InvalidArgumentException if $count is less than 1
      */
     public static function tee(iterable $iterable, int $count): array
     {
-        $iterator = static::toIterator($iterable);
-        return (new TeeIterator($iterator, $count))->getRelatedIterators();
+        // The count is checked before the iterable is touched: TeeIterator resolves it only on the first read.
+        return (new TeeIterator($iterable, $count))->getRelatedIterators();
     }
 }

@@ -324,8 +324,10 @@ final class Summary
      * Returns true if all given collections are the same.
      *
      * For single iterable or empty iterables list returns true without reading the iterable. So does one
-     * iterator or generator passed more than once, directly or through a Stream or other \IteratorAggregate
-     * that returns it: same($it, $it) returns true without reading $it.
+     * object passed more than once, which is the same as itself: same($it, $it) returns true without reading
+     * $it, and same($aggregate, $aggregate) without calling its getIterator(). So do distinct objects that
+     * all resolve to one iterator or generator, such as a Stream or other \IteratorAggregate that returns it.
+     * An array passed more than once is still compared by value, where NAN never matches.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -333,6 +335,7 @@ final class Summary
      */
     public static function same(iterable ...$iterables): bool
     {
+        $iterables = self::distinctByIdentity($iterables);
         if (\count($iterables) < 2) {
             return true;
         }
@@ -516,7 +519,11 @@ final class Summary
     /**
      * Returns true if given collections are permutations of each other (using strict-type comparisons).
      *
-     * Returns true if no collections given or for single collection.
+     * Returns true if no collections given or for single collection. So does one object passed more than
+     * once, without resolving or reading it (an \IteratorAggregate's getIterator() is not called): an object
+     * is a permutation of itself. Distinct objects that all resolve to one iterator or generator, such as a
+     * Stream or other \IteratorAggregate that returns it, also return true: each is resolved, but the
+     * iterator is not read.
      *
      * Equality follows the strict rules in README "Strict and Coercive Types".
      *
@@ -534,7 +541,11 @@ final class Summary
     /**
      * Returns true if given collections are permutations of each other (using type coercion).
      *
-     * Returns true if no collections given or for single collection.
+     * Returns true if no collections given or for single collection. So does one object passed more than
+     * once, without resolving or reading it (an \IteratorAggregate's getIterator() is not called): an object
+     * is a permutation of itself. Distinct objects that all resolve to one iterator or generator, such as a
+     * Stream or other \IteratorAggregate that returns it, also return true: each is resolved, but the
+     * iterator is not read.
      *
      * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
@@ -562,13 +573,21 @@ final class Summary
      */
     private static function arePermutationsInternal(bool $strict, iterable ...$iterables): bool
     {
+        // An object is a permutation of itself, so a repeated one is neither resolved nor read.
+        $iterables = self::distinctByIdentity($iterables);
         if (\count($iterables) < 2) {
             return true;
         }
 
-        $usageMap = new UsageMap($strict);
-
         $iterator = self::comparisonIterator(...$iterables);
+
+        // MultipleIterator attaches an Iterator once however many times it is passed, so distinct objects
+        // resolving to one iterator leave a single one, which is a permutation of itself without being read.
+        if ($iterator->countIterators() < 2) {
+            return true;
+        }
+
+        $usageMap = new UsageMap($strict);
         foreach ($iterator as $values) {
             foreach ($values as $collectionIndex => $value) {
                 $usageMap->addUsage($value, \strval($collectionIndex));
@@ -591,6 +610,35 @@ final class Summary
         }
 
         return true;
+    }
+
+    /**
+     * The given iterables with each object kept once, at its first position, without resolving any of them.
+     *
+     * An object passed more than once is the same as, and a permutation of, itself. Arrays are all kept: they
+     * compare by value, where NAN never matches.
+     *
+     * @param array<iterable<mixed>> $iterables
+     *
+     * @return list<iterable<mixed>>
+     */
+    private static function distinctByIdentity(array $iterables): array
+    {
+        $distinct = [];
+        $seen     = [];
+        foreach ($iterables as $iterable) {
+            if (\is_object($iterable)) {
+                // Every argument is alive for the whole call, so no two of them share an object id.
+                $id = \spl_object_id($iterable);
+                if (isset($seen[$id])) {
+                    continue;
+                }
+                $seen[$id] = true;
+            }
+            $distinct[] = $iterable;
+        }
+
+        return $distinct;
     }
 
     /**

@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace IterTools\Util\Iterators;
 
+use IterTools\Transform;
+
 /**
  * Shared, lazily filled buffer behind a set of RelatedIterators.
  *
- * - The source is read only when a related iterator first needs an element it has not been given yet.
+ * - The source is read only when a related iterator first needs an element it has not been given yet. Until then
+ *   it is not even resolved to an iterator: an \IteratorAggregate's getIterator() is called on that first read,
+ *   once, and what it throws is a source failure like any other.
  * - Each element's key and value are buffered until every live related iterator has moved past it.
  * - A source failure is kept: every related iterator that reaches it gets the same exception, and the source is
  *   not read again.
@@ -31,11 +35,25 @@ final class TeeIterator
     private \Iterator $source;
 
     /**
+     * The iterable the source is resolved from on the first read; released (an empty array) once resolved.
+     *
+     * @var iterable<TKey, TValue>
+     */
+    private iterable $pending;
+
+    /**
      * Current position of every live related iterator, by id.
      *
      * @var array<int, int>
      */
     private array $positions = [];
+
+    /**
+     * Position every live related iterator started from, by id: 0, or for a clone the position it was cloned at.
+     *
+     * @var array<int, int>
+     */
+    private array $starts = [];
 
     /**
      * Buffered keys, by absolute position.
@@ -77,17 +95,19 @@ final class TeeIterator
     private int $nextId;
 
     /**
-     * @param \Iterator<TKey, TValue> $iterator
+     * @param iterable<TKey, TValue> $iterable not resolved to an iterator until a related iterator first reads
      * @param int $relatedCount
      */
-    public function __construct(\Iterator $iterator, private readonly int $relatedCount)
+    public function __construct(iterable $iterable, private readonly int $relatedCount)
     {
         if ($relatedCount < 1) {
             throw new \InvalidArgumentException("Count must be ≥ 1. Got {$relatedCount}");
         }
 
-        $this->source = $iterator;
+        $this->pending = $iterable;
+        $this->source = new \EmptyIterator();
         $this->positions = \array_fill(0, $relatedCount, 0);
+        $this->starts = $this->positions;
         $this->nextId = $relatedCount;
     }
 
@@ -176,11 +196,13 @@ final class TeeIterator
     }
 
     /**
+     * Whether a related iterator has moved past the position it started from, so it can no longer be rewound.
+     *
      * @param RelatedIterator<TKey, TValue> $related
      */
-    public function getPosition(RelatedIterator $related): int
+    public function hasAdvanced(RelatedIterator $related): bool
     {
-        return $this->positions[$related->getId()];
+        return $this->positions[$related->getId()] > $this->starts[$related->getId()];
     }
 
     /**
@@ -194,6 +216,7 @@ final class TeeIterator
     {
         $id = $this->nextId++;
         $this->positions[$id] = $this->positions[$related->getId()];
+        $this->starts[$id] = $this->positions[$id];
 
         return $id;
     }
@@ -205,7 +228,7 @@ final class TeeIterator
      */
     public function detach(RelatedIterator $related): void
     {
-        unset($this->positions[$related->getId()]);
+        unset($this->positions[$related->getId()], $this->starts[$related->getId()]);
         $this->releaseConsumed();
     }
 
@@ -240,6 +263,11 @@ final class TeeIterator
     private function fetch(): void
     {
         if (!$this->rewound) {
+            // Released first, so the iterable is not held once resolved. A getIterator() that throws is called
+            // once: hasElementAt() keeps the failure, and nothing is read after it.
+            $pending = $this->pending;
+            $this->pending = [];
+            $this->source = Transform::toIterator($pending);
             $this->source->rewind();
             $this->rewound = true;
         } elseif ($this->needsAdvance) {

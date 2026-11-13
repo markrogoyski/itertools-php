@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Transform;
 
+use IterTools\Tests\Fixture\ArrayIteratorFixture;
+use IterTools\Tests\Fixture\CountingIteratorAggregateFixture;
+use IterTools\Tests\Fixture\GeneratorFixture;
 use IterTools\Tests\Fixture\IteratorAggregateFixture;
 use IterTools\Transform;
 
@@ -1278,5 +1281,252 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         foreach ($copies as $copy) {
             $this->assertNull($copy->get());
         }
+    }
+
+    /**
+     * @test tee: a clone of an advanced copy yields the rest of the source, and the original is unaffected (array)
+     */
+    public function testCloneBranchOfAdvancedCopyYieldsTheRestArray(): void
+    {
+        // Given
+        $data = [10, 20, 30];
+        [$copy] = Transform::tee($data, 1);
+        $copy->rewind();
+        $copy->next();
+
+        // When
+        $clone = clone $copy;
+
+        // Then
+        $this->assertSame([1 => 20, 2 => 30], \iterator_to_array($clone));
+
+        // And when the original is walked on (it has advanced, so it is not rewound)
+        $original = [];
+        while ($copy->valid()) {
+            $original[$copy->key()] = $copy->current();
+            $copy->next();
+        }
+
+        // Then
+        $this->assertSame([1 => 20, 2 => 30], $original);
+    }
+
+    /**
+     * @test tee: a clone of an advanced copy yields the rest of the source, and the original is unaffected (generator)
+     */
+    public function testCloneBranchOfAdvancedCopyYieldsTheRestGenerator(): void
+    {
+        // Given
+        $data = GeneratorFixture::getGenerator([10, 20, 30]);
+        [$copy] = Transform::tee($data, 1);
+        $copy->rewind();
+        $copy->next();
+
+        // When
+        $clone = clone $copy;
+
+        // Then
+        $this->assertSame([1 => 20, 2 => 30], \iterator_to_array($clone));
+
+        // And when the original is walked on (it has advanced, so it is not rewound)
+        $original = [];
+        while ($copy->valid()) {
+            $original[$copy->key()] = $copy->current();
+            $copy->next();
+        }
+
+        // Then
+        $this->assertSame([1 => 20, 2 => 30], $original);
+    }
+
+    /**
+     * @test tee: a clone of an advanced copy yields the rest of the source, and the original is unaffected (iterator)
+     */
+    public function testCloneBranchOfAdvancedCopyYieldsTheRestIterator(): void
+    {
+        // Given
+        $data = new ArrayIteratorFixture([10, 20, 30]);
+        [$copy] = Transform::tee($data, 1);
+        $copy->rewind();
+        $copy->next();
+
+        // When
+        $clone = clone $copy;
+
+        // Then
+        $this->assertSame([1 => 20, 2 => 30], \iterator_to_array($clone));
+
+        // And when the original is walked on (it has advanced, so it is not rewound)
+        $original = [];
+        while ($copy->valid()) {
+            $original[$copy->key()] = $copy->current();
+            $copy->next();
+        }
+
+        // Then
+        $this->assertSame([1 => 20, 2 => 30], $original);
+    }
+
+    /**
+     * @test tee: a clone of an advanced copy yields the rest of the source, and the original is unaffected (traversable)
+     */
+    public function testCloneBranchOfAdvancedCopyYieldsTheRestTraversable(): void
+    {
+        // Given
+        $data = new IteratorAggregateFixture([10, 20, 30]);
+        [$copy] = Transform::tee($data, 1);
+        $copy->rewind();
+        $copy->next();
+
+        // When
+        $clone = clone $copy;
+
+        // Then
+        $this->assertSame([1 => 20, 2 => 30], \iterator_to_array($clone));
+
+        // And when the original is walked on (it has advanced, so it is not rewound)
+        $original = [];
+        while ($copy->valid()) {
+            $original[$copy->key()] = $copy->current();
+            $copy->next();
+        }
+
+        // Then
+        $this->assertSame([1 => 20, 2 => 30], $original);
+    }
+
+    /**
+     * @test tee: a clone of an advanced copy can be rewound until it advances, then not
+     */
+    public function testCloneBranchRewindsOnlyBeforeAdvancing(): void
+    {
+        // Given
+        [$copy] = Transform::tee([10, 20, 30], 1);
+        $copy->next();
+        $clone = clone $copy;
+        $clone->rewind();
+        $clone->rewind();
+
+        // When
+        $clone->next();
+
+        // Then
+        $this->assertSame(30, $clone->current());
+        $this->assertSame(20, $copy->current());
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('RelatedIterator cannot be rewinded after it has advanced');
+        $clone->rewind();
+    }
+
+    /**
+     * @test tee rejects a count of 0 without calling an IteratorAggregate's getIterator()
+     */
+    public function testLazyTeeRejectsZeroCountBeforeResolvingTheAggregate(): void
+    {
+        // Given
+        $aggregate = new CountingIteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        try {
+            Transform::tee($aggregate, 0);
+            $this->fail('Expected an InvalidArgumentException');
+        } catch (\InvalidArgumentException $e) {
+            // Then
+            $this->assertSame('Count must be ≥ 1. Got 0', $e->getMessage());
+        }
+        $this->assertSame(0, $aggregate->getIteratorCallCount());
+    }
+
+    /**
+     * @test tee rejects a count of 0 even when the IteratorAggregate's getIterator() would throw
+     */
+    public function testLazyTeeRejectsZeroCountOfAThrowingAggregate(): void
+    {
+        // Given
+        $aggregate = new class () implements \IteratorAggregate {
+            public function getIterator(): \Iterator
+            {
+                throw new \RuntimeException('getIterator must not be called');
+            }
+        };
+
+        // Then
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Count must be ≥ 1. Got 0');
+
+        // When
+        Transform::tee($aggregate, 0);
+    }
+
+    /**
+     * @test         tee calls an IteratorAggregate's getIterator() once, on the first read of any copy
+     * @dataProvider dataProviderForLazyTeeCount
+     * @param        int $count
+     */
+    public function testLazyTeeResolvesTheAggregateOnceOnFirstRead(int $count): void
+    {
+        // Given
+        $aggregate = new CountingIteratorAggregateFixture([1, 2, 3]);
+
+        // When
+        $copies = Transform::tee($aggregate, $count);
+
+        // Then
+        $this->assertSame(0, $aggregate->getIteratorCallCount());
+
+        // And when the last copy is read first
+        $last = $copies[$count - 1];
+        $this->assertTrue($last->valid());
+
+        // Then
+        $this->assertSame(1, $aggregate->getIteratorCallCount());
+
+        // And when every copy is read to the end
+        foreach ($copies as $copy) {
+            $this->assertSame([1, 2, 3], \iterator_to_array($copy));
+        }
+
+        // Then
+        $this->assertSame(1, $aggregate->getIteratorCallCount());
+    }
+
+    public static function dataProviderForLazyTeeCount(): array
+    {
+        return [
+            'one copy'     => [1],
+            'three copies' => [3],
+        ];
+    }
+
+    /**
+     * @test tee of an IteratorAggregate whose getIterator() throws: every copy gets that exception when first read
+     */
+    public function testLazyTeeGivesAThrowingAggregatesExceptionToEveryCopy(): void
+    {
+        // Given
+        $aggregate = new class () implements \IteratorAggregate {
+            public int $calls = 0;
+
+            public function getIterator(): \Iterator
+            {
+                ++$this->calls;
+                throw new \RuntimeException('cannot open the source');
+            }
+        };
+        $copies = Transform::tee($aggregate, 2);
+
+        // When
+        $messages = [];
+        foreach ($copies as $copy) {
+            try {
+                $copy->valid();
+            } catch (\RuntimeException $e) {
+                $messages[] = $e->getMessage();
+            }
+        }
+
+        // Then
+        $this->assertSame(['cannot open the source', 'cannot open the source'], $messages);
+        $this->assertSame(1, $aggregate->calls);
     }
 }

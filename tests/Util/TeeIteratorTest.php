@@ -291,4 +291,121 @@ class TeeIteratorTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame('180000300000', $output);
     }
+
+    /**
+     * @test a clone of an advanced related iterator yields the rest of the source through iterator_to_array
+     */
+    public function testCloneBranchOfAdvancedRelatedYieldsTheRest(): void
+    {
+        // Given
+        $teeIterator = new TeeIterator(Transform::toIterator([10, 20, 30]), 1);
+        $relatedIterator = $teeIterator->getRelatedIterators()[0];
+        $relatedIterator->rewind();
+        $relatedIterator->next();
+
+        // When
+        $clone = clone $relatedIterator;
+
+        // Then
+        $this->assertSame([1 => 20, 2 => 30], \iterator_to_array($clone));
+    }
+
+    /**
+     * @test a clone of an advanced related iterator can be rewound repeatedly before it advances
+     */
+    public function testCloneBranchCanBeRewoundBeforeAdvancing(): void
+    {
+        // Given
+        $teeIterator = new TeeIterator(Transform::toIterator([10, 20, 30]), 1);
+        $relatedIterator = $teeIterator->getRelatedIterators()[0];
+        $relatedIterator->next();
+        $clone = clone $relatedIterator;
+
+        // When
+        $clone->rewind();
+        $clone->rewind();
+
+        // Then
+        $this->assertSame(20, $clone->current());
+        $this->assertSame([1 => 20, 2 => 30], \iterator_to_array($clone));
+    }
+
+    /**
+     * @test a clone of an advanced related iterator cannot be rewound once it advances itself
+     */
+    public function testCloneBranchCannotBeRewoundAfterAdvancing(): void
+    {
+        // Given
+        $teeIterator = new TeeIterator(Transform::toIterator([10, 20, 30]), 1);
+        $relatedIterator = $teeIterator->getRelatedIterators()[0];
+        $relatedIterator->next();
+        $clone = clone $relatedIterator;
+        $clone->next();
+
+        // When
+        try {
+            $clone->rewind();
+            $this->fail('Expected a LogicException');
+        } catch (\LogicException $e) {
+            // Then
+            $this->assertSame('RelatedIterator cannot be rewinded after it has advanced', $e->getMessage());
+        }
+    }
+
+    /**
+     * @test a clone and the related iterator it was cloned from are independent
+     */
+    public function testCloneBranchAndOriginalAreIndependent(): void
+    {
+        // Given
+        $teeIterator = new TeeIterator(Transform::toIterator([10, 20, 30]), 1);
+        $relatedIterator = $teeIterator->getRelatedIterators()[0];
+        $relatedIterator->rewind();
+        $relatedIterator->next();
+        $clone = clone $relatedIterator;
+
+        // When
+        $cloned = [];
+        foreach ($clone as $key => $value) {
+            $cloned[$key] = $value;
+        }
+
+        // Then
+        $this->assertSame([1 => 20, 2 => 30], $cloned);
+        $this->assertSame(20, $relatedIterator->current());
+
+        // And when the original is walked to the end
+        $original = [];
+        while ($relatedIterator->valid()) {
+            $original[$relatedIterator->key()] = $relatedIterator->current();
+            $relatedIterator->next();
+        }
+
+        // Then
+        $this->assertSame([1 => 20, 2 => 30], $original);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('RelatedIterator cannot be rewinded after it has advanced');
+        $relatedIterator->rewind();
+    }
+
+    /**
+     * @test a clone of a clone starts at the position of the clone it was made from
+     */
+    public function testCloneBranchOfACloneStartsAtItsParentsPosition(): void
+    {
+        // Given
+        $teeIterator = new TeeIterator(Transform::toIterator([10, 20, 30, 40]), 1);
+        $relatedIterator = $teeIterator->getRelatedIterators()[0];
+        $relatedIterator->next();
+        $clone = clone $relatedIterator;
+        $clone->next();
+
+        // When
+        $cloneOfClone = clone $clone;
+
+        // Then
+        $this->assertSame([2 => 30, 3 => 40], \iterator_to_array($cloneOfClone));
+        $this->assertSame(30, $clone->current());
+        $this->assertSame(20, $relatedIterator->current());
+    }
 }

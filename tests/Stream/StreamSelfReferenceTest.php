@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace IterTools\Tests\Stream;
 
 use IterTools\Stream;
+use IterTools\Tests\Fixture\ArrayIteratorFixture;
 use IterTools\Tests\Fixture\GeneratorFixture;
+use IterTools\Tests\Fixture\IteratorAggregateFixture;
 use IterTools\Tests\Fixture\NonSerializableFixture;
 
 /**
@@ -1251,5 +1253,84 @@ class StreamSelfReferenceTest extends \PHPUnit\Framework\TestCase
                 [10, 20],
             ],
         ];
+    }
+
+    /**
+     * @test a stream passed directly to its own method stands for its elements at that point in the pipeline (array)
+     */
+    public function testDirectSelfReferenceStandsForElementsAtThatPointArray(): void
+    {
+        // Given
+        $source = [1, 2, 3];
+        $stream = Stream::of($source)->map(static fn (int $x): int => $x * 10);
+
+        // When
+        $result = $stream->zipWith($stream)->toArray();
+
+        // Then
+        $this->assertSame([[10, 10], [20, 20], [30, 30]], $result);
+    }
+
+    /**
+     * @test a stream passed directly to its own method stands for its elements at that point in the pipeline (generator)
+     */
+    public function testDirectSelfReferenceStandsForElementsAtThatPointGenerator(): void
+    {
+        // Given
+        $source = GeneratorFixture::getGenerator([1, 2, 3]);
+        $stream = Stream::of($source)->map(static fn (int $x): int => $x * 10);
+
+        // When
+        $result = $stream->zipWith($stream)->toArray();
+
+        // Then
+        $this->assertSame([[10, 10], [20, 20], [30, 30]], $result);
+    }
+
+    /**
+     * @test a stream passed directly to its own method stands for its elements at that point in the pipeline (iterator)
+     */
+    public function testDirectSelfReferenceStandsForElementsAtThatPointIterator(): void
+    {
+        // Given
+        $source = new ArrayIteratorFixture([1, 2, 3]);
+        $stream = Stream::of($source)->map(static fn (int $x): int => $x * 10);
+
+        // When
+        $result = $stream->zipWith($stream)->toArray();
+
+        // Then
+        $this->assertSame([[10, 10], [20, 20], [30, 30]], $result);
+    }
+
+    /**
+     * @test a stream passed directly to its own method stands for its elements at that point in the pipeline (traversable)
+     */
+    public function testDirectSelfReferenceStandsForElementsAtThatPointTraversable(): void
+    {
+        // Given
+        $source = new IteratorAggregateFixture([1, 2, 3]);
+        $stream = Stream::of($source)->map(static fn (int $x): int => $x * 10);
+
+        // When
+        $result = $stream->zipWith($stream)->toArray();
+
+        // Then
+        $this->assertSame([[10, 10], [20, 20], [30, 30]], $result);
+    }
+
+    /**
+     * @test a stream holding NAN, passed directly to its own sameWith after a step, is the same as itself
+     */
+    public function testDirectSelfReferenceWithNanIsTheSameAsItself(): void
+    {
+        // Given
+        $stream = Stream::of([1.0, \NAN, 3.0])->map(static fn (float $x): float => $x * 10);
+
+        // When
+        $result = $stream->sameWith($stream);
+
+        // Then
+        $this->assertTrue($result);
     }
 }

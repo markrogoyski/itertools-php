@@ -2863,7 +2863,8 @@ final class Stream implements \IteratorAggregate
      * Returns true if iterable source and all given collections are the same.
      *
      * For empty iterables list returns true without reading the stream. So does the stream itself, or the
-     * iterator or generator it was created from, passed as the only collection: Stream::of($it)->sameWith($it).
+     * object it was created from, passed as the only collection: Stream::of($it)->sameWith($it), without
+     * calling an \IteratorAggregate's getIterator().
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -2902,8 +2903,8 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if stream and given collections are permutations of each other (using strict-type comparisons).
      *
-     * Returns true if no collections given. Equality follows the strict rules in README
-     * "Strict and Coercive Types".
+     * Returns true if no collections given, or only the stream itself or the object it was created from,
+     * without reading the stream. Equality follows the strict rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -2914,14 +2915,18 @@ final class Stream implements \IteratorAggregate
      */
     public function arePermutationsWith(iterable ...$iterables): bool
     {
+        // The stream is a permutation of itself, unread. An array source in its place would be read twice instead.
+        if (\array_filter($iterables, fn (iterable $iterable): bool => $iterable !== $this) === []) {
+            return true;
+        }
         return Summary::arePermutations($this->iterable, ...$this->replaceSelfWithSource($iterables));
     }
 
     /**
      * Returns true if stream and given collections are permutations of each other (using type coercion).
      *
-     * Returns true if no collections given. Equality follows the coercive rules in README
-     * "Strict and Coercive Types".
+     * Returns true if no collections given, or only the stream itself or the object it was created from,
+     * without reading the stream. Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -2932,6 +2937,10 @@ final class Stream implements \IteratorAggregate
      */
     public function arePermutationsCoerciveWith(iterable ...$iterables): bool
     {
+        // The stream is a permutation of itself, unread. An array source in its place would be read twice instead.
+        if (\array_filter($iterables, fn (iterable $iterable): bool => $iterable !== $this) === []) {
+            return true;
+        }
         return Summary::arePermutationsCoercive($this->iterable, ...$this->replaceSelfWithSource($iterables));
     }
 

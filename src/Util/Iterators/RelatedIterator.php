@@ -25,7 +25,8 @@ final class RelatedIterator implements \Iterator
     }
 
     /**
-     * A clone is its own branch: it continues independently from the position of the original.
+     * A clone is its own branch: it continues independently from the position of the original, and that position
+     * is where it starts, so it can be rewound until it advances from there.
      */
     public function __clone()
     {
@@ -86,13 +87,14 @@ final class RelatedIterator implements \Iterator
     /**
      * {@inheritDoc}
      *
-     * Rewinding is a no-op until the iterator advances; after that the elements it has moved past are gone.
+     * Rewinding is a no-op until the iterator advances from where it started (the first element, or for a clone
+     * the position it was cloned at); after that the elements it has moved past are gone.
      *
      * @throws \LogicException if the iterator has advanced
      */
     public function rewind(): void
     {
-        if ($this->parentIterator->getPosition($this) > 0) {
+        if ($this->parentIterator->hasAdvanced($this)) {
             throw new \LogicException('RelatedIterator cannot be rewinded after it has advanced');
         }
     }
