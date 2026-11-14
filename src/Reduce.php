@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\Arithmetic;
-use IterTools\Util\MeanAccumulator;
+use IterTools\Util\Precision\Arithmetic;
+use IterTools\Util\Precision\MeanAccumulator;
 use IterTools\Util\Values\NoValueMonad;
 use IterTools\Util\Values\Truthiness;
 use IterTools\Util\Values\ValueCounter;

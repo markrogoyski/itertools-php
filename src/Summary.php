@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\Arithmetic;
+use IterTools\Util\Precision\Arithmetic;
 use IterTools\Util\Values\Identity;
 use IterTools\Util\Iterators\RelatedIterator;
 use IterTools\Util\Snapshot\Snapshot;

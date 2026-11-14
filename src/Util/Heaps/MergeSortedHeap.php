@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools\Util\Heaps;
 
-use IterTools\Util\Arithmetic;
+use IterTools\Util\Precision\Arithmetic;
 
 /**
  * @internal

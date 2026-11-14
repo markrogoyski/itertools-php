@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Util;
+namespace IterTools\Tests\Util\Precision;
 
-use IterTools\Util\Arithmetic;
+use IterTools\Util\Precision\Arithmetic;
 
 class ArithmeticTest extends \PHPUnit\Framework\TestCase
 {
