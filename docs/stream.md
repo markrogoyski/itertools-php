@@ -3145,7 +3145,7 @@ Reduces iterable source to its value at the given percentile.
 - Uses the R-7 / linear-interpolation method (the NumPy default). Percentile `0` is the minimum, `100` is the maximum.
 - `$percentile` must be in the inclusive range `[0, 100]`; otherwise throws `\InvalidArgumentException`.
 - The interpolation does not overflow when the two neighbouring values span more than `PHP_FLOAT_MAX`.
-- The rank `(n - 1) * p / 100` is located exactly, so a percentile that lands on an element returns that element. Between two integers beyond `±2**53` the interpolation is correctly rounded; otherwise it is accurate to about an ulp, as in NumPy.
+- The rank `(n - 1) * p / 100` is located exactly, so a percentile that lands on an element returns that element. Between two integers beyond `±2**53` the interpolation is correctly rounded; otherwise it is accurate to about an ulp of the endpoint with the larger magnitude, as in NumPy, so a result near zero, between endpoints of opposite sign, can have a much larger relative error.
 - Percentile `50` returns exactly what `toMedian` returns, for every source.
 - Values are ordered by exact value, as in `toMin` and `toMax`.
 - If any item is `NAN`, returns `NAN` for every percentile, wherever the `NAN` sits in the source (see `toMedian`). An out-of-range `$percentile` still throws.
