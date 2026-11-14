@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Util;
+namespace IterTools\Util\Heaps;
+
+use IterTools\Util\Arithmetic;
 
 /**
  * Bounded heap of (key, insertion-index, value) triples used by Sort::largest and Sort::smallest.

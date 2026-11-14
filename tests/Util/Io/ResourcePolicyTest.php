@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Util;
+namespace IterTools\Tests\Util\Io;
 
-use IterTools\Util\ResourcePolicy;
+use IterTools\Util\Io\ResourcePolicy;
 use org\bovigo\vfs\vfsStream;
 
 class ResourcePolicyTest extends \PHPUnit\Framework\TestCase

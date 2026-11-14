@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Util;
+namespace IterTools\Util\Io;
 
 /**
  * Writes to a stream resource and fails loudly on a failed or short write.

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Arithmetic;
-use IterTools\Util\SortBoundedHeap;
+use IterTools\Util\Heaps\SortBoundedHeap;
 
 final class Sort
 {

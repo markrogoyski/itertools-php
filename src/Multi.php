@@ -7,7 +7,7 @@ namespace IterTools;
 use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\Iterators\ShortestMultipleIterator;
 use IterTools\Util\Iterators\StrictMultipleIterator;
-use IterTools\Util\MergeSortedHeap;
+use IterTools\Util\Heaps\MergeSortedHeap;
 
 final class Multi
 {

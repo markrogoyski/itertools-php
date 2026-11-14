@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Util;
+namespace IterTools\Tests\Util\Heaps;
 
-use IterTools\Util\SortBoundedHeap;
+use IterTools\Util\Heaps\SortBoundedHeap;
 
 class SortBoundedHeapTest extends \PHPUnit\Framework\TestCase
 {

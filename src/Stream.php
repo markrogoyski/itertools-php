@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Iterators\MemoizedIterable;
-use IterTools\Util\ResourcePolicy;
-use IterTools\Util\ResourceWriter;
+use IterTools\Util\Io\ResourcePolicy;
+use IterTools\Util\Io\ResourceWriter;
 
 /**
  * Provides fluent interface for working with iterables.
