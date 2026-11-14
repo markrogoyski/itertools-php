@@ -25,6 +25,16 @@ final class MemoizedIterable implements \IteratorAggregate
         $this->cache = new MemoCache($iterable);
     }
 
+    /**
+     * The iterable this was created from while it has not been read, otherwise null. Reads nothing.
+     *
+     * @return iterable<mixed, mixed>|null
+     */
+    public function pendingSource(): ?iterable
+    {
+        return $this->cache->pendingSource();
+    }
+
     /** @return \Generator<TKey, TValue> */
     public function getIterator(): \Generator
     {

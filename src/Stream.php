@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools;
 
+use IterTools\Util\Iterators\MemoizedIterable;
 use IterTools\Util\ResourcePolicy;
 use IterTools\Util\ResourceWriter;
 
@@ -11,9 +12,11 @@ use IterTools\Util\ResourceWriter;
  * Provides fluent interface for working with iterables.
  *
  * A stream passed to its own methods stands for its elements at that point in the pipeline, before the method
- * is applied, and is read as that source passed more than once: $stream->zipWith($stream). chainWith does
- * not buffer, so it chains a stream over a generator, as after a step such as map(), with itself only as far as
- * the first copy, then throws, as Multi::chain($generator, $generator) does.
+ * is applied, and is read as that source passed more than once: $stream->zipWith($stream). So does the stream
+ * wrapped in Stream::of() streams with no steps of their own or unread Transform::memoize() iterables, nested
+ * in any order: $stream->zipWith(Stream::of($stream)). chainWith does not buffer, so it chains a stream over
+ * a generator, as after a step such as map(), with itself only as far as the first copy, then throws, as
+ * Multi::chain($generator, $generator) does.
  *
  * @implements \IteratorAggregate<mixed>
  */
@@ -1558,11 +1561,14 @@ final class Stream implements \IteratorAggregate
     }
 
     /**
-     * Replace each argument that is this stream with the stream's current source, keeping positions and keys.
+     * Replace each argument that is this stream, directly or through a wrapper isSelf() sees through, with
+     * the stream's current source, keeping positions and keys.
      *
      * A method that reassigns the source would otherwise leave this stream, passed as an argument, reading the
      * new pipeline step itself: zipWith($this) would zip the zip. With the source in its place, the operation
      * reads it as a repeated argument, as it would Stream::of($source) passed alongside the stream.
+     *
+     * A wrapper replaced this way is left as it is: it is not read, and an unread memoized one is not filled.
      *
      * @param array<array-key, iterable<mixed>> $iterables
      *
@@ -1571,7 +1577,48 @@ final class Stream implements \IteratorAggregate
     private function replaceSelfWithSource(array $iterables): array
     {
         $source = $this->iterable;
-        return \array_map(fn (iterable $iterable): iterable => $iterable === $this ? $source : $iterable, $iterables);
+        return \array_map(
+            fn (iterable $iterable): iterable => $this->isSelf($iterable) ? $source : $iterable,
+            $iterables
+        );
+    }
+
+    /**
+     * Tells whether an iterable is this stream, or wrappers that would read only this stream as it is now:
+     * Streams with no steps of their own and memoized iterables not yet read, nested in any order.
+     *
+     * Follows only two links: a Stream's source and an unread MemoizedIterable's pending source. Nothing is
+     * read, rewound or resolved, and no getIterator() is called. An array, any other object (a generator, as
+     * a Stream with steps holds; a tee copy; a user IteratorAggregate) and a memoized iterable already read
+     * end the search.
+     *
+     * The search ends. Every assignment to a Stream's source points it at an iterable that existed before
+     * (the constructor), or at a new object whose only followed link is the previous source
+     * (Stream::memoize()), or at an object with no followed link (each other step's generator,
+     * reservoirSample()'s array). A memoized iterable's pending source is fixed at construction and only ever
+     * becomes null. So no link closes a path back to the object that holds it.
+     *
+     * @param iterable<mixed> $iterable
+     */
+    private function isSelf(iterable $iterable): bool
+    {
+        while (\is_object($iterable)) {
+            if ($iterable === $this) {
+                return true;
+            }
+            if ($iterable instanceof self) {
+                $iterable = $iterable->iterable;
+            } elseif ($iterable instanceof MemoizedIterable) {
+                $pending = $iterable->pendingSource();
+                if ($pending === null) {
+                    return false;
+                }
+                $iterable = $pending;
+            } else {
+                return false;
+            }
+        }
+        return false;
     }
 
     /**
@@ -2631,8 +2678,9 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty prefix → true without consuming the stream. So is the stream itself, or the iterator or generator
-     * it was created from, passed as the prefix: Stream::of($it)->startsWith($it).
+     * Empty prefix → true without consuming the stream. So is the stream itself, directly or through
+     * Stream::of() or an unread Transform::memoize(), or the iterator or generator it was created from,
+     * passed as the prefix: Stream::of($it)->startsWith($it).
      *
      * Lazy: the stream is never advanced beyond the last element compared.
      *
@@ -2646,7 +2694,7 @@ final class Stream implements \IteratorAggregate
     {
         // The stream starts with itself. Its source in its place could be compared by value instead, where NAN never
         // matches and a coercive comparison throws for an object that cannot be serialized.
-        if ($prefix === $this) {
+        if ($this->isSelf($prefix)) {
             return true;
         }
         return Summary::startsWith($this->iterable, $prefix);
@@ -2657,8 +2705,9 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty prefix → true without consuming the stream. So is the stream itself, or the iterator or generator
-     * it was created from, passed as the prefix: Stream::of($it)->startsWithCoercive($it).
+     * Empty prefix → true without consuming the stream. So is the stream itself, directly or through
+     * Stream::of() or an unread Transform::memoize(), or the iterator or generator it was created from,
+     * passed as the prefix: Stream::of($it)->startsWithCoercive($it).
      *
      * Lazy: the stream is never advanced beyond the last element compared.
      *
@@ -2672,7 +2721,7 @@ final class Stream implements \IteratorAggregate
     {
         // The stream starts with itself. Its source in its place could be compared by value instead, where NAN never
         // matches and a coercive comparison throws for an object that cannot be serialized.
-        if ($prefix === $this) {
+        if ($this->isSelf($prefix)) {
             return true;
         }
         return Summary::startsWithCoercive($this->iterable, $prefix);
@@ -2683,8 +2732,9 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty suffix → true without consuming the stream. So is the stream itself, or the iterator or generator
-     * it was created from, passed as the suffix: Stream::of($it)->endsWith($it). The stream must be finite.
+     * Empty suffix → true without consuming the stream. So is the stream itself, directly or through
+     * Stream::of() or an unread Transform::memoize(), or the iterator or generator it was created from,
+     * passed as the suffix: Stream::of($it)->endsWith($it). The stream must be finite.
      *
      * @param iterable<mixed> $suffix
      *
@@ -2696,7 +2746,7 @@ final class Stream implements \IteratorAggregate
     {
         // The stream ends with itself. Its source in its place could be compared by value instead, where NAN never
         // matches and a coercive comparison throws for an object that cannot be serialized.
-        if ($suffix === $this) {
+        if ($this->isSelf($suffix)) {
             return true;
         }
         return Summary::endsWith($this->iterable, $suffix);
@@ -2707,8 +2757,9 @@ final class Stream implements \IteratorAggregate
      *
      * Compares values pairwise; keys are ignored.
      *
-     * Empty suffix → true without consuming the stream. So is the stream itself, or the iterator or generator
-     * it was created from, passed as the suffix: Stream::of($it)->endsWithCoercive($it). The stream must be finite.
+     * Empty suffix → true without consuming the stream. So is the stream itself, directly or through
+     * Stream::of() or an unread Transform::memoize(), or the iterator or generator it was created from,
+     * passed as the suffix: Stream::of($it)->endsWithCoercive($it). The stream must be finite.
      *
      * @param iterable<mixed> $suffix
      *
@@ -2720,7 +2771,7 @@ final class Stream implements \IteratorAggregate
     {
         // The stream ends with itself. Its source in its place could be compared by value instead, where NAN never
         // matches and a coercive comparison throws for an object that cannot be serialized.
-        if ($suffix === $this) {
+        if ($this->isSelf($suffix)) {
             return true;
         }
         return Summary::endsWithCoercive($this->iterable, $suffix);
@@ -2894,9 +2945,10 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if iterable source and all given collections are the same.
      *
-     * For empty iterables list returns true without reading the stream. So does the stream itself, or the
-     * object it was created from, passed as the only collection: Stream::of($it)->sameWith($it), without
-     * calling an \IteratorAggregate's getIterator().
+     * For empty iterables list returns true without reading the stream. So does the stream itself, directly
+     * or through Stream::of() or an unread Transform::memoize(), or the object it was created from, passed as
+     * every collection, without calling an \IteratorAggregate's getIterator():
+     * Stream::of($it)->sameWith($it).
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -2908,7 +2960,7 @@ final class Stream implements \IteratorAggregate
     {
         // The stream is the same as itself. Its source in its place could be compared by value instead, where NAN
         // never matches.
-        if (\array_filter($iterables, fn (iterable $iterable): bool => $iterable !== $this) === []) {
+        if (\array_filter($iterables, fn (iterable $iterable): bool => !$this->isSelf($iterable)) === []) {
             return true;
         }
         return Summary::same($this->iterable, ...$this->replaceSelfWithSource($iterables));
@@ -2919,7 +2971,8 @@ final class Stream implements \IteratorAggregate
      *
      * For single iterable or empty iterables list returns true. An iterator or generator passed more than
      * once, including the stream's own source or the stream itself, is traversed once:
-     * Stream::of($it)->sameCountWith($it).
+     * Stream::of($it)->sameCountWith($it). The stream through Stream::of() or an unread Transform::memoize()
+     * counts as the stream itself, and such a memoized iterable is neither read nor filled.
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -2935,8 +2988,9 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if stream and given collections are permutations of each other (using strict-type comparisons).
      *
-     * Returns true if no collections given, or only the stream itself or the object it was created from,
-     * without reading the stream. Equality follows the strict rules in README "Strict and Coercive Types".
+     * Returns true if no collections given, or only the stream itself, directly or through Stream::of() or an
+     * unread Transform::memoize(), or the object it was created from, without reading the stream. Equality
+     * follows the strict rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -2948,7 +3002,7 @@ final class Stream implements \IteratorAggregate
     public function arePermutationsWith(iterable ...$iterables): bool
     {
         // The stream is a permutation of itself, unread. An array source in its place would be read twice instead.
-        if (\array_filter($iterables, fn (iterable $iterable): bool => $iterable !== $this) === []) {
+        if (\array_filter($iterables, fn (iterable $iterable): bool => !$this->isSelf($iterable)) === []) {
             return true;
         }
         return Summary::arePermutations($this->iterable, ...$this->replaceSelfWithSource($iterables));
@@ -2957,8 +3011,9 @@ final class Stream implements \IteratorAggregate
     /**
      * Returns true if stream and given collections are permutations of each other (using type coercion).
      *
-     * Returns true if no collections given, or only the stream itself or the object it was created from,
-     * without reading the stream. Equality follows the coercive rules in README "Strict and Coercive Types".
+     * Returns true if no collections given, or only the stream itself, directly or through Stream::of() or an
+     * unread Transform::memoize(), or the object it was created from, without reading the stream. Equality
+     * follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param iterable<mixed> ...$iterables
      *
@@ -2970,7 +3025,7 @@ final class Stream implements \IteratorAggregate
     public function arePermutationsCoerciveWith(iterable ...$iterables): bool
     {
         // The stream is a permutation of itself, unread. An array source in its place would be read twice instead.
-        if (\array_filter($iterables, fn (iterable $iterable): bool => $iterable !== $this) === []) {
+        if (\array_filter($iterables, fn (iterable $iterable): bool => !$this->isSelf($iterable)) === []) {
             return true;
         }
         return Summary::arePermutationsCoercive($this->iterable, ...$this->replaceSelfWithSource($iterables));

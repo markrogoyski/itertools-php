@@ -39,6 +39,32 @@ $result = $stream->zipWith($stream, ['a', 'b', 'c'])->toArray();
 
 `chainWith` does not buffer, so it chains a stream over a generator, as after a step such as `map`, with itself only as far as the first copy, then throws, as `Multi::chain($generator, $generator)` does.
 
+A stream wrapped in `Stream::of()` streams with no steps of their own, or in `Transform::memoize()` iterables not yet read, nested in any order, means the same as the stream passed directly. The call reads its source in the wrapper's place, and reads, fills and changes nothing in the wrapper:
+
+```php
+$stream = Stream::of([1, 2, 3]);
+$result = $stream->zipWith(Stream::of($stream))->toArray();
+// [[1, 1], [2, 2], [3, 3]], as $stream->zipWith($stream)
+
+$stream = Stream::of([1.0, NAN, 3.0]);
+$result = $stream->sameWith(Transform::memoize($stream));
+// true, as $stream->sameWith($stream)
+```
+
+Outside the call, the wrapper keeps its own meaning:
+* `Stream::of($stream)` stays a live view of the stream. Read later, it reads the stream with the new step, and steps added to the wrapper afterwards apply to what it reads, not to the stream's pipeline.
+* A wrapper read after the stream has been consumed fails, as reading the stream again does: after `$stream->zipWith($memo)->toArray()`, reading `$memo` throws "Cannot rewind a generator that was already run".
+* An unread `Transform::memoize($stream)` stays unread, also after a call that succeeds, such as `$stream->sameCountWith($memo)` or a comparison. It memoizes the stream's pipeline when it is first read.
+
+Whether a memoized wrapper is detected depends on its state:
+* Unread, its iterator handed out but not advanced, or a clone of such a memo: it stands for the stream and is left unread.
+* Partly or fully read: not detected. It is read like any other iterable over the stream, and what that gives depends on the iterator the stream gives at that point:
+  * A fresh iterator on each read (an array, an `IteratorAggregate` that returns a new iterator per call, or a stream whose last step gives a fresh iterator per read, such as `memoize()`): the memo is a copy. `zipWith` over `[1, 2, 3]` yields `[[1, 1], [2, 2], [3, 3]]`, and an array-backed stream holding `NAN` is not `sameWith` a read memo of itself.
+  * One shared iterator (a generator, as after a step such as `map()`; an `Iterator`; or an aggregate that returns the same object on every call): the memo and the stream share one cursor. Partly read, `zipWith` over `[1, 2, 3]` yields `[[1, 1], [3, 3]]`, and the memo then holds `[1, 3]`. Fully read, a rewindable `Iterator` is read again from the start; a generator cannot be rewound, so the call throws "Cannot rewind a generator that was already run", while the memo still replays `[1, 2, 3]`.
+* Failed: not detected; the call rethrows the memo's cached exception, the same object.
+
+Not detected, and still throwing an `\Error` when read inside the stream's own pipeline: a wrapper with a step of its own (`Stream::of($stream)->map(…)`, whose step is kept), a `Transform::tee()` copy, and any other `IteratorAggregate` that reads the stream.
+
 ### Stream Sources
 
 #### Of

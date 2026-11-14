@@ -46,6 +46,19 @@ final class MemoCache
         $this->iterable = $iterable;
     }
 
+    /**
+     * The iterable the source will be resolved from while it has not been, otherwise null. Reads nothing.
+     *
+     * initializeSource() marks the cache initialized before anything else, so a resolution in progress or one
+     * that failed is never pending.
+     *
+     * @return iterable<mixed, mixed>|null
+     */
+    public function pendingSource(): ?iterable
+    {
+        return $this->initialized ? null : $this->iterable;
+    }
+
     /** @return \Generator<TKey, TValue> */
     public function replay(): \Generator
     {
