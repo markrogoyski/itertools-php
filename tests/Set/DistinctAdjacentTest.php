@@ -294,6 +294,87 @@ class DistinctAdjacentTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Regression: each row is compared as it was when read. Both rows refer to one cell, which held a
+     * different array holding NAN at each read, so they are distinct, though both refer to the same
+     * array once the second is read.
+     *
+     * @test distinctAdjacent keeps reference-slot rows whose slot held separate arrays holding NAN when read
+     */
+    public function testReferenceSlotToSeparateArraysHoldingNan(): void
+    {
+        // Given
+        $nan = NAN;
+        $data = (function () use ($nan): \Generator {
+            $cell = [$nan];
+            yield [&$cell];
+            $cell = [$nan];
+            yield [&$cell];
+        })();
+
+        // When
+        $result = \iterator_to_array(Set::distinctAdjacent($data), false);
+
+        // Then
+        $this->assertCount(2, $result);
+    }
+
+    /**
+     * A row with a reference slot is compared through its copy, so the NAN it holds is compared element
+     * by element and never matches, even in the same unchanged row read twice.
+     *
+     * @test distinctAdjacent keeps a reference-slot row holding NAN read twice
+     */
+    public function testReferenceSlotRowHoldingNanReadTwice(): void
+    {
+        // Given
+        $data = self::referenceSlotRowsHoldingNan(1, 1);
+
+        // When
+        $ids = [];
+        foreach (Set::distinctAdjacent($data) as $row) {
+            $ids[] = $row['id'];
+        }
+
+        // Then
+        $this->assertSame([1, 1], $ids);
+    }
+
+    /**
+     * A subarray without reference slots is not copied, so PHP finds it identical to itself, NAN included.
+     *
+     * @test distinctAdjacent drops a reference-slot row read twice holding NAN in a subarray without reference slots
+     */
+    public function testReferenceSlotRowHoldingNanInSubarrayReadTwice(): void
+    {
+        // Given
+        $id = 1;
+        $row = ['id' => &$id, 'scores' => [NAN]];
+        $data = [$row, $row];
+
+        // When
+        $result = \iterator_to_array(Set::distinctAdjacent($data), false);
+
+        // Then
+        $this->assertCount(1, $result);
+    }
+
+    /**
+     * @test distinctAdjacent keeps separate reference-slot arrays holding NAN, since NAN never matches NAN
+     */
+    public function testSeparateReferenceSlotArraysHoldingNan(): void
+    {
+        // Given
+        $id = 1;
+        $data = [[&$id, NAN], [&$id, NAN]];
+
+        // When
+        $result = \iterator_to_array(Set::distinctAdjacent($data), false);
+
+        // Then
+        $this->assertCount(2, $result);
+    }
+
+    /**
      * Yields rows that all share one reference slot, as PDOStatement::bindColumn() fills them:
      * each yielded ['id' => &$id] follows the next assignment to $id.
      *
@@ -303,6 +384,23 @@ class DistinctAdjacentTest extends \PHPUnit\Framework\TestCase
     {
         $id = null;
         $row = ['id' => &$id];
+
+        foreach ($ids as $value) {
+            $id = $value;
+
+            yield $row;
+        }
+    }
+
+    /**
+     * Yields one array, holding NAN, whose reference slot follows the next assignment to $id.
+     *
+     * @return \Generator<int, array{id: int, score: float}>
+     */
+    private static function referenceSlotRowsHoldingNan(int ...$ids): \Generator
+    {
+        $id = null;
+        $row = ['id' => &$id, 'score' => NAN];
 
         foreach ($ids as $value) {
             $id = $value;

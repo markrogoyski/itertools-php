@@ -268,6 +268,8 @@ final class TeeIterator
             $pending = $this->pending;
             $this->pending = [];
             $this->source = Transform::toIterator($pending);
+            // Not held here either, so that releasing the source below drops its last reference.
+            unset($pending);
             $this->source->rewind();
             $this->rewound = true;
         } elseif ($this->needsAdvance) {
@@ -276,8 +278,10 @@ final class TeeIterator
         }
 
         if (!$this->source->valid()) {
-            $this->exhausted = true;
+            // Released before it is marked exhausted: a destructor that throws is then a source failure,
+            // kept by hasElementAt() for every related iterator, not only the one whose read released it.
             $this->source = new \EmptyIterator();
+            $this->exhausted = true;
             return;
         }
 

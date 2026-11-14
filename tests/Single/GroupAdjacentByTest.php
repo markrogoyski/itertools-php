@@ -244,6 +244,83 @@ class GroupAdjacentByTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Regression: each key is compared as it was when projected. Both keys refer to one cell, which held
+     * a different array holding NAN at each projection, so they start separate groups, though both refer
+     * to the same array once the second is projected.
+     *
+     * @test groupAdjacentBy splits elements whose reference-slot keys held separate arrays holding NAN
+     */
+    public function testReferenceSlotKeysToSeparateArraysHoldingNan(): void
+    {
+        // Given
+        $nan = NAN;
+        $cell = null;
+        $data = (function () use ($nan, &$cell): \Generator {
+            $cell = [$nan];
+            yield 1;
+            $cell = [$nan];
+            yield 2;
+        })();
+        $keyFn = function (int $datum) use (&$cell): array {
+            return [&$cell];
+        };
+
+        // When
+        $groups = [];
+        foreach (Single::groupAdjacentBy($data, $keyFn) as [$key, $group]) {
+            $groups[] = $group;
+        }
+
+        // Then
+        $this->assertSame([[1], [2]], $groups);
+    }
+
+    /**
+     * A key with a reference slot is compared through its copy, so the NAN it holds never matches, even
+     * in the same unchanged key projected twice.
+     *
+     * @test groupAdjacentBy splits elements whose reference-slot key holding NAN is projected twice
+     */
+    public function testReferenceSlotKeyHoldingNanProjectedTwice(): void
+    {
+        // Given
+        $id = 1;
+        $key = ['id' => &$id, 'score' => NAN];
+        $data = [1, 2];
+        $keyFn = fn (int $datum): array => $key;
+
+        // When
+        $groups = [];
+        foreach (Single::groupAdjacentBy($data, $keyFn) as [$groupKey, $group]) {
+            $groups[] = $group;
+        }
+
+        // Then
+        $this->assertSame([[1], [2]], $groups);
+    }
+
+    /**
+     * @test groupAdjacentBy groups elements whose reference-slot key holds NAN in a subarray without reference slots
+     */
+    public function testReferenceSlotKeyHoldingNanInSubarrayProjectedTwice(): void
+    {
+        // Given
+        $id = 1;
+        $key = ['id' => &$id, 'scores' => [NAN]];
+        $data = [1, 2];
+        $keyFn = fn (int $datum): array => $key;
+
+        // When
+        $groups = [];
+        foreach (Single::groupAdjacentBy($data, $keyFn) as [$groupKey, $group]) {
+            $groups[] = $group;
+        }
+
+        // Then
+        $this->assertSame([[1, 2]], $groups);
+    }
+
+    /**
      * Yields rows that all share one reference slot, as PDOStatement::bindColumn() fills them:
      * each yielded ['id' => &$id] follows the next assignment to $id.
      *

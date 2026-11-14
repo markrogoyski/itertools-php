@@ -309,6 +309,74 @@ class DistinctAdjacentByTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Regression: each key is compared as it was when projected. Both keys refer to one cell, which held
+     * a different array holding NAN at each projection, so they are distinct, though both refer to the
+     * same array once the second is projected.
+     *
+     * @test distinctAdjacentBy keeps elements whose reference-slot keys held separate arrays holding NAN
+     */
+    public function testReferenceSlotKeysToSeparateArraysHoldingNan(): void
+    {
+        // Given
+        $nan = NAN;
+        $cell = null;
+        $data = (function () use ($nan, &$cell): \Generator {
+            $cell = [$nan];
+            yield 1;
+            $cell = [$nan];
+            yield 2;
+        })();
+        $keyFn = function (int $datum) use (&$cell): array {
+            return [&$cell];
+        };
+
+        // When
+        $result = \iterator_to_array(Set::distinctAdjacentBy($data, $keyFn), false);
+
+        // Then
+        $this->assertSame([1, 2], $result);
+    }
+
+    /**
+     * A key with a reference slot is compared through its copy, so the NAN it holds never matches, even
+     * in the same unchanged key projected twice.
+     *
+     * @test distinctAdjacentBy keeps elements whose reference-slot key holding NAN is projected twice
+     */
+    public function testReferenceSlotKeyHoldingNanProjectedTwice(): void
+    {
+        // Given
+        $id = 1;
+        $key = ['id' => &$id, 'score' => NAN];
+        $data = [1, 2];
+        $keyFn = fn (int $datum): array => $key;
+
+        // When
+        $result = \iterator_to_array(Set::distinctAdjacentBy($data, $keyFn), false);
+
+        // Then
+        $this->assertSame([1, 2], $result);
+    }
+
+    /**
+     * @test distinctAdjacentBy drops an element whose reference-slot key holds NAN in a subarray without reference slots
+     */
+    public function testReferenceSlotKeyHoldingNanInSubarrayProjectedTwice(): void
+    {
+        // Given
+        $id = 1;
+        $key = ['id' => &$id, 'scores' => [NAN]];
+        $data = [1, 2];
+        $keyFn = fn (int $datum): array => $key;
+
+        // When
+        $result = \iterator_to_array(Set::distinctAdjacentBy($data, $keyFn), false);
+
+        // Then
+        $this->assertSame([1], $result);
+    }
+
+    /**
      * Yields rows that all share one reference slot, as PDOStatement::bindColumn() fills them:
      * each yielded ['id' => &$id] follows the next assignment to $id.
      *

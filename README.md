@@ -675,7 +675,11 @@ Functions that keep an element while they read the next one compare it as it was
   its reference slots, taken before anything is yielded. Only arrays that hold a reference slot
   are copied, each once however often it recurs, but every nested array is read to find them,
   so the time this takes grows with an array's logical size, as hashing does: subarrays
-  without reference slots that share storage are read once per occurrence. An object is kept as the same instance, so strict comparison and `<=>` find one
+  without reference slots that share storage are read once per occurrence. Copying can make two
+  reads of the same unchanged array compare unequal, where rebuilding it exposes a `NAN` to
+  element-by-element comparison: a row `['id' => &$id, 'score' => NAN]` yielded twice is two
+  distinct rows to `distinctAdjacent`. Arrays and subarrays without reference slots are not
+  copied and compare as PHP compares them. An object is kept as the same instance, so strict comparison and `<=>` find one
   mutated object equal to itself: `isSorted` of one object whose value goes from 2 to 1 is
   `true`.
 * `endsWithCoercive` hashes each array and object element as it is read, so an object is

@@ -1113,6 +1113,95 @@ class TeeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Regression: a source released once read to its end can throw from its destructor. That is a
+     * source failure like any other, so every copy gets it, not only the copy whose read released it.
+     *
+     * @test every tee copy receives an exception thrown while releasing the exhausted source
+     */
+    public function testSourceReleaseExceptionReachesEveryCopy(): void
+    {
+        // Given
+        $exception = new \RuntimeException('cleanup failed');
+        $source = new class ([1, 2], $exception) extends \ArrayIterator {
+            public function __construct(array $array, private ?\Throwable $onDestruct)
+            {
+                parent::__construct($array);
+            }
+
+            public function __destruct()
+            {
+                $exception = $this->onDestruct;
+                $this->onDestruct = null;
+                if ($exception !== null) {
+                    throw $exception;
+                }
+            }
+        };
+        [$a, $b] = Transform::tee($source, 2);
+        unset($source);
+
+        foreach ([$a, $b] as $copy) {
+            // When
+            $values = [];
+            $caught = null;
+            try {
+                foreach ($copy as $value) {
+                    $values[] = $value;
+                }
+            } catch (\RuntimeException $e) {
+                $caught = $e;
+            }
+
+            // Then
+            $this->assertSame([1, 2], $values);
+            $this->assertSame($exception, $caught);
+        }
+    }
+
+    /**
+     * @test every tee copy receives an exception thrown while releasing an empty source
+     */
+    public function testEmptySourceReleaseExceptionReachesEveryCopy(): void
+    {
+        // Given
+        $exception = new \RuntimeException('cleanup failed');
+        $source = new class ([], $exception) extends \ArrayIterator {
+            public function __construct(array $array, private ?\Throwable $onDestruct)
+            {
+                parent::__construct($array);
+            }
+
+            public function __destruct()
+            {
+                $exception = $this->onDestruct;
+                $this->onDestruct = null;
+                if ($exception !== null) {
+                    throw $exception;
+                }
+            }
+        };
+        [$a, $b] = Transform::tee($source, 2);
+        unset($source);
+
+        foreach ([$a, $b] as $copy) {
+            // When
+            $values = [];
+            $caught = null;
+            try {
+                foreach ($copy as $value) {
+                    $values[] = $value;
+                }
+            } catch (\RuntimeException $e) {
+                $caught = $e;
+            }
+
+            // Then
+            $this->assertSame([], $values);
+            $this->assertSame($exception, $caught);
+        }
+    }
+
+    /**
      * @test a tee copy lagging behind the one that hit a source failure still gets the elements before it, then the failure
      */
     public function testSourceExceptionReachesLaggingCopyAfterBufferedElements(): void

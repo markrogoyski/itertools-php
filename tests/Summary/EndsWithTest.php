@@ -333,6 +333,94 @@ class EndsWithTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Regression: the suffix and the source refer to one cell, which held a different array holding NAN
+     * when each was read, so they differ, though both refer to the same array once the source is read.
+     *
+     * @test endsWith - reference-slot rows whose slot held separate arrays holding NAN when read differ
+     */
+    public function testReferenceSlotToSeparateArraysHoldingNan(): void
+    {
+        // Given
+        $nan = NAN;
+        $cell = [$nan];
+        $suffix = [[&$cell]];
+        $data = (function () use ($nan, &$cell): \Generator {
+            $cell = [$nan];
+            yield [&$cell];
+        })();
+
+        // When
+        $result = Summary::endsWith($data, $suffix);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * Regression: rows are compared as read, so slots that later come to hold self-referential arrays
+     * are not traversed.
+     *
+     * @test endsWith - reference-slot rows whose slots later become self-referential are compared as read
+     */
+    public function testReferenceSlotsLaterSelfReferential(): void
+    {
+        // Given
+        $a = 1;
+        $b = 2;
+        $suffix = [[&$b]];
+        $data = (function () use (&$a, &$b): \Generator {
+            yield [&$a];
+            $a = [&$a];
+            $b = [&$b];
+        })();
+
+        // When
+        $result = Summary::endsWith($data, $suffix);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * A row with a reference slot is compared through its copy, so the NAN it holds never matches, even
+     * when the source ends with the suffix's own unchanged row.
+     *
+     * @test endsWith - a reference-slot row holding NAN does not end with itself
+     */
+    public function testReferenceSlotRowHoldingNanDoesNotEndWithItself(): void
+    {
+        // Given
+        $id = 1;
+        $row = ['id' => &$id, 'score' => NAN];
+        $data = [0, $row];
+        $suffix = [$row];
+
+        // When
+        $result = Summary::endsWith($data, $suffix);
+
+        // Then
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @test endsWith - a reference-slot row holding NAN in a subarray without reference slots ends with itself
+     */
+    public function testReferenceSlotRowHoldingNanInSubarrayEndsWithItself(): void
+    {
+        // Given
+        $id = 1;
+        $row = ['id' => &$id, 'scores' => [NAN]];
+        $data = [0, $row];
+        $suffix = [$row];
+
+        // When
+        $result = Summary::endsWith($data, $suffix);
+
+        // Then
+        $this->assertTrue($result);
+    }
+
+    /**
      * @test endsWith - a reference slot nested inside a row is compared as read
      */
     public function testNestedReferenceSlotSource(): void
