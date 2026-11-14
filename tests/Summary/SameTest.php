@@ -304,7 +304,7 @@ class SameTest extends \PHPUnit\Framework\TestCase
     public function testGeneratorsTrue(iterable ...$iterables)
     {
         // When
-        $result = Summary::same($iterables);
+        $result = Summary::same(...$iterables);
 
         // Then
         $this->assertTrue($result);
@@ -549,7 +549,7 @@ class SameTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @test         Same iterators true
-     * @dataProvider dataProviderForGeneratorsFalse
+     * @dataProvider dataProviderForIteratorsFalse
      * @param        iterable ...$iterables
      */
     public function testIteratorsFalse(iterable ...$iterables)
