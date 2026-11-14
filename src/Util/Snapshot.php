@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools\Util;
 
+use IterTools\Util\Values\UniqueExtractor;
+
 /**
  * @internal
  * A copy of a value that later writes through the references it shares cannot change.

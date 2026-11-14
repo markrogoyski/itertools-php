@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\Arithmetic;
 use IterTools\Util\MeanAccumulator;
-use IterTools\Util\ValueCounter;
+use IterTools\Util\Values\ValueCounter;
 
 final class Math
 {

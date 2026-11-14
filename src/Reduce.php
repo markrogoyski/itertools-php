@@ -6,9 +6,9 @@ namespace IterTools;
 
 use IterTools\Util\Arithmetic;
 use IterTools\Util\MeanAccumulator;
-use IterTools\Util\NoValueMonad;
-use IterTools\Util\Truthiness;
-use IterTools\Util\ValueCounter;
+use IterTools\Util\Values\NoValueMonad;
+use IterTools\Util\Values\Truthiness;
+use IterTools\Util\Values\ValueCounter;
 
 final class Reduce
 {

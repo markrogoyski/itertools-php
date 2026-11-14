@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace IterTools\Tests\Util;
 
 use IterTools\Util\Snapshot;
-use IterTools\Util\UniqueExtractor;
+use IterTools\Util\Values\UniqueExtractor;
 
 class SnapshotTest extends \PHPUnit\Framework\TestCase
 {

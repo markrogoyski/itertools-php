@@ -6,7 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\Iterators\TeeIterator;
 use IterTools\Util\Iterators\MemoizedIterable;
-use IterTools\Util\Truthiness;
+use IterTools\Util\Values\Truthiness;
 
 final class Transform
 {

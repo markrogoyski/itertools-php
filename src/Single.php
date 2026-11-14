@@ -6,8 +6,8 @@ namespace IterTools;
 
 use IterTools\Util\Arithmetic;
 use IterTools\Util\Snapshot;
-use IterTools\Util\Truthiness;
-use IterTools\Util\UniqueExtractor;
+use IterTools\Util\Values\Truthiness;
+use IterTools\Util\Values\UniqueExtractor;
 
 final class Single
 {

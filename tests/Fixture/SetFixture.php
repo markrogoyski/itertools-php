@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace IterTools\Tests\Fixture;
 
-use IterTools\Util\UniqueExtractor;
+use IterTools\Util\Values\UniqueExtractor;
 
 class SetFixture
 {

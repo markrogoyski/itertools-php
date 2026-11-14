@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace IterTools\Util;
 
+use IterTools\Util\Values\UniqueExtractor;
+
 /**
  * @internal
  * The subarrays one {@see Snapshot::of()} has rebuilt, each class of identical ones (`===`, with the same

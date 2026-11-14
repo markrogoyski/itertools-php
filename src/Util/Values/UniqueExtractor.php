@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Util;
+namespace IterTools\Util\Values;
+
+use IterTools\Util\Arithmetic;
 
 /**
  * @internal

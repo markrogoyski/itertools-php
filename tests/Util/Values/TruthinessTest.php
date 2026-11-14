@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Util;
+namespace IterTools\Tests\Util\Values;
 
-use IterTools\Util\Truthiness;
+use IterTools\Util\Values\Truthiness;
 
 class TruthinessTest extends \PHPUnit\Framework\TestCase
 {

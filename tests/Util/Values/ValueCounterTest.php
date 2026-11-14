@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Util;
+namespace IterTools\Tests\Util\Values;
 
-use IterTools\Util\ValueCounter;
+use IterTools\Util\Values\ValueCounter;
 
 /**
  * Hash strings are internal to UniqueExtractor: these tests assert counts, sizes, representatives

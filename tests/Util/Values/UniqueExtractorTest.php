@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Util;
+namespace IterTools\Tests\Util\Values;
 
 use IterTools\Tests\Fixture;
 use IterTools\Tests\Fixture\EnumFixture;
 use IterTools\Tests\Fixture\NonSerializableFixture;
-use IterTools\Util\UniqueExtractor;
+use IterTools\Util\Values\UniqueExtractor;
 
 /**
  * Key strings are internal to UniqueExtractor: these tests only assert which values share a key

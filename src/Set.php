@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace IterTools;
 
-use IterTools\Util\Identity;
+use IterTools\Util\Values\Identity;
 use IterTools\Util\Iterators\JustifyMultipleIterator;
-use IterTools\Util\NoValueMonad;
+use IterTools\Util\Values\NoValueMonad;
 use IterTools\Util\Snapshot;
-use IterTools\Util\UsageMap;
-use IterTools\Util\ValueCounter;
+use IterTools\Util\Values\UsageMap;
+use IterTools\Util\Values\ValueCounter;
 
 final class Set
 {
