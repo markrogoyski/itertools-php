@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Util;
+namespace IterTools\Tests\Util\Iterators;
 
 use IterTools\Transform;
 use IterTools\Util\Iterators\TeeIterator;
@@ -279,7 +279,7 @@ class TeeIteratorTest extends \PHPUnit\Framework\TestCase
     public function testPeekStreamOfALargeGeneratorFitsInA128MLimit(): void
     {
         // Given
-        $autoload = \dirname(__DIR__, 2) . '/vendor/autoload.php';
+        $autoload = \dirname(__DIR__, 3) . '/vendor/autoload.php';
         $code = 'require ' . \var_export($autoload, true) . ';'
             . '$gen = (static function () { for ($i = 1; $i <= 600000; ++$i) { yield $i; } })();'
             . 'echo IterTools\\Stream::of($gen)->peekStream(fn ($s) => $s->toCount())->toSum();';

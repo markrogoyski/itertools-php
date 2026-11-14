@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Util;
+namespace IterTools\Tests\Util\Iterators;
 
 use IterTools\Tests\Fixture;
 use IterTools\Util\Iterators\StrictMultipleIterator;
