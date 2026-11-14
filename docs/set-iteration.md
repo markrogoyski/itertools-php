@@ -265,7 +265,7 @@ Iterates the symmetric difference of iterables.
 
 ```Set::symmetricDifference(iterable ...$iterables)```
 
-If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
+If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) symmetric difference rules apply.
 
 Given a single iterable, yields its elements, as with an empty second iterable. Given none, yields nothing.
 
@@ -287,7 +287,7 @@ Iterates the symmetric difference of iterables with [type coercion](../README.md
 
 ```Set::symmetricDifferenceCoercive(iterable ...$iterables)```
 
-If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) difference rules apply.
+If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) symmetric difference rules apply.
 
 Given a single iterable, yields its elements, as with an empty second iterable. Given none, yields nothing.
 

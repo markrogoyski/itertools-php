@@ -1650,7 +1650,7 @@ Return a stream of the symmetric difference of the stream and the given iterable
 
 ```$stream->symmetricDifferenceWith(iterable ...$iterables): Stream```
 
-Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) symmetric difference rules apply.
 
 With no given iterables, the stream keeps its own elements, as with an empty iterable.
 
@@ -1672,7 +1672,7 @@ Return a stream of the symmetric difference of the stream and the given iterable
 
 ```$stream->symmetricDifferenceCoerciveWith(iterable ...$iterables): Stream```
 
-Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) intersection rules apply.
+Note: If input iterables produce duplicate items, then [multiset](https://en.wikipedia.org/wiki/Multiset) symmetric difference rules apply.
 
 With no given iterables, the stream keeps its own elements, as with an empty iterable.
 
@@ -2503,7 +2503,7 @@ $boolean = Stream::of($path)->endsWith(['error.log']);
 Returns true if the stream ends with the given suffix using [type coercion](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty suffix returns true without consuming the stream. So does the stream itself, or the iterator or generator it was created from, passed as the suffix: `Stream::of($it)->endsWith($it)`.
+- Empty suffix returns true without consuming the stream. So does the stream itself, or the iterator or generator it was created from, passed as the suffix: `Stream::of($it)->endsWithCoercive($it)`.
 - The stream must be finite.
 - Equality follows the [coercive rules](../README.md#strict-and-coercive-types).
 - Throws `\InvalidArgumentException` if a non-serializable object is reached during comparison.
@@ -2751,7 +2751,7 @@ $boolean = Stream::of($path)->startsWith(['etc']);
 Returns true if the stream starts with the given prefix using [type coercion](../README.md#strict-and-coercive-types).
 
 - Compares values pairwise; keys are ignored.
-- Empty prefix returns true without consuming the stream. So does the stream itself, or the iterator or generator it was created from, passed as the prefix: `Stream::of($it)->startsWith($it)`.
+- Empty prefix returns true without consuming the stream. So does the stream itself, or the iterator or generator it was created from, passed as the prefix: `Stream::of($it)->startsWithCoercive($it)`.
 - Lazy: the stream is never advanced beyond the last element compared.
 - Equality follows the [coercive rules](../README.md#strict-and-coercive-types).
 - Throws `\InvalidArgumentException` if a non-serializable object is reached during comparison.

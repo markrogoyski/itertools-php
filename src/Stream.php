@@ -1929,7 +1929,7 @@ final class Stream implements \IteratorAggregate
      *
      * Equality follows the strict rules in README "Strict and Coercive Types".
      *
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      *
      * @return Stream
      *
@@ -1946,7 +1946,7 @@ final class Stream implements \IteratorAggregate
      *
      * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      *
      * @return Stream
      *
@@ -2050,7 +2050,7 @@ final class Stream implements \IteratorAggregate
      * Equality follows the strict rules in README "Strict and Coercive Types".
      *
      * @param positive-int $minIntersectionCount
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      *
      * @return Stream
      *
@@ -2070,7 +2070,7 @@ final class Stream implements \IteratorAggregate
      * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
      * @param positive-int $minIntersectionCount
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      *
      * @return Stream
      *
@@ -2089,7 +2089,7 @@ final class Stream implements \IteratorAggregate
      *
      * Equality follows the strict rules in README "Strict and Coercive Types".
      *
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      *
      * @return Stream
      *
@@ -2106,7 +2106,7 @@ final class Stream implements \IteratorAggregate
      *
      * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
-     * @param array<iterable<mixed>> ...$iterables
+     * @param iterable<mixed> ...$iterables
      *
      * @return Stream
      *
@@ -2658,7 +2658,7 @@ final class Stream implements \IteratorAggregate
      * Compares values pairwise; keys are ignored.
      *
      * Empty prefix → true without consuming the stream. So is the stream itself, or the iterator or generator
-     * it was created from, passed as the prefix: Stream::of($it)->startsWith($it).
+     * it was created from, passed as the prefix: Stream::of($it)->startsWithCoercive($it).
      *
      * Lazy: the stream is never advanced beyond the last element compared.
      *
@@ -2708,7 +2708,7 @@ final class Stream implements \IteratorAggregate
      * Compares values pairwise; keys are ignored.
      *
      * Empty suffix → true without consuming the stream. So is the stream itself, or the iterator or generator
-     * it was created from, passed as the suffix: Stream::of($it)->endsWith($it). The stream must be finite.
+     * it was created from, passed as the suffix: Stream::of($it)->endsWithCoercive($it). The stream must be finite.
      *
      * @param iterable<mixed> $suffix
      *
@@ -3083,15 +3083,13 @@ final class Stream implements \IteratorAggregate
      *
      * @param callable|null $compareBy
      *
-     * @return array{numeric, numeric}|array{null, null}
+     * @return array{mixed, mixed}|array{null, null}
      *
      * @see Reduce::toMinMax()
      */
     public function toMinMax(?callable $compareBy = null): array
     {
-        /** @var iterable<numeric> $iterable */
-        $iterable = $this->iterable;
-        return Reduce::toMinMax($iterable, $compareBy);
+        return Reduce::toMinMax($this->iterable, $compareBy);
     }
 
     /**

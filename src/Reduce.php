@@ -194,10 +194,10 @@ final class Reduce
      *
      * Returns [null, null] if given collection is empty.
      *
-     * @param iterable<numeric> $numbers
-     * @param callable|null     $compareBy
+     * @param iterable<mixed> $numbers
+     * @param callable|null   $compareBy
      *
-     * @return array{numeric, numeric}|array{null, null}
+     * @return array{mixed, mixed}|array{null, null}
      */
     public static function toMinMax(iterable $numbers, ?callable $compareBy = null): array
     {
@@ -254,7 +254,6 @@ final class Reduce
             $result = [$min, $max];
         }
 
-        /** @var array{numeric, numeric}|array{null, null} */
         return [
             ($result[0] instanceof NoValueMonad) ? null : $result[0],
             ($result[1] instanceof NoValueMonad) ? null : $result[1],

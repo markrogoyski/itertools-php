@@ -266,7 +266,7 @@ final class Set
     /**
      * Iterates union of given iterables in strict type mode.
      *
-     * If input iterables produce duplicate items, then multiset intersection rules apply.
+     * If input iterables produce duplicate items, then multiset union rules apply.
      *
      * Equality follows the strict rules in README "Strict and Coercive Types".
      *
@@ -282,7 +282,7 @@ final class Set
     /**
      * Iterates union of given iterables using type coercion.
      *
-     * If input iterables produce duplicate items, then multiset intersection rules apply.
+     * If input iterables produce duplicate items, then multiset union rules apply.
      *
      * Equality follows the coercive rules in README "Strict and Coercive Types".
      *
@@ -350,7 +350,7 @@ final class Set
     /**
      * Iterates the symmetric difference of iterables in strict type mode.
      *
-     * If input iterables produce duplicate items, then multiset difference rules apply.
+     * If input iterables produce duplicate items, then multiset symmetric difference rules apply.
      *
      * Equality follows the strict rules in README "Strict and Coercive Types". Retains the
      * last-seen representative per distinct value; see the Retained values subsection there.
@@ -370,7 +370,7 @@ final class Set
     /**
      * Iterates the symmetric difference of iterables using type coercion.
      *
-     * If input iterables produce duplicate items, then multiset intersection rules apply.
+     * If input iterables produce duplicate items, then multiset symmetric difference rules apply.
      *
      * Equality follows the coercive rules in README "Strict and Coercive Types". Retains the
      * last-seen representative per distinct value; see the Retained values subsection there.

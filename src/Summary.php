@@ -691,7 +691,7 @@ final class Summary
      * Compares values pairwise; keys are ignored.
      *
      * Empty prefix → true without consuming the source. So is an iterator, generator or \IteratorAggregate
-     * passed as its own prefix: startsWith($it, $it).
+     * passed as its own prefix: startsWithCoercive($it, $it).
      *
      * Lazy: the source is never advanced beyond the last element compared. On a match it is
      * left on the last prefix element; on a mismatch, on the mismatching element; if it is
@@ -742,7 +742,7 @@ final class Summary
      * Compares values pairwise; keys are ignored.
      *
      * Empty suffix → true without consuming the source. So is an iterator, generator or \IteratorAggregate
-     * passed as its own suffix: endsWith($it, $it).
+     * passed as its own suffix: endsWithCoercive($it, $it).
      *
      * Both source and suffix must be finite. Buffers up to count($suffix) elements via a sliding window.
      * Each array or object element is hashed when read, so it is compared as it was then; see README
