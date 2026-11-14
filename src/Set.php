@@ -7,7 +7,7 @@ namespace IterTools;
 use IterTools\Util\Values\Identity;
 use IterTools\Util\Iterators\JustifyMultipleIterator;
 use IterTools\Util\Values\NoValueMonad;
-use IterTools\Util\Snapshot;
+use IterTools\Util\Snapshot\Snapshot;
 use IterTools\Util\Values\UsageMap;
 use IterTools\Util\Values\ValueCounter;
 

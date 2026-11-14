@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace IterTools\Tests\Util;
+namespace IterTools\Tests\Util\Snapshot;
 
-use IterTools\Util\Snapshot;
+use IterTools\Util\Snapshot\Snapshot;
 use IterTools\Util\Values\UniqueExtractor;
 
 class SnapshotTest extends \PHPUnit\Framework\TestCase

@@ -7,7 +7,7 @@ namespace IterTools;
 use IterTools\Util\Arithmetic;
 use IterTools\Util\Values\Identity;
 use IterTools\Util\Iterators\RelatedIterator;
-use IterTools\Util\Snapshot;
+use IterTools\Util\Snapshot\Snapshot;
 use IterTools\Util\Values\Truthiness;
 use IterTools\Util\Values\UniqueExtractor;
 use IterTools\Util\Values\UsageMap;

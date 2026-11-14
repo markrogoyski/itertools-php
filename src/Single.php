@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Arithmetic;
-use IterTools\Util\Snapshot;
+use IterTools\Util\Snapshot\Snapshot;
 use IterTools\Util\Values\Truthiness;
 use IterTools\Util\Values\UniqueExtractor;
 
