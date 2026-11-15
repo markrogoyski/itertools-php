@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Precision\Arithmetic;
+use IterTools\Util\Precision\ExactFloat;
+use IterTools\Util\Precision\Ulp;
 use IterTools\Util\Snapshot\Snapshot;
 use IterTools\Util\Values\Truthiness;
 use IterTools\Util\Values\UniqueExtractor;
@@ -1308,7 +1310,7 @@ final class Single
                     $operandAllowance = 0.0;
                     foreach ([$start, $end] as $operand) {
                         if (\is_float($operand) && \floor($operand) !== $operand) {
-                            $operandAllowance += Arithmetic::halfFloatSpacing($operand);
+                            $operandAllowance += Ulp::halfFloatSpacing($operand);
                         }
                     }
                     $differenceAllowance = [
@@ -1406,9 +1408,9 @@ final class Single
                 $endRest = 0.0;
                 if (\is_int($startExact) && \is_int($endExact)) {
                     [$low, $high] = $ascending ? [$startExact, $endExact] : [$endExact, $startExact];
-                    $exactSpan = self::exactIntSpan($low, $high);
+                    $exactSpan = ExactFloat::exactIntSpan($low, $high);
                     $operandAllowance = [];
-                    $endRest = self::intToFloats($endExact)[1];
+                    $endRest = ExactFloat::intToFloats($endExact)[1];
                 } else {
                     $exactSpan = self::exactFloatDifference(\max($startF, $endF), \min($startF, $endF));
                     $operandAllowance = self::roundingAllowances($start, $end, \abs($step), true, $exactSpan);
@@ -1431,7 +1433,7 @@ final class Single
                 // roundingAllowances(); int operands are exact, since their span is.
                 $operandTolerance = $intOperands
                     ? 0.0
-                    : (Arithmetic::halfFloatSpacing($startF) + Arithmetic::halfFloatSpacing($endF)) / $magnitudeF;
+                    : (Ulp::halfFloatSpacing($startF) + Ulp::halfFloatSpacing($endF)) / $magnitudeF;
                 if ($operandTolerance >= 0.25) {
                     $operandTolerance = 0.0;
                 }
@@ -1462,7 +1464,7 @@ final class Single
             // range(0.5, 27021597764222988.0, 2 ** 53 + 3) to 27021597764222988.0, where its last value is
             // 27021597764222984.0. Only operands that aren't both ints get here with an int step, a whole one. An
             // int step that a float holds is applied as that float, as the equal float step is.
-            $exactStep = \is_int($step) && self::intToFloats(\abs($step))[1] !== 0.0;
+            $exactStep = \is_int($step) && ExactFloat::intToFloats(\abs($step))[1] !== 0.0;
 
             // A value can pass $end through rounding: of $startF (int operands past 2^53), of the offset or of
             // the addition. It passes by less than a float spacing, so it lands on $end. The common case has a
@@ -1479,7 +1481,7 @@ final class Single
                     yield $valF;
                 }
             } elseif ($exactStep) {
-                [$stepHi, $stepLo] = self::intToFloats(\abs($step));
+                [$stepHi, $stepLo] = ExactFloat::intToFloats(\abs($step));
                 for ($i = 0; $i <= $lastIndex; ++$i) {
                     // (float) $i is exact up to 2^53, which iteration never reaches.
                     $valF = $i > 0 && $i <= 2 ** 53
@@ -1663,7 +1665,7 @@ final class Single
     private static function roundIntPlusMultiple(int $start, int $i, float $magnitude, bool $ascending): float
     {
         // $product + $error is exactly $i·$magnitude.
-        [$product, $error] = self::twoProduct((float)$i, $magnitude);
+        [$product, $error] = ExactFloat::twoProduct((float)$i, $magnitude);
 
         // Integer parts, truncated toward zero, and the fractions left over, all exact. $product is positive.
         $productInt = \floor($product);
@@ -1723,7 +1725,7 @@ final class Single
         $loPart = $rest - $sumError;
         $restError = ($sumError - ($rest - $loPart)) + ($lo - $loPart);
         if ($restError !== 0.0) {
-            $spacing = 2.0 * Arithmetic::halfFloatSpacing($rest);
+            $spacing = 2.0 * Ulp::halfFloatSpacing($rest);
             if ($spacing > 0.0 && \fmod($rest / $spacing, 2.0) === 0.0) {
                 // Toward 0 from a power of two, the next float down is half a spacing away.
                 $towardZero = ($rest > 0.0) !== ($restError > 0.0);
@@ -1759,9 +1761,9 @@ final class Single
         bool $ascending
     ): float {
         $sign = $ascending ? 1.0 : -1.0;
-        [$hiProduct, $hiError] = self::twoProduct((float)$i, $stepHi);
-        [$loProduct, $loError] = self::twoProduct((float)$i, $stepLo);
-        $value = self::expansion([
+        [$hiProduct, $hiError] = ExactFloat::twoProduct((float)$i, $stepHi);
+        [$loProduct, $loError] = ExactFloat::twoProduct((float)$i, $stepLo);
+        $value = ExactFloat::expansion([
             $start,
             $sign * $hiProduct,
             $sign * $hiError,
@@ -1776,15 +1778,15 @@ final class Single
         // The value is 0 or at least 1 in magnitude: an integer from an integral $start, or more than 2^52 from a
         // non-integral one, which is below 2^52. So the loop stays clear of the subnormals, where
         // halfFloatSpacing() is 0.
-        $offset = self::expansion([...$value, -$rounded]);
-        while (\abs($rounded) >= \PHP_FLOAT_MIN && !self::roundsTo($rounded, $offset)) {
+        $offset = ExactFloat::expansion([...$value, -$rounded]);
+        while (\abs($rounded) >= \PHP_FLOAT_MIN && !ExactFloat::roundsTo($rounded, $offset)) {
             // To the neighbour on the side of the value. Toward 0 from a power of two, it is half a spacing away.
-            $halfSpacing = Arithmetic::halfFloatSpacing($rounded);
-            $up = self::expansionSign($offset) > 0;
+            $halfSpacing = Ulp::halfFloatSpacing($rounded);
+            $up = ExactFloat::expansionSign($offset) > 0;
             $towardZero = $up === ($rounded < 0.0);
             $rounded += ($up ? 1.0 : -1.0)
                 * ($towardZero && \abs($rounded) === $halfSpacing * 2.0 ** 53.0 ? $halfSpacing : 2.0 * $halfSpacing);
-            $offset = self::expansion([...$value, -$rounded]);
+            $offset = ExactFloat::expansion([...$value, -$rounded]);
         }
 
         return $rounded;
@@ -1811,12 +1813,12 @@ final class Single
         // An int step past 2^53 is the sum of its float and the rest. The float span is at most the step, so it
         // is finite.
         $terms = [
-            ...(\is_int($magnitude) ? self::intToFloats($magnitude) : [$magnitude]),
-            ...self::negated(self::exactFloatDifference($high, $low)),
-            ...self::negated($allowance),
+            ...(\is_int($magnitude) ? ExactFloat::intToFloats($magnitude) : [$magnitude]),
+            ...ExactFloat::negated(self::exactFloatDifference($high, $low)),
+            ...ExactFloat::negated($allowance),
         ];
 
-        return self::expansionSign(self::expansion($terms)) > 0;
+        return ExactFloat::expansionSign(ExactFloat::expansion($terms)) > 0;
     }
 
     /**
@@ -1871,7 +1873,7 @@ final class Single
                 $terms[] = [$sign * (float)$integer, $scale];
             } elseif (\is_int($operand) && $isStep) {
                 // An int step stands for itself, exactly.
-                foreach (self::intToFloats($operand) as $part) {
+                foreach (ExactFloat::intToFloats($operand) as $part) {
                     $terms[] = [$sign * $part, 0];
                 }
             } elseif (\is_int($operand)) {
@@ -1895,19 +1897,19 @@ final class Single
                 $factor = (float)('1e' . \min($power, 22));
                 $products = [];
                 foreach ($parts as $part) {
-                    [$product, $error] = self::twoProduct($part, $factor);
+                    [$product, $error] = ExactFloat::twoProduct($part, $factor);
                     if (!(\abs($product) < 2.0 ** 990.0) || !\is_finite($error)) {
                         return null;
                     }
                     $products[] = $product;
                     $products[] = $error;
                 }
-                $parts = self::expansion($products);
+                $parts = ExactFloat::expansion($products);
             }
             \array_push($scaled, ...$parts);
         }
 
-        return self::expansionSign(self::expansion($scaled)) > 0;
+        return ExactFloat::expansionSign(ExactFloat::expansion($scaled)) > 0;
     }
 
     /**
@@ -1949,21 +1951,21 @@ final class Single
         // $remainder is exactly $span - $steps·$magnitude (TwoProduct of each part of the step).
         $steps = (int)\round($quotient);
         $terms = $span;
-        foreach (\is_int($magnitude) ? self::intToFloats($magnitude) : [$magnitude] as $part) {
-            [$product, $error] = self::twoProduct((float)$steps, $part);
+        foreach (\is_int($magnitude) ? ExactFloat::intToFloats($magnitude) : [$magnitude] as $part) {
+            [$product, $error] = ExactFloat::twoProduct((float)$steps, $part);
             $terms[] = -$product;
             $terms[] = -$error;
         }
-        $remainder = self::expansion($terms);
-        $remainderSign = self::expansionSign($remainder);
+        $remainder = ExactFloat::expansion($terms);
+        $remainderSign = ExactFloat::expansionSign($remainder);
 
         // |$remainder| - the allowance
-        $terms = $remainderSign < 0 ? self::negated($remainder) : $remainder;
+        $terms = $remainderSign < 0 ? ExactFloat::negated($remainder) : $remainder;
         $allowance = [...$operandAllowance, (float)$steps * $stepAllowance];
         foreach ($allowance as $term) {
             $terms[] = -$term;
         }
-        if ($steps > 0 && self::expansionSign(self::expansion($terms)) <= 0) {
+        if ($steps > 0 && ExactFloat::expansionSign(ExactFloat::expansion($terms)) <= 0) {
             return [$steps, true];
         }
         if ($remainderSign < 0) {
@@ -1971,36 +1973,9 @@ final class Single
         }
 
         // The last value, $end ∓ $remainder, as an offset from the float $end.
-        $offset = self::expansion([$endRest, ...($ascending ? self::negated($remainder) : $remainder)]);
+        $offset = ExactFloat::expansion([$endRest, ...($ascending ? ExactFloat::negated($remainder) : $remainder)]);
 
-        return [$steps, self::roundsTo($end, $offset)];
-    }
-
-    /**
-     * Whether $float plus the sum of $offset, an expansion(), rounds to $float (to nearest, ties to even).
-     *
-     * @param float       $float
-     * @param list<float> $offset
-     *
-     * @return bool
-     */
-    private static function roundsTo(float $float, array $offset): bool
-    {
-        $offsetSign = self::expansionSign($offset);
-        if ($offsetSign === 0) {
-            return true;
-        }
-        $halfSpacing = Arithmetic::halfFloatSpacing($float);
-        // Toward 0 from a power of two, the next float is half a spacing closer.
-        $towardZero = ($offsetSign > 0) === ($float < 0.0);
-        $halfGap = $towardZero && \abs($float) === $halfSpacing * 2.0 ** 53.0 ? $halfSpacing / 2.0 : $halfSpacing;
-
-        $terms = $offsetSign > 0 ? $offset : self::negated($offset);
-        $terms[] = -$halfGap;
-        $excess = self::expansionSign(self::expansion($terms));
-
-        return $excess < 0
-            || ($excess === 0 && $halfSpacing > 0.0 && \fmod(\abs($float) / (2.0 * $halfSpacing), 2.0) === 0.0);
+        return [$steps, ExactFloat::roundsTo($end, $offset)];
     }
 
     /**
@@ -2025,7 +2000,7 @@ final class Single
         if (\is_int($operand)) {
             return 0.0;
         }
-        $halfSpacing = Arithmetic::halfFloatSpacing($operand);
+        $halfSpacing = Ulp::halfFloatSpacing($operand);
         if (\floor($operand) === $operand) {
             $exact = !$forLanding || \abs($operand) <= 2.0 ** 53.0 || self::isShortestDecimal($operand);
             return $exact ? 0.0 : $halfSpacing;
@@ -2259,130 +2234,6 @@ final class Single
         $error = ($high - $highPart) + (-$low - ($difference - $highPart));
 
         return [$difference, $error];
-    }
-
-    /**
-     * $high - $low, exactly, as a sum of floats. Past the int range, it is 2^63 plus an excess that is an int.
-     *
-     * @param int $low
-     * @param int $high at least $low
-     *
-     * @return list<float>
-     */
-    private static function exactIntSpan(int $low, int $high): array
-    {
-        // The span fits in an int unless $low is negative and $high - $low passes PHP_INT_MAX.
-        if ($low >= 0 || $high <= \PHP_INT_MAX + $low) {
-            return self::intToFloats($high - $low);
-        }
-
-        return [-(float)\PHP_INT_MIN, ...self::intToFloats($high - ($low - \PHP_INT_MIN))];
-    }
-
-    /**
-     * $n, exactly, as its float and the rest.
-     *
-     * @param int $n
-     *
-     * @return array{float, float}
-     */
-    private static function intToFloats(int $n): array
-    {
-        $float = (float)$n;
-        // (float) PHP_INT_MAX rounds up to 2^63, which isn't an int.
-        $rest = $float >= -(float)\PHP_INT_MIN ? ($n - \PHP_INT_MAX) - 1 : $n - (int)$float;
-
-        return [$float, (float)$rest];
-    }
-
-    /**
-     * @param list<float> $terms
-     *
-     * @return list<float>
-     */
-    private static function negated(array $terms): array
-    {
-        $negated = [];
-        foreach ($terms as $term) {
-            $negated[] = -$term;
-        }
-
-        return $negated;
-    }
-
-    /**
-     * $a·$b, exactly, as the float product and its rounding error (Dekker's TwoProduct, with Veltkamp's split).
-     *
-     * Exact unless the product overflows or underflows, or a factor is past 2^996, where the split overflows.
-     *
-     * @param float $a
-     * @param float $b
-     *
-     * @return array{float, float}
-     */
-    private static function twoProduct(float $a, float $b): array
-    {
-        $product = $a * $b;
-        $split = 134217729.0 * $a;
-        $aHi = $split - ($split - $a);
-        $aLo = $a - $aHi;
-        $split = 134217729.0 * $b;
-        $bHi = $split - ($split - $b);
-        $bLo = $b - $bHi;
-        $error = (($aHi * $bHi - $product) + $aHi * $bLo + $aLo * $bHi) + $aLo * $bLo;
-
-        return [$product, $error];
-    }
-
-    /**
-     * The exact sum of $terms, which must not overflow, as a nonoverlapping expansion: floats in order of
-     * magnitude, each below the lowest bit of the next (Shewchuk's Grow-Expansion with TwoSum, zeros dropped).
-     *
-     * @param list<float> $terms
-     *
-     * @return list<float>
-     */
-    private static function expansion(array $terms): array
-    {
-        /** @var list<float> $expansion */
-        $expansion = [];
-        foreach ($terms as $sum) {
-            if ($sum === 0.0) {
-                continue;
-            }
-            $grown = [];
-            foreach ($expansion as $component) {
-                $partial = $sum + $component;
-                $componentPart = $partial - $sum;
-                $error = ($sum - ($partial - $componentPart)) + ($component - $componentPart);
-                if ($error !== 0.0) {
-                    $grown[] = $error;
-                }
-                $sum = $partial;
-            }
-            $grown[] = $sum;
-            $expansion = $grown;
-        }
-
-        return $expansion;
-    }
-
-    /**
-     * The sign of the sum of an expansion(): that of its largest nonzero component.
-     *
-     * @param list<float> $expansion
-     *
-     * @return int -1, 0 or 1
-     */
-    private static function expansionSign(array $expansion): int
-    {
-        for ($i = \count($expansion) - 1; $i >= 0; --$i) {
-            if ($expansion[$i] !== 0.0) {
-                return $expansion[$i] > 0.0 ? 1 : -1;
-            }
-        }
-
-        return 0;
     }
 
     /**

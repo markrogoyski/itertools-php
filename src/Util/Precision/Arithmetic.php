@@ -179,33 +179,4 @@ final class Arithmetic
 
         return $exact === null ? -1 : $int <=> $exact;
     }
-
-    /**
-     * Half the float spacing at $x: 2^-53 times the largest power of two not above |x|.
-     *
-     * Bounding it by PHP_FLOAT_EPSILON / 2 * |x| instead is up to twice as loose, which makes
-     * {@see \IterTools\Single::range()} accept range(1e15, 1e15 + 3.125, 1.1) as 3 steps when no
-     * operands that round to these floats give that.
-     * Subnormals are taken as exact: half their spacing, 2^-1075, isn't representable.
-     *
-     * @param float $x
-     *
-     * @return float
-     */
-    public static function halfFloatSpacing(float $x): float
-    {
-        $x = \abs($x);
-        if ($x < \PHP_FLOAT_MIN) {
-            return 0.0;
-        }
-        // log() can be off by one at powers of two; correct the power to bracket $x. Near
-        // PHP_FLOAT_MAX it rounds up to 1024, and 2^1024 overflows to INF, so cap it first.
-        $power = 2.0 ** \min(\floor(\log($x, 2)), 1023.0);
-        if ($power > $x) {
-            $power /= 2.0;
-        } elseif ($power * 2.0 <= $x) {
-            $power *= 2.0;
-        }
-        return $power * (\PHP_FLOAT_EPSILON / 2.0);
-    }
 }

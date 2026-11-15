@@ -6,6 +6,7 @@ namespace IterTools;
 
 use IterTools\Util\Precision\Arithmetic;
 use IterTools\Util\Precision\MeanAccumulator;
+use IterTools\Util\Precision\Ulp;
 use IterTools\Util\Values\NoValueMonad;
 use IterTools\Util\Values\Truthiness;
 use IterTools\Util\Values\ValueCounter;
@@ -1339,24 +1340,24 @@ final class Reduce
 
         // Each pass either returns or moves the candidate one float; a couple of moves suffice.
         for ($moves = 0; $moves < self::MAX_ROUNDING_MOVES; ++$moves) {
-            $up = static::nextFloat($candidate, true);
+            $up = Ulp::nextFloat($candidate, true);
             $aboveMidpoint = static::compareWithMidpoint($expansion, $candidate, $up, $scale);
             if ($aboveMidpoint > 0) {
                 $candidate = $up;
                 continue;
             }
             if ($aboveMidpoint === 0) {
-                return static::evenOf($candidate, $up);
+                return Ulp::evenOf($candidate, $up);
             }
 
-            $down = static::nextFloat($candidate, false);
+            $down = Ulp::nextFloat($candidate, false);
             $belowMidpoint = static::compareWithMidpoint($expansion, $candidate, $down, $scale);
             if ($belowMidpoint < 0) {
                 $candidate = $down;
                 continue;
             }
             if ($belowMidpoint === 0) {
-                return static::evenOf($candidate, $down);
+                return Ulp::evenOf($candidate, $down);
             }
 
             return $candidate;
@@ -1444,59 +1445,6 @@ final class Reduce
         $product = $a * $b;
 
         return [$product, static::twoProductError($a, $b, $product)];
-    }
-
-    /**
-     * The adjacent float above or below a finite one, through its bit pattern (64-bit PHP only).
-     *
-     * @param float $x
-     * @param bool  $up
-     *
-     * @return float
-     */
-    private static function nextFloat(float $x, bool $up): float
-    {
-        if ($x === 0.0) {
-            $tiny = \PHP_FLOAT_MIN * \PHP_FLOAT_EPSILON;
-
-            return $up ? $tiny : -$tiny;
-        }
-
-        // A float's magnitude rises with its bit pattern read as an integer, and the sign bit is its own.
-        $bits = static::floatBits($x) + (($x > 0.0) === $up ? 1 : -1);
-
-        /** @var array{1: float} $unpacked */
-        $unpacked = \unpack('d', \pack('q', $bits));
-
-        return $unpacked[1];
-    }
-
-    /**
-     * Of two adjacent floats, the one whose last significand bit is 0.
-     *
-     * @param float $a
-     * @param float $b
-     *
-     * @return float
-     */
-    private static function evenOf(float $a, float $b): float
-    {
-        return (static::floatBits($a) & 1) === 0 ? $a : $b;
-    }
-
-    /**
-     * A float's bit pattern as an integer (64-bit PHP only).
-     *
-     * @param float $x
-     *
-     * @return int
-     */
-    private static function floatBits(float $x): int
-    {
-        /** @var array{1: int} $unpacked */
-        $unpacked = \unpack('q', \pack('d', $x));
-
-        return $unpacked[1];
     }
 
     /**
