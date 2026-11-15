@@ -40,6 +40,39 @@ jobs:
           ./vendor/bin/phpunit --version
           ./vendor/bin/phpunit --configuration tests/phpunit.xml
 
+  unit-tests-32-bit:
+    name: Unit Tests (32-bit)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.2', '8.5']
+
+    # JavaScript actions can't run inside a 32-bit container, so the host installs the dependencies (pure PHP,
+    # resolved for the same PHP version) and only the tests run in the official 32-bit (linux/386) PHP image.
+    steps:
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Run Composer
+        run: COMPOSER=composer-test.json composer install --no-interaction
+
+      - name: Unit tests on 32-bit PHP
+        run: |
+          docker run --rm --platform linux/386 -v "$PWD":/app -w /app php:${{ matrix.php }}-cli sh -c '
+            set -e
+            php -v
+            php -r "if (PHP_INT_SIZE !== 4) { fwrite(STDERR, \"PHP_INT_SIZE is \" . PHP_INT_SIZE . \", not 4\n\"); exit(1); }"
+            php -d memory_limit=-1 vendor/bin/phpunit --configuration tests/phpunit.xml
+          '
+
   static-analysis:
     name: Static Analysis
     runs-on: ubuntu-latest
