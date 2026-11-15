@@ -10,9 +10,6 @@ namespace IterTools\Util\Precision;
  */
 final class Interpolation
 {
-    /** Integers of magnitude up to 2^53 convert to float exactly. */
-    private const FLOAT_EXACT_INT = 9007199254740992;
-
     /**
      * The most moves of a correctly rounded interpolation's candidate before it is a logic error: it starts
      * within an ulp or so and moves at most a couple of times.
@@ -122,7 +119,7 @@ final class Interpolation
         $hiInt = Arithmetic::toExactInt($hi);
         if (
             $loInt !== null && $hiInt !== null
-            && ($loInt < -self::FLOAT_EXACT_INT || $hiInt > self::FLOAT_EXACT_INT)
+            && ($loInt < -Arithmetic::FLOAT_EXACT_INT_LIMIT || $hiInt > Arithmetic::FLOAT_EXACT_INT_LIMIT)
             && $nearWeight !== [$half, 0.0]
         ) {
             return self::interpolateIntegers($loInt, $hiInt, $nearWeight, $fromLo, $scale);
