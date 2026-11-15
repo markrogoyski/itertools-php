@@ -27,8 +27,9 @@ final class Interpolation
      *
      * The weights are returned in units of 1/S of the rank, for the scale S = $scale (100 for a percentile,
      * 1 for a quantile): $above = S * (h - j), zero exactly when h is an integer, and $below =
-     * S * (j + 1 - h). Each is accurate to a rounding when it is the smaller one, the one an interpolation
-     * from the nearer value multiplies, even when it is far below 1.
+     * S * (j + 1 - h). The smaller one, which an interpolation from the nearer value multiplies, is correctly
+     * rounded, even when it is far below 1. The larger is only within an ulp: where $below is the larger, it
+     * can round twice.
      *
      * For {@see Interpolation::interpolateIntegers()}, the smaller weight is also returned exactly, as floats whose
      * unevaluated sum it is, with whether it is $above (so the interpolation is from $lo), decided on the

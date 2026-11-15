@@ -184,9 +184,14 @@ class InterpolationTest extends \PHPUnit\Framework\TestCase
         [$index, $above, $below, $exactWeight, $fromLo] = $rank;
 
         $this->assertSame($expectedIndex, $index);
-        $this->assertSame($expectedAbove, $above);
-        $this->assertSame($expectedBelow, $below);
         $this->assertSame($expectedFromLo, $fromLo);
+        // Only the smaller weight is correctly rounded. The larger is within an ulp of the oracle's correctly
+        // rounded value, and an ulp of a positive float is at most the float times 2^-52.
+        [$smaller, $expectedSmaller, $larger, $expectedLarger] = $expectedFromLo
+            ? [$above, $expectedAbove, $below, $expectedBelow]
+            : [$below, $expectedBelow, $above, $expectedAbove];
+        $this->assertSame($expectedSmaller, $smaller);
+        $this->assertEqualsWithDelta($expectedLarger, $larger, $expectedLarger * \PHP_FLOAT_EPSILON);
         // The returned floats sum exactly to the oracle's smaller weight.
         $difference = ExactFloat::expansion([...$exactWeight, ...ExactFloat::negated($expectedExactWeight)]);
         $this->assertSame(0, ExactFloat::expansionSign($difference));
@@ -268,6 +273,10 @@ class InterpolationTest extends \PHPUnit\Framework\TestCase
             'percentile 33.3 of 4' => [3, 33.3, 100.0, 0, 99.89999999999999, 0.10000000000000853, [0.10000000000000853], false],
             'quantile 0.999 of 2^31' => [2147483647, 0.999, 1.0, 2145336163, 0.35299999809265137, 0.6470000019073486, [0.35299999809265137], true],
             'percentile 0.001 of 2^31' => [2147483647, 0.001, 100.0, 21474, 83.6470000000447, 16.352999999955298, [16.352999999955298, -1.2221126888256606e-15], false],
+            'larger weight 330 * 0.001' => [330, 0.001, 1.0, 0, 0.33, 0.67, [0.33, -8.673617379884035e-18], true],
+            'larger weight 7 * 0.05' => [7, 0.05, 1.0, 0, 0.35000000000000003, 0.65, [0.35000000000000003, -1.3877787807814457e-17], true],
+            'larger weight 3 * 0.022' => [3, 0.022, 1.0, 0, 0.066, 0.934, [0.066, -6.938893903907228e-18], true],
+            'larger weight 7 * 0.071' => [7, 0.071, 1.0, 0, 0.49699999999999994, 0.503, [0.49699999999999994, 1.3877787807814457e-17], true],
             'random 0' => [177, 0.5869517693631843, 1.0, 103, 0.8904631772836162, 0.10953682271638376, [0.10953682271638376], false],
             'random 1' => [52018, 12.896270675353193, 100.0, 6708, 38.20799052240747, 61.79200947759253, [38.20799052240747], true],
             'random 2' => [12119, 0.8446054923265126, 1.0, 10235, 0.7739615050062961, 0.22603849499370388, [0.22603849499370388], false],
