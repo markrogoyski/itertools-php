@@ -23,7 +23,10 @@ final class Interpolation
      * an integer onto it, or one that is an integer just off it, so neither the floor nor the test for an
      * integer can use a rounded rank. Both come from the exact product $last * $fraction, held as the
      * unevaluated sum $hi + $lo (Dekker's TwoProduct, exact here even for a subnormal product, as $last is an
-     * integer): $hi - $scale * $j is exact (Sterbenz, or $j = 0), so the remainder's sign and zero are too.
+     * integer): $scale * $j is exact, as $last * $scale is below 2^53, and so is $hi - $scale * $j (Sterbenz,
+     * or $j = 0), so the remainder's sign and zero are too. Past that bound S * j rounds, and the weights, and
+     * even which is the smaller, are wrong; a percentile's caller would need over 2^53 / 100 (about 9 * 10^13)
+     * values in memory to get there.
      *
      * The weights are returned in units of 1/S of the rank, for the scale S = $scale (100 for a percentile,
      * 1 for a quantile): $above = S * (h - j), zero exactly when h is an integer, and $below =
@@ -36,7 +39,7 @@ final class Interpolation
      * exact weights: past 2^53 a weight's rounding can decide a tie, and when both round to S / 2, an offset
      * taken from the wrong end can exceed half a span past PHP_INT_MAX.
      *
-     * @param int   $last     the last index, $count - 1 (below 2^53)
+     * @param int   $last     the last index, $count - 1, with $last * $scale below 2^53
      * @param float $fraction in the inclusive range [0, $scale]
      * @param float $scale    100.0 for a percentile, 1.0 for a quantile
      *
