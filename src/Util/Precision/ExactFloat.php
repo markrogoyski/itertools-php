@@ -87,6 +87,26 @@ final class ExactFloat
     }
 
     /**
+     * $a + $b, exactly, as the float sum and its rounding error (Knuth's TwoSum).
+     *
+     * Exact for finite operands whose float sum does not overflow, under round-to-nearest (PHP's only rounding
+     * mode). The operands need no order of magnitude.
+     *
+     * @param float $a
+     * @param float $b
+     *
+     * @return array{float, float}
+     */
+    public static function twoSum(float $a, float $b): array
+    {
+        $sum = $a + $b;
+        $back = $sum - $a;
+        $error = ($a - ($sum - $back)) + ($b - $back);
+
+        return [$sum, $error];
+    }
+
+    /**
      * $a·$b, exactly, as the float product and its rounding error (Dekker's TwoProduct, with Veltkamp's split).
      *
      * Exact unless the product overflows or underflows, or a factor is past 2^996, where the split overflows.
