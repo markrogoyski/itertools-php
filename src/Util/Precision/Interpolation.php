@@ -166,6 +166,10 @@ final class Interpolation
      * no intermediate rounding can cancel into the result (-1 + 0.9 is not -0.1), break a tie or make a
      * false one.
      *
+     * For S = 1 the value must be in the domain of that rounding: exactly zero or above 2^-1021 in magnitude.
+     * {@see Interpolation::interpolate()} calls this only with an endpoint past 2^53, which keeps it there; a
+     * direct call need not be: interpolateIntegers(0, 1, [2^-1074], true, 1.0) gives 2^-1073.
+     *
      * @param int         $lo
      * @param int         $hi
      * @param list<float> $weight S * the weight of the nearer endpoint's partner, at most S / 2, exactly as
@@ -222,13 +226,13 @@ final class Interpolation
      *
      * An exact zero gives 0.0, as $x - $x does; a negative value that underflows keeps its sign, -0.0.
      *
-     * The value must also be exactly zero or have |value / S| above 2^-1021: below that, halving a float for
-     * the S / 2 midpoint in {@see Interpolation::compareWithMidpoint()} can round across the value. An interpolation
-     * between integers is always in this domain. Outside it the result can be wrong: [2^-1074] divided by 1.0
-     * gives 2^-1073.
+     * For S = 1 the value must also be exactly zero or above 2^-1021 in magnitude: below that, halving a float
+     * for the S / 2 midpoint in {@see Interpolation::compareWithMidpoint()} can round across the value. Outside
+     * it the result can be wrong: [2^-1074] divided by 1.0 gives 2^-1073. For S = 100 the midpoint takes 50
+     * times a float, which is exact, so a value of any magnitude below 2^70 is in the domain.
      *
-     * @param list<float> $expansion nonadjacent, in increasing magnitude, of magnitude below 2^70 and either
-     *                               exactly zero or above S * 2^-1021
+     * @param list<float> $expansion nonadjacent, in increasing magnitude, of magnitude below 2^70 and, for
+     *                               S = 1, either exactly zero or above 2^-1021
      * @param float       $scale     S: 100.0 for a percentile, 1.0 for a quantile
      *
      * @return float
@@ -279,9 +283,10 @@ final class Interpolation
      *
      * S / 2 times a float is exact as a product and its error: 50 is an integer, and 0.5 halves, which is
      * exact unless the half is subnormal, for a float below 2^-1021 in magnitude, where it is off by at most
-     * 2^-1075. An interpolation between integers past 2^53 is then either exactly zero, whose candidate 0.0
-     * is already its rounding (a false tie with 2^-1074 still gives 0.0), or of magnitude above 2^-1021, so
-     * at least 2^-1074 past any midpoint of such small floats, a margin the error cannot cross.
+     * 2^-1075. For S = 1, a value in the domain of {@see Interpolation::roundExpansionDividedBy()} is then
+     * either exactly zero, whose candidate 0.0 is already its rounding (a false tie with 2^-1074 still gives
+     * 0.0), or of magnitude above 2^-1021, so at least 2^-1074 past any midpoint of such small floats, a
+     * margin the error cannot cross.
      *
      * @param list<float> $expansion nonoverlapping, in increasing magnitude
      * @param float       $a         a candidate, below 2^64 in magnitude

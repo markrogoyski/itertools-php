@@ -474,6 +474,8 @@ class InterpolationTest extends \PHPUnit\Framework\TestCase
             'tiny weight past 2^62, S=1' => [-4611686018427387905, 4611686018427387905, [9.332636185032189e-302, 0.0], true, 1.0, -4.611686018427388e+18],
             'small endpoints, S=1' => [0, 10, [0.3, 0.0], true, 1.0, 3.0],
             'small endpoints from hi, S=1' => [-3, 4, [0.30000000000000004, 0.0, -5.551115123125783e-17], false, 1.0, 1.9000000000000001],
+            'smallest weight past 2^53, S=1' => [0, 9007199254740993, [5e-324, 0.0], true, 1.0, 4.450147717014403e-308],
+            'smallest weight past -2^53, S=1' => [-9007199254740993, 0, [5e-324, 0.0], false, 1.0, -4.450147717014403e-308],
             'lo == hi past 2^53, a tie to even, S=100' => [9007199254740993, 9007199254740993, [0.30000000000000004, -2.7755575615628914e-17], true, 100.0, 9007199254740992.0],
             'lo == hi == PHP_INT_MAX, S=100' => [\PHP_INT_MAX, \PHP_INT_MAX, [33.300000000000004, 8.881784197001252e-16], false, 100.0, 9.223372036854776e+18],
             'lo == hi == PHP_INT_MIN, S=100' => [\PHP_INT_MIN, \PHP_INT_MIN, [50.0, 0.0], true, 100.0, -9.223372036854776e+18],
@@ -501,6 +503,8 @@ class InterpolationTest extends \PHPUnit\Framework\TestCase
             'small endpoints, S=100' => [0, 10, [30.0, 0.0], true, 100.0, 3.0],
             'small endpoints from hi, S=100' => [-3, 4, [30.0, 0.0, -0.0], false, 100.0, 1.9],
             'smallest weight between 0 and 1, S=100' => [0, 1, [5e-324, 0.0], true, 100.0, 0.0],
+            'smallest weight past 2^53, S=100' => [0, 9007199254740993, [5e-324, 0.0], true, 100.0, 4.4501477170144e-310],
+            'smallest weight past -2^53, S=100' => [-9007199254740993, 0, [5e-324, 0.0], false, 100.0, -4.4501477170144e-310],
             'random 0' => [17631643319115663, 2230741617354521773, [0.3573079091221154, 0.0], true, 1.0, 8.083933407990057e+17],
             'random 1' => [-84791090891240, -3827248668358512, [0.46197198007052975, 0.0, -0.0], true, 100.0, -102080196265165.14],
             'random 2' => [-6866188627920765383, -962725009783576256, [0.09673502526065703, 0.0], false, 1.0, -1.533796712009447e+18],
@@ -540,7 +544,7 @@ class InterpolationTest extends \PHPUnit\Framework\TestCase
      *
      *   Each expansion is the Grow-Expansion fold, from [], of exact TwoProducts with an integer-valued
      *   factor, as interpolateIntegers builds one; each is nonadjacent and in increasing magnitude, of
-     *   magnitude below 2^70, and zero or above scale * 2^-1021.
+     *   magnitude below 2^70, and for scale 1, zero or above 2^-1021.
      *
      * @return array<string, array{list<float>, float, float}>
      */
@@ -611,6 +615,8 @@ class InterpolationTest extends \PHPUnit\Framework\TestCase
             'interpolation, tiny weight past 2^62, S=1' => [[1.8665272370064378e-301, 8.607837561916492e-283, -1.0, -4.611686018427388e+18], 1.0, -4.611686018427388e+18],
             'interpolation, small endpoints, S=1' => [[-1.1102230246251565e-16, 3.0], 1.0, 3.0],
             'interpolation, small endpoints from hi, S=1' => [[-5.551115123125783e-17, 1.9000000000000001], 1.0, 1.9000000000000001],
+            'interpolation, smallest weight past 2^53, S=1' => [[5e-324, 4.450147717014403e-308], 1.0, 4.450147717014403e-308],
+            'interpolation, smallest weight past -2^53, S=1' => [[-5e-324, -4.450147717014403e-308], 1.0, -4.450147717014403e-308],
             'interpolation, lo == hi past 2^53, a tie to even, S=100' => [[-28.0, 9.007199254740993e+17], 100.0, 9007199254740992.0],
             'interpolation, lo == hi == PHP_INT_MAX, S=100' => [[-100.0, 9.223372036854776e+20], 100.0, 9.223372036854776e+18],
             'interpolation, lo == hi == PHP_INT_MIN, S=100' => [[-9.223372036854776e+20], 100.0, -9.223372036854776e+18],
@@ -637,6 +643,9 @@ class InterpolationTest extends \PHPUnit\Framework\TestCase
             'interpolation, tiny weight past 2^62, S=100' => [[1.8665272370064378e-301, 8.607837561916492e-283, -100.0, -4.611686018427388e+20], 100.0, -4.611686018427388e+18],
             'interpolation, small endpoints, S=100' => [[300.0], 100.0, 3.0],
             'interpolation, small endpoints from hi, S=100' => [[190.0], 100.0, 1.9],
+            'interpolation, smallest weight between 0 and 1, S=100' => [[5e-324], 100.0, 0.0],
+            'interpolation, smallest weight past 2^53, S=100' => [[5e-324, 4.450147717014403e-308], 100.0, 4.4501477170144e-310],
+            'interpolation, smallest weight past -2^53, S=100' => [[-5e-324, -4.450147717014403e-308], 100.0, -4.4501477170144e-310],
             'interpolation, random 0' => [[2.6645352591003757e-15, 43.54935040414876, 8.083933407990057e+17], 1.0, 8.083933407990057e+17],
             'interpolation, random 1' => [[0.3604357990097924, -1.0208019626516514e+16], 100.0, -102080196265165.14],
             'interpolation, random 2' => [[3.219646771412954e-15, -57.44929574389226, -1.533796712009447e+18], 1.0, -1.533796712009447e+18],
