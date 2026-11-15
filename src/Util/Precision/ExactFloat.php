@@ -58,6 +58,9 @@ final class ExactFloat
     /**
      * $n, exactly, as its float and the rest.
      *
+     * Any int is accepted, PHP_INT_MAX included, whose float rounds up to 2^63 on 64-bit PHP. The rest is
+     * integral and at most 2^10 in magnitude, so a small integer times it is exact; on 32-bit PHP it is 0.0.
+     *
      * @param int $n
      *
      * @return array{float, float}
@@ -90,7 +93,8 @@ final class ExactFloat
      * $a + $b, exactly, as the float sum and its rounding error (Knuth's TwoSum).
      *
      * Exact for finite operands whose float sum does not overflow, under round-to-nearest (PHP's only rounding
-     * mode). The operands need no order of magnitude.
+     * mode). The operands need no order of magnitude. A difference $high - $low is twoSum(-$low, $high), signed
+     * zeros included.
      *
      * @param float $a
      * @param float $b
@@ -110,6 +114,10 @@ final class ExactFloat
      * $a·$b, exactly, as the float product and its rounding error (Dekker's TwoProduct, with Veltkamp's split).
      *
      * Exact unless the product overflows or underflows, or a factor is past 2^996, where the split overflows.
+     * It is also exact for a subnormal product when one factor is integer-valued and no intermediate product
+     * (the split multiplications, the product, the partial products) overflows: the partial products are then
+     * multiples of the other factor's ulp, which even a subnormal result can hold. When one factor is a power
+     * of two and the product is normal, the product is exact and the error is 0.
      *
      * @param float $a
      * @param float $b
@@ -134,7 +142,12 @@ final class ExactFloat
      * The exact sum of $terms, which must not overflow, as a nonoverlapping expansion: floats in order of
      * magnitude, each below the lowest bit of the next (Shewchuk's Grow-Expansion with TwoSum, zeros dropped).
      *
-     * @param list<float> $terms
+     * The terms are finite and may come in any order and overlap: expansion([1.0, 1.0]) is [2.0]. Zero terms
+     * are skipped, so no terms, or only zeros, give []. Neither the exact sum nor any partial sum may overflow.
+     * Under round-to-nearest the result is also nonadjacent: no two components are adjacent bit ranges. After
+     * cancellation it can end in 0.0.
+     *
+     * @param list<float> $terms finite
      *
      * @return list<float>
      */
@@ -164,9 +177,43 @@ final class ExactFloat
     }
 
     /**
+     * $expansion + $b, exactly, as a nonoverlapping expansion (Shewchuk's Grow-Expansion with TwoSum, zero
+     * rounding errors dropped).
+     *
+     * $expansion must be nonoverlapping, its components in increasing magnitude, as expansion() and this
+     * method build one. $b is any finite float, and the sum must not overflow. Unlike in expansion(), a zero
+     * $b is kept: growExpansion([], 0.0) is [0.0]. The result is again nonoverlapping and in increasing
+     * magnitude, so its largest nonzero component carries the sign of the sum (see expansionSign()), and it
+     * can end in 0.0 after cancellation. Under round-to-nearest it is also nonadjacent when the input is, as
+     * an expansion grown from empty always is (Shewchuk's Grow-Expansion theorem).
+     *
+     * @param list<float> $expansion nonoverlapping, in increasing magnitude
+     * @param float       $b         finite
+     *
+     * @return list<float>
+     */
+    public static function growExpansion(array $expansion, float $b): array
+    {
+        $grown = [];
+        $sum = $b;
+        foreach ($expansion as $component) {
+            $partial = $sum + $component;
+            $componentPart = $partial - $sum;
+            $error = ($sum - ($partial - $componentPart)) + ($component - $componentPart);
+            if ($error !== 0.0) {
+                $grown[] = $error;
+            }
+            $sum = $partial;
+        }
+        $grown[] = $sum;
+
+        return $grown;
+    }
+
+    /**
      * The sign of the sum of an expansion(): that of its largest nonzero component.
      *
-     * @param list<float> $expansion
+     * @param list<float> $expansion nonoverlapping, in increasing magnitude; zero components are allowed
      *
      * @return int -1, 0 or 1
      */

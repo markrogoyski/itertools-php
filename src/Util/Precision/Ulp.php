@@ -13,7 +13,10 @@ final class Ulp
     /**
      * The adjacent float above or below a finite one, through its bit pattern (64-bit PHP only).
      *
-     * @param float $x
+     * Either zero, 0.0 or -0.0, steps to 2^-1074 up and to -2^-1074 down. Stepping outward from
+     * ±PHP_FLOAT_MAX gives ±INF.
+     *
+     * @param float $x finite
      * @param bool  $up
      *
      * @return float
@@ -69,7 +72,8 @@ final class Ulp
      * Bounding it by PHP_FLOAT_EPSILON / 2 * |x| instead is up to twice as loose, which makes
      * {@see \IterTools\Single::range()} accept range(1e15, 1e15 + 3.125, 1.1) as 3 steps when no
      * operands that round to these floats give that.
-     * Subnormals are taken as exact: half their spacing, 2^-1075, isn't representable.
+     * Subnormals are taken as exact, so the result is 0.0 for them: half their spacing, 2^-1075, isn't
+     * representable.
      *
      * @param float $x
      *

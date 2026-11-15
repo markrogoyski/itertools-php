@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace IterTools;
 
 use IterTools\Util\Precision\Arithmetic;
+use IterTools\Util\Precision\ExactFloat;
 use IterTools\Util\Precision\MeanAccumulator;
 use IterTools\Util\Precision\Ulp;
 use IterTools\Util\Values\NoValueMonad;
@@ -913,16 +914,15 @@ final class Reduce
     private static function percentileRank(int $last, float $fraction, float $scale): array
     {
         $a    = (float) $last;
-        $hi   = $a * $fraction;
         $half = $scale / 2.0;
 
-        $lo = static::twoProductError($a, $fraction, $hi);
+        // $last is below 2^53 and $fraction at most S, so no product here comes near overflow.
+        [$hi, $lo] = ExactFloat::twoProduct($a, $fraction);
 
         // $hi / S can round up onto $j + 1 only from below it, never down, so $j is right or one too high.
         $j = (int) \floor($hi / $scale);
         $x = $hi - $scale * (float) $j;
-        $d = $x + $lo;
-        $dError = static::twoSumError($x, $lo, $d);
+        [$d, $dError] = ExactFloat::twoSum($x, $lo);
 
         if ($d < 0) {
             return [$j - 1, $scale + $d, -$d, [-$d, -$dError], false];
@@ -936,9 +936,9 @@ final class Reduce
         if ($d < $half || ($d === $half && $dError <= 0.0)) {
             return [$j, $d, $below, [$d, $dError], true];
         }
-        $b = $scale - $d;
+        [$b, $bError] = ExactFloat::twoSum($scale, -$d);
 
-        return [$j, $d, $below, [$b, static::twoSumError($scale, -$d, $b), -$dError], false];
+        return [$j, $d, $below, [$b, $bError, -$dError], false];
     }
 
     /**
@@ -1261,12 +1261,13 @@ final class Reduce
      *
      * S times the result, for the scale S = $scale (100 for a percentile, 1 for a quantile), is held
      * exactly, as a nonoverlapping expansion (a list of floats whose unevaluated sum it is, see
-     * {@see Reduce::growExpansion()}): S * $lo + w * $hi - w * $lo from $lo, or S * $hi - w * $hi + w * $lo
-     * from $hi, for the exact smaller weight w. Each endpoint is split into its float and integer residual,
-     * and each product taken as a float and its error (TwoProduct), which is exact as one factor is an
-     * integer: no span is formed, so none can overflow. The value is then rounded once, by
-     * {@see Reduce::roundExpansionDividedBy()}, so no intermediate rounding can cancel into the result
-     * (-1 + 0.9 is not -0.1), break a tie or make a false one.
+     * {@see ExactFloat::growExpansion()}): S * $lo + w * $hi - w * $lo from $lo, or
+     * S * $hi - w * $hi + w * $lo from $hi, for the exact smaller weight w. Each endpoint is split into its
+     * float and integral rest ({@see ExactFloat::intToFloats()}), and each product taken as a float and its
+     * error ({@see ExactFloat::twoProduct()}), which is exact as one factor is an integer: no span is formed,
+     * so none can overflow. The value is then rounded once, by {@see Reduce::roundExpansionDividedBy()}, so
+     * no intermediate rounding can cancel into the result (-1 + 0.9 is not -0.1), break a tie or make a
+     * false one.
      *
      * @param int         $lo
      * @param int         $hi
@@ -1279,25 +1280,28 @@ final class Reduce
      */
     private static function interpolateIntegers(int $lo, int $hi, array $weight, bool $fromLo, float $scale): float
     {
-        // Residuals are at most 2^10 in magnitude, so they and S times them convert exactly.
-        [$lo1, $lo2] = static::toFloatWithResidual($lo);
-        [$hi1, $hi2] = static::toFloatWithResidual($hi);
+        // The rests are integral and at most 2^10 in magnitude, so S times them is exact.
+        [$lo1, $lo2] = ExactFloat::intToFloats($lo);
+        [$hi1, $hi2] = ExactFloat::intToFloats($hi);
         [$near1, $near2, $sign] = $fromLo ? [$lo1, $lo2, 1.0] : [$hi1, $hi2, -1.0];
 
-        $terms   = static::exactProduct($scale, $near1);
-        $terms[] = $scale * (float) $near2;
+        // Every product here multiplies a factor of at most S (100 for a percentile, 1 for a quantile) by one
+        // below 2^64, one of them integer-valued: far from overflow, so each TwoProduct is exact, even for a
+        // subnormal product.
+        $terms   = ExactFloat::twoProduct($scale, $near1);
+        $terms[] = $scale * $near2;
         foreach ($weight as $w) {
-            foreach ([$hi1, (float) $hi2] as $x) {
-                \array_push($terms, ...static::exactProduct($sign * $w, $x));
+            foreach ([$hi1, $hi2] as $x) {
+                \array_push($terms, ...ExactFloat::twoProduct($sign * $w, $x));
             }
-            foreach ([$lo1, (float) $lo2] as $x) {
-                \array_push($terms, ...static::exactProduct(-$sign * $w, $x));
+            foreach ([$lo1, $lo2] as $x) {
+                \array_push($terms, ...ExactFloat::twoProduct(-$sign * $w, $x));
             }
         }
 
         $scaled = [];
         foreach ($terms as $term) {
-            $scaled = static::growExpansion($scaled, $term);
+            $scaled = ExactFloat::growExpansion($scaled, $term);
         }
 
         return static::roundExpansionDividedBy($scaled, $scale);
@@ -1312,16 +1316,22 @@ final class Reduce
      * S / 2 * the candidate + S / 2 * its neighbour, as exact products), and the candidate moves one float
      * towards the value while it lies past one.
      *
-     * The expansion must be nonadjacent, as {@see Reduce::growExpansion()} keeps one built up from empty: no
-     * two components are adjacent bit ranges. Then the approximate sum is within an ulp, and the candidate
-     * moves at most a couple of times. Merely nonoverlapping components can sum far off
+     * The expansion must be nonadjacent, as {@see ExactFloat::growExpansion()} keeps one built up from
+     * empty: no two components are adjacent bit ranges. Then the approximate sum is within an ulp, and the
+     * candidate moves at most a couple of times. Merely nonoverlapping components can sum far off
      * ([2^-54, -(1 - 2^-53), 1] sums to 2^-52, not 2^-54 + 2^-53), and the loop would then take
      * astronomically many steps; so would a midpoint comparison at the wrong scale. The moves are therefore
      * bounded, and running out of them is a logic error rather than an endless loop.
      *
      * An exact zero gives 0.0, as $x - $x does; a negative value that underflows keeps its sign, -0.0.
      *
-     * @param list<float> $expansion nonadjacent, in increasing magnitude, of magnitude below 2^70
+     * The value must also be exactly zero or have |value / S| above 2^-1021: below that, halving a float for
+     * the S / 2 midpoint in {@see Reduce::compareWithMidpoint()} can round across the value. An interpolation
+     * between integers is always in this domain. Outside it the result can be wrong: [2^-1074] divided by 1.0
+     * gives 2^-1073.
+     *
+     * @param list<float> $expansion nonadjacent, in increasing magnitude, of magnitude below 2^70 and either
+     *                               exactly zero or above S * 2^-1021
      * @param float       $scale     S: 100.0 for a percentile, 1.0 for a quantile
      *
      * @return float
@@ -1377,133 +1387,21 @@ final class Reduce
      * at least 2^-1074 past any midpoint of such small floats, a margin the error cannot cross.
      *
      * @param list<float> $expansion nonoverlapping, in increasing magnitude
-     * @param float       $a
-     * @param float       $b
+     * @param float       $a         a candidate, below 2^64 in magnitude
+     * @param float       $b         a float adjacent to $a
      * @param float       $scale     S: 100.0 for a percentile, 1.0 for a quantile
      *
      * @return int -1, 0 or 1
      */
     private static function compareWithMidpoint(array $expansion, float $a, float $b, float $scale): int
     {
+        // Each product multiplies S / 2 (0.5 or 50) by a float below 2^64 in magnitude: far from overflow.
         $minusHalf = -$scale / 2.0;
-        foreach ([...static::exactProduct($minusHalf, $a), ...static::exactProduct($minusHalf, $b)] as $term) {
-            $expansion = static::growExpansion($expansion, $term);
+        foreach ([...ExactFloat::twoProduct($minusHalf, $a), ...ExactFloat::twoProduct($minusHalf, $b)] as $term) {
+            $expansion = ExactFloat::growExpansion($expansion, $term);
         }
 
-        // The largest nonzero component of a nonoverlapping expansion has the sign of its value.
-        for ($i = \count($expansion) - 1; $i >= 0; --$i) {
-            if ($expansion[$i] !== 0.0) {
-                return $expansion[$i] > 0.0 ? 1 : -1;
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * Adds a float to a nonoverlapping expansion exactly (Shewchuk's Grow-Expansion, dropping zeros).
-     *
-     * The result is again nonoverlapping, its components in increasing magnitude, so its largest nonzero
-     * component carries the sign of the sum. Under round-to-nearest it is also nonadjacent when the input is,
-     * as an expansion grown from empty always is (Shewchuk's Grow-Expansion theorem), which
-     * {@see Reduce::roundExpansionDividedBy()} needs.
-     *
-     * @param list<float> $expansion nonoverlapping, in increasing magnitude
-     * @param float       $b
-     *
-     * @return list<float>
-     */
-    private static function growExpansion(array $expansion, float $b): array
-    {
-        $grown = [];
-        $q     = $b;
-        foreach ($expansion as $component) {
-            $sum   = $q + $component;
-            $error = static::twoSumError($q, $component, $sum);
-            $q     = $sum;
-            if ($error !== 0.0) {
-                $grown[] = $error;
-            }
-        }
-        $grown[] = $q;
-
-        return $grown;
-    }
-
-    /**
-     * A product as the float and its rounding error, whose unevaluated sum it is exactly when one factor is
-     * integer-valued and nothing overflows, as {@see Reduce::twoProductError()} requires, or when one factor
-     * is a power of two and the product is neither subnormal nor overflows (the product is then exact).
-     *
-     * @param float $a
-     * @param float $b
-     *
-     * @return array{float, float}
-     */
-    private static function exactProduct(float $a, float $b): array
-    {
-        $product = $a * $b;
-
-        return [$product, static::twoProductError($a, $b, $product)];
-    }
-
-    /**
-     * Converts an integer to float, with the exact integer residual the conversion rounded off.
-     *
-     * @param int $n
-     *
-     * @return array{float, int} [(float) $n, $n - (float) $n]
-     */
-    private static function toFloatWithResidual(int $n): array
-    {
-        $rounded = (float) $n;
-
-        // (float) $n can round up to 2^63, which (int) can't take: its residual is $n - 2^63 then.
-        $residual = $rounded >= -(float) \PHP_INT_MIN ? ($n - \PHP_INT_MAX) - 1 : $n - (int) $rounded;
-
-        return [$rounded, $residual];
-    }
-
-    /**
-     * The rounding error of a float sum: $a + $b - $sum exactly, for $sum = $a + $b (Knuth's TwoSum).
-     *
-     * @param float $a
-     * @param float $b
-     * @param float $sum $a + $b
-     *
-     * @return float
-     */
-    private static function twoSumError(float $a, float $b, float $sum): float
-    {
-        $back = $sum - $a;
-
-        return ($a - ($sum - $back)) + ($b - $back);
-    }
-
-    /**
-     * The rounding error of a float product: $a * $b - $product exactly, for $product = $a * $b (Dekker's
-     * TwoProduct with Veltkamp's split). Exact when one factor is integer-valued and no intermediate product
-     * (the split multiplications, the product, the partial products) overflows: the partial products are
-     * then multiples of the other factor's ulp, which even a subnormal result can hold. Every call here
-     * multiplies a factor of at most the scale S (100 for a percentile, 1 for a quantile) by one below 2^64,
-     * one of them integer-valued or 0.5: far from overflow.
-     *
-     * @param float $a
-     * @param float $b
-     * @param float $product $a * $b
-     *
-     * @return float
-     */
-    private static function twoProductError(float $a, float $b, float $product): float
-    {
-        $c  = 134217729.0 * $a;
-        $aH = $c - ($c - $a);
-        $aL = $a - $aH;
-        $c  = 134217729.0 * $b;
-        $bH = $c - ($c - $b);
-        $bL = $b - $bH;
-
-        return (($aH * $bH - $product) + $aH * $bL + $aL * $bH) + $aL * $bL;
+        return ExactFloat::expansionSign($expansion);
     }
 
     /**

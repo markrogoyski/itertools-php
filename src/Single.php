@@ -1304,7 +1304,7 @@ final class Single
             // 33.0 - 10.19 rounds up to 22.810000000000002, and -4.0 + 0.97 to 3.0300000000000002. An integral
             // float step is taken as exact, so range(0.1, 2.0 ** 53, 2.0 ** 53) still throws.
             if (!$intOperands && $magnitudeF >= $spanF) {
-                $floatDifference = self::exactFloatDifference(\max($startF, $endF), \min($startF, $endF));
+                $floatDifference = ExactFloat::twoSum(-\min($startF, $endF), \max($startF, $endF));
                 $differenceAllowance = [0.0];
                 if (self::roundingAllowances($start, $end, \abs($step), false) !== []) {
                     $operandAllowance = 0.0;
@@ -1412,7 +1412,7 @@ final class Single
                     $operandAllowance = [];
                     $endRest = ExactFloat::intToFloats($endExact)[1];
                 } else {
-                    $exactSpan = self::exactFloatDifference(\max($startF, $endF), \min($startF, $endF));
+                    $exactSpan = ExactFloat::twoSum(-\min($startF, $endF), \max($startF, $endF));
                     $operandAllowance = self::roundingAllowances($start, $end, \abs($step), true, $exactSpan);
                 }
                 [$stepsF, $landsOnEnd] = self::countFloatSteps(
@@ -1814,7 +1814,7 @@ final class Single
         // is finite.
         $terms = [
             ...(\is_int($magnitude) ? ExactFloat::intToFloats($magnitude) : [$magnitude]),
-            ...ExactFloat::negated(self::exactFloatDifference($high, $low)),
+            ...ExactFloat::negated(ExactFloat::twoSum(-$low, $high)),
             ...ExactFloat::negated($allowance),
         ];
 
@@ -2031,7 +2031,7 @@ final class Single
      * @param int|float           $magnitude
      * @param bool                $forLanding
      * @param array{float, float} $floatDifference the operands' float difference and its rounding error (see
-     *                                             exactFloatDifference()), for landing
+     *                                             ExactFloat::twoSum()), for landing
      *
      * @return list<float>
      */
@@ -2074,7 +2074,7 @@ final class Single
      * the step.
      *
      * @param array{float, float} $floatDifference  the operands' float difference and its rounding error (see
-     *                                              exactFloatDifference())
+     *                                              ExactFloat::twoSum())
      * @param float               $operandAllowance the sum of the operands' half float spacings
      * @param int|float           $magnitude        the step magnitude
      * @param bool                $forLanding       as for roundingAllowance(), which decides whether the step is
@@ -2217,23 +2217,6 @@ final class Single
         $significand = $length > 1 ? $trimmed[0] . '.' . \substr($trimmed, 1) : $trimmed;
 
         return [$significand, $power + $length - 1, $length - 1];
-    }
-
-    /**
-     * $high - $low, exactly, as the float difference and its rounding error (TwoSum).
-     *
-     * @param float $high
-     * @param float $low
-     *
-     * @return array{float, float}
-     */
-    private static function exactFloatDifference(float $high, float $low): array
-    {
-        $difference = $high - $low;
-        $highPart = $difference + $low;
-        $error = ($high - $highPart) + (-$low - ($difference - $highPart));
-
-        return [$difference, $error];
     }
 
     /**
