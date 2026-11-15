@@ -78,6 +78,9 @@ A fix or change to a function also applies to its `Stream` wrapper.
 * Set: `symmetricDifference*` of a single iterable yields its elements instead of nothing.
 * File: documented that the default CSV `$escape = '\\'` does not round-trip a field ending in a backslash; pass `$escape = ''` when writing and reading. The default changes to `''` in 3.0.
 
+### Internal
+* The `@internal` helper classes in `IterTools\Util` moved into sub-namespaces (`Util\Precision`, `Util\Values`, `Util\Snapshot`, `Util\Heaps`, `Util\Io`), so the v2.7.0 names `Identity`, `MergeSortedHeap`, `NoValueMonad`, `ResourcePolicy`, `SortBoundedHeap`, `UniqueExtractor`, `UsageMap` and `ValueCounter` changed; no aliases are kept.
+
 ## v2.7.0 - 2026-10-07
 
 ### Bug Fixes
