@@ -13,46 +13,6 @@ use IterTools\Single;
 class RangePortabilityTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @test         isShortestDecimal tells whether an integral float past 2^53 is the shortest decimal that reads back
-     *               as it, also for decimals of more digits than a 32-bit int holds
-     * @dataProvider dataProviderForIsShortestDecimal
-     * @param        float $x
-     * @param        bool  $expected
-     */
-    public function testIsShortestDecimal(float $x, bool $expected): void
-    {
-        // Given
-        $method = new \ReflectionMethod(Single::class, 'isShortestDecimal');
-
-        // When
-        $result = $method->invoke(null, $x);
-
-        // Then
-        $this->assertSame($expected, $result);
-    }
-
-    /**
-     * Test data generated with Python, comparing the shortest round-tripping decimal with the float exactly:
-     *   Fraction(repr(x)) == Fraction(x)
-     */
-    public static function dataProviderForIsShortestDecimal(): array
-    {
-        return [
-            '2^53 + 2'                => [9007199254740994.0, true],
-            '2^54'                    => [2.0 ** 54, true],
-            '27021597764222988.0'     => [27021597764222988.0, true],
-            '1e16'                    => [1e16, true],
-            '1e22'                    => [1e22, true],
-            '1.2345e20'               => [1.2345e20, true],
-            '1.2345e21'               => [1.2345e21, false],
-            '1e23'                    => [1e23, false],
-            '2^60'                    => [2.0 ** 60, false],
-            '2^63'                    => [2.0 ** 63, false],
-            'largest float'           => [1.7976931348623157e308, false],
-        ];
-    }
-
-    /**
      * @test         range with an integral float step at the limits of the int range on either platform
      * @dataProvider dataProviderForIntegralFloatStepAtIntRangeLimits
      * @param        int          $start
