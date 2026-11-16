@@ -41,9 +41,18 @@ final class JustifyMultipleIterator extends AbstractMultipleIterator
 
     /**
      * {@inheritDoc}
+     *
+     * An exhausted iterable gives $filler.
+     *
+     * @return array<mixed>
      */
-    protected function currentOf(\Iterator $iterator): mixed
+    public function current(): array
     {
-        return $iterator->valid() ? $iterator->current() : $this->filler;
+        $values = [];
+        foreach ($this->iterators as $iterator) {
+            $values[] = $iterator->valid() ? $iterator->current() : $this->filler;
+        }
+
+        return $this->allDistinct ? $values : $this->toPositions($values);
     }
 }

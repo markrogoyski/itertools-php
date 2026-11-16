@@ -28,6 +28,11 @@ abstract class AbstractMultipleIterator implements \Iterator
      */
     protected array $iteratorIndexes = [];
     /**
+     * Whether no iterator was passed more than once, so $iteratorIndexes is 0, 1, 2, ... and the values of
+     * $iterators are already in position order.
+     */
+    protected bool $allDistinct;
+    /**
      * @var int
      */
     protected int $index = 0;
@@ -51,6 +56,8 @@ abstract class AbstractMultipleIterator implements \Iterator
             }
             $this->iteratorIndexes[] = $indexesById[$id];
         }
+
+        $this->allDistinct = \count($this->iterators) === \count($this->iteratorIndexes);
     }
 
     /**
@@ -60,12 +67,14 @@ abstract class AbstractMultipleIterator implements \Iterator
      */
     public function current(): array
     {
-        $values = \array_map(
-            fn (\Iterator $iterator): mixed => $this->currentOf($iterator),
-            $this->iterators,
-        );
+        // A plain loop rather than array_map with a closure, and no per-element hook: this runs once per
+        // element of every row, and the calls cost several times the read itself.
+        $values = [];
+        foreach ($this->iterators as $iterator) {
+            $values[] = $iterator->current();
+        }
 
-        return \array_map(static fn (int $index): mixed => $values[$index], $this->iteratorIndexes);
+        return $this->allDistinct ? $values : $this->toPositions($values);
     }
 
     /**
@@ -103,14 +112,21 @@ abstract class AbstractMultipleIterator implements \Iterator
     }
 
     /**
-     * The value an iterator gives each of its positions in the current list.
+     * Spreads the current values of the distinct iterators, in the order of $iterators, over the positions
+     * passed: an iterator passed more than once gives its value to each of its positions. Needed only when one
+     * was; otherwise $values already are the positions, and current() returns them without this call.
      *
-     * @param \Iterator<mixed> $iterator
+     * @param list<mixed> $values
      *
-     * @return mixed
+     * @return list<mixed>
      */
-    protected function currentOf(\Iterator $iterator): mixed
+    protected function toPositions(array $values): array
     {
-        return $iterator->current();
+        $positions = [];
+        foreach ($this->iteratorIndexes as $index) {
+            $positions[] = $values[$index];
+        }
+
+        return $positions;
     }
 }
