@@ -195,6 +195,7 @@ final class Transform
      * an \IteratorAggregate) until a copy is first used; getIterator() is then called once for all copies.
      * A copy can be rewound until it advances. A clone of a copy is an independent copy from the position it was
      * cloned at, and can be rewound until it advances from there.
+     * Reading a copy from inside the source while it produces an element throws \LogicException, as with memoize.
      *
      * @template TKey
      * @template TValue

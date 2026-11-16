@@ -1618,4 +1618,305 @@ class TeeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['cannot open the source', 'cannot open the source'], $messages);
         $this->assertSame(1, $aggregate->calls);
     }
+
+    /**
+     * Regression: the source is resolved on the first read, so a copy read from inside getIterator() re-entered
+     * that read. It found the iterable already released, resolved it as empty, and the tee ended after one element.
+     *
+     * @test a tee copy read from inside the source's getIterator() throws the re-entrancy guard to every copy, as memoize does
+     */
+    public function testReentrantReadFromAggregateFactoryThrowsTheSharedGuardFailureAsMemoizeDoes(): void
+    {
+        // Given
+        $b = null;
+        $teeSource = self::aggregateThatReadsWhileResolving(static function () use (&$b): void {
+            $b->valid();
+        });
+        [$a, $b] = Transform::tee($teeSource, 2);
+
+        // And
+        $clone = null;
+        $memoizeSource = self::aggregateThatReadsWhileResolving(static function () use (&$clone): void {
+            $clone->getIterator()->valid();
+        });
+        $memoized = Transform::memoize($memoizeSource);
+        $clone = clone $memoized;
+
+        // When
+        [$valuesA, $failureA] = self::readFromWhereItIs($a);
+        [$valuesB, $failureB] = self::readFromWhereItIs($b);
+        [$memoizedValues, $memoizedFailure] = self::readFromWhereItIs($memoized->getIterator());
+        [$clonedValues, $clonedFailure] = self::readFromWhereItIs($clone->getIterator());
+
+        // Then
+        $this->assertSame([], $valuesA);
+        $this->assertInstanceOf(\LogicException::class, $failureA);
+        $this->assertSame('Tee iterator cannot advance its source re-entrantly', $failureA->getMessage());
+        $this->assertSame([], $valuesB);
+        $this->assertSame($failureA, $failureB);
+        $this->assertSame(1, $teeSource->calls);
+
+        // And
+        $this->assertSame([], $memoizedValues);
+        $this->assertInstanceOf(\LogicException::class, $memoizedFailure);
+        $this->assertSame('Memoized iterable cannot advance its source re-entrantly', $memoizedFailure->getMessage());
+        $this->assertSame([], $clonedValues);
+        $this->assertSame($memoizedFailure, $clonedFailure);
+        $this->assertSame(1, $memoizeSource->calls);
+    }
+
+    /**
+     * Regression: a copy read from inside the source's valid() re-entered the read in progress, which buffered the
+     * first element, and the outer read then buffered it again.
+     *
+     * @test a tee copy read from inside a source iterator's method throws the re-entrancy guard to every copy, as memoize does
+     */
+    public function testReentrantReadFromIteratorMethodThrowsTheSharedGuardFailureAsMemoizeDoes(): void
+    {
+        // Given
+        $b = null;
+        $teeSource = self::iteratorThatReadsOnFirstValid(static function () use (&$b): void {
+            $b->current();
+        });
+        [$a, $b] = Transform::tee($teeSource, 2);
+
+        // And
+        $clone = null;
+        $memoizeSource = self::iteratorThatReadsOnFirstValid(static function () use (&$clone): void {
+            $clone->getIterator()->current();
+        });
+        $memoized = Transform::memoize($memoizeSource);
+        $clone = clone $memoized;
+
+        // When
+        [$valuesA, $failureA] = self::readFromWhereItIs($a);
+        [$valuesB, $failureB] = self::readFromWhereItIs($b);
+        [$memoizedValues, $memoizedFailure] = self::readFromWhereItIs($memoized->getIterator());
+        [$clonedValues, $clonedFailure] = self::readFromWhereItIs($clone->getIterator());
+
+        // Then
+        $this->assertSame([], $valuesA);
+        $this->assertInstanceOf(\LogicException::class, $failureA);
+        $this->assertSame('Tee iterator cannot advance its source re-entrantly', $failureA->getMessage());
+        $this->assertSame([], $valuesB);
+        $this->assertSame($failureA, $failureB);
+        $this->assertSame(1, $teeSource->validCalls);
+
+        // And
+        $this->assertSame([], $memoizedValues);
+        $this->assertInstanceOf(\LogicException::class, $memoizedFailure);
+        $this->assertSame('Memoized iterable cannot advance its source re-entrantly', $memoizedFailure->getMessage());
+        $this->assertSame([], $clonedValues);
+        $this->assertSame($memoizedFailure, $clonedFailure);
+        $this->assertSame(1, $memoizeSource->validCalls);
+    }
+
+    /**
+     * Regression: a copy read from inside a running generator recorded "Cannot resume an already running
+     * generator" as the source failure and dropped the source. The generator caught it, so no copy ever threw it,
+     * and the tee silently ended after one element.
+     *
+     * @test a re-entrant tee read that the source generator catches leaves the rest of the source to every copy, as memoize does
+     */
+    public function testReentrantReadCaughtByGeneratorKeepsTheRestOfTheSourceAsMemoizeDoes(): void
+    {
+        // Given
+        $b = null;
+        $teeCaught = null;
+        $teeSource = (static function () use (&$b, &$teeCaught): \Generator {
+            yield 10;
+            try {
+                $b->next();
+                $b->valid();
+            } catch (\Throwable $e) {
+                $teeCaught = $e;
+            }
+            yield 20;
+            yield 30;
+        })();
+        [$a, $b] = Transform::tee($teeSource, 2);
+
+        // And
+        $clone = null;
+        $memoizeCaught = null;
+        $memoizeSource = (static function () use (&$clone, &$memoizeCaught): \Generator {
+            yield 10;
+            try {
+                foreach ($clone as $_value) {
+                }
+            } catch (\Throwable $e) {
+                $memoizeCaught = $e;
+            }
+            yield 20;
+            yield 30;
+        })();
+        $memoized = Transform::memoize($memoizeSource);
+        $clone = clone $memoized;
+
+        // When
+        [$valuesA, $failureA] = self::readFromWhereItIs($a);
+        [$valuesB, $failureB] = self::readFromWhereItIs($b);
+        [$memoizedValues, $memoizedFailure] = self::readFromWhereItIs($memoized->getIterator());
+
+        // Then
+        $this->assertSame([10, 20, 30], $valuesA);
+        $this->assertNull($failureA);
+        $this->assertInstanceOf(\LogicException::class, $teeCaught);
+        $this->assertSame('Tee iterator cannot advance its source re-entrantly', $teeCaught->getMessage());
+        $this->assertSame([20, 30], $valuesB);
+        $this->assertNull($failureB);
+
+        // And
+        $this->assertSame([10, 20, 30], $memoizedValues);
+        $this->assertNull($memoizedFailure);
+        $this->assertInstanceOf(\LogicException::class, $memoizeCaught);
+        $this->assertSame('Memoized iterable cannot advance its source re-entrantly', $memoizeCaught->getMessage());
+    }
+
+    /**
+     * @test a tee copy can read an element already buffered from inside the source generator (no re-entrant advance)
+     */
+    public function testReentrantReadOfABufferedElementStillWorksGenerator(): void
+    {
+        // Given
+        $b = null;
+        $read = null;
+        $source = (static function () use (&$b, &$read): \Generator {
+            yield 10;
+            $read = $b->current();
+            yield 20;
+            yield 30;
+        })();
+        [$a, $b] = Transform::tee($source, 2);
+
+        // When
+        [$valuesA, $failureA] = self::readFromWhereItIs($a);
+        [$valuesB, $failureB] = self::readFromWhereItIs($b);
+
+        // Then
+        $this->assertSame(10, $read);
+        $this->assertSame([10, 20, 30], $valuesA);
+        $this->assertNull($failureA);
+        $this->assertSame([10, 20, 30], $valuesB);
+        $this->assertNull($failureB);
+    }
+
+    /**
+     * @test a tee copy can read an element already buffered from inside a source iterator's next() (no re-entrant advance)
+     */
+    public function testReentrantReadOfABufferedElementStillWorksIterator(): void
+    {
+        // Given
+        $b = null;
+        $read = null;
+        $source = self::iteratorThatReadsOnFirstNext(static function () use (&$b, &$read): void {
+            $read = $b->current();
+        });
+        [$a, $b] = Transform::tee($source, 2);
+
+        // When
+        [$valuesA, $failureA] = self::readFromWhereItIs($a);
+        [$valuesB, $failureB] = self::readFromWhereItIs($b);
+
+        // Then
+        $this->assertSame(10, $read);
+        $this->assertSame([10, 20, 30], $valuesA);
+        $this->assertNull($failureA);
+        $this->assertSame([10, 20, 30], $valuesB);
+        $this->assertNull($failureB);
+    }
+
+    /**
+     * Read an iterator from where it is, with valid() / current() / next() and no rewind(): rewinding a tee copy
+     * that has advanced throws.
+     *
+     * @return array{0: list<mixed>, 1: \Throwable|null} the values read, and what the read threw, if anything
+     */
+    private static function readFromWhereItIs(\Iterator $iterator): array
+    {
+        $values = [];
+        try {
+            for (; $iterator->valid(); $iterator->next()) {
+                $values[] = $iterator->current();
+            }
+        } catch (\Throwable $failure) {
+            return [$values, $failure];
+        }
+
+        return [$values, null];
+    }
+
+    /**
+     * An aggregate of [10, 20, 30] whose getIterator() calls $read before returning the iterator, and counts its calls.
+     */
+    private static function aggregateThatReadsWhileResolving(\Closure $read): \IteratorAggregate
+    {
+        return new class ($read) implements \IteratorAggregate {
+            public int $calls = 0;
+
+            public function __construct(private readonly \Closure $read)
+            {
+            }
+
+            public function getIterator(): \Iterator
+            {
+                ++$this->calls;
+                ($this->read)();
+
+                return new \ArrayIterator([10, 20, 30]);
+            }
+        };
+    }
+
+    /**
+     * An iterator over [10, 20, 30] whose first valid() calls $read, and which counts its valid() calls.
+     */
+    private static function iteratorThatReadsOnFirstValid(\Closure $read): \Iterator
+    {
+        return new class ([10, 20, 30], $read) extends \ArrayIterator {
+            public int $validCalls = 0;
+            private bool $hasRead = false;
+
+            public function __construct(array $array, private readonly \Closure $read)
+            {
+                parent::__construct($array);
+            }
+
+            public function valid(): bool
+            {
+                ++$this->validCalls;
+                if (!$this->hasRead) {
+                    // Set first, so that a valid() call from inside $read does not read again.
+                    $this->hasRead = true;
+                    ($this->read)();
+                }
+
+                return parent::valid();
+            }
+        };
+    }
+
+    /**
+     * An iterator over [10, 20, 30] whose first next() calls $read before advancing.
+     */
+    private static function iteratorThatReadsOnFirstNext(\Closure $read): \Iterator
+    {
+        return new class ([10, 20, 30], $read) extends \ArrayIterator {
+            private bool $hasRead = false;
+
+            public function __construct(array $array, private readonly \Closure $read)
+            {
+                parent::__construct($array);
+            }
+
+            public function next(): void
+            {
+                if (!$this->hasRead) {
+                    $this->hasRead = true;
+                    ($this->read)();
+                }
+                parent::next();
+            }
+        };
+    }
 }

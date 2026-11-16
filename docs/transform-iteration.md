@@ -42,6 +42,8 @@ A copy can be rewound as long as it has not advanced. Once it has, `rewind()` th
 
 If the source throws, every copy still yields the elements before the failure, then throws the same exception object when it reaches it. The source is not read again after it fails, so a copy never ends early without an exception.
 
+A copy must not be read from inside the source while the source is producing an element (from its `getIterator()`, an iterator method or a generator body): that read throws `\LogicException`, as with [`memoize()`](#memoize). If the source lets it through, it is a source failure like any other and reaches every copy. If the source catches it, the copies are unaffected. Elements already buffered can still be read.
+
 ### To Array
 Transforms any iterable to an array.
 

@@ -15,6 +15,9 @@ use IterTools\Transform;
  * - Each element's key and value are buffered until every live related iterator has moved past it.
  * - A source failure is kept: every related iterator that reaches it gets the same exception, and the source is
  *   not read again.
+ * - The source is not advanced re-entrantly: a related iterator read from inside the source (its getIterator(), an
+ *   iterator method or a generator body) for an element not yet buffered throws \LogicException, as MemoCache does.
+ *   If the source lets it through, it is a source failure like any other; if the source catches it, nothing is lost.
  * - Related iterators are not retained here, so dropping them frees everything without the cycle collector.
  *   One exception: with zend.exception_ignore_args off, a kept source failure's trace holds the arguments of the
  *   calls that read the source, which can include related iterators. Those form a cycle through this object, so
@@ -83,6 +86,11 @@ final class TeeIterator
     private bool $needsAdvance = false;
     private bool $exhausted = false;
     private bool $handedOut = false;
+
+    /**
+     * Whether the source is being read, so that a related iterator read from inside it cannot advance it again.
+     */
+    private bool $advancing = false;
 
     /**
      * What the source threw, at position $fetched. Nothing is read from the source after it.
@@ -236,6 +244,8 @@ final class TeeIterator
      * Read from the source until the element at $position is buffered, if the source has one.
      *
      * @throws \Throwable what the source threw, to every related iterator that reaches the position it failed at
+     * @throws \LogicException if called from inside the source while it is being read, to read a position not yet
+     *                         buffered
      */
     private function hasElementAt(int $position): bool
     {
@@ -243,12 +253,21 @@ final class TeeIterator
             if ($this->failure !== null) {
                 throw $this->failure;
             }
+            // Thrown before the try, so the nested read records no failure and leaves the source in place. If the
+            // source lets it through, the outer read below records it as the source failure.
+            if ($this->advancing) {
+                throw new \LogicException('Tee iterator cannot advance its source re-entrantly');
+            }
+
+            $this->advancing = true;
             try {
                 $this->fetch();
             } catch (\Throwable $exception) {
                 $this->failure = $exception;
                 $this->source = new \EmptyIterator();
                 throw $exception;
+            } finally {
+                $this->advancing = false;
             }
         }
 
