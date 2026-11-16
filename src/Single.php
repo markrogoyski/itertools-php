@@ -179,8 +179,11 @@ final class Single
     {
         $drop = true;
         foreach ($data as $key => $datum) {
-            if ($drop === true && Truthiness::of($predicate($datum))) {
-                continue;
+            if ($drop) {
+                $verdict = $predicate($datum);
+                if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
+                    continue;
+                }
             }
             $drop = false;
             yield $key => $datum;
@@ -199,8 +202,11 @@ final class Single
     {
         $drop = true;
         foreach ($data as $key => $datum) {
-            if ($drop && Truthiness::of($predicate($datum, $key))) {
-                continue;
+            if ($drop) {
+                $verdict = $predicate($datum, $key);
+                if (\is_float($verdict) ? Truthiness::of($verdict) : (bool) $verdict) {
+                    continue;
+                }
             }
             $drop = false;
             yield $key => $datum;
