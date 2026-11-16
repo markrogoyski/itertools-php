@@ -313,6 +313,39 @@ class SourceTest extends \PHPUnit\Framework\TestCase
             [0, 10, 10],
             [0, 10, 50],
             [-5, 5, 100],
+        ];
+    }
+
+    /**
+     * @test stream of random numbers with a bound beyond 2^31
+     * @dataProvider dataProviderForStreamOfRandomNumbersSixtyFourBit
+     */
+    public function testStreamOfRandomNumbersSixtyFourBit(int $min, int|float $max, int $repetitions): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the test does not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $this->assertIsInt($max);
+        $stream = Stream::ofRandomNumbers($min, $max, $repetitions);
+
+        // When
+        $actual = $stream->toArray();
+
+        // Then
+        $this->assertCount($repetitions, $actual);
+
+        // And
+        foreach ($actual as $number) {
+            $this->assertIsInt($number);
+            $this->assertTrue($number >= $min);
+            $this->assertTrue($number <= $max);
+        }
+    }
+
+    public static function dataProviderForStreamOfRandomNumbersSixtyFourBit(): array
+    {
+        return [
             [-928739, 9872937492, 9482],
         ];
     }

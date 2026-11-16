@@ -263,17 +263,17 @@ class RunningProductTest extends \PHPUnit\Framework\TestCase
     /**
      * @test         runningProduct array of integers beyond 2^31 with initial value
      * @dataProvider dataProviderForArrayWithInitialValue64Bit
-     * @param        array $numbers
-     * @param        int   $initialValue
-     * @param        array $expected
+     * @param        array     $numbers
+     * @param        int|float $initialValue
+     * @param        array     $expected
      */
-    public function testArrayWithInitialValue64Bit(array $numbers, int $initialValue, array $expected): void
+    public function testArrayWithInitialValue64Bit(array $numbers, int|float $initialValue, array $expected): void
     {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the expected values do not apply)
         if (\PHP_INT_SIZE < 8) {
             $this->markTestSkipped('Requires 64-bit integers.');
         }
-
-        // Given
+        $this->assertIsInt($initialValue);
         $result = [];
 
         // When

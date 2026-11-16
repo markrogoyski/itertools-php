@@ -390,14 +390,14 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     /**
      * @test         int operands beyond 2^53 with a step below float spacing yield floor(span / step) + 1 elements
      * @dataProvider dataProviderForStepBelowFloatSpacingIntOperands
-     * @param        int          $start
-     * @param        int          $end
+     * @param        int|float    $start
+     * @param        int|float    $end
      * @param        float        $step
      * @param        array<float> $expected
      */
     public function testFloatRangeWithStepBelowFloatSpacingOnIntOperands(
-        int $start,
-        int $end,
+        int|float $start,
+        int|float $end,
         float $step,
         array $expected
     ): void {
@@ -405,6 +405,8 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         if (\PHP_INT_SIZE < 8) {
             $this->markTestSkipped('Requires 64-bit integers');
         }
+        $this->assertIsInt($start);
+        $this->assertIsInt($end);
 
         // When
         $result = \iterator_to_array(Single::range($start, $end, $step), false);
@@ -474,16 +476,16 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     /**
      * @test         int operands beyond 2^53 whose start rounds away from $end still end on $end
      * @dataProvider dataProviderForIntStartRoundingAwayFromEnd
-     * @param        int   $start
-     * @param        int   $end
-     * @param        float $step
-     * @param        int   $count
-     * @param        float $first
-     * @param        float $last
+     * @param        int|float $start
+     * @param        int|float $end
+     * @param        float     $step
+     * @param        int       $count
+     * @param        float     $first
+     * @param        float     $last
      */
     public function testFractionalStepOnIntsBeyondFloatPrecisionEndsOnEnd(
-        int $start,
-        int $end,
+        int|float $start,
+        int|float $end,
         float $step,
         int $count,
         float $first,
@@ -493,6 +495,8 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         if (\PHP_INT_SIZE < 8) {
             $this->markTestSkipped('Requires 64-bit integers');
         }
+        $this->assertIsInt($start);
+        $this->assertIsInt($end);
 
         // When
         $result = \iterator_to_array(Single::range($start, $end, $step), false);
@@ -730,14 +734,14 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     /**
      * @test         distinct int operands beyond 2^53 with a fractional step use the exact int span, not the collapsed float span
      * @dataProvider dataProviderForDistinctIntsBeyondFloatPrecision
-     * @param        int          $start
-     * @param        int          $end
+     * @param        int|float    $start
+     * @param        int|float    $end
      * @param        float        $step
      * @param        array<float> $expected
      */
     public function testFractionalStepOnDistinctIntsBeyondFloatPrecision(
-        int $start,
-        int $end,
+        int|float $start,
+        int|float $end,
         float $step,
         array $expected
     ): void {
@@ -745,6 +749,8 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         if (\PHP_INT_SIZE < 8) {
             $this->markTestSkipped('Requires 64-bit integers');
         }
+        $this->assertIsInt($start);
+        $this->assertIsInt($end);
 
         // When
         $result = \iterator_to_array(Single::range($start, $end, $step), false);
@@ -878,13 +884,13 @@ class RangeTest extends \PHPUnit\Framework\TestCase
      *               past its float, which the span, taken from the operands converted to float, doesn't include
      * @dataProvider dataProviderForIntEndBeyondFloatPrecisionWithNonIntegralStart
      * @param        float        $start
-     * @param        int          $end
+     * @param        int|float    $end
      * @param        float        $step
      * @param        array<float> $expected
      */
     public function testIntEndBeyondFloatPrecisionWithNonIntegralStart(
         float $start,
-        int $end,
+        int|float $end,
         float $step,
         array $expected
     ): void {
@@ -892,6 +898,7 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         if (\PHP_INT_SIZE < 8) {
             $this->markTestSkipped('Requires 64-bit integers');
         }
+        $this->assertIsInt($end);
 
         // When
         $result = \iterator_to_array(Single::range($start, $end, $step), false);
@@ -1455,14 +1462,14 @@ class RangeTest extends \PHPUnit\Framework\TestCase
      * @test         a fractional step on int operands whose start a float can't hold gives each value from the exact
      *               start, not from the start converted to float
      * @dataProvider dataProviderForFractionalStepOnIntStartBeyondFloatPrecision
-     * @param        int          $start
-     * @param        int          $end
+     * @param        int|float    $start
+     * @param        int|float    $end
      * @param        float        $step
      * @param        array<float> $expected
      */
     public function testFractionalStepOnIntStartBeyondFloatPrecision(
-        int $start,
-        int $end,
+        int|float $start,
+        int|float $end,
         float $step,
         array $expected
     ): void {
@@ -1470,6 +1477,8 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         if (\PHP_INT_SIZE < 8) {
             $this->markTestSkipped('Requires 64-bit integers');
         }
+        $this->assertIsInt($start);
+        $this->assertIsInt($end);
 
         // When
         $result = \iterator_to_array(Single::range($start, $end, $step), false);
@@ -1553,15 +1562,15 @@ class RangeTest extends \PHPUnit\Framework\TestCase
      * @test         a fractional step on int operands whose start a float can't hold, over a span beyond the int range,
      *               gives each value from the exact start
      * @dataProvider dataProviderForFractionalStepOnIntStartBeyondFloatPrecisionLongRange
-     * @param        int               $start
-     * @param        int               $end
+     * @param        int|float         $start
+     * @param        int|float         $end
      * @param        float             $step
      * @param        int               $count
      * @param        array<int, float> $expected values at chosen indices
      */
     public function testFractionalStepOnIntStartBeyondFloatPrecisionLongRange(
-        int $start,
-        int $end,
+        int|float $start,
+        int|float $end,
         float $step,
         int $count,
         array $expected
@@ -1570,6 +1579,8 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         if (\PHP_INT_SIZE < 8) {
             $this->markTestSkipped('Requires 64-bit integers');
         }
+        $this->assertIsInt($start);
+        $this->assertIsInt($end);
 
         // When
         $result = \iterator_to_array(Single::range($start, $end, $step), false);
@@ -1657,16 +1668,17 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     /**
      * @test         an int step equal to the float span of float operands throws when the exact span is smaller
      * @dataProvider dataProviderForIntStepEqualToFloatSpanExceedingExactSpan
-     * @param        float $start
-     * @param        float $end
-     * @param        int   $step
+     * @param        float     $start
+     * @param        float     $end
+     * @param        int|float $step
      */
-    public function testIntStepEqualToFloatSpanExceedingExactSpanThrows(float $start, float $end, int $step): void
+    public function testIntStepEqualToFloatSpanExceedingExactSpanThrows(float $start, float $end, int|float $step): void
     {
         // Given (on 32-bit PHP these literals parse as floats, so the expected values do not apply)
         if (\PHP_INT_SIZE < 8) {
             $this->markTestSkipped('Requires 64-bit integers');
         }
+        $this->assertIsInt($step);
 
         // Then
         $this->expectException(\InvalidArgumentException::class);
@@ -2919,6 +2931,11 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         int $step,
         array $expected
     ): void {
+        // Given (on 32-bit PHP the expected integer literals parse as floats, so the expected values do not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
         // When
         $actual = \iterator_to_array(Single::range($start, $end, $step), false);
 

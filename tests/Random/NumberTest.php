@@ -47,6 +47,44 @@ class NumberTest extends \PHPUnit\Framework\TestCase
             [0, 10, 10],
             [0, 10, 50],
             [-5, 5, 100],
+        ];
+    }
+
+    /**
+     * @test         number with a bound beyond 2^31
+     * @dataProvider dataProviderForNumberSixtyFourBit
+     * @param        int       $min
+     * @param        int|float $max
+     * @param        int       $repetitions
+     */
+    public function testNumberSixtyFourBit(int $min, int|float $max, int $repetitions): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the test does not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $this->assertIsInt($max);
+        $result = [];
+
+        // When
+        foreach (Random::number($min, $max, $repetitions) as $number) {
+            $result[] = $number;
+        }
+
+        // Then
+        $this->assertCount($repetitions, $result);
+
+        // And
+        foreach ($result as $number) {
+            $this->assertIsInt($number);
+            $this->assertTrue($number >= $min);
+            $this->assertTrue($number <= $max);
+        }
+    }
+
+    public static function dataProviderForNumberSixtyFourBit(): array
+    {
+        return [
             [-928739, 9872937492, 9482],
         ];
     }
@@ -137,6 +175,36 @@ class NumberTest extends \PHPUnit\Framework\TestCase
     public function testNumberIteratorToArray(int $min, int $max, int $repetitions): void
     {
         // Given
+        $iterator = Random::number($min, $max, $repetitions);
+
+        // When
+        $result = \iterator_to_array($iterator);
+
+        // Then
+        $this->assertCount($repetitions, $result);
+
+        // And
+        foreach ($result as $number) {
+            $this->assertIsInt($number);
+            $this->assertTrue($number >= $min);
+            $this->assertTrue($number <= $max);
+        }
+    }
+
+    /**
+     * @test         number iterator_to_array with a bound beyond 2^31
+     * @dataProvider dataProviderForNumberSixtyFourBit
+     * @param        int       $min
+     * @param        int|float $max
+     * @param        int       $repetitions
+     */
+    public function testNumberIteratorToArraySixtyFourBit(int $min, int|float $max, int $repetitions): void
+    {
+        // Given (on 32-bit PHP these integer literals parse as floats, so the test does not apply)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $this->assertIsInt($max);
         $iterator = Random::number($min, $max, $repetitions);
 
         // When
