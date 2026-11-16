@@ -599,8 +599,9 @@ never matches `NAN` in `contains`, `startsWith`, `endsWith`, `same`, `distinctAd
 `distinctAdjacentBy`, and `groupAdjacentBy`, nor in their `Stream` counterparts (`sameWith`
 for `same`). The exception is one iterator or generator compared with itself, as in
 `same($it, $it)`, `startsWith($it, $it)` or `endsWith($it, $it)`: it is not read, and is `true`
-even if it holds `NAN`. `startsWith` and `endsWith` extend this to an `IteratorAggregate` passed as
-its own prefix or suffix. The `Coercive` variants of `contains`, `startsWith`, and `endsWith` follow
+even if it holds `NAN`. `same`, `startsWith` and `endsWith` extend this to an `IteratorAggregate`
+compared with itself (passed twice to `same`, or as its own prefix or suffix), without calling its
+`getIterator()`. The `Coercive` variants of `contains`, `startsWith`, and `endsWith` follow
 the coercive rules below.
 
 ### Coercive mode (numeric equivalence)

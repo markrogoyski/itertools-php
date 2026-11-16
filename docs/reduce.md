@@ -518,7 +518,7 @@ Reduces to its value at the given quantile.
 
 ```Reduce::toQuantile(iterable $data, float $quantile): int|float|null```
 
-- Thin wrapper over `toPercentile` that accepts a quantile in the inclusive range `[0, 1]` (e.g. `0.25` is the first quartile / 25th percentile). Values are ordered by exact value, as there.
+- Uses the same R-7 / linear-interpolation method as `toPercentile`, with a quantile in the inclusive range `[0, 1]` (e.g. `0.25` is the first quartile / 25th percentile). The rank is located from the quantile itself, exactly, not from the quantile scaled to a percentile. Values are ordered by exact value, as there.
 - `$quantile` must be in the inclusive range `[0, 1]`; otherwise throws `\InvalidArgumentException`.
 - If any element is `NAN`, returns `NAN` for every quantile, wherever the `NAN` sits in the input (see `toMedian`).
 - Returns null if collection is empty.
