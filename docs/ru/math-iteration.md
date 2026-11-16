@@ -131,6 +131,8 @@ foreach (Math::runningDifference($dartsScores, $startingScore) as $runningScore)
 
 ```Math::runningMax(iterable $numbers, int|float|null $initialValue = null)```
 
+- Из равных значений сохраняет первое: `runningMax([1, 1.0])` выдаёт `1, 1`.
+
 ```php
 use IterTools\Math;
 
@@ -146,6 +148,8 @@ foreach (Math::runningMax($numbers) as $runningMax) {
 Поиск минимального значения в процессе итерирования.
 
 ```Math::runningMin(iterable $numbers, int|float|null $initialValue = null)```
+
+- Из равных значений сохраняет первое: `runningMin([1.0, 1])` выдаёт `1.0, 1.0`.
 
 ```php
 use IterTools\Math;

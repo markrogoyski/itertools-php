@@ -681,4 +681,116 @@ class RunningMinTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         runningMin of tied values returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array $data
+     * @param        array $expected
+     */
+    public function testTieKeepsFirstArray(array $data, array $expected): void
+    {
+        // When
+        $result = \iterator_to_array(Math::runningMin($data), false);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         runningMin of tied values in a generator returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array $data
+     * @param        array $expected
+     */
+    public function testTieKeepsFirstGenerators(array $data, array $expected): void
+    {
+        // Given
+        $iterable = Fixture\GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = \iterator_to_array(Math::runningMin($iterable), false);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         runningMin of tied values in an iterator returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array $data
+     * @param        array $expected
+     */
+    public function testTieKeepsFirstIterators(array $data, array $expected): void
+    {
+        // Given
+        $iterable = new Fixture\ArrayIteratorFixture($data);
+
+        // When
+        $result = \iterator_to_array(Math::runningMin($iterable), false);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         runningMin of tied values in an IteratorAggregate returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array $data
+     * @param        array $expected
+     */
+    public function testTieKeepsFirstTraversables(array $data, array $expected): void
+    {
+        // Given
+        $iterable = new Fixture\IteratorAggregateFixture($data);
+
+        // When
+        $result = \iterator_to_array(Math::runningMin($iterable), false);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value and returns the first of
+     * equal values:
+     *   list(itertools.accumulate(data, min))
+     */
+    public static function dataProviderForTieKeepsFirst(): array
+    {
+        return [
+            'int then equal float' => [
+                [1, 1.0],
+                [1, 1],
+            ],
+            'float then equal int' => [
+                [1.0, 1],
+                [1.0, 1.0],
+            ],
+            'int zero then negative zero' => [
+                [0, -0.0],
+                [0, 0],
+            ],
+            'negative zero then int zero' => [
+                [-0.0, 0],
+                [-0.0, -0.0],
+            ],
+            'negative zero then zero' => [
+                [-0.0, 0.0],
+                [-0.0, -0.0],
+            ],
+            'zero then negative zero' => [
+                [0.0, -0.0],
+                [0.0, 0.0],
+            ],
+            'tied minimum after a larger value' => [
+                [2, 1, 1.0],
+                [2, 1, 1],
+            ],
+            'tied maximum after a smaller value' => [
+                [0, 1.0, 1],
+                [0, 0, 0],
+            ],
+        ];
+    }
 }

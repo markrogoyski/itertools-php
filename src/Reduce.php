@@ -100,12 +100,13 @@ final class Reduce
                 if ($result instanceof NoValueMonad) {
                     $result = $datum;
                 } elseif (\is_int($result) !== \is_int($datum) && \is_float($result) !== \is_float($datum) && $result == $datum) {
-                    // \min() compares an int and a float as floats, which only goes wrong for a pair it finds equal:
-                    // an int beyond ±2^53 and a float. Arithmetic::min() compares that pair exactly. The types are
+                    // < compares an int and a float as floats, which only goes wrong for a pair it finds equal: an
+                    // int beyond ±2^53 and a float. Arithmetic::min() compares that pair exactly. The types are
                     // tested first, as == on other values, such as arrays or Stringables, would compare them twice.
                     $result = Arithmetic::min($result, $datum);
                 } else {
-                    $result = \min($result, $datum);
+                    // As Arithmetic::min(): the first of tied values, which a two-argument \min() can't promise.
+                    $result = $datum < $result ? $datum : $result;
                 }
             }
         }
@@ -166,7 +167,8 @@ final class Reduce
                 } elseif (\is_int($result) !== \is_int($datum) && \is_float($result) !== \is_float($datum) && $result == $datum) {
                     $result = Arithmetic::max($result, $datum);
                 } else {
-                    $result = \max($result, $datum);
+                    // As Arithmetic::max(): the first of tied values.
+                    $result = $datum <= $result ? $result : $datum;
                 }
             }
         }
@@ -235,12 +237,13 @@ final class Reduce
                 if (\is_int($min) !== \is_int($datum) && \is_float($min) !== \is_float($datum) && $min == $datum) {
                     $min = Arithmetic::min($min, $datum);
                 } else {
-                    $min = \min($min, $datum);
+                    // As Arithmetic::min() and max(): the first of tied values.
+                    $min = $datum < $min ? $datum : $min;
                 }
                 if (\is_int($max) !== \is_int($datum) && \is_float($max) !== \is_float($datum) && $max == $datum) {
                     $max = Arithmetic::max($max, $datum);
                 } else {
-                    $max = \max($max, $datum);
+                    $max = $datum <= $max ? $max : $datum;
                 }
             }
             $result = [$min, $max];
@@ -1017,15 +1020,16 @@ final class Reduce
                 $min = $max = $number;
                 continue;
             }
-            // \min() and \max() compare an int and a float as floats, which only goes wrong for a pair they find
-            // equal: an int beyond ±2^53 and a float. Arithmetic::min() and max() compare that pair exactly. The
-            // numbers are compared first, as that is cheaper than testing their types.
+            // < and <= compare an int and a float as floats, which only goes wrong for a pair they find equal: an
+            // int beyond ±2^53 and a float. Arithmetic::min() and max() compare that pair exactly. The numbers are
+            // compared first, as that is cheaper than testing their types. Each bound is the first of the values
+            // tied for it, as in Arithmetic::min() and max().
             $min = $min == $number && \is_int($min) !== \is_int($number)
                 ? Arithmetic::min($min, $number)
-                : \min($min, $number);
+                : ($number < $min ? $number : $min);
             $max = $max == $number && \is_int($max) !== \is_int($number)
                 ? Arithmetic::max($max, $number)
-                : \max($max, $number);
+                : ($number <= $max ? $max : $number);
         }
 
         if ($min === null || $max === null) {
@@ -1046,11 +1050,10 @@ final class Reduce
             }
         }
 
+        // The bounds of a zero range are the same value, the first of the tied values, so the range is 0.0, never
+        // -0.0.
         /** @psalm-suppress InvalidOperand */
-        $range = $max - $min;
-
-        // A range is never negative, but the tie rule can leave -0.0 as the maximum and 0.0 as the minimum.
-        return $range === 0.0 ? 0.0 : $range;
+        return $max - $min;
     }
 
     /**

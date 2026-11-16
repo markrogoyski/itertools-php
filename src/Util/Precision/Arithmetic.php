@@ -119,8 +119,10 @@ final class Arithmetic
     }
 
     /**
-     * \min() of two values, except that an int and a float are compared by their exact values. Every other
-     * pair, and an exact tie, goes to \min(), whose choice on a tie depends on the PHP version.
+     * The lesser of two values, except that an int and a float are compared by their exact values. Other pairs
+     * are ordered by PHP's comparison, as \min() orders them. Of two values that compare equal, returns the
+     * first, as PHP documents for \min() and as PHP 8.2's does: `$b < $a ? $b : $a`. A two-argument \min()
+     * call can return the second on PHP 8.4+, so it isn't used.
      *
      * @template T
      *
@@ -133,17 +135,19 @@ final class Arithmetic
     {
         if ((\is_int($a) || \is_float($a)) && (\is_int($b) || \is_float($b))) {
             $order = self::compare($a, $b);
-            if ($order !== 0) {
-                return $order < 0 ? $a : $b;
-            }
+            return $order > 0 ? $b : $a;
         }
 
-        return \min($a, $b);
+        return $b < $a ? $b : $a;
     }
 
     /**
-     * \max() of two values, except that an int and a float are compared by their exact values. Every other
-     * pair, and an exact tie, goes to \max(), whose choice on a tie depends on the PHP version.
+     * The greater of two values, except that an int and a float are compared by their exact values. Other pairs
+     * are ordered by PHP's comparison, as \max() orders them. Of two values that compare equal, returns the
+     * first, as PHP documents for \max() and as PHP 8.2's does: `$b <= $a ? $a : $b`. A two-argument \max()
+     * call isn't used, for symmetry with min(). Nor is `$b > $a ? $b : $a`, which PHP evaluates as `$a < $b`
+     * and which differs for values PHP can't order, such as arrays with different keys: PHP 8.2's \max()
+     * takes the second of those.
      *
      * @template T
      *
@@ -156,12 +160,10 @@ final class Arithmetic
     {
         if ((\is_int($a) || \is_float($a)) && (\is_int($b) || \is_float($b))) {
             $order = self::compare($a, $b);
-            if ($order !== 0) {
-                return $order > 0 ? $a : $b;
-            }
+            return $order < 0 ? $b : $a;
         }
 
-        return \max($a, $b);
+        return $b <= $a ? $a : $b;
     }
 
     /**

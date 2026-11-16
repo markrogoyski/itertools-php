@@ -249,12 +249,13 @@ final class Math
             if ($max === null) {
                 $max = $number;
             } elseif ($max == $number && \is_int($max) !== \is_int($number)) {
-                // \max() compares an int and a float as floats, which only goes wrong for a pair it finds equal:
-                // an int beyond ±2^53 and a float. Arithmetic::max() compares that pair exactly. The numbers are
-                // compared first, as that is cheaper than testing their types.
+                // <= compares an int and a float as floats, which only goes wrong for a pair it finds equal: an int
+                // beyond ±2^53 and a float. Arithmetic::max() compares that pair exactly. The numbers are compared
+                // first, as that is cheaper than testing their types.
                 $max = Arithmetic::max($max, $number);
             } else {
-                $max = \max($max, $number);
+                // As Arithmetic::max(): the first of tied values.
+                $max = $number <= $max ? $max : $number;
             }
             yield $max;
         }
@@ -283,12 +284,13 @@ final class Math
             if ($min === null) {
                 $min = $number;
             } elseif ($min == $number && \is_int($min) !== \is_int($number)) {
-                // \min() compares an int and a float as floats, which only goes wrong for a pair it finds equal:
-                // an int beyond ±2^53 and a float. Arithmetic::min() compares that pair exactly. The numbers are
-                // compared first, as that is cheaper than testing their types.
+                // < compares an int and a float as floats, which only goes wrong for a pair it finds equal: an int
+                // beyond ±2^53 and a float. Arithmetic::min() compares that pair exactly. The numbers are compared
+                // first, as that is cheaper than testing their types.
                 $min = Arithmetic::min($min, $number);
             } else {
-                $min = \min($min, $number);
+                // As Arithmetic::min(): the first of tied values, which a two-argument \min() can't promise.
+                $min = $number < $min ? $number : $min;
             }
             yield $min;
         }

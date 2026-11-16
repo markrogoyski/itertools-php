@@ -237,46 +237,98 @@ class ArithmeticTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @test min and max leave an int and a float that are exactly equal to \min() and \max()
+     * @test min and max return the first of two exactly equal values, whatever the PHP version
      * @dataProvider dataProviderForMinMaxTie
      * @param int|float $a
      * @param int|float $b
+     * @param int|float $expectedMin
+     * @param int|float $expectedMax
      */
-    public function testMinMaxTie(int|float $a, int|float $b): void
+    public function testMinMaxTie(int|float $a, int|float $b, int|float $expectedMin, int|float $expectedMax): void
     {
         // When
         $min = Arithmetic::min($a, $b);
         $max = Arithmetic::max($a, $b);
 
-        // Then (which value \min() and \max() return on a tie depends on the PHP version)
-        $this->assertSame(\min($a, $b), $min);
-        $this->assertSame(\max($a, $b), $max);
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expectedMin, true), \var_export($min, true));
+        $this->assertSame(\var_export($expectedMax, true), \var_export($max, true));
     }
 
     /**
-     * @return array<array{int|float, int|float}>
+     * Test data generated with Python, which compares int and float by exact value and returns the first of
+     * equal values:
+     *   min(a, b), max(a, b)
+     *
+     * @return array<array{int|float, int|float, int|float, int|float}>
      */
     public static function dataProviderForMinMaxTie(): array
     {
         return [
-            [1, 1.0],
-            [1.0, 1],
-            [0, -0.0],
-            [-0.0, 0],
-            [2 ** 53, 2.0 ** 53],
-            [2.0 ** 53, 2 ** 53],
-            [\PHP_INT_MIN, -(2.0 ** 63)],
-            [-(2.0 ** 63), \PHP_INT_MIN],
+            [1, 1.0, 1, 1],
+            [1.0, 1, 1.0, 1.0],
+            [0, -0.0, 0, 0],
+            [-0.0, 0, -0.0, -0.0],
+            [-0.0, 0.0, -0.0, -0.0],
+            [0.0, -0.0, 0.0, 0.0],
+            [2 ** 53, 2.0 ** 53, 2 ** 53, 2 ** 53],
+            [2.0 ** 53, 2 ** 53, 2.0 ** 53, 2.0 ** 53],
         ];
     }
 
     /**
-     * @test compareValues, min and max leave a pair that isn't an int and a float to <=>, \min() and \max()
+     * @test min and max return the first of a 64-bit int and a float that are exactly equal
+     * @dataProvider dataProviderForMinMaxTieSixtyFourBit
+     * @param int|float $a
+     * @param int|float $b
+     * @param int|float $expectedMin
+     * @param int|float $expectedMax
+     */
+    public function testMinMaxTieSixtyFourBit(
+        int|float $a,
+        int|float $b,
+        int|float $expectedMin,
+        int|float $expectedMax
+    ): void {
+        // Given (on 32-bit PHP, PHP_INT_MIN is -2^31, which no longer equals -2.0^63)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
+        // When
+        $min = Arithmetic::min($a, $b);
+        $max = Arithmetic::max($a, $b);
+
+        // Then
+        $this->assertSame($expectedMin, $min);
+        $this->assertSame($expectedMax, $max);
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value and returns the first of
+     * equal values:
+     *   min(a, b), max(a, b)
+     *
+     * @return array<array{int|float, int|float, int|float, int|float}>
+     */
+    public static function dataProviderForMinMaxTieSixtyFourBit(): array
+    {
+        return [
+            [\PHP_INT_MIN, -(2.0 ** 63), \PHP_INT_MIN, \PHP_INT_MIN],
+            [-(2.0 ** 63), \PHP_INT_MIN, -(2.0 ** 63), -(2.0 ** 63)],
+        ];
+    }
+
+    /**
+     * @test compareValues, min and max order a pair that isn't an int and a float by PHP's comparison, as <=>,
+     *       \min() and \max() do, and return the first of a pair that compares equal
      * @dataProvider dataProviderForMinMaxNotNumbers
      * @param mixed $a
      * @param mixed $b
+     * @param mixed $expectedMin
+     * @param mixed $expectedMax
      */
-    public function testMinMaxNotNumbers(mixed $a, mixed $b): void
+    public function testMinMaxNotNumbers(mixed $a, mixed $b, mixed $expectedMin, mixed $expectedMax): void
     {
         // When
         $order = Arithmetic::compareValues($a, $b);
@@ -285,26 +337,30 @@ class ArithmeticTest extends \PHPUnit\Framework\TestCase
 
         // Then
         $this->assertSame($a <=> $b, $order);
-        $this->assertSame(\min($a, $b), $min);
-        $this->assertSame(\max($a, $b), $max);
+        $this->assertSame($expectedMin, $min);
+        $this->assertSame($expectedMax, $max);
     }
 
     /**
-     * @return array<array{mixed, mixed}>
+     * Expected values follow PHP's documented rule for min() and max(): the lesser or greater value by PHP's
+     * comparison, and the first of two values that compare equal (the last four pairs). PHP 8.2's min() and
+     * max(), and a dynamic call to them on later versions, give the same values.
+     *
+     * @return array<array{mixed, mixed, mixed, mixed}>
      */
     public static function dataProviderForMinMaxNotNumbers(): array
     {
         return [
-            ['a', 'b'],
-            ['b', 'a'],
-            ['10', 9],
-            [9, '10'],
-            ['9007199254740993', 9007199254740992.0],
-            ['abc', 0],
-            [[1, 2], [1, 3]],
-            [true, 1],
-            [1, true],
-            [null, 0],
+            ['a', 'b', 'a', 'b'],
+            ['b', 'a', 'a', 'b'],
+            ['10', 9, 9, '10'],
+            [9, '10', 9, '10'],
+            ['abc', 0, 0, 'abc'],
+            [[1, 2], [1, 3], [1, 2], [1, 3]],
+            ['9007199254740993', 9007199254740992.0, '9007199254740993', '9007199254740993'],
+            [true, 1, true, true],
+            [1, true, 1, 1],
+            [null, 0, null, null],
         ];
     }
 

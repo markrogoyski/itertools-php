@@ -935,6 +935,7 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
      *   numpy.ptp(numpy.array(data, dtype=float))
      * The int-vs-float result type is the library's contract, not the oracle's: a range of int
      * values stays an int, which numpy.ptp(numpy.array(data, dtype=numpy.int64)) confirms is 0.
+     * Each bound is the first of the values tied for it, so [0, -0.0] has int bounds and an int range.
      */
     public static function dataProviderForNegativeZeroArray(): array
     {
@@ -969,7 +970,7 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
             ],
             'int zero then negative zero' => [
                 [0, -0.0],
-                0.0,
+                0,
             ],
             'signed zeros around a nonzero range' => [
                 [-0.0, 0.0, 1.5],
@@ -1004,6 +1005,7 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
      *   numpy.ptp(numpy.array(data, dtype=float))
      * The int-vs-float result type is the library's contract, not the oracle's: a range of int
      * values stays an int, which numpy.ptp(numpy.array(data, dtype=numpy.int64)) confirms is 0.
+     * Each bound is the first of the values tied for it, so [0, -0.0] has int bounds and an int range.
      */
     public static function dataProviderForNegativeZeroGenerators(): array
     {
@@ -1042,7 +1044,7 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
             ],
             'int zero then negative zero' => [
                 $gen([0, -0.0]),
-                0.0,
+                0,
             ],
             'signed zeros around a nonzero range' => [
                 $gen([-0.0, 0.0, 1.5]),
@@ -1077,6 +1079,7 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
      *   numpy.ptp(numpy.array(data, dtype=float))
      * The int-vs-float result type is the library's contract, not the oracle's: a range of int
      * values stays an int, which numpy.ptp(numpy.array(data, dtype=numpy.int64)) confirms is 0.
+     * Each bound is the first of the values tied for it, so [0, -0.0] has int bounds and an int range.
      */
     public static function dataProviderForNegativeZeroIterators(): array
     {
@@ -1115,7 +1118,7 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
             ],
             'int zero then negative zero' => [
                 $iter([0, -0.0]),
-                0.0,
+                0,
             ],
             'signed zeros around a nonzero range' => [
                 $iter([-0.0, 0.0, 1.5]),
@@ -1150,6 +1153,7 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
      *   numpy.ptp(numpy.array(data, dtype=float))
      * The int-vs-float result type is the library's contract, not the oracle's: a range of int
      * values stays an int, which numpy.ptp(numpy.array(data, dtype=numpy.int64)) confirms is 0.
+     * Each bound is the first of the values tied for it, so [0, -0.0] has int bounds and an int range.
      */
     public static function dataProviderForNegativeZeroTraversables(): array
     {
@@ -1188,7 +1192,7 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
             ],
             'int zero then negative zero' => [
                 $trav([0, -0.0]),
-                0.0,
+                0,
             ],
             'signed zeros around a nonzero range' => [
                 $trav([-0.0, 0.0, 1.5]),
@@ -1215,5 +1219,117 @@ class ToRangeTest extends \PHPUnit\Framework\TestCase
         // Then
         // -0.0 === 0.0, so compare the exported forms, which differ in the sign.
         $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         toRange of tied values returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testTieKeepsFirstArray(array $data, int|float $expected): void
+    {
+        // When
+        $result = Reduce::toRange($data);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         toRange of tied values in a generator returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testTieKeepsFirstGenerators(array $data, int|float $expected): void
+    {
+        // Given
+        $iterable = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toRange($iterable);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         toRange of tied values in an iterator returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testTieKeepsFirstIterators(array $data, int|float $expected): void
+    {
+        // Given
+        $iterable = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toRange($iterable);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         toRange of tied values in an IteratorAggregate returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testTieKeepsFirstTraversables(array $data, int|float $expected): void
+    {
+        // Given
+        $iterable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toRange($iterable);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value and returns the first of
+     * equal values:
+     *   max(data) - min(data)
+     */
+    public static function dataProviderForTieKeepsFirst(): array
+    {
+        return [
+            'int then equal float' => [
+                [1, 1.0],
+                0,
+            ],
+            'float then equal int' => [
+                [1.0, 1],
+                0.0,
+            ],
+            'int zero then negative zero' => [
+                [0, -0.0],
+                0,
+            ],
+            'negative zero then int zero' => [
+                [-0.0, 0],
+                0.0,
+            ],
+            'negative zero then zero' => [
+                [-0.0, 0.0],
+                0.0,
+            ],
+            'zero then negative zero' => [
+                [0.0, -0.0],
+                0.0,
+            ],
+            'tied minimum after a larger value' => [
+                [2, 1, 1.0],
+                1,
+            ],
+            'tied maximum after a smaller value' => [
+                [0, 1.0, 1],
+                1.0,
+            ],
+        ];
     }
 }

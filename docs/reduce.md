@@ -260,7 +260,7 @@ Reduces to the max value.
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
-- If several elements tie on the `$compareBy` value, returns the first of them.
+- If several elements tie (on the `$compareBy` value, if given), returns the first of them: `toMax([1, 1.0])` is `1`.
 - Returns null if collection is empty.
 
 ```php
@@ -320,7 +320,7 @@ Reduces to the min value.
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
-- If several elements tie on the `$compareBy` value, returns the first of them.
+- If several elements tie (on the `$compareBy` value, if given), returns the first of them: `toMin([1.0, 1])` is `1.0`.
 - Returns null if collection is empty.
 
 ```php
@@ -366,7 +366,7 @@ Reduces to array of its upper and lower bounds (max and min).
 
 - Optional callable param `$compareBy` must return comparable value.
 - If `$compareBy` is not provided then items of given collection must be comparable.
-- If several elements tie for the minimum or for the maximum on the `$compareBy` value, each bound is the first of them.
+- If several elements tie for the minimum or for the maximum (on the `$compareBy` value, if given), each bound is the first of them.
 - Returns `[null, null]` if given collection is empty.
 
 ```php
@@ -555,7 +555,7 @@ Reduces given collection to its range (difference between max and min).
 
 Returns `0` if iterable source is empty.
 
-* A float range of zero is `0.0`, never `-0.0`: `Reduce::toRange([-0.0, 0.0])` is `0.0`.
+* A float range of zero is `0.0`, never `-0.0`: `Reduce::toRange([-0.0, 0.0])` is `0.0`. Each bound is the first of the values tied for it, so a range of zero has the type of the first value: `Reduce::toRange([0, -0.0])` is `0`, and `Reduce::toRange([-0.0, 0])` is `0.0`.
 * Values are compared exactly, and an int beyond ±2^53, which a float can't always represent, is subtracted exactly from an int or an integral float within the int range when their difference fits in an int: `Reduce::toRange([2**53 + 1, 2.0**53])` is `1.0`, where `max - min` in PHP gives `0.0`. A difference beyond the int range is correctly rounded to a float: `Reduce::toRange([-(2**62 + 1), 2.0**62 + 1024])` is 2^63 + 2048, where `max - min` in PHP rounds the operands first and gives 2^63. Paired with a non-integral float or a float beyond the int range, the int is converted to float in the subtraction and the range can be off: `Reduce::toRange([PHP_INT_MAX, 2.0**63])` is `0.0`, where the true range is 1.
 
 ```php

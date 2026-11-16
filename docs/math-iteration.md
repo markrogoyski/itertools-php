@@ -137,6 +137,8 @@ Accumulate the running maximum over a list of numbers.
 
 ```Math::runningMax(iterable $numbers, int|float|null $initialValue = null)```
 
+- Of values that tie, keeps the first: `runningMax([1, 1.0])` yields `1, 1`.
+
 ```php
 use IterTools\Math;
 
@@ -152,6 +154,8 @@ foreach (Math::runningMax($numbers) as $runningMax) {
 Accumulate the running minimum over a list of numbers.
 
 ```Math::runningMin(iterable $numbers, int|float|null $initialValue = null)```
+
+- Of values that tie, keeps the first: `runningMin([1.0, 1])` yields `1.0, 1.0`.
 
 ```php
 use IterTools\Math;

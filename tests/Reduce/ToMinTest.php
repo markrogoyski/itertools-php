@@ -2490,4 +2490,116 @@ class ToMinTest extends \PHPUnit\Framework\TestCase
         // Then
         $this->assertSame(1, $stringable->conversions);
     }
+
+    /**
+     * @test         toMin of tied values returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testTieKeepsFirstArray(array $data, int|float $expected): void
+    {
+        // When
+        $result = Reduce::toMin($data);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         toMin of tied values in a generator returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testTieKeepsFirstGenerators(array $data, int|float $expected): void
+    {
+        // Given
+        $iterable = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toMin($iterable);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         toMin of tied values in an iterator returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testTieKeepsFirstIterators(array $data, int|float $expected): void
+    {
+        // Given
+        $iterable = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toMin($iterable);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * @test         toMin of tied values in an IteratorAggregate returns the first of them, whatever the PHP version
+     * @dataProvider dataProviderForTieKeepsFirst
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testTieKeepsFirstTraversables(array $data, int|float $expected): void
+    {
+        // Given
+        $iterable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toMin($iterable);
+
+        // Then (-0.0 === 0.0, so compare the exported forms, which differ in the sign)
+        $this->assertSame(\var_export($expected, true), \var_export($result, true));
+    }
+
+    /**
+     * Test data generated with Python, which compares int and float by exact value and returns the first of
+     * equal values:
+     *   min(data)
+     */
+    public static function dataProviderForTieKeepsFirst(): array
+    {
+        return [
+            'int then equal float' => [
+                [1, 1.0],
+                1,
+            ],
+            'float then equal int' => [
+                [1.0, 1],
+                1.0,
+            ],
+            'int zero then negative zero' => [
+                [0, -0.0],
+                0,
+            ],
+            'negative zero then int zero' => [
+                [-0.0, 0],
+                -0.0,
+            ],
+            'negative zero then zero' => [
+                [-0.0, 0.0],
+                -0.0,
+            ],
+            'zero then negative zero' => [
+                [0.0, -0.0],
+                0.0,
+            ],
+            'tied minimum after a larger value' => [
+                [2, 1, 1.0],
+                1,
+            ],
+            'tied maximum after a smaller value' => [
+                [0, 1.0, 1],
+                0,
+            ],
+        ];
+    }
 }
