@@ -86,7 +86,7 @@ final class Transform
     public static function toIterator(iterable $iterable): \Iterator
     {
         /** @psalm-suppress DocblockTypeContradiction, MixedArgumentTypeCoercion */
-        return match (true) { // @phpstan-ignore return.type
+        return match (true) {
             $iterable instanceof \Iterator => $iterable,
             $iterable instanceof \IteratorAggregate => self::toIterator(self::unwrapAggregate($iterable)),
             $iterable instanceof \Traversable => new \IteratorIterator($iterable),
@@ -123,7 +123,7 @@ final class Transform
             $seen[$id] = $traversable;
 
             /** @var mixed $next a getIterator() marked #[\ReturnTypeWillChange] can return anything */
-            $next = $traversable->getIterator();
+            $next = $traversable->getIterator(); // @phpstan-ignore varTag.nativeType (it can return anything)
             if (!($next instanceof \Traversable)) {
                 throw new \LogicException(
                     \get_class($traversable) . '::getIterator() must return an object that implements Traversable'
