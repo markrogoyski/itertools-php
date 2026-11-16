@@ -70,7 +70,7 @@ jobs:
             set -e
             php -v
             php -r "if (PHP_INT_SIZE !== 4) { fwrite(STDERR, \"PHP_INT_SIZE is \" . PHP_INT_SIZE . \", not 4\n\"); exit(1); }"
-            php -d memory_limit=-1 vendor/bin/phpunit --configuration tests/phpunit.xml
+            php vendor/bin/phpunit --configuration tests/phpunit.xml
           '
 
   static-analysis:

@@ -39,7 +39,7 @@ final class Ulp
     }
 
     /**
-     * Of two adjacent floats, the one whose last significand bit is 0.
+     * Of two adjacent floats, the one whose last significand bit is 0 (64-bit PHP only).
      *
      * @param float $a
      * @param float $b
@@ -75,7 +75,7 @@ final class Ulp
      * Subnormals are taken as exact, so the result is 0.0 for them: half their spacing, 2^-1075, isn't
      * representable.
      *
-     * @param float $x
+     * @param float $x finite
      *
      * @return float
      */

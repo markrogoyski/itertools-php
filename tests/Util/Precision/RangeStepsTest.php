@@ -247,6 +247,65 @@ class RangeStepsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    /**
+     * Regression: an exact $i·$magnitude in [2^64 - 1024, 2^64) has a float product that rounds up to 2^64, and
+     * casting the 2^63 left after the shift to int overflowed: PHP warned, and the result had the wrong sign.
+     *
+     * @test roundIntPlusMultiple with $i·$magnitude just below 2^64 is correctly rounded, without a warning
+     * @dataProvider dataProviderForRoundIntPlusMultipleNearTwoToTheSixtyFour
+     * @param int|float $start
+     * @param int|float $i
+     * @param float     $magnitude
+     * @param bool      $ascending
+     * @param float     $expected
+     */
+    public function testRoundIntPlusMultipleNearTwoToTheSixtyFourIsCorrectlyRoundedWithoutWarning(
+        int|float $start,
+        int|float $i,
+        float $magnitude,
+        bool $ascending,
+        float $expected
+    ): void {
+        // Given
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+        $warnings = [];
+        $previous = \set_error_handler(static function (int $errno, string $errstr) use (&$warnings): bool {
+            $warnings[] = $errstr;
+            return true;
+        });
+
+        try {
+            // When
+            $result = RangeSteps::roundIntPlusMultiple($start, $i, $magnitude, $ascending);
+        } finally {
+            \set_error_handler($previous);
+        }
+
+        // Then
+        $this->assertSame([], $warnings);
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with tools/oracles/rangesteps_round_plus_multiple.py:
+     *   float(Fraction(start) + i * Fraction(magnitude)) if ascending else float(Fraction(start) - i * Fraction(magnitude))
+     *
+     * @return array<string, array{int|float, int|float, float, bool, float}>
+     */
+    public static function dataProviderForRoundIntPlusMultipleNearTwoToTheSixtyFour(): array
+    {
+        return [
+            'PHP_INT_MIN + 1 up by 9001705049998561 x 2049.25, product in the window' => [-9223372036854775807, 9001705049998561, 2049.25, true, 9.223372036854776e+18],
+            'PHP_INT_MAX down by 9001705049998561 x 2049.25, product in the window' => [\PHP_INT_MAX, 9001705049998561, 2049.25, false, -9.223372036854776e+18],
+            'PHP_INT_MIN + 1 up by 6147685154205675 x 3000.6, last i below the window' => [-9223372036854775807, 6147685154205675, 3000.6, true, 9.223372036854772e+18],
+            'PHP_INT_MAX down by 6147685154205675 x 3000.6, last i below the window' => [\PHP_INT_MAX, 6147685154205675, 3000.6, false, -9.223372036854772e+18],
+            'PHP_INT_MIN + 1 up by 6147685154205676 x 3000.6, first i in the window' => [-9223372036854775807, 6147685154205676, 3000.6, true, 9.223372036854775e+18],
+            'PHP_INT_MAX down by 6147685154205676 x 3000.6, first i in the window' => [\PHP_INT_MAX, 6147685154205676, 3000.6, false, -9.223372036854775e+18],
+        ];
+    }
+
 
     /**
      * @test roundFloatPlusMultiple returns $start ± $i·($stepHi + $stepLo) correctly rounded to float

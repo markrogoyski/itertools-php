@@ -130,6 +130,9 @@ final class RangeSteps
 
         // $base = $start ± ($productInt + $small), added in an order that stays within the int range. Past
         // 2^63, $i·$magnitude spans 0, from a $start on the other side of it, so $start ± 2^63 is an int.
+        // The exact product is below 2^64, so $product reaches 2^64 only by rounding up, with $error in
+        // [-1024, 0), and the shift then leaves 2^63, one more than PHP_INT_MAX. That one moves to $small, which
+        // stays negative, since $base is within 1 of a value in the int range: the second sum below takes it.
         $sign = $ascending ? 1 : -1;
         $from = $start;
         $productIntRange = $productInt;
@@ -137,7 +140,13 @@ final class RangeSteps
             $from = $ascending ? $start - \PHP_INT_MIN : $start + \PHP_INT_MIN;
             $productIntRange = $productInt + (float)\PHP_INT_MIN;
         }
-        $whole = (int)$productIntRange;
+        if ($productIntRange >= -(float)\PHP_INT_MIN) {
+            // $product rounded up to 2^64: 2^63 is one more than PHP_INT_MAX, so the one moves to $small.
+            $whole = \PHP_INT_MAX;
+            ++$small;
+        } else {
+            $whole = (int)$productIntRange;
+        }
         $base = $small >= 0
             ? ($from + $sign * $small) + $sign * $whole
             : $from + $sign * ($whole + $small);
