@@ -14,7 +14,12 @@ class InterpolationTest extends \PHPUnit\Framework\TestCase
      */
     public function testNonConvergingRoundingThrows(): void
     {
-        // Given nonoverlapping components whose float sum 2^-52 is far from their value 2^-54 + 2^-53
+        // Given nonoverlapping components whose float sum 2^-52 is far from their value 2^-54 + 2^-53. The nonzero
+        // candidate steps with Ulp::nextFloat(), which reads a float's bits as a 64-bit integer (\unpack('q', …) in
+        // Ulp::floatBits()), so on 32-bit PHP it throws \ValueError instead.
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
         $expansion = [2 ** -54, -(1 - 2 ** -53), 1.0];
 
         // When

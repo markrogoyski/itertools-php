@@ -651,6 +651,56 @@ class ArithmeticTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test integerMidpoint of 32-bit integers whose sum overflows is an int for an even sum, as without overflow
+     * @dataProvider dataProviderForIntegerMidpointThirtyTwoBit
+     * @param int       $lo
+     * @param int       $hi
+     * @param int|float $expected
+     */
+    public function testIntegerMidpointOfAnOverflowingSumThirtyTwoBit(int $lo, int $hi, int|float $expected): void
+    {
+        // Given (only on 32-bit PHP does the sum overflow; on 64-bit PHP these rows take the direct division)
+        if (\PHP_INT_SIZE !== 4) {
+            $this->markTestSkipped('Requires 32-bit integers');
+        }
+
+        // When
+        $result = Arithmetic::integerMidpoint($lo, $hi);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python int arithmetic and fractions.Fraction
+     * (tools/oracles/arithmetic_midpoint_oracles.py):
+     *   (lo + hi) // 2 if (lo + hi) % 2 == 0 else float(Fraction(lo + hi, 2))
+     * keeping only rows with lo and hi in [-2^31, 2^31) whose sum is outside [-2^31, 2^31 - 1], so it
+     * overflows on 32-bit PHP. -2^31 is written (-2147483647 - 1): the literal -2147483648 is a float there.
+     *
+     * @return array<string, array{int, int, int|float}>
+     */
+    public static function dataProviderForIntegerMidpointThirtyTwoBit(): array
+    {
+        return [
+            'positive, even sum' => [2147483645, 2147483647, 2147483646],
+            'positive, odd sum' => [2147483646, 2147483647, 2147483646.5],
+            'positive, even sum, reversed' => [2147483647, 2147483645, 2147483646],
+            'positive, odd sum, reversed' => [2147483647, 2147483646, 2147483646.5],
+            'negative, even sum' => [(-2147483647 - 1), -2147483646, -2147483647],
+            'negative, odd sum' => [(-2147483647 - 1), -2147483647, -2147483647.5],
+            'negative, even sum, reversed' => [-2147483646, (-2147483647 - 1), -2147483647],
+            'negative, odd sum, reversed' => [-2147483647, (-2147483647 - 1), -2147483647.5],
+            '2^31 - 1 with itself' => [2147483647, 2147483647, 2147483647],
+            '-2^31 with itself' => [(-2147483647 - 1), (-2147483647 - 1), (-2147483647 - 1)],
+            'smallest positive overflow, sum 2^31' => [1073741824, 1073741824, 1073741824],
+            'positive overflow, sum 2^31 + 1' => [1073741824, 1073741825, 1073741824.5],
+            'negative overflow, sum -2^31 - 1' => [-1073741824, -1073741825, -1073741824.5],
+            'negative overflow, sum -2^31 - 2' => [-1073741825, -1073741825, -1073741825],
+        ];
+    }
+
+    /**
      * @test integerDifference is the exact difference of two integers
      * @dataProvider dataProviderForIntegerDifference
      * @param int       $a

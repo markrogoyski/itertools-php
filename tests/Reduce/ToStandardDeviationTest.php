@@ -903,6 +903,11 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
      */
     public function testLargeIntsAreExact(array $data, bool $sample, float $expected): void
     {
+        // Given (on 32-bit PHP these integer literals parse as floats, and 2 ** 53 + 1 === 2 ** 53 there)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
         // When
         $result = Reduce::toStandardDeviation($data, $sample);
 
@@ -955,6 +960,11 @@ class ToStandardDeviationTest extends \PHPUnit\Framework\TestCase
      */
     public function testLargeIntsWithinRounding(array $data, bool $sample, float $expected): void
     {
+        // Given (on 32-bit PHP these integer literals parse as floats, and 2 ** 53 + 1 === 2 ** 53 there)
+        if (\PHP_INT_SIZE < 8) {
+            $this->markTestSkipped('Requires 64-bit integers');
+        }
+
         // When
         $result = Reduce::toStandardDeviation($data, $sample);
 

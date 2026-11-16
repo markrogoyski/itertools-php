@@ -972,6 +972,122 @@ class ToQuantileTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @test         toQuantile(0.5) of a array of two 32-bit integers whose sum overflows is identical to toMedian and toPercentile(50)
+     * @dataProvider dataProviderForHalfQuantileOfAnOverflowingThirtyTwoBitSum
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testHalfQuantileMatchesMedianAndPercentileThirtyTwoBitArray(array $data, int|float $expected): void
+    {
+        // Given (only on 32-bit PHP does the sum of the middle values overflow)
+        if (\PHP_INT_SIZE !== 4) {
+            $this->markTestSkipped('Requires 32-bit integers');
+        }
+
+        // When
+        $result = Reduce::toQuantile($data, 0.5);
+
+        // Then
+        $this->assertSame($expected, $result);
+        $this->assertSame($result, Reduce::toMedian($data));
+        $this->assertSame($result, Reduce::toPercentile($data, 50));
+    }
+
+    /**
+     * @test         toQuantile(0.5) of a generator of two 32-bit integers whose sum overflows is identical to toMedian and toPercentile(50)
+     * @dataProvider dataProviderForHalfQuantileOfAnOverflowingThirtyTwoBitSum
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testHalfQuantileMatchesMedianAndPercentileThirtyTwoBitGenerator(array $data, int|float $expected): void
+    {
+        // Given (only on 32-bit PHP does the sum of the middle values overflow)
+        if (\PHP_INT_SIZE !== 4) {
+            $this->markTestSkipped('Requires 32-bit integers');
+        }
+
+        // When
+        $result = Reduce::toQuantile(GeneratorFixture::getGenerator($data), 0.5);
+
+        // Then
+        $this->assertSame($expected, $result);
+        $this->assertSame($result, Reduce::toMedian(GeneratorFixture::getGenerator($data)));
+        $this->assertSame($result, Reduce::toPercentile(GeneratorFixture::getGenerator($data), 50));
+    }
+
+    /**
+     * @test         toQuantile(0.5) of a iterator of two 32-bit integers whose sum overflows is identical to toMedian and toPercentile(50)
+     * @dataProvider dataProviderForHalfQuantileOfAnOverflowingThirtyTwoBitSum
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testHalfQuantileMatchesMedianAndPercentileThirtyTwoBitIterator(array $data, int|float $expected): void
+    {
+        // Given (only on 32-bit PHP does the sum of the middle values overflow)
+        if (\PHP_INT_SIZE !== 4) {
+            $this->markTestSkipped('Requires 32-bit integers');
+        }
+
+        // When
+        $result = Reduce::toQuantile(new ArrayIteratorFixture($data), 0.5);
+
+        // Then
+        $this->assertSame($expected, $result);
+        $this->assertSame($result, Reduce::toMedian(new ArrayIteratorFixture($data)));
+        $this->assertSame($result, Reduce::toPercentile(new ArrayIteratorFixture($data), 50));
+    }
+
+    /**
+     * @test         toQuantile(0.5) of a traversable of two 32-bit integers whose sum overflows is identical to toMedian and toPercentile(50)
+     * @dataProvider dataProviderForHalfQuantileOfAnOverflowingThirtyTwoBitSum
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testHalfQuantileMatchesMedianAndPercentileThirtyTwoBitTraversable(array $data, int|float $expected): void
+    {
+        // Given (only on 32-bit PHP does the sum of the middle values overflow)
+        if (\PHP_INT_SIZE !== 4) {
+            $this->markTestSkipped('Requires 32-bit integers');
+        }
+
+        // When
+        $result = Reduce::toQuantile(new IteratorAggregateFixture($data), 0.5);
+
+        // Then
+        $this->assertSame($expected, $result);
+        $this->assertSame($result, Reduce::toMedian(new IteratorAggregateFixture($data)));
+        $this->assertSame($result, Reduce::toPercentile(new IteratorAggregateFixture($data), 50));
+    }
+
+    /**
+     * Test data generated with Python int arithmetic and fractions.Fraction
+     * (tools/oracles/arithmetic_midpoint_oracles.py), for data = [lo, hi]:
+     *   (lo + hi) // 2 if (lo + hi) % 2 == 0 else float(Fraction(lo + hi, 2))
+     * keeping only rows with lo and hi in [-2^31, 2^31) whose sum is outside [-2^31, 2^31 - 1], so it
+     * overflows on 32-bit PHP. -2^31 is written (-2147483647 - 1): the literal -2147483648 is a float there.
+     * The oracle gives the exact value; its int-vs-float type is the library's contract, not the oracle's.
+     */
+    public static function dataProviderForHalfQuantileOfAnOverflowingThirtyTwoBitSum(): array
+    {
+        return [
+            'positive, even sum' => [[2147483645, 2147483647], 2147483646],
+            'positive, odd sum' => [[2147483646, 2147483647], 2147483646.5],
+            'positive, even sum, reversed' => [[2147483647, 2147483645], 2147483646],
+            'positive, odd sum, reversed' => [[2147483647, 2147483646], 2147483646.5],
+            'negative, even sum' => [[(-2147483647 - 1), -2147483646], -2147483647],
+            'negative, odd sum' => [[(-2147483647 - 1), -2147483647], -2147483647.5],
+            'negative, even sum, reversed' => [[-2147483646, (-2147483647 - 1)], -2147483647],
+            'negative, odd sum, reversed' => [[-2147483647, (-2147483647 - 1)], -2147483647.5],
+            '2^31 - 1 with itself' => [[2147483647, 2147483647], 2147483647],
+            '-2^31 with itself' => [[(-2147483647 - 1), (-2147483647 - 1)], (-2147483647 - 1)],
+            'smallest positive overflow, sum 2^31' => [[1073741824, 1073741824], 1073741824],
+            'positive overflow, sum 2^31 + 1' => [[1073741824, 1073741825], 1073741824.5],
+            'negative overflow, sum -2^31 - 1' => [[-1073741824, -1073741825], -1073741824.5],
+            'negative overflow, sum -2^31 - 2' => [[-1073741825, -1073741825], -1073741825],
+        ];
+    }
+
+    /**
      * @test         toQuantile between integers past 2^53 is correctly rounded and identical to toPercentile
      * @dataProvider dataProviderForLargeIntegerInterpolation
      * @param        array $data

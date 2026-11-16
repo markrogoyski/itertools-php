@@ -616,4 +616,115 @@ class ToMedianTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @test         toMedian array of two 32-bit integers whose sum overflows is an int for an even sum
+     * @dataProvider dataProviderForEvenMedianOfAnOverflowingThirtyTwoBitSum
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testEvenMedianOfAnOverflowingThirtyTwoBitSumArray(array $data, int|float $expected): void
+    {
+        // Given (only on 32-bit PHP does the sum of the middle values overflow)
+        if (\PHP_INT_SIZE !== 4) {
+            $this->markTestSkipped('Requires 32-bit integers');
+        }
+
+        // When
+        $result = Reduce::toMedian($data);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toMedian generator of two 32-bit integers whose sum overflows is an int for an even sum
+     * @dataProvider dataProviderForEvenMedianOfAnOverflowingThirtyTwoBitSum
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testEvenMedianOfAnOverflowingThirtyTwoBitSumGenerator(array $data, int|float $expected): void
+    {
+        // Given (only on 32-bit PHP does the sum of the middle values overflow)
+        if (\PHP_INT_SIZE !== 4) {
+            $this->markTestSkipped('Requires 32-bit integers');
+        }
+        $iterable = GeneratorFixture::getGenerator($data);
+
+        // When
+        $result = Reduce::toMedian($iterable);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toMedian iterator of two 32-bit integers whose sum overflows is an int for an even sum
+     * @dataProvider dataProviderForEvenMedianOfAnOverflowingThirtyTwoBitSum
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testEvenMedianOfAnOverflowingThirtyTwoBitSumIterator(array $data, int|float $expected): void
+    {
+        // Given (only on 32-bit PHP does the sum of the middle values overflow)
+        if (\PHP_INT_SIZE !== 4) {
+            $this->markTestSkipped('Requires 32-bit integers');
+        }
+        $iterable = new ArrayIteratorFixture($data);
+
+        // When
+        $result = Reduce::toMedian($iterable);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @test         toMedian traversable of two 32-bit integers whose sum overflows is an int for an even sum
+     * @dataProvider dataProviderForEvenMedianOfAnOverflowingThirtyTwoBitSum
+     * @param        array     $data
+     * @param        int|float $expected
+     */
+    public function testEvenMedianOfAnOverflowingThirtyTwoBitSumTraversable(array $data, int|float $expected): void
+    {
+        // Given (only on 32-bit PHP does the sum of the middle values overflow)
+        if (\PHP_INT_SIZE !== 4) {
+            $this->markTestSkipped('Requires 32-bit integers');
+        }
+        $iterable = new IteratorAggregateFixture($data);
+
+        // When
+        $result = Reduce::toMedian($iterable);
+
+        // Then
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * Test data generated with Python int arithmetic and fractions.Fraction
+     * (tools/oracles/arithmetic_midpoint_oracles.py), for data = [lo, hi]:
+     *   (lo + hi) // 2 if (lo + hi) % 2 == 0 else float(Fraction(lo + hi, 2))
+     * keeping only rows with lo and hi in [-2^31, 2^31) whose sum is outside [-2^31, 2^31 - 1], so it
+     * overflows on 32-bit PHP. -2^31 is written (-2147483647 - 1): the literal -2147483648 is a float there.
+     * The oracle gives the exact value; its int-vs-float type is the library's contract, not the oracle's.
+     */
+    public static function dataProviderForEvenMedianOfAnOverflowingThirtyTwoBitSum(): array
+    {
+        return [
+            'positive, even sum' => [[2147483645, 2147483647], 2147483646],
+            'positive, odd sum' => [[2147483646, 2147483647], 2147483646.5],
+            'positive, even sum, reversed' => [[2147483647, 2147483645], 2147483646],
+            'positive, odd sum, reversed' => [[2147483647, 2147483646], 2147483646.5],
+            'negative, even sum' => [[(-2147483647 - 1), -2147483646], -2147483647],
+            'negative, odd sum' => [[(-2147483647 - 1), -2147483647], -2147483647.5],
+            'negative, even sum, reversed' => [[-2147483646, (-2147483647 - 1)], -2147483647],
+            'negative, odd sum, reversed' => [[-2147483647, (-2147483647 - 1)], -2147483647.5],
+            '2^31 - 1 with itself' => [[2147483647, 2147483647], 2147483647],
+            '-2^31 with itself' => [[(-2147483647 - 1), (-2147483647 - 1)], (-2147483647 - 1)],
+            'smallest positive overflow, sum 2^31' => [[1073741824, 1073741824], 1073741824],
+            'positive overflow, sum 2^31 + 1' => [[1073741824, 1073741825], 1073741824.5],
+            'negative overflow, sum -2^31 - 1' => [[-1073741824, -1073741825], -1073741824.5],
+            'negative overflow, sum -2^31 - 2' => [[-1073741825, -1073741825], -1073741825],
+        ];
+    }
 }

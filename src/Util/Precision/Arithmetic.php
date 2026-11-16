@@ -262,6 +262,8 @@ final class Arithmetic
      *
      * An overflowing sum means both values share a sign. With 32-bit integers both are within
      * ±2^53, so they convert to floats exactly, their float sum is exact, and halving it is exact.
+     * An even sum then gives the integer, as without overflow: its half lies between the two
+     * values, so it converts back exactly.
      * With 64-bit integers the midpoint's magnitude is at least 2^62, where floats are at least 512
      * apart and the midway points between them are even. The true midpoint m + 0.5 (m its floor)
      * is never one of those midway points, so it rounds like whichever of m and m + 1 is odd, and
@@ -280,7 +282,10 @@ final class Arithmetic
         }
 
         if (\abs($lo) <= 9007199254740992 && \abs($hi) <= 9007199254740992) {
-            return ((float) $lo + (float) $hi) / 2.0;
+            // Reached only with 32-bit integers: the float sum is exact, and so is its half.
+            $half = ((float) $lo + (float) $hi) / 2.0;
+
+            return \floor($half) === $half ? (int) $half : $half;
         }
 
         if ($lo > $hi) {
